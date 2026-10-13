@@ -3424,6 +3424,32 @@ the piece L of the plan for the 32 bits, which has the mend in words):
   program leaves is written into a row of what the command before
   printed.
 
+What a trial of the extender's memory met, DPMI 0500h to 0503h under
+DOS/32A, before the memory of the panels and the texts was taken from
+it (`TODO.md`, "X, the extender's memory on the bench", which has the
+facts row for row and what the piece F9 goes by):
+
+- The extender keeps 16 bytes of its own in front of every block, in
+  the memory itself, and looks at them all at every call for memory,
+  0500h too. A write behind the end of a block ends the program at the
+  next such call, "DOS/32A run-time (6004): extended memory blocks
+  have been corrupted", with the name of the block, which is its
+  address less 16. A scenario that ends so has written behind a block.
+- A block is given with what the memory held, and a block made shorter
+  has the extender's 16 bytes written behind its new end.
+- A toy that asks what is in memory must not have taken and given back
+  blocks there first: the search by halving of `blocks.c` left the
+  extender's 16 bytes at two dozen places, and the first reading of
+  "what a machine that has just started has in its memory" was of
+  those.
+- `harness/trial32/run.py` starts a machine for every file that it is
+  given. Two programs on one machine are one file and steps that type
+  the second at DOS's prompt, `q '"d:\vc\vc" Enter'`, with `--extra`
+  for another file. A capital letter is `Shift+s` in a step.
+- A program that is to be had with little memory is run from
+  `harness/trial32/second.c`, which keeps all of the extender's memory
+  but as much as its keys say.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without

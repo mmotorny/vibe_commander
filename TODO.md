@@ -8747,7 +8747,12 @@ paragraphs of 16: how large a block can be is what DPMI 0500h says is
 free. The system's file keeps the extender's name for each block by
 its address, for 0502h and 0503h. The 640 KB and what hands them out
 go from that file, and the program is that much shorter in the memory;
-its file is not, since they have no value.
+its file is not, since they have no value. What the extender does with
+such blocks was tried on the bench, and "X, the extender's memory on
+the bench" has it with what F9 goes by: above all that 0503h, refused,
+does not say how long a block could be, as DOS's 4Ah does and `Aexec0`
+asks; that a block is given with what the memory held; and that the
+extender ends a program which has written behind the end of a block.
 
 **A command run from the program.** The original gives its memory
 back to DOS around a command and takes it again. The program of 32
@@ -8766,7 +8771,9 @@ program, and any program of that extender. If the first copy kept
 all that the machine has, a second would find no room and leave with
 the original's words for no memory, where the original runs
 (`second-copy`, `start-memory`). That a second copy gets what the
-first has given back is from reading and is what the trial X is for.
+first has given back, and nothing while the first holds all, was seen
+on the bench with toys: "X, the extender's memory on the bench", rows
+17 to 20.
 
 **The 256 files kept while a command runs** (`F21_31` of `enter.c`,
 `enter-many`). Nothing needs them cut any more: a panel keeps its
@@ -8812,11 +8819,11 @@ entry 1 of `DEVIATIONS.md`.
 | g | The tree | 768 directories, a buffer of the main data | The same | `tree-deep` | Nothing to see |
 | h | The files of a panel | 64K, some 2,700, or fewer if the memory is short | 64K, some 2,700, always: a panel has its whole block from the start. The original shows fewer on a machine with little memory | None fills a panel | Covered, as more room. The limit itself is question 3, after the layer |
 | i | The old list while a directory is read, by which the cursor and what is selected are kept | As much of it as the room holds, 64K at the most | The same | | Nothing to see |
-| j | A machine with too little memory | The extender does not load the program, which has the 640 KB in it, and says so in its own words | The program is 640 KB shorter and starts where there is room for two panels and the least of the viewer, some 140 KB; with less, `Init11` fails and the program leaves with the original's words for no memory (`AlocEr`) | None: the bench has 16 MB | Covered: toward the original. Entry 1, "what the program wants of the machine", is written anew |
+| j | A machine with too little memory | The extender does not load the program, which has the 640 KB in it, and says so in its own words: 892,606 bytes above the megabyte, for its two objects | The program is 640 KB shorter, some 237 KB, and the extender loads it where that fits; with less, the extender says so as today, "DOS/32A fatal (4003): not enough extended memory to load application exec", and the program ends with FFh. Loaded, it wants two panels and the least of the viewer besides, some 139 KB; with less, `Init11` fails and the program leaves with the original's words for no memory (`AlocEr`). Some 376 KB in all, where the plan had 140 before X | None: the bench has 16 MB. `harness/trial32/second.c` makes the bench such a machine for the program that it runs | Covered: toward the original. Entry 1, "what the program wants of the machine", is written anew |
 | k | "Program too big to fit in memory", of the system's file | For want of the block below the megabyte that the calls in real mode need | The same | | Nothing changes |
 | l | "Not enough memory to load", a viewer or an editor of another's | For want of DOS's memory | The same | | Nothing changes |
-| m | What a command finds of memory | DOS's whole; none above the megabyte | The same | `command`, by what `mem` prints | Nothing changes, if X finds it so |
-| n | A second copy of the program | Runs, with the 640 KB of its own | Runs, with what the first copy gave back | `second-copy`, `start-memory` | Nothing to see, if X finds it so. If not, it is a question then |
+| m | What a command finds of memory | DOS's whole; none above the megabyte | The same | `command`, by what `mem` prints | Nothing changes. X saw it: `mem` and `above.asm`, run from a toy that holds the largest block of the extender's and from one that has given it back, are told the same, which is what `command`'s patch has today (row 21 of X) |
+| n | A second copy of the program | Runs, with the 640 KB of its own | Runs, with what the first copy gave back. It is loaded behind the first copy's two panels, not right behind the first copy | `second-copy`, `start-memory` | Nothing to see. X saw a second program of the extender get what the first gave back, by 0502h or by 0503h, and none while the first holds all (rows 17 to 20 and 27 of X). The driver of the tests is told the copy's new place, which is F9's |
 | o | The 256 files kept while a command runs | Cut | Cut | `enter-many` | Unchanged in step 2. Question 4, after the layer |
 
 What the scenarios lose by it is what they have lost already: the
@@ -8853,7 +8860,7 @@ lines.
 | Piece | What it changes | Owns | Needs; beside | Right when | Writes down |
 |---|---|---|---|---|---|
 | F0, the net and the record. At work | The data's image at the end of a scenario, of the main data and of the program's blocks by name, and the tool that holds two builds' images against each other. The record of the words, with its test | `harness/`, `CMakeLists.txt` for the test | Nothing | The image of a build against itself is equal; against a build with one byte of the main data written wrongly by hand, it is not. Every golden derived again leaves `harness/goldens/` clean | What differs between two runs of one build, if anything, and how a piece names what it means to change |
-| X, the extender's memory tried | A toy on the bench, of `harness/trial32/memory.c`: what DPMI 0500h says is free of the 16 MB; the largest block taken, given back and taken again, and where it then is; a block made shorter and longer, 0503h, whether it moves and keeps what it held; a second copy of the toy while the first holds the largest block, and while it has given it back; what a command's `mem` prints either way; and by `harness/trial32/calls.asm`, that DOS is asked nothing by any of it | `harness/trial32/` | Nothing; beside F0 and F1 | It has run, and the table of what it found is in this plan | What F9 goes by: whether the room is all that the extender has or leaves some, and whether rows m and n of "What a user would see otherwise" stand |
+| X, the extender's memory tried. **Done**: "X, the extender's memory on the bench" below | A toy on the bench, of `harness/trial32/memory.c`: what DPMI 0500h says is free of the 16 MB; the largest block taken, given back and taken again, and where it then is; a block made shorter and longer, 0503h, whether it moves and keeps what it held; a second copy of the toy while the first holds the largest block, and while it has given it back; what a command's `mem` prints either way; and by `harness/trial32/calls.asm`, that DOS is asked nothing by any of it | `harness/trial32/` | Nothing; beside F0 and F1 | It has run, and the table of what it found is in this plan | What F9 goes by: whether the room is all that the extender has or leaves some, and whether rows m and n of "What a user would see otherwise" stand |
 | F1, three blocks where there was one. The proof | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, with the guard; `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
 | F2, a panel is a pointer. A sweep | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
 | F3, what a dialog is handed. A sweep | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
@@ -8862,7 +8869,7 @@ lines.
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `resident.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
-| F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes of 32 bits; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with the guard and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. A scenario of a file of more than a megabyte, which the editor refuses as the original does | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the answer to question 8 | The scenarios, `second-copy`, `start-memory`, `command` above all; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
+| F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes of 32 bits; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with the guard and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. A scenario of a file of more than a megabyte, which the editor refuses as the original does. By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the answer to question 8 | The scenarios, `second-copy`, `start-memory`, `command` above all; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
 | N0, the finder of the widths | `harness/width.py` of `harness/int16.py`, its record and its test; `bool` in `vc.h`. The rule tried on the files that have no word of the addresses, `string.c`, `format.c`, `digits.c`, `mask.c`, `line.c`, `box.c`, `screen.c`, `mouse.c`, `blank.c`, `misc.c`, some 1,600 lines: their booleans made, every other number of 8 or 16 bits recorded with its kind and its reason, nothing widened | `harness/`, those files, `vc.h` | F3, and the switch's fourth stage for the finder; beside F4 to F8 | The scenarios; the images; the record holds those files | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md` |
 | B1 to B7, the booleans by file, and the record | In its files: each number that is only ever true or false made a `bool`; every other number of 8 or 16 bits recorded with its kind, 1, 3, 4 or 5, and its reason. Nothing is widened and no cut is moved. B1 the panels and the tree (`files.c`, `read.c`, `place.c`, `panel.c`, `info.c`, `drive.c`, `tree.c`, `treebox.c`, `cmdline.c`, `extfile.c`); B2 `main.c`, `keys.c`, `commands.c`; B3 `dialog.c`, `menu.c`, `usermenu.c`, `help.c`, `input.c`, `bars.c`, `window.c`, `system.c`; B4 `enter.c`, `start.c`, `resident.c`, `setup.c` and the setup's four; B5 `copy.c`, `dirfunc.c`; B6 `view.c`, `find.c`; B7 `edit.c` | Its files, and the lines of `vc.h` that declare their functions | N0, F10; side by side | The scenarios; the images equal; clang's three warnings of "Booleans" silent; the record holds its files, and the test of the record fails for a number of them that is not in it | A number that wraps within a user's reach, with what was seen, for the session: it is asked after the layer's design, with question 5 |
@@ -8948,13 +8955,29 @@ What a piece goes by:
     editor's, a copy's, the file search's; one that no scenario uses
     does not show at all.
 12. A second copy of the program, or a command of the same extender,
-    that finds no memory while the first copy holds the room. X tries
-    it before anything rests on it; `second-copy` and `start-memory`
-    hold it afterwards.
-13. The extender's blocks. That a block given back and taken again is
-    had at all after a command has left a program in the memory, and
-    what 0503h does to a block that cannot grow where it is, are from
-    reading. X tries both.
+    that finds no memory while the first copy holds the room. X tried
+    it: it finds none, and its extender ends it with a line of its
+    own, while the first holds the largest block; it gets what the
+    first has given back (rows 17 to 20 of X). `second-copy` and
+    `start-memory` hold it afterwards.
+13. The extender's blocks. What 0503h does to a block that cannot
+    grow where it is, X tried: it moves the block and what it holds,
+    or refuses and leaves it (rows 9 and 10 of X). The room has
+    nothing behind it and does not move. That a block given back is
+    had again after a command has left a program in the memory was
+    not tried: the extender's memory is not DOS's, and `start-memory`
+    is the scenario with such a program.
+14. A write behind the end of a block, found by X (row 25). The
+    extender keeps 16 bytes of its own between two blocks and looks at
+    them at every call for memory: a panel or the room written a byte
+    too far, which the 640 KB of today take without a sign, ends the
+    program at its next `GiveMem` with "DOS/32A run-time (6004):
+    extended memory blocks have been corrupted". The original reads
+    and copies behind the end of things in places, and where one of
+    them writes behind the end of a panel that is 64K whole or behind
+    the room, F9 meets it as a scenario that ends so, with the block
+    named. What the program is then to do there is not F9's to
+    choose: it is handed back and asked.
 
 ### Two opinions, as asked
 
@@ -9022,9 +9045,12 @@ the widening. The recommendation is first.
 
 Everything else that a user would see otherwise by the memory is
 covered by answer 2, as its table has it row for row. Two rows there
-say "if X finds it so": should the trial find that a command or a
-second copy gets less than today, that is a question then, with what
-was seen.
+said "if X finds it so", m and n, and X found it so: a command is
+told of the memory what it is told today, and a second copy runs in
+what the first gave back. What X found besides that a user could
+meet is in row j: a machine with too little memory for the program
+itself is told so by the extender, as today, and only one with room
+for the program and not for its panels by the program.
 
 ### After the layer's design
 
@@ -9077,15 +9103,187 @@ further here than this: the layer names the types first.
 - That no scenario fills a panel, read from the scenarios' names.
 - What `harness/reads.py` needs for the new form of a table handed on:
   its patterns were looked at, not changed.
-- Everything that the plan says of DPMI 0500h to 0503h under DOS/32A
-  but that 0500h and 0501h answer, which the trial of step 1 saw: how
-  much is free of 16 MB, whether a second copy gets what the first
-  gave back, whether DOS is asked anything. X is there for that.
+- What the plan says of DPMI 0500h to 0503h under DOS/32A was a guess
+  and is none any more: X tried it, with what it overturned at the
+  top of its section. Still guessed there: the program as the first
+  of two copies, which only F9 can show; the figures of the program
+  once its 640 KB are gone, worked out from today's objects; and any
+  host of DPMI but the pinned extender.
 - That 1000h paragraphs for a panel from the start change nothing
   that a scenario shows, and that the room of some 511 KB in the 640
   KB after F1 does not either.
 - The figures of the file search's list, worked out from the room and
   not seen.
+
+### X, the extender's memory on the bench: done, and what F9 goes by
+
+The trial of 13 October 2026, with two toys of `harness/trial32/`,
+`blocks.c` and `second.c`, on the bench as it is: QEMU, FreeDOS, 16
+MB, the pinned DOS/32A, which answers 090Ch for its version, as the
+stub of each toy, and no XMS driver unless a row says so. Nothing of
+the program changed. Each row has the run that showed it; the steps
+are those of `harness/trial32/run.py`, and `blocks` and `second` stand
+for `build/trial32/blocks-d32.exe` and `build/trial32/second-d32.exe`.
+
+**What it overturns, or adds, of the plan as it stood:**
+
+1. *The program does not start in some 140 KB.* The extender loads
+   the program's two objects into the same memory that 0501h hands
+   out, and refuses in its own words when they do not fit. 140 KB is
+   what `Init11` will ask for behind that. With the 640 KB gone the
+   objects are some 237 KB (892,606 bytes today, less 655,360), so
+   the program wants some 376 KB above the megabyte, and a machine
+   with less is told so by two hands: below the 237 KB by the
+   extender, "DOS/32A fatal (4003): not enough extended memory to load
+   application exec", and the program ends with FFh; between that and
+   376 KB by the program, with the original's words. Row j is written
+   anew.
+2. *A write behind the end of a block ends the program.* The extender
+   keeps 16 bytes in front of every block, in the memory itself, and
+   looks at all of them at every call of 0500h to 0503h. With those of
+   one block overwritten, the next such call does not come back: "DOS/32A
+   run-time (6004): extended memory blocks have been corrupted
+   (#address)", and the program is at DOS's prompt. In the 640 KB of
+   today such a write lands in the next block or in nothing and is
+   not noticed. 14 of "What could go wrong".
+3. *0503h refused says nothing of how long the block could be*, where
+   DOS's 4Ah answers that in BX and `Aexec0` of `view.c` asks for
+   0FFFFh paragraphs to learn it. What F9 does in its place is below.
+4. *A block is given with what was in the memory*, not zeros: what the
+   program had there before it gave the block back, what a second
+   copy left, what the program before left. That is what the original
+   has of DOS, and the 640 KB of today have not (item 12 of "The
+   program of 32 bits: what differs from the original"): toward the
+   original, and a thing that F9 declares away from entry 1, not into
+   it.
+5. *The second copy is elsewhere*, which the driver of the tests has
+   to be told: see the last row.
+
+Everything else that the plan says of the extender's memory stood up.
+Rows m and n are as the plan expected, and say so now.
+
+| | What | How it was seen |
+|---|---|---|
+| 1 | 0500h says how much the largest block is that 0501h gives, to the byte: that many bytes are given, one more is refused with the carry and 8013h in AX. It is all that there is in one piece: FE0000h, where the BIOS's 15,232K end, less where the program's objects end, less 16. 15,574,416 bytes for `blocks`, 15,577,232 for `second`; for the program some 15.36 million once the 640 KB are gone | `blocks f l`: "0500h says 00EDA590", "the largest that 0501h gives is 00EDA590 bytes; one more is refused", "taken: at 00105A70" |
+| 2 | 0500h's other numbers: EDFh pages of memory, EDAh free and as many not locked and locked; no paging file, FFFFFFFFh. There is no paging: an address is the memory's own | `blocks f` |
+| 3 | With an XMS driver, FreeDOS's HimemX, everything below is the same, 162,816 bytes further up and with as many fewer: 15,411,600 for `blocks` | `run.py --himem`, `blocks f l r g`, `second m t m a c s c b c` |
+| 4 | With the largest block taken nothing is left: 0500h says 0, and a block of one byte is refused, 8013h. DOS's memory is not touched by any of it: its largest block is 6CF9h paragraphs before and meanwhile | `blocks l` |
+| 5 | A block is at an address that is a multiple of 16, and its length is taken up to a multiple of 16. In front of it are 16 bytes of the extender's: 12345678h, the length with the highest bit set while it is taken, 0, 12345678h. The name that 0501h answers in SI:DI is the address of those, the block's address less 16, in every block seen. Blocks follow one another with nothing but those 16 bytes between: 1 byte asked for at 00105A70, 17 at 00105A90, 4,096 at 00105AC0, 4,097 at 00106AD0, 65,536 at 00107AF0. Nothing is on a page | `blocks a`, and `w` for the 16 bytes |
+| 6 | A block is taken at the lowest place that holds it. One that was given back is given again at the same place, if nothing lower has become free meanwhile | `blocks l`: "taken again: at 00105A70"; `g`: with 1 MB at 00105A70 given back, 512 KB are taken there, 512 KB less 16 bytes right behind them, and 1 MB behind everything |
+| 7 | What 0500h says is the largest free piece, not the sum: four blocks given back in front of a fifth leave it as it was, and the fifth makes it whole again | `blocks a` |
+| 8 | 0503h with nothing behind the block: longer and shorter in its place, the name the same, what it held kept. It grows to its length and what 0500h says and 16 bytes, and not a byte beyond | `blocks r`: 1 MB at 00105A70 made 2 MB and 512 KB, there; `x`: "made as long as what is free, 16 bytes more: at 00115A80 ... free 00000000", and with 17 refused |
+| 9 | 0503h with a block behind it and not room enough before that: the block moves to the lowest place that holds the new length, with another name, and holds there what it held; where it was is free. Made shorter it stays | `blocks r`: 512 KB at 00105A70 with 4 KB behind them, made 1 MB, are at 00186A90, their 512 KB still 5Ah |
+| 10 | 0503h refused, for more than there is: the carry and 8013h, and the block is where it was, as long as it was, with what it held. Nothing says how long it could have been | `blocks r`: "made a megabyte longer than there is: refused, AX 8013", and its 256 KB are still 5Ah; `x` |
+| 11 | Made shorter, a block has 16 bytes of the extender's written right behind its new end, for the free piece that follows. Made longer again it has those where it had its own. DOS does the same to a block of its own, so the original has that too | `blocks x`: 1 MB of 5Ah made 8 KB, given back, and taken with all that is free: "of 00100000 bytes 00000010 are not 5A, from 00117A80 to 00117A8F: 12345678" |
+| 12 | A block is given with what the memory held. One that was written, given back and taken again has what was written; one that was moved leaves its bytes where it was | `blocks g`: "512 KB: at 00105A70 ... of 00080000 bytes 00000000 are not C3", the C3h that the megabyte given back had been filled with |
+| 13 | So has a program that is started later, of what an earlier one wrote: the largest block filled with A5h by a toy that then ended is A5h to the next toy, every byte | `blocks d q '"d:\vc\vc" Enter' z`, one machine: "of 00EDA590 bytes 00EDA590 are not 00, from 00105A70 to 00FDFFFF: A5A5A5A5" |
+| 14 | On a machine that has just started, the largest block is zeros but for 76,425 bytes between 00FA2F10h and 00FBFFFBh, in the last 250 KB of it: what the machine's start left there. A room of a megabyte right behind the program is zeros at every scenario's start, as the 640 KB are; a room of all that there is would not be | `blocks z` as the first step: "of 00EDA590 bytes 00012A89 are not 00, from 00FA2F10 to 00FBFFFB". Not behind `l`, which leaves the extender's 16 bytes wherever a block of its halving ended |
+| 15 | What a file does not hold of a program's objects the extender clears as it loads the program: `zero.c`, run on the machine where the toy before had filled that memory with A5h, finds its 200,000 bytes all 0. The trial of step 1 had left that open | `--extra VC/Z.EXE=build/trial32/zero-d32.exe`, `blocks d q '"d:\vc\z" Enter'` |
+| 16 | DOS is asked nothing by 0500h, 0501h, 0502h or 0503h. Of the calls that DOS gets while the toy runs, as `calls.asm` writes them down, none lies between the two with 30h that the toy makes around each key's work, but the one 48h that the toy asks itself, for DOS's largest block | `run.py --name VC.COM --extra VC.EXE=build/trial32/blocks-d32.exe --keep build/trial32/calls build/trial32/calls.com f l a r x g z h q`, then `listed.py build/trial32/calls.D.img`: 51 calls, the pairs `3000` with B0xxh and E0xxh in BX one behind the other |
+| 17 | A program of the same extender that is run while the first has the largest block: its extender finds no memory, writes "DOS/32A fatal (4003): not enough extended memory to load application exec" with the file's name, and ends it with FFh. 4Bh itself comes back without the carry. So the room has to be given back, or made short, before anything of the extender's kind is run, as the plan has it | `second t c`: "came back: carry 0 AX 4B00, ended with 00FF; free 00000000" |
+| 18 | What the first gives back the second gets, whichever way it was made free. With the block made 68 KB shorter by 0503h, a copy of the toy is loaded into that, at 00FCF43Ch, and is told that 48 KB are free, which are the rest of it. With the block given back by 0502h, the copy is right behind the first toy and is told 15,192 KB, all but itself | `second t c 1 c s c b c` |
+| 19 | When the second ends, the first has free what it had, whether the second gave its blocks back or not: the copy takes the largest block and ends with it | The same run: "free 00010FF0" in front of the copy and behind it |
+| 20 | The program of the portable C as the second, in what a toy leaves it: with 888,816 bytes free the extender refuses it as in row 17, with 892,912 it runs, to its panels and to F10. Its objects are 892,606 bytes: it wants those, and at most 306 more | `--extra VC.EXE=build/portable_c/VC.EXE`, `second t`, 13 of `s`, 9 of `1`, `p F10 Enter 1 p F10 Enter` |
+| 21 | What a command is told of the memory is the same whether the program that runs it holds the largest block, has given it back, or has taken nothing. `mem`: `Extended (XMS) 15,360K 15,360K 0K`, `Total memory 16,384K`, which are the two rows of `command`'s patch as it is. `above.asm`: 88h answers 0, E801h and E820h are refused, the clock's memory has 3C00h, no XMS, no DPMI: the table of C2. With an XMS driver, 15,232K, all of it used, either way | `--extra VC/ABOVE.COM=build/trial32/above.com`, `second m a t m a b t Shift+s m a`; the same with `--himem` |
+| 22 | When a program ends, by itself, with blocks taken, the next has all: 0500h says to a toy started behind one that kept the largest block what it said to that one | `blocks h q '"d:\vc\vc" Enter' f`, one machine |
+| 23 | When DOS ends a program by another's hand with a block taken, the same: the toy as `T.EXE` keeps the largest block and idles, `ended.asm` has DOS end it, and `memory.c` run from DOS's prompt is told 00EDB650h, what it is told on a machine that has run nothing | `run.py --name VC.COM --extra VC/T.EXE=build/trial32/second-d32.exe --extra VC/M.EXE=build/trial32/memory-d32.exe build/trial32/ended.com '"d:\vc\m" Enter'` |
+| 24 | And the same of a second program inside a first: the first has given 64 KB back, `ended.asm` is run from it and runs `T.EXE`, which takes what there is, and DOS ends that. The first has its 64 KB free again, and a copy run next is where `T.EXE` was | `--extra VC/ENDED.COM=build/trial32/ended.com --extra VC/T.EXE=build/trial32/second-d32.exe`, `second t s e f c` |
+| 25 | A write of 16 bytes behind the end of a block, where the next block's 16 bytes are: the next call, which was 0500h, does not come back. "DOS/32A run-time (6004): extended memory blocks have been corrupted (#001068B0)", the number being the name of the block whose bytes they were, and DOS's prompt | `blocks w` |
+| 26 | 0502h for a block that was given back already is not refused: no carry | `blocks r`, its last line |
+| 27 | With two blocks of 64 KB kept by the first, as the two panels will be while a command runs, and the largest block behind them given back, the second is loaded 20020h further up than with nothing kept: twice a panel and its 16 bytes | `second c k t b c`: the copy's code at 0010539C and then at 001253BC |
+
+**Rows m and n.** m stands: row 21. n stands: rows 17 to 20 and 24,
+with toys for the first copy and the program itself for the second.
+What no toy can show is the program as the first copy; `second-copy`
+and `start-memory` hold that when F9 has made it.
+
+**For question 8**, the guard of the room, which is asked with what
+this found. Nothing here speaks against the guard or for it by
+itself. Under it the room is a megabyte of the bench's 15, so 14 are
+free behind it at all times; without it, as with a machine of little
+memory, the room is all that there is and nothing of the extender's
+kind runs until it is given back (row 17), which the program does
+around every command anyway. And a room of all that there is has in
+its last 250 KB what the machine's start left there (row 14), where a
+room of a megabyte is zeros at a scenario's start: of no weight unless
+a scenario reads the room that far before it has written it.
+
+**What was not tried.** A block taken again after a command has left
+a program of DOS's in the memory (13 of "What could go wrong"): the
+extender's memory is not DOS's and DOS is asked nothing (rows 4 and
+16), so nothing was expected and nothing was run; `start-memory` is
+the scenario that has such a program. A block that can grow neither
+where it is nor anywhere in one piece, with free pieces on both sides
+of it. Memory with holes in it, as a machine with more than 16 MB may
+have. Another version of DOS/32A than the pinned one, and any other
+host of DPMI: the 16 bytes, the names and the message of row 25 are
+this extender's, and nothing of DPMI promises them.
+
+**What F9 goes by:**
+
+- *How large a block can be* is the first number of 0500h, and 0501h
+  gives exactly that. Then nothing is left at all (row 4): no later
+  call of 0501h can be met while the room is the largest block, by
+  the program or by a second one.
+- *The order makes the room the last block*: the two panels first,
+  then the room. A block with nothing behind it is made shorter and
+  longer where it is (row 8), and given back and taken again it is
+  where it was (row 6). So no pointer into the room goes stale on the
+  bench by `GiveMem`, `TakeMem` or `Aexec0`. That is this extender's
+  way and not DPMI's promise: 0503h answers with an address, and the
+  code takes that address, whatever it is.
+- *As long as it goes.* `Aexec0` and `TakeMem` learn the most that a
+  block can be by asking DOS for too much. 0503h does not answer that
+  (row 10). Two ways that were both seen to work: make the room
+  as long as it is and what 0500h says and 16 bytes (row 8), which
+  rests on the 16 bytes and on the free piece behind the room being
+  the largest; or give the room back and take what 0500h then says,
+  which rests on neither, lands where the room was (row 6) and leaves
+  what it held but the 16 bytes of row 11. The second is the one to
+  write. Either way the function of `sys.h` that makes a block longer
+  can no longer answer "the largest" when it is refused, unless the
+  system's file works it out by the first way: that is the one place
+  where F9 changes what the three functions are asked, and not only
+  their unit.
+- *The name of a block* is kept with its address, in the system's
+  file, for each of the three blocks. That it is the address less 16
+  here (row 5) is not to be counted on.
+- *Around a command* the room is given back whole, or made as short
+  as the least of the viewer for another's viewer, and whatever is
+  then run of the extender's kind lives in it (rows 17 to 19). A
+  second copy of the program wants the first to have free, behind its
+  two panels, the second's objects, its two panels and the least of
+  its viewer: some 376 KB with the figures of today.
+- *The end.* The extender takes back what a program holds when the
+  program ends, by itself or by DOS's hand (rows 22 to 24). Nothing
+  has to be given back for the memory's sake when the program leaves.
+- *What is in a block* is what was there (rows 12 to 14). On the
+  bench, at a scenario's start, that is zeros in the megabyte behind
+  the program, as today; behind a command of the program it is what
+  the room held before, as today; behind a second copy it is what the
+  copy left, where today the first copy's 640 KB are untouched by the
+  second. The images of F0 will differ there, in the room and not in
+  the main data.
+- *The 16 bytes.* A write behind the end of a panel or of the room,
+  or in front of one, ends the program at its next call for memory
+  (row 25). The scenarios then hold every scenario to it, which is a
+  net that the 640 KB never were; and a scenario that ends in
+  "run-time (6004)" names the block. A read behind the end reads the
+  16 bytes and then the next block, where in the 640 KB it read the
+  next block at once: 14 of "What could go wrong".
+- *The driver of the tests* knows the second copy's place by
+  `behind()` of `harness/le.py`, which has it right behind the first
+  copy's objects. With two panels kept between, of 10000h bytes each,
+  it is 20020h further (row 27). `second-copy`, `start-memory`,
+  `comspec`, `ended`, `start-setup` and `start-screen` start such a
+  copy.
+- *A machine with little memory* can be had on the bench as it is,
+  for the words of `AlocEr` and for row j: `second.c` keeps all but as
+  much as its keys say and runs the program in the rest, `second t`,
+  some `Shift+s`, `s` and `1`, then `p` (row 20).
+- *DOS is asked nothing* (row 16): entry 6 of `DEVIATIONS.md` loses
+  nothing and gains nothing by it, and `calls.asm` with `listed.py`
+  holds F9 to that.
 
 ## An implementation of the layer for tests: future work
 
