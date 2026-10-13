@@ -37,6 +37,9 @@
 #define FLARE_3 6
 #define FLARE_4 3
 
+#define NO_CURSOR 0x2000                /* a shape of the cursor that does
+                                           not show */
+
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
@@ -44,7 +47,7 @@
    original tells Windows too, and DESQview: see DEVIATIONS.md. */
 void LeaveTm(void)
 {
-    Int28();
+    Idle();
 }
 
 /* A random number below `limit`, which is 255 at the most: the high word
@@ -58,21 +61,15 @@ static u16 Below(u16 limit)
 }
 
 /* Write a character on the display, at a row and a column, the row in
-   the high byte of `place`, in a colour of the program's. The BIOS is
-   asked for the page that is shown first; `regs` has the registers as it
-   left them the last time. */
-static void Star(struct BiosRegs STACK *regs, u16 place, u16 look,
-                 u16 color)
+   the high byte of `place`, in a colour of the program's. The system is
+   asked for the page that is shown first, and the cursor goes to the
+   place. */
+static void Star(u16 place, u16 look, u16 color)
 {
-    regs->ax = 0x0F00;
-    Int10(regs);
-    regs->dx = place;
-    regs->ax = 0x0200 | regs->ax & 0xFF;
-    Int10(regs);
-    regs->bx = regs->bx & 0xFF00 | Color(color);
-    regs->cx = 1;
-    regs->ax = 0x0900 | look;
-    Int10(regs);
+    u16 page = ScreenState().page;
+
+    CursorTo(page, place);
+    ScreenFill(page, look, Color(color), 1);
 }
 
 /* Blank the screen and show the sky, until a key is pressed, which is
@@ -91,40 +88,25 @@ static void Star(struct BiosRegs STACK *regs, u16 place, u16 look,
    kept as a byte. */
 void Blank(void)
 {
-    struct BiosRegs regs;
     struct STAR *star;
     struct Mouse pointer;
-    u16 shape, cursor;                  /* the cursor's, to put it back */
+    struct CursorAt cursor;             /* the cursor's, to put it back */
     u16 mouse;                          /* where the mouse is, last seen */
     u16 held;                           /* Shift, Ctrl, Alt and the locks */
     u16 ticks = 0;                      /* the timer's, at the last turn */
     u16 place, clock, number, kind, mode, look, vacant, now, i;
 
     CurMous(0);
-    regs.ax = 0x0F00;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.dx = 0;
-    Int10((struct BiosRegs STACK *)&regs);
-    regs.ax = 0x0300 | regs.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&regs);
-    shape = regs.cx;
-    cursor = regs.dx;
-    regs.cx = 0x2000;                   /* no cursor */
-    regs.ax = 0x0100 | regs.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&regs);
-    regs.cx = 0;                        /* the screen empty, as a window
-                                           scrolled by all its rows */
-    regs.dx = (u16)(u8)(md.Lines - 1) << 8 | 79;
-    regs.bx = Color(Sky1_C) << 8 | regs.bx & 0xFF;
-    regs.ax = 0x0600;
-    Int10((struct BiosRegs STACK *)&regs);
+    cursor = CursorWhere(ScreenState().page);
+    CursorShape(NO_CURSOR);
+    /* The screen empty, as a window scrolled by all its rows. */
+    ScreenScroll(0, 0, Color(Sky1_C), 0, (u16)(u8)(md.Lines - 1) << 8 | 79);
     for (i = 0; i < NmbStrs; i++) {
         md.Stars[i].StarMod = 0;
         md.Stars[i].StarPos = 0;
     }
     mouse = GetMous(0).place;
-    held = Int16(0x200).key & 0xFF;
+    held = KeysHeld();
 
     for (;;) {
         /* Blnk01: a star comes out. */
@@ -151,7 +133,7 @@ void Blank(void)
             goto older;
         md.Stars[vacant].StarMod = kind << 8 | clock;
         md.Stars[vacant].StarPos = place;
-        Star((struct BiosRegs STACK *)&regs, place, md.StarTab[0], Sky1_C);
+        Star(place, md.StarTab[0], Sky1_C);
 
     older:
         /* Blnk05: every star a turn older. One of the kind 0 flares up
@@ -189,16 +171,16 @@ void Blank(void)
                 }
             }
         shown:                                  /* Blnk08 */
-            Star((struct BiosRegs STACK *)&regs, place, look, Sky2_C);
+            Star(place, look, Sky2_C);
         }
 
         /* Blnk10: until the timer ticks. */
         for (;;) {
-            if (Int16(0x100).none == 0) {
-                Int16(0);                       /* Blnk13 */
+            if (KeyWaiting().none == 0) {
+                KeyRead();                      /* Blnk13 */
                 goto wake;
             }
-            now = Int16(0x200).key & 0xFF;
+            now = KeysHeld();
             i = held & 0xF0 ^ now;
             held = now;
             if (i != 0)
@@ -219,13 +201,7 @@ void Blank(void)
     }
 
 wake:                                           /* Blnk14 */
-    regs.ax = 0x0F00;
-    Int10((struct BiosRegs STACK *)&regs);
-    regs.dx = cursor;
-    regs.ax = 0x0200 | regs.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&regs);
-    regs.cx = shape;
-    regs.ax = 0x0100 | regs.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&regs);
+    CursorTo(ScreenState().page, cursor.place);
+    CursorShape(cursor.shape);
     CurMous(1);
 }
