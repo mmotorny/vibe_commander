@@ -149,9 +149,7 @@ These held while `src/c/` was made, and they say what it is.
      that opens whatever fits, is declared. The widening is of this
      step and does not wait for the layer: the pointers first, then
      the booleans and the widths together, with the reason written
-     down for every number that stays 16 bits, and a named type for
-     what crosses to the system, a size of a file or a count of bytes
-     read, so that the layer can say later how wide that is. A limit
+     down for every number that stays 16 bits. A limit
      of the original that goes when a number is widened is a
      deviation, and each is asked as the work comes to it. For an hour
      of that day the widening was put behind the layer's design: the
@@ -263,6 +261,15 @@ These held while `src/c/` was made, and they say what it is.
   rest of it does not know which system that is. Today that place is
   `sys.h`, with `dos32.c` behind it, the one file of the system's
   functions since the 16-bit build went.
+- No name is given to an integer type for what a number means, on the
+  user's word of 13 October 2026: C holds such a name apart from
+  nothing, a `Colour` that is a `u16` is taken wherever a `u16` is, so
+  the name is a comment that looks like a type. A number has the type
+  of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`; what it is,
+  its name and a comment say. That holds for what crosses to the
+  system as well, the size of a file or a count of bytes: it is a
+  `u32` until the layer's design says what it is. Where the compiler
+  is to hold two things apart, they are structures.
 - Names may change here once a thing no longer is what its name in the
   assembly says. The C translation keeps the old names, and a comment at
   the new name says what it was.
