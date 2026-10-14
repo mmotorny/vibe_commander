@@ -175,7 +175,7 @@ void PutInf(struct WCBdef *panel)
             if (i == LF_CR || i == CR_LF)
                 break;
             text--;
-            if (MD_PLACE(text) > (u16)(MD_PLACE(md.InfBuf) + md.InfoLen))
+            if (text > md.InfBuf + md.InfoLen)
                 break;
             if (room == 0)
                 continue;
@@ -190,7 +190,7 @@ void PutInf(struct WCBdef *panel)
             cell += 2;
             room--;
         }
-        if (MD_PLACE(text) > (u16)(MD_PLACE(md.InfBuf) + md.InfoLen))
+        if (text > md.InfBuf + md.InfoLen)
             break;
         screen += 80;
     } while (--lines);

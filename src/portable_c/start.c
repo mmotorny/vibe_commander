@@ -603,7 +603,7 @@ void IniData(void)
     md.BlocEr = 0;
     md.TstEGA = 0;
     md.WinMous = 0;
-    md.HstAdr = MD_PLACE(md.HstBuf);
+    HistoryPlace = md.HstBuf;
     md.BarPrev = 0xFF;
     if (ScreenEga())                    /* TstEGA */
         md.TstEGA = 1;

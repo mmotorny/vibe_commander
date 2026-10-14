@@ -117,7 +117,8 @@ static struct Left Leaves(u16 bx, u16 dx)
 }
 
 /* Move the cursor of a panel of files or of the tree to the entry at the
-   address `cursor`, with the entry at `first` the first one shown, if
+   offset `cursor`, in the panel or in the tree's list (TREE_OFFSET of
+   vc.h), with the entry at `first` the first one shown, if
    that leaves the cursor among those shown, and put on the screen what
    has changed: the two entries, the status line below them, and the
    entries shown if they are others. Where they have moved by one, the
@@ -145,8 +146,8 @@ struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first)
         cursor = panel->CurAdr;
     } else {
         step = sizeof(struct DIRENT);
-        first = md.TreFrst;
-        cursor = md.TreAdr;
+        first = TREE_OFFSET(TreeFirst);
+        cursor = TREE_OFFSET(TreeCursor);
         if (was.cursor != cursor)
             md.FlagCD = 1;
     }
@@ -163,8 +164,14 @@ struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first)
             Window(left.bx, left.dx);
             return left;
         }
-    } else if (was.cursor == cursor)
+    } else if (was.cursor == cursor) {
+        /* Of the tree the original leaves the two addresses in the main
+           data, neither of which is ever 0, and Rename goes by whether
+           the two are: the offsets in the list are both 0 at the root. */
+        if (panel->WinTyp != 0)
+            return Leaves(MD_PLACE(TreeFirst), MD_PLACE(TreeCursor));
         return Leaves(first, cursor);
+    }
     left = Leaves(first, cursor);
 
     /* The cursor goes from where it was, on the screen as it is. */

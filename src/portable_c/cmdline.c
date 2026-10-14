@@ -9,8 +9,8 @@
  * The command line is DosBuf, a text of up to 123 characters, with the
  * column of its cursor in DosCol. The history is HstBuf: the commands
  * that were run, each with its zero byte, the latest first, behind a zero
- * byte that stands for the empty line; HstAdr is where in it Ctrl+E and
- * Ctrl+X have got to.
+ * byte that stands for the empty line; HistoryPlace is where in it
+ * Ctrl+E and Ctrl+X have got to.
  */
 #include "vc.h"
 
@@ -273,7 +273,7 @@ F68_03:
     lines = (u8)((size >> 8) - 5);
     at = 0;
 F68_04:
-    if (MD_PLACE(text) <= md.HstAdr)
+    if (text <= HistoryPlace)
         at++;
     room = width;
     i = 0;
@@ -403,24 +403,25 @@ F68_20:                                 /* the box goes */
    `panel` or in the tree, and put the cursor there: F77_10. */
 static void F77_10(u16 key, struct WCBdef *panel)
 {
-    u16 segment, at, first, begin, end, step, found;
+    const u8 *list;
+    u16 at, first, begin, end, step, found;
 
     if (panel->WinTyp == 0) {
-        segment = SEG_OF(panel);
+        list = (const u8 *)panel;
         at = panel->CurAdr;
         first = panel->First;
         end = panel->EndBuf;
         begin = DSKBUF;
         step = sizeof(struct FILENT);
     } else {
-        segment = MAIN_SEG;
-        at = md.TreAdr;
-        first = md.TreFrst;
-        begin = TRELIST;
-        end = (((struct DIRTREE *)md.TreeBuf)->TreeLen << 4) + begin;
+        list = (const u8 *)TRELIST;
+        at = TREE_OFFSET(TreeCursor);
+        first = TREE_OFFSET(TreeFirst);
+        begin = 0;
+        end = ((struct DIRTREE *)md.TreeBuf)->TreeLen << 4;
         step = sizeof(struct DIRENT);
     }
-    found = Search(segment, at, begin, end, step, key);
+    found = Search(list, at, begin, end, step, key);
     if (found != at)
         F00_50(panel, found, first);
 }

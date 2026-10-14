@@ -185,7 +185,7 @@ void AlocEr(u16 bx)
     Exit00(1);
 }
 
-/* Run the commands that DosBuf holds from BatAdr on, one after the
+/* Run the commands that DosBuf holds from NextCommand on, one after the
    other: each ends with a zero byte, and behind the last there is one
    more. A command that begins with `@`, behind another, is run without
    being shown first, with a prompt, as the others are. Returns when
@@ -216,11 +216,11 @@ static void Exec02(void)
 
     for (;;) {
         SetBreakCheck(md.BreakFl);
-        command = MD_POINTER(md.BatAdr);
+        command = NextCommand;
         before = command - 4;
         for (end = command; *end++ != 0; )
             ;
-        md.BatAdr = MD_PLACE(end);
+        NextCommand = end;
         for (end = command, count = LenCmd; count; count--)
             if (*end++ == 0)
                 break;
@@ -247,11 +247,11 @@ static void Exec02(void)
             if (NotFind(FnFil_S, name)) /* Exec06 */
                 return;
         }
-        command = MD_POINTER(md.BatAdr);        /* Exec07 */
+        command = NextCommand;          /* Exec07 */
         if (*command == 0)
             return;
         if (*command == '@') {
-            md.BatAdr++;
+            NextCommand++;
             continue;
         }
         /* Exec08: the prompt, and the command behind it. BX is the
@@ -271,9 +271,9 @@ static void Exec02(void)
         }
         *to++ = '>';                    /* Exec09 */
         *to = 0;
-        bx = WAS(md.BatAdr);
+        bx = WAS(MD_PLACE(NextCommand));
         OutStr0(PromptLine, bx);
-        OutStr0(MD_POINTER(md.BatAdr), bx);
+        OutStr0(NextCommand, bx);
         ScreenType(0x0D, bx >> 8, bx);
         ScreenType(0x0A, bx >> 8, bx);
     }
@@ -298,7 +298,7 @@ static void Exec10(void)
    but the part that this is of, if the program is set up so. */
 void Exec(void)
 {
-    md.BatAdr = MD_PLACE(md.DosBuf);    /* Exec01 */
+    NextCommand = md.DosBuf;            /* Exec01 */
     Exec02();
     Exec10();
 }

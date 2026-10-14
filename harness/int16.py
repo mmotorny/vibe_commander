@@ -191,7 +191,7 @@ OFFSETOF = ("-Doffsetof(type,field)="
 # of them, to hold this to.
 WORDS = {"ARENA", "MAIN_SEG", "AT", "SEG_OF", "OFFSET_IN_SEG",
          "MAIN_AS_PANEL", "PANEL_AS_MAIN", "NUMBER_OF", "NEAR", "MD_PLACE",
-         "MD_POINTER", "PLACE"}
+         "MD_POINTER", "TREE_OFFSET", "TREE_ENTRY", "PLACE"}
 
 # The kinds, in the order of the summary: the name that the record has
 # for each, and what is done there with a number that the two builds may

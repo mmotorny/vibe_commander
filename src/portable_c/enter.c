@@ -413,9 +413,9 @@ static struct Onward ChDir(struct WCBdef *panel, const u8 *path)
     return To(NEXT_INIT50);
 }
 
-struct Onward F24_01(struct WCBdef *panel, u16 path)
+struct Onward F24_01(struct WCBdef *panel, const u8 *path)
 {
-    return ChDir(panel, MD_POINTER(path));
+    return ChDir(panel, path);
 }
 
 /* ^\: the root of the current drive. */
@@ -459,7 +459,7 @@ static void F27_07(const u8 *text, u16 cursor)
    F27_06. */
 static void F27_06(const u8 *entry)
 {
-    md.HstAdr = MD_PLACE(entry);
+    HistoryPlace = entry;
     md.DosBuf[0] = 0;
     md.DosBuf[1] = 0;
     F27_07(entry, 0);
@@ -469,7 +469,7 @@ static void F27_06(const u8 *entry)
    command line has from the history, if there is one. */
 struct Onward F25_00(void)
 {
-    const u8 *entry = MD_POINTER(md.HstAdr);
+    const u8 *entry = HistoryPlace;
     u16 count = 256;
     u8 c;
 
@@ -477,7 +477,7 @@ struct Onward F25_00(void)
         c = *entry++;
     while (--count && c != 0);
     if (*entry == 0)
-        entry = MD_POINTER(md.HstAdr);
+        entry = HistoryPlace;
     F27_06(entry);
     return To(NEXT_FUNC05);
 }
@@ -486,24 +486,24 @@ struct Onward F25_00(void)
    last one run an empty line. */
 struct Onward F26_00(void)
 {
-    u16 entry = md.HstAdr - 1;
+    const u8 *entry = HistoryPlace - 1;
     u16 count = 256;
     u8 c;
 
-    if (entry >= MD_PLACE(md.HstBuf)) {
-        if (entry == MD_PLACE(md.HstBuf)) {
-            F27_06(MD_POINTER(entry));
+    if (entry >= md.HstBuf) {
+        if (entry == md.HstBuf) {
+            F27_06(entry);
             return To(NEXT_FUNC05);
         }
         entry--;
         do {
-            c = *MD_POINTER(entry);
+            c = *entry;
             entry--;
         } while (--count && c != 0);
         entry++;
     }
     entry++;
-    F27_06(MD_POINTER(entry));
+    F27_06(entry);
     return To(NEXT_FUNC05);
 }
 
@@ -523,7 +523,7 @@ struct Onward F27_00(struct WCBdef *panel)
 
     if (md.DosBuf[0] == 0)
         goto F27_05;
-    entry = MD_POINTER(md.HstAdr);
+    entry = HistoryPlace;
     if (cursor != 0) {
         c = md.DosBuf[cursor - 1];
         if (CmpSym(c) || c == '@')

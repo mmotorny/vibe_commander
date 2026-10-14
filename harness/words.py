@@ -125,7 +125,12 @@ WORDS = [
                             "number: F4 to F8, by file"),
     _word("MD_POINTER", "F8", "and the number made the pointer again"),
     # What stays.
-    _word("TRELIST", None, "the tree's list: a pointer from F7 on"),
+    _word("TRELIST", None, "the tree's list: a pointer since F7"),
+    _word("TREE_OFFSET", None, "an entry of the tree's list as an offset "
+                               "in it, where one routine moves a cursor "
+                               "through a panel's files or the tree alike: "
+                               "it rests on the list, not on the megabyte"),
+    _word("TREE_ENTRY", None, "and the entry at such an offset"),
     _word("NUMBER_OF", None, "a word of a table that holds a number"),
     _word("ENTRY", None, "an offset in a panel, added to the panel"),
     _word("DSKBUF", None, "where a panel's list begins in it"),

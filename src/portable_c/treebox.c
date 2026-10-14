@@ -75,7 +75,7 @@ extern const struct BOXTOP TrSav_P;     /* "Saving the directory..." */
 #define CnfUn_C 22                      /* and underlined */
 
 #define TREE ((struct DIRTREE *)md.TreeBuf)
-#define LIST ((struct DIRENT *)MD_POINTER(TRELIST))
+#define LIST TRELIST
 
 /* What the reading of the disk keeps where the file has its name. */
 #define TreeErr TreHead[0]              /* how it ended: see below */
@@ -178,8 +178,8 @@ RdTr02:                                 /* the file */
     count <<= 4;
     if ((u16)(done - 11) != count)
         goto RdTr10;
-    if (ChkSum(MD_POINTER(TRELIST), count)
-        != *(u16 *)MD_POINTER(TRELIST + count))
+    if (ChkSum((const u8 *)TRELIST, count)
+        != *(const u16 *)((const u8 *)TRELIST + count))
         goto RdTr10;
     goto RdTr40;
 
@@ -300,7 +300,7 @@ RdTr22:                                 /* no more in this directory: on
             if (*text++ == '\\')
                 break;
     } while (--count);
-    text = NEAR(MvzLine(text, entry->DirName, 13));
+    text = MvzLine(text, entry->DirName, 13);
     text[0] = '\\';
     text[1] = '*';
     text[2] = '.';
@@ -332,7 +332,7 @@ RdTr26:
     count = TREE->TreeLen;
     TREE->TreSum1 = ChkSum(md.TreeBuf, 7);
     count <<= 4;
-    *(u16 *)MD_POINTER(TRELIST + count) = ChkSum(MD_POINTER(TRELIST), count);
+    *(u16 *)((u8 *)TRELIST + count) = ChkSum((const u8 *)TRELIST, count);
     size = count + 11;
     had = FileAttributes(Tree_F);       /* with the attributes it has */
     if (had.failed) {
@@ -362,10 +362,15 @@ RdTr40:
     return TREE->TreeErr == READ_NO_DISK;
 }
 
-/* The number of the entry at an address of the list, and the address of
-   the entry with a number: TreNum and NumAd1 of the assembly. */
-#define NUMBER(address) ((u16)((address) - TRELIST) >> 4)
-#define ADDRESS(number) ((u16)(((number) << 4) + TRELIST))
+/* The address of the entry with a number: NumAd1 of the assembly. An
+   address is an offset in the list here, in bytes, TREE_OFFSET of vc.h,
+   where the assembly has a place of the main data: the box reckons with
+   addresses in 16 bits, a line that has moved up by a line is at an
+   offset below 0 that has wrapped round, and all of it is differences
+   and comparisons within the list, which are what they were. The number
+   of an entry, TreNum, is the pointer's own. */
+#define ADDRESS(number) ((u16)((number) << 4))
+#define NUMBER(entry) ((u16)((entry) - TRELIST))
 
 /* Show a line of the list in the box that begins at `begin`: the one
    that is `offset` bytes of the list behind the first one shown. */
@@ -387,9 +392,9 @@ static void ChTr50(u16 begin, u16 offset)
    Returns 0 for Enter, with the path of the directory in TmpBuf, and 1
    if the box was left otherwise.
 
-   The cursor and the first line shown are those of the tree, TreAdr and
-   TreFrst, which a panel that shows the tree has too: such a panel is
-   marked as changed. */
+   The cursor and the first line shown are those of the tree, TreeCursor
+   and TreeFirst, which a panel that shows the tree has too: such a panel
+   is marked as changed. */
 u16 ChTree(u16 column)
 {
     struct LineArgs line;
@@ -443,15 +448,15 @@ ChTr59:                                 /* the box, and the tree read */
     if (TREE->TreeLen < lines)
         n = 0;
     n = ADDRESS(n);
-    if (n < md.TreFrst)
-        md.TreFrst = n;
+    if (n < TREE_OFFSET(TreeFirst))
+        TreeFirst = TREE_ENTRY(n);
     ((u16 *)&md.MousTim)[1] = 0xFFFF;
     md.MousEnt = 0;
     /* Nothing is shown yet: the screen is taken to be elsewhere. */
-    cursor = md.TreAdr;
-    first = md.TreFrst;
-    md.TreAdr += 2 * sizeof(struct DIRENT);
-    md.TreFrst += 2 * sizeof(struct DIRENT);
+    cursor = TREE_OFFSET(TreeCursor);
+    first = TREE_OFFSET(TreeFirst);
+    TreeCursor += 2;
+    TreeFirst += 2;
     goto ChTr11;
 
 ChTr10:                                 /* to the entries with these numbers */
@@ -459,7 +464,8 @@ ChTr10:                                 /* to the entries with these numbers */
     first = ADDRESS(first);
 
 ChTr11:
-    if (cursor != md.TreAdr) {          /* the speed search begins anew */
+    if (cursor != TREE_OFFSET(TreeCursor)) {    /* the speed search begins
+                                                   anew */
         *(u16 *)(md.MenuBuf + SPEED - 2) = 0;
         md.MenuBuf[SPEED] = 0;
     }
@@ -470,12 +476,12 @@ ChTr12:                                 /* the cursor within the lines */
     n = (u16)(u8)((size >> 8) - 9) << 4;
     if ((u16)(cursor - first) > n)
         first = cursor - n;
-    moved = first - md.TreFrst;
-    was = md.TreAdr;
-    shown = md.TreFrst;
-    md.TreAdr = cursor;
-    md.TreFrst = first;
-    if (moved == 0 && was == md.TreAdr)
+    was = TREE_OFFSET(TreeCursor);
+    shown = TREE_OFFSET(TreeFirst);
+    moved = first - shown;
+    TreeCursor = TREE_ENTRY(cursor);
+    TreeFirst = TREE_ENTRY(first);
+    if (moved == 0 && was == cursor)
         goto ChTr20;
 
     /* The lines. */
@@ -508,7 +514,8 @@ ChTr12:                                 /* the cursor within the lines */
         ChTr50(begin, (u16)(short)(signed char)scroll << 4);
     }
     ChTr50(begin, was - shown);         /* the line that had the cursor */
-    ChTr50(begin, md.TreAdr - md.TreFrst);      /* and the one that has */
+    ChTr50(begin, TREE_OFFSET(TreeCursor) - TREE_OFFSET(TreeFirst));    /* and
+                                           the one that has */
 
 ChTr19:                                 /* the path of the cursor */
     Window(begin + (size & 0xFF00) - 0x500 + 5, 0x126);
@@ -518,8 +525,8 @@ ChTr20:                                 /* the speed search, and a key */
     if (md.WinMous == 0)
         InSt10(place, MD_PLACE(md.MenuBuf + SPEED), 12, ChTr_P[1] << 8);
     Cursor(place + *(u16 *)(md.MenuBuf + SPEED - 2));
-    cursor = NUMBER(md.TreAdr);
-    first = NUMBER(md.TreFrst);
+    cursor = NUMBER(TreeCursor);
+    first = NUMBER(TreeFirst);
     if (GetMous(0).buttons != 0)
         goto ChTr60;
     md.MousEnt = 0;
@@ -567,12 +574,12 @@ ChTr20:                                 /* the speed search, and a key */
         }
     }
     /* Another key is for the speed search. */
-    n = Search(MAIN_SEG, md.TreAdr, TRELIST, ADDRESS(TREE->TreeLen),
-               sizeof(struct DIRENT), key);
-    if (n == md.TreAdr)
+    n = Search((const u8 *)TRELIST, TREE_OFFSET(TreeCursor), 0,
+               ADDRESS(TREE->TreeLen), sizeof(struct DIRENT), key);
+    if (n == TREE_OFFSET(TreeCursor))
         goto ChTr20;
     cursor = n;
-    first = md.TreFrst;
+    first = TREE_OFFSET(TreeFirst);
     goto ChTr12;
 
 ChTr35:                                 /* Up */

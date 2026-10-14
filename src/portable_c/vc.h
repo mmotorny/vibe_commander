@@ -276,7 +276,10 @@ struct MainDat {
     struct EPBs EPB;                    /* Execute program block */
     u16 MouseX;                         /* Mouse cursor X */
     u16 MouseY;                         /* Mouse cursor Y */
-    u16 BatAdr;                         /* Pointer to command in buffer */
+    u16 BatAdr;                         /* Of the original: where in
+                                           DosBuf the command to run next
+                                           is. Not set or read here: see
+                                           NextCommand */
     u16 BatPoin;                        /* Pointer to command, kept
                                            while the shell ran another:
                                            not set here */
@@ -356,10 +359,14 @@ struct MainDat {
                                            word that nothing sets or
                                            reads, which keeps the place
                                            of what is behind it */
-    u16 HstAdr;
-    u16 TreAdr;
-    u16 TreFrst;
-    u16 TreCrnt;
+    u16 HstAdr;                         /* Of the original: places of
+                                           the main data, in the history, */
+    u16 TreAdr;                         /* of the tree's cursor, */
+    u16 TreFrst;                        /* of its first line shown */
+    u16 TreCrnt;                        /* and of the current directory
+                                           in it. Not set or read here:
+                                           see HistoryPlace and
+                                           TreeCursor */
     u16 ClstSiz;
     u16 Total;
     u16 FreeDsk;
@@ -486,6 +493,31 @@ extern struct WCBdef *RightPanel;
 extern u8 *Room;
 extern u8 *RoomEnd;
 u16 RoomParas(void);
+
+/* Places of the main data that the program keeps, of main.c: each is a
+   word of the main data in the original, the place as a number, and a
+   pointer here, beside the main data since a pointer is longer than
+   the word. The main data does not move, so they hold for as long as
+   the program runs.
+
+   TreeCursor is the directory of the tree that the cursor is on,
+   TreeFirst the first one shown, and TreeCurrent the current directory
+   where PutTree has just written it, or 0 if it is not among the lines
+   written: TreAdr, TreFrst and TreCrnt of the original. They are
+   entries of the tree's list, TRELIST; the first two are set when a
+   panel that shows the tree is set up (Init92 of main.c) and when the
+   tree is read (TreeCur of tree.c), and are 0 until then. For a moment
+   ChTree of treebox.c has both two entries further on than they are,
+   which may be behind the list's end: nothing is read there.
+
+   HistoryPlace is where in the history, HstBuf, Ctrl+E and Ctrl+X
+   are: HstAdr. NextCommand is the command of DosBuf that Exec02 of
+   exec.c runs next: BatAdr. */
+extern struct DIRENT *TreeCursor;
+extern struct DIRENT *TreeFirst;
+extern struct DIRENT *TreeCurrent;
+extern const u8 *HistoryPlace;
+extern u8 *NextCommand;
 
 /* The paragraphs of a panel's block: 64K, which is as far as the
    offsets of 16 bits reach that a panel keeps its places in. And the
@@ -781,7 +813,10 @@ struct WCBdef *InvWCB(struct WCBdef *panel);
 u16 FilePan(struct WCBdef *panel);
 void AdrNum(struct WCBdef *panel, struct Place *place);
 void CorPar(struct WCBdef *panel);
-struct Shown {                          /* what a panel shows, as addresses: */
+struct Shown {                          /* what a panel shows, as offsets
+                                           in its list's home, the panel
+                                           for files and TRELIST for the
+                                           tree (see TREE_OFFSET): */
     u16 cursor;                         /* the entry that the cursor is on, */
     u16 first;                          /* and the first one shown */
 };
@@ -1034,7 +1069,7 @@ void F21_40(struct WCBdef *panel);
 struct Onward F22_00(struct WCBdef *panel);
 struct Onward F23_00(struct WCBdef *panel);
 struct Onward F24_00(struct WCBdef *panel);
-struct Onward F24_01(struct WCBdef *panel, u16 path);
+struct Onward F24_01(struct WCBdef *panel, const u8 *path);
 void F24_02(struct WCBdef *panel);
 struct Onward F25_00(void);
 struct Onward F26_00(void);
@@ -1340,7 +1375,8 @@ u16 Rnd(void);
 struct Edited EdLin(u16 key, u8 *text, u16 cursor, u16 length);
 u16 EdSub1(const u8 *line, u16 cursor);
 u16 CmpSym(u16 symbol);
-u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
+u16 Search(const u8 *list, u16 at, u16 begin, u16 end, u16 step,
+           u16 key);
 
 /* What the program makes of the system at every turn: see each in
    system.c. OpenFil opens a file, `mode` as DOS takes it in AL, and
@@ -1521,11 +1557,29 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #define MD_PLACE(pointer) ((u16)((const u8 *)(pointer) - (const u8 *)&md))
 #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
 
-/* Where in a panel's block its list of files begins, DskBuf, and where
-   in the main data the list of the tree's directories, TreeBuf.TreList.
-   The assembly keeps places in both as addresses, not as numbers. */
+/* Where in a panel's block its list of files begins, DskBuf, an offset
+   in the panel; and the list of the tree's directories in the main
+   data, TreeBuf.TreList, a pointer to its first entry, the root. The
+   assembly keeps places in both as addresses, not as numbers. */
 #define DSKBUF  (sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT))
-#define TRELIST MD_PLACE(&((struct DIRTREE *)md.TreeBuf)->TreSum2)
+#define TRELIST \
+    ((struct DIRENT *)&((struct DIRTREE *)md.TreeBuf)->TreSum2)
+
+/* An entry of the tree's list as an offset in the list, in bytes, and
+   the entry at such an offset. What moves a cursor through a panel's
+   files or through the tree alike, F00_50 of keys.c, the speed search,
+   ChgAdr and NumAdr of place.c, the tree's box, knows an entry of
+   either list by a number of 16 bits: a file by its offset in the
+   panel, which is 16 bits by the panel's layout, and a directory by
+   this, where the original has its address in the main data. The two
+   differ by where the list begins, in every such number alike, and
+   what the program does with them is differences and comparisons
+   within the list; the list is in the main data, far shorter than
+   64K. The offset is cut to 16 bits, as ENTRY cuts a panel's. */
+#define TREE_OFFSET(entry) \
+    ((u16)((const u8 *)(entry) - (const u8 *)TRELIST))
+#define TREE_ENTRY(offset) \
+    ((struct DIRENT *)((u8 *)TRELIST + (u16)(offset)))
 
 /* The file entry at an address in a panel's block. The address is
    cut to 16 bits, so one that has wrapped round means what it means on

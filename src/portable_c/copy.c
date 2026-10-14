@@ -1435,7 +1435,7 @@ struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
     if (panel->Visible == 0 || panel->WinTyp > 1)
         return F45_01(panel, command, directories, files);
     if (panel->WinTyp == 1) {
-        if (md.TreAdr <= TRELIST)                       /* the root */
+        if (TreeCursor <= TRELIST)                      /* the root */
             return Go(GO_KEYS);
         if (command != 0)
             goto F36_03;
@@ -1496,7 +1496,7 @@ F35_06:
 F36_03:
     /* A new name for the directory, which stays where it is. */
     for (i = 0; i < 13; i++)
-        CpDest[i] = *MD_POINTER(md.TreAdr + i);
+        CpDest[i] = ((const u8 *)TreeCursor)[i];
     if ((u8)Ask(&Renam_B, 0) != 0)
         return Go(GO_KEYS);
     typed = CpDest;

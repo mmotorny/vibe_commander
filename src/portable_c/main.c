@@ -145,6 +145,14 @@ struct WCBdef *OtherPanel;
 struct WCBdef *LeftPanel;
 struct WCBdef *RightPanel;
 
+/* Places of the main data that the program keeps: see vc.h. Beside the
+   main data for the same reason. */
+struct DIRENT *TreeCursor;
+struct DIRENT *TreeFirst;
+struct DIRENT *TreeCurrent;
+const u8 *HistoryPlace;
+u8 *NextCommand;
+
 #define ALT_KEYS 38                     /* the length of AltSr_T */
 
 #define KEY_MOUSE 0xFC                  /* the scan code that Input has
@@ -260,14 +268,14 @@ static void Init90(struct WCBdef *panel)
         md.Volume[0] = 0;
         md.InfoLen = 0xFFFF;
     } else if (panel->WinTyp < 2) {       /* Init92 */
-        root = (struct DIRENT *)MD_POINTER(TRELIST);
+        root = TRELIST;
         for (i = 0; i < sizeof(struct DIRENT); i++)
             ((u8 *)root)[i] = 0;
         root->DirName[0] = '\\';
         root->DirShift = 1;
         ((struct DIRTREE *)md.TreeBuf)->TreeLen = 1;
-        md.TreFrst = TRELIST;
-        md.TreAdr = TRELIST;
+        TreeFirst = TRELIST;
+        TreeCursor = TRELIST;
     }
 }
 
@@ -950,7 +958,7 @@ static u16 MnuEnd(u16 answer, struct Regs *r)
     case MNU_INIT50:
         return INIT50;
     case MNU_F24_01:                    /* MnuF24 */
-        return CmdEnd(F24_01(r->ds, MD_PLACE(md.TmpBuf)), r);
+        return CmdEnd(F24_01(r->ds, md.TmpBuf), r);
     default:                            /* MnuV00, MNU_V00_01: the menu of
                                            the command is in CL */
         return V00_03(r->cx & 0xFF, 1, 1);

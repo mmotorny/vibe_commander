@@ -9,8 +9,9 @@
  * in it, with the level it is on. A path is not kept: it is made, entry
  * by entry, by putting each name behind the backslash of its level in a
  * path that is carried along the list. The program keeps the cursor and
- * the first line shown as addresses of entries, TreAdr and TreFrst, and
- * the entry of the current directory in TreCrnt.
+ * the first line shown as pointers to entries, TreeCursor and TreeFirst,
+ * and the entry of the current directory in TreeCurrent: TreAdr, TreFrst
+ * and TreCrnt of the original, which are addresses in the main data.
  *
  * The assembly keeps what it carries along in MenuBuf, and so does this:
  * the buffer is free while no menu is open, and what is left in it goes
@@ -39,7 +40,9 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
                                            bytes */
 #define STATUS  (*(u16 *)(md.MenuBuf + 46))     /* where the path of the
                                                    cursor is written */
-#define OWNER   (*(u16 *)(md.MenuBuf + 48))     /* the panel */
+/* The word at 48 is the panel in the original, its segment, kept there
+   by PutTree for itself. Here that is PutTree's `panel`, and the word is
+   not written. */
 #define PATH    (md.MenuBuf + 50)       /* the path of the entry at hand */
 #define SHOWN   (md.MenuBuf + 140)      /* that of the cursor, as shown */
 
@@ -99,13 +102,13 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
         md.MenuBuf[1] = ':'; \
         md.MenuBuf[2] = '\\'; \
         md.MenuBuf[3] = 0; \
-        entry = (struct DIRENT *)MD_POINTER(TRELIST); \
+        entry = TRELIST; \
         for (count = TREE->TreeLen; count; count--) { \
             if (entry->DirLevel != 0) \
                 DESCEND(md.MenuBuf, entry, text, i, n); \
             IS_PATH(found, md.MenuBuf, md.CrnPath, i, n); \
             if (found) { \
-                md.TreAdr = MD_PLACE(entry); \
+                TreeCursor = entry; \
                 break; \
             } \
             entry++; \
@@ -134,8 +137,8 @@ void PutTre(struct WCBdef *panel)
    are the numbers of four colours, as in PutTr_P.
 
    The current directory is in its own colours and has a mark in the last
-   column but one; its entry is noted in TreCrnt, which is 0 if it is not
-   among the lines written. The directory under the cursor is in the
+   column but one; its entry is noted in TreeCurrent, which is 0 if it is
+   not among the lines written. The directory under the cursor is in the
    colour of the cursor if `panel` is the current panel, and between
    brackets if not; its path is written into the row below the lines,
    which is the last but one of the box, the characters only, and is left
@@ -155,10 +158,9 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
     u8 *goes_on, *text;
     u16 lines, color, width, i, n;
 
-    OWNER = SEG_OF(panel);
     STATUS = place + (size & 0xFF00) - 0x200 + 1;
-    md.TreCrnt = 0;
-    entry = (struct DIRENT *)MD_POINTER(TRELIST);
+    TreeCurrent = 0;
+    entry = TRELIST;
     n = TREE->TreeLen;
     for (i = 0; i < n && entry[i].DirLevel <= 7; i++)
         ;
@@ -170,7 +172,7 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
     PATH[2] = '\\';
     PATH[3] = 0;
     screen = BasAdr(place + 0x102);
-    n -= (u16)(md.TreFrst - TRELIST) >> 4;
+    n -= (u16)(TreeFirst - TRELIST);
     lines = (u8)((size >> 8) - 4);
     if (lines > n) {
         lines = n;
@@ -192,7 +194,7 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
         n = entry->DirLevel;
         if (n != 0) {
             while (--n) {
-                if (MD_PLACE(entry) >= md.TreFrst && goes_on <= GOES_ON + 10) {
+                if (entry >= TreeFirst && goes_on <= GOES_ON + 10) {
                     if (goes_on < GOES_ON + 10) {
                         if (*goes_on != 0)
                             *(u8 *)cell = RUNS_DOWN;
@@ -209,7 +211,7 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
                 *goes_on = 0;
             }
             goes_on++;
-            if (MD_PLACE(entry) >= md.TreFrst) {
+            if (entry >= TreeFirst) {
                 if (goes_on < GOES_ON + 12)
                     *(u8 *)cell = (u8)n;
                 cell++;
@@ -225,25 +227,25 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
             *goes_on = 1;
         if (entry->DirLevel != 0)
             DESCEND(PATH, entry, text, i, n);
-        if (MD_PLACE(entry) < md.TreFrst)
+        if (entry < TreeFirst)
             continue;
 
         width = 12;
-        if (MD_PLACE(entry) == TRELIST)
+        if (entry == TRELIST)
             width = 1;
         IS_PATH(color, PATH, md.DosPth, i, n);
         if (color) {
-            md.TreCrnt = MD_PLACE(entry);
+            TreeCurrent = entry;
             screen[36] = Color(colors[2]) << 8 | MARK_CURRENT;
             color = 2;
         }
         /* `color` is which of the colours a directory has here, and the
            one after it is that of the cursor. */
-        if (MD_PLACE(entry) != md.TreAdr) {
+        if (entry != TreeCursor) {
             color = Color(colors[color]) << 8;
         } else {
             n = BRACKETS;
-            if (OWNER == SEG_OF(CurrentPanel)) {
+            if (panel == CurrentPanel) {
                 n = ' ' << 8 | ' ';
                 color++;
             }
@@ -299,8 +301,8 @@ void TreeCur(void)
     u8 *text;
     u16 count, found, again, i, n;
 
-    md.TreFrst = TRELIST;
-    md.TreAdr = TRELIST;
+    TreeFirst = TRELIST;
+    TreeCursor = TRELIST;
     for (again = 0;; again = 1) {
         FIND(found, entry, count, text, i, n);
         if (found)
@@ -331,10 +333,17 @@ void TrCr10(void)
    Only the low byte of `lines` counts, and of that not the highest bit. */
 void TrCr20(u16 lines)
 {
-    u16 above = (lines & 0x7E) << 3;
-    u16 first = md.TreAdr - above;
+    /* The original takes eight bytes for each of them off the address
+       of the cursor's entry, which is half as many entries of 16 bytes,
+       and takes the root where that address has wrapped round below 0
+       or is in front of the list. It cannot wrap: the list is further
+       into the main data than 1,008 bytes, the most that there are to
+       take off. So the root is taken where the cursor has fewer entries
+       above it than that. */
+    i32 above = (lines & 0x7E) >> 1;
 
-    if (md.TreAdr < above || first < TRELIST)
-        first = TRELIST;
-    md.TreFrst = first;
+    if (TreeCursor < TRELIST + above)
+        TreeFirst = TRELIST;
+    else
+        TreeFirst = TreeCursor - above;
 }

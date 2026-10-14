@@ -5,10 +5,12 @@
  * Translated from VCSUB2.INC and VCFUNC.INC.
  *
  * A panel keeps the cursor and the first line it shows as addresses: of
- * file entries in its own segment, CurAdr and First, or, if it shows the
- * tree, of directory entries in the main data, TreAdr and TreFrst. To move
- * them the program turns the addresses into numbers, counted from the
- * start of the list, and back.
+ * file entries, as offsets in the panel, CurAdr and First, or, if it
+ * shows the tree, of directory entries in the main data, as pointers,
+ * TreeCursor and TreeFirst. To move them the program turns the addresses
+ * into numbers, counted from the start of the list, and back. Where one
+ * routine does that for either list, an entry of the tree is an offset
+ * too, in the tree's list: TREE_OFFSET of vc.h.
  *
  * The arithmetic that several of these share is written as macros and
  * with shifts: CorPar is called from where the panels are drawn, deep
@@ -42,10 +44,9 @@ u16 NumAdr(struct WCBdef *panel, u16 number);
    with a number: in a list of files, and in the tree. */
 #define FILE_NUMBER(address) \
     ((u16)((address) - DSKBUF) / sizeof(struct FILENT))
-#define TREE_NUMBER(address) \
-    ((u16)((address) - TRELIST) / sizeof(struct DIRENT))
+#define TREE_NUMBER(entry) ((u16)((entry) - TRELIST))
 #define FILE_ADDRESS(number) (((number) << 4) + ((number) << 3) + DSKBUF)
-#define TREE_ADDRESS(number) (((number) << 4) + TRELIST)
+#define TREE_ADDRESS(number) (TRELIST + (number))
 
 /* Where on the screen a panel begins: the row in the high byte, below the
    menu bar if that is always visible, and the column in the low one. */
@@ -97,8 +98,8 @@ u16 FilePan(struct WCBdef *panel)
             lines = (u16)(short)(signed char)ROWS(); \
             lines = LINES(lines); \
         } else { \
-            cursor = TREE_NUMBER(md.TreAdr); \
-            first = TREE_NUMBER(md.TreFrst); \
+            cursor = TREE_NUMBER(TreeCursor); \
+            first = TREE_NUMBER(TreeFirst); \
             last = ((struct DIRTREE *)md.TreeBuf)->TreeLen; \
             lines = (u16)(short)(signed char)(u8)(ROWS() - 4); \
         } \
@@ -117,16 +118,17 @@ void AdrNum(struct WCBdef *panel, struct Place *place)
     place->lines = lines;
 }
 
-/* The address of the entry with a number, in the list of a panel. */
+/* The address of the entry with a number, in the list of a panel: its
+   offset in the panel, or in the tree's list. */
 u16 NumAdr(struct WCBdef *panel, u16 number)
 {
     if (panel->WinTyp == 0)
         return FILE_ADDRESS(number);
-    return TREE_ADDRESS(number);
+    return number << 4;
 }
 
-/* Give a panel another cursor and another first line, as addresses, and
-   return those it had. */
+/* Give a panel another cursor and another first line, as such offsets,
+   and return those it had. */
 struct Shown ChgAdr(struct WCBdef *panel, u16 cursor, u16 first)
 {
     struct Shown was;
@@ -137,10 +139,10 @@ struct Shown ChgAdr(struct WCBdef *panel, u16 cursor, u16 first)
         panel->CurAdr = cursor;
         panel->First = first;
     } else {
-        was.cursor = md.TreAdr;
-        was.first = md.TreFrst;
-        md.TreAdr = cursor;
-        md.TreFrst = first;
+        was.cursor = TREE_OFFSET(TreeCursor);
+        was.first = TREE_OFFSET(TreeFirst);
+        TreeCursor = TREE_ENTRY(cursor);
+        TreeFirst = TREE_ENTRY(first);
     }
     return was;
 }
@@ -173,7 +175,7 @@ void CorPar(struct WCBdef *panel)
         panel->CurAdr = FILE_ADDRESS(cursor);
         panel->First = FILE_ADDRESS(first);
     } else {
-        md.TreAdr = TREE_ADDRESS(cursor);
-        md.TreFrst = TREE_ADDRESS(first);
+        TreeCursor = TREE_ADDRESS(cursor);
+        TreeFirst = TREE_ADDRESS(first);
     }
 }

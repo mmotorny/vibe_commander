@@ -175,7 +175,7 @@ u8 *PtPt10(struct WCBdef *panel)
         end = MvzLine(end, Progs_S, sizeof Progs_S);
     end[0] = ' ';
     end[1] = 0;
-    return NEAR(end) + 1;
+    return end + 1;
 }
 
 /* Write the path of a panel into the top of its frame, in the middle: in
@@ -443,7 +443,7 @@ void SetCur(struct WCBdef *panel, u16 set)
         /* A directory up to 11 levels down has its name at its level,
            two or three columns to each; one further down in the last
            column. */
-        lines = ((struct DIRENT *)MD_POINTER(md.TreAdr))->DirLevel;
+        lines = TreeCursor->DirLevel;
         if (lines <= 11) {
             width = lines + lines - 0x17;
             if (md.TreeTyp != 0)
@@ -453,14 +453,14 @@ void SetCur(struct WCBdef *panel, u16 set)
         screen = BasAdr(place);
         *(u8 *)screen = ' ';
         width = 3;
-        if (md.TreAdr > TRELIST) {
+        if (TreeCursor > TRELIST) {
             width = 14;
             if (set == 0) {
                 *screen++ = Color(Back_C) << 8 | LINE;
                 width--;
             }
         }
-        if (md.TreAdr == md.TreCrnt)
+        if (TreeCursor == TreeCurrent)
             color += Slct_C;
     }
     MvsColr(screen, width, Color(color));

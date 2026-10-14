@@ -12,8 +12,8 @@
  *
  * Nothing here but SetMask touches the main data: FnFile and NearFl
  * take what they read as pointers. NearFl names the room there, Room,
- * for where the old list is, since a pointer does not say which segment
- * it is in.
+ * for where the old list is, since a pointer does not say what it is a
+ * pointer into.
  */
 #include "vc.h"
 
@@ -282,13 +282,13 @@ u16 FnFile(struct WCBdef *panel, const u8 *name)
    or 0 if there is none or `name` is not in the old list.
 
    The old list is where ReDr50 of read.c has it, the one routine that
-   calls this: where the room begins, Room of vc.h. On DOS the
-   pointer says so itself, and its offset is where the entry is in the
-   list. */
+   calls this: where the room begins, Room of vc.h. An entry of it is
+   an offset in it of 16 bits, as an entry of a panel's list is in the
+   panel: the list was a panel's. */
 u16 NearFl(struct WCBdef *panel, const u8 *name, u16 end)
 {
-    u16 start = OFFSET_IN_SEG(SEG_OF(Room), name);
-    const u8 *list = name - start;
+    const u8 *list = Room;
+    u16 start = (u16)(name - list);
     u16 at = start;
     u16 forward = 1;
     u16 found;

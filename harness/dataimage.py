@@ -179,7 +179,10 @@ RENAMED = {MAIN_DATA: {"FreMem1": "MemSeg"}}
 class Address:
     """A word that holds an address. `field` is the field of the main
     data that has it, as `kind` says: a SEGMENT, a paragraph of the
-    megabyte; or PARAGRAPHS from the main data on. `variable` is the
+    megabyte; PARAGRAPHS from the main data on; or a PLACE of the main
+    data, bytes from where it begins, of which 0 is no place: the word
+    was never set, or says that there is none, as a pointer that is 0
+    does. `variable` is the
     symbol of the map that has it as a pointer, in a build that has
     one: a build is asked for the variable first, so that a build in
     which the word has left the main data and the build before it are
@@ -192,7 +195,7 @@ class Address:
     cut: str = None
 
 
-SEGMENT, PARAGRAPHS = "segment", "paragraphs"
+SEGMENT, PARAGRAPHS, PLACE = "segment", "paragraphs", "place"
 TEXT = "behind the panels"
 
 # The piece that takes a word out of the main data names its variable
@@ -215,6 +218,16 @@ ADDRESSES = (
     # bytes that it is.
     Address("ViewSeg", "ViewSeg", SEGMENT, ("main", "_Room"), cut=TEXT),
     Address("FreMem2", "FreMem2", PARAGRAPHS, ("main", "_RoomEnd")),
+    # The places of the main data that it kept in words of itself:
+    # pointers beside it since a place is one. The tree's cursor, its
+    # first line shown and the current directory in it, which is none
+    # where the tree was written without it; where the history is; and
+    # the command to run next.
+    Address("TreAdr", "TreAdr", PLACE, ("main", "_TreeCursor")),
+    Address("TreFrst", "TreFrst", PLACE, ("main", "_TreeFirst")),
+    Address("TreCrnt", "TreCrnt", PLACE, ("main", "_TreeCurrent")),
+    Address("HstAdr", "HstAdr", PLACE, ("main", "_HistoryPlace")),
+    Address("BatAdr", "BatAdr", PLACE, ("main", "_NextCommand")),
 )
 
 # The variables that have such a word, as Build.variables names them:
@@ -687,7 +700,11 @@ class Read:
                 return self.word(at, 4), "{}.{}".format(*one.variable)
         at = build.main + build.fields[one.field]
         value = self.word(at)
-        if one.kind == SEGMENT:
+        if one.kind == PLACE:
+            if value == 0:              # no place: as a pointer that is 0
+                return 0, build.fields[one.field]
+            address = build.main + value
+        elif one.kind == SEGMENT:
             address = build.main - ARENA + PARAGRAPH * value
         else:
             address = build.main + PARAGRAPH * value
@@ -698,6 +715,8 @@ class Read:
         the same in two builds that have the same thing there: (what,
         how far into it), or None for an address of nothing known."""
         build = self.build
+        if address == 0:
+            return "nothing", 0         # a pointer to nothing
         at = address - build.address
         if 0 <= at - build.main < build.main_size:
             return "the main data", at - build.main
