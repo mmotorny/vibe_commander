@@ -11199,6 +11199,281 @@ widens, had clang name 28 places in `edit.c`, 9 in `view.c`, 7 in
 `panel.c`. So N3, N4, N6 to N8 and N9 are slower by that much, a few
 tool calls each, and the others by nothing that was measured.
 
+## The compiler's lost cut: what Open Watcom does, and where
+
+`wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on
+into 32 bits, where C says FFFEh and not FFFFFFFEh ("The compiler, at
+such a call", above; `harness/cut.py` is the test that was being
+written against it as this was, and is spoken of below as it was read
+then). This is what that fault
+is, where it is in the compiler's source, and what follows for a tree
+that is about to say every narrowing and every change of sign by a
+cast. Nothing of the program or of the harness was changed for it.
+
+What was run and what was read are kept apart below. Run: the pinned
+compiler, "Open Watcom C x86 32-bit Optimizing Compiler, Version 2.0
+beta Oct 1 2026 06:32:26 (64-bit)", and `wcc` of the same download for
+16 bits. Read: the compiler's source at the commit of the release,
+`e28568669775a7119f381f3b37d21745d8afcfb6`, which is what the tag
+`2026-10-01-Build` of github.com/open-watcom/open-watcom-v2 names, the
+tag in the URL that `CMakeLists.txt` pins. The source was fetched for
+the reading alone and is gone again; the compiler was not built, so
+that the lines below are the cause is a conclusion, by what they
+predict.
+
+**The cause.** `DoConversionOps` of `bld/cg/c/peepopt.c`, the code
+generator's peephole optimiser, lines 577 to 597 at that commit:
+
+    if( ins->head.opcode == OP_CONVERT && next->head.opcode == OP_CONVERT ) {
+        if( ins->result == next->operands[0] &&
+            ins->type_class == next->base_type_class ) {
+            /*
+             * change (cnv i1 -> i2; cnv i2 -> i4) into
+             *        (cnv i1 -> i2; cnv i1 -> i4) and let dead code take care of
+             * the first ins if it is not needed
+             ...
+             * watch for converting down - bad to fold
+             */
+            if( ins->type_class < ins->base_type_class )
+                return( false );
+            next->base_type_class = ins->base_type_class;
+            next->operands[0] = ins->operands[0];
+
+Of two conversions in one block, A to B and then B to C, it makes the
+second a conversion of the first one's operand, A to C, and so takes
+whether C is filled with the sign or with zeros from A alone. That is
+right as the comment has it, for two types with a sign, and wrong
+where B has no sign and A has one. The one thing it watches for is
+"converting down", by the order of the type classes (`U1`, `I1`,
+`U2`, `I2`, `U4`, `I4`, `U8`, `I8`, two classes of pointers, `FS`,
+`FD`, `FL`, in `bld/cg/h/typcldef.h`), and pointers, which are far
+ones only: a near pointer is `U2` or `U4`. So the fold is made
+whenever B is not below A in that order, and it is wrong exactly when
+A has a sign, B is wider and has none, and C is wider than B or is a
+floating type.
+
+What else those lines say. The first two of these, and the floating
+types and the new value for the source further down, were said from
+the lines before they were run; the rest explains what was known:
+
+- The two conversions have to be in one block, with nothing between
+  that may redefine the first one's result or its operand
+  (`_IsReDefinedBy`, tested for each instruction between). A jump
+  between them, a call when the variable's address has been handed
+  out, a store through a pointer that may be the variable, and a new
+  value for the source all keep the fold away.
+- An instruction that names something `volatile` is not looked at
+  (`VolatileIns`, in `PeepOptBlock`).
+- `ins->type_class == next->base_type_class`: the second conversion
+  has to start from the very class that the first ended in. A
+  conversion between two types of one size is no instruction at all
+  (`NeedConvert` of `bld/cg/c/bldins.c`: the lengths are the same, so
+  the value is only given the other type). `(u16)(short)(signed
+  char)c` is therefore a conversion `I1` to `I2` and one `U2` to `U4`,
+  the classes differ, and nothing is folded: a `short` between is
+  right by how the fold is written, not by the order of the passes.
+- `(u16)(int)x`, `(u16)(u32)x` and their like are the same as
+  `(u16)x`: `DemoteTree` of `bld/cg/c/treeconv.c` gives the inner
+  conversion the narrower type when the tree is built. Arithmetic
+  that the front end folds to nothing is no instruction either.
+  Arithmetic that stays is an instruction between the two
+  conversions with a result of its own, so the second conversion does
+  not start from the first one's result.
+- The calls of the peephole optimiser lie under
+  `_IsntModel( CGSW_GEN_NO_OPTIMIZATION )`: two in `PostOptimize` of
+  `bld/cg/c/generate.c`, and one in `CommonSex` of `bld/cg/c/cse.c`,
+  which `generate.c` calls under the same test; a fourth, in
+  `PropIndexes` of the loop optimiser, was not followed that far.
+  That is `-od`, and no other option of the compiler: the peephole
+  is not one of the optimisations that `-o` chooses among. It is behind both front
+  ends and in the code generator of every target, 16 bits included.
+
+**The table.** Every chain of two conversions among the eight integer
+types of 8 to 64 bits, 392 chains, each as twelve functions, compiled
+with the build's options for a file of the tree (`-3r -mf -s -zl -zls
+-os`), linked for Linux with the C library of the same download, run
+on this computer on sixteen values and held against gcc. Eight chains
+are wrong, the eight that the rule above names, and no other:
+
+| from | to | and on to |
+|---|---|---|
+| s8 | u16 | s32, u32, s64, u64 |
+| s8 | u32 | s64, u64 |
+| s16 | u32 | s64, u64 |
+
+and each of the eight in the same forms:
+
+| form | | |
+|---|---|---|
+| `(C)(B)x` in one expression | wrong | `movsx eax,al` |
+| `B v = (B)x; return (C)v;` | wrong | |
+| the same with no cast written | wrong | |
+| through a global, `g = (B)x; return (C)g;` | wrong | stored rightly, read wrongly |
+| through a variable whose address is kept, nothing between | wrong | |
+| the source read through a pointer, or returned by a function | wrong | |
+| `B v = (B)x; if (flag) count++; return (C)v;` | right | two blocks |
+| `B v = (B)x; look(&v); return (C)v;` | right | the call may write `v` |
+| `volatile B v = (B)x; return (C)v;` | right | |
+| across a return, `(C)mid(x)` with `B mid(A)` | right | wrong with `-ox` or `-oe`, which expand `mid` in place |
+| as an argument, `take((B)x)` with `C take(B)` | right | `take` cuts for itself; wrong with `-ox`, `-oe` |
+
+The other 384 chains are right in all twelve forms: every narrowing,
+every change of sign at one size, a widening from a type without a
+sign, and a widening with a sign both times. With `-ot`, `-ox`, no
+`-o` at all, and `-os -oe` it is the same eight; with `-od` none.
+The compiler for 16 bits does the same, read in its listing and not
+run: `cbw; cwd` for s8 to u16 to a long of either sign, wrong and
+right in the same forms, of which ten of the twelve were read. The
+compiler for C++ makes `movsx eax,al` of the first form too.
+
+Beyond the eight, by the same lines, each tried:
+
+- A floating type as the third: `(double)(u16)c` for a signed char is
+  `cbw` and `fild word ptr`, -2 where C says 65534, and so are s8 or
+  s16 by way of u32, and s32 by way of u64. Six chains tried, six
+  wrong, right with `-od`.
+- A pointer as the third, in 32 bits: `(void *)(u16)c`, `base[(u16)c]`
+  and `base + (u16)c` are `movsx`.
+- The source may be anything of a signed type of that size: a
+  bit-field declared `signed char`, worked out by two shifts in a
+  byte, goes wrong like a variable.
+- A step that the compiler folds to nothing does not help: `(u16)(c +
+  0)`, `- 0`, `| 0`, `^ 0`, `* 1`, `/ 1`, `<< 0`, `>> 0`, `& -1`,
+  `-(-c)`, and `(u16)(c + 1 - 1)`, are all `movsx eax,al`. Written
+  out nobody writes them; a macro that is 0 does.
+- A step that stays does: `(u16)(c - 1)`, `(u16)~~c`, `(u16)(c + k)`
+  for a variable `k` that is 0, and the mask `& 0xFFFF` on either
+  side of the cast, are right. Those rest on the instruction still
+  being there when the peephole last runs, which nothing promises of
+  the mask.
+- A new value for the source between the two, `u16 v = (u16)x; x =
+  ...; return v;`, is right, and a store through a pointer to a u16
+  between is right: the two tests of `_IsReDefinedBy`.
+- An integer that a floating type rounds, `(double)(float)i` and
+  `(int)(float)i` for 16,777,217, keeps all its digits with `-os`
+  where a variable is between, and is rounded with `-od`. The lines
+  say so too: `FS` is above every integer, so the fold is made. But
+  in one expression it is not rounded with `-od` either, so the
+  coprocessor's own precision is in it, and this was not taken
+  further.
+
+**Upstream.** `peepopt.c` is the same file on the project's default
+branch on 13 October 2026, commit
+`1f178ef1b1a1bb06492759f8e2b76c2a7f39e9b6`. The lines are in the
+first commit of the repository, of 2002, with the same tests in the
+same order: the fault is as old as the published source, and every
+release since has it by that. A dozen searches of the project's issues
+(sign extension, `movsx`, `movzx`, `cdq`, conversion, cast, signed
+char, unsigned short, wrong code, `peepopt`, `DoConversionOps`) and
+one of the web found no report of it. The nearest, issue 822, is of
+the type of the constant -32768 and another matter.
+
+**The mend**, described and not tried, since the compiler is not
+built here: in `DoConversionOps`, behind the test for "converting
+down", leave the pair alone when the first conversion is from a class
+with a sign (`_IsSigned`, of `split.h`) to an integer class without
+one and the second goes on to a wider class (`TypeClassSize`) or to a
+floating one. A dozen lines and an `#include`. The rounding by a
+floating type, above, is no part of it or of the report: it was seen
+and not understood. The plainest form of the mend, never to fold
+behind a conversion from a signed class to one without a sign, loses
+only folds like s8 to u32 to u16.
+
+**What it means for the tree.** With no number of 64 bits and no
+floating type, a program of 32 bits meets the fault in one shape, a
+signed type of 8 bits made a type of 16 bits without a sign that goes
+on into 32, which is what `harness/cut.py` says. And the casts that
+the tree is about to lean on are honoured as far as this fold goes: a
+narrowing first conversion is never folded, a change of sign at one
+size is no conversion, and a fold whose second conversion narrows is
+right; the 384 chains are the evidence. What the finder of
+`harness/cut.py` should have besides, as it was read while it was
+being written:
+
+- It looks through casts, a `+` in front, a comma and a choice. By
+  the lines it would have to look through every step that the
+  compiler folds to nothing, of which the list above is what was
+  tried. Simpler and closed: take arithmetic for a step that changes
+  the number only where an operand of it is no constant, and take
+  nothing but a `short` between for the form of the tree.
+- A floating type is to be refused as a number of 64 bits is: with
+  one, a `short` made a u32 is wrong as well.
+- `-oe`, or `-ox`, which has it, expands a function in place and
+  brings two conversions into one block that a call kept apart. The
+  check that holds `harness/cutcheck.c` to its instructions compiles
+  with the build's options, so a build that got such an option would
+  show there.
+
+**A report for the compiler's project**, to file as it is; nothing
+was sent.
+
+> **cg: peephole fold of two conversions extends the sign through an
+> unsigned type: `(unsigned long)(unsigned short)c` of a `signed char`
+> is `movsx eax,al`**
+>
+> Open Watcom C x86 32-bit Optimizing Compiler, Version 2.0 beta Oct
+> 1 2026 06:32:26 (64-bit), the snapshot 2026-10-01-Build, commit
+> e28568669775a7119f381f3b37d21745d8afcfb6. The same in `wpp386` and
+> in `wcc` (16 bits) of that build. The code is unchanged on master
+> and has been there since the first commit.
+>
+>     #include <stdio.h>
+>
+>     unsigned long lost( signed char c )
+>     {
+>         return( (unsigned short)c );
+>     }
+>
+>     unsigned long kept( signed char c )
+>     {
+>         return( (unsigned short)(short)c );
+>     }
+>
+>     double lost_fp( signed char c )
+>     {
+>         return( (unsigned short)c );
+>     }
+>
+>     int main( void )
+>     {
+>         printf( "%lx %lx %g\n", lost( -2 ), kept( -2 ), lost_fp( -2 ) );
+>         return( 0 );
+>     }
+>
+> `wcc386 -bt=linux lost.c`, linked with `system linux`, and likewise
+> with `-os`, `-ot`, `-ox`. Expected, and printed with `-od`:
+> `fffe fffe 65534`. Printed: `fffffffe fffe -2`.
+>
+> `lost` is `movsx eax,al; ret`, where the conversion to `unsigned
+> short` gives 0xFFFE and the one to `unsigned long` has to fill with
+> zeros (`cbw; movzx eax,ax`, which is what `kept` gets). `lost_fp` is
+> `cbw; mov [esp],eax; fild word ptr [esp]`. With `wcc`, `lost` is
+> `cbw; cwd`. In general: a conversion from a signed integer type to a
+> wider unsigned one, followed in the same block by a conversion to a
+> still wider integer type, of either sign, or to a floating type; the
+> second is made with the sign of the first one's operand. Of the 392
+> chains of two conversions among the integer types of 8 to 64 bits,
+> exactly eight are wrong: s8 to u16 to s32, u32, s64 or u64; s8 to
+> u32 to s64 or u64; s16 to u32 to s64 or u64. It also happens through
+> a variable, a global or a field, when both conversions end up in one
+> block.
+>
+> Cause: `DoConversionOps` in `bld/cg/c/peepopt.c` changes `cnv A ->
+> B; cnv B -> C` into `cnv A -> B; cnv A -> C`, and refuses only
+> pointers and "converting down" (`ins->type_class <
+> ins->base_type_class`). `cnv I1 -> U2; cnv U2 -> U4` becomes `cnv I1
+> -> U4`, which extends the sign.
+>
+> Proposed mend, behind the test for converting down (it needs
+> `split.h` for `_IsSigned`); not built or tested:
+>
+>     if( _IsSigned( ins->base_type_class )
+>       && !_IsSigned( ins->type_class )
+>       && !_IsFloating( ins->type_class )
+>       && ( _IsFloating( next->type_class )
+>         || TypeClassSize[next->type_class] > TypeClassSize[ins->type_class] ) )
+>         return( false );
+
 ## An implementation of the layer for tests: future work
 
 The road of the portable C (`CLAUDE.md`, "The portable C") has a
