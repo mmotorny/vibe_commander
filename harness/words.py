@@ -94,6 +94,13 @@ WORDS = [
                               "in paragraphs", OF_MAIN, "FreMem2"),
     _word("PANEL_PARAS", "F1", "a panel's length in paragraphs"),
     _word("VIEW_PARAS", "F1", "the room of the viewer in paragraphs"),
+    # What F1 put in their place, which counts in paragraphs of 16
+    # bits: gone when the memory is the extender's and counted in bytes.
+    _word("RoomParas", "F9", "the room's length in paragraphs: each of "
+                             "the five clusters that count the room "
+                             "moves its calls to bytes", CALLED),
+    _word("PANEL_BLOCK", "F9", "a panel's block in paragraphs"),
+    _word("ROOM_LEAST", "F9", "the least of the room in paragraphs"),
     _word("OFFSET", "F3", "a table as an offset in the tables' segment"),
     _word("TABLES_BY", "F3", "the tables' segment"),
     _word("AsmSeg", "F3", "the same, as a function"),

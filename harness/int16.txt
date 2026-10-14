@@ -180,6 +180,13 @@ start.c, MnPth0: index
     at is a place in the environment, which DOS holds to 32K, and i is
     below the length of a name of a variable, which the callers write.
 
+start.c, RoomParas: shift
+    | return (u16)((RoomEnd - Room) >> 4);
+    RoomEnd is behind Room, in the same block: Memory, just above, makes
+    it of Room and a count of paragraphs of 16 bits, and nothing else
+    sets either. So the difference is not below 0, and its sixteenth is
+    that count again.
+
 stcolor.c, StCol00: index
     | chosen.color = StPalets[ColAddr(sd.ColCur) - md.ColTab];
     ColAddr answers with a place in ColTab: IN_TABLE of screen.c adds to

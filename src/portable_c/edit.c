@@ -4,8 +4,9 @@
  *
  * Translated from VCEDIT.INC.
  *
- * The text of the file is in the memory behind the program, from the
- * segment ViewSeg on, EdLen bytes of it, and may be longer than a segment.
+ * The text of the file is in the room, from Room of vc.h on, the
+ * segment ViewSeg of the original, EdLen bytes of it, and may be longer
+ * than a segment.
  * A place in it is an offset from its start, 32 bits, or the address of
  * the byte: a segment, and an offset of less than 16 where the program has
  * made the address from an offset. The line that the cursor is in is
@@ -14,7 +15,7 @@
  *
  * A line ends with a carriage return and a line feed, in either order; in
  * hex mode a line is 16 bytes, and the number of a line there is that of
- * its segment, counted from ViewSeg.
+ * its segment, counted from that of Room.
  *
  * The editor has no procedure of its own in the assembly: the viewer's
  * code jumps to T00_00 once it has opened the file, and the editor jumps
@@ -251,7 +252,7 @@ static const u8 MainExt_F[] = "VC.EXT";
 
 /* The offset in the text of the byte at an address. */
 #define OFFSET_OF(segment, offset) \
-    (((u32)(u16)((segment) - md.ViewSeg) << 4) + (offset))
+    (((u32)(u16)((segment) - SEG_OF(Room)) << 4) + (offset))
 
 /* The address of the byte at an offset in the text: its segment, and for
    the offset what is left, less than 16. Of the offset in the text 20
@@ -262,7 +263,7 @@ static struct Address AddressOf(u32 place)
     u16 high = HIGH(place);
     u16 low = LOW(place);
 
-    address.segment = (low >> 4 | high << 12) + md.ViewSeg;
+    address.segment = (low >> 4 | high << 12) + SEG_OF(Room);
     address.offset = low & 0x0F;
     return address;
 }
@@ -451,7 +452,7 @@ void T51_00(void)
         address = AddressOf(end);
         segment = address.segment;
         offset = address.offset;
-        limit = ed.EdSpace + md.ViewSeg;
+        limit = ed.EdSpace + SEG_OF(Room);
         if (segment >= limit) {
             ed.EdScrn = 1;
             Beep();
@@ -625,13 +626,13 @@ u16 T54_00(struct Where *where)
     if (where->line == 0)
         return 1;
     if (ed.EdTxHex != 0) {
-        if (segment <= md.ViewSeg)
+        if (segment <= SEG_OF(Room))
             return 1;
         where->segment = segment - 1;
         where->line--;
         return 0;
     }
-    if (segment <= md.ViewSeg && offset == 0)
+    if (segment <= SEG_OF(Room) && offset == 0)
         return 1;
     place = OFFSET_OF(segment, offset);
     checked = offset > 2;
@@ -639,7 +640,7 @@ u16 T54_00(struct Where *where)
     for (;;) {
         if (!checked || offset < 2) {
             /* The segment has no more: take one that is lower. */
-            back = segment - md.ViewSeg;
+            back = segment - SEG_OF(Room);
             if (back == 0) {
                 offset = 0;
                 break;
@@ -1072,7 +1073,7 @@ static struct Answer T80_02(u16 attributes)
             attributes = 0xFFFF;
         }
         left = ed.EdLen;
-        segment = md.ViewSeg;
+        segment = SEG_OF(Room);
         do {
             count = 0xFF00;
             if (HIGH(left) == 0 && LOW(left) < count)
@@ -1170,7 +1171,7 @@ static void T80_14(void)
     count = LenExt - 1;
     if (HIGH(ed.EdLen) == 0 && count > LOW(ed.EdLen))
         count = LOW(ed.EdLen);
-    text = AT(md.ViewSeg, 0);
+    text = AT(SEG_OF(Room), 0);
     for (c = 0; c < count; c++)
         md.ExtMain[c] = text[c];
     md.ExtMain[count] = 0x1A;
@@ -1430,7 +1431,7 @@ static void T01_10(u16 key)
         if (ed.EdHexAs == 0)
             *byte &= 0xF0;
         if (address.offset >= 0x0F      /* T01_13 */
-            && (u16)(address.segment - md.ViewSeg + 1) >= ed.EdSpace) {
+            && (u16)(address.segment - SEG_OF(Room) + 1) >= ed.EdSpace) {
             Beep();
         } else {
             ed.EdLen++;                 /* T01_14 */
@@ -1625,7 +1626,7 @@ static void T16_00(void)
             ;
         T60_20(&where);
     } else {
-        ed.EdLine = AddressOf(ed.EdLen).segment - md.ViewSeg;   /* T16_10 */
+        ed.EdLine = AddressOf(ed.EdLen).segment - SEG_OF(Room);   /* T16_10 */
         ed.EdOffst = ed.EdLen & 0xFFFFFFF0UL;
     }
     T14_11();                           /* T16_11 */
@@ -1912,7 +1913,7 @@ static void T30_00(void)
         place = ed.EdOffst + ed.EdCursr;
         address = AddressOf(place);
         ed.EdCursr = address.offset;
-        ed.EdLine = address.segment - md.ViewSeg;
+        ed.EdLine = address.segment - SEG_OF(Room);
         ed.EdLin0 = ed.EdLine;
         ed.EdOffst = OFFSET_OF(address.segment, 0);
     } else {
@@ -1966,7 +1967,7 @@ static void T32_00(void)
         ed.EdHexAs = (u8)sought.found;
         ed.EdHxCur = 0;
         ed.EdOffst = place & 0xFFFFFFF0UL;
-        ed.EdLine = AddressOf(place).segment - md.ViewSeg;
+        ed.EdLine = AddressOf(place).segment - SEG_OF(Room);
         ed.EdCursr = LOW(place) & 0x0F;
     } else {
         T56_00(HIGH(ed.EdOffst), LOW(ed.EdOffst), ed.EdLine,   /* T32_06 */
@@ -2558,7 +2559,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     u16 code = AsmSeg();
     u16 help, file, count, segment, place, color, i;
 
-    ed.EdSpace = MAIN_SEG + md.FreMem2 - md.ViewSeg;
+    ed.EdSpace = RoomParas();
     if ((u32)ed.EdSpace << 4 <= ed.EdLen) {
         /* T00_01. The assembly leaves in DX for the text that ^I stands
            for, and in BX and SI for a box that is on the screen, what the
@@ -2601,7 +2602,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
             goto closed;
     } else {
         left = ed.EdLen;                /* T00_06 */
-        segment = md.ViewSeg;
+        segment = SEG_OF(Room);
         for (;;) {
             count = PIECE;              /* T00_07 */
             if (HIGH(left) == 0 && LOW(left) < count)

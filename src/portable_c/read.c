@@ -4,14 +4,16 @@
  *
  * Translated from VCSUB2.INC and VCSUB3.INC.
  *
- * The panels lie in the memory one behind the other, each as long as its
- * list of files, and behind them begins the room that the viewer and the
- * editor take, at ViewSeg. Before a directory is read the panel behind
- * the one that reads is moved up as far as it goes, so that the list may
- * grow, and afterwards down again to where the list ends. While the
- * directory is read the list that the panel had is kept behind the
- * panels: what was selected in it and where the cursor was is looked up
- * in the new one by name.
+ * Each panel has a block of the memory of its own, 64K, which is as long
+ * as a list of files can get, and the room that the viewer and the
+ * editor take is a third, at Room (see vc.h). In the original the panels
+ * lie one behind the other, each as long as its list, and the room
+ * begins behind them, at ViewSeg: before a directory is read the panel
+ * behind the one that reads is moved up as far as it goes, so that the
+ * list may grow, and afterwards down again to where the list ends.
+ * Nothing is moved here. While the directory is read the list that the
+ * panel had is kept in the room: what was selected in it and where the
+ * cursor was is looked up in the new one by name.
  *
  * ReDir chooses by which of the three kinds a panel is of: RdInfo for
  * the Info, for the tree ReadTre of treebox.c, and for files ReDr00,
@@ -28,7 +30,7 @@
 #include "vc.h"
 
 /* What ReDr00 keeps of the list that a panel had, for ReDr50: ReDir has
-   it on the stack between the two. The list itself is at ViewSeg. */
+   it on the stack between the two. The list itself is at Room. */
 struct OldList {
     u16 keep;                           /* not 0: the cursor and what is
                                            selected are to stay */
@@ -58,7 +60,6 @@ extern const u8 Ext_F[];
 static const u8 DrIn_F[] = "DIRINFO";
 
 #define SIZE_FILENT sizeof(struct FILENT)
-#define MinView 8000                    /* Minimum view buffer size */
 
 /* Errors of DOS, and the one that a call makes of a drive that is not
    ready, where it is asked with the program's errors. */
@@ -70,7 +71,7 @@ static const u8 DrIn_F[] = "DIRINFO";
 
 /* Read the directory of a panel of files, and its extension file: ReDir
    of the original from ReDr00 on. What
-   the panel had before is left for ReDr50 at ViewSeg and in `old`, with
+   the panel had before is left for ReDr50 at Room and in `old`, with
    `keep`, of which the low byte counts; that is made 0 if the directory
    was not there.
 
@@ -100,53 +101,23 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
     struct FILENT *entry;
     u8 *to;
     const u8 *from;
-    u16 top, other, size, count, i;
+    u16 size, count, i;
     u16 limit, file, number, retries;
     u16 oldCursor, oldFirst;
     u16 drive, attributes, found, answer;
     struct Answer opened, asked, got, closed;
 
-    /* Expand: the panel behind this one as far up as it goes, but no
-       further than 64K from here. */
-    top = MAIN_SEG + md.FreMem2 - (((MinView - 1) >> 4) + 1);
-    limit = panel + 0x1000;
-    other = md.WCB1seg;
-    if (panel >= other)
-        other = md.WCB2seg;
-    if (panel < other) {
-        size = md.ViewSeg - other;
-        top -= size;
-        if (top > limit)
-            top = limit;
-        md.ViewSeg = size + top;
-        count = size << 4;
-        from = (const u8 *)PANEL(other);
-        to = (u8 *)PANEL(top);
-        for (i = count; i != 0; ) {     /* from its end: they overlap */
-            i--;
-            to[i] = from[i];
-        }
-        if (other == md.WCB1seg)
-            md.WCB1seg = top;
-        if (other == md.WCB2seg)
-            md.WCB2seg = top;
-        if (other == md.WCBcrn)
-            md.WCBcrn = top;
-        if (other == md.WCBsec)
-            md.WCBsec = top;
-    } else {
-        if (top > limit)
-            top = limit;
-        md.ViewSeg = top;
-    }
-    limit = top - panel;                /* where the list has to end */
-    if (limit > 0xFFF)
-        limit = 0xFFF;
-    limit = (limit << 4) - 2 * SIZE_FILENT;
+    /* Expand, in the original: it moves the panel behind this one as
+       far up as it goes, but no further than 64K from here, and the
+       room with it, so that the list has room to grow. Here a panel has
+       its 64K from the start, and nothing is moved. Where the list has
+       to end is what the original has with memory enough: a paragraph
+       short of 64K, which is as far as it counts in 16 bits. */
+    limit = ((PANEL_BLOCK - 1) << 4) - 2 * SIZE_FILENT;
 
-    /* Keep the old list behind the panels, as much of it as there is room
-       for in whole entries. */
-    size = md.FreMem2 - (md.ViewSeg - MAIN_SEG);
+    /* Keep the old list in the room, as much of it as there is room for
+       in whole entries. */
+    size = RoomParas();
     if (size > 0xFFF)
         size = 0xFFF;
     size <<= 4;
@@ -164,7 +135,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
         }
     }
     from = (const u8 *)wcb + DSKBUF;
-    to = (u8 *)PANEL(md.ViewSeg);
+    to = Room;
     for (i = 0; i < count; i++)
         to[i] = from[i];
     old->end = count;                   /* places in the old list from */
@@ -342,12 +313,11 @@ static void ReDr45(u16 panel)
 static void ReDr50(u16 panel, struct OldList *old)
 {
     struct WCBdef *wcb = PANEL(panel);
-    u8 *to;
     const u8 *from;
-    u16 top, other, size, count, i;
+    u16 i;
     u16 attributes, found;
 
-    from = (const u8 *)PANEL(md.ViewSeg);
+    from = Room;
     for (i = 0; i < old->end; i += SIZE_FILENT) {
         attributes = ((const struct FILENT *)(from + i))->AttrF & 0xC0;
         if (attributes == 0)
@@ -370,33 +340,10 @@ static void ReDr50(u16 panel, struct OldList *old)
             wcb->First = found;
     }
 
-    /* Compress: the panel behind this one down to where the list ends, or
-       to where a panel with the fewest files would. */
-    top = wcb->EndFul + SIZE_FILENT - 1;
-    if (top < sizeof(struct WCBdef) - 1)
-        top = sizeof(struct WCBdef) - 1;
-    top = (top >> 4) + 1 + panel;
-    other = md.WCB1seg;
-    if (panel >= other)
-        other = md.WCB2seg;
-    if (panel < other) {
-        size = md.ViewSeg - other;
-        count = size << 4;
-        from = (const u8 *)PANEL(other);
-        to = (u8 *)PANEL(top);
-        for (i = 0; i < count; i++)
-            to[i] = from[i];
-        if (other == md.WCB1seg)
-            md.WCB1seg = top;
-        if (other == md.WCB2seg)
-            md.WCB2seg = top;
-        if (other == md.WCBcrn)
-            md.WCBcrn = top;
-        if (other == md.WCBsec)
-            md.WCBsec = top;
-        top += size;
-    }
-    md.ViewSeg = top;
+    /* Compress, in the original: it moves the panel behind this one
+       down to where the list ends, or to where a panel with the fewest
+       files would, and has the room begin behind it. Nothing is moved
+       here: see ReDr00. */
     CorPar(panel);
 }
 

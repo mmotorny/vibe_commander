@@ -812,7 +812,7 @@ static void Status(void)
    between them Left or Right. */
 void V00_10(u16 handle)
 {
-    u16 segment = md.ViewSeg;
+    u16 segment = SEG_OF(Room);
     const u8 *text = TEXT(segment);
     struct Line line;
     struct Box box;
@@ -825,7 +825,7 @@ void V00_10(u16 handle)
     u16 mouse = 0;
     u8 third, quarter;
 
-    count = MAIN_SEG + md.FreMem2 - md.ViewSeg;
+    count = RoomParas();
     if (count > 0xFFE)
         count = 0xFFE;
     count <<= 4;
@@ -1565,7 +1565,6 @@ extern const u8 Run1_S[];               /* "Can't run commands for some
                                            reason." */
 extern const u8 Run2_S[];               /* "Try rebooting." */
 
-#define MinView 8000                    /* Minimum view buffer size */
 
 #define EOF_CHAR 0x1A
 
@@ -1757,17 +1756,17 @@ static void Aexec0(u16 edit)
         tail[13] = 1;
     }
     /* The panels keep their memory, and the viewer as much as it needs
-       at the least: the block that both are in is made that long. In
-       the original it begins with the main data. */
-    MemResize(md.MemSeg,
-              md.ViewSeg - md.MemSeg + ((MinView - 1) >> 4) + 1);
+       at the least: the room is made that long. In the original the
+       panels and the room are one block, which begins with the main
+       data. */
+    MemResize(SEG_OF(Room), ROOM_LEAST);
     LetLin(md.TmpBuf);
     ran = ProgramRun(md.TmpBuf, md.TmpBuf + 100);
     error = ran.value;
     /* All the memory that there is, again: DOS says how much that is
        when it is asked for more. */
-    all = MemResize(md.MemSeg, 0xFFFF);
-    MemResize(md.MemSeg, all.largest);
+    all = MemResize(SEG_OF(Room), 0xFFFF);
+    MemResize(SEG_OF(Room), all.largest);
     HidCur();
     SavMous();
     IniMous();

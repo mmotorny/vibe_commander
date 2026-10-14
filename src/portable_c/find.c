@@ -14,7 +14,7 @@
  *
  * A file that was found is a line of 65 characters, as the list shows
  * it, and so is the directory before the first file found in it. The
- * lines are kept in the memory from ViewSeg on, one behind the other;
+ * lines are kept in the room, from Room on, one behind the other;
  * what follows the last one serves to read a file into that is searched
  * for a text.
  */
@@ -153,13 +153,13 @@ enum {
 };
 
 /* Where a line of the list is in the memory. The lines follow one
-   another from ViewSeg on, and the address is made so that a line never
+   another from Room on, and the address is made so that a line never
    crosses the end of a segment: of 20 bits, like the assembly's. */
 static u8 *Line(u16 number)
 {
     u32 at = ((u32)number << 6) + number;       /* 65 bytes to a line */
 
-    return AT((u16)(at >> 4) + md.ViewSeg, (u16)at & 0x0F);
+    return AT((u16)(at >> 4) + SEG_OF(Room), (u16)at & 0x0F);
 }
 
 /* Write a line of the list to the screen buffer, in the colour of the
@@ -610,7 +610,7 @@ next:
             goto next;
         }
         handle = opened.value;
-        room = MAIN_SEG + md.FreMem2 - md.ViewSeg;
+        room = RoomParas();
         chunk = 0x8000 + 80;
         if (!(room & 0xF000)) {
             room <<= 4;
@@ -855,7 +855,7 @@ again:
     ((u16 *)&md.MousTim)[1] = 0xFFFF;
     ViTxHex = 0;
     /* As many lines as the memory behind the program has room for. */
-    room = MAIN_SEG + md.FreMem2 - md.ViewSeg;
+    room = RoomParas();
     FND->FndSize = (u16)(((u32)room << 4) / LenFnf) - 1;
     FND->FndDrv = 'A';
 

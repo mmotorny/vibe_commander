@@ -667,17 +667,17 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 307,107 bytes, of which the extender's stub is 27,536 |
+| `VC.EXE` | 307,175 bytes, of which the extender's stub is 27,536 |
 | as a multiple of the original's 65,090 bytes | 4.72 |
-| more than the C translation's 133,056 bytes | 174,051 bytes |
-| Its code, and what the file has of its data | 132,130 and 104,411 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 892,529 bytes |
-| The addresses in it that the extender sets when it loads it | 5,274 |
+| more than the C translation's 133,056 bytes | 174,119 bytes |
+| Its code, and what the file has of its data | 131,864 and 104,463 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 892,323 bytes |
+| The addresses in it that the extender sets when it loads it | 5,258 |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
-| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c-layout` holds them | 24,056 and 16,692 bytes |
-| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,628 and 2,347 bytes |
-| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 400,583 bytes, 222,733 of them code |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c-layout` holds them | 24,052 and 16,696 bytes |
+| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,576 and 2,339 bytes |
+| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 400,683 bytes, 222,352 of them code |
 | Inline assembly | 98 instructions in 13 pieces: 98 in 13 of `dos32.c` |
 | Lines of `#pragma aux` | 17, of which 5 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
@@ -792,8 +792,14 @@ by the test `portable_c-data`: [the figures](#the-figures) have how
 many such words there are.
 
 The memory of the panels, the viewer and the editor is not DOS's. The
-program asks for a block as the original asks DOS for one, and
-`dos32.c` hands it out of those 640 KB, as DOS hands out its memory. So
+program asks for it as the original asks DOS, and `dos32.c` hands it
+out of those 640 KB, as DOS hands out its memory: a block of 64K for
+each panel, which is kept for as long as the program runs and never
+moved, and one for the room that the viewer, the editor, a copy and
+the file search take, where the original has one block that it cuts up
+and moves its panels in. In front of each block and behind the last are
+16 bytes of a pattern, which the tests look at when a scenario ends: a
+write just outside a block fails the scenario. So
 a command that the program runs has DOS's memory below the megabyte,
 all but the extender's part, and finds none above it, which the
 extender holds; and the editor has room for a larger file than the

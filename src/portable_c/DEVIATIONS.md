@@ -104,12 +104,18 @@ below the megabyte stays the extender.
   copy of itself: it never says "Bad or missing", and goes on if its
   file is deleted while a command runs.
 - The main data is of the program, not a block that it asks DOS for. The
-  panels, with the memory of the viewer behind them, are a block that it
-  asks for when it starts, and not of DOS either: the program has 640 KB
-  of its own, above the megabyte, which it hands out to itself as DOS
-  hands out its memory. For a command that block is made as long as two
-  panels of 256 files, and afterwards the program asks for the largest
-  block that there is, as the original does; DOS gains nothing by it.
+  panels and the memory of the viewer, the room, are not of DOS either:
+  the program has 640 KB of its own, above the megabyte, which it hands
+  out to itself as DOS hands out its memory. They are three blocks where
+  the original has one that it cuts up: one for each panel, 64K, which
+  is as long as a panel's list of files can get, asked for when the
+  program starts and kept for as long as it runs; and the room, the
+  largest block that there is then. The original has each panel as long
+  as its list and the room behind them, and moves the second panel and
+  the room when a list grows or shrinks; here nothing is moved. For a
+  command the room is given back, and afterwards the program asks for
+  the largest block that there is, as the original does; DOS gains
+  nothing by it.
 - A panel is left with 256 files for a command, as the original leaves
   it, the cursor's file and the first one shown put last if they are
   beyond, and is read again afterwards: what stays selected is what the
@@ -1636,18 +1642,21 @@ what the program is larger. The program of 32 bits has its panels and
 its text in memory of its own, 640 KB that are a part of the program
 and that it hands out to itself where the program of 16 bits asks DOS
 (`TODO.md`, "The portable C in 32 bits: the plan", "The memory"): its
-editor has all of that but the panels' lists, whatever DOS has free and
-however large the program is. On the bench of the tests that is nearly
-twice the original's room, and more than twice that of the program of
-16 bits; `TODO.md`, "C1, the editor", has the four figures as they were
-measured.
+editor has all of that but the two panels, 64K each, whatever DOS has
+free and however large the program is: 524,240 bytes, on any machine.
+On the bench of the tests that is half as much again as the original's
+room, 345,840 bytes. Until the panels had blocks of their own, of 64K
+from the start, it was 641,824 bytes with the lists that the bench has;
+`TODO.md`, "C1, the editor", has the figures as they were measured
+then, with that of the program of 16 bits.
 
 So the program of 32 bits opens a file in the editor that the original
 refuses with its box, if the file is larger than the original's room
 and smaller than its own. A file that is larger than its own room it
 refuses as the original does, with the same box. A copy reads a file
 of that size in one piece where the original reads and writes it in
-two, and the file search has room for a longer list.
+two, and the file search has room for a longer list, 8,064 lines on the
+bench.
 
 **Why.** The user's decision, on 13 October 2026: the editor of the
 program of 32 bits has room for a file that the original's has none
@@ -1684,8 +1693,8 @@ much room a build has:
 
 | Scenario | What it is for | In the program of 32 bits |
 |---|---|---|
-| `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has some 250,000 bytes free where the original has none. Seen, in the count of its status line |
-| `copy-big` | A file that the memory does not hold, 526,632 bytes, read and written in two parts, and skipped when not all of it has been read | The memory holds it: one part. By the numbers, not seen |
+| `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has 130,270 bytes free where the original has none. Seen, in the count of its status line |
+| `copy-big` | A file that the memory does not hold, 526,632 bytes, read and written in two parts, and skipped when not all of it has been read | As the original, since the room is 524,240 bytes: two parts, the first of 523,776 bytes where the original's is of 345,600, and skipped with not all of it read. Seen, in what the program has in its memory at the end of the scenario. While the room was 641,824 bytes, the memory held the file: one part |
 
 ### 14. No Quick execute commands
 

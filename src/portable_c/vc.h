@@ -310,14 +310,16 @@ struct MainDat {
     u16 WCBsec;
     u16 WCB1seg;
     u16 WCB2seg;
-    u16 ViewSeg;
-    u16 MemSeg;                         /* The block of the memory that
-                                           the panels and the viewer are
-                                           in. The original has a number
-                                           for the Info here, FreMem1 */
-    u16 FreMem2;                        /* How many paragraphs it is from
-                                           the main data to the end of
-                                           that block */
+    u16 ViewSeg;                        /* Of the original: the segment
+                                           behind the panels. Not set or
+                                           read here: see Room */
+    u16 MemSeg;                         /* Not set or read here. The
+                                           original has a number for the
+                                           Info here, FreMem1 */
+    u16 FreMem2;                        /* Of the original: the
+                                           paragraphs of its block of
+                                           memory. Not set or read here:
+                                           see RoomEnd */
     u16 Memorys;                        /* The memory that the machine
                                            has, in paragraphs, for the
                                            Info: of the original. Here a
@@ -405,6 +407,30 @@ LAID_OUT(WCBdef, 0x1A62);
    handed the main data's segment in place of a panel's, it reads the
    main data as if it were one. */
 extern struct MainDat md;
+
+/* The room, of main.c: the memory that whatever is at work has, the
+   text of the viewer or the editor, the list of the file search, a
+   copy's buffer, the old list while a directory is read. It is a block
+   of its own, behind the blocks of the two panels, and Room is where it
+   begins and RoomEnd where it ends: ViewSeg and FreMem2 of the
+   original, which has a segment for the first and a count of paragraphs
+   for the second, in the main data, and which has the room begin where
+   the second panel ends, wherever that is. The room is given back for
+   a command and taken again, and may then be elsewhere and of another
+   length: nothing keeps a pointer into it across GiveMem, TakeMem or
+   Aexec0 of view.c. RoomParas, of start.c, says how long it is, in
+   paragraphs. */
+extern u8 *Room;
+extern u8 *RoomEnd;
+u16 RoomParas(void);
+
+/* The paragraphs of a panel's block: 64K, which is as far as the
+   offsets of 16 bits reach that a panel keeps its places in. And the
+   paragraphs that the room has at the least, which is what the viewer
+   needs: with less the program does not start. */
+#define MinView     8000                /* Minimum view buffer size */
+#define PANEL_BLOCK 0x1000
+#define ROOM_LEAST  (((MinView - 1) >> 4) + 1)
 
 /* The stack, of stack.c: LenStk bytes in a segment of their own. */
 extern u8 Stack[];
@@ -507,19 +533,14 @@ struct Label GetVol(u8 *volume);
 u16 MakeIni(void);
 struct Answer SaveSet(void);
 
-/* How many paragraphs a panel takes that has room for the fewest files.
-   The two panels are what the program keeps of its block of memory
-   while a command runs. */
-#define PANEL_PARAS (((sizeof(struct WCBdef) - 1) >> 4) + 1)
-
 /* The start of the program, start.c. Init00 reads the setup, when the
-   program has been loaded, and Init11 then asks DOS for the memory of
-   the panels and the viewer, all that there is, and makes the panels:
-   it answers with how many paragraphs there were, and whether that is
-   too few. IniData finds out about the machine, then and after every
-   command. GiveMem gives all of that memory but the panels back to DOS,
-   for a command, and TakeMem takes it again afterwards, and answers as
-   Init11 does. Main of main.c is the program from when DOS has loaded it:
+   program has been loaded, and Init11 then asks for the memory of the
+   panels and for the room, all that there is, and makes the panels: it
+   answers with how many paragraphs there were, and whether that is too
+   few. IniData finds out about the machine, then and after every
+   command. GiveMem gives the room back for a command, and TakeMem
+   takes it again afterwards, and answers as Init11 does. Main of main.c
+   is the program from when DOS has loaded it:
    the system calls it where it enters the program, Start of dos32.c,
    and it does not return. */
 void Init00(void);

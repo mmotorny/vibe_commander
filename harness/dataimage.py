@@ -67,7 +67,8 @@ what it compares:
 
 Where the blocks are. The tool learns that from the image itself and the
 map: the main data at `_md`; the blocks by what dos32.c keeps of them,
-today a paragraph in front of each inside `Own`, which the map names.
+a table beside `Own`, both of which the map names, and in a build from
+before that table a paragraph in front of each block inside `Own`.
 When the memory comes from the extender, a block lies wherever the
 extender put it and is a stretch of its own in the image: taken by the
 same `pmemsave` at the address and with the length that a table of
@@ -109,8 +110,9 @@ the program's own hand-out of memory is to keep 16 bytes of a pattern,
 GUARD below: in front of each block that is taken and behind the last
 block. They are looked at when an image is taken, by guards(): a
 scenario whose image has them otherwise fails the scenarios' test, with
-the block and the place, and `save` and `compare` say the same. While
-no pattern is declared, nothing is looked at.
+the block and the place, and `save` and `compare` say the same. In a
+build from before dos32.c wrote the pattern, which is known by its
+having no table of its blocks, nothing is looked at.
 
 `compare` prints, for every scenario that differs, each run of bytes
 with its name, and ends with what was held and how much. It fails if
@@ -145,6 +147,14 @@ PROGRAM = "the program's data"
 # What the program is linked of that the tool knows by name.
 MAIN = "_md"                      # the main data
 OWN = ("dos32", "_Own")           # the memory that the program hands out
+# What dos32.c keeps of the blocks of that memory, in a build that has
+# a table for it: the table, and how many blocks it has. An entry is the
+# paragraph of the megabyte that the block begins in, its paragraphs,
+# and whether it is taken, a word each.
+OWN_BLOCKS = ("dos32", "_OwnBlocks")
+OWN_HELD = ("dos32", "_OwnHeld")
+OWN_ENTRY = "<HHH"
+OWN_MOST = 8                      # as many as the table has room for
 STACK = "STACK"                   # segments of the map
 TABLES = ("CONST", "CONST2")
 VARIABLES = ("_DATA", "_BSS")
@@ -192,9 +202,13 @@ ADDRESSES = (
     Address("WCB2seg", "WCB2seg", SEGMENT, cut=PANEL),
     Address("WCBcrn", "WCBcrn", SEGMENT),
     Address("WCBsec", "WCBsec", SEGMENT),
-    Address("ViewSeg", "ViewSeg", SEGMENT, cut=TEXT),
-    Address("MemSeg", "MemSeg", SEGMENT),
-    Address("FreMem2", "FreMem2", PARAGRAPHS),
+    # Where the room begins and where it ends: beside the main data
+    # since the program has three blocks where it had one to cut. The
+    # word MemSeg, the block that all of it was in, names nothing since
+    # then and is no address: its field is not set, and is held as the
+    # bytes that it is.
+    Address("ViewSeg", "ViewSeg", SEGMENT, ("main", "_Room"), cut=TEXT),
+    Address("FreMem2", "FreMem2", PARAGRAPHS, ("main", "_RoomEnd")),
 )
 
 # What two builds may have otherwise with no fault in either, each with
@@ -212,6 +226,14 @@ UNSTEADY = (
                          "looked at: " + TIME),
     ("DTA", 22, 4, "the time and the date of the file that DOS last "
                    "found, which a scenario may have made: " + TIME),
+    # Found by F1, against a build that took thousands of instructions
+    # more to a step, which `save --early` does not: read in Input of
+    # input.c.
+    ("ScrBuf", 152, 1, "the separator of the clock, at the end of the "
+                       "first row of the screen as the program keeps "
+                       "it: a colon in the second half of a second and "
+                       "a space in the first. " + TIME),
+    ("ScrBuf", 154, 1, "the same, of a clock of 24 hours"),
 )
 # Of the variables, by name.
 UNSTEADY_VARIABLES = {
@@ -232,10 +254,10 @@ COPIED = "the same bytes as the time of a file in a panel's list, in a " \
 # write just in front of a block or just behind its end is in them. The
 # image's tool holds them when an image is taken, and a scenario whose
 # image has them otherwise fails the scenarios' test, with the block
-# and the place: guards(). None while the program writes none; the
-# piece that has dos32.c write them puts the pattern here, as bytes,
-# and _guarded() says where they are, by the blocks of _blocks().
-GUARD = None
+# and the place: guards(). The pattern is here as bytes, as Guard() of
+# dos32.c writes it, and _guarded() says where it is, by the blocks of
+# _blocks().
+GUARD = bytes(0xF0 - at for at in range(16))   # Guard() of dos32.c
 
 
 class Spoilt(Exception):
@@ -541,8 +563,10 @@ class Read:
     def _blocks(self):
         """The blocks of the memory that the program hands out to
         itself, in their order: (offset in the program's data, length,
-        taken). In front of each, dos32.c keeps a paragraph: whether a
-        block follows, whether this one is taken, and its paragraphs."""
+        taken). dos32.c keeps them in a table, which the map names. A
+        build from before it had the table keeps a paragraph in front of
+        each block: whether a block follows, whether this one is taken,
+        and its paragraphs."""
         build = self.build
         own = build._symbol(*OWN)
         if own is None:
@@ -550,6 +574,26 @@ class Read:
                          "are that the program was handed is read there"
                          .format(*OWN))
         arena = build.main - ARENA
+        table, held = build._symbol(*OWN_BLOCKS), build._symbol(*OWN_HELD)
+        if table is not None and held is not None:
+            count = self.word(held, 4)
+            if count > OWN_MOST:
+                raise Spoilt(f"dos32.c's table of its blocks says that it "
+                             f"has {count} of them")
+            found = []
+            for number in range(count):
+                block, paragraphs, taken = struct.unpack_from(
+                    OWN_ENTRY, self.data,
+                    table + number * struct.calcsize(OWN_ENTRY))
+                at = arena + block * PARAGRAPH
+                # The first a paragraph behind where the memory begins,
+                # rounded up to one; each a paragraph behind the last.
+                if at != sum(found[-1][:2]) + PARAGRAPH if found \
+                        else not own < at <= own + 2 * PARAGRAPH:
+                    raise Spoilt(f"dos32.c's table has block {number} "
+                                 "where it cannot be")
+                found.append((at, paragraphs * PARAGRAPH, bool(taken)))
+            return found
         at = arena + (own + PARAGRAPH - 1 - arena) // PARAGRAPH * PARAGRAPH
         found = []
         while True:
@@ -699,7 +743,10 @@ def _guarded(read):
 def guards(read, pattern=None, places=None):
     """Where the bytes round a block are not the pattern, as lines of
     text, each with the block and the first byte that is another. None
-    is looked for while no pattern is declared: see GUARD."""
+    is looked for in a build that has no table of its blocks, which is
+    one from before dos32.c wrote the pattern: see GUARD."""
+    if not pattern and read.build._symbol(*OWN_BLOCKS) is None:
+        return []                 # a build from before there was one
     pattern = pattern or GUARD
     if not pattern:
         return []
@@ -718,7 +765,8 @@ def guards(read, pattern=None, places=None):
             f"the {len(pattern)} bytes {said} are not the pattern, from "
             f"the byte at +{first} of them on: {_hex(has)}, where the "
             f"pattern is {_hex(pattern)}. Something has written "
-            + ("in front of the block" if "front" in said else
+            + ("in front of the block, or behind the end of the one "
+               "before it" if "front" in said else
                "behind the end of the block")
             + ", or the block was not taken as dos32.c takes one")
     return found
@@ -1110,6 +1158,10 @@ def check(directory, out=print):
     begins = read.blocks[block][0]
     panel = read.addresses["WCB1seg"][0] - build.address
     text = read.addresses["ViewSeg"][0] - build.address
+    # The block that the room is in, which the program had as one block
+    # with its panels once and has as a block of its own since.
+    room = next(one for one in read.blocks
+                if one[0] <= text < sum(one[:2]))
     variable, (at, _) = next(iter(sorted(
         (name, where) for name, where in build.variables.items()
         if where[1] and not name.startswith("("))))
@@ -1121,7 +1173,7 @@ def check(directory, out=print):
         (panel + dict(build.structures[PANEL][1])[LIST] + 24 * 2 + 13,
          "entry 2 of its list, AttrF"),
         (text + 1000, f"{TEXT}, +1000"),
-        (begins + read.blocks[block][1] - 1, f"{TEXT}, +"),
+        (sum(room[:2]) - 1, f"{TEXT}, +"),
         (at, variable),
         (build.main + build.fields["WCBsec"], "WCBsec: names "),
     ]
@@ -1145,12 +1197,13 @@ def check(directory, out=print):
                 out(f"  a byte changed at +{offset:X}h of {name} was to "
                     f"be named with \"{expected}\", and this was said:")
                 out("\n".join("      " + line for line in lines))
-    # The pattern round a block: the one that is declared, or, while
-    # there is none, what the image has in front of its first block
-    # that is taken, held there alone.
+    # The pattern round a block: the one that is declared, or, in a
+    # build from before dos32.c wrote one, what the image has in front
+    # of its first block that is taken, held there alone.
     front = begins - 16
-    pattern = GUARD or read.data[front:begins]
-    places = None if GUARD else [(front, f"in front of block {block}")]
+    old = build._symbol(*OWN_BLOCKS) is None
+    pattern = read.data[front:begins] if old else GUARD
+    places = [(front, f"in front of block {block}")] if old else None
     data = bytearray(read.data)
     data[begins - 1] ^= 0x40
     spoilt = Read(build, Image([(PROGRAM, build.address, bytes(data))]
@@ -1164,9 +1217,9 @@ def check(directory, out=print):
             f"of the image as it is: {guards(read, pattern, places)}")
     else:
         out(f"  a byte changed at +{begins - 1:X}h: {said[0]}")
-        if not GUARD:
-            out("  (no pattern is declared: what the image has there "
-                "was taken for one, for this trial)")
+        if old:
+            out("  (the build writes no pattern: what the image has "
+                "there was taken for one, for this trial)")
     out("the net " + ("did not catch every one" if failed else
                       f"caught each of {len(trials) + 1} bytes changed in "
                       f"{name}, by its name"))

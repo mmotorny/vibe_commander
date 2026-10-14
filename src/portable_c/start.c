@@ -1,14 +1,14 @@
 /*
  * The start of the program: the setup file read, or the defaults taken
  * where there is none that will do; the banner; the memory for the
- * panels and the viewer asked of DOS; and what the program finds out
- * about the machine before it draws anything.
+ * panels and the room asked for; and what the program finds out about
+ * the machine before it draws anything.
  *
  * Translated from VC.ASM.
  *
  * The program runs through this once from Init00, when it is started:
- * Init00, which reads the setup, Init11, which asks DOS for the memory
- * and makes the panels, and IniData, a name that the assembly does not
+ * Init00, which reads the setup, Init11, which asks for the memory and
+ * makes the panels, and IniData, a name that the assembly does not
  * have, which is the rest, as far as the main loop (see main.c). After
  * every command it comes back to IniData: a command may have left the
  * screen, the country and the directories anything.
@@ -20,8 +20,8 @@
  * main data and the panels of the copy. So its Init00 reads the setup
  * to where that copy is, with no main data yet. The portable C stays in
  * the memory whole (see DEVIATIONS.md): its main data is of the
- * program, it has no copy, and for a command it gives DOS back only
- * the memory behind the panels, which GiveMem and TakeMem do here.
+ * program, it has no copy, and for a command it gives back only the
+ * room, which GiveMem and TakeMem do here.
  *
  * Main of main.c calls them all.
  */
@@ -40,10 +40,6 @@ extern const u8 Init_F[];
 extern const u8 Ext_F[];
 extern u8 IniSave[];
 
-#define MinView 8000                    /* Minimum view buffer size */
-
-/* How many paragraphs the viewer takes at the least. */
-#define VIEW_PARAS  (((MinView - 1) >> 4) + 1)
 
 /* Where Init00 has the setup file as it read it, or the defaults of the
    two panels in its place, until Init11 makes the panels of that: in
@@ -384,131 +380,104 @@ Init04:                                 /* Output Report */
     TakeEnd();
 }
 
-/* What DOS has given the program for its panels and the viewer: the
-   block at `segment`, of `size` paragraphs. */
+/* The room is the block at `segment`, of `size` paragraphs. */
 static void Memory(u16 segment, u16 size)
 {
-    md.MemSeg = segment;
-    md.FreMem2 = segment + size - MAIN_SEG;
+    Room = AT(segment, 0);
+    RoomEnd = Room + ((u32)size << 4);
 }
 
-/* Ask DOS for the memory of the two panels and the viewer, all that
-   there is, and make the panels of what Init00 has left of them at
-   IMAGE: each with room for the fewest files, one behind the other,
-   without files, and the viewer's memory behind them. Answers with how
-   many paragraphs there were, and whether that is too few for the least
-   that the program needs: the assembly has them in BX where it says
-   that there is no memory, and the BIOS takes a page of the screen
-   there (see AlocEr of exec.c).
+/* How long the room is, in paragraphs. The original works that out
+   wherever it wants it, of FreMem2 and ViewSeg. */
+u16 RoomParas(void)
+{
+    return (u16)((RoomEnd - Room) >> 4);
+}
 
-   The original asks for its main data here too, which is the start of
-   the same block: FreMem2 is the paragraphs of that block there, and
-   here as many as it is from the main data to the end of the block. */
+/* Ask for the memory of the two panels and for the room, and make the
+   panels of what Init00 has left of them at IMAGE, without files. Each
+   panel has a block of its own, as long as a panel can get, which it
+   keeps for as long as the program runs and which is never moved; the
+   room is the largest block that there is when the panels have theirs.
+   Answers with how many paragraphs there were for the room, or for a
+   panel that got none, and whether that is too few for the least that
+   the program needs: the assembly has them in BX where it says that
+   there is no memory, and the BIOS takes a page of the screen there
+   (see AlocEr of exec.c).
+
+   The original asks DOS for one block, the largest that there is, and
+   cuts it up itself: its main data at the start, behind it the two
+   panels, each as long as its list of files, and the room behind them.
+   A panel that grows has the other panel and the room moved up, and one
+   that shrinks, down: ReDir of read.c. See DEVIATIONS.md for what
+   follows from the difference. */
 struct Answer Init11(void)
 {
     struct Answer answer;
+    struct Block block;
     struct WCBdef *wcb;
     const u8 *from = IMAGE + 3;
-    u16 largest, segment, panel, i;
+    u16 largest, panel, i;
 
-    largest = MemTake(0xFFFF).largest;  /* a block of the memory: of all
-                                           of it, which DOS refuses, and
-                                           says how large one can be */
-    segment = MemTake(largest).value;
-    answer.value = largest;
-    answer.failed = (u16)(VIEW_PARAS + 2 * PANEL_PARAS) > largest;
-    if (answer.failed)
-        return answer;
-    Memory(segment, largest);           /* Init13 */
-    md.WCB1seg = segment;
-    md.WCB2seg = md.WCB1seg + PANEL_PARAS;
-    md.ViewSeg = md.WCB2seg + PANEL_PARAS;
-    for (panel = md.WCB1seg; panel != md.ViewSeg; panel += PANEL_PARAS) {
-        wcb = PANEL(panel);
+    for (panel = 0; panel < 2; panel++) {
+        block = MemTake(PANEL_BLOCK);
+        answer.value = block.largest;
+        answer.failed = block.failed != 0;
+        if (answer.failed)
+            return answer;
+        if (panel == 0)
+            md.WCB1seg = block.value;
+        else
+            md.WCB2seg = block.value;
+        wcb = PANEL(block.value);       /* Init13 */
         for (i = 0; i < WCBini; i++)
             ((u8 *)wcb)[i] = *from++;
         wcb->CurAdr = DSKBUF;
         wcb->First = DSKBUF;
         wcb->EndBuf = DSKBUF;
     }
+    largest = MemTake(0xFFFF).largest;  /* a block of the memory: of all
+                                           of it, which is refused, with
+                                           how large one can be */
+    block = MemTake(largest);
+    answer.value = largest;
+    answer.failed = ROOM_LEAST > largest;
+    if (answer.failed)
+        return answer;
+    Memory(block.value, largest);
     return answer;
 }
 
-/* Give DOS the memory behind the panels back, for the commands that are
-   about to be run. F21_31 of enter.c has left each panel with no more
-   files than one has room for at the least: the panel that is behind
-   the other is put right behind it, as the two are when the program
-   starts, and the block is made as long as the two.
+/* Give the room back, for the commands that are about to be run. The
+   panels keep their blocks. F21_31 of enter.c has left each panel with
+   no more files than the original keeps of one.
 
-   The original gives the whole block back, the main data with it, and
-   keeps of each panel what it will make it of again: Init11 there, and
-   in DEVIATIONS.md what follows from the difference. */
+   The original gives its whole block back to DOS, the main data with
+   it, and keeps of each panel what it will make it of again: Init11
+   there, and in DEVIATIONS.md what follows from the difference. */
 void GiveMem(void)
 {
-    u16 first = md.WCB1seg, second = md.WCB2seg;
-    u16 behind, i;
-    const u8 *from;
-    u8 *to;
-
-    if (second < first) {
-        first = md.WCB2seg;
-        second = md.WCB1seg;
-    }
-    behind = first + PANEL_PARAS;
-    if (second != behind) {
-        from = (const u8 *)PANEL(second);
-        to = (u8 *)PANEL(behind);
-        for (i = 0; i < sizeof(struct WCBdef); i++)
-            to[i] = from[i];
-        if (second == md.WCB1seg)
-            md.WCB1seg = behind;
-        else
-            md.WCB2seg = behind;
-    }
-    md.ViewSeg = behind + PANEL_PARAS;
-    MemResize(md.MemSeg, md.ViewSeg - md.MemSeg);
+    MemGive(SEG_OF(Room));
 }
 
-/* Take all the memory that there is again, when the commands have been
-   run: answers as Init11 does.
+/* Take the room again, when the commands have been run: the largest
+   block that there is now. Answers as Init11 does.
 
    The original has given its block back to DOS for the commands, and
-   asks for the largest that there is now, wherever that is: where its
-   own was, as a rule, and behind a program that a command has left in
-   the memory if that is where the most is. This does the same, to have
-   its memory where the original has it. The block of the panels is
-   given back, and the largest that DOS has is asked for: the same block
-   again, longer, or another, to which the panels are then moved. They
-   are read where they were, in memory that is DOS's for that moment and
-   that nothing has been given since. */
+   asks for the largest that there is now, wherever that is. */
 struct Answer TakeMem(void)
 {
     struct Answer answer;
-    u16 kept = md.ViewSeg - md.MemSeg;
-    u16 largest, segment, i;
-    const u8 *from;
-    u8 *to;
+    u16 largest;
+    struct Block block;
 
-    MemGive(md.MemSeg);
-    largest = MemTake(0xFFFF).largest;  /* the largest block, asked for
-                                           as Init11 asks */
-    segment = MemTake(largest).value;
+    largest = MemTake(0xFFFF).largest;  /* asked for as Init11 asks */
+    block = MemTake(largest);
     answer.value = largest;
-    answer.failed = (u16)(VIEW_PARAS + kept) > largest;
+    answer.failed = ROOM_LEAST > largest;
     if (answer.failed)
         return answer;
-    if (segment != md.MemSeg) {
-        /* From the start: where the two overlap, the new block begins
-           in front of the old one. */
-        from = AT(md.MemSeg, 0);
-        to = AT(segment, 0);
-        for (i = kept << 4; i != 0; i--)
-            *to++ = *from++;
-        md.WCB1seg += segment - md.MemSeg;
-        md.WCB2seg += segment - md.MemSeg;
-        md.ViewSeg += segment - md.MemSeg;
-    }
-    Memory(segment, largest);
+    Memory(block.value, largest);
     return answer;
 }
 

@@ -874,45 +874,63 @@ u16 DriveCd(u16 drive)
 }
 
 /* Memory. In 16 bits it is DOS's, in blocks that DOS hands out by their
-   segments, and the program asks for the largest that there is and cuts
-   it up by segments itself, for its panels and the text of the viewer.
-   It does the same here, as long as a segment is a number in it (vc.h,
-   "The words of the addresses"): so the memory that it gets has to be
-   where a segment can name it, in the megabyte that begins 64K below
-   the main data, and that is no memory of DOS's nor a block that the
-   extender gives wherever it likes. It is of the program's own: 640 KB
-   among what has no value, which the linker is to have behind the main
-   data, with a paragraph in front for what is kept of the first block.
+   segments. Here a block is still known by its segment, as long as a
+   segment is a number in the program (vc.h, "The words of the
+   addresses"): so the memory that it gets has to be where a segment can
+   name it, in the megabyte that begins 64K below the main data, and
+   that is no memory of DOS's nor a block that the extender gives
+   wherever it likes. It is of the program's own: 640 KB among what has
+   no value, which the linker is to have behind the main data, with a
+   paragraph more.
 
    It is handed out as DOS hands out its own, since the program goes by
-   that: a block is known by its paragraph in the megabyte, in front of
-   each is a paragraph that says how long it is and whether it is taken,
-   the lowest block that is long enough is given, a refusal says how
-   long the longest is, and free blocks that lie one behind the other
-   become one when the memory is looked through and not when a block is
-   given back. What it answers with, DOS's AX and its numbers for an
-   error, is what the DOS of the test bench answers, FreeDOS. */
+   that: a block is known by its paragraph in the megabyte, the lowest
+   block that is long enough is given, a refusal says how long the
+   longest is, and free blocks that lie one behind the other become one
+   when the memory is looked through and not when a block is given
+   back. What it answers with, DOS's AX and its numbers for an error, is
+   what the DOS of the test bench answers, FreeDOS.
+
+   What is kept of the blocks, where each begins, how long it is and
+   whether it is taken, is in a table beside the memory, OwnBlocks, and
+   not in the memory itself, where DOS has it. In the memory there is a
+   paragraph in front of each block and one behind the last, and each
+   holds 16 bytes of a pattern, GUARD_FIRST on: in front of a block from
+   when it is taken, behind the last from the start. Nothing reads
+   them here. The extender, when the memory is its own, keeps 16 bytes
+   between two blocks and ends a program that has written into them;
+   the pattern is there so that such a write is seen before that day,
+   by the tests, which look at the pattern at the end of every scenario
+   (harness/dataimage.py, GUARD). */
 
 #define OWN_PARAGRAPHS 0xA000           /* 640 KB */
+#define OWN_BLOCKS     8                /* as many as the table has room
+                                           for: the program has three,
+                                           and what is free between */
 
 static u8 Own[((u32)OWN_PARAGRAPHS + 1) * 16 + 15];
 
-/* The first paragraph of it in the megabyte, where what is kept of the
-   first block is, and how many paragraphs there are from there on: none
-   if it is not where a segment can name all of it. */
+/* The first paragraph of it in the megabyte, and how many paragraphs
+   there are from there on: none if it is not where a segment can name
+   all of it. */
 static u16 OwnFirst = 0, OwnCount = 0;
 
-/* What is kept in front of a block: whether one follows it, whether it
-   is taken, and its paragraphs. */
+/* A block: the paragraph of the megabyte that it begins in, its
+   paragraphs, and whether it is taken. The blocks of the table are in
+   the order in which they lie, each a paragraph behind the end of the
+   one before, and together they are all of the memory. */
 struct Held {
-    u8 kind;
-    u8 taken;
+    u16 block;
     u16 paragraphs;
+    u16 taken;
 };
 
-#define HELD_MORE 'M'
-#define HELD_LAST 'Z'
-#define HELD(block) ((struct Held *)AT((block) - 1, 0))
+static struct Held OwnBlocks[OWN_BLOCKS] = { { 0, 0, 0 } };
+static u32 OwnHeld = 0;                 /* how many blocks there are */
+
+#define GUARD_BYTES 16
+#define GUARD_FIRST 0xF0                /* the pattern: F0h, EFh, EEh, and
+                                           so on down to E1h */
 
 #define ERR_NO_FUNCTION 1               /* DOS's error for a call that it
                                            does not know */
@@ -921,62 +939,75 @@ struct Held {
 #define ERR_NO_MEMORY   8               /* for want of memory */
 #define ERR_NO_BLOCK    9               /* and for a block that is none */
 
-/* The start of the program has all of it be one block that is free. */
+/* The pattern, in the paragraph in front of `paragraph`. */
+static void Guard(u16 paragraph)
+{
+    u8 *to = AT(paragraph - 1, 0);
+    u16 i;
+
+    for (i = 0; i < GUARD_BYTES; i++)
+        to[i] = (u8)(GUARD_FIRST - i);
+}
+
+/* The start of the program has all of it be one block that is free,
+   with the pattern behind it. */
 static void OwnSet(void)
 {
     u32 first = (u32)(Own + 15 - ARENA) >> 4;
-    struct Held *held;
 
     if (first > 0xFFFF - OWN_PARAGRAPHS)
         return;
     OwnFirst = (u16)first;
     OwnCount = OWN_PARAGRAPHS + 1;
-    held = HELD(OwnFirst + 1);
-    held->kind = HELD_LAST;
-    held->taken = 0;
-    held->paragraphs = OWN_PARAGRAPHS;
+    OwnBlocks[0].block = OwnFirst + 1;
+    OwnBlocks[0].paragraphs = OWN_PARAGRAPHS - 1;
+    OwnBlocks[0].taken = 0;
+    OwnHeld = 1;
+    Guard(OwnFirst + OwnCount);
 }
 
-/* Is `block` a block, by what is in front of it? */
-static u16 Known(u16 block)
+/* Which block of the table `block` is: OwnHeld if it is none. */
+static u32 Known(u16 block)
 {
-    struct Held *held;
+    u32 i;
 
-    if (block <= OwnFirst || (u32)block - OwnFirst > OwnCount)
-        return 0;
-    held = HELD(block);
-    return held->kind == HELD_MORE || held->kind == HELD_LAST;
-}
-
-/* The free blocks that follow `block` become part of it. */
-static void Join(u16 block)
-{
-    struct Held *held = HELD(block);
-    struct Held *next;
-
-    while (held->kind == HELD_MORE) {
-        next = HELD(block + held->paragraphs + 1);
-        if (next->taken)
+    for (i = 0; i < OwnHeld; i++)
+        if (OwnBlocks[i].block == block)
             break;
-        held->kind = next->kind;
-        held->paragraphs += next->paragraphs + 1;
+    return i;
+}
+
+/* The free blocks that follow the block `at` of the table become part
+   of it. */
+static void Join(u32 at)
+{
+    struct Held *held = &OwnBlocks[at];
+    u32 i;
+
+    while (at + 1 < OwnHeld && !held[1].taken) {
+        held->paragraphs += held[1].paragraphs + 1;
+        OwnHeld--;
+        for (i = at + 1; i < OwnHeld; i++)
+            OwnBlocks[i] = OwnBlocks[i + 1];
     }
 }
 
-/* `block` made so many paragraphs, which is no more than it has: what
-   is left behind it becomes a block that is free. */
-static void Split(u16 block, u16 paragraphs)
+/* The block `at` of the table made so many paragraphs, which is no more
+   than it has: what is left behind it becomes a block that is free. A
+   table that is full leaves the block as long as it is. */
+static void Split(u32 at, u16 paragraphs)
 {
-    struct Held *held = HELD(block);
-    struct Held *rest;
+    struct Held *held = &OwnBlocks[at];
+    u32 i;
 
-    if (held->paragraphs == paragraphs)
+    if (held->paragraphs == paragraphs || OwnHeld == OWN_BLOCKS)
         return;
-    rest = HELD(block + paragraphs + 1);
-    rest->kind = held->kind;
-    rest->taken = 0;
-    rest->paragraphs = held->paragraphs - paragraphs - 1;
-    held->kind = HELD_MORE;
+    for (i = OwnHeld; i > at + 1; i--)
+        OwnBlocks[i] = OwnBlocks[i - 1];
+    OwnHeld++;
+    held[1].block = held->block + paragraphs + 1;
+    held[1].paragraphs = held->paragraphs - paragraphs - 1;
+    held[1].taken = 0;
     held->paragraphs = paragraphs;
 }
 
@@ -994,15 +1025,13 @@ struct Block MemTake(u16 paragraphs)
 {
     struct Block block;
     struct Held *held;
-    u16 at = OwnFirst + 1;
+    u32 at;
     u16 largest = 0;
 
     if (OwnCount == 0)
         return Refused(ERR_NO_MEMORY, 0);
-    for (;;) {
-        held = HELD(at);
-        if (!Known(at))
-            return Refused(ERR_BAD_CHAIN, paragraphs);
+    for (at = 0; ; at++) {
+        held = &OwnBlocks[at];
         if (!held->taken) {
             Join(at);
             if (held->paragraphs >= paragraphs)
@@ -1010,13 +1039,13 @@ struct Block MemTake(u16 paragraphs)
             if (held->paragraphs > largest)
                 largest = held->paragraphs;
         }
-        if (held->kind == HELD_LAST)
+        if (at + 1 == OwnHeld)
             return Refused(ERR_NO_MEMORY, largest);
-        at += held->paragraphs + 1;
     }
     Split(at, paragraphs);
     held->taken = 1;
-    block.value = at;
+    Guard(held->block);
+    block.value = held->block;
     block.failed = 0;
     block.largest = paragraphs;
     return block;
@@ -1027,13 +1056,14 @@ struct Block MemTake(u16 paragraphs)
 struct Answer MemGive(u16 block)
 {
     struct Answer answer;
+    u32 at = Known(block);
 
-    if (!Known(block)) {
+    if (at == OwnHeld) {
         answer.value = ERR_NO_BLOCK;
         answer.failed = 0xFFFF;
         return answer;
     }
-    HELD(block)->taken = 0;
+    OwnBlocks[at].taken = 0;
     answer.value = 0x4900;
     answer.failed = 0;
     return answer;
@@ -1045,19 +1075,24 @@ struct Answer MemGive(u16 block)
 struct Block MemResize(u16 block, u16 paragraphs)
 {
     struct Block made;
-    struct Held *held = HELD(block);
+    struct Held *held;
+    u32 at = Known(block);
 
-    if (!Known(block))
+    if (at == OwnHeld)
         return Refused(ERR_BAD_CHAIN, paragraphs);
+    held = &OwnBlocks[at];
     if (paragraphs > held->paragraphs) {
-        Join(block);
+        Join(at);
         if (paragraphs > held->paragraphs)
             return Refused(ERR_NO_MEMORY, held->paragraphs);
     }
     if (paragraphs < held->paragraphs) {
-        Split(block, paragraphs);
-        Join(block + paragraphs + 1);
+        Split(at, paragraphs);
+        if (at + 1 < OwnHeld && !held[1].taken)
+            Join(at + 1);
     }
+    if (!held->taken)
+        Guard(held->block);
     held->taken = 1;
     made.value = block;
     made.failed = 0;

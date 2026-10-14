@@ -135,6 +135,12 @@ extern u8 IniSave[];
 struct MainDat md;
 #pragma data_seg()
 
+/* Where the room begins and where it ends: see vc.h. They are beside
+   the main data and not in it, since its layout is the original's, and
+   a pointer is longer than the word that the original has for each. */
+u8 *Room;
+u8 *RoomEnd;
+
 #define ALT_KEYS 38                     /* the length of AltSr_T */
 
 #define KEY_MOUSE 0xFC                  /* the scan code that Input has
@@ -1552,9 +1558,10 @@ static void Exit(void)
    IniData, as it does after every command, and the main loop runs,
    until the program is to end or has commands of DOS to run, which
    Enter has left in DosBuf; with nothing to run after all it starts
-   over at once. For the commands DOS gets the memory behind the panels
-   back, and the program takes it again when they are done: if there is
-   too little then, it says so and leaves, as it does when it starts.
+   over at once. For the commands the room is given back, the memory
+   that the viewer and the editor take, and the program takes it again
+   when they are done: if there is too little then, it says so and
+   leaves, as it does when it starts.
 
    In the original the part of it that stays in the memory while a
    command runs has this loop, Stay there: it jumps to the rest of the

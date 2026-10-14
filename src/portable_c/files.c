@@ -10,9 +10,9 @@
  * in the list is an address in the segment, as the assembly has it.
  *
  * Nothing here but SetMask touches the main data: FnFile and NearFl
- * take what they read as pointers. NearFl names ViewSeg there, for
- * where the old list is, since a pointer does not say which segment it
- * is in.
+ * take what they read as pointers. NearFl names the room there, Room,
+ * for where the old list is, since a pointer does not say which segment
+ * it is in.
  */
 #include "vc.h"
 
@@ -284,12 +284,12 @@ u16 FnFile(u16 panel, const u8 *name)
    or 0 if there is none or `name` is not in the old list.
 
    The old list is where ReDr50 of read.c has it, the one routine that
-   calls this: in the segment ViewSeg, behind both panels. On DOS the
+   calls this: where the room begins, Room of vc.h. On DOS the
    pointer says so itself, and its offset is where the entry is in the
    list. */
 u16 NearFl(u16 panel, const u8 *name, u16 end)
 {
-    u16 start = OFFSET_IN_SEG(md.ViewSeg, name);
+    u16 start = OFFSET_IN_SEG(SEG_OF(Room), name);
     const u8 *list = name - start;
     u16 at = start;
     u16 forward = 1;

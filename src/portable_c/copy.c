@@ -15,8 +15,8 @@
  * of DOS to the next, is in TmpBuf.
  *
  * C00_00 first makes the name of the target, CpDest, then renames, copies
- * or moves. A file is read into the memory behind the program, from
- * ViewSeg on, as much of it as there is room for, and written from there.
+ * or moves. A file is read into the room, from Room of vc.h on, as much
+ * of it as there is room for, and written from there.
  */
 #include "vc.h"
 
@@ -678,8 +678,8 @@ static u16 C20_00(u16 fits)
     SplitFl = 0;
 
 read:
-    left = (u32)((MAIN_SEG + md.FreMem2 - md.ViewSeg) & 0xFFE0) << 4;
-    segment = md.ViewSeg;
+    left = (u32)(RoomParas() & 0xFFE0) << 4;
+    segment = SEG_OF(Room);
     if (ChgDisk(CpSrc))
         goto terminate;
     do {
@@ -846,7 +846,7 @@ append:
 
 write:
     left = CpRead - CpWrite;
-    segment = md.ViewSeg;
+    segment = SEG_OF(Room);
     if (CpCont != 0)
         segment = CpCont;
     CpCont = 0;
