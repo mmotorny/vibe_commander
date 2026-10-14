@@ -20,14 +20,12 @@
 /* A line ends with a carriage return and a line feed, in either order. */
 #define IS_CRLF(pair) ((pair) == 0x0D0A || (pair) == 0x0A0D)
 
-/* Where FndItem stopped, and whether that is the end of the file. The
-   file is in the main data, in MenuBuf, whoever asks: the place is one
-   of the main data. */
+/* Where FndItem stopped, and whether that is the end of the file. */
 static struct Entry Found(u16 end, const u8 *file)
 {
     struct Entry entry;
 
-    entry.at = MD_PLACE(NEAR(file));
+    entry.at = file;
     entry.end = end;
     return entry;
 }
@@ -68,10 +66,10 @@ struct Entry FndItem(const u8 *file)
 }
 
 /* Find the entry of the extension file in MenuBuf for the file `name`,
-   and return where its command begins, behind the colon, as an offset in
-   the main data; 0 if the file has no entry for it. The extension is
+   and return where its command begins, behind the colon; 0 if the file
+   has no entry for it. The extension is
    left at TmpErr, three characters, with spaces for those it lacks. */
-u16 FindExt(const u8 *name)
+u8 *FindExt(const u8 *name)
 {
     const u8 *file;
     const u8 *wanted;
@@ -96,7 +94,7 @@ u16 FindExt(const u8 *name)
     for (;;) {
         if (item.end != 0)
             return 0;
-        file = MD_POINTER(item.at);
+        file = item.at;
         wanted = md.TmpErr;             /* FnEx05 */
         count = 3;
         for (;;) {
@@ -133,7 +131,7 @@ u16 FindExt(const u8 *name)
             if ((pair & 0xFF) == EOF_CHAR)
                 return 0;
             if ((pair & 0xFF) == ':')
-                return MD_PLACE(file);
+                return (u8 *)file;      /* in MenuBuf, which is written */
         }
         continue;
 FnEx12:

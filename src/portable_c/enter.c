@@ -32,12 +32,9 @@
 
 /* C routines of other files that vc.h does not have. TstExe is 1 for a
    name that DOS can run: com, exe or bat. TrCr10 finds the current
-   directory in the tree again. Run_00 makes the commands of a line of an
-   extension file, which begin at `text` in MenuBuf, and is 1 if there is
-   one to run. */
+   directory in the tree again. */
 u16 TstExe(const u8 *name);                             /* files.c */
 void TrCr10(void);                                      /* tree.c */
-u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 
 /* The dialog that asks whether to quit, and the name of the program for
    it: constants of keys_t.c. */
@@ -240,8 +237,9 @@ struct Onward F21_10(struct WCBdef *panel)
 {
     const struct FILENT *file;
     const u8 *from;
+    u8 *command;
     struct Edited edited;
-    u16 address, command, cursor, i;
+    u16 address, cursor, i;
     u8 c;
 
     if (panel->WinTyp == 1) {
@@ -279,7 +277,7 @@ struct Onward F21_10(struct WCBdef *panel)
         if (command == 0)
             return To(NEXT_FUNC04);
         command--;
-        *MD_POINTER(command) = ' ';
+        *command = ' ';
         if (Run_00(command, 0))
             return F21_30();
         return To(NEXT_FUNC04);

@@ -1340,17 +1340,18 @@ void PutMnu(u16 item);
 void PtMnu1(u16 item);
 void PutPrm(struct WCBdef *panel);
 void DosCom(void);
-/* The entries of an extension file or a menu file: FndItem returns where
-   the next one is, and whether that is the end of the file; FindExt
-   where in the main data the command for a file's extension is, or 0.
-   See extfile.c. */
+/* The entries of an extension file or a menu file, in MenuBuf: FndItem
+   returns where the next one is, and whether that is the end of the
+   file; FindExt where the command for a file's extension is, or 0. See
+   extfile.c. Run_00 makes the commands of a line that begin at `text`
+   into DosBuf, and is 1 if there is one to run: see usermenu.c. */
 struct Entry {
-    u16 at;                             /* where it is: the offset in the
-                                           segment of the file */
+    const u8 *at;                       /* where it is */
     u16 end;                            /* 1 if the file ends there */
 };
 struct Entry FndItem(const u8 *file);
-u16 FindExt(const u8 *name);
+u8 *FindExt(const u8 *name);
+u16 Run_00(u8 *text, u16 view);
 /* Waiting for a key, and a line that is typed into: see each in input.c.
    Input and Input0 return the key, the scan code in the high byte, where
    FCh says that the mouse did something; Input0 says besides whether

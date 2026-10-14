@@ -1533,12 +1533,12 @@ none:
  * the name of the file what such a program reads of the setup.
  */
 
-/* The commands are declared in vc.h, and so are F34_30 and F34_40. */
+/* The commands are declared in vc.h, and so are F34_30, F34_40, FindExt
+   and Run_00. */
 
 /* More C routines of other files that vc.h does not have. */
 const u8 *FndLet(const u8 *text);                       /* string.c */
 u8 *MainFil(u8 *to, const u8 *name);
-u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 
 /* More of them, and two names of other files, those of the menu file
    and of the file that an Info panel shows. The names of the extension
@@ -1801,7 +1801,8 @@ static struct Onward F34_11(u16 how)
     struct Answer file, read, found;
     u16 edit = how & 0xFF;
     u16 own = how >> 8;
-    u16 count, command, i;
+    u16 count, i;
+    u8 *command;
 
     if ((edit != 0 ? md.AltEdit : md.AltView) == 0)
         own = own == 0;
@@ -1841,13 +1842,13 @@ static struct Onward F34_11(u16 how)
     command = FindExt(CutPath(md.ViewFil));
     if (command == 0)
         return Own(edit);
-    next = F34_30(MD_POINTER(command));
+    next = F34_30(command);
     if (next.none)
         return Own(edit);
     named = F34_40(next.at, 1);
     if (named.file == 0) {
         *named.at = ' ';
-        if (Run_00(MD_PLACE(named.at), 1))
+        if (Run_00(named.at, 1))
             return F21_30();
         return To(NEXT_FUNC04);
     }

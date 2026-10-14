@@ -9356,7 +9356,7 @@ thought and long in lines.
 | F4, the viewer and the file search. **Done**: "F4, the viewer and the file search" below | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
 | F6, a copy and what goes through files. **Done**: "F6, a copy and what goes through files" below | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
-| F7, the tree, the history, the commands. **Done** but for the commands of a line, which wait for F4: "F7, the tree, the history, the commands" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
+| F7, the tree, the history, the commands. **Done**: "F7, the tree, the history, the commands" below, and the commands of a line, which waited for F4, by the small piece F7b: "F7b, the commands of a line" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest. **Done**: "F8, the rest" below | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
 | F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
@@ -11144,7 +11144,7 @@ that piece's function and not before:
 | `SEG_OF(Room)`, 3 | `Aexec0` of `view.c`, the three calls of `MemResize` | F9's, by its row: the lines that call the functions for the memory, which take a segment until then |
 | `RoomParas`, 3, and `ROOM_LEAST` | `V00_10`, `Aexec0`, `FindFil`, `F67_00` | N3 and N5 move theirs to bytes; F9 the one of `Aexec0` |
 | `MD_PLACE(md.WinBuf)`, 4 | `SavWin` and `ResWin` in `F67_00`, `ResWin` in `Aexec0` | F8's: `window.c` takes the buffer as a place |
-| `MD_POINTER(command)` and `MD_PLACE(named.at)` | `F34_11` of `view.c`: what `FindExt` answers and what `Run_00` takes | The small piece that F7 left behind it, of the commands of a line: see below |
+| `MD_POINTER(command)` and `MD_PLACE(named.at)` | `F34_11` of `view.c`: what `FindExt` answers and what `Run_00` takes | The small piece that F7 left behind it, of the commands of a line: see below. Gone, by F7b |
 
 **Lines in files of other pieces**, each as small as it could be:
 
@@ -11514,7 +11514,7 @@ check's record and that of `portable_c-int16` did not move.
 
 | Where | What | Whose |
 |---|---|---|
-| `usermenu.c` 14, `extfile.c` 4, `enter.c` 1 | The commands of a line: `struct Entry` with `at`, what `FndItem` and `FindExt` answer, `Run_00(u16 text, u16 view)`, and `F34_30(u16 text)` with `struct Next` and `F34_40`, which are in `view.c`: places of `MenuBuf` in 16 bits, with 0 for none | A piece of its own behind F4, small: five functions and two structures, a pointer into `MenuBuf` each, and the callers in `view.c`, `enter.c` and `usermenu.c`. It was not begun, so that nothing of it stands half done beside F4 |
+| `usermenu.c` 14, `extfile.c` 4, `enter.c` 1 | The commands of a line: `struct Entry` with `at`, what `FndItem` and `FindExt` answer, `Run_00(u16 text, u16 view)`, and `F34_30(u16 text)` with `struct Next` and `F34_40`, which are in `view.c`: places of `MenuBuf` in 16 bits, with 0 for none | A piece of its own behind F4, small: five functions and two structures, a pointer into `MenuBuf` each, and the callers in `view.c`, `enter.c` and `usermenu.c`. It was not begun, so that nothing of it stands half done beside F4. Done by F7b, below |
 | `cmdline.c` 5, `treebox.c` 4, `drive.c` 2, `usermenu.c` 2 | `MD_PLACE(md.WinBuf)` and its like, handed to `SavWin` and `ResWin` of `window.c` and to `InSt10` of `dialog.c`, which take the buffer as a place | F8, with the two routines of `window.c` and `InSt10`: done, "F8, the rest" below |
 | `exec.c` 2, `treebox.c` 1 | The original's addresses, above | Stay, each with its reason |
 
@@ -11975,6 +11975,131 @@ takes them in as what DOS's memory held behind a short name.
 plan and the sections 12; reading the code 12; the change, built
 without a warning at the first try, 8; the records, the suite, the
 images and the documents the rest.
+
+### F7b, the commands of a line: done, and what a later piece should know
+
+The small piece that F7 left behind it and F4 began. A line of a menu
+file or of an extension file is a pointer into `MenuBuf` from where
+`FndItem` finds it to where `Run_00` makes its commands, and no place
+of the main data is kept in a number for it any more. The whole suite
+passes, 14 tests, with all 155 scenarios and no golden and no patch
+changed, at the first run; one commit. It took some 45 tool calls.
+
+**What it is now.**
+
+- `struct Entry` of `vc.h` has `const u8 *at`, where the line is, and
+  `FndItem` answers with it; `Found` of `extfile.c` keeps the pointer
+  that it is handed, where it made a place of it.
+- `FindExt` answers `u8 *`, where the command begins behind the colon,
+  or 0 for none, as the place was 0. It is not `const` since the
+  callers write a space over the colon: the cast is written once, at
+  its return, with "in MenuBuf, which is written", as `Next` of
+  `view.c` has it.
+- `Run_00(u8 *text, u16 view)` is declared once, in `vc.h` beside
+  `FndItem` and `FindExt`, where `enter.c`, `view.c` and `usermenu.c`
+  each declared it for itself: one prototype now holds every call.
+- `command` is a `u8 *` in `F21_10` of `enter.c`, `F34_11` of `view.c`
+  and `F32_00` of `usermenu.c`. `command--` of `F21_10` steps the
+  pointer back onto the colon.
+- The four bridges are gone: `F34_30(command)` and `Run_00(named.at,
+  1)` in `F34_11`, `command = found.at` and `command = named.at` in
+  `F32_00`.
+- `F32_00` hands `Run_00` `key != 0` for its `view`, where it handed
+  `MD_PLACE(key)`, and clears `key` to a pointer to nothing where it
+  made it the place 0 of the main data. `Run_00` only asks whether
+  `view` is 0, and the place of the keys, `TmpBuf+100` and on, never
+  is: the same answer in both ways. Where `F34_30` finds no command
+  `key` is still on the keys, and `Run_00` is told that a file is
+  being viewed, as in the original, whose BP is then on them.
+- The path in front of the name of the file being viewed, which
+  `Run_00` copies for "!" in a command of the viewer's extension file,
+  is copied `while (more != name)`, where a count of 16 bits was made
+  of two places, `MD_PLACE(NEAR(name)) - MD_PLACE(md.ViewFil)`, and
+  stepped down to 0: `more` begins at `ViewFil` and is stepped with
+  every byte copied, so the two stop at the same byte. Written with a
+  count, as `i32 count = name - md.ViewFil`, it was a new place of the
+  kind `widen` to `portable_c-int16`, a difference of two pointers that
+  is 16 bits with an int of 16; the loop has no number.
+
+**The words' record**, of the four files, before and after, as it
+stands rebased behind F8, which took out the `MD_PLACE` of `WinBuf`
+that was its own in `usermenu.c` and `view.c`:
+
+    enter.c     MD_POINTER 1
+                none of them
+    extfile.c   NEAR 1, MD_PLACE 2, MD_POINTER 1
+                none
+    usermenu.c  NEAR 2, MD_PLACE 5, MD_POINTER 6
+                none
+    view.c      MD_PLACE 1, MD_POINTER 1
+                none
+
+In the whole tree `NEAR` is at nothing, `MD_PLACE` at 10 where it was
+18 and `MD_POINTER` at 3 where it was 12; the record's last line has
+F8 at 13 where it was 33. The record of the widths has six numbers
+fewer, `command` in each of the three files, `at` of `struct Entry`,
+what `FindExt` answers and `text` of `Run_00` (before the rebase, when
+it still counted cuts, three cuts fewer as well). The host check's
+record and that of `portable_c-int16` did not move.
+
+**The places read by hand**, for a number of 16 bits that counted on
+wrapping where it meets the pointer, and for whether a `NEAR` that went
+was of a pointer into the main data:
+
+| Place | What it was | What it is, and why nothing wrapped |
+|---|---|---|
+| `Found` of `extfile.c` | `MD_PLACE(NEAR(file))` | `file`. Every call of `FndItem` and of `Item` is on `MenuBuf`: `F32_00` and `FindExt` hand it `md.MenuBuf` or a pointer that they have walked through it. `Item` stops at the 1Ah that the callers put behind what was read, at `LenMenu - 1` at the most, or one byte behind it: within `MenuBuf` or on its last byte, in the main data |
+| `FindExt` | `MD_POINTER(item.at)`, `MD_PLACE(file)` | `item.at`, and `file` cast to `u8 *`: a place of `MenuBuf` was never near 64K, and was made the pointer again unchanged |
+| `F21_10` of `enter.c` | `command--` of a place, `*MD_POINTER(command)` | The pointer stepped back, onto the colon in front of the command: `FindExt` answers one byte behind it at the least |
+| `Run_00` | `MD_POINTER(text)`, `NEAR(FndLet(from))` | `text`, `FndLet(from)`: `FndLet` answers a pointer into the text that it is handed, the line in `MenuBuf` |
+| `Run_00`, "!" in the viewer's commands | `MD_PLACE(NEAR(name)) - MD_PLACE(md.ViewFil)`, a count of 16 bits | `while (more != name)`, above. `CutPath` answers a pointer into `ViewFil`, at or behind its start: the count was 0 to the length of the path and never wrapped |
+| `F32_00` | `MD_POINTER(item.at)` 2, `MD_POINTER(FndItem(text).at)` 2 | The pointers: the same, as for `FindExt` |
+| `F32_00` | `MD_PLACE(found.at)`, `MD_PLACE(named.at)` | The pointers. `named.at` is `text - 1` of `F34_40` there, and `text` is a command behind the first character of a line, so it is in `MenuBuf` |
+| `F32_00` | `MD_POINTER(0)` and `MD_PLACE(key)` | `0` and `key != 0`, above |
+| `F34_11` of `view.c` | `MD_POINTER(command)`, `MD_PLACE(named.at)` | The pointers, as for `F32_00` |
+
+**What the clusters should know.**
+
+- N13, of `extfile.c`: nothing of the addresses is left. `end` of
+  `struct Entry` is 0 or 1, and `Found` is handed a comparison or 1.
+- N14, of `enter.c`: `command` of `F21_10` is a pointer; no number of
+  that function was touched.
+- N15, of `usermenu.c`: `view` of `Run_00` is only asked whether it is
+  0, and is handed `key != 0`, 1 and 0 by its three callers, a boolean
+  by "The rule for a number" if nothing else is found. `key` of
+  `F32_00` is a pointer that is 0 or on the keys. `c` of `Run_00` is no
+  longer the count of the path's bytes; it is a character, a flag of
+  `FileLst` and the count of `DosCol` there.
+- N3 and N4, of `view.c`: `command` of `F34_11` is a pointer.
+
+**Lines in files of other pieces**: `view.c`, `F34_11`'s declaration
+of `command`, its two bridges, the local prototype of `Run_00` taken
+out and the comment above it; of `vc.h`, the comment, `struct Entry`
+and the prototypes of `FindExt` and `Run_00`, together.
+
+**The image.** `compare` of the build of `859b90d`, which the piece
+stands on, saved before anything was changed, with the piece's build:
+"155 scenarios, 155 with nothing that differs; 0 differences, 0 more
+in what was declared as changed, 0 in what may differ", and "465
+pointers that name the same in both". Nothing was declared. The code
+is 124 bytes shorter and nothing of the data moved, so not even the
+blocks' paragraphs differ, nor `DTA+41`, nor the six bytes of `copy`
+and `copy-dirs`.
+
+What a later piece should know: **save the image of the base from a
+copy**, `build/.../portable_c/VC.EXE` with its map, and not from
+`build/portable_c/VC.EXE`: a build made while `save` runs changes the
+program under it, and the images are of two programs then. This piece
+started so, stopped the save and began it again on a copy.
+
+Rebased onto `8cd5bf9`, with F6, F5, N0d, the byte made a word and F8
+in, and held against a build of that commit made in a copy under
+`build/`: "155 scenarios, 150 with nothing that differs; 0
+differences, 0 more in what was declared as changed, 46 in what may
+differ", the five being `blank`, `blank-timed`, `cursor`, `mouse-line`
+and `mouse-tree`, in `Rand1`, `Rand2` and `Stars`, which follow the
+time; "493 pointers that name the same in both". The whole suite
+passes there too, 14 tests.
 
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 

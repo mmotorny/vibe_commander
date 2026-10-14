@@ -26,11 +26,11 @@
 #include "vc.h"
 
 u16 F32_70(u16 begin, u16 size);
-u16 Run_00(u16 text, u16 view);
 
 /* Other files call these: the history's box F32_70, in cmdline.c, and
-   Enter and the commands of the viewer Run_00. F32_00, the command, is
-   declared in vc.h: see "The commands" there. */
+   Enter and the commands of the viewer Run_00, which is declared in vc.h
+   with FndItem. F32_00, the command, is declared in vc.h too: see "The
+   commands" there. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -57,8 +57,8 @@ u16 Run_00(u16 text, u16 view);
    F34_30, which looks for the next command of a line, and F34_40, which
    looks at whether a command is the name of a file of the kind that is
    being read, a menu here: then it has put the path of that file at
-   TmpBuf. Both return a place, and whether there is no command, or
-   whether it is such a name. FndItem returns where the next line of a
+   TmpBuf. Both return where in MenuBuf, and whether there is no command,
+   or whether it is such a name. FndItem returns where the next line of a
    menu is that is neither empty, nor a comment, nor a command, and
    whether there is none, the end of the file. */
 
@@ -292,9 +292,9 @@ FiLs20:
    line on the screen. Of a line no more than 123 characters are taken,
    but what stands for "!" is not counted in full, and all commands
    together have 998 bytes. */
-u16 Run_00(u16 text, u16 view)
+u16 Run_00(u8 *text, u16 view)
 {
-    const u8 *from = MD_POINTER(text);  /* SI */
+    const u8 *from = text;              /* SI */
     u8 *to = md.DosBuf;                 /* DI */
     const u8 *name;
     const u8 *more;
@@ -322,7 +322,7 @@ Run_02:                                 /* to the end of the line */
     goto Run_30;
 
 Run_04:                                 /* a command */
-    from = NEAR(FndLet(from));
+    from = FndLet(from);
     pair = WORD_AT(from);
     if (IS_CRLF(pair))
         goto Run_02;
@@ -421,7 +421,7 @@ Run_18:                                 /* the name of the file */
     if (view != 0) {
         name = CutPath(md.ViewFil);
         more = md.ViewFil;
-        for (c = MD_PLACE(NEAR(name)) - MD_PLACE(md.ViewFil); c != 0; c--) {
+        while (more != name) {          /* the path in front of it */
             *to++ = *more++;
             if (to >= COMMANDS_END)
                 goto Run_30;
@@ -490,7 +490,8 @@ u16 F32_00(u16 main)
     u16 row;                            /* CH: the line of the cursor */
     const u8 *include;                  /* DX: what ^I stands for in a box */
     u16 c, next, width, widest, lines, length;
-    u16 limit, i, to, answer, room, command;
+    u16 limit, i, to, answer, room;
+    u8 *command;
 
     if (main)
         goto F42_00;
@@ -538,7 +539,7 @@ F32_05:                                 /* read it */
     item = FndItem(md.MenuBuf);
     if (item.end)
         goto F32_03;
-    text = MD_POINTER(item.at);
+    text = item.at;
 
     /* The keys of its lines, how wide they are, and how wide the widest
        line behind them is. */
@@ -619,7 +620,7 @@ F32_16:
     item = FndItem(text);
     if (item.end)
         goto F32_18;
-    text = MD_POINTER(item.at);
+    text = item.at;
     goto F32_10;
 
 F32_18:                                 /* the box */
@@ -646,7 +647,7 @@ F32_18:                                 /* the box */
     to = begin + 0x205;
     text = md.MenuBuf;
 F32_22:
-    text = MD_POINTER(FndItem(text).at);
+    text = FndItem(text).at;
     screen = BasAdr(to);
     if (*key != 0) {
         i = 0;
@@ -776,7 +777,7 @@ F32_50:                                 /* Enter: the commands of the line */
     text = md.MenuBuf;
     i = (u8)(row + 1);
 F32_51:
-    text = MD_POINTER(FndItem(text).at);
+    text = FndItem(text).at;
 F32_52:
     answer = WORD_AT(text);
     text += 2;
@@ -800,18 +801,18 @@ F32_55:                                 /* Esc, and the box goes */
         return 0;
     }
     found = F34_30(text);
-    command = MD_PLACE(found.at);
+    command = found.at;
     if (found.none)
         goto F32_57;
     named = F34_40(found.at, 0);
-    command = MD_PLACE(named.at);
+    command = named.at;
     /* BP, which was on the keys, is 0 from here on, and Run_00 takes it
-       for whether a file is being viewed: so it is the place 0 of the
-       main data, not a pointer to nothing, which has no place. */
-    key = (u16 *)MD_POINTER(0);
+       for whether a file is being viewed. Where F34_30 finds no command
+       it is still on the keys, and Run_00 is told that one is. */
+    key = 0;
     if (named.file)
         goto F32_02;                    /* another menu */
 F32_57:
     md.MenuFl = md.AutoMnu;
-    return Run_00(command, MD_PLACE(key));
+    return Run_00(command, key != 0);
 }
