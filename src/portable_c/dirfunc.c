@@ -389,7 +389,7 @@ static u16 F38_70(void)
     if (md.TmpBuf[1] == ':')
         drive = md.TmpBuf[0];
     fcb[7] = (u8)(drive - ('A' - 1));
-    name = NEAR(CutPath(md.TmpBuf));
+    name = (u8 *)CutPath(md.TmpBuf);
     if ((u8)FcbParse(name, fcb + 7, 2) != 1)
         return NOT_DONE;
     OncZoom(BOX_PLACE, &DelFl_P, DelFs_S, &box);
@@ -529,10 +529,10 @@ static u16 Figure(const u8 **text, u16 *number)
 {
     const u8 *from = *text;
 
-    *text = NEAR(TxtNum(from, number));
+    *text = TxtNum(from, number);
     if (*text == from)
         return 0;
-    *text = NEAR(FndLet(*text));
+    *text = FndLet(*text);
     return 1;
 }
 
@@ -576,18 +576,18 @@ struct Checked M30_60(u16 answer)
         return Accepted(answer);
     AttrDat = 0xFFFF;
     AttrTim = 0xFFFF;
-    text = NEAR(FndLet(md.DosBuf + LenCmd + 10 + 3));
+    text = FndLet(md.DosBuf + LenCmd + 10 + 3);
     if (*text != 0) {
         if (!Figure(&text, &month))
             goto refused;
         if (*text != md.Country.DateSep[0])
             goto refused;
-        text = NEAR(FndLet(text + 1));
+        text = FndLet(text + 1);
         if (!Figure(&text, &day))
             goto refused;
         if (*text != md.Country.DateSep[0])
             goto refused;
-        text = NEAR(FndLet(text + 1));
+        text = FndLet(text + 1);
         if (!Figure(&text, &year))
             goto refused;
         if (*text != 0)
@@ -630,19 +630,19 @@ struct Checked M30_60(u16 answer)
     }
 
     /* M30_70 */
-    text = NEAR(FndLet(md.DosBuf + LenCmd + 10 + 100 + 3));
+    text = FndLet(md.DosBuf + LenCmd + 10 + 100 + 3);
     if (*text == 0)
         return Accepted(0);
     if (!Figure(&text, &hours))
         goto refused;
     if (*text == md.Country.TimeSep[0]) {
-        text = NEAR(FndLet(text + 1));
+        text = FndLet(text + 1);
         if (!Figure(&text, &minutes))
             goto refused;
         if (minutes >= 60)
             goto refused;
         if (*text == md.Country.TimeSep[0]) {
-            text = NEAR(FndLet(text + 1));
+            text = FndLet(text + 1);
             if (!Figure(&text, &seconds))
                 goto refused;
             if (seconds >= 60)
@@ -652,7 +652,7 @@ struct Checked M30_60(u16 answer)
     /* M30_71 */
     if (*text != 0) {
         letter = (u8)UpCase(*text);
-        text = NEAR(FndLet(text + 1));
+        text = FndLet(text + 1);
         if (*text != 0)
             goto refused;
     }
@@ -745,7 +745,7 @@ u16 DirFunc(void)
         }
         /* DiFu03 */
         if (md.DTA.FilName[0] != '.') {
-            name = NEAR(CutPath(md.TmpBuf));
+            name = (u8 *)CutPath(md.TmpBuf);
             for (count = 0; count < 13; count++)
                 name[count] = md.DTA.FilName[count];
             if (TstBrk())
@@ -760,7 +760,7 @@ u16 DirFunc(void)
     }
 
     /* DiFu07: the directory itself, in the one above */
-    name = NEAR(CutPath(md.TmpBuf));
+    name = (u8 *)CutPath(md.TmpBuf);
     if (name <= md.TmpBuf)
         return STOP;
     c = name[-1];
@@ -773,7 +773,7 @@ u16 DirFunc(void)
     }
     if (c == ':')
         return all;
-    name = NEAR(CutPath(md.TmpBuf));
+    name = (u8 *)CutPath(md.TmpBuf);
     for (count = 0; count < 13; count++)
         md.MenuBuf[count] = name[count];
     for (count = 0; count < 4; count++)
@@ -801,7 +801,7 @@ u16 DirFunc(void)
         }
     }
     /* DiFu12 */
-    name = NEAR(CutPath(md.TmpBuf));
+    name = (u8 *)CutPath(md.TmpBuf);
     for (count = 0; count < 13; count++)
         name[count] = md.MenuBuf[count];
     return all;
@@ -888,15 +888,15 @@ static u16 F47_01(const struct BOXHD *box)
         return TO_FUNC04;
     if (md.TmpBuf[0] == 0)
         return TO_FUNC04;
-    name = NEAR(CutPath(md.TmpBuf));
+    name = (u8 *)CutPath(md.TmpBuf);
     Convert(name, md.TmpBuf + 100);
     UnConv(name, md.TmpBuf + 100);
     if (box == &MkDi2_B) {
-        if (NEAR(CutPath(md.TmpBuf)) != md.TmpBuf)
+        if (CutPath(md.TmpBuf) != md.TmpBuf)
             goto failed;
         path = md.TmpBuf + 100;
-        end = NEAR(MvzLine(path, md.CrnPath + 2, LenPath));
-        end = NEAR(AddFile(end));
+        end = MvzLine(path, md.CrnPath + 2, LenPath);
+        end = AddFile(end);
         for (i = 0; i < 13; i++)
             end[i] = md.TmpBuf[i];
     }
@@ -920,7 +920,7 @@ failed:
             md.CrnPath[2 + i] = path[i];
         md.ViewFil[0] = 0;              /* the byte behind CrnPath */
         PathLin(md.CrnPath + 2);
-    } else if (NEAR(CutPath(path)) == path) {
+    } else if (CutPath(path) == path) {
         /* F47_06 */
         PathLin(path);
         wcb = CurrentPanel;
@@ -985,7 +985,7 @@ u16 F38_00(struct WCBdef *panel)
             return TO_FUNC04;
         md.ZoomOne = 0;
         if ((u8)F38_40(ATTR_DIRECTORY) != 0) {
-            end = NEAR(CutPath(md.CrnPath));
+            end = (u8 *)CutPath(md.CrnPath);
             if (end > md.CrnPath + 3)
                 end--;
             *end = 0;
@@ -1047,7 +1047,7 @@ u16 F48_00(void)
     LetLin(md.TmpBuf);
     if (md.TmpBuf[0] == 0)
         return TO_FUNC04;
-    name = NEAR(CutPath(md.TmpBuf));
+    name = (u8 *)CutPath(md.TmpBuf);
     if (*(u16 *)name != '.') {
         /* Every file, if DOS makes eleven question marks of it. */
         if ((u8)FcbParse(name, md.TmpBuf + 100, 0) != 1)
@@ -1060,7 +1060,7 @@ u16 F48_00(void)
     for (i = 0; i < 4; i++)
         name[i] = Mask_S[1 + i];
     from = md.TmpBuf;
-    if (NEAR(CutPath(md.TmpBuf)) == md.TmpBuf)
+    if (CutPath(md.TmpBuf) == md.TmpBuf)
         from = DlWr4_S;
     for (i = 0; i < LenPath + 13; i++)
         md.TmpBuf[100 + i] = from[i];
@@ -1207,7 +1207,7 @@ u16 F54_00(void)
     if (md.Volume[0] != 0) {
         md.TmpBuf[20] = ' ';
         md.TmpBuf[21] = '"';
-        end = NEAR(MvzLine(md.TmpBuf + 22, md.Volume, 12));
+        end = MvzLine(md.TmpBuf + 22, md.Volume, 12);
         end[0] = '"';
         end[1] = 0;
     }
@@ -1217,7 +1217,7 @@ u16 F54_00(void)
     md.TmpBuf[20] = 0xFF;               /* an extended FCB, */
     md.TmpBuf[26] = 8;                  /* for a label, */
     md.TmpBuf[27] = 0;                  /* on the current drive */
-    end = NEAR(MvzLine(md.TmpBuf + 28, md.Volume, 12));
+    end = MvzLine(md.TmpBuf + 28, md.Volume, 12);
     for (i = 0; i < 12; i++)
         end[i] = ' ';
     if (md.TmpBuf[1] == 0) {
@@ -1274,7 +1274,7 @@ static u16 FncMs1(const u8 *include)
         /* FncMs2 */
         if (!(md.DTA.FilAttr & (ATTR_DIRECTORY | ATTR_SYSTEM | ATTR_HIDDEN))) {
             include = 0;
-            name = NEAR(CutPath(md.TmpBuf));
+            name = (u8 *)CutPath(md.TmpBuf);
             for (i = 0; i < 13; i++)
                 name[i] = md.DTA.FilName[i];
             if (TstBrk())

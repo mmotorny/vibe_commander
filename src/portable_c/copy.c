@@ -195,7 +195,7 @@ static void C40_05(const u8 *path, u8 *buffer)
     u8 *to;
     u16 pair, count;
 
-    to = NEAR(AddFile(MvzLine(buffer, md.DosPth, LenPath)));
+    to = AddFile(MvzLine(buffer, md.DosPth, LenPath));
     pair = *(const u16 *)path;
     if (pair >> 8 == ':') {
         if ((u8)UpCase(pair) != buffer[0]) {
@@ -335,7 +335,7 @@ static u16 C00_01(void)
     PathLin(CpDest);
     if (CopyMov == 3)
         return 1;
-    name = NEAR(CutPath(CpDest));
+    name = (u8 *)CutPath(CpDest);
     to = name;
     if (*name == 0)
         goto source;
@@ -407,7 +407,7 @@ mask:
     for (i = 0; i < 11; i++)
         if (md.TmpErr[i] == '?')
             md.TmpErr[i] = md.TmpErr[20 + i];
-    to = NEAR(UnConv(name, md.TmpErr));
+    to = UnConv(name, md.TmpErr);
     from = part;
     count = to - CpDest;
     goto rest;
@@ -447,7 +447,7 @@ static void C10_13(void)
     u8 *entry;
     u16 file, i;
 
-    if (NEAR(CutPath(CpSrc)) != CpSrc || NEAR(CutPath(CpDest)) != CpDest)
+    if (CutPath(CpSrc) != CpSrc || CutPath(CpDest) != CpDest)
         return;
     file = FnFile(CurrentPanel, CpSrc);
     if (file >= wcb->EndBuf)
@@ -971,7 +971,7 @@ full:
         SplitFl = 1;
     for (i = 0; i < LenName; i++)
         md.TmpErr[i] = CpDest[i];
-    part = NEAR(CutPath(md.TmpErr));
+    part = (u8 *)CutPath(md.TmpErr);
     if (part <= md.TmpErr)
         goto open;
     part--;
@@ -1370,7 +1370,7 @@ struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
         CpSrc[i] = md.ViewFil[i];
     if (md.ViewFil[0] == 0 || md.ToFile[0] == 0)
         return Go(GO_PANELS);
-    CpBgNam = MD_PLACE(NEAR(CutPath(CpSrc)));
+    CpBgNam = MD_PLACE(CutPath(CpSrc));
     F35_70();
     return Masked(F35_40());
 }
@@ -1392,7 +1392,7 @@ static void F36_04(void)
 
     for (i = 0; i < LenPath; i++)
         CpSrc[i] = md.CrnPath[i];
-    CpBgNam = MD_PLACE(NEAR(CutPath(CpSrc)));
+    CpBgNam = MD_PLACE(CutPath(CpSrc));
     F35_70();
     md.ZoomOne = 0;
     if ((u8)C00_00(ATTR_DIRECTORY) == 0 || CopyMov == 0)
@@ -1404,7 +1404,7 @@ static void F36_04(void)
         if (md.CrnPath[i] != md.DosPth[i])
             goto F36_05;
     rest = md.DosPth + length;
-    to = NEAR(MvzLine(CpInpt, md.ToFile, LenStr + 1));
+    to = MvzLine(CpInpt, md.ToFile, LenStr + 1);
     for (i = 0; i < LenPath; i++)
         to[i] = rest[i];
     DirChange(CpInpt + 2);
@@ -1470,7 +1470,7 @@ struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
         length = 13;
 F35_06:
         *to++ = '"';
-        to = NEAR(MvzLine(to, from, length));
+        to = MvzLine(to, from, length);
         *to++ = '"';
     }
     for (i = 0; i < 3; i++)                             /* " to" */
@@ -1500,11 +1500,11 @@ F36_03:
     if ((u8)Ask(&Renam_B, 0) != 0)
         return Go(GO_KEYS);
     typed = CpDest;
-    if (NEAR(CutPath(typed)) != typed)
+    if (CutPath(typed) != typed)
         goto F36_01;
     for (i = 0; i < LenPath; i++)
         CpInpt[i] = md.CrnPath[i];
-    name = NEAR(CutPath(CpInpt));
+    name = CutPath(CpInpt);
     for (i = 0; i < 13; i++)
         ((u8 *)name)[i] = typed[i];
     for (i = 0; CpInpt[i] != 0; i++)
@@ -1561,7 +1561,7 @@ u16 F35_61(u16 answer, u16 place)
     DriveSelect((u8)(pair - 'A'));
     if (left)
         return 1;
-    end = NEAR(MvzLine(line, md.TmpBuf, LenName));
+    end = MvzLine(line, md.TmpBuf, LenName);
     if (end[-1] != '\\') {
         end[0] = '\\';
         end[1] = 0;

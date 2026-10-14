@@ -12,11 +12,11 @@ box.c         none
 cmdline.c     MD_PLACE 5, TRELIST 1, TREE_OFFSET 2, ENTRY 4, DSKBUF 3
 commands.c    ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
 commands_t.c  MD_AT 45, WCB_AT 3, NUMBER 17
-copy.c        AT 3, SEG_OF 2, RoomParas 1, u16 segment 1, NEAR 13, MD_PLACE 9, MD_POINTER 3, TRELIST 1, ENTRY 4
+copy.c        AT 3, SEG_OF 2, RoomParas 1, u16 segment 1, MD_PLACE 9, MD_POINTER 3, TRELIST 1, ENTRY 4
 copy_t.c      MD_AT 22, NUMBER 4
 dialog.c      MD_PLACE 2, MD_POINTER 3, NUMBER_OF 9
 digits.c      none
-dirfunc.c     NEAR 25, MD_PLACE 1, ENTRY 7, DSKBUF 2
+dirfunc.c     MD_PLACE 1, ENTRY 7, DSKBUF 2
 dirfunc_t.c   MD_AT 75, NUMBER 9
 dos32.c       ARENA 1, AT 1
 drive.c       MD_PLACE 2, DSKBUF 2
