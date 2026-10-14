@@ -9382,7 +9382,7 @@ for.
 | N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
-| N9 † | `copy.c` | 1,571; 147 | F6 | The buffer in bytes |
+| N9 † | `copy.c` | 1,571; 147 | F6 | **Done**, the buffer in bytes: "N9, `copy.c`: done, and what a later cluster should know" below. Meets a question of the user's, prepared there |
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | |
@@ -13702,6 +13702,130 @@ plan and the three files some 30 of them, and some 35 more to land
 behind N5 and N3, with the question's answer; the scenarios and the
 images ran once before the rebase and once behind it.
 
+### N9, `copy.c`: done, and what a later cluster should know
+
+**A question for the user, prepared and not decided.** Copying reads
+the source into the room, in pieces of 32K, before it writes. Of a
+device that gives a piece in more than one call of DOS, the room left
+is counted down by the last call alone while the buffer goes on by
+the whole piece (`C20_10` to `C20_13` of `VCCOPY.INC`: `SUB SI,AX`
+behind the loop of the calls). So the reading runs on behind the end of
+the room for as long as the device gives, over whatever lies there; a
+file gives each piece in one call, or ends, and is not touched by it.
+The original has it as it is; "Known and not dealt with" has it, by
+reading. It cannot be tried on the bench: the one device that the
+copying reads there, `nul` in `copy`, gives nothing, and the console,
+which would give a line at a time, is refused as a source. In the 640
+KB of today the bytes go into whatever lies behind the room; from F9
+on the extender ends the program for it, "What could go wrong", 14.
+The ways:
+
+- A. Leave it as the original has it. From F9 on, copying from such a
+  device ends the program with the extender's message.
+- B. Count the room down by every call, so that a piece that came in
+  several calls takes as much room as it is long, and the reading
+  stops at the room's end. A file and a device that gives a piece in
+  one call are copied as before, byte for byte; no scenario changes. A
+  deviation, with its entry in `DEVIATIONS.md`.
+- C. Keep the original's count and stop the reading where the buffer
+  reaches the room's end. As much code as B, and a second count beside
+  the first that says the same thing.
+
+Recommended: B. It is what the code is evidently for, it is one line
+(`left -= got` inside the loop of the calls, in place of behind it),
+and it changes nothing that a scenario or a file can show. In a
+dialog: "Copying from a device that answers a piece in several reads
+runs past the end of its buffer, a bug of the original. Fix it (count
+every read; nothing else changes), or keep it (from F9 on the
+extender ends the program)?"
+
+**What there is.** `copy.c` sorted by "The rule for a number", with
+`struct Copied` of `vc.h`, which its commands answer in; clang's
+warnings of a conversion silent for it. The copy's room is in bytes:
+`left = RoomBytes() & ~0x1FF`, the room rounded down to 512 bytes as
+the original rounds it, by `RoomBytes` of `start.c`, which N5 added
+beside `RoomParas` (this piece had added one of its own, the same,
+and dropped it at the rebase). The whole suite passes, no
+golden and no patch changed, and the image of each of the 155
+scenarios is that of the build before (below).
+
+**The numbers.** Of the 81 of 8 or 16 bits and the 6 that were a
+`u32`:
+
+| | Of 8 or 16 bits | `u32` | Which |
+|---|---|---|---|
+| Widened, to `i32` | 36 | 1 | The counts of the loops and the indexes; the bytes that `C00_End` looks at and what it leaves, which is `fits` of `C00_00` and the bytes of a path that `C40_00` did not compare; the piece of a copy, its offset and what a call read or wrote; the room left, `left`, which was a `u32`; the cells of `PerCent`; the kind of a target, `CpCase`'s; the button that a box answers; what a command is told to do and how many directories and files are selected; and `place` of `struct Copied` |
+| Made `bool` | 6 | | What `C40_00`, `C00_01` and `F35_61` answer, `across` of `C30_00`, `rename` of `C00_00`, and in `F35_61` whether a directory was chosen |
+| Kept by a word | 37 | 2 | `bits` 11 (DONE, NOTHING, STOP and COPY in what four functions answer, what DOS says of a handle, the answer handed to `F35_61`), `text` 10 (the seven texts, the first two characters of a path read as one word), `character` 5, `system` 3 (DOS's errors), `attributes` 2, `cell` 1, `handle` 1, `address` 1 (a place in a panel's block: question 3), `place` 1; and of the `u32`, `size` for what is free on the disk |
+| Kept by a sentence | 4 | 4 | The number of 48 bits that `PerCent` works out as the original does, in a `u32` and a `u16` with the carry and the borrow between them: each wraps round, and that is what the loop goes by |
+
+Three numbers are new, each where a variable held two things in turn:
+the cell that `C20_00` draws the row of the count with, where `count`
+held it before it was the piece (`cell`, a `u16`); the drive that a
+full disk is asked about, where `error` held it (`drive`, a `u16`); and
+whether anything was written to a target before a full disk, where
+`info` held it after what DOS said of the handle (`filled`, a `bool`).
+And `size`, a `u32`, the end of a file that is appended to, where
+`left` held it before it counted the room.
+
+Two places of the kind `sign`: `got >> 4 << 4`, the step of the buffer
+by whole paragraphs of what was written, `got` being what `FileWrite`
+answers, 0 or more.
+
+**The casts.** clang named 5 places before anything changed. Four went
+by a type, three differences of two pointers into `CpDest` and one
+count of a loop, now `i32`; one is a cast, the cell of the count's row,
+`(u16)((u8)Color(Box_C) << 8 | 0xB0)`. The widening made 14 more: the
+piece handed to `FileRead` and `FileWrite`, and kept in `space.sector`
+where DOS would not tell; the bytes of a path not compared, kept as a
+time where DOS would not tell one; what was read and written added to
+the two sizes, `(u32)got`, three; what is left to write, `(i32)(CpRead
+- CpWrite)`, which is in the room; the free bytes held against the
+piece and handed to `FileWrite`; the cursor of `F35_61`; the counts
+handed to `FilDir` of `panel.c`, two; and the count of a loop,
+`(i32)sizeof AllIn_S`. So 15 casts; one that there was is gone, the
+`(u16)` of a difference of two pointers in `C40_00`. Two have a comment
+of what they fit by: what is left to write, and the two counts of
+`FilDir`. `harness/reads.py` knows a loop to `(i32)sizeof X` as a loop
+to a count since N3, which had met it too.
+
+**Across clusters.**
+
+- `F35_01` and `F45_01` take `command`, `directories` and `files` as
+  an `i32`; `main.c` hands them `r->bx` and `r->dx` and a comparison,
+  and nothing there changed. `place` of `struct Copied` is an `i32`,
+  which `main.c` reads in a `switch`.
+- `FilDir` of `panel.c` takes the two counts as a `u16`: a cast at the
+  call here until N12 widens it.
+- `F35_61` answers a `bool`: its declaration in `dialog.c` changed, one
+  line, whose call asks `!= 0`.
+- `C00_00` takes and answers a `u16` still, by the word `attributes`
+  and `bits`: it is called through `FncCall` of `dirfunc.c`, whose type
+  N10 has.
+- `RoomParas` is called by `edit.c` alone now, for N6;
+  `harness/words.txt` has one fewer.
+
+**`harness/int16.py`.** The one place that there was, `i < CpVar2 -
+CpVar1` of `F35_50`, is gone; six are new, each a difference of two
+pointers kept in an `i32` now, with its reason.
+
+**The program.** The image of every scenario, `python3
+harness/dataimage.py compare`, against the build of `main` that it
+began on: "155 scenarios, 151 with nothing that differs; 0 differences,
+0 more in what was declared as changed, 39 in what may differ", in
+`blank-timed`, `command-line`, `cursor` and `mouse-dialog`, which the
+tool lets differ. `VC.EXE` is another, by the types: the listings of
+`copy.c` and `start.c` changed, of `dialog.c` where it tests what
+`F35_61` answers, a byte now, which the compiler then lays out anew
+around it, and of `main.c`, which reads `struct Copied`.
+
+It took some 75 tool calls, of which waiting for the images and the
+suite on a machine that four other clusters were testing on was a
+dozen: reading the plan and the sections 15,
+the file read whole once with the finder's lists beside it 10, the
+types by one script 10, the record's reasons by another 5, the tests
+and the documents the rest.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on
@@ -15286,7 +15410,9 @@ than it is would pass.
     copies to new files now, so no scenario has it.
   - Of a device that gives its bytes in several calls of DOS to a
     piece, the room left in the memory is counted down by the last
-    call only. By reading: the bench has no such device.
+    call only. By reading: the bench has no such device. Whether it is
+    mended is a question for the user, prepared in "N9, `copy.c`: done,
+    and what a later cluster should know".
   - Where DOS will not tell the date and the time of a file that it has
     just opened, the copying goes on with CX and DX as they are, and
     the target is given that for a time and a date when it is closed.

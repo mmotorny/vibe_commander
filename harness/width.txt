@@ -76,7 +76,7 @@ N2              79          0     0              0      68    11     0     3    
 N3, N4         107         75    13              7      38     0     6    12    45  view.c
 N5              76          0     0              0      70     6     3     4    44  find.c
 N6 to N8       194        194    41             41       0     0     5     0     6  edit.c
-N9              81         81     6              6       0     0     0     0     0  copy.c
+N9              41          0     6              0      39     8     2     7    37  copy.c
 N10             98         98     0              0       0     0     0     0     0  dirfunc.c
 N11             47          0     1              0      46     2     2     9    34  files.c read.c place.c
 N12             80         80     3              3       0     0     0     0     0  panel.c info.c drive.c
@@ -92,11 +92,11 @@ N19b            41         41     0              0       0     0     0     0    
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        285        105    12              1     150     2     0     0     0  vc.h sys.h tables.h
-all           2709       1597   152             66     485    27    27    35   242
+headers        284        104    12              1     150     2     0     0     0  vc.h sys.h tables.h
+all           2668       1515   152             60     524    35    29    42   279
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               228         48    11              0     150     2     0     0     0
+vc.h               227         47    11              0     150     2     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              40         40     0              0       0     0     0     0     0
@@ -104,7 +104,7 @@ blank.c             12          0     0              0      12     0     2     0
 box.c               30          0     0              0      29     1     1     0    18
 cmdline.c           58         58     0              0       0     0     0     0     1
 commands.c          74         74     0              0       0     0     0     0     0
-copy.c              81         81     6              6       0     0     0     0     0
+copy.c              41          0     6              0      39     8     2     7    37
 dialog.c            79          0     0              0      68    11     0     3    29
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           98         98     0              0       0     0     0     0     0
@@ -668,8 +668,6 @@ vc.h, struct Sought: not sorted, 2 numbers
 
 vc.h, struct Checked: not sorted, 2 numbers
 
-vc.h, struct Copied: not sorted, 1 number
-
 vc.h, struct SpeedKey: not sorted, 2 numbers
 
 vc.h, struct Picked: not sorted, 4 numbers
@@ -864,7 +862,193 @@ commands.c: not sorted, 74 numbers
 commands_t.c: as a whole, 72 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-copy.c: not sorted, 81 numbers, 6 u32
+copy.c, (): variable Copy0_S, u8[]
+    text
+
+copy.c, (): variable Move0_S, u8[]
+    text
+
+copy.c, (): variable Ren0_S, u8[]
+    text
+
+copy.c, (): variable RnMv_S, u8[]
+    text
+
+copy.c, (): variable CopTo_S, u8[]
+    text
+
+copy.c, (): variable CopFi_S, u8[]
+    text
+
+copy.c, (): variable AllIn_S, u8[5]
+    text
+
+copy.c, C00_End: variable c, u8
+    character
+
+copy.c, C00_30: returns, u16
+    character: the letter of the drive, or 0.
+
+copy.c, C00_30: variable pair, u16
+    text: the first two characters of a path, read in one word as the
+    original reads them.
+
+copy.c, C40_05: variable pair, u16
+    text: the first two characters of a path, read in one word as the
+    original reads them.
+
+copy.c, SetDate: parameter handle, u16
+    handle
+
+copy.c, PerCent: variable before, u32
+    The low 32 bits of the number of 48 that PerCent works out, or the
+    high 16, as they were before a step: what tells whether the step
+    wrapped round, which is the carry or the borrow that the original
+    counts on.
+
+copy.c, PerCent: variable low, u32
+    The low 32 bits of the number of 48 that PerCent works out as the
+    original does: they wrap round, and the carry out of them goes
+    into `high`.
+
+copy.c, PerCent: variable sum, u32
+    The low 32 bits of what was read and written together, which may
+    wrap round: the carry is kept beside it in `carry`.
+
+copy.c, PerCent: variable twice, u32
+    The low 32 bits of twice the size of the file, the high bit being
+    in `twice_high`: a part of a number of 33 bits.
+
+copy.c, PerCent: variable borrow, u16
+    The borrow out of the low 32 bits of the number of 48, which is
+    taken off the high 16: a part of that number.
+
+copy.c, PerCent: variable carry, u16
+    The carry out of the low 32 bits of what was read and written
+    together: a part of that number.
+
+copy.c, PerCent: variable high, u16
+    The high 16 bits of the number of 48 that PerCent works out as the
+    original does: they wrap round below 0 when twice the size has
+    been taken off once too often, and the loop ends by that.
+
+copy.c, PerCent: variable twice_high, u16
+    The high bit of twice the size of the file: a part of a number of
+    33 bits.
+
+copy.c, PerCent: variable cell, u16
+    cell
+
+copy.c, C00_01: variable info, u16
+    bits: what DOS answers of a handle, bit 7 for a device; or, where
+    it will not say, what the original has in DX instead, the place of
+    the name.
+
+copy.c, C00_01: variable c, u8
+    character
+
+copy.c, C10_13: variable file, u16
+    address: a place in the panel's block, 16 bits while a panel is
+    64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+copy.c, C10_00: returns, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word, or COPY, 0FFFFh.
+
+copy.c, C10_00: variable error, u16
+    system: an error of DOS, as a call answers it.
+
+copy.c, C10_00: variable result, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word, or COPY, 0FFFFh.
+
+copy.c, C20_00: returns, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word.
+
+copy.c, C20_00: variable free, u32
+    size: the bytes that are free on the disk.
+
+copy.c, C20_00: variable size, u32
+    size: the length of a file that is appended to, and then the place
+    of its last byte.
+
+copy.c, C20_00: variable attributes, u16
+    attributes
+
+copy.c, C20_00: variable cell, u16
+    cell
+
+copy.c, C20_00: variable drive, u16
+    text: the first two characters of the target's path, read in one
+    word as the original reads them, or the letter of the current
+    drive alone.
+
+copy.c, C20_00: variable error, u16
+    system: an error of DOS, as a call answers it.
+
+copy.c, C20_00: variable info, u16
+    bits: what DOS answers of a handle, bit 7 for a device; or, where
+    it will not say, what the original has in DX instead, the place of
+    the name.
+
+copy.c, C20_00: variable result, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word.
+
+copy.c, C20_00: variable c, u8
+    character
+
+copy.c, C20_00: sign
+    | buffer += got >> 4 << 4;
+    `got` is what FileWrite answers that it wrote, which is not below
+    0, and the loop has gone on only where the write did not fail.
+
+copy.c, C20_00: sign
+    | rest = buffer + (got >> 4 << 4); /* in paragraphs, as above */
+    `got` is 0, or what FileWrite answers that it wrote, which is not
+    below 0.
+
+copy.c, C30_00: returns, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word, or what DirFunc answers, which is the
+    same.
+
+copy.c, C30_00: variable error, u16
+    system: an error of DOS, as a call answers it.
+
+copy.c, C30_00: variable result, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word, or what DirFunc answers, which is the
+    same.
+
+copy.c, C00_00: parameter attributes, u16
+    attributes
+
+copy.c, C00_00: returns, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word: what FncCall of dirfunc.c takes of
+    every function that it calls.
+
+copy.c, C00_00: variable drive, u16
+    character: the letter of a drive, as C00_30 answers it.
+
+copy.c, C00_00: variable result, u16
+    bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
+    in the two bytes of a word, or COPY, 0FFFFh, between C10_00 and
+    C20_00.
+
+copy.c, F35_61: parameter answer, u16
+    bits: the number of the answer in the low byte, and above it not 0
+    for F10 itself, as Dialog hands it on.
+
+copy.c, F35_61: parameter place, u16
+    place
+
+copy.c, F35_61: variable pair, u16
+    text: the first two characters of the typed path, read in one word
+    as the original reads them, and then the letter of a drive alone.
 
 copy_t.c: as a whole, 38 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

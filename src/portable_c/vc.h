@@ -1201,15 +1201,15 @@ struct Checked StF04_10(u16 answer);
    the command does not count what is selected, it goes by those two as
    they come: see F35_50 there. */
 struct Copied {                         /* what they return: */
-    u16 place;                          /* where the program goes on: a
+    i32 place;                          /* where the program goes on: a
                                            GO_ */
     const u8 *title;                    /* with GO_MASKED the title of the
                                            boxes */
 };
-struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
-                     u16 files);
-struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
-                     u16 files);
+struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
+                     i32 files);
+struct Copied F45_01(struct WCBdef *panel, i32 command, i32 directories,
+                     i32 files);
 
 /* The file search, find.c; the command line, cmdline.c: a key for it,
    Esc, the selected files and the path of a panel put into it, the

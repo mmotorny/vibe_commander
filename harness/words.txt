@@ -12,7 +12,7 @@ box.c         none
 cmdline.c     TRELIST 1, TREE_OFFSET 2, ENTRY 4, DSKBUF 3
 commands.c    ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
 commands_t.c  MD_AT 45, WCB_AT 3, NUMBER 17
-copy.c        RoomParas 1, MD_PLACE 5, TRELIST 1, ENTRY 4
+copy.c        MD_PLACE 5, TRELIST 1, ENTRY 4
 copy_t.c      MD_AT 22, NUMBER 4
 dialog.c      NUMBER_OF 9
 digits.c      none

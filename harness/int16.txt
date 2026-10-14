@@ -21,10 +21,34 @@ cmdline.c, F68_00: widen
     Up, Down and the mouse keep from two rows below its top to four above
     its bottom: 0 or more, and below its rows.
 
-copy.c, F35_50: compare
+copy.c, C00_01: widen
+    | count = end - CpDest;
+    end is behind the zero byte of CpDest, looked for in LenName bytes
+    of it by C00_End just above: 1 to LenName.
+
+copy.c, C00_01: widen
+    | count = from - CpSrc;
+    from is CpBgNam, the name in CpSrc behind its path, which CutPath or
+    the start of CpSrc made: 0 to LenName.
+
+copy.c, C00_01: widen
+    | count = to - CpDest;
+    to is where UnConv has written the name into CpDest, behind its
+    path: within the LenName bytes of CpDest.
+
+copy.c, C40_00: widen
+    | count = C00_End(target, &count) - target;
+    C00_End looked for the zero byte in LenName bytes of target, just
+    above, and answers behind it: 1 to LenName.
+
+copy.c, C40_05: widen
+    | for (count = LenName - (to - buffer); count; count--)
+    to is buffer, buffer + 2, or behind the path of LenPath bytes that
+    AddFile ended: LenName less that is 1 or more.
+
+copy.c, F35_50: widen
     | for (i = 0; i < CpVar2 - CpVar1; i++)
-    CpVar1 and CpVar2 are places of TmpBuf that are written at the top of
-    the file, 120 and 140: 20 apart.
+    Two places of TmpBuf, 20 bytes apart.
 
 dialog.c, DialBox: widen
     | size = (u16)((head->lines << 8 | width & 0xFF) + 0x40C);

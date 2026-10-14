@@ -119,7 +119,7 @@
    as well, and is not 0 to go on with the dialog; the answer stays what
    it was. */
 u16 F38_10(u16 answer);                                 /* dirfunc.c */
-u16 F35_61(u16 answer, u16 place);                      /* copy.c */
+bool F35_61(u16 answer, u16 place);                     /* copy.c */
 
 /* C routines of other files that vc.h does not have. */
 i32 LnStr(const struct LineArgs *args);                 /* line.c */

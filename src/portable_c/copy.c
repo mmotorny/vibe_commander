@@ -58,7 +58,7 @@ static u8 *CpBgNam;
 #define LenName (LenPath + 13)          /* a path and a file name */
 
 u16 C00_00(u16 attributes);
-u16 F35_61(u16 answer, u16 place);
+bool F35_61(u16 answer, u16 place);
 
 /* C00_00 is what FncAddr names, and F35_61 what the dialogs of the
    commands name for F10. The commands, F35_01 and F45_01, are declared in
@@ -165,9 +165,9 @@ static const u8 *F35_40(void)
 /* Where the text at `text` ends, looked for in `count` bytes: the address
    behind its zero byte, or behind the bytes if there is none. `count` is
    then what was left to look at. */
-static const u8 *C00_End(const u8 *text, u16 *count)
+static const u8 *C00_End(const u8 *text, i32 *count)
 {
-    u16 left = *count;
+    i32 left = *count;
     u8 c;
 
     do {
@@ -200,7 +200,8 @@ static u16 C00_30(const u8 *path)
 static void C40_05(const u8 *path, u8 *buffer)
 {
     u8 *to;
-    u16 pair, count;
+    u16 pair;
+    i32 count;
 
     to = AddFile(MvzLine(buffer, md.DosPth, LenPath));
     pair = *(const u16 *)path;
@@ -225,27 +226,27 @@ copy:
         *to = 0;
 }
 
-/* Whether the source and the target are the same file: 1 if so. `left`
+/* Whether the source and the target are the same file. `left`
    gets what the assembly has in CX afterwards, the bytes of the target's
    path that were not compared: C10_00 hands that on. */
-static u16 C40_00(u16 *left)
+static bool C40_00(i32 *left)
 {
     const u8 *source = md.TmpErr, *target = md.TmpErr + 100;
-    u16 count;
+    i32 count;
 
     C40_05(CpSrc, md.TmpErr);
     C40_05(CpDest, md.TmpErr + 100);
     count = LenName;
-    count = (u16)(C00_End(target, &count) - target);
+    count = C00_End(target, &count) - target;
     do {
         count--;
         if (*source++ != *target++) {
             *left = count;
-            return 0;
+            return false;
         }
     } while (count);
     *left = 0;
-    return 1;
+    return true;
 }
 
 /* Write the target as the boxes show it: a file with its name in small
@@ -276,8 +277,8 @@ static void SetDate(u16 handle)
 static void PerCent(void)
 {
     u32 sum, low = 0, twice, before;
-    u16 carry, high = 0, twice_high, borrow, cells;
-    u16 count;
+    u16 carry, high = 0, twice_high, borrow;
+    i32 cells, count;
     u16 *screen;
     u16 cell;
 
@@ -293,7 +294,7 @@ static void PerCent(void)
     if (CpSize != 0) {
         twice = CpSize << 1;
         twice_high = HIGH(CpSize) >> 15;
-        cells = 0xFFFF;
+        cells = -1;
         do {
             cells++;
             borrow = twice_high + (low < twice);
@@ -312,7 +313,7 @@ static void PerCent(void)
 }
 
 /* Make the name of the target, CpDest, from what was typed, ToFile.
-   Returns 0 to stop: for a drive that is not ready.
+   Returns false to stop: for a drive that is not ready.
 
    In capitals. A name that ends with a backslash or a colon, the name
    "..", the directory of the other panel and any other directory that is
@@ -325,7 +326,7 @@ static void PerCent(void)
 
    What a name without a mask is, a directory, something new or a file,
    is found out for the first file and kept in CpCase for the others. */
-static u16 C00_01(void)
+static bool C00_01(void)
 {
     struct WCBdef *other;
     const u8 *from = md.ToFile;
@@ -334,14 +335,15 @@ static u16 C00_01(void)
     struct Answer opened;
     struct Device device;
     struct FileAttr attr;
-    u16 count, i, kind, info;
+    i32 count, i, kind;
+    u16 info;
     u8 c;
 
     for (i = 0; i < LenName; i++)
         CpDest[i] = from[i];
     PathLin(CpDest);
     if (CopyMov == 3)
-        return 1;
+        return true;
     name = (u8 *)CutPath(CpDest);
     to = name;
     if (*name == 0)
@@ -367,7 +369,7 @@ static u16 C00_01(void)
     kind = CpCase;
     if (kind == 0) {
         if (ChgDisk(CpDest))
-            return 0;
+            return false;
         opened = OpenFil(CpDest, 0x40);
         if (opened.failed == 0) {
             device = FileDevice(opened.value);
@@ -383,11 +385,11 @@ static u16 C00_01(void)
                 goto known;
             }
         } else if (opened.value == ERR_NOT_READY)
-            return 0;
+            return false;
         attr = FileAttributes(CpDest);
         if (attr.failed) {
             if (attr.value == ERR_NOT_READY)
-                return 0;
+                return false;
             kind = 1;
         } else {
             kind = 3;
@@ -400,7 +402,7 @@ known:
     if (kind == 2)
         goto directory;
     if (kind > 2)
-        return 1;
+        return true;
 mask:
     Convert(name, md.TmpErr);
     part = CpBgNam;
@@ -428,7 +430,7 @@ rest:
         for (count = LenName - count; count; count--)
             *to++ = *from++;
     *to = 0;
-    return 1;
+    return true;
 }
 
 /* Mark the tree file of the drive of a path as out of date, if trees are
@@ -452,7 +454,8 @@ static void C10_13(void)
 {
     struct WCBdef *wcb = CurrentPanel;
     u8 *entry;
-    u16 file, i;
+    u16 file;
+    i32 i;
 
     if (CutPath(CpSrc) != CpSrc || CutPath(CpDest) != CpDest)
         return;
@@ -479,13 +482,14 @@ static void C10_13(void)
    names left, 0 if the source's path only goes on where the target's
    ends; or, for a file to append to, the attributes of that file, 0 if
    it has none. C20_00 then says that it cannot open the file. */
-static u16 C10_00(u16 *fits)
+static u16 C10_00(i32 *fits)
 {
     struct Box box;
     struct FileAttr attr;
     struct Answer asked;
     const struct BOXHD *report;
-    u16 result, answer, error;
+    u16 result, error;
+    i32 answer;
 
     CopyMov = 3;
     OncZoom(0x528, &RenFi_P, 0, &box);
@@ -603,10 +607,10 @@ close:
    other when the copying stops; and after a piece that took more than
    one call of DOS to read, which only a device gives, the room left in
    the memory is counted down by the last of them only. */
-static u16 C20_00(u16 fits)
+static u16 C20_00(i32 fits)
 {
     struct Box box;
-    u32 left, free;
+    u32 size, free;
     struct Answer opened, moved, asked;
     struct Device device;
     struct FileAttr attr;
@@ -614,8 +618,9 @@ static u16 C20_00(u16 fits)
     struct Space space;
     const struct BOXTOP *shown;
     const struct BOXHD *report;
-    u16 result, error, answer, info, attributes;
-    u16 offset, count, got, i;
+    u16 result, error, info, attributes, drive, cell;
+    i32 answer, left, offset, count, got, i;
+    bool filled;
     u16 *screen;
     u8 *part, *end;
     u8 *buffer, *rest;
@@ -630,9 +635,9 @@ static u16 C20_00(u16 fits)
     CpCntBg = box.begin + 0x605;
     CpCntSz = (u8)(box.size - 12);
     screen = BasAdr(CpCntBg);
-    count = (u8)Color(Box_C) << 8 | 0xB0;
+    cell = (u16)((u8)Color(Box_C) << 8 | 0xB0);
     for (i = CpCntSz; i; i--)
-        *screen++ = count;
+        *screen++ = cell;
     Window(CpCntBg, 0x100 | CpCntSz);
     report = &OpnEr_B;
     if (fits == 0)
@@ -676,7 +681,7 @@ static u16 C20_00(u16 fits)
            not set then. For a file both are 0, of the place just gone
            to, as FileTime has them; for a device they are what comparing
            the two names left and the address of the name. */
-        stamp.time = count;
+        stamp.time = (u16)count;
         stamp.date = MD_PLACE(CpSrc);
     }
     CpDate = stamp.date;
@@ -688,7 +693,7 @@ static u16 C20_00(u16 fits)
     SplitFl = 0;
 
 read:
-    left = (u32)(RoomParas() & 0xFFE0) << 4;
+    left = RoomBytes() & ~0x1FF;        /* rounded down to 512 bytes */
     buffer = Room;
     if (ChgDisk(CpSrc))
         goto terminate;
@@ -697,17 +702,17 @@ read:
             goto terminate;
         offset = 0;
         count = 0x8000;
-        if (HIGH(left) == 0 && count > LOW(left))
-            count = LOW(left);
+        if (count > left)
+            count = left;
         do {
             got = 0;
             if (count != 0) {
-                moved = FileRead(CpHndl1, buffer + offset, count);
+                moved = FileRead(CpHndl1, buffer + offset, (u16)count);
                 if (moved.failed)
                     goto terminate;
                 got = moved.value;
             }
-            CpRead += got;
+            CpRead += (u32)got;
             PerCent();
             if (got == 0)
                 goto ended;
@@ -844,18 +849,19 @@ append:
     }
     CpDate = stamp.date;
     CpTime = stamp.time;
-    left = FileSeek(CpHndl2, 2, 0).place;
-    if (left != 0) {
-        left--;
-        FileSeek(CpHndl2, 0, left);
+    size = FileSeek(CpHndl2, 2, 0).place;
+    if (size != 0) {
+        size--;
+        FileSeek(CpHndl2, 0, size);
         if (FileRead(CpHndl2, md.TmpErr, 1).failed)
             goto terminate;
         if (md.TmpErr[0] == 0x1A)
-            FileSeek(CpHndl2, 0, left);
+            FileSeek(CpHndl2, 0, size);
     }
 
 write:
-    left = CpRead - CpWrite;
+    /* What was read and is not written yet, which is in the room. */
+    left = (i32)(CpRead - CpWrite);
     buffer = Room;
     if (rest != 0)
         buffer = rest;
@@ -864,18 +870,18 @@ write:
         if (TstBrk())
             goto terminate;
         count = 0x8000;
-        if (HIGH(left) == 0 && count > LOW(left))
-            count = LOW(left);
+        if (count > left)
+            count = left;
         got = 0;
         if (count != 0) {
-            moved = FileWrite(CpHndl2, buffer, count);
+            moved = FileWrite(CpHndl2, buffer, (u16)count);
             if (moved.failed)
                 goto terminate;
             got = moved.value;
             if (got == 0)
                 goto full;
         }
-        CpWrite += got;
+        CpWrite += (u32)got;
         PerCent();
         left -= got;
         /* The assembly steps a segment, by the paragraphs that were
@@ -929,38 +935,38 @@ done:
 
 full:
     /* Not a byte of the piece was written. How much room is there? */
-    error = *(const u16 *)CpDest;
-    if (error >> 8 != ':')
-        error = md.DosPth[0];
+    drive = *(const u16 *)CpDest;
+    if (drive >> 8 != ':')
+        drive = md.DosPth[0];
     /* DOS leaves the carry flag as it finds it here: the assembly has it
        from taking 'A'-1 off the letter. */
-    space = DriveSpace((u8)(error - ('A' - 1)), (u8)error < 'A' - 1);
+    space = DriveSpace((u8)(drive - ('A' - 1)), (u8)drive < 'A' - 1);
     if (space.failed) {
         /* The assembly goes on with BX and CX as they are, which DOS has
            not set then: the handle, and the size of the piece. */
         space.free = CpHndl2;
-        space.sector = count;
+        space.sector = (u16)count;
     }
     got = 0;
     if (space.value != 0xFFFF) {
         /* The bytes of a cluster as 16 bits, times the clusters. */
         free = (u32)(u16)(space.value * space.sector) * space.free;
-        if (HIGH(free) == 0 && LOW(free) < count) {
-            moved = FileWrite(CpHndl2, buffer, LOW(free));
+        if (free < (u32)count) {
+            moved = FileWrite(CpHndl2, buffer, (u16)free);
             if (moved.failed)
                 goto terminate;
             got = moved.value;
         }
     }
-    CpWrite += got;
+    CpWrite += (u32)got;
     PerCent();
     rest = buffer + (got >> 4 << 4);         /* in paragraphs, as above */
     SetDate(CpHndl2);
     /* Is anything in the file? */
-    info = FileSeek(CpHndl2, 2, 0).place != 0;
+    filled = FileSeek(CpHndl2, 2, 0).place != 0;
     if (FileClose(CpHndl2).failed)
         goto forget;
-    if (info == 0) {
+    if (!filled) {
         if (FileDelete(CpDest).failed)
             goto terminate;
     } else {
@@ -1051,7 +1057,7 @@ close:
 }
 
 /* Copy, rename or move a directory. Returns what C00_00 does. `across`
-   is 0 for a directory that DOS may be able to rename, and `fits` is not
+   is false for a directory that DOS may be able to rename, and `fits` is not
    0 if the name of the target is short enough.
 
    If DOS does not rename it, the target is made, with the attributes of
@@ -1063,13 +1069,14 @@ close:
 
    The first time a directory is made or goes, the tree file of its drive
    is marked as out of date. */
-static u16 C30_00(u16 across, u16 fits)
+static u16 C30_00(bool across, i32 fits)
 {
     struct Box box;
     struct FileAttr attr, there;
     struct Answer marked, asked;
     const struct BOXTOP *shown;
-    u16 result, error, i;
+    u16 result, error;
+    i32 i;
     u8 *end;
 
     if (CpDev2 != 0)
@@ -1082,7 +1089,7 @@ static u16 C30_00(u16 across, u16 fits)
         goto unmade;
     if (C40_00(&i))
         goto same;
-    if (CopyMov == 0 || across != 0)
+    if (CopyMov == 0 || across)
         goto make;
     if (ChgDisk(CpDest))
         goto stop;
@@ -1170,7 +1177,7 @@ walk:
             /* Is anything left in it? Its own two entries are. */
             for (end = CpSrc; *end != 0; end++)
                 ;
-            for (i = 0; i < sizeof AllIn_S; i++)
+            for (i = 0; i < (i32)sizeof AllIn_S; i++)
                 end[i] = AllIn_S[i];
             asked = FindFirst(CpSrc, 0x37);
             *end = 0;
@@ -1223,21 +1230,23 @@ close:
    directory that cannot be made. */
 u16 C00_00(u16 attributes)
 {
-    u16 result, fits, drive, rename;
+    u16 result, drive;
+    i32 fits;
+    bool rename;
 
     md.SftErr = 1;
     result = STOP;
     if (C00_01()) {
         fits = LenPath + 12;
         C00_End(CpDest, &fits);
-        rename = 0;
+        rename = false;
         if (CpDev2 == 0 && CopyMov != 2) {
             if (CopyMov > 2)
-                rename = 1;
+                rename = true;
             else if (CopyMov != 0) {
                 drive = C00_30(CpSrc);
                 if (drive != 0 && C00_30(CpDest) == drive)
-                    rename = 1;
+                    rename = true;
             }
         }
         if (attributes & ATTR_DIRECTORY)
@@ -1266,7 +1275,7 @@ u16 C00_00(u16 attributes)
 /* What a command returns, struct Copied of vc.h: the place where the
    program goes on, a GO_ there; or that it goes on with the files of a
    mask, GO_MASKED, with the title of the boxes. */
-static struct Copied Go(u16 place)
+static struct Copied Go(i32 place)
 {
     struct Copied copied;
 
@@ -1309,14 +1318,14 @@ static void F35_70(void)
    `directories` and `files` are the numbers of what is selected, where
    the command has counted, and what BX and DX happened to hold where it
    has not: after Shift-F6, or F6 with the panel switched off. */
-static u8 *F35_50(struct WCBdef *panel, u16 directories, u16 files)
+static u8 *F35_50(struct WCBdef *panel, i32 directories, i32 files)
 {
     const struct WCBdef *wcb;
     const u8 *from;
     u8 *to;
     const u8 *title;
     const u8 *words;
-    u16 length, i;
+    i32 length, i;
 
     from = md.ToFile;                                   /* F35_55 */
     if (md.OneFile == 0 || CopyMov == 0) {
@@ -1362,11 +1371,11 @@ F35_57:
 /* Copy or rename, as the 1 in the low byte of `command` says, files that
    are asked for by name: Shift-F5 and Shift-F6, and F5 and F6 where the
    panel shows no files. Returns where to go on. */
-struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
-                     u16 files)
+struct Copied F45_01(struct WCBdef *panel, i32 command, i32 directories,
+                     i32 files)
 {
     u8 *to;
-    u16 i;
+    i32 i;
 
     CopyMov = (u8)command;
     md.HlpPage = (u8)(20 + command);
@@ -1399,7 +1408,7 @@ static void F36_04(void)
 {
     const u8 *rest;
     u8 *to;
-    u16 length, i;
+    i32 length, i;
 
     for (i = 0; i < LenPath; i++)
         CpSrc[i] = md.CrnPath[i];
@@ -1431,14 +1440,14 @@ F36_05:
    and to rename that only a name is asked for. `directories` and `files`
    are what BX and DX hold when the key arrives: see F35_50. Returns
    where to go on. */
-struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
-                     u16 files)
+struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
+                     i32 files)
 {
     const u8 *from;
     const u8 *name, *typed;
     u8 *to, *end;
     struct Selected selected;
-    u16 length, i;
+    i32 length, i;
 
     command &= 0xFF;
     CopyMov = (u8)command;
@@ -1475,7 +1484,8 @@ struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
         goto F35_06;
     }
     if ((directories | files) != 0) {
-        to = FilDir(to, directories, files) - 1;
+        /* Both came in 16 bits: from TotSel, or BX and DX. */
+        to = FilDir(to, (u16)directories, (u16)files) - 1;
     } else {
         from = ENTRY(panel, panel->CurAdr)->NameF;
         length = 13;
@@ -1538,20 +1548,22 @@ F36_01:
    `place` is where the line is that the target is typed into. That
    answer has a directory chosen from the tree, of the drive that was
    typed if it was F10 and of the current one otherwise, and puts its
-   path into the line. Returns 1 if the dialog is to go on, as it is
-   after that answer, and 0 for any other. */
-u16 F35_61(u16 answer, u16 place)
+   path into the line. Returns true if the dialog is to go on, as it is
+   after that answer, and false for any other. */
+bool F35_61(u16 answer, u16 place)
 {
     u8 *line = md.DosBuf + 124 + 10 + 3;        /* DosBuf+LenCmd+10+3 */
     u8 *kept = md.MenuBuf + 350;
     u8 *end;
-    u16 pair, left, i;
+    u16 pair;
+    bool left;
+    i32 i;
 
     if ((answer & 0xFF) != 1)
-        return 0;
+        return false;
     for (i = 0; i < LenPath; i++)
         kept[i] = md.DosPth[i];
-    left = 0;
+    left = false;
     if (answer >> 8 != 0) {
         for (i = 0; i < LenStr + 1; i++)
             md.TmpBuf[i] = line[i];
@@ -1560,18 +1572,18 @@ u16 F35_61(u16 answer, u16 place)
         if (pair >> 8 == ':') {
             DriveSelect((u8)(UpCase(pair) - 'A'));
             if (SetPth())
-                left = 1;
+                left = true;
         }
     }
     if (!left)
-        left = ChTree(28);
+        left = ChTree(28) != 0;
     /* Back to the drive and the directory that were the current ones. */
     pair = kept[0];
     for (i = 0; i < LenPath; i++)
         md.DosPth[i] = kept[i];
     DriveSelect((u8)(pair - 'A'));
     if (left)
-        return 1;
+        return true;
     end = MvzLine(line, md.TmpBuf, LenName);
     if (end[-1] != '\\') {
         end[0] = '\\';
@@ -1580,8 +1592,8 @@ u16 F35_61(u16 answer, u16 place)
     line[LenStr] = 0;
     for (i = 0; line[i] != 0; i++)
         ;
-    *(u16 *)(line - 3) = i;             /* the cursor behind the path */
+    *(u16 *)(line - 3) = (u16)i;        /* the cursor behind the path */
     line[-1] = 1;                       /* and what is typed added to it */
     InSt10(place, line, LenStr, BoxCu_C << 8);
-    return 1;
+    return true;
 }
