@@ -73,7 +73,7 @@ cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i
 N0              35          0     1              0      36     0     3     3    28  digits.c mask.c line.c mouse.c blank.c
 N1              81          0     2              0      77     6     5     4    45  string.c format.c box.c screen.c misc.c
 N2              79          0     0              0      68    11     0     3    29  dialog.c
-N3, N4         153        153    13             13       0     0     0     0     2  view.c
+N3, N4         107         75    13              7      38     0     6    12    45  view.c
 N5              76          0     0              0      70     6     3     4    44  find.c
 N6 to N8       194        194    41             41       0     0     5     0     6  edit.c
 N9              81         81     6              6       0     0     0     0     0  copy.c
@@ -93,7 +93,7 @@ N20            113        113     0              0       0     0     0     0    
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
 headers        292        115    12              1     147     2     0     0     0  vc.h sys.h tables.h
-all           2805       1775   152             73     398    25    19    14   165
+all           2759       1697   152             67     436    25    25    26   208
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               235         58    11              0     147     2     0     0     0
@@ -141,7 +141,7 @@ system.c            21         21     1              1       0     0     0     0
 tree.c              18         18     0              0       0     0     0     0     1
 treebox.c           38         38     0              0       0     0     0     0     2
 usermenu.c          49         49     0              0       0     0     0     0     1
-view.c             153        153    13             13       0     0     0     0     2
+view.c             107         75    13              7      38     0     6    12    45
 window.c            39         39     0              0       0     0     0     0     0
 
 ----
@@ -1741,7 +1741,167 @@ treebox_t.c: as a whole, 7 numbers
 
 usermenu.c: not sorted, 49 numbers
 
-view.c: not sorted, 153 numbers, 13 u32
+view.c, struct ViewDat: field ViSpace, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViLoaded, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViLen, u32
+    size: the length of the file.
+
+view.c, struct ViewDat: field ViOffset, u32
+    size: where in the file the part in the memory begins.
+
+view.c, struct ViewDat: field ViKeyBar, u16
+    bits: KeyBar and Clock of the main data, a byte each, put back as they were.
+
+view.c, struct ViewDat: field ViFirst, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViHandle, u16
+    handle
+
+view.c, struct ViewDat: field ViCol, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViPoint, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViEndTab, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViBase, u16
+    place
+
+view.c, struct ViewDat: field ViSize, u16
+    place: the rows and the columns of the window.
+
+view.c, struct ViewDat: field ViSrLen, u8
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViTmp1, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViTmp2, u16
+    unused: the number is the i32 of the same name of this file, since the structure has no room to grow in TmpBuf.
+
+view.c, struct ViewDat: field ViSearch, u32
+    size: where in the file a search goes on.
+
+view.c, (): variable ViFl_S, u8[]
+    text
+
+view.c, (): variable EdFl_S, u8[]
+    text
+
+view.c, (): variable Col_S, u8[]
+    text
+
+view.c, (): variable Byts_S, u8[6]
+    text
+
+view.c, (): variable ViewE_F, u8[]
+    text
+
+view.c, (): variable EditE_F, u8[]
+    text
+
+view.c, (): variable Menu_F, u8[]
+    text
+
+view.c, (): variable DrIn_F, u8[]
+    text
+
+view.c, (): variable RunEr_S, u8[]
+    text
+
+view.c, (): variable Run1_S, u8[]
+    text
+
+view.c, (): variable Run2_S, u8[]
+    text
+
+view.c, (): variable ViewPar, u8[9]
+    text: the bytes of the command line handed to the viewer or the editor of another's.
+
+view.c, V00_02: variable length, u32
+    size: the length of the file.
+
+view.c, V00_02: variable handle, u16
+    handle
+
+view.c, NextLin: variable word, u16
+    text: two bytes of the text, held against CR LF.
+
+view.c, PrevLin: variable word, u16
+    text: two bytes of the text, held against CR LF, or an entry of the table of lines, which the table keeps in a word.
+
+view.c, V20_00: variable word, u16
+    text: two bytes of the text, held against CR LF.
+
+view.c, V25_00: not sorted, 4 numbers, 3 u32
+
+view.c, V30_00: not sorted, 7 numbers
+
+view.c, V31_00: not sorted, 3 numbers
+
+view.c, V32_00: not sorted, 11 numbers, 2 u32
+
+view.c, Load: parameter position, u32
+    size: a place in the file.
+
+view.c, V50_00: variable rest, u32
+    size: what the file has behind the part in the memory.
+
+view.c, V50_00: sign
+    | i32 half = ViSpace >> 1;
+    ViSpace is the room in whole paragraphs, 0FFE0h at the most, and is set
+    before anything else of the viewer runs: not below 0.
+
+view.c, V51_00: sign
+    | i32 shift = space >> 1;
+    space is ViSpace, the room in whole paragraphs, 0FFE0h at the most: not
+    below 0.
+
+view.c, V55_00: parameter handle, u16
+    handle
+
+view.c, V60_00: variable word, u16
+    text: two bytes of the text, held against CR LF, the first of them against a tab.
+
+view.c, Status: not sorted, 2 numbers
+
+view.c, V00_10: not sorted, 18 numbers, 2 u32, 4 of a sign
+
+view.c, V13_01: not sorted, 1 number
+
+view.c, V81_00: not sorted, 2 numbers
+
+view.c, Sought: not sorted, 2 numbers
+
+view.c, V82_00: not sorted, 6 numbers
+
+view.c, To: not sorted, 1 number
+
+view.c, Own: not sorted, 1 number
+
+view.c, Next: not sorted, 1 number
+
+view.c, F34_30: not sorted, 1 number
+
+view.c, F34_40: not sorted, 4 numbers
+
+view.c, Aexec0: variable error, u16
+    system: the error that DOS answers when it does not run the program.
+
+view.c, F34_11: not sorted, 5 numbers
+
+view.c, F44_01: not sorted, 1 number
+
+view.c, F34_10: not sorted, 3 numbers
+
+view.c, F34_01: not sorted, 2 numbers
 
 view_t.c: as a whole, 23 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

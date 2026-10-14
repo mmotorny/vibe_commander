@@ -1111,7 +1111,7 @@ struct Onward F64_00(struct WCBdef *panel);
 struct Onward F33_00(struct WCBdef *panel);
 struct Onward F34_00(struct WCBdef *panel);
 struct Onward F34_10(struct WCBdef *panel);
-u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open);
+i32 V00_02(i32 menu, bool edit, bool whole, struct Open *open);
 void V00_10(u16 handle);
 void V13_00(void);
 void V13_01(u16 changed);

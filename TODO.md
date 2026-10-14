@@ -9377,7 +9377,7 @@ for.
 |---|---|---|---|---|
 | N1 | `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c` | 891; 133 | F3, N0 | **Done**: "N1, `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c`" below |
 | N2 | `dialog.c` | 1,126; 110 | F3 | **Done**: "N2, `dialog.c`: done, and what a later cluster should know" below |
-| N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | The viewer's room in bytes. It names what `ViewDat` and `EdData` share, for N6. It says where it cut the file |
+| N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | **Done**: "N3, `view.c`, its first part" below, with what `ViewDat` and `EdData` share and where the file is cut |
 | N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | |
 | N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
@@ -13287,6 +13287,179 @@ differ", the one in `mouse-dialog`, which the tool lets differ.
 It took some 45 tool calls, the reading of the file and of the plan
 some 25 of them, with the file read whole once and the reasons
 written by one script; and some 20 more to land.
+
+### N3, `view.c`, its first part: done, and what a later cluster should know
+
+**What there is.** `struct ViewDat`, `struct Line` and the routines that
+open the file, read it and keep the table of its lines sorted by "The
+rule for a number", with the steps of "N0d" in their order: `V00_02`,
+`NextLin`, `PrevLin`, `V20_00`, `V40_00`, `Load`, `V50_00`, `V51_00`,
+`V55_00`, `V60_00` and `Aexec0`, and the texts of the file. The
+viewer's room is counted in bytes, by `RoomBytes` of `start.c`, which
+N5 added while this cluster was at work, under the same name. clang's warnings of a conversion are silent for all of
+`view.c`, which the test asks of a file as soon as anything of it is
+sorted.
+
+**Where the file is cut.** N3 has the scopes named above, and the
+file's own (the texts, by the word `text`). N4 has the rest, each
+`not sorted` in `harness/width.txt`: what draws, `V25_00`, `V30_00`,
+`V31_00`, `V32_00`, `Status`; the viewer's loop of keys, `V00_10`, with
+what it calls to search, `V81_00`, `Sought`, `V82_00`; the ends,
+`V13_00`, `V13_01`, `Files`, `V80_00`; and the commands, `To`, `Own`,
+`Next`, `F34_30`, `F34_40`, `F34_11`, `F44_01`, `F34_10`, `F34_01` and
+the six by their keys. Of `V00_10` N3 changed the lines that take the
+room, and nothing else but casts.
+
+**The numbers.** Of the 108 that the scopes have (the record's count,
+the texts among them):
+
+| | Numbers | Which |
+|---|---|---|
+| Widened, to `i32` | 43 | Nine fields of `ViewDat`, as variables beside it (below); `at` and `entry` of `struct Line`; every place of the text and entry of the table in the routines, `at`, `entry`, `from`, `to`, `table`, `second`, `loaded`; the counts, `count`, `kept`, `left`, `half`, `shift`, `space`, the column of `V60_00`, the index of `Aexec0`; what `V00_02` and `V20_00` answer, and the item of the menu bar that `V00_02` takes |
+| Made `bool` | 12 | Six flags of `ViewDat`, `ViewEdit`, `ViStatus`, `ViTxHex`, `ViWrap`, `ViSrPan`, `Vi100pc`, a byte as before; what `NextLin`, `PrevLin` and `V40_00` answer; `edit` and `whole` of `V00_02`, `edit` of `Aexec0` |
+| Kept by a word | 38 | `text` 16: the twelve texts of the file and `word` of the four routines that hold two bytes of the text against CR LF; `unused` 9, the fields whose numbers are variables now; `size` 6, the length of the file, where its part begins, where a search goes on, a place in the file, what is left of it; `handle` 3; `place` 2, `ViBase` and `ViSize`; `bits` 1, `ViKeyBar`; `system` 1, the error of a program that DOS does not run |
+| Kept by a sentence | 0 | |
+| `sign` | 2 | `half` of `V50_00` and `shift` of `V51_00`, half of the viewer's space |
+
+**`ViewDat` and the variables beside it.** The structure lies in
+`TmpBuf` from 200 on, 43 bytes, 13 short of the end of `TmpBuf`, and
+the nine fields that the rule widens would make it 62: it cannot grow
+there. So, as the plan has it for the main data, each leaves it as a
+variable of `view.c` of the same name, an `i32`, and its bytes in the
+structure are no longer written, `unused` in the record: `ViSpace`,
+`ViLoaded`, `ViFirst`, `ViPoint`, `ViEndTab`, `ViCol`, `ViSrLen`,
+`ViTmp1`, `ViTmp2`. Each is set before it is read when the viewer
+begins or a text is found. The rest of the structure keeps its layout
+and its `LAID_OUT`, the flags being `bool`, one byte.
+
+**What `ViewDat` and `EdData` share, for N6.** `EdData` lies at
+`TmpBuf+100` and is 138 bytes, so its last 38 are the first 38 of
+`ViewDat`. Byte for byte, by name:
+
+| `ViewDat`, from 200 | `EdData`, from 100 | Shared? |
+|---|---|---|
+| `ViSpace` +0, 2 | `EdSpace` +100, 2 | No longer: the viewer's is the variable, the editor's counts paragraphs and is its own |
+| `ViewEdit` +2, `bool` | `Reserved2` +102 | Yes: `V00_02` sets it, the editor leaves it, nothing reads it behind the editor today |
+| `ViStatus` +3, `bool` | `EdStat` +103 | No: each sets its own |
+| `ViLoaded` +4, 2 (unused) | `EdHexAs`, `EdHxCur` +104 | No |
+| `ViLen` +6, `u32` | `EdLen` +106 | Yes: `V00_02` sets it, the editor reads it. `size`, a `u32` in both |
+| `ViOffset` +10, `u32` | `EdCol`, `EdLine` +110 | No |
+| `ViKeyBar` +14, 2 | `Reserved3` +114 | Yes: the editor leaves it, `V13_01` reads it behind the editor. `bits` |
+| `ViTxHex` +16, `bool` | `EdTxHex` +116 | The same byte, which each sets for itself, to 0 or 1; `find.c` clears it by its place, `md.TmpBuf[216]` |
+| `ViWrap` +17, `bool` | `EdChng` +117 | No |
+| `ViFirst` +18, 2 (unused); `ViHandle` +20, 2 | `Reserved4` +118, 4 | `ViHandle`: yes, the editor leaves it and `V13_00` closes it behind the editor. `handle` |
+| `ViCol` +22, 2 (unused) | `EdCol0` +122 | No |
+| `ViPoint` +24, 2 (unused) | `EdLin0` +124 | No |
+| `ViEndTab` +26, 2 (unused) | `Reserved5` +126 | No |
+| `ViBase` +28, 2 | `EdBase` +128 | Yes: `V00_02` or `F34_01` sets it, the editor reads it. `place` |
+| `ViSize` +30, 2 | `EdSizeX`, `EdSizeY` +130 | Yes, the same way: the columns and the rows. `place` |
+| `ViSrPan`, `ViSrLen`, `ViTmp1` +32 | `EdFirst` +132, 4 | No |
+| `ViTmp2` +36, 2 (unused) | `EdShape` +136, 2 | No |
+
+So what N6 has to keep is six things: `EdLen`, `EdBase`, `EdSizeX` and
+`EdSizeY`, `EdTxHex` where they are, at the widths they have (a `size`,
+a `place` and its two bytes, a byte or a `bool`), and `Reserved2`,
+`Reserved3` and `Reserved4` unwritten. Any other field of `EdData`
+over `ViewDat` is the editor's alone and may leave the structure as
+the viewer's did: `EdSpace`, `EdCol`, `EdLine`, `EdCol0`, `EdLin0`,
+`EdFirst` are counts or places. `EdData` cannot grow in place either:
+it ends 18 bytes before `TmpBuf` does, under `ViewDat`.
+
+**The room.** `V00_10` took `RoomParas`, at most 0FFEh paragraphs, and
+made bytes of it; it takes `RoomBytes() & ~0xF`, at most 0FFE0h, which
+is the same number while the room is whole paragraphs, as it is until
+F9, and stays the viewer's own number afterwards. `RoomBytes` is the
+function in bytes of the plan's table "The numbers that count the
+room": an `i32`, `RoomEnd - Room`, in `start.c` beside `RoomParas`, which
+N5 and this cluster wrote alike, and N5's landed first. N6, N9 and N11
+move their calls to it; F9 takes `RoomParas` out. Of
+`view.c` no call of `RoomParas` is left, and `harness/words.txt` says
+so. Nothing writes behind the room for the wider number: the viewer
+never has more than 0FFE0h of it, by the test that stands behind the
+call, and what it reads is cut to that by `V55_00`'s count. `Aexec0`'s
+`ROOM_LEAST` and `SEG_OF(Room)` are F9's.
+
+**The casts.** clang named 18 places of the file before anything
+changed and 41 after the widening; none went by a type. So 41 casts,
+and two more that clang would have named or that the program counts on:
+
+- In N3's routines, 13: `(u32)` where a count or a place is added to
+  `ViOffset` or held against `ViLen`, 4; `(u16)` where a place goes into
+  a word of the table of lines, 2, which `ViSpace` keeps below 0FFE0h;
+  the count of `FileRead` of `sys.h`, which is S's; the item of
+  `PutMnu`; the size of the window and `ViKeyBar`, and the screen's
+  rows for `Window`, which had their cast inside and have it around the
+  whole now; `(i32)sizeof ViewPar`, for the comparison of the loop. And
+  one cast that the program counts on, with `wraps` in its comment:
+  `count` of `V50_00`, the bytes of the second half that are kept,
+  which the original counts in 16 bits and the loop goes to by `!=`.
+  It is not below 0 where the scenarios get to; whether a file of
+  nothing but empty lines can make it so was not worked out, and the
+  cut keeps the original's count either way.
+- In N4's routines, 39: 24 at the border, a place or a count that is an
+  `i32` now kept in a `u16` of `V00_10`, `V25_00` or `V32_00`, or
+  handed to `V32_00`'s `u16`, `(u16)line.at`, `(u16)ViLoaded`,
+  `(u16)ViCol` and the like, and two `(u32)`; 15 that clang named
+  before, a cell or a place of the screen made of two bytes, the
+  length of `SRCH_LEN`, the digit that `TstHex` answers. N4 takes out
+  those at the border when it widens its variables.
+
+`(u16)(space - 2)` of `V51_00` went: `space` is an `i32` and 8,000 at
+the least. The test that `V51_00` makes of a sum past 64K, `loaded <
+shift`, stays with a comment, as `PgDn`'s does (N1).
+
+`harness/reads.py` knows a loop to `(i32)sizeof NAME` as one to `sizeof
+NAME`, a commit of its own: the data's test took the cast for a read of
+unknown length.
+
+**`harness/int16.py`.** No place of N3's routines was in it. One place
+of `V00_10` has a cast on its line now, and its reason again.
+
+**`WORD_AT`** keeps its cut, `(u16)(at)`: a place of the text is an
+`i32` now, and `WORD_AT(text, at - 2)` of a line that begins at 0 or 1
+reads where the original does, at the end of 64K, as before
+("F4"). N4 has the read, as F4 said.
+
+**The program.** Of `view.c`'s routines ten are shorter, by 1 to 22
+bytes and `V00_10` by 128, and `V00_02` is a byte longer; the file is longer by the variables, which have no
+value and stand in front of what has one. `main.c` and `start.c` have
+other listings, by the prototype of `V00_02` and by `RoomBytes`.
+**The image.** `compare` of the build of `24220f2`, which the cluster
+stands on, saved before anything was changed, with the cluster's build,
+`--changed ViewDat`: "155 scenarios, 0 with nothing that differs; 6
+differences, 56 more in what was declared as changed, 785 in what may
+differ", and "493 pointers that name the same in both". The 56 are the
+bytes of the nine fields that are variables now, which the viewer no
+longer writes, in the scenarios that view a file: `ViSpace` 11,
+`ViLoaded` 11, `ViPoint` 12, `ViTmp1` 9, `ViFirst` 4, `ViEndTab` 3,
+`ViSrLen` 3, `ViTmp2` 2, `ViCol` 1. The six are F2's six, in `copy` and
+`copy-dirs`, the byte behind a name copied as 13 bytes into `TmpBuf`
+and `TmpErr`, 7Fh before and 80h after, the pair that `DTA+41` has in
+the scenarios where the tool knows it. What may differ is in every
+scenario since the program's data begins 0D0h lower: the paragraphs of
+dos32.c's blocks, and `DTA+41`. The nine variables are "not there
+before: not compared".
+
+**What N4 should know.**
+
+- The places of the text and the entries of the table are `i32` in
+  `struct Line` and in the nine variables; `V00_10` keeps them in its
+  `u16` variables by casts, which go when those are widened. `V32_00`
+  takes `number`, `at` and `end` as `u16`. A place is below `ViSpace`,
+  0FFE0h, wherever it is read; a step back below 0 is what to look for
+  when a variable is widened, as `NextLin` was read for it.
+- `V40_00`, `NextLin` and `PrevLin` answer `bool`; `V20_00` an `i32`.
+- `ViSrPan` is a `bool` that takes `(u8)panel`, as the byte did: a
+  `panel` of 100h is false there, as it was 0.
+- `edit` of `Own` and `F34_11` is 0 or 1 and handed to `Aexec0`, which
+  takes a `bool`.
+
+**What N6 should know.** The table above: six things of `EdData` stay
+as they are, and the rest of what lies over `ViewDat` is the editor's
+alone. `RoomBytes` is there for `EdSpace`.
+
+It took some 95 tool calls, of which some 25 were reading the brief,
+the plan and the file, and the images and the scenarios ran once.
 
 ### N5, `find.c`: done, and what a later cluster should know
 

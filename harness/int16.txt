@@ -347,7 +347,7 @@ view.c, F34_40: compare
     and MenuBuf is 4,000 bytes.
 
 view.c, V00_10: minus
-    | T71_00(0x700, begin + ((VI->ViSize >> 8) - 1 << 8), (u16)-(2 * 80));
+    | T71_00(0x700, (u16)(begin + ((VI->ViSize >> 8) - 1 << 8)), (u16)-(2 * 80));
     The step of T71_00 of edit.c, which adds it to a place of the main
     data, a number, and makes the pointer of the sum. The sum wraps
     round there in both builds.
