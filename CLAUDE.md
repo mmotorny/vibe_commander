@@ -311,7 +311,13 @@ These held while `src/c/` was made, and they say what it is.
   the portable C's own, where the original cannot go: `editor-huge`,
   a file larger than the original's room, when the memory comes from
   the extender. On DOS, Alt with a letter goes on naming the letter of
-  a US keyboard, as the BIOS gives it.
+  a US keyboard, as the BIOS gives it. Of a help file that is broken,
+  decided the same day: where its numbers of lines run past 65,535,
+  the help wraps them as the original does; and an entry that says its
+  text has no bytes, for which the program of 32 bits would write 64K
+  behind the main data where the original went round its own segment,
+  is refused as a broken file, a bug of the original fixed and
+  declared.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
