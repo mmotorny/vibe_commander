@@ -2066,3 +2066,42 @@ cursor's file among them, until the end. Its patch has those rows.
 `enter-many` runs a command from the same directory with nothing
 selected, which shows the same in both, and no other scenario has a list
 longer than 256 entries when a command runs or the setup is entered.
+
+### 21. A tree's file that says it has no entry, or 4,096 or more, is refused
+
+**What the original does.** The tree of directories is kept in
+`TREEINFO.NCD` in the root of its disk, which says how many entries its
+list has, with a sum of its head and one of the list. The program holds
+the file's length against the bytes of that many entries, in 16 bits,
+and takes it if they agree and the sums are right. Of a count of 4,096
+entries or more the bytes wrap round, so such a file is held to the low
+twelve bits of its count, and is taken if it is as long as that says:
+the program then has the count that the file says, and shows that many
+entries of `TreeBuf` and of what lies behind it in the main data. And a
+file of no entry is as long as its head alone and is taken: the tree is
+empty then, without even the root, and a click on a line of the tree's
+box puts the cursor on the line under the mouse, which is no entry.
+That is known by reading the assembly, `RdTr02` and `ChTr67` of
+`VCSUB3.INC`, and was not tried. No program writes such a file: the
+original's own has five entries or more.
+
+**What the portable C does.** Such a file is taken for a broken one, as
+one that is too long or whose sums are wrong is: the disk is read, and
+the file written anew. Every other file is taken as before. `ReadTre`
+of `treebox.c`, and the cursor of `ChTree`, which a list of no entry no
+longer reaches.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed. The program of 32
+bits counts the bytes of the list in 32 bits, which refuses a count of
+4,096 or more by itself; the cluster N13 met it where it widened that
+count, and had kept the cut of 16 bits until this was decided
+(`TODO.md`, "N13, `tree.c`, `treebox.c`, `extfile.c`").
+
+**Which scenarios show it.** None. A scenario sets up what it needs
+through the program's own menus, and such a file has bytes that are no
+characters, a count and two sums that are worked out, which the editor
+would have to be typed into by their codes; nothing of the original's
+writes one. `tree`, `tree-box`, `tree-choose`, `tree-deep`, `copy-tree`
+and `mouse-tree`, which read a tree from the disk and from its file, are
+held to the original's goldens as they are.

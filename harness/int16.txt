@@ -353,6 +353,11 @@ treebox.c, ChTree: widen
     and below the list's length.
 
 treebox.c, ChTree: widen
+    | cursor = TREE->TreeLen - 1; /* the list has the root */
+    ReadTre, at the top of the function, leaves a list of one entry or
+    more, the root at least: a file that says none is refused.
+
+treebox.c, ChTree: widen
     | first = NUMBER(TreeFirst);
     The number of an entry of the list, which TreeFirst is: 0 or more,
     and below the list's length.
@@ -372,11 +377,15 @@ treebox.c, ChTree: widen
     inner has the rows of the lines in the box, the screen's less 11:
     14 to 39, and this 13 to 38.
 
-treebox.c, ReadTre: widen
+treebox.c, ReadTre: widen, 2 times
     | count = TREE->TreeLen << 4;
     TreeLen is what RdTr11 has counted while the disk was read, which
     the test at RdTr16 keeps within the room of TreeBuf: the bytes of
     the list, in TreeBuf.
+    The other is of a file, whose count is anything: it is held against
+    the bytes that were read, fewer than TreeBuf has, and a count of
+    4,096 entries or more is refused there, as the comment says. 32
+    bits keep it whole, which is what refuses it.
 
 usermenu.c, F32_00: index
     | screen += keys + 1;

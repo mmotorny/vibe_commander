@@ -9386,7 +9386,7 @@ for.
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | **Done**: "N10, `dirfunc.c`: done, and what a later cluster should know" below |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | **Done**: "N12, `panel.c`, `info.c`, `drive.c`" below. Two questions of the Info panel, a cluster of 64K and a file just under 65,536 clusters, answered: fix both, the second by N12, entry 19 of `DEVIATIONS.md`, the first by M |
-| N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | **Done**: "N13, `tree.c`, `treebox.c`, `extfile.c`" below, with two cuts of a tree file that no program writes kept as the original has them |
+| N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | **Done**: "N13, `tree.c`, `treebox.c`, `extfile.c`" below, with its question answered and its fix: a tree file of no entry or of 4,096 or more is refused, entry 21 |
 | N14 † | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | **Done**, with the answer to question 4 carried out: "N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know" below |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
 | N16 | `main.c` | 1,601; 117 | F8 | |
@@ -14542,7 +14542,16 @@ two entries further on than they are for a moment still, which makes
 `moved` -32 at the first round, and every line is drawn then, as
 before. `n -= TreeFirst - TRELIST` of `PutTree` has lost its cast.
 
-**Two cuts that are kept, of a tree file that no program writes.**
+**The question that it met: answered.** Two cuts of a tree file that
+no program writes, which this piece kept as the original has them
+while the question was asked. **Answered** on 14 October 2026
+(`CLAUDE.md`, "The portable C"): such a file is refused as a broken
+one, entry 21 of `src/portable_c/DEVIATIONS.md`, made in a commit of
+its own behind the widths: the two casts are gone, `ReadTre` refuses a
+count of none and counts the bytes in 32 bits, which refuses 4,096 or
+more, and `ChTree` takes the last line with no cut. No scenario shows
+it, and none changed. What was kept until then:
+
 `ReadTre` holds a tree file to the count of entries that it says, by
 the bytes of the list: in 16 bits, as the original does, so a file
 that says 4,096 entries or more is held to the low twelve bits of the
@@ -14612,8 +14621,9 @@ widen. The six are the same in a second run of each build.
   in bytes: the cast goes when the parameter is widened. What it
   answers is kept in an `i32` here.
 - `ChkSum` of `misc.c` takes its count as a `u16`, by N1's sentence,
-  0 being 65,536, which a tree file of no entries or of 4,096 is summed
-  with; `Number` of `format.c` a `u16`, its low word, and `FileWrite` of
+  0 being 65,536, which a tree file of no entries or of 4,096 was
+  summed with until entry 21 refused such a file before its sum;
+  `Number` of `format.c` a `u16`, its low word, and `FileWrite` of
   `sys.h` one: `ReadTre` casts the count of the list's bytes and of the
   file's for them.
 - N17a, of `keys.c`, and N11's `place.c`: the tree's cursor is a number

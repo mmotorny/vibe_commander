@@ -176,14 +176,19 @@ RdTr02:                                 /* the file */
             goto RdTr10;
     if (ChkSum(md.TreeBuf, 7) != TREE->TreSum1)
         goto RdTr10;
-    /* The bytes of the list, in 16 bits as the original has them: this
-       wraps for a count of 4,096 entries or more, which a file that fits
-       TreeBuf has only if it says what it has not, and such a file is
-       held to a list of the low twelve bits of its count. */
-    count = (u16)(TREE->TreeLen << 4);
-    if (done - 11 != count)
+    /* A file that says it has no entry, or 4,096 or more, is taken for a
+       broken one, and the disk is read. The original counts the bytes of
+       the list in 16 bits, so it holds a file of 4,096 entries or more
+       to the low twelve bits of its count, and takes one of none: it
+       then shows the entries that the count says, of TreeBuf and of what
+       lies behind it, or an empty tree. A bug of the original, fixed on
+       the user's word (DEVIATIONS.md, 21). */
+    if (TREE->TreeLen == 0)
         goto RdTr10;
-    if (ChkSum((const u8 *)TRELIST, (u16)count)
+    count = TREE->TreeLen << 4;
+    if (done - 11 != count)             /* beyond TreeBuf for 4,096 */
+        goto RdTr10;
+    if (ChkSum((const u8 *)TRELIST, (u16)count)         /* in TreeBuf */
         != *(const u16 *)((const u8 *)TRELIST + count))
         goto RdTr10;
     goto RdTr40;
@@ -690,10 +695,7 @@ ChTr67:                                 /* on a line */
                     0x100 | (u8)(size - 10), under);
     if (click == 2) {                   /* the cursor goes there */
         under += first;
-        /* This wraps for a list of no entries, which only a tree file that
-           no program writes leaves: the original takes the line under the
-           mouse then. */
-        cursor = (u16)(TREE->TreeLen - 1);
+        cursor = TREE->TreeLen - 1;     /* the list has the root */
         if (cursor > under)
             cursor = under;
         goto ChTr10;
