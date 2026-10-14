@@ -11665,6 +11665,154 @@ are copied as 81 bytes by `DialBox`, behind their zero too: a number
 that a cluster widens in what lies there, from `TmpBuf+100` to
 `TmpBuf+180`, is carried to `TmpErr+101` with the text.
 
+### F5, the editor: done, and what a later piece should know
+
+The text of the editor is `Room`, a `u8 *`, and a place in it a number
+added to it: `AddressOf`, `OFFSET_OF`, `struct Address` and `T62_00`
+are gone, with every `AT`, `SEG_OF(Room)`, `u16 segment`, `MAIN_SEG`,
+`MD_POINTER` and `NEAR` of `edit.c`. All 155 scenarios pass with no
+golden and no patch changed, and the whole suite, 14 tests. Nothing of
+`vc.h` changed, nor a caller in another file.
+
+**The cut.** None was made: the piece is one commit. The cut that the
+plan offered, `T50_00` to `T54_00` apart, does not cut: `struct Where`
+is what every key that moves the cursor hands to `T53_00` and `T54_00`,
+so the two halves meet in some twenty functions. What made the whole
+small enough is that the text could be read as places only, which the
+next paragraph says, and that what was left is a few lines each.
+
+**Where a segment was stepped to keep an offset small**, each read,
+and each held against the old code on this computer (below):
+
+| Where | What the assembly does by the segment | What it is now |
+|---|---|---|
+| `T53_10` | Looks no further than 0FFFEh of the segment of the address that it is given, and has no end for a line that goes on; in hex, none where the offset wraps | Looks as far as the text goes. Every caller either asked again, from the address with the lowest offset and then a piece of 0FF00h bytes on at a time (`T53_00`, `T00_20`), which finds the same two characters, or took such a line for one longer than the buffer keeps, 3,900, which it is (`T50_00`) |
+| `T53_00` | A line that does not end in the segment of its address, looked at again from the address made anew, and then a piece at a time; the address that comes back is in the segment it was given, offsets growing down the window | `where->place = end.at`. Which segment an address had changed nothing that it answered |
+| `T54_00` | Back through at most 32K at a time, taking a lower segment; in hex `segment - 1`, and no line before one in the first segment | A place counted down, `at`, an `i32` since from the second byte of the text it is the byte before; in hex `place - 16`, and none for a place below 16. Every caller hands it a line as `T60_10` makes it, never one that `T53_00` has stepped, so the hex test is the first 16 bytes |
+| `T51_30` | Copies a piece of 0FF00h bytes at a time, stepping both segments by 0FF0h, downwards from addresses made with offsets high enough to count down from | One loop, downwards from `Room + tail - 1` to `Room + end - 1`: the pieces were one byte after another in one direction all through |
+| `T51_00` | Holds the segment of where the text would end against `EdSpace + ViewSeg` | `end >> 4 >= ed.EdSpace`, the room still in paragraphs, for N6 |
+| `T01_10` | The last byte of the room: an offset of 0Fh in the last segment | `(place & 0x0F) == 0x0F && (place >> 4) + 1 >= ed.EdSpace` |
+| `T16_00`, `T30_00`, `T32_00` | The line of a place in hex, the segment of its address less `ViewSeg` | `(u16)(place >> 4)`: the line in hex is 16 bits, N6's, and the cast says it. The 20 bits of `AddressOf` went where nothing cut: `ed.EdOffst = place & 0xFFFFFFF0UL` |
+| `T80_02`, `T00_00` | Write and read the file 0FF00h bytes at a time, the segment stepped by 0FF0h | A pointer stepped by `PIECE` |
+| `T72_00` | Takes `from` and `end` as offsets in a segment, and looks for the two characters in the two bytes before `end` wherever `end` is 2 or more | Takes `from`, `end` and `base`, where that segment began, and looks where `end - base >= 2`. This is the one thing that the original does by an address that shows: a last line of one byte that makes the two characters with the byte before it, as at the end of a text "...\r\n\r", is shown as no bytes, but where it is the first line of the window and stands at the start of a paragraph, where the character is shown. Ported as it is: `T00_20` hands the paragraph of `EdFirst`, which is the original's segment for that line, and for every line below it the test is true either way; `T73_10` hands the main data for the line buffer, which is the original's segment for that, so the two bytes in front of what the buffer holds are looked at for a line of one character too |
+| `T00_20`, T00_42 | A line that does not end within 64K: the window gets what its segment has, to 0FFFFh, and the end is looked for a piece at a time | One call of `T72_00` with where the line ends. The window shows at most the columns before it and in it of a line, and the cursor is no further than 3,900 characters in, tabs among them: at most some 32K bytes, which both reach |
+| `T32_00` | The viewer's search, `V82_00`, takes a segment and an offset and answers an offset | F4 has it take a text and an offset in it: `Room + base`, the paragraph of the place, and the place less `base`, as the assembly had them; `base + sought.end` is the place found |
+
+**Held on this computer.** The old functions and the new, from
+`T50_00` to `T54_00` with `T53_10`, were taken out of the two files by
+a script, compiled by gcc for this computer with a few lines in place
+of `vc.h` (an arena of 1.2 MB, `Room` in it at a segment of 3000h,
+`AT` and `SEG_OF` as `vc.h` has them), and called alike on 400 texts:
+short ones, and ones of 60K to 450K with lines of up to 200,000 bytes,
+lines of 3,898 to 3,903 and of 65,500 to 65,540, ended by CR LF, LF CR,
+CR, LF or nothing, with the two characters behind the end of the text.
+`T53_00` at every place and line number, also from an address of
+another segment than `AddressOf` makes; `T54_00` from the start of
+every line; `T53_10` in hex; `T50_00` at the start of a line and at any
+place; `T51_00` with a buffer shorter, as long and longer, the room
+full and not. 854,385 checks, none that differs in what the two
+answered, in the text, in the buffer or in the beeps. The script and
+the program are `build/f5/`, not kept: about 150 lines. What it cannot
+hold: the window, `T72_00` and `T00_20`, which the table reads.
+
+**The steps added to a place**, of the brief, each read:
+
+- `T71_00`, the screen's lines moved by one: the step of 16 bits, 160
+  or FF60h, was added to the place of the main data, `MD_POINTER(
+  MD_PLACE(to) + step)`. It is `(i32)(short)step / 2` cells added to the
+  pointer, `stride`: FF60h is 80 cells back. The viewer's two calls and
+  the editor's hand what they handed, and `T71_00` keeps its prototype.
+- `T54_00`: `at`, an `i32`, from `place - 2` down, and `at - 2` read;
+  it stops below 2, so nothing before the text is read.
+- `T53_00`, `T53_10`, `T50_00`: `Room + end.at - 2`, with `end.at` at
+  least two on from a place before the end, where it is read.
+- `T51_00`: `Room + tail - 1` and `Room + end - 1`, with `tail` not
+  below `EdEndBf`. Where the room is full and the line grows by more
+  than the room has, `tail` wraps below 0 as a `u32`, as it did; the
+  room is never under `MinView`, 8,000 bytes, so that is not
+  reached.
+- `T26_00`: `left`, an `i32`, the bytes from the cursor to `from` in the
+  line buffer, where it was a difference of two places of the main
+  data; not above 0 when the cursor is behind.
+- `T00_20`: `Room + start - 2` behind `start < 2`.
+- `T01_10`: `*(u16 *)&ed.EdOffst += 0x10`, the low word of the place
+  stepped by a line of hex and back, without the carry, as the
+  assembly does: a place within 16 bytes of a multiple of 64K draws
+  the line 64K back. Left as it is, a bug of the original, and N6's to
+  keep: it counts on the wrapping.
+- `T72_00` in hex: the place shown is `(u32)(from - Room)`.
+
+**The image.** `compare` of origin/main's build, saved before anything
+was changed, with this one: "155 scenarios, 40 with nothing that
+differs; 124 differences, 0 more in what was declared as changed, 137
+in what may differ". The six of `copy` and `copy-dirs`, 84h before and
+82h after, the pair that `DTA+41` has. The other 118 are in the eight
+scenarios of the Russian bench that list files, `attributes-russia`,
+`clock-night-russia`, `clock-path-russia`, `clock-russia`, `russian`,
+`setup-options-russia`, `stamps-russia`, and of those `DTA+42`, C3h
+before and 00h after, and the same byte where the program has copied
+a name as 13 bytes: `NameF+12` of the entries of both panels, `TmpBuf`,
+`TmpErr`, behind the panels. None of the eight runs a line of
+`edit.c`, so it is the program's file that differs there and not what
+the program does: the byte behind a name that DOS found, of what DOS's
+memory held before, which on the Russian bench is another byte of the
+program's file than `DTA+41` is on the other. It is not 6E25h, which
+is 00h in both files. A variant of this build with an unused function
+of four addresses moved `DTA+41`'s six, 82h to 83h, and not `DTA+42`,
+which is 00h in both: so it is not shown which byte of the file it
+is. The tool lists `DTA+41` alone as what may differ; `DTA+42` could
+go beside it, which this piece did not do. Nothing of the editor's
+data, of the room or of a table differs.
+
+**The program.** 289,099 bytes, where F3b's build was 293,683; as it
+landed behind F4, F6 and F7, 288,663 where theirs is 293,255.
+
+**Behind F4, F6 and F7.** The call of `V82_00` in `T32_00` takes the
+text as F4 made it, `Room + base`, and the `SEG_OF` of the bridge
+went. The whole suite passes again, and the images against a build of
+origin/main differ in the six of `copy` and `copy-dirs` alone, 83h
+before and 81h after, the pair of `DTA+41`: "155 scenarios, 43 with
+nothing that differs; 6 differences, 0 more in what was declared as
+changed, 113 in what may differ".
+
+**The records.** The words', of `edit.c`: `AddressOf` 24 and
+`OFFSET_OF` 21 at nothing; `AT` 14, `SEG_OF` 13, `MAIN_SEG` 1,
+`u16 segment` 8, `NEAR` 4 and `MD_POINTER` 3 at nothing; `MD_PLACE` 13
+to 2. Left to go: F5 0. The two `MD_PLACE(md.WinBuf)` that are left
+hand `ResWin` where it puts back what a box covered, a place of the
+main data as every caller of `ResWin` hands it: whoever changes
+`ResWin` takes them. The widths' record, of `edit.c`: 233 numbers to
+196, 37 `u32` to 41, 278 cuts to 216, four `i32`. `harness/int16.txt`
+has three places more, each with its reason: `left` of `T26_00`, `end
+- base` and `from - Room` of `T72_00`. `harness/ported.py` has
+`T62_00_c` in `GONE`.
+
+**What N6 to N8 should know.**
+
+- A place of the text is a `u32`, as `EdOffst`, `EdEndBf`, `EdLen` and
+  `EdFirst` are: `struct Where`'s `place`, `struct Ending`'s `at`,
+  `start` of `T00_20`, `base` of `T32_00`, the parameter of `T53_10`,
+  `EndsAt` and `NoEnd`. They are the editor's places and go with those
+  fields, which the cluster sorts; making them `i32` alone would have
+  put a cast at every meeting. `struct Where` stays, a place and a line
+  number, where the plan had it go: a line is a thing that the keys
+  hand on, and N6's row names it.
+- `T63_01(high, low)`, `T56_00`'s four halves, `HIGH` and `LOW` are as
+  they were: the halves of a place, which a number of 32 bits does not
+  need. `T63_01` is called with `HIGH(place), LOW(place)` everywhere.
+- The four `i32` are new and signed by the rule: `length` of
+  `T50_00`, `at` of `T54_00`, `left` of `T26_00`, `stride` of `T71_00`.
+- The line in hex is `(u16)(place >> 4)` in three places, the 16 bits of
+  `EdLine`; `end >> 4 >= ed.EdSpace` and `(place >> 4) + 1 >=
+  ed.EdSpace` compare a number of 32 bits with the room in paragraphs,
+  N6's to make bytes.
+- `T72_00`'s `end - base >= 2` is the original's, and is to stay what
+  it is when the numbers are sorted: it is a test of where an address
+  is, not of the line.
+- `*(u16 *)&ed.EdOffst` in `T01_10` counts on the wrap, above.
+- `PIECE` is a count of 16 bits handed to `FileRead` and `FileWrite`
+  with `count`, a `u16`.
+
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 
 **What there is.** `harness/width.py`, its record `harness/width.txt`

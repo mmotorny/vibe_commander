@@ -20,7 +20,7 @@ dirfunc.c     MD_PLACE 1, ENTRY 7, DSKBUF 2
 dirfunc_t.c   MD_AT 75, NUMBER 9
 dos32.c       ARENA 1, AT 1
 drive.c       MD_PLACE 2, DSKBUF 2
-edit.c        AT 15, SEG_OF 13, MAIN_SEG 1, RoomParas 1, u16 segment 8, AddressOf 24, OFFSET_OF 21, NEAR 4, MD_PLACE 13, MD_POINTER 3
+edit.c        RoomParas 1, MD_PLACE 2
 edit_t.c      MD_AT 15, NUMBER 1
 enter.c       MD_POINTER 1, ENTRY 14, DSKBUF 11, MAIN_AS_PANEL 1
 exec.c        MD_PLACE 2

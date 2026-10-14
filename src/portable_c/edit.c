@@ -5,17 +5,18 @@
  * Translated from VCEDIT.INC.
  *
  * The text of the file is in the room, from Room of vc.h on, the
- * segment ViewSeg of the original, EdLen bytes of it, and may be longer
- * than a segment.
- * A place in it is an offset from its start, 32 bits, or the address of
- * the byte: a segment, and an offset of less than 16 where the program has
- * made the address from an offset. The line that the cursor is in is
+ * segment ViewSeg of the original, EdLen bytes of it.
+ * A place in it is an offset from its start, 32 bits, and the byte there
+ * is Room + place. The assembly has the address of the byte besides, a
+ * segment and an offset, which it makes of a place with an offset of
+ * less than 16, and what it does by the segment of an address is said
+ * where it is done. The line that the cursor is in is
  * edited in a buffer of its own, EditBuf, which holds EdSizLn bytes of it,
  * and is put back into the text when the cursor leaves it.
  *
  * A line ends with a carriage return and a line feed, in either order; in
- * hex mode a line is 16 bytes, and the number of a line there is that of
- * its segment, counted from that of Room.
+ * hex mode a line is 16 bytes, and the number of a line there is a
+ * sixteenth of its place: that of its segment, counted from the text's.
  *
  * The editor has no procedure of its own in the assembly: the viewer's
  * code jumps to T00_00 once it has opened the file, and the editor jumps
@@ -75,37 +76,25 @@ struct EdData {
     u16 EdShape;                        /* Original cursor shape */
 };
 
-/* A line of the text, as the assembly has it in DS:SI and DI: the address
-   of its first byte and its number, counted from 0. In the order in which
-   the assembly had them on the stack where it called T53_00 and
-   T54_00. */
-struct Where {
-    u16 offset;
-    u16 segment;
-    u16 line;
-};
-
 #pragma pack(pop)
 
 LAID_OUT(EdData, 138);
 
-/* The address of a byte of the text. One that AddressOf has made of an
-   offset in the text has an offset of less than 16. */
-struct Address {
-    u16 offset;
-    u16 segment;
+/* A line of the text: the place of its first byte and its number,
+   counted from 0. DS:SI and DI of the assembly, which has the address of
+   the byte where this has its place. */
+struct Where {
+    u32 place;
+    u16 line;
 };
 
 /* What T53_10 returns: where a line ends. */
 struct Ending {
-    u16 at;                             /* behind the line: an offset in
-                                           the segment of the address that
-                                           was given; with none, the offset
-                                           that was given */
-    u16 none;                           /* 1 if the line does not end in
-                                           that segment, or the address is
-                                           at the end of the text or behind
-                                           it */
+    u32 at;                             /* the place behind the line; with
+                                           none, the place that was
+                                           given */
+    u16 none;                           /* 1 if that place is at the end
+                                           of the text or behind it */
 };
 
 /* What Column, T57_00 and T57_01 return: how far characters of the line
@@ -140,18 +129,17 @@ struct Drawn {
 void T50_00(void);
 void T51_00(void);
 u16 T53_00(struct Where *where);
-struct Ending T53_10(u16 segment, u16 offset);
+struct Ending T53_10(u32 place);
 u16 T54_00(struct Where *where);
 u16 T55_00(u16 cursor);
 void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low);
 struct Reached T57_00(void);
 struct Reached T57_01(u16 limit);
 u16 T57_02(void);
-struct Address T62_00(void);
 u16 T63_01(u16 high, u16 low);
 u16 T64_00(const u8 *name, const u8 *text, u16 count);
 void T71_00(u16 function, u16 place, u16 step);
-void T72_00(u16 line, u16 segment, u16 from, u16 end);
+void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base);
 void T73_00(void);
 struct Drawn T73_10(void);
 void T74_00(void);
@@ -234,8 +222,7 @@ static const u8 MainExt_F[] = "VC.EXT";
 #define LF_CR 0x0D0A                    /* word, and the other way round */
 #define ENDS_LINE(word) ((word) == CR_LF || (word) == LF_CR)
 
-#define PIECE 0xFF00                    /* bytes moved at a time, */
-#define PIECE_SEGMENTS 0x0FF0           /* and that in segments */
+#define PIECE 0xFF00                    /* bytes read or written at a time */
 
 /* Errors of DOS, the one of a call that the user gave up when a drive
    was not ready (sys.h), and the one that the editor makes of a disk
@@ -248,24 +235,6 @@ static const u8 MainExt_F[] = "VC.EXT";
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 #define PAIR(high, low) ((u32)(high) << 16 | (low))
-
-/* The offset in the text of the byte at an address. */
-#define OFFSET_OF(segment, offset) \
-    (((u32)(u16)((segment) - SEG_OF(Room)) << 4) + (offset))
-
-/* The address of the byte at an offset in the text: its segment, and for
-   the offset what is left, less than 16. Of the offset in the text 20
-   bits count. */
-static struct Address AddressOf(u32 place)
-{
-    struct Address address;
-    u16 high = HIGH(place);
-    u16 low = LOW(place);
-
-    address.segment = (low >> 4 | high << 12) + SEG_OF(Room);
-    address.offset = low & 0x0F;
-    return address;
-}
 
 /* The column that `count` characters of the line buffer end in, with
    tabs to every eighth, and how many of them were not counted, because
@@ -319,14 +288,6 @@ u16 T57_02(void)
     return Column(ed.EdCursr, 0xFFFF).column;
 }
 
-/* The address of the first line on the screen. T60_00 and T61_00 of the
-   assembly, which make an offset of an address and an address of an
-   offset, are OFFSET_OF and AddressOf. */
-struct Address T62_00(void)
-{
-    return AddressOf(ed.EdFirst);
-}
-
 /* Where an offset is in the text: 0 before its end, 1 at the end and 2
    behind it. */
 u16 T63_01(u16 high, u16 low)
@@ -344,34 +305,39 @@ u16 T63_01(u16 high, u16 low)
    buffer ends. Not in hex mode, which has no use for the buffer.
 
    The buffer gets 3900 bytes of the text whatever the length of the
-   line. */
+   line.
+
+   The assembly takes a line that does not end in the segment of its
+   address, 64K from there less up to 17 bytes, for one that the buffer
+   does not hold, without looking how long it is: which a line of that
+   length is. */
 void T50_00(void)
 {
-    struct Address address;
     struct Ending end;
     const u8 *text;
+    i32 length;
     u16 count, size;
 
     if (ed.EdTxHex != 0)
         return;
-    address = AddressOf(ed.EdOffst);
-    text = AT(address.segment, address.offset);
+    text = Room + ed.EdOffst;
     for (count = 0; count < LenEdit - 100; count++)
         EditBuf[count] = text[count];
     ed.EdWhole = 1;
     size = 0;
     if (T63_01(HIGH(ed.EdOffst), LOW(ed.EdOffst)) == 0) {
-        end = T53_10(address.segment, address.offset);
-        if (!end.none) {
-            size = end.at - address.offset;
-            if (size >= 2
-                && ENDS_LINE(*(const u16 *)
-                             AT(address.segment, end.at - 2)))
-                size -= 2;
-        }
-        if (end.none || size > LenEdit - 100) {
+        end = T53_10(ed.EdOffst);
+        /* From a place before the end of the text to one that is no
+           further than its end: a length of the room, which is not
+           below 0. */
+        length = (i32)(end.at - ed.EdOffst);
+        if (length >= 2 && ENDS_LINE(*(const u16 *)(Room + end.at - 2)))
+            length -= 2;
+        if (length > LenEdit - 100) {
             size = LenEdit - 100;
             ed.EdWhole = 0;
+        } else {
+            size = (u16)length;
         }
     }
     ed.EdEndBf = ed.EdOffst + size;
@@ -379,37 +345,18 @@ void T50_00(void)
     ed.EdUpdat = 0;
 }
 
-/* Copy bytes of the text to another place in it, which may be more than
-   a segment: upwards from the addresses given, or downwards, a piece at
-   a time. */
-static void T51_30(u16 from_segment, u16 from, u16 to_segment, u16 to,
-                   u32 count, u16 down)
+/* Copy bytes of the text to another place in it: upwards from the two
+   bytes given, or downwards. The assembly does it a piece of 0FF00h
+   bytes at a time, each from a segment that much further on or back, a
+   byte after the other in the same direction all through. */
+static void T51_30(const u8 *source, u8 *target, u32 count, u16 down)
 {
-    const u8 *source;
-    u8 *target;
-    u16 piece;
-
-    for (;;) {
-        piece = count >= PIECE ? PIECE : LOW(count);
-        source = AT(from_segment, from);
-        target = AT(to_segment, to);
-        if (down) {
-            for (; piece; piece--)
-                *target-- = *source--;
-        } else {
-            for (; piece; piece--)
-                *target++ = *source++;
-        }
-        if (count < PIECE)
-            break;
-        count -= PIECE;
-        if (down) {
-            from_segment -= PIECE_SEGMENTS;
-            to_segment -= PIECE_SEGMENTS;
-        } else {
-            from_segment += PIECE_SEGMENTS;
-            to_segment += PIECE_SEGMENTS;
-        }
+    if (down) {
+        for (; count; count--)
+            *target-- = *source--;
+    } else {
+        for (; count; count--)
+            *target++ = *source++;
     }
 }
 
@@ -422,14 +369,17 @@ static void T51_30(u16 from_segment, u16 from, u16 to_segment, u16 to,
    with the last byte but one of the memory. Ported as it is: what follows
    is moved up by as much as was asked for all the same, so that its end
    is lost and not the end of the line; of the line only what would go
-   beyond the memory by itself is cut off. */
+   beyond the memory by itself is cut off.
+
+   The room is counted in paragraphs, EdSpace, and the assembly holds
+   the segment of where the text would end against it: a sixteenth of
+   the place. */
 void T51_00(void)
 {
     u32 old, less, end, tail;
-    struct Address address, source;
     const u8 *buffer;
     u8 *text;
-    u16 size, more, grown, segment, offset, limit, count;
+    u16 size, more, grown, count;
 
     if (ed.EdTxHex != 0 || ed.EdUpdat == 0)
         return;
@@ -439,60 +389,46 @@ void T51_00(void)
     size = ed.EdSizLn;
     if (HIGH(old) != 0 || LOW(old) > size) {
         less = old - size;
-        address = AddressOf(ed.EdOffst + size);
-        source = AddressOf(ed.EdEndBf);
-        T51_30(source.segment, source.offset, address.segment,
-               address.offset, ed.EdLen - ed.EdEndBf, 0);
+        T51_30(Room + ed.EdEndBf, Room + ed.EdOffst + size,
+               ed.EdLen - ed.EdEndBf, 0);
         ed.EdLen -= less;
     } else if (LOW(old) < size) {
         more = size - LOW(old);
         grown = more;
         end = ed.EdLen + more;
-        address = AddressOf(end);
-        segment = address.segment;
-        offset = address.offset;
-        limit = ed.EdSpace + SEG_OF(Room);
-        if (segment >= limit) {
+        if (end >> 4 >= ed.EdSpace) {
             ed.EdScrn = 1;
             Beep();
-            segment = limit - 1;
-            offset = 0x0F;
-            end = OFFSET_OF(segment, offset);
+            end = ((u32)ed.EdSpace << 4) - 1;
             if (HIGH(end) == HIGH(ed.EdOffst)
                 && (u16)(LOW(end) - LOW(ed.EdOffst)) < ed.EdSizLn)
                 ed.EdSizLn = LOW(end) - LOW(ed.EdOffst);
             grown = LOW(end) - LOW(ed.EdLen);
         }
-        /* The last byte to write and the last to read, as addresses with
-           offsets high enough to count down from by a piece. */
+        /* From the last byte to read to the last to write, downwards. */
         tail = end - more;
-        if (tail >= ed.EdEndBf) {
-            source = AddressOf(tail);
-            T51_30(source.segment - 0x0FFF, source.offset + 0xFFF0 - 1,
-                   segment - 0x0FFF, offset - 0x10 - 1,
-                   tail - ed.EdEndBf, 1);
-        }
+        if (tail >= ed.EdEndBf)
+            T51_30(Room + tail - 1, Room + end - 1, tail - ed.EdEndBf, 1);
         ed.EdLen += grown;
     }
-    address = AddressOf(ed.EdOffst);
-    text = AT(address.segment, address.offset);
+    text = Room + ed.EdOffst;
     buffer = EditBuf;
     for (count = ed.EdSizLn; count; count--)
         *text++ = *buffer++;
 }
 
-/* What T53_10 returns: a line that ends at an offset, or one that does
-   not, with the offset that T53_10 was given. */
-static struct Ending EndsAt(u16 offset)
+/* What T53_10 returns: a line that ends at a place, or none, with the
+   place that T53_10 was given. */
+static struct Ending EndsAt(u32 place)
 {
     struct Ending ending;
 
-    ending.at = offset;
+    ending.at = place;
     ending.none = 0;
     return ending;
 }
 
-static struct Ending NoEnd(u16 start)
+static struct Ending NoEnd(u32 start)
 {
     struct Ending ending;
 
@@ -501,156 +437,115 @@ static struct Ending NoEnd(u16 start)
     return ending;
 }
 
-/* Where the line ends that the byte at an address is in, as an offset in
-   the same segment: behind the two characters that end it, or where the
-   text ends; in hex mode behind its 16 bytes, or where the text ends.
-   There is no such place, and the offset that was given comes back, if
-   the address is at the end of the text or behind it, or if the line
-   does not end in that segment. */
-struct Ending T53_10(u16 segment, u16 offset)
+/* Where the line ends that the byte at a place is in: behind the two
+   characters that end it, or where the text ends; in hex mode behind its
+   16 bytes, or where the text ends. There is no such place, and the
+   place that was given comes back, if it is at the end of the text or
+   behind it.
+
+   The assembly is given an address and looks no further than its
+   segment goes, 0FFFEh, and has no end either for a line that goes on
+   beyond that. Whoever asked it then asked again, from the address with
+   the lowest offset and from there a piece of 0FF00h bytes further on
+   every time, each time for a line that begins there: which finds the
+   same two characters, the first from the place on, or the end of the
+   text. What the two did otherwise, for a line of more than 64K less 17
+   bytes, is said at T50_00 and at T00_20. */
+struct Ending T53_10(u32 place)
 {
-    u32 place = OFFSET_OF(segment, offset);
-    u32 left;
-    u16 start = offset;
-    u16 limit, word;
+    u32 start = place;
+    u16 word;
 
     if (T63_01(HIGH(place), LOW(place)))
         return NoEnd(start);
     if (ed.EdTxHex != 0) {
-        offset = (offset | 0x0F) + 1;
-        if (offset == 0)
-            return NoEnd(start);
-        place = OFFSET_OF(segment, offset);
+        place = (place | 0x0F) + 1;
         if (T63_01(HIGH(place), LOW(place)))
-            offset -= LOW(place) - LOW(ed.EdLen);
-        return EndsAt(offset);
+            place = ed.EdLen;
+        return EndsAt(place);
     }
-    /* As far as the text goes, or the segment. */
-    left = ed.EdLen - place;
-    limit = 0xFFFE;
-    if (HIGH(left) == 0 && (u16)(LOW(left) + offset) >= offset
-        && (u16)(LOW(left) + offset) < 0xFFFE)
-        limit = LOW(left) + offset;
-    while (offset < limit) {
-        word = *(const u16 *)AT(segment, offset);
-        offset += 2;
-        if (offset <= limit && ENDS_LINE(word))
-            return EndsAt(offset);
-        offset--;
+    /* As far as the text goes. The last word that is looked at has its
+       second byte behind the text, and ends no line. */
+    while (place < ed.EdLen) {
+        word = *(const u16 *)(Room + place);
+        place += 2;
+        if (place <= ed.EdLen && ENDS_LINE(word))
+            return EndsAt(place);
+        place--;
     }
-    place = OFFSET_OF(segment, offset);
-    if (T63_01(HIGH(place), LOW(place)))
-        return EndsAt(offset);
-    return NoEnd(start);
+    return EndsAt(place);
 }
 
 /* Go to the next line of the text. Returns 0, with `where` on it, or 1
    and `where` as it was if there is none: at the end of the text, and
    after a line that the text ends in without the two characters. In hex
-   mode the next line is the next 16 bytes, if the text has that many.
-
-   A line that does not end in the segment of its address is looked at
-   again from the address with the lowest offset, and from there on a
-   piece further on every time. */
+   mode the next line is the next 16 bytes, if the text has that many. */
 u16 T53_00(struct Where *where)
 {
-    u16 segment = where->segment;
-    u16 offset = where->offset;
-    u32 place, start;
+    u32 place = where->place;
     struct Ending end;
-    struct Address address;
 
     if (where->line == 0xFFFF)
         return 1;
-    place = OFFSET_OF(segment, offset);
     if (T63_01(HIGH(place), LOW(place)))
         return 1;
+    end = T53_10(place);
     if (ed.EdTxHex != 0) {
-        end = T53_10(segment, offset);
-        if (end.none) {
-            address = AddressOf(place);
-            segment = address.segment;
-            end = T53_10(segment, address.offset);
-        }
-        offset = end.at;
-        if (offset & 0x0F)
+        if (end.at & 0x0F)
             return 1;
     } else {
-        start = place;
-        for (;;) {
-            end = T53_10(segment, offset);
-            if (!end.none)
-                break;
-            place = OFFSET_OF(segment, offset);
-            address = AddressOf(place);
-            segment = address.segment;
-            offset = address.offset;
-            end = T53_10(segment, offset);
-            if (!end.none)
-                break;
-            segment += PIECE_SEGMENTS;
-        }
-        offset = end.at;
-        place = OFFSET_OF(segment, offset);
-        if (place - start <= 1)
+        if (end.at - place <= 1)
             return 1;
-        if (!ENDS_LINE(*(const u16 *)AT(segment, offset - 2)))
+        if (!ENDS_LINE(*(const u16 *)(Room + end.at - 2)))
             return 1;
     }
-    where->segment = segment;
-    where->offset = offset;
+    where->place = end.at;
     where->line++;
     return 0;
 }
 
 /* Go to the line before. Returns 0, with `where` on it, or 1 and `where`
    as it was if there is none: in the first line. In hex mode the line
-   before is 16 bytes back.
+   before is 16 bytes back, and there is none for a line in the first 16
+   bytes whatever its number.
 
-   As text, the bytes before the line are looked through backwards, at
-   most 32K at a time, for the two characters that end a line before the
-   two that end the line before this one. Lines of nothing but those two
-   may follow one another there, and are passed over as long as they do;
-   so from where that stopped the lines are taken forwards again until the
-   next one would be this line. */
+   As text, the bytes before the line are looked through backwards for
+   the two characters that end a line before the two that end the line
+   before this one. Lines of nothing but those two may follow one another
+   there, and are passed over as long as they do; so from where that
+   stopped the lines are taken forwards again until the next one would be
+   this line. The assembly looks through at most 32K at a time, and then
+   takes a segment that is lower. */
 u16 T54_00(struct Where *where)
 {
     struct Where line;
-    u16 segment = where->segment;
-    u16 offset = where->offset;
-    u32 place, from, next;
-    struct Address address;
-    u16 found = 0, checked, pair, word, back;
+    u32 place = where->place;
+    u32 from, next;
+    i32 at;
+    u16 found = 0, pair, word;
 
     if (where->line == 0)
         return 1;
     if (ed.EdTxHex != 0) {
-        if (segment <= SEG_OF(Room))
+        if (place < 16)
             return 1;
-        where->segment = segment - 1;
+        where->place = place - 16;
         where->line--;
         return 0;
     }
-    if (segment <= SEG_OF(Room) && offset == 0)
+    if (place == 0)
         return 1;
-    place = OFFSET_OF(segment, offset);
-    checked = offset > 2;
-    offset -= 2;
+    /* Two bytes behind the word that is looked at: with a sign, since
+       from the second byte of the text that is the byte before the
+       text. */
+    at = (i32)place - 2;
     for (;;) {
-        if (!checked || offset < 2) {
-            /* The segment has no more: take one that is lower. */
-            back = segment - SEG_OF(Room);
-            if (back == 0) {
-                offset = 0;
-                break;
-            }
-            if (back > 0x800)
-                back = 0x800;
-            segment -= back;
-            offset += back << 4;
+        if (at < 2) {
+            /* The text has no more. */
+            at = 0;
+            break;
         }
-        checked = 1;
-        word = *(const u16 *)AT(segment, offset - 2);
+        word = *(const u16 *)(Room + at - 2);
         if (!found) {
             if (ENDS_LINE(word)) {
                 found = 1;
@@ -659,27 +554,23 @@ u16 T54_00(struct Where *where)
         } else {
             pair = pair << 8 | pair >> 8;
             if (word != pair) {
-                offset++;
+                at++;
                 break;
             }
         }
-        offset--;
+        at--;
     }
-    from = OFFSET_OF(segment, offset);
+    from = (u32)at;
     for (;;) {
-        address = AddressOf(from);
-        line.segment = address.segment;
-        line.offset = address.offset;
+        line.place = from;
         line.line = 0;
         T53_00(&line);
-        next = OFFSET_OF(line.segment, line.offset);
+        next = line.place;
         if (next >= place)
             break;
         from = next;
     }
-    address = AddressOf(from);
-    where->segment = address.segment;
-    where->offset = address.offset;
+    where->place = from;
     where->line--;
     return 0;
 }
@@ -731,18 +622,16 @@ void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low)
     struct Where where;
     u32 place = PAIR(high, low);
     u32 target = PAIR(target_high, target_low);
-    struct Address address = AddressOf(place);
     u16 cursor, last;
 
-    where.segment = address.segment;
-    where.offset = address.offset;
+    where.place = place;
     where.line = line;
     for (;;) {
         ed.EdOffst = place;
         ed.EdLine = where.line;
         if (T53_00(&where))
             break;
-        place = OFFSET_OF(where.segment, where.offset);
+        place = where.place;
         if (place > target)
             break;
     }
@@ -795,7 +684,12 @@ struct Cleared T70_00(u16 line)
 void T71_00(u16 function, u16 place, u16 step)
 {
     u16 *to = BasAdr(place);
-    u16 *from = (u16 *)MD_POINTER(MD_PLACE(to) + step);
+    /* The step is a number of 16 bits that the assembly adds to an
+       offset, where one of FF60h goes 160 back: added to a pointer as it
+       is, it would go that far on. Taken with its sign it is so many
+       bytes on or back, two to a cell. */
+    i32 stride = (i32)(short)step / 2;
+    u16 *from = to + stride;
     u16 count = (u8)(ed.EdSizeY - function) - 1;
     u16 cells, column;
 
@@ -807,10 +701,8 @@ void T71_00(u16 function, u16 place, u16 step)
         cells = count & 0xFF00 | ed.EdSizeX;
         for (column = 0; column != cells; column++)
             to[column] = from[column];
-        /* The step is added to the place, where one of FF60h goes 160
-           back: added to the pointer it would go that far on. */
-        from = (u16 *)MD_POINTER(MD_PLACE(from) + step);
-        to = (u16 *)MD_POINTER(MD_PLACE(to) + step);
+        from += stride;
+        to += stride;
     } while (--count);
     Scroll(function >> 8 == 7, Color(Back_C),
            ed.EdBase + ((function & 0xFF) << 8),
@@ -818,8 +710,8 @@ void T71_00(u16 function, u16 place, u16 step)
 }
 
 /* Write a line of the text to the line `line` of the window in the
-   screen buffer, of which the low byte counts: the bytes in the segment
-   `segment` from `from` to `end`.
+   screen buffer, of which the low byte counts: the bytes from `from` up
+   to `end`.
 
    As text: without the two characters that end a line, if it has them, a
    carriage return and a line feed in either order; with tabs to every
@@ -827,15 +719,22 @@ void T71_00(u16 function, u16 place, u16 step)
    wide. Where it goes on, the last column has an arrow, and the first one
    has, if columns are left out there.
 
-   In hex: the offset of the first byte, eight digits, and then at most 16
+   In hex: the place of the first byte, eight digits, and then at most 16
    bytes, as two digits each, in fours, and once more as characters, a
    zero as a dot.
 
    Ported as it is: the arrow in the first column is drawn for a line of
-   no bytes too, which T73_10 does not hand over at all. */
-void T72_00(u16 line, u16 segment, u16 from, u16 end)
+   no bytes too, which T73_10 does not hand over at all. And the two
+   characters are looked for in the two bytes before `end` whether the
+   line has two or not: the assembly has `from` and `end` as offsets in a
+   segment, and looks there wherever `end` is 2 or more. `base` is where
+   that segment begins. So of a line of one byte that makes the two
+   characters with the byte before it, which a text can end in, nothing
+   is written, but where it stands less than two bytes into its
+   segment; and the two bytes before a line that is in the buffer are
+   always looked at. */
+void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base)
 {
-    const u8 *text = AT(segment, 0);
     u16 *screen = T70_00(line).screen;
     u16 *cell;
     u8 *ascii;
@@ -844,13 +743,13 @@ void T72_00(u16 line, u16 segment, u16 from, u16 end)
 
     if (ed.EdTxHex == 0) {
         column = 0;
-        if (end >= 2) {
-            c = *(const u16 *)(text + (u16)(end - 2));
+        if (end - base >= 2) {
+            c = *(const u16 *)(end - 2);
             if (c == CR_LF || c == LF_CR)
                 end -= 2;
         }
         while (from < end) {
-            c = text[from++];
+            c = *from++;
             if (c == TAB) {
                 column |= 7;
                 c = ' ';
@@ -869,18 +768,19 @@ void T72_00(u16 line, u16 segment, u16 from, u16 end)
             *screen = Color(Arrow_C) << 8 | 0x1B;
         return;
     }
-    offset = OFFSET_OF(segment, from);
+    /* In hex the line is of the text, and no place in it is below 0. */
+    offset = (u32)(from - Room);
     cell = screen + 1;
     cell = HexByt(cell, (u16)(offset >> 24));
     cell = HexByt(cell, (u16)(offset >> 16));
     cell = HexByt(cell, (u16)offset >> 8);
     cell = HexByt(cell, (u16)offset);
     cell += 2;
-    ascii = (u8 *)((u16 *)NEAR(cell) + 52);
+    ascii = (u8 *)(cell + 52);
     for (count = 16; count; count--) {
         if (from >= end)
             break;
-        c = text[from++];
+        c = *from++;
         *ascii = c == 0 ? '.' : (u8)c;
         ascii += 2;
         cell = HexByt(cell, c) + 1;
@@ -902,8 +802,8 @@ struct Drawn T73_10(void)
     struct Drawn drawn;
     u16 line = ed.EdLine - ed.EdLin0;
     u16 place = ed.EdBase + (line << 8);
-    struct Address address;
-    u16 from, end;
+    const u8 *from;
+    const u8 *end;
 
     if (ed.EdTxHex == 0) {
         if ((u16)(ed.EdSizLn - ed.EdCursr)
@@ -912,15 +812,17 @@ struct Drawn T73_10(void)
             T51_00();
             T50_00();
         }
-        from = MD_PLACE(EditBuf);
+        from = EditBuf;
         end = from + ed.EdSizLn;
         T70_00(line);
+        /* The segment of the buffer is the main data in the assembly,
+           where the buffer is far from the start. */
         if (from < end)
-            T72_00(line, MAIN_SEG, from, end);
+            T72_00(line, from, end, (const u8 *)&md);
     } else {
-        address = AddressOf(ed.EdOffst);
-        end = T53_10(address.segment, address.offset).at;
-        T72_00(line, address.segment, address.offset, end);
+        from = Room + ed.EdOffst;
+        end = Room + T53_10(ed.EdOffst).at;
+        T72_00(line, from, end, Room);
     }
     drawn.begin = place;
     drawn.size = 0x100 | ed.EdSizeX;
@@ -1047,8 +949,9 @@ static struct Answer T80_02(u16 attributes)
 {
     struct Answer answer;
     struct Device device;
+    const u8 *piece;
     u32 left;
-    u16 handle, segment, count, error, failed;
+    u16 handle, count, error, failed;
 
     if (attributes & 1) {
         answer = FileSetAttributes(md.ViewFil, attributes & 0xFFFE);
@@ -1071,12 +974,12 @@ static struct Answer T80_02(u16 attributes)
             attributes = 0xFFFF;
         }
         left = ed.EdLen;
-        segment = SEG_OF(Room);
+        piece = Room;
         do {
-            count = 0xFF00;
+            count = PIECE;
             if (HIGH(left) == 0 && LOW(left) < count)
                 count = LOW(left);
-            answer = FileWrite(handle, AT(segment, 0), count);
+            answer = FileWrite(handle, piece, count);
             failed = answer.failed;
             error = answer.value;
             if (failed)
@@ -1086,7 +989,7 @@ static struct Answer T80_02(u16 attributes)
                 error = ERR_DISK_FULL;
                 goto close;
             }
-            segment += 0xFF0;
+            piece += PIECE;
             left -= count;
         } while (left != 0);
     }
@@ -1149,14 +1052,14 @@ static void T80_14(void)
         do
             c = *to++;
         while (--count && c != 0);
-        to = NEAR(AddFile(to - 1));
+        to = AddFile(to - 1);
     }
     if (md.TmpBuf + LenPath + 13 <= to)
         return;
     for (count = md.TmpBuf + LenPath + 13 - to; count; count--)
         *to++ = *name++;
     PathLin(md.TmpBuf);
-    file = NEAR(CutPath(md.TmpBuf));
+    file = CutPath(md.TmpBuf);
     count = file - md.TmpBuf;
     for (c = 0; c < count; c++)
         if (md.TmpBuf[c] != md.NcPath[c])
@@ -1169,7 +1072,7 @@ static void T80_14(void)
     count = LenExt - 1;
     if (HIGH(ed.EdLen) == 0 && count > LOW(ed.EdLen))
         count = LOW(ed.EdLen);
-    text = AT(SEG_OF(Room), 0);
+    text = Room;
     for (c = 0; c < count; c++)
         md.ExtMain[c] = text[c];
     md.ExtMain[count] = 0x1A;
@@ -1229,13 +1132,13 @@ done:
     return failed;
 }
 
-/* The line that the cursor is in, as T53_00 and T54_00 take one. */
+/* The line that the cursor is in, as T53_00 and T54_00 take one. T60_00
+   and T61_00 of the assembly, which make an offset of an address and an
+   address of an offset, and T62_00, the address of the first line on the
+   screen, are nothing here: a line is known by its place. */
 static void T60_10(struct Where *where)
 {
-    struct Address address = AddressOf(ed.EdOffst);
-
-    where->segment = address.segment;
-    where->offset = address.offset;
+    where->place = ed.EdOffst;
     where->line = ed.EdLine;
 }
 
@@ -1243,7 +1146,7 @@ static void T60_10(struct Where *where)
 static void T60_20(const struct Where *where)
 {
     ed.EdLine = where->line;
-    ed.EdOffst = OFFSET_OF(where->segment, where->offset);
+    ed.EdOffst = where->place;
 }
 
 /* Put the cursor in the column `limit` of the line, counted from 1, or
@@ -1260,7 +1163,6 @@ static void T14_12(u16 limit)
    in hex, to the last byte of the 16, or behind the last one there is. */
 static void T14_11(void)
 {
-    struct Address address;
     struct Ending end;
     u16 cursor;
 
@@ -1269,15 +1171,13 @@ static void T14_11(void)
         return;
     }
     ed.EdHxCur = 0;                     /* T14_00 */
-    address = AddressOf(ed.EdOffst);
-    end = T53_10(address.segment, address.offset);
-    cursor = end.at;
-    if (!end.none) {
-        cursor &= 0x0F;
-        if (cursor == 0) {
-            cursor = 0x0F;
-            ed.EdHxCur++;
-        }
+    end = T53_10(ed.EdOffst);
+    /* With no end, the assembly has the offset of the line's address
+       here, which is less than 16. */
+    cursor = (u16)(end.at & 0x0F);
+    if (!end.none && cursor == 0) {
+        cursor = 0x0F;
+        ed.EdHxCur++;
     }
     ed.EdCursr = cursor;
 }
@@ -1410,8 +1310,7 @@ static void T01_03(u16 key)
 static void T01_10(u16 key)
 {
     u32 place = ed.EdOffst + ed.EdCursr;
-    struct Address address = AddressOf(place);
-    u8 *byte = AT(address.segment, address.offset);
+    u8 *byte = Room + place;
     u16 digit;
 
     if (ed.EdHexAs == 0) {
@@ -1427,8 +1326,9 @@ static void T01_10(u16 key)
     if (T63_01(HIGH(place), LOW(place)) != 0) {
         if (ed.EdHexAs == 0)
             *byte &= 0xF0;
-        if (address.offset >= 0x0F      /* T01_13 */
-            && (u16)(address.segment - SEG_OF(Room) + 1) >= ed.EdSpace) {
+        /* The last byte of the last paragraph of the room. */
+        if ((place & 0x0F) == 0x0F      /* T01_13 */
+            && (place >> 4) + 1 >= ed.EdSpace) {
             Beep();
         } else {
             ed.EdLen++;                 /* T01_14 */
@@ -1541,7 +1441,6 @@ static void T05_00(void)
 static void T10_02(u16 down, u16 count)
 {
     struct Where where;
-    struct Address address;
     struct Ending end;
     u16 failed, cursor;
 
@@ -1565,11 +1464,10 @@ static void T10_02(u16 down, u16 count)
     }
     ed.EdCursr = ed.EdCol1;             /* T10_10 */
     ed.EdHxCur = ed.EdHex1;
-    address = AddressOf(ed.EdOffst);
-    end = T53_10(address.segment, address.offset);
+    end = T53_10(ed.EdOffst);
     if (!end.none && (end.at & 0x0F) == 0)
         return;
-    cursor = end.at & 0x0F;             /* T10_11 */
+    cursor = (u16)(end.at & 0x0F);      /* T10_11 */
     if (cursor > ed.EdCursr)
         return;
     ed.EdCursr = cursor;
@@ -1623,7 +1521,7 @@ static void T16_00(void)
             ;
         T60_20(&where);
     } else {
-        ed.EdLine = AddressOf(ed.EdLen).segment - SEG_OF(Room);   /* T16_10 */
+        ed.EdLine = (u16)(ed.EdLen >> 4);       /* T16_10 */
         ed.EdOffst = ed.EdLen & 0xFFFFFFF0UL;
     }
     T14_11();                           /* T16_11 */
@@ -1641,7 +1539,7 @@ static void T20_02(u8 *from, u8 *end)
     ed.EdUndo = count;
     for (; count; count--)
         *undo++ = *source++;
-    if (MD_PLACE(EditBuf + ed.EdSizLn) > MD_PLACE(end))
+    if (EditBuf + ed.EdSizLn > end)
         for (count = EditBuf + ed.EdSizLn - end; count; count--)
             *from++ = *end++;
     ed.EdSizLn -= cut;                  /* T20_03 */
@@ -1684,7 +1582,7 @@ static void T20_06(u32 end, u16 drawn)
         if (T53_00(&where) != 0)
             break;
         if (--count == 0) {
-            place = OFFSET_OF(where.segment, where.offset);
+            place = where.place;
             break;
         }
     }
@@ -1714,7 +1612,7 @@ static void T20_05(u16 drawn)
         return;
     ed.EdUndo = 2;
     *(u16 *)UndoBuf = CR_LF;
-    T20_06(OFFSET_OF(where.segment, where.offset), drawn);
+    T20_06(where.place, drawn);
 }
 
 /* Del: the character under the cursor, or at the end of the line the
@@ -1801,7 +1699,7 @@ static void T24_00(void)
         where.line = 0;                 /* see T20_05 */
         end = ed.EdLen;
         if (T53_00(&where) == 0)
-            end = OFFSET_OF(where.segment, where.offset) - 2;
+            end = where.place - 2;
         ed.EdEndBf = end;               /* T24_01 */
         ed.EdWhole = 1;
     }
@@ -1833,7 +1731,7 @@ static void T25_00(void)
     where.line = 0;                     /* see T20_05 */
     end = ed.EdLen;
     if (T53_00(&where) == 0)
-        end = OFFSET_OF(where.segment, where.offset);
+        end = where.place;
     ed.EdSizLn = 0;                     /* T25_02 */
     ed.EdCursr = 0;
     T20_06(end, 1);
@@ -1849,7 +1747,8 @@ static void T26_00(void)
     u32 offset;
     u16 count = ed.EdUndo;
     u16 line = 0;
-    u16 i, cursor;
+    u16 i;
+    i32 left;
     u8 *from, *to;
 
     if (ed.EdTxHex != 0 || count == 0)
@@ -1860,9 +1759,11 @@ static void T26_00(void)
         ed.EdSizLn += count;            /* T26_01 */
         to = EditBuf + LenEdit - 1;
         from = to - count;
-        cursor = MD_PLACE(EditBuf + ed.EdCursr - 1);
-        if (MD_PLACE(from) > cursor)
-            for (i = MD_PLACE(from) - cursor; i; i--)
+        /* The bytes from the cursor to `from`, both of them counted:
+           none, if the cursor is behind that. */
+        left = (i32)(from - (EditBuf + ed.EdCursr - 1));
+        if (left > 0)
+            for (; left; left--)
                 *to-- = *from--;
         ed.EdCursr += count;            /* T26_02 */
         to = from + 1;
@@ -1897,7 +1798,6 @@ static void T26_00(void)
 static void T30_00(void)
 {
     u32 place;
-    struct Address address;
 
     if (ed.EdSizeX < 80)
         return;
@@ -1908,11 +1808,10 @@ static void T30_00(void)
     if (ed.EdTxHex != 0) {
         ed.EdHxCur = 0;
         place = ed.EdOffst + ed.EdCursr;
-        address = AddressOf(place);
-        ed.EdCursr = address.offset;
-        ed.EdLine = address.segment - SEG_OF(Room);
+        ed.EdCursr = (u16)(place & 0x0F);
+        ed.EdLine = (u16)(place >> 4);
         ed.EdLin0 = ed.EdLine;
-        ed.EdOffst = OFFSET_OF(address.segment, 0);
+        ed.EdOffst = place & 0xFFFFFFF0UL;
     } else {
         place = ed.EdOffst + ed.EdCursr;        /* T30_10 */
         T56_00(0, 0, 0, HIGH(place), LOW(place));
@@ -1930,8 +1829,7 @@ static void T30_00(void)
 static void T32_00(void)
 {
     struct Box box;
-    u32 place, left;
-    struct Address address;
+    u32 place, left, base;
     struct Sought sought;
     u16 count;
 
@@ -1949,8 +1847,11 @@ static void T32_00(void)
         count = 0x8000;
         if (HIGH(left) == 0 && LOW(left) < count)
             count = LOW(left);
-        address = AddressOf(place);     /* T32_02 */
-        sought = V82_00(AT(address.segment, 0), address.offset, count);
+        /* T32_02. The viewer's search takes the paragraph of the place
+           and an offset from there, and answers with one: so the
+           assembly had them, a segment and an offset of less than 16. */
+        base = place & 0xFFFFFFF0UL;
+        sought = V82_00(Room + base, (u16)(place - base), count);
         if (sought.found < 0x100)
             break;
         if (count < SrchLen)
@@ -1959,12 +1860,12 @@ static void T32_00(void)
     }
     if (TstBrk())                       /* T32_05 */
         goto done;
-    place = OFFSET_OF(address.segment, sought.end);
+    place = base + sought.end;
     if (ed.EdTxHex != 0) {
         ed.EdHexAs = (u8)sought.found;
         ed.EdHxCur = 0;
         ed.EdOffst = place & 0xFFFFFFF0UL;
-        ed.EdLine = AddressOf(place).segment - SEG_OF(Room);
+        ed.EdLine = (u16)(place >> 4);
         ed.EdCursr = LOW(place) & 0x0F;
     } else {
         T56_00(HIGH(ed.EdOffst), LOW(ed.EdOffst), ed.EdLine,   /* T32_06 */
@@ -2250,11 +2151,11 @@ static u16 T00_71(u16 mouse)
 static void T00_20(void)
 {
     struct Where where;
-    struct Address address;
     struct Ending end;
-    u32 place, free;
+    const u8 *base;
+    u32 place, free, start;
     u16 column, first_column, first_line, line, old_column, old_line;
-    u16 delta, row, count, size, segment, start, state, color, i;
+    u16 delta, row, count, size, state, color, i;
     u16 *saved;
 
     column = T57_02();
@@ -2304,9 +2205,7 @@ static void T00_20(void)
         if (first_line >= old_line) {
             count = delta;
             if (count <= row) {
-                address = T62_00();
-                where.segment = address.segment;
-                where.offset = address.offset;
+                where.place = ed.EdFirst;
                 do                      /* T00_27 */
                     T53_00(&where);
                 while (--count);
@@ -2318,9 +2217,7 @@ static void T00_20(void)
             count = -delta;
             if (count <= row) {
                 row = count;
-                address = T62_00();
-                where.segment = address.segment;
-                where.offset = address.offset;
+                where.place = ed.EdFirst;
             }
         }
         count = row;                    /* T00_29 */
@@ -2331,7 +2228,7 @@ static void T00_20(void)
             while (--count);
         }
 first:
-        place = OFFSET_OF(where.segment, where.offset);     /* T00_31 */
+        place = where.place;            /* T00_31 */
 top:
         ed.EdFirst = place;             /* T00_32 */
     }
@@ -2363,53 +2260,41 @@ whole:
     ClrKbd();                           /* T00_40 */
     count = ed.EdSizeY;
     row = 0;
-    address = T62_00();
-    segment = address.segment;
-    start = address.offset;
+    /* The assembly has the lines as offsets in the segment of the first
+       of them, the paragraph that EdFirst is in, and T72_00 goes by how
+       far into that segment a line ends. */
+    start = ed.EdFirst;
+    base = Room + (start & 0xFFFFFFF0UL);
     do {                                /* T00_41 */
-        place = OFFSET_OF(segment, start);
-        state = T63_01(HIGH(place), LOW(place));
+        state = T63_01(HIGH(start), LOW(start));
         if (state == 1 && ed.EdTxHex == 0) {
             /* The end of the text: a line of nothing, if the text ends
                with the two characters. */
-            if (place < 2)              /* T00_45 */
+            if (start < 2)              /* T00_45 */
                 break;
-            address = AddressOf(place - 2);
-            if (!ENDS_LINE(*(const u16 *)
-                           AT(address.segment, address.offset)))
+            if (!ENDS_LINE(*(const u16 *)(Room + start - 2)))
                 break;
-            T72_00(row, address.segment, address.offset + 2, 0);
+            /* Nothing before it is looked at: the assembly hands it
+               over as ending at the start of a segment. */
+            T72_00(row, Room + start, Room + start, Room + start);
             break;
         }
         if (state != 0) {
             /* In hex, the end of the text or what is behind it: a line
                of no bytes, if a line begins there. */
             if (ed.EdTxHex != 0 && (start & 0x0F) == 0)     /* T00_46 */
-                T72_00(row, segment, start, 0);
+                T72_00(row, Room + start, Room + start, base);
             break;
         }
-        end = T53_10(segment, start);
-        if (end.none) {
-            address = AddressOf(place);
-            segment = address.segment;
-            start = address.offset;
-            end = T53_10(segment, start);
-            if (end.none) {
-                /* A line that does not end within 64K: what the window
-                   shows of it is at its start, and where it ends is
-                   looked for a piece at a time. */
-                T72_00(row, segment, start, 0xFFFF);
-                do {                    /* T00_42 */
-                    segment += PIECE_SEGMENTS;
-                    end = T53_10(segment, 0);
-                } while (end.none);
-                start = end.at;
-                goto next;
-            }
-        }
-        T72_00(row, segment, start, end.at);    /* T00_43 */
+        /* Of a line that does not end within 64K of its address the
+           assembly hands over what its segment has, T00_42, and looks
+           for where it ends a piece at a time. What the window shows of
+           a line is at most its first 32K: as many bytes as the columns
+           before the window and in it, and the cursor is no further
+           than 3900 characters into a line, tabs among them. */
+        end = T53_10(start);
+        T72_00(row, Room + start, Room + end.at, base);     /* T00_43 */
         start = end.at;
-next:
         row++;                          /* T00_44 */
     } while (--count);
     T73_10();                           /* T00_48 */
@@ -2551,9 +2436,10 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     u8 *end;
     u16 *cell;
     u16 *screen;
+    u8 *piece;
     u32 left;
     const u8 *file;
-    u16 help, count, segment, place, color, i;
+    u16 help, count, place, color, i;
 
     ed.EdSpace = RoomParas();
     if ((u32)ed.EdSpace << 4 <= ed.EdLen) {
@@ -2574,7 +2460,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     end = MvzLine(md.TmpBuf, name, 13);
     *end++ = 0;
     PathLin(md.TmpBuf);
-    count = MD_PLACE(NEAR(end)) - MD_PLACE(md.TmpBuf);
+    count = (u16)(end - md.TmpBuf);
     help = 0x0A01;
     file = Menu_F;
     if (!T64_00(file, md.TmpBuf, count)) {
@@ -2598,12 +2484,12 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
             goto closed;
     } else {
         left = ed.EdLen;                /* T00_06 */
-        segment = SEG_OF(Room);
+        piece = Room;
         for (;;) {
             count = PIECE;              /* T00_07 */
             if (HIGH(left) == 0 && LOW(left) < count)
                 count = LOW(left);
-            read = FileRead(handle, AT(segment, 0), count);     /* T00_08 */
+            read = FileRead(handle, piece, count);      /* T00_08 */
             if (read.failed)
                 goto closed;            /* T00_09 */
             if (TstBrk())
@@ -2613,7 +2499,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
                 ed.EdLen -= left;
                 break;
             }
-            segment += PIECE_SEGMENTS;
+            piece += PIECE;
             left -= count;
             if (left == 0)
                 break;

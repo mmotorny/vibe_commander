@@ -71,7 +71,7 @@ N1             130        130     2              2       0     0    48     0    
 N2             112        112     0              0       0     0    61     0     0  dialog.c
 N3, N4         156        156    13             13       0     0   202     0     0  view.c
 N5             121        121     0              0       0     0    77     0     1  find.c
-N6 to N8       233        233    37             37       0     0   278     0     0  edit.c
+N6 to N8       196        196    41             41       0     0   216     0     4  edit.c
 N9              81         81     6              6       0     0    64     0     0  copy.c
 N10             98         98     0              0       0     0    55     0     0  dirfunc.c
 N11             91         91     1              1       0     0    60     0     0  files.c read.c place.c
@@ -89,7 +89,7 @@ N20            113        113     0              0       0     0    89     0    
 N21             82         82     3              3       0     0    59     0     0  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0    57     0     0  the tables, dos32.c stack.c
 headers        299        127    12              1     143     1     0     0     0  vc.h sys.h tables.h
-all           2993       2205   148             71     178     1  1790     3    30
+all           2956       2168   152             75     178     1  1728     3    34
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  cuts  bool   i32
 vc.h               242         70    11              0     143     1     0     0     0
@@ -105,7 +105,7 @@ dialog.c           112        112     0              0       0     0    61     0
 digits.c             2          0     1              0       3     0     5     0     4
 dirfunc.c           98         98     0              0       0     0    55     0     0
 drive.c             27         27     0              0       0     0    39     0     0
-edit.c             233        233    37             37       0     0   278     0     0
+edit.c             196        196    41             41       0     0   216     0     4
 enter.c             32         32     0              0       0     0    22     0     0
 exec.c              16         16     0              0       0     0    12     0     0
 extfile.c            8          8     0              0       0     0     3     0     0
@@ -830,7 +830,7 @@ dos32.c: as a whole, 163 numbers, 65 u32, 57 cuts
 
 drive.c: not sorted, 27 numbers, 39 cuts
 
-edit.c: not sorted, 233 numbers, 37 u32, 278 cuts
+edit.c: not sorted, 196 numbers, 41 u32, 216 cuts
 
 edit_t.c: as a whole, 26 numbers, 0 cuts
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

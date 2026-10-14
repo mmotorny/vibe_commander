@@ -3138,6 +3138,19 @@ in "The portable C".
   Reading the copies of the code alone, 68 bytes of a path, 13 of a
   name, found none, and the image found this one.
 
+- A routine that reckons with segments can be held against its flat
+  form on this computer before any scenario runs: the old function and
+  the new cut out of the two files by a script, compiled by gcc with a
+  few lines in place of `vc.h` that give `AT` and `SEG_OF` an arena of a
+  megabyte or so, and called alike on data made for the edges, lines of
+  64K less a few bytes, of 3,900 and of nothing. F5 did so for the
+  editor's lines (`TODO.md`, "F5, the editor"), and the first things
+  that it found were its own: a field that a function reads and the
+  test had not set, after which the old code and the new looped for
+  ever alike, and a room smaller than the program ever has, where both
+  copied four gigabytes. Set every field that either reads, and give
+  the program's least of what it has.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through

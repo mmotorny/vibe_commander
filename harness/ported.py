@@ -1364,6 +1364,10 @@ GONE = {
             "mode that dos32.c keeps below the megabyte, Ended_T there, "
             "which are bytes of a table and no function. That they ran "
             "is held by what the scenario ended shows of the registers"),
+        "T62_00_c": "the address of the first line on the editor's "
+                    "screen, a segment and an offset made of its place: "
+                    "the text of the portable C is a pointer and a line "
+                    "is known by its place, EdFirst",
     },
 }
 

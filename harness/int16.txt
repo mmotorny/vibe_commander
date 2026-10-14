@@ -73,6 +73,26 @@ edit.c, T02_03: minus
     number, and makes the pointer of the sum: MD_POINTER(MD_PLACE(to) +
     step). The sum wraps round there in both builds.
 
+edit.c, T26_00: widen
+    | left = (i32)(from - (EditBuf + ed.EdCursr - 1));
+    Two places of the line buffer, which has 4,000 bytes: how far
+    `from` is behind the cursor, or before it, within 16 bits either
+    way. The line below asks whether it is above 0.
+
+edit.c, T72_00: compare
+    | if (end - base >= 2) {
+    Written for an int of 32 bits and meant so: how far a line ends
+    behind the paragraph that the first line of the window begins
+    in, two places of the text, which is not held to 64K; or the
+    place of the line buffer in the main data. `base` is at or
+    before `end` at every call.
+
+edit.c, T72_00: widen
+    | offset = (u32)(from - Room);
+    Written for an int of 32 bits and meant so: the place of a byte
+    of the text, an address less the address of the text, which is
+    not below 0 and is shown as eight digits of hex.
+
 enter.c, F21_25: back
     | md.HstBuf[i] = md.HstBuf[i - length];
     The loop goes on while i is length or more.
