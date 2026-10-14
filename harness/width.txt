@@ -77,7 +77,7 @@ N3, N4         107         75    13              7      38     0     6    12    
 N5              76          0     0              0      70     6     3     4    44  find.c
 N6 to N8       194        194    41             41       0     0     5     0     6  edit.c
 N9              41          0     6              0      39     8     2     7    37  copy.c
-N10             98         98     0              0       0     0     0     0     0  dirfunc.c
+N10             55          0     0              0      49     6     3     9    37  dirfunc.c
 N11             47          0     1              0      46     2     2     9    34  files.c read.c place.c
 N12             80         80     3              3       0     0     0     0     0  panel.c info.c drive.c
 N13             63         63     0              0       0     0     0     0     3  tree.c treebox.c extfile.c
@@ -92,11 +92,11 @@ N19b            41         41     0              0       0     0     0     0    
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        284        104    12              1     150     2     0     0     0  vc.h sys.h tables.h
-all           2668       1515   152             60     524    35    29    42   279
+headers        283        102    12              1     150     3     0     0     0  vc.h sys.h tables.h
+all           2624       1415   152             60     573    42    32    51   316
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               227         47    11              0     150     2     0     0     0
+vc.h               226         45    11              0     150     3     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              40         40     0              0       0     0     0     0     0
@@ -107,7 +107,7 @@ commands.c          74         74     0              0       0     0     0     0
 copy.c              41          0     6              0      39     8     2     7    37
 dialog.c            79          0     0              0      68    11     0     3    29
 digits.c             2          0     1              0       3     0     0     0     4
-dirfunc.c           98         98     0              0       0     0     0     0     0
+dirfunc.c           55          0     0              0      49     6     3     9    37
 drive.c             27         27     0              0       0     0     0     0     0
 edit.c             194        194    41             41       0     0     5     0     6
 enter.c             31         31     0              0       0     0     0     0     0
@@ -666,7 +666,10 @@ vc.h, struct Cleared: not sorted, 1 number
 
 vc.h, struct Sought: not sorted, 2 numbers
 
-vc.h, struct Checked: not sorted, 2 numbers
+vc.h, struct Checked: field answer, u16
+    What Dialog answers, in two bytes, as every caller takes it
+    apart: in the low byte 0, a button or FFh for Esc, and 1 or 0
+    above it for F10 and Alt-F10.
 
 vc.h, struct SpeedKey: not sorted, 2 numbers
 
@@ -1323,7 +1326,212 @@ digits.c, HexByt: variable digit, u16
 digits.c, TstHex: parameter digit, u16
     character: its low byte alone counts, which the first line says.
 
-dirfunc.c: not sorted, 98 numbers
+dirfunc.c, struct DateText: field century, u16
+    character: two, the first in the low byte, as PUT16 writes them
+
+dirfunc.c, struct DateText: field first, u16
+    character: two, the first in the low byte, as PUT16 writes them
+
+dirfunc.c, struct DateText: field second, u16
+    character: two, the first in the low byte, as PUT16 writes them
+
+dirfunc.c, struct DateText: field third, u16
+    character: two, the first in the low byte, as PUT16 writes them
+
+dirfunc.c, struct TimeText: field hour, u16
+    character: two, the first in the low byte, as PUT16 writes them
+
+dirfunc.c, struct TimeText: field minute, u16
+    character: two, the first in the low byte, as PUT16 writes them
+
+dirfunc.c, struct TimeText: field second, u16
+    character: two, the first in the low byte, as PUT16 writes them
+
+dirfunc.c, struct TimeText: field unused, u8
+    unused
+
+dirfunc.c, struct TimeText: field suffix, u8
+    character
+
+dirfunc.c, (): variable Del_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable DelFs_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable Empty_S, u8[]
+    text
+
+dirfunc.c, (): variable NoFnd_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable NoAtr_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable CrDir_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable MkDir_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable Subdi_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable DlWr4_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable Attr8_S, u8[]
+    text: of the tables, dirfunc_t.c
+
+dirfunc.c, (): variable Mask_S, u8[]
+    text
+
+dirfunc.c, (): variable Tree_F, u8[]
+    text
+
+dirfunc.c, F38_10: parameter answer, u16
+    What Dialog answers, in two bytes, as every caller takes it
+    apart: in the low byte 0, a button or FFh for Esc, and 1 or 0
+    above it for F10 and Alt-F10.
+
+dirfunc.c, F38_10: returns, u16
+    The answer for the dialog to go by, as Dialog answers it: what
+    was handed in, or its high byte alone for Delete.
+
+dirfunc.c, F38_40: parameter attributes, u16
+    attributes: in the low byte; above it what DirFunc hands on of AX
+    as DOS left it, which only C00_00 reads.
+
+dirfunc.c, F38_40: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, F38_40: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, F38_40: variable error, u16
+    system: AX as DOS left it, the error to report
+
+dirfunc.c, F38_70: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, F38_70: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop; first what DOS
+    left in AL, of which one more, as a byte, is the low byte.
+
+dirfunc.c, F38_70: variable kept, u8
+    character
+
+dirfunc.c, F38_70: variable letter, u8
+    character: the letter of the drive, as typed
+
+dirfunc.c, M30_50: parameter attributes, u16
+    attributes: in the low byte; above it what DirFunc hands on of AX
+    as DOS left it, which only C00_00 reads.
+
+dirfunc.c, M30_50: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, M30_50: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, M30_50: variable error, u16
+    system: AX as DOS left it, the error to report
+
+dirfunc.c, M30_50: variable old, u16
+    attributes
+
+dirfunc.c, Figure: variable read, u16
+    What TxtNum reads a number into, through a pointer of 16 bits, so
+    that a number of more digits wraps round there as the original's
+    does. It is the parameter of digits.c that decides.
+
+dirfunc.c, Accepted: parameter answer, u16
+    What Dialog answers, in two bytes, as every caller takes it
+    apart: in the low byte 0, a button or FFh for Esc, and 1 or 0
+    above it for F10 and Alt-F10.
+
+dirfunc.c, M30_60: parameter answer, u16
+    What Dialog answers, in two bytes, as every caller takes it
+    apart: in the low byte 0, a button or FFh for Esc, and 1 or 0
+    above it for F10 and Alt-F10.
+
+dirfunc.c, M30_60: variable letter, u8
+    character
+
+dirfunc.c, M30_60: sign
+    | AttrTim = (u16)(((hours + add) << 11) + (minutes << 5) + (seconds >> 1));
+    seconds is 0 to 59, by the test where it is read, or 0.
+
+dirfunc.c, FncCall: parameter attributes, u16
+    attributes: in the low byte; above it what DirFunc hands on of AX
+    as DOS left it, which only C00_00 reads.
+
+dirfunc.c, FncCall: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, DirFunc: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, DirFunc: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, DirFunc: variable c, u8
+    character
+
+dirfunc.c, DelTr0: variable written, u16
+    system: AX as DOS left it, the bytes written or the error
+
+dirfunc.c, F48_00: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, M30_82: returns, u16
+    attributes
+
+dirfunc.c, M30_82: variable bits, u16
+    attributes
+
+dirfunc.c, M30_00: variable attributes, u16
+    attributes
+
+dirfunc.c, M30_00: variable bits, u16
+    attributes
+
+dirfunc.c, FncMs1: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, FncSel: variable address, u16
+    A place in the panel's block, as CurAdr, First and EndBuf have
+    it: 16 bits while a panel is 64K, by question 3 of the plan. Its
+    difference with First is cut to 16 bits, which the program
+    counts on for a file above the page, with the cast written.
+
+dirfunc.c, FncSel: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, FncSel: variable begin, u16
+    place
+
+dirfunc.c, FncSel: sign
+    | i = number % lines;
+    number is a u16 divided by 16, and lines is what LnsAX answers,
+    the rows of the panel, 1 or more: neither is below 0.
+
+dirfunc.c, FncSel: sign
+    | number /= lines;
+    number is a u16 divided by 16, and lines is what LnsAX answers,
+    the rows of the panel, 1 or more: neither is below 0.
 
 dirfunc_t.c: as a whole, 60 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

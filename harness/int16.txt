@@ -83,10 +83,6 @@ dialog.c, MnMn11: shift
     | key = (u16)(button - table >> 1);
     button steps up from table, two at a time, in the loop above.
 
-dirfunc.c, DirFunc: index
-    | end[count] = Mask_S[skip + count];
-    skip is 0 or 1, by the lines above, and count is below 5.
-
 dos32.c, OwnSet: widen
     | u32 first = (u32)(Own + 15 - ARENA) >> 4;
     Written for an int of 32 bits and meant so: how far Own is behind

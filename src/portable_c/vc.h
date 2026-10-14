@@ -1171,24 +1171,24 @@ u16 M75_00(struct WCBdef *panel);
 /* Directories made, files deleted, attributes and the label, dirfunc.c;
    and where a command ends that goes through files: FncSel for those
    that are selected, FncMas for those of a mask, with the title of its
-   boxes, and FncExt, which like FncSel returns 1 if the panels are to be
-   read again. */
-u16 F37_00(struct WCBdef *panel);
-u16 F47_00(void);
-u16 F38_00(struct WCBdef *panel);
-u16 F48_00(void);
-u16 F58_00(struct WCBdef *panel);
-u16 M30_00(struct WCBdef *panel);
-u16 F54_00(void);
-u16 FncMas(const u8 *include);
-u16 FncSel(void);
-u16 FncExt(void);
+   boxes, and FncExt, which like FncSel returns true if the panels are to
+   be read again. */
+i32 F37_00(struct WCBdef *panel);
+i32 F47_00(void);
+i32 F38_00(struct WCBdef *panel);
+i32 F48_00(void);
+i32 F58_00(struct WCBdef *panel);
+i32 M30_00(struct WCBdef *panel);
+i32 F54_00(void);
+i32 FncMas(const u8 *include);
+bool FncSel(void);
+bool FncExt(void);
 /* What the dialog of attributes has Dialog call when it is answered,
    with the answer: it reads the date and the time that were typed. */
 struct Checked {                        /* what M30_60 returns: */
     u16 answer;                         /* the answer for the dialog to go
                                            by */
-    u16 refused;                        /* 1 if a line is no date or no
+    bool refused;                       /* whether a line is no date or no
                                            time: the dialog goes on */
 };
 struct Checked M30_60(u16 answer);
@@ -1278,8 +1278,8 @@ struct Named {                          /* what F34_40 found: */
 struct Next F34_30(const u8 *text);
 struct Named F34_40(u8 *text, u16 view);
 /* Have both panels read again: where a command ends that has changed
-   what is on the disk. Returns 1. See dirfunc.c. */
-u16 FncEx1(void);
+   what is on the disk. Returns true. See dirfunc.c. */
+bool FncEx1(void);
 
 /* Calls what FncAddr names for every file of the directory at TmpBuf, and
    returns 1 if every call did what it was to, 0 if one did not, and 100h

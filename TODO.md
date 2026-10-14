@@ -9383,7 +9383,7 @@ for.
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
 | N9 † | `copy.c` | 1,571; 147 | F6 | **Done**, the buffer in bytes, with its question answered and its fix: "N9, `copy.c`: done, and what a later cluster should know" below |
-| N10 | `dirfunc.c` | 1,405; 174 | F6 | |
+| N10 | `dirfunc.c` | 1,405; 174 | F6 | **Done**: "N10, `dirfunc.c`: done, and what a later cluster should know" below |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | |
 | N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | |
@@ -13814,6 +13814,108 @@ testing on was a dozen, and some 40 more for the fix and to land: reading the pl
 the file read whole once with the finder's lists beside it 10, the
 types by one script 10, the record's reasons by another 5, the tests
 and the documents the rest.
+
+### N10, `dirfunc.c`: done, and what a later cluster should know
+
+**What there is.** `dirfunc.c` sorted by "The rule for a number", with
+the steps of "N0d" in their order, and `struct Checked` of `vc.h`,
+which `M30_60` answers in; clang's warnings of a conversion silent for
+it. The whole suite passes, no golden and no patch changed, and the
+image of each of the 155 scenarios is that of the build before (below).
+
+**The numbers.** Of the 98 of 8 or 16 bits, none a `u32`, and three
+that are new, `button` of `F38_40`, `letter` of `F38_70` and `read` of
+`Figure`:
+
+| | `dirfunc.c` | `vc.h` | Which |
+|---|---|---|---|
+| Widened, to `i32` | 37 | | The counts and indexes of the loops; the date and the time that `M30_60` reads, ten; the drive of `F38_70`, a number of DOS's taken out of the FCB; the button that the boxes of `F38_40` are answered with, a variable of its own now, where `answer` held it before it held the routine's answer; `skip` of `DirFunc`, an index; the line and the page of a file in `FncSel`; and what every command of the file answers, a place of the loop, `TO_` of `vc.h`: `F37_00`, `F47_00`, `F38_00`, `F48_00`, `F58_00`, `M30_00`, `F54_00`, `FncMas`, `FncMs1`, `F47_01` |
+| Made `bool` | 9 | 1 | What `Figure`, `FncSel`, `FncExt` and `FncEx1` answer; `carry` of `F38_70` and of `DelTr0`; `first` of `DirFunc` and of `FncMs1`, `all` of `DirFunc`; and `refused` of `struct Checked` |
+| Kept by a word | 49 | | `text` 12, the texts of the tables that the file names; `character` 12, of which 7 are two in a word, the fields of `struct DateText` and `struct TimeText` as `format.c` has them; `bits` 12, what a routine of `FncAddr` answers, below; `attributes` 8; `system` 3, AX as DOS left it, an error or the bytes written; `place` 1; `unused` 1 |
+| Kept by a sentence | 6 | 1 | What `Dialog` answers, as N2 has it, where `F38_10`, `Accepted` and `M30_60` are handed it and `F38_10` returns it, 4, and `answer` of `struct Checked`; `read` of `Figure`, which `TxtNum` reads a number into through a pointer of 16 bits; and `address` of `FncSel`, a place in the panel's block as `CurAdr` has it, 16 bits while a panel is 64K |
+| `sign` | 3 | | `seconds >> 1` of `M30_60`, and the line and the page of `FncSel`, `% lines` and `/= lines` |
+
+What a routine of `FncAddr` answers stays a `u16`, `bits`: 1 or 0 in the
+low byte, and something above it to stop, which every caller takes
+apart, `answer >> 8` and `(u8)answer`. It is the type `FncFn` of the
+file, which `C00_00` of `copy.c`, `DiSi10` of `read.c` and `FindFil` of
+`find.c` are too, and `FncCall`, `DirFunc`, `F38_40`, `M30_50` and
+`F38_70`: widened, it would change all five together, in three other
+clusters' files, and want a `sign` entry at each shift. What they are
+handed stays `attributes`, with what `DirFunc` hands on above them of
+AX as DOS left it, which only `C00_00` reads.
+
+`Figure` takes an `i32 *` and reads into a `u16` of its own, which it
+widens: `TxtNum` of `digits.c` reads into 16 bits, so a date or a time
+of more digits than fit wraps round there as it did, and the numbers of
+`M30_60` hold what they held, each 0 to 65,535.
+
+**The casts.** clang named 3 places before anything changed, the date
+and the time that `M30_60` puts together and the row that `FncSel`
+draws; each is a cast now, none went by a type. The widening made two
+more: the drive handed to `DirCurrent` of `sys.h`, which takes a `u16`,
+and the page of `FncSel`, a `u16` divided by `sizeof`, which is a
+number without a sign, kept in an `i32`, `(i32)(... / sizeof(struct
+FILENT))`. And, on the rebase onto N11, which made the two counts of
+`struct Selected` an `i32`, the two that `F38_00` hands to `FilDir` of
+`panel.c`, which takes them in 16 bits until N12 widens it, as `copy.c`
+has them. So 7 casts. The date and the time have a comment that says
+by which tests they fit, the row one that says it is a row of the
+page. The cast that was there in the page, `(u16)(address -
+wcb->First)`, has a comment with `wraps` now: a file above the page
+comes out far behind it, and is not drawn. `portable_c-cut` needed no
+function more.
+
+`harness/int16.txt` lost its one place in the file, `Mask_S[skip +
+count]` of `DirFunc`, both numbers `i32` now.
+
+**Across clusters.** The lines that changed outside `dirfunc.c` are
+those of `vc.h`; no caller changed.
+
+- The commands of the file answer an `i32`, and `F1Next` of `main.c`
+  takes a `u16`: clang names the seven calls of `Command` when N16
+  sorts `main.c`, and `F1Next` is widened then. `FncSel`, `FncExt` and
+  `FncEx1` answer a `bool`, which `F1Next` keeps in `read`, a `u16`
+  there, and `F35_90` tests: that is a `bool` for N16 too.
+- `refused` of `struct Checked` is a `bool`, and `StF04_10` of
+  `stopts.c` writes 0 and 1 into it, as `Accepted` there does: `false`
+  and `true` for N20, which changes no instruction. `dialog.c` reads it
+  as `checked.refused != 0`, which clang takes.
+- `dialog.c` declares `F38_10` for itself, and it did not change.
+- `C00_00`, `DiSi10` and `FindFil` are of `FncFn`: their clusters keep
+  the type as it is, or change it with this file's five.
+
+**The program.** `dirfunc.c` is 224 bytes shorter in its code, 0177Ch
+for 0185Ch; the listings of `dialog.c`, `main.c` and `stopts.c` moved
+by a few bytes, by the `bool`s. No listing has a byte extended with its
+sign into 32 bits but `menu.c`, as before. The image of every
+scenario, `python3 harness/dataimage.py compare`, against the build of
+`main` that it landed on, `bf073d6`: "155 scenarios, 43 with nothing
+that differs; 6 differences, 0 more in what was declared as changed,
+136 in what may differ". The 136 are what the tool lets differ. The 6
+are one byte, in `copy` and `copy-dirs`: 80h on `main` and 7Fh here,
+behind the zero of a name that DOS found, where the DTA has it too,
+the `NAME_TAIL` of `harness/dataimage.py`, a byte of DOS's memory that
+follows the build. The tool did not know them for that because the
+program has the name in lower case there, `con` and `readme.txt` where
+the DTA has `CON` and `STAMPS`, so the 13 bytes are not the field's:
+in `TmpBuf+11` and `TmpBuf+141` of `copy`, `TmpBuf+155` of `copy-dirs`,
+and where `DialBox` carries them to `TmpErr`. What brings it about is
+`M30_60` alone: a build with its numbers and `Figure` as on `main` and
+everything else of this piece had no difference. Against `24220f2`,
+before the rebase, the image had had none. `VC.EXE` is `f56b550b...`
+for `957d0bed...` of `bf073d6`.
+
+It took some 65 tool calls, of which some 15 were reading the brief
+and the plan; the file was read whole once, and the reasons were
+written by one script. An hour went on a first `dataimage.py save` of
+the build before, copied to `build/n10-base-VC.EXE`: a program that is
+not in a directory called `portable_c` is taken through the
+original's steps with nothing declared for it, so the scenarios of
+the setup found no `VCSETUP` and waited out their time, and some
+scenarios had no image. Copy the build before, its directory whole,
+to `build/NAME/portable_c/` and save from there, as the notes of
+`CLAUDE.md` have it for a copy that is tested.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

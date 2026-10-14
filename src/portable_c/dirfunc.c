@@ -43,7 +43,7 @@ u16 F38_40(u16 attributes);
 static u16 F38_70(void);
 u16 M30_50(u16 attributes);
 static struct Answer F38_60(void);
-static u16 FncMs1(const u8 *include);
+static i32 FncMs1(const u8 *include);
 
 /* DirFunc, DelTr0 and M30_60 are in vc.h. */
 /* The commands, with FncMas, FncSel and FncExt, are declared in vc.h:
@@ -215,7 +215,8 @@ u16 F38_40(u16 attributes)
     struct FileAttr had;
     struct Answer asked, removed, marked;
     const struct BOXHD *report;
-    u16 answer, error, count;
+    u16 answer, error;
+    i32 count, button;
 
     if (!(attributes & ATTR_DIRECTORY)) {
         OncZoom(BOX_PLACE, &DelFl_P, Empty_S, &box);
@@ -233,11 +234,11 @@ u16 F38_40(u16 attributes)
                    of a drive that is not ready, whatever DOS left. */
                 error &= 0xFF00;
                 if (had.attributes & 1) {
-                    answer = (u8)Dialog(&RdOnl_B, Del_S,
+                    button = (u8)Dialog(&RdOnl_B, Del_S,
                                         0, 0, &md);
-                    if (answer == 1)
+                    if (button == 1)
                         goto not_done;
-                    if (answer > 1)
+                    if (button > 1)
                         goto stop;
                     asked = FileSetAttributes(md.TmpBuf, 0x20);
                     error = asked.value;
@@ -271,10 +272,10 @@ u16 F38_40(u16 attributes)
         }
         /* F38_51: it is not empty */
         if (DEL_ALL == 0) {
-            answer = (u8)Dialog(&NoEmp_B, Del_S, 0, 0, &md);
-            if (answer > 1)
+            button = (u8)Dialog(&NoEmp_B, Del_S, 0, 0, &md);
+            if (button > 1)
                 goto not_done;
-            if (answer == 1)
+            if (button == 1)
                 DEL_ALL = 1;
         }
         /* F38_52 */
@@ -339,7 +340,7 @@ out:
 static struct Answer F38_60(void)
 {
     struct Answer asked;
-    u16 count;
+    i32 count;
 
     asked = DirRemove(md.TmpBuf);
     if (!asked.failed || asked.value != ERR_CURRENT_DIR)
@@ -380,15 +381,17 @@ static u16 F38_70(void)
     u8 *fcb = md.TmpBuf + 200;
     u8 *back = md.TmpBuf + 100;
     u8 *name, *end;
-    u16 answer, drive, carry = 0;
-    u8 kept;
+    u16 answer;
+    i32 drive;
+    bool carry = false;
+    u8 letter, kept;
 
     fcb[0] = 0xFF;                      /* an extended one, */
     fcb[6] = 0x26;                      /* for these attributes */
-    drive = 'A' - 1;
+    letter = 'A' - 1;
     if (md.TmpBuf[1] == ':')
-        drive = md.TmpBuf[0];
-    fcb[7] = (u8)(drive - ('A' - 1));
+        letter = md.TmpBuf[0];
+    fcb[7] = (u8)(letter - ('A' - 1));
     name = (u8 *)CutPath(md.TmpBuf);
     if ((u8)FcbParse(name, fcb + 7, 2) != 1)
         return NOT_DONE;
@@ -406,7 +409,7 @@ static u16 F38_70(void)
                 *back++ = ':';
             }
             *back++ = '\\';
-            asked = DirCurrent(drive, back);
+            asked = DirCurrent((u16)drive, back);
             if (asked.failed)
                 goto failed;
             end = name;
@@ -527,16 +530,19 @@ close:
 }
 
 /* A number in a date or a time, and what follows the spaces behind it.
-   Returns 0 if there is no digit. */
-static u16 Figure(const u8 **text, u16 *number)
+   Returns false if there is no digit. The number is read in 16 bits, as
+   TxtNum reads it, and wraps round there as the original's does. */
+static bool Figure(const u8 **text, i32 *number)
 {
     const u8 *from = *text;
+    u16 read;
 
-    *text = TxtNum(from, number);
+    *text = TxtNum(from, &read);
     if (*text == from)
-        return 0;
+        return false;
+    *number = read;
     *text = FndLet(*text);
-    return 1;
+    return true;
 }
 
 /* What M30_60 returns when it has refused no line: the answer for the
@@ -546,7 +552,7 @@ static struct Checked Accepted(u16 answer)
     struct Checked checked;
 
     checked.answer = answer;
-    checked.refused = 0;
+    checked.refused = false;
     return checked;
 }
 
@@ -571,8 +577,8 @@ struct Checked M30_60(u16 answer)
 {
     struct Checked checked;
     const u8 *text;
-    u16 month, day, year, days, swap;
-    u16 hours, minutes = 0, seconds = 0, add = 0, limit;
+    i32 month, day, year, days, swap;
+    i32 hours, minutes = 0, seconds = 0, add = 0, limit;
     u8 letter = 0;
 
     if ((u8)answer != 0)
@@ -629,7 +635,9 @@ struct Checked M30_60(u16 answer)
         }
         if (day > days || day == 0)
             goto refused;
-        AttrDat = (year << 9) + (month << 5) + day;
+        /* Below 64K, by the tests above: a year below 128, a month to 12
+           and a day to 31. */
+        AttrDat = (u16)((year << 9) + (month << 5) + day);
     }
 
     /* M30_70 */
@@ -672,13 +680,15 @@ struct Checked M30_60(u16 answer)
         goto refused;
     if (hours == limit)
         hours = 0;
-    AttrTim = ((hours + add) << 11) + (minutes << 5) + (seconds >> 1);
+    /* Below 64K, by the tests above: hours to 23, minutes and seconds to
+       59. */
+    AttrTim = (u16)(((hours + add) << 11) + (minutes << 5) + (seconds >> 1));
     return Accepted(0);
 
 refused:
     /* None of its lines has ^I: no include line. */
     checked.answer = Dialog(&NoDat_B, 0, 0, 0, &md);
-    checked.refused = 1;
+    checked.refused = true;
     return checked;
 }
 
@@ -711,8 +721,9 @@ u16 DirFunc(void)
 {
     struct Answer found;
     u8 *end, *name;
-    u16 count, length, answer, skip, first;
-    u16 all = 1;
+    i32 count, length, skip;
+    u16 answer;
+    bool first, all = true;
     u8 c;
 
     end = md.TmpBuf;
@@ -733,7 +744,7 @@ u16 DirFunc(void)
     for (count = 0; count < 5; count++)
         end[count] = Mask_S[skip + count];
     SetDTA();
-    for (first = 1; ; first = 0) {
+    for (first = true; ; first = false) {
         /* DiFu05 */
         if (ChgDisk(md.TmpBuf))
             return STOP;
@@ -758,7 +769,7 @@ u16 DirFunc(void)
             if (answer >> 8)
                 return STOP;
             if ((u8)answer == 0)
-                all = 0;
+                all = false;
         }
     }
 
@@ -783,7 +794,7 @@ u16 DirFunc(void)
         name[count] = Mask_S[1 + count];
     if (ChgDisk(md.TmpBuf))
         return STOP;
-    for (first = 1; ; first = 0) {
+    for (first = true; ; first = false) {
         if (first)
             found = FindFirst(md.TmpBuf, 0x37);
         else
@@ -828,7 +839,9 @@ u16 DirFunc(void)
 struct Answer DelTr0(const u8 *path)
 {
     struct Answer opened, wrote, marked;
-    u16 count, written, carry;
+    i32 count;
+    u16 written;
+    bool carry;
 
     md.TmpErr[0] = path[1] == ':' ? path[0] : md.DosPth[0];
     md.TmpErr[1] = ':';
@@ -838,18 +851,18 @@ struct Answer DelTr0(const u8 *path)
     opened = OpenFil(md.TmpErr, 0x11);
     written = opened.value;
     if (opened.failed != 0) {
-        carry = 1;
+        carry = true;
         if (written == ERR_NO_ACCESS) {
             Beep();
-            carry = 0;
+            carry = false;
         }
     } else {
         md.TmpErr[0] = 0;
         wrote = FileWrite(opened.value, md.TmpErr, 1);
         written = wrote.value;
-        carry = 1;
+        carry = true;
         if (!FileClose(opened.value).failed && !wrote.failed) {
-            carry = 0;
+            carry = false;
             if (written != 1)
                 Beep();
         }
@@ -877,14 +890,14 @@ struct Answer DelTr0(const u8 *path)
    goes into the byte after CrnPath, the first of ViewFil. And the entry
    is added to the list of the current panel whatever that shows, and
    without asking whether the list has room. */
-static u16 F47_01(const struct BOXHD *box)
+static i32 F47_01(const struct BOXHD *box)
 {
     struct Answer made;
     struct WCBdef *wcb;
     struct FILENT *entry;
     u8 *path = md.TmpBuf;
     u8 *name, *end;
-    u16 i;
+    i32 i;
 
     md.TmpBuf[0] = 0;
     if ((u8)Dialog(box, CrDir_S, 0, 0, &md) != 0)
@@ -942,14 +955,14 @@ failed:
 }
 
 /* Shift-F7: make a directory, by a path. */
-u16 F47_00(void)
+i32 F47_00(void)
 {
     return F47_01(&MkDi1_B);
 }
 
 /* F7: make a directory, in the current directory of the tree if the
    panel shows that. */
-u16 F37_00(struct WCBdef *panel)
+i32 F37_00(struct WCBdef *panel)
 {
     const struct WCBdef *wcb = panel;
 
@@ -963,14 +976,14 @@ u16 F37_00(struct WCBdef *panel)
    which is then no longer the current one of the tree. It is asked
    about first; FncSel then has F38_40 called for each. For a panel that
    is off or shows neither files nor the tree, this is Shift-F8. */
-u16 F38_00(struct WCBdef *panel)
+i32 F38_00(struct WCBdef *panel)
 {
     const struct FILENT *file;
     u8 *end;
     struct Selected selected;
     const struct BOXHD *box;
     const u8 *include;
-    u16 i;
+    i32 i;
 
     DEL_ALL = 0;
     FNC_CHANGE = 0;
@@ -999,7 +1012,8 @@ u16 F38_00(struct WCBdef *panel)
     selected = TotSel(panel);
     if ((selected.directories != 0 || selected.files != 0)
         && md.OneFile == 0) {
-        FilDir(md.TmpBuf, selected.directories, selected.files);
+        /* Counts of a panel's entries, which a panel keeps below 64K. */
+        FilDir(md.TmpBuf, (u16)selected.directories, (u16)selected.files);
         for (i = 0; i < LenPath; i++)
             md.TmpBuf[100 + i] = panel->WinPath[i];
         box = &DelSe_B;
@@ -1034,12 +1048,13 @@ u16 F38_00(struct WCBdef *panel)
    asked about once more. F38_70 has DOS delete what it deletes at one
    call, and FncMs1 goes through the files that are left, or says that
    there was none. */
-u16 F48_00(void)
+i32 F48_00(void)
 {
     const u8 *from;
     u8 *name;
     const u8 *include;
-    u16 i, answer;
+    i32 i;
+    u16 answer;
 
     /* None of its lines has ^I: no include line. */
     if ((u8)Dialog(&DlMas_B, 0, 0, 0, &md) != 0)
@@ -1087,7 +1102,7 @@ delete:
 }
 
 /* Ctrl-F8: delete the file under the cursor, whatever is selected. */
-u16 F58_00(struct WCBdef *panel)
+i32 F58_00(struct WCBdef *panel)
 {
     md.OneFile = 1;
     return F38_00(panel);
@@ -1118,14 +1133,15 @@ static u16 M30_82(const u8 *ticks)
    The dialog has its ticks at the start of TmpBuf, those to clear at
    10, the date at 15 and the time at 30, each without the space that it
    begins with where a number has one digit, and the name at 100. */
-u16 M30_00(struct WCBdef *panel)
+i32 M30_00(struct WCBdef *panel)
 {
     const struct FILENT *file;
     struct DateText date;
     struct TimeText time;
     struct Selected selected;
     u8 *end;
-    u16 i, bits, attributes;
+    i32 i;
+    u16 bits, attributes;
 
     if (!FilePan(panel))
         return TO_FUNC04;
@@ -1193,11 +1209,11 @@ set:
    as they find it, and the assembly has it clear there, of comparing
    with 0. None of the boxes has ^I in a line, and they get no include
    line here, where the assembly left them what DX held. */
-u16 F54_00(void)
+i32 F54_00(void)
 {
     struct Answer made;
     u8 *end;
-    u16 i;
+    i32 i;
 
     HidCur();
     ChgDisk(md.DosPth);
@@ -1255,13 +1271,14 @@ u16 F54_00(void)
    DOS finds no file at all and `include` is not 0, a box says so,
    "Can't find file", or "files" for a mask, with `include`, the name of
    the command, for its title. Returns where to go on: FncExt. */
-static u16 FncMs1(const u8 *include)
+static i32 FncMs1(const u8 *include)
 {
     struct Answer found;
     const u8 *text;
     u8 *name;
-    u16 i, answer;
-    u16 first = 1;
+    i32 i;
+    u16 answer;
+    bool first = true;
 
     SetDTA();
     for (;;) {
@@ -1287,7 +1304,7 @@ static u16 FncMs1(const u8 *include)
             if (answer >> 8)
                 return TO_FNCEXT;
         }
-        first = 0;
+        first = false;
     }
     if (found.value != 0x12 && found.value > 3)
         return TO_FNCEXT;
@@ -1306,7 +1323,7 @@ static u16 FncMs1(const u8 *include)
 
 /* FncMas of the assembly, which a command jumps to: the files of the
    mask at TmpBuf, each by what FncAddr names. */
-u16 FncMas(const u8 *include)
+i32 FncMas(const u8 *include)
 {
     md.ZoomOne = 0;
     FNC_CHANGE = 0;
@@ -1314,22 +1331,22 @@ u16 FncMas(const u8 *include)
 }
 
 /* Where a command ends that may have changed what is on the disk:
-   FncExt. Returns 1 if the panels are to be read again, 0 if they are as
-   they were; the main loop goes on at Init50 or at Func04 by that.
-   FncEx1, of vc.h, has them read again whatever. */
-u16 FncEx1(void)
+   FncExt. Returns true if the panels are to be read again, false if
+   they are as they were; the main loop goes on at Init50 or at Func04 by
+   that. FncEx1, of vc.h, has them read again whatever. */
+bool FncEx1(void)
 {
     struct WCBdef *panel = CurrentPanel;
 
     panel->ChgFlg = 1;
     InvWCB(panel)->ChgFlg = 1;
-    return 1;
+    return true;
 }
 
-u16 FncExt(void)
+bool FncExt(void)
 {
     if (FNC_CHANGE == 0)
-        return 0;
+        return false;
     return FncEx1();
 }
 
@@ -1345,13 +1362,14 @@ u16 FncExt(void)
    setup has it so, UnSlct, the panel is written anew for every such file
    and its line put on the screen, if that is among those shown, with the
    status line. */
-u16 FncSel(void)
+bool FncSel(void)
 {
     struct WCBdef *panel = CurrentPanel;
     struct WCBdef *wcb = panel;
     struct FILENT *file;
     struct Selected selected;
-    u16 address, answer, lines, number, begin, i;
+    u16 address, answer, begin;
+    i32 lines, number, i;
 
     md.ZoomOne = 0;
     FNC_CHANGE = 0;
@@ -1390,12 +1408,16 @@ one:
                 else
                     PutInf(panel);
                 lines = LnsAX();
-                number = (u16)(address - wcb->First) / sizeof(struct FILENT);
+                /* wraps: a file above the page is one far behind it,
+                   and is not drawn. */
+                number = (i32)((u16)(address - wcb->First)
+                               / sizeof(struct FILENT));
                 i = number % lines;
                 number /= lines;
                 if (number <= (wcb->BrfFul == 0 ? 2 : 0)) {
                     begin = BegBX(panel) + 0x201;
-                    Window(begin + (i << 8), 0x126);
+                    /* Its row of the page, which is on the screen. */
+                    Window((u16)(begin + (i << 8)), 0x126);
                 }
                 if (md.MiniSta != 0) {
                     begin = BegBX(panel);
