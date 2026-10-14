@@ -1312,7 +1312,7 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
              const void *data, struct Box *where);
 u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
            void *data);
-void InSt10(u16 place, const u8 *text, u16 length, u16 color);
+void InSt10(u16 place, const u8 *text, i32 length, u16 color);
 struct Buttons {                        /* what MinMnu returns: */
     u16 key;                            /* the key that is for the caller */
     u16 chosen;                         /* the button chosen, in the low
@@ -1322,9 +1322,9 @@ struct Buttons {                        /* what MinMnu returns: */
 };
 struct Taken {                          /* what MnMn10 returns: */
     u16 key;                            /* the key */
-    u8  button;                         /* the button chosen */
-    u8  taken;                          /* not 0 if the buttons have dealt
-                                           with the key */
+    i32 button;                         /* the button chosen */
+    bool taken;                         /* the buttons have dealt with the
+                                           key */
 };
 struct Buttons MinMnu(const u8 *control, u16 begin, u16 size,
                       const u8 *color, u16 keys, u16 item);

@@ -9376,7 +9376,7 @@ for.
 | Cluster | Its files | Lines; narrow | Starts when | Besides sorting |
 |---|---|---|---|---|
 | N1 | `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c` | 891; 133 | F3, N0 | **Done**: "N1, `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c`" below |
-| N2 | `dialog.c` | 1,126; 110 | F3 | |
+| N2 | `dialog.c` | 1,126; 110 | F3 | **Done**: "N2, `dialog.c`: done, and what a later cluster should know" below |
 | N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | The viewer's room in bytes. It names what `ViewDat` and `EdData` share, for N6. It says where it cut the file |
 | N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | |
 | N5 † | `find.c` | 1,044; 125 | F4 | The list's room in bytes, and its counts |
@@ -13172,6 +13172,87 @@ What a later cluster should know:
 
 It took 62 tool calls of the piece, of which some 15 were reading the
 brief and the plan, and the scenarios and the images ran once.
+
+### N2, `dialog.c`: done, and what a later cluster should know
+
+**What there is.** `dialog.c` sorted by "The rule for a number", with
+the three structures of `vc.h` that its functions answer in, `struct
+Box` of `DialBox`, `struct Buttons` of `MinMnu` and `struct Taken` of
+`MnMn10`; clang's warnings of a conversion silent for it; `MD` and
+`MDW` of the file made of `(u8 *)&md + offset`, as F8 left them.
+`InSt10` takes its text as a pointer since F8, which did that itself
+while this piece was at work. The whole suite passes, no
+golden and no patch changed, and the image of each of the 155
+scenarios is that of the build before (below).
+
+**The numbers.** Of the 111 of 8 or 16 bits, and the 8 of the three
+structures of `vc.h` (`saved` of `struct Box` is F8's pointer):
+
+| | `dialog.c` | `vc.h` | Which |
+|---|---|---|---|
+| Widened, to `i32` | 28 | 1 | The counts of the loops; the width and the lengths of a box's lines; the column, the cursor, the length and the bar of a line to type into; the lines, their count and the bar of a group; what `Slct20` answers; the kind of a field; the button that `MnMn10` answers |
+| Made `bool` | 3 | 1 | What `MnMn50` answers, `taken` of `MnMn11` and of `struct ButtonKey`, and of `struct Taken` |
+| Kept by a word | 68 | 4 | `place` 29, `key` 11, `colour` 8, `character` 8, `system` 6 (the mouse's buttons, the shape of the cursor), `bits` 5 (a group's two lines, a field's control word and link, how a text of a box is written), `cell` 1; in `vc.h` `place` 2 and `key` 2 |
+| Kept by a sentence | 11 | 1 | Two numbers in one word that are stepped or taken apart as the original's register is: the button chosen with the key bar above it, in `MnMn11`, `MnMn10`, `MinMnu`, `MnMn40`, `MnMn41`, `MnMn50` and `struct Buttons`, 8; the byte of a box to tick, which goes back as it came where it is not changed and so is no `bool`, 2; and what `Dialog` answers, 1 |
+| Gone | 1 | | `value` of `Dialog`, which held a tick and then a line: the tick is read where it is kept, and the line is `line`, an `i32` that is new |
+
+No place of the kind `sign`: no `i32` of the file is shifted right or
+divided.
+
+**The casts.** clang named 23 places before anything changed; one went
+by a type, `length = LnStr(&args)`, the length being an `i32` now. The
+widening made nine more: a column, a bar or a length handed to a
+function of a cluster not yet sorted that takes a `u16`, `Input`
+three times, `Cursor`, `EdLin` twice, `MvsColr`; the cursor kept in
+the main data's word of a line; and `Slct20`, which answers an `i32`,
+in a size of a window. So 31 casts, every one of them `(u16)`, of
+which four are a cast that was there and was moved out to the whole
+expression, `(u16)(color[0] << 8 | color[1])` for `(u16)color[0] << 8 |
+color[1]`. One comment says `wraps`, at the mask of `Slct20`, whose
+count of cells goes round to 0 at 256 and is answered so; the others
+that have one say by what the number fits: `Color` answers a byte,
+the field's bytes, a box has fewer lines than the screen has rows. And
+one `(i32)` that clang does not ask for on a machine of 32 bits, the
+difference of two pointers in `InpStr`, where `(u16)` was.
+
+**Across clusters.**
+
+- `InSt10(place, const u8 *text, i32 length, color)`: its length is an
+  `i32`, and no caller changed. `harness/words.txt` has the two
+  `MD_POINTER` of `MD` and `MDW` fewer.
+- `struct Taken` has an `i32` and a `bool` and is twelve bytes: `find.c`
+  keeps `button` in a `u16`, which clang will name when N5 sorts it.
+- The parameters of `Input`, `Cursor`, `EdLin`, `MvsColr`, `InWind`,
+  `BasAdr` and `Window` that take a column, a length or a bar have a
+  `(u16)` at every call of this file. The cluster that widens one takes
+  the cast out here, as "The rule for a number", "Across clusters",
+  has it.
+- A length of 0 is no line to type into. `InSt10` and `InpStr` were
+  written so that one of 0 was one of 65,536, and a box without a line
+  had 65,536: no table has either, by a `grep` of the dialogs' fields
+  and of the boxes, and with an `i32` a count of 0 would go below 0.
+  The two comments say so now. A later cluster that meets a `do ...
+  while (--count)` on a count that comes from a table looks at the
+  table.
+
+**`harness/int16.py`.** Five places are new, each of a number that is
+an `i32` now, with its reason: `size` of `DialBox`, cut on its own
+line; the column and the end of a line in `InpStr`; and the line of a
+group in `Dialog` and the byte behind its field. The two places that
+there were, a difference of two pointers shifted right in `MnMn11`,
+stay as they were: the number is kept in `key` and `chosen`, which stay
+16 bits.
+
+**The program.** The listings of `dialog.c` changed, and that of
+`find.c`, by the structure. The image of every scenario, `python3
+harness/dataimage.py compare`, against the build of `main` that it
+landed on: "155 scenarios, 154 with nothing that differs; 0
+differences, 0 more in what was declared as changed, 1 in what may
+differ", the one in `mouse-dialog`, which the tool lets differ.
+
+It took some 45 tool calls, the reading of the file and of the plan
+some 25 of them, with the file read whole once and the reasons
+written by one script; and some 20 more to land.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

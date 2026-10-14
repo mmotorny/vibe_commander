@@ -72,7 +72,7 @@ not plain behind a colon. The code has no name for any of them.
 cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32  its files
 N0              35          0     1              0      36     0     3     3    28  digits.c mask.c line.c mouse.c blank.c
 N1              81          0     2              0      77     6     5     4    45  string.c format.c box.c screen.c misc.c
-N2             111        111     0              0       0     0     0     0     0  dialog.c
+N2              79          0     0              0      68    11     0     3    29  dialog.c
 N3, N4         153        153    13             13       0     0     0     0     2  view.c
 N5             120        120     0              0       0     0     0     0     2  find.c
 N6 to N8       194        194    41             41       0     0     5     0     6  edit.c
@@ -92,11 +92,11 @@ N19b            41         41     0              0       0     0     0     0    
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        295        123    12              1     143     1     0     0     0  vc.h sys.h tables.h
-all           2884       2014   152             73     256     7    16     7    93
+headers        293        116    12              1     147     2     0     0     0  vc.h sys.h tables.h
+all           2850       1896   152             73     328    19    16    10   122
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               238         66    11              0     143     1     0     0     0
+vc.h               236         59    11              0     147     2     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              40         40     0              0       0     0     0     0     0
@@ -105,7 +105,7 @@ box.c               30          0     0              0      29     1     1     0
 cmdline.c           58         58     0              0       0     0     0     0     1
 commands.c          74         74     0              0       0     0     0     0     0
 copy.c              81         81     6              6       0     0     0     0     0
-dialog.c           111        111     0              0       0     0     0     0     0
+dialog.c            79          0     0              0      68    11     0     3    29
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           98         98     0              0       0     0     0     0     0
 drive.c             27         27     0              0       0     0     0     0     0
@@ -641,7 +641,11 @@ vc.h, struct Selected: not sorted, 2 numbers
 
 vc.h, struct Shown: not sorted, 2 numbers
 
-vc.h, struct Box: not sorted, 2 numbers
+vc.h, struct Box: field begin, u16
+    place
+
+vc.h, struct Box: field size, u16
+    place
 
 vc.h, struct Onward: not sorted, 2 numbers
 
@@ -671,9 +675,15 @@ vc.h, struct Next: not sorted, 1 number
 
 vc.h, struct Named: not sorted, 1 number
 
-vc.h, struct Buttons: not sorted, 2 numbers
+vc.h, struct Buttons: field key, u16
+    key
 
-vc.h, struct Taken: not sorted, 3 numbers
+vc.h, struct Buttons: field chosen, u16
+    The button chosen in the low byte and the key bar above it, as
+    MinMnu keeps them together in one word, the original's register.
+
+vc.h, struct Taken: field key, u16
+    key
 
 vc.h, struct Entry: not sorted, 1 number
 
@@ -856,7 +866,264 @@ copy.c: not sorted, 81 numbers, 6 u32
 copy_t.c: as a whole, 38 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-dialog.c: not sorted, 111 numbers
+dialog.c, DiBx30: variable mode, u16
+    bits: how a text of a box is to be written, BOXTX's byte.
+
+dialog.c, DialBox: parameter place, u16
+    place
+
+dialog.c, DialBox: variable begin, u16
+    place
+
+dialog.c, DialBox: variable row, u16
+    place
+
+dialog.c, DialBox: variable size, u16
+    place
+
+dialog.c, InSt10: parameter color, u16
+    colour: its number in the high byte.
+
+dialog.c, InSt10: parameter place, u16
+    place
+
+dialog.c, InSt10: variable cell, u16
+    cell
+
+dialog.c, InSt10: variable c, u16
+    character
+
+dialog.c, Slct20: parameter place, u16
+    place
+
+dialog.c, MnMn50: parameter item, u16
+    The button in the low byte, and the key bar above it that
+    MnMn11 keeps in the same word, which is not read.
+
+dialog.c, MnMn60: returns, u16
+    place
+
+dialog.c, MnMn41: parameter item, u16
+    The button in the low byte, and the key bar above it that
+    MnMn40 is handed in the same word, which is not read.
+
+dialog.c, MnMn41: parameter number, u16
+    colour
+
+dialog.c, MnMn41: returns, u16
+    colour: in both bytes.
+
+dialog.c, MnMn41: variable color, u16
+    colour
+
+dialog.c, MnMn40: parameter colors, u16
+    colour: two numbers, in the high byte and the low.
+
+dialog.c, MnMn40: parameter item, u16
+    The button in the low byte, and above it what the caller has
+    there, the key bar of MinMnu, which only MnMn41 is handed and
+    reads the low byte of.
+
+dialog.c, MnMn40: parameter place, u16
+    place
+
+dialog.c, MnMn40: parameter size, u16
+    place
+
+dialog.c, MnMn40: returns, u16
+    colour: in both bytes.
+
+dialog.c, MnMn40: variable both, u16
+    colour: in both bytes.
+
+dialog.c, struct ButtonKey: field key, u16
+    key
+
+dialog.c, MnMn11: parameter key, u16
+    key
+
+dialog.c, MnMn11: parameter place, u16
+    place
+
+dialog.c, MnMn11: variable chosen, u16
+    The button chosen in the low byte and the key bar above it, as
+    the original has them in one register. A step moves the button
+    and never carries into the key bar: it is down only from a button
+    that is not the first, and up only to one that there is.
+
+dialog.c, MnMn11: variable begin, u16
+    place
+
+dialog.c, MnMn11: variable buttons, u16
+    system: the buttons of the mouse that are held.
+
+dialog.c, MnMn11: variable look, u16
+    character: the look of the mouse pointer, 0 for its own.
+
+dialog.c, MnMn11: variable low, u16
+    character
+
+dialog.c, MnMn11: variable mouse, u16
+    place
+
+dialog.c, MnMn11: variable now, u16
+    character: the look of the mouse pointer, 0 for its own.
+
+dialog.c, MnMn11: variable size, u16
+    place
+
+dialog.c, MnMn10: parameter item, u16
+    The button chosen in the low byte and the key bar above it, which
+    MnMn11 takes and hands back as one word.
+
+dialog.c, MnMn10: parameter key, u16
+    key
+
+dialog.c, MnMn10: parameter place, u16
+    place
+
+dialog.c, MnMn10: parameter size, u16
+    place
+
+dialog.c, MinMnu: parameter begin, u16
+    place
+
+dialog.c, MinMnu: parameter size, u16
+    place
+
+dialog.c, MinMnu: parameter item, u16
+    The button chosen in the low byte, which alone is read: a caller
+    may hand back what MinMnu answered, with the key bar above it.
+
+dialog.c, MinMnu: parameter keys, u16
+    The key bar in the low byte, which alone is read, with 80h for a
+    field of a dialog: the file search hands KEY_MOUSE above it.
+
+dialog.c, MinMnu: variable state, u16
+    The button chosen in the low byte and the key bar above it, as
+    MnMn11 takes them in one word.
+
+dialog.c, MinMnu: variable key, u16
+    key
+
+dialog.c, struct Typed: field key, u16
+    key
+
+dialog.c, struct Chosen: field key, u16
+    key
+
+dialog.c, struct Chosen: field lines, u16
+    bits: the line chosen in the low byte and that of the cursor in
+    the high one, as the main data keeps them for a group.
+
+dialog.c, struct Ticked: field key, u16
+    key
+
+dialog.c, struct Ticked: field value, u16
+    The byte that the caller has for a box to tick, 0 for one that is
+    not: a value that is not changed goes back as it came, whatever it
+    is, so it is no bool.
+
+dialog.c, InpStr: parameter place, u16
+    place
+
+dialog.c, InpStr: parameter color, u16
+    colour
+
+dialog.c, InpStr: variable buttons, u16
+    system: the buttons of the mouse that are held.
+
+dialog.c, InpStr: variable key, u16
+    key
+
+dialog.c, InpStr: variable low, u16
+    character
+
+dialog.c, InpStr: variable mouse, u16
+    place
+
+dialog.c, Select: parameter lines, u16
+    bits: the line chosen in the low byte and that of the cursor in
+    the high one, as the main data keeps them for a group.
+
+dialog.c, Select: parameter place, u16
+    place
+
+dialog.c, Select: variable key, u16
+    key
+
+dialog.c, Select: variable buttons, u16
+    system: the buttons of the mouse that are held.
+
+dialog.c, Select: variable low, u16
+    character
+
+dialog.c, Select: variable mouse, u16
+    place
+
+dialog.c, FlipFl: parameter place, u16
+    place
+
+dialog.c, FlipFl: parameter value, u16
+    The byte that the caller has for a box to tick, 0 for one that is
+    not: a value that is not changed goes back as it came, whatever it
+    is, so it is no bool.
+
+dialog.c, FlipFl: variable buttons, u16
+    system: the buttons of the mouse that are held.
+
+dialog.c, FlipFl: variable key, u16
+    key
+
+dialog.c, Dial18: parameter place, u16
+    place
+
+dialog.c, Dial18: returns, u16
+    place
+
+dialog.c, Dialog: parameter begin, u16
+    place
+
+dialog.c, Dialog: parameter size, u16
+    place
+
+dialog.c, Dialog: returns, u16
+    The answer in two bytes, as every caller takes it apart: in the
+    low byte 0, a button or FFh for Esc, and 1 or 0 above it for F10
+    and Alt-F10.
+
+dialog.c, Dialog: variable control, u16
+    bits: the length of a line in the low byte and the INPUT_ flags
+    in the high one, as the field has them.
+
+dialog.c, Dialog: variable key, u16
+    key: and in turn the answer that Dialog returns.
+
+dialog.c, Dialog: variable link, u16
+    bits: a field's number with LINK_ flags.
+
+dialog.c, Dialog: variable place, u16
+    place
+
+dialog.c, Dialog: variable shape, u16
+    system: the shape of the cursor, as ChgCur answers it.
+
+dialog.c, Dialog: variable buttons, u16
+    system: the buttons of the mouse that are held.
+
+dialog.c, Dialog: variable look, u16
+    character: the look of the mouse pointer, 0 for its own, or FFh
+    outside the box.
+
+dialog.c, Dialog: variable mouse, u16
+    place
+
+dialog.c, Dialog: variable now, u16
+    character: the look of the mouse pointer, 0 for its own, or FFh
+    outside the box.
+
+dialog.c, Dialog: variable window, u16
+    place
 
 digits.c, HexByt: parameter byte, u32
     bits: eight of them are read, four at a time, by a shift and a

@@ -26,6 +26,31 @@ copy.c, F35_50: compare
     CpVar1 and CpVar2 are places of TmpBuf that are written at the top of
     the file, 120 and 140: 20 apart.
 
+dialog.c, DialBox: widen
+    | size = (u16)((head->lines << 8 | width & 0xFF) + 0x40C);
+    Cut to 16 bits by the cast on the line itself; a box has fewer
+    lines than the screen has rows, so nothing reaches above them.
+
+dialog.c, Dialog: index
+    | MD(field->mPoint + 1) = (u8)line;
+    mPoint is the place of a field of the main data, which is shorter
+    than 64K: the byte behind it is in the main data too.
+
+dialog.c, Dialog: widen
+    | line = NUMBER_OF(field->mCtrl) - 1;
+    Only its low byte is kept, by the cast of the line below, which is
+    the same of -1 as of FFFFh.
+
+dialog.c, InpStr: widen
+    | column = mouse - place;
+    The mouse is on the line that begins at place, by InWind just
+    above: the difference is a column of it, 0 to 254.
+
+dialog.c, InpStr: widen
+    | end = (i32)(from - text) - 1;
+    from has stepped past the first byte at least, the length being
+    1 or more: the number is 0 to the length less 1.
+
 dialog.c, MnMn11: shift
     | chosen = (u16)(button - table >> 1);
     button steps up from table, two at a time, in the loop above.

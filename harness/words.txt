@@ -14,7 +14,7 @@ commands.c    ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
 commands_t.c  MD_AT 45, WCB_AT 3, NUMBER 17
 copy.c        RoomParas 1, MD_PLACE 5, TRELIST 1, ENTRY 4
 copy_t.c      MD_AT 22, NUMBER 4
-dialog.c      MD_POINTER 2, NUMBER_OF 9
+dialog.c      NUMBER_OF 9
 digits.c      none
 dirfunc.c     MD_PLACE 1, ENTRY 7, DSKBUF 2
 dirfunc_t.c   MD_AT 75, NUMBER 9

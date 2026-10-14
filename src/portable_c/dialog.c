@@ -92,8 +92,8 @@
                                            left and on the right */
 
 /* A byte and a word of the main data, by their offsets. */
-#define MD(offset)  (*MD_POINTER(offset))
-#define MDW(offset) (*(u16 *)MD_POINTER(offset))
+#define MD(offset)  (*((u8 *)&md + (offset)))
+#define MDW(offset) (*(u16 *)((u8 *)&md + (offset)))
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -131,7 +131,7 @@ static void DiBx30(const struct BOXTX *entry, u8 *to, const void *data)
 {
     const u8 *from = (const u8 *)data + entry->from;
     u8 *text = to;
-    u16 count = LenPath + 13;
+    i32 count = LenPath + 13;
     u16 mode;
 
     do
@@ -153,8 +153,8 @@ static void DiBx30(const struct BOXTX *entry, u8 *to, const void *data)
    than 25 lines. `include` is the text that ^I stands for in its lines,
    or 0 for none, and `data` what the texts are in that it puts in, each
    at the offset that the box names. `where` gets where
-   the box is and where what it covers is kept. A box without a line has
-   65536.
+   the box is and where what it covers is kept. A box has a line at
+   least, its title.
 
    The lines of the box are words that name their texts, one behind the
    other behind the texts that it puts in: `line` is at one of them. */
@@ -165,7 +165,8 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
     const u8 * const *lines;
     const u8 * const *line;
     struct LineArgs args;
-    u16 texts, count, width, length, size, begin, row;
+    i32 texts, count, width, length;
+    u16 size, begin, row;
     u16 *screen;
 
     HidCur();
@@ -196,14 +197,15 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
         }
         line++;
     } while (--count);
-    size = ((u16)head->lines << 8 | width & 0xFF) + 0x40C;
+    /* A box has fewer lines than the screen has rows. */
+    size = (u16)((head->lines << 8 | width & 0xFF) + 0x40C);
     begin = ADD_LOW(place, -((((size & 0xFF) - 1) & 0xFF) >> 1));
     where->begin = begin;
     where->size = size;
     /* The box names a buffer of the main data by its offset there. */
     where->saved = (u16 *)((u8 *)&md + head->saved);
     SavWin(begin, size, where->saved);
-    MinBox(begin, size, Color(head->colors[0]) << 8);
+    MinBox(begin, size, (u16)(Color(head->colors[0]) << 8));
 
     row = place;
     line = lines;
@@ -216,22 +218,23 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
             CntLine(&args);
         } else {
             screen = BasAdr(row) - ((((size & 0xFF) - 1) & 0xFFFE) >> 1);
-            BoxLine(screen, Color(head->colors[0]) << 8 | LINE, LEFT_RIGHT,
+            BoxLine(screen, (u16)(Color(head->colors[0]) << 8 | LINE),
+                    LEFT_RIGHT,
                     3, (size & 0xFF) - 10 & 0xFF);
         }
         line++;
     } while (--count);
 }
 
-/* Show what a line that is typed into holds: `text`, in the main data, in
-   `length` cells at `place`, in the colour whose number is in the high
-   byte of `color`. A length of 0 is one of 65536, for a text that long. */
-void InSt10(u16 place, const u8 *text, u16 length, u16 color)
+/* Show what a line that is typed into holds: `text`, in `length` cells
+   at `place`, in the colour whose number is in the high byte of `color`.
+   `length` is 1 to 255: every caller has a line of a byte's length. */
+void InSt10(u16 place, const u8 *text, i32 length, u16 color)
 {
     u16 *screen = BasAdr(place);
-    u16 cell = Color(color >> 8) << 8;
+    u16 cell = (u16)(Color(color >> 8) << 8);  /* Color answers a byte */
     const u8 *from = text;
-    u16 count = length;
+    i32 count = length;
     u16 c;
 
     for (;;) {
@@ -251,22 +254,23 @@ void InSt10(u16 place, const u8 *text, u16 length, u16 color)
 
 /* How many cells a field takes at `place`: up to two spaces, one after
    the other, and 0 for 256 without. */
-static u16 Slct20(u16 place)
+static i32 Slct20(u16 place)
 {
     const u8 *cell = (const u8 *)BasAdr(place);
-    u16 width = 0;
+    i32 width = 0;
 
     do {
         if (cell[0] == ' ' && cell[2] == ' ')
             break;
         cell += 2;
-        width = width + 1 & 0xFF;
+        width = width + 1 & 0xFF;       /* wraps to 0 at 256, which ends
+                                           the loop and is the answer */
     } while (width != 0);
     return width;
 }
 
 /* True if the button `item` of the buttons at `table` is the last. */
-static u16 MnMn50(const u8 *table, u16 item)
+static bool MnMn50(const u8 *table, u16 item)
 {
     return table[((item & 0xFF) << 1) + 2] == 0;
 }
@@ -290,7 +294,7 @@ static u16 MnMn41(u16 number, u16 item, const u8 *table, u16 *screen)
 {
     u16 color = Color(number);
     const u8 *button;
-    u16 count = item & 0xFF;
+    i32 count = item & 0xFF;
 
     count += count;
     button = table + count;
@@ -298,8 +302,8 @@ static u16 MnMn41(u16 number, u16 item, const u8 *table, u16 *screen)
     count += count;
     screen = (u16 *)((u8 *)screen + count);
     count = count & 0xFF00 | button[0];
-    MvsColr(screen, count, color);
-    return color << 8 | color;
+    MvsColr(screen, (u16)count, color);     /* a button's width, a byte */
+    return (u16)(color << 8 | color);       /* Color answers a byte */
 }
 
 /* Show the buttons at `table`, which take `size` at `place`, in the
@@ -325,8 +329,8 @@ u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, const u8 *table)
    the buttons have dealt with it: the carry flag of the assembly. */
 struct ButtonKey {
     u16 key;
-    u16 taken;                          /* 1 if the buttons have dealt with
-                                           the key */
+    bool taken;                         /* the buttons have dealt with the
+                                           key */
 };
 static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
                                const u8 *table)
@@ -334,8 +338,9 @@ static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
     struct ButtonKey pressed;
     const u8 *button;
     u16 chosen = *state;
-    u16 taken = 1;
-    u16 low, count, buttons, mouse, column, look, now, begin, size;
+    bool taken = true;
+    i32 count, column;
+    u16 low, buttons, mouse, look, now, begin, size;
     const u16 *screen;
     struct Mouse pointer;
 
@@ -439,7 +444,7 @@ MnMn22:
     chosen = (u16)(button - table >> 1);
     key = KEY_ENTER;
 MnMn23:
-    taken = 0;
+    taken = false;
 MnMn16:
     *state = chosen;
     pressed.key = key;
@@ -460,8 +465,8 @@ struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size,
     (void)size;
     pressed = MnMn11(key, place, &item, table);
     taken.key = pressed.key;
-    taken.button = (u8)item;
-    taken.taken = (u8)pressed.taken;
+    taken.button = item & 0xFF;
+    taken.taken = pressed.taken;
     return taken;
 }
 
@@ -476,20 +481,20 @@ struct Buttons MinMnu(const u8 *control, u16 begin, u16 size,
                       const u8 *color, u16 keys, u16 item)
 {
     struct Buttons buttons;
-    u16 state = (keys & 0xFF) << 8 | item & 0xFF;
+    u16 state = (u16)((keys & 0xFF) << 8 | item & 0xFF);
     u16 key;
     struct ButtonKey pressed;
 
     HidCur();
     for (;;) {
-        MnMn40((u16)color[0] << 8 | color[1], begin, state, size, control);
+        MnMn40((u16)(color[0] << 8 | color[1]), begin, state, size, control);
         key = Input(state >> 8 & 0x7F);
         pressed = MnMn11(key, begin, &state, control);
         key = pressed.key;
-        if (pressed.taken != 0)
+        if (pressed.taken)
             continue;
         if (key >> 8 != KEY_MOUSE)
-            MnMn40((u16)color[0] << 8 | color[2], begin, state, size,
+            MnMn40((u16)(color[0] << 8 | color[2]), begin, state, size,
                    control);
         break;
     }
@@ -504,7 +509,7 @@ struct Buttons MinMnu(const u8 *control, u16 begin, u16 size,
    The buttons have theirs in vc.h, with MinMnu. */
 struct Typed {
     u16 key;
-    u16 cursor;                         /* the column of the cursor */
+    i32 cursor;                         /* the column of the cursor */
 };
 struct Chosen {
     u16 key;
@@ -520,18 +525,21 @@ struct Ticked {
    at the most, at `place`, in the colour with the number `color`, the
    cursor in the column `cursor`. Takes keys until one is not for the
    line. Returns that key, and the column of the cursor. */
-static struct Typed InpStr(u16 place, u8 *text, u16 cursor, u16 length,
-                           u16 color, u16 bar)
+static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
+                           u16 color, i32 bar)
 {
     struct Typed typed;
-    u16 key, low, buttons, mouse, column, end, count;
+    u16 key, low, buttons, mouse;
+    i32 column, end, count;
     const u8 *from;
     struct Mouse pointer;
 
     for (;;) {                          /* InSt01 */
-        InSt10(place, text, length, color << 8);
-        Cursor(place + cursor);
-        key = Input(bar);
+        /* The colour, the bar, the cursor and the length are each a byte,
+           as the field has them. */
+        InSt10(place, text, length, (u16)(color << 8));
+        Cursor((u16)(place + cursor));
+        key = Input((u16)bar);
         if (key >> 8 == KEY_MOUSE) {
             for (;;) {                  /* InSt05 */
                 pointer = GetMous(0);
@@ -553,7 +561,7 @@ static struct Typed InpStr(u16 place, u8 *text, u16 cursor, u16 length,
                 for (count = length; count != 0; count--)
                     if (*from++ == 0)
                         break;
-                end = (u16)(from - text) - 1;
+                end = (i32)(from - text) - 1;
                 if (column > end)
                     column = end;
                 if (column == cursor)
@@ -593,7 +601,7 @@ static struct Typed InpStr(u16 place, u8 *text, u16 cursor, u16 length,
                 text[0] = 0;
         }
 InSt04:
-        cursor = EdLin(key, text, cursor, length).cursor;
+        cursor = EdLin(key, text, (u16)cursor, (u16)length).cursor;
     }
 InSt08:
     typed.key = key;
@@ -605,22 +613,25 @@ InSt08:
    has the line chosen and in its high byte the line of the cursor. Takes
    keys until one is not for the group, and returns it, and the two lines
    as they are then. */
-static struct Chosen Select(u16 place, u16 bar, u16 total, u16 lines)
+static struct Chosen Select(u16 place, i32 bar, i32 total, u16 lines)
 {
     struct Chosen answer;
-    u16 chosen = lines & 0xFF;
-    u16 cursor = lines >> 8;
+    i32 chosen = lines & 0xFF;
+    i32 cursor = lines >> 8;
     u16 key = 0;
-    u16 low, buttons, mouse, row;
+    u16 low, buttons, mouse;
+    i32 row;
     struct Mouse pointer;
 
+    /* The lines of the group are rows of the screen, and their count and
+       the bar are each a byte, as the field has them. */
 Slct01:
-    Cursor(place + (cursor << 8));
+    Cursor((u16)(place + (cursor << 8)));
     if ((key & 0xFF) != 0)              /* until the mouse is let go */
         while (GetMous(0).buttons != 0)
             ;
 Slct03:
-    key = Input(bar);
+    key = Input((u16)bar);
     if (key >> 8 == KEY_MOUSE) {
         for (;;) {                      /* Slct04 */
             pointer = GetMous(0);
@@ -632,10 +643,11 @@ Slct03:
             ClrKbd();
             if (buttons != 1)
                 goto Slct13;
-            if (InWind(mouse, place - 1, total << 8 | Slct20(place - 1)))
+            if (InWind(mouse, place - 1,
+                       (u16)(total << 8 | Slct20(place - 1))))
                 goto Slct13;
             row = (mouse >> 8) - (place >> 8) & 0xFF;
-            key = row << 8 | mouse & 0xFF;
+            key = (u16)(row << 8 | mouse & 0xFF);
             if (row == cursor)
                 continue;
             cursor = row;
@@ -688,24 +700,24 @@ Slct03:
     goto Slct03;
 
 Slct07:                                 /* choose the line of the cursor */
-    *(u8 *)BasAdr(place + (chosen << 8)) = ' ';
-    Window(place + (chosen << 8), 0x101);
-    *(u8 *)BasAdr(place + (cursor << 8)) = BULLET;
-    Window(place + (cursor << 8), 0x101);
+    *(u8 *)BasAdr((u16)(place + (chosen << 8))) = ' ';
+    Window((u16)(place + (chosen << 8)), 0x101);
+    *(u8 *)BasAdr((u16)(place + (cursor << 8))) = BULLET;
+    Window((u16)(place + (cursor << 8)), 0x101);
     chosen = cursor;
-    key = cursor << 8 | key & 0xFF;
+    key = (u16)(cursor << 8 | key & 0xFF);
     goto Slct01;
 
 Slct13:
     answer.key = key;
-    answer.lines = cursor << 8 | chosen;
+    answer.lines = (u16)(cursor << 8 | chosen);
     return answer;
 }
 
 /* A box to tick at `place`, which is ticked if `value` is not 0. Space
    and a click change it; any other key is returned, and the value as it
    is then. */
-static struct Ticked FlipFl(u16 place, u16 bar, u16 value)
+static struct Ticked FlipFl(u16 place, i32 bar, u16 value)
 {
     struct Ticked ticked;
     u16 key, buttons;
@@ -715,7 +727,7 @@ static struct Ticked FlipFl(u16 place, u16 bar, u16 value)
     value &= 0xFF;
     Cursor(place);
     for (;;) {
-        key = Input(bar);
+        key = Input((u16)bar);          /* a byte, as the field has it */
         if (key != 0x3920) {
             if (key >> 8 != KEY_MOUSE)
                 break;
@@ -727,7 +739,8 @@ static struct Ticked FlipFl(u16 place, u16 bar, u16 value)
             ClrKbd();
             if (buttons != 1)
                 break;
-            if (InWind(pointer.place, place - 1, 0x100 | Slct20(place - 1)))
+            if (InWind(pointer.place, place - 1,    /* Slct20: a byte */
+                       (u16)(0x100 | Slct20(place - 1))))
                 break;
         }
         cell = (u8 *)BasAdr(place);
@@ -751,7 +764,7 @@ static struct Ticked FlipFl(u16 place, u16 bar, u16 value)
    plus what the field has for them, of which the row counts and the
    column is counted from the left half of the screen or from the right,
    whichever the box begins in, at `column`. */
-static u16 Dial18(u16 place, u16 column)
+static u16 Dial18(u16 place, i32 column)
 {
     place = ADD_LOW(place, -column);
     if (column >= 40)
@@ -820,8 +833,9 @@ u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
     struct Buttons menu;
     struct Checked checked;
     struct Mouse pointer;
-    u16 shape, key, type, place, control, count, link, value;
+    u16 shape, key, place, control, link;
     u16 look, now, buttons, mouse, window;
+    i32 type, count, line;
 
     md.Quote = 0;
     shape = ChgCur();
@@ -866,13 +880,12 @@ u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
                 *text++ = *from++;
             *text = 0;
             InSt10(place, INPUT(control) + 3, control & 0xFF,
-                   (u16)colors[1] << 8);
+                   (u16)(colors[1] << 8));
         } else if (type == FIELD_SELECT) {
             *((u8 *)screen + MD(field->mPoint) * (2 * 80)) = BULLET;
         } else if (type == FIELD_FLIP) {
-            value = *((const u8 *)data + NUMBER_OF(field->mCtrl));
-            MD(field->mPoint) = (u8)value;
-            if (value != 0)
+            MD(field->mPoint) = *((const u8 *)data + NUMBER_OF(field->mCtrl));
+            if (MD(field->mPoint) != 0)
                 *(u8 *)screen = 'x';
         } else if (type == FIELD_BUTTONS) {
             screen = BasAdr(Dial18(place, begin & 0xFF));
@@ -899,7 +912,7 @@ Dial31:                                 /* the field of the cursor has the keys 
         text = INPUT(control);
         typed = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
                        colors[1], head->bKeyBar);
-        *(u16 *)text = typed.cursor;
+        *(u16 *)text = (u16)typed.cursor;   /* a byte's length at most */
         key = typed.key;
     } else if (type == FIELD_SELECT) {
         chosen = Select(place, head->bKeyBar,
@@ -917,7 +930,7 @@ Dial31:                                 /* the field of the cursor has the keys 
         MD(field->mPoint) = (u8)menu.chosen;
         key = menu.key;
     } else
-        key = (begin & 0xFF) << 8 | type;
+        key = (u16)((begin & 0xFF) << 8 | type);    /* mType is a byte */
     if (key >> 8 == KEY_MOUSE)
         goto Dial40;
     if (key >> 8 == 0)                  /* Case takes none without a scan code */
@@ -982,10 +995,10 @@ Dial31:                                 /* the field of the cursor has the keys 
     cursor = first + (link & LINK_FIELD);
     field = cursor;
     if (field->mType == FIELD_SELECT && (link & LINK_SET)) {
-        value = 0;
+        line = 0;
         if (link & LINK_LAST)
-            value = NUMBER_OF(field->mCtrl) - 1;
-        MD(field->mPoint + 1) = (u8)value;
+            line = NUMBER_OF(field->mCtrl) - 1;
+        MD(field->mPoint + 1) = (u8)line;
     }
     goto Dial31;
 
@@ -1014,8 +1027,8 @@ Dial40:                                 /* the mouse */
                 if (type == FIELD_INPUT) {
                     window = 0x100 | NUMBER_OF(field->mCtrl) & 0xFF;
                 } else if (type <= FIELD_FLIP) {
-                    window = (NUMBER_OF(field->mCtrl) & 0xFF) << 8
-                             | Slct20(place);
+                    window = (u16)((NUMBER_OF(field->mCtrl) & 0xFF) << 8
+                                   | Slct20(place));    /* a byte */
                     if (type != FIELD_SELECT)
                         window = 0x100 | window & 0xFF;
                 } else {
@@ -1044,7 +1057,7 @@ Dial49:
     /* Buttons that the cursor leaves have none chosen any more. */
     field = cursor;
     if (field->mType == FIELD_BUTTONS)
-        MnMn40((u16)colors[0] << 8 | colors[2],
+        MnMn40((u16)(colors[0] << 8 | colors[2]),
                Dial18(begin + field->mBase, begin & 0xFF),
                MD(field->mPoint), MnMn60(field->mCtrl), field->mCtrl);
     cursor = item;
