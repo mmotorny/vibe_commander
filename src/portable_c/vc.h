@@ -664,10 +664,10 @@ u16 Color(u16 number);                  /* screen.c */
 u16 *BasAdr(u16 place);
 u16 *MvsColr(u16 *screen, u16 count, u16 color);
 u16 *MovDz0(u16 *screen, const u8 *text);
-u16 *HexByt(u16 *screen, u16 byte);                     /* digits.c */
-u16 TstHex(u16 digit);
+u16 *HexByt(u16 *screen, u32 byte);                     /* digits.c */
+u32 TstHex(u16 digit);
 void Convert(const u8 *name, u8 *buffer);               /* mask.c */
-u16 TstMas(const u8 *name, const u8 *mask);
+bool TstMas(const u8 *name, const u8 *mask);
 void NgLine(struct LineArgs *args);                     /* line.c */
 void CntLine(struct LineArgs *args);
 u8 *AddFile(u8 *end);                                   /* string.c */
@@ -1276,10 +1276,10 @@ struct Mouse {
 void IniMous(void);
 void TypMous(u16 pointer);
 void SavMous(void);
-void CurMous(u16 show);
+void CurMous(bool show);
 struct Mouse GetMous(u16 place);
-u16 DoublMo(u16 begin, u16 size, u16 cursor);
-u16 InWind(u16 where, u16 begin, u16 size);
+u32 DoublMo(u16 begin, u16 size, u32 cursor);
+bool InWind(u16 where, u16 begin, u16 size);
 /* The screen, its cursor, and windows of the screen buffer: see each in
    window.c. A place has the row in its high byte, and a size the rows.
    `buffer` is an address in the main data. */

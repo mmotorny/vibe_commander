@@ -27,16 +27,16 @@
  */
 #include "vc.h"
 
-u16 LnStr(const struct LineArgs *args);
+u32 LnStr(const struct LineArgs *args);
 
 /* struct LineArgs, NgLine and CntLine are in vc.h. */
 
 /* The length of a text that is put into a line, as LnStr counts it: it
    looks at 80 characters, and a text without an end among them counts as
    79 long. */
-static u16 Included(const u8 *text)
+static u32 Included(const u8 *text)
 {
-    u16 length = 0;
+    u32 length = 0;
 
     while (length < 80 && text[length] != 0)
         length++;
@@ -48,11 +48,12 @@ static u16 Included(const u8 *text)
 
    The count is kept as the assembly keeps it: what a run of characters or
    a text put in adds to it is added to its low byte only. */
-u16 LnStr(const struct LineArgs *args)
+u32 LnStr(const struct LineArgs *args)
 {
     const u8 *line = args->line;
-    u16 length = 0;
-    u16 first, second, more;
+    u32 length = 0;
+    u16 first, second;
+    u32 more;
 
     for (;;) {
         first = line[0];
@@ -82,14 +83,14 @@ u16 LnStr(const struct LineArgs *args)
         } else if (first == 0xFF) {
             /* The count less one, and one more unless a character follows
                it, which is then counted like any other. */
-            more = (second << 8 | second & 0x7F) - 1;
+            more = (u16)((second << 8 | second & 0x7F) - 1);
             more = (more & 0xFF) + (more & 0x8000 ? 0 : 1);
         } else {
             line--;
             length++;
             continue;
         }
-        length = length & 0xFF00 | length + more & 0xFF;
+        length = length & ~(u32)0xFF | length + more & 0xFF;
     }
     return length;
 }
@@ -103,10 +104,11 @@ void NgLine(struct LineArgs *args)
     const u8 *line = args->line;
     const u8 *text;
     u16 *screen = args->screen;
-    u16 room = args->value & 0xFF;
-    u16 style = 0;                      /* which of the colours is on */
+    u32 room = args->value & 0xFF;
+    u32 style = 0;                      /* which of the colours is on */
     u16 color = Color(args->colors[0]) << 8;
-    u16 c, count, high;
+    u16 c;
+    u32 count, high;
 
 #define PUT(character) \
     if (room) { \
@@ -178,7 +180,7 @@ void NgLine(struct LineArgs *args)
 void CntLine(struct LineArgs *args)
 {
     struct LineArgs line = *args;
-    u16 length = LnStr(args);
+    u32 length = LnStr(args);
 
     line.screen = BasAdr(args->value) - (length + 1 >> 1);
     line.value = length;

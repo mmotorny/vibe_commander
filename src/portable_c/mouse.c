@@ -64,12 +64,12 @@ void SavMous(void)
     md.MouseY = at.y;
 }
 
-/* Show the mouse pointer, or hide it if the low byte of `show` is 0. */
-void CurMous(u16 show)
+/* Show the mouse pointer, or hide it. */
+void CurMous(bool show)
 {
     if (md.Mouse == 0)
         return;
-    if ((show & 0xFF) == 0)
+    if (!show)
         MouseHide();
     else
         MouseShow();
@@ -112,7 +112,7 @@ struct Mouse GetMous(u16 place)
    seconds and the minutes. The second click is in time until the clock
    has gone beyond that, which for the last 40 hundredths of a second is
    when the next second ends. */
-u16 DoublMo(u16 begin, u16 size, u16 cursor)
+u32 DoublMo(u16 begin, u16 size, u32 cursor)
 {
     struct Time time;
     struct Mouse click;
@@ -158,19 +158,19 @@ u16 DoublMo(u16 begin, u16 size, u16 cursor)
 
 /* Is a place outside a window? `where` is the place, `begin` where the
    window begins and `size` its rows and columns, each with the row in
-   the high byte. Not 0 if it is outside. A window of no rows or no
+   the high byte. True if it is outside. A window of no rows or no
    columns has 256 of them. */
-u16 InWind(u16 where, u16 begin, u16 size)
+bool InWind(u16 where, u16 begin, u16 size)
 {
-    u16 row = where >> 8, column = where & 0xFF;
+    u32 row = where >> 8, column = where & 0xFF;
 
     if (row < begin >> 8)
-        return 1;
+        return true;
     row -= begin >> 8;
     if (column < (begin & 0xFF))
-        return 1;
+        return true;
     column -= begin & 0xFF;
     if ((u8)((size >> 8) - 1) < row)
-        return 1;
+        return true;
     return (u8)(size - 1) < column;
 }

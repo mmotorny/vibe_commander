@@ -15,11 +15,6 @@ bars.c, DosCom: compare
     | if (cursor >= width && cursor - width > first)
     The same line asks first that cursor is width or more.
 
-blank.c, Below: shift
-    | return ((number >> 8) * limit + ((number & 0xFF) * limit >> 8)) >> 8;
-    limit is a byte: the two calls hand it md.Lines and 80. Each product
-    is 255 times 255 at the most, and the sum 65,025 and 254.
-
 box.c, MinBx5: divide
     | u16 less = (u8)(((u16)(u8)(size - least) >> 1) * step / (Diskret - 1));
     What is shifted is cut to a byte first, so the half is below 128; and
@@ -37,6 +32,14 @@ dialog.c, MnMn11: shift
 dialog.c, MnMn11: shift
     | key = item - table >> 1;
     item steps up from table, two at a time, in the loop above.
+
+digits.c, TstHex: widen
+    | return digit - '0';
+    The line above has asked that digit is '0' or more.
+
+digits.c, TstHex: widen
+    | return digit - ('A' - 10);
+    The line above has asked that digit is 'A' or more.
 
 dirfunc.c, DirFunc: index
     | end[count] = Mask_S[skip + count];
@@ -113,11 +116,6 @@ find.c, FindFil: index
 info.c, PutInf: index
     | cell += i + i;
     The line above has made i 8 at the most.
-
-line.c, CntLine: shift
-    | line.screen = BasAdr(args->value) - (length + 1 >> 1);
-    length is how many cells a line of text takes, which LnStr counts a
-    character at a time: no text of the program has 65,535.
 
 main.c, Loop: back
     | if (keys[i - 1] == key >> 8) {

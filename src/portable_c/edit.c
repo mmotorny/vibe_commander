@@ -179,7 +179,7 @@ u16 T80_00(void);
    is the segment of the program's constants. */
 
 /* C routines of other files that vc.h does not have. */
-u16 *HexByt(u16 *screen, u16 byte);                     /* digits.c */
+u16 *HexByt(u16 *screen, u32 byte);                     /* digits.c */
 u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
            u16 color);                                  /* screen.c */
 void PathLin(u8 *text);                                 /* string.c */

@@ -53,7 +53,7 @@ void LeaveTm(void)
 /* A random number below `limit`, which is 255 at the most: the high word
    of the next of the program's numbers times the limit. The product has
    32 bits, and is worked out here in halves that have 16. */
-static u16 Below(u16 limit)
+static u32 Below(u32 limit)
 {
     u16 number = Rnd();
 
@@ -94,7 +94,8 @@ void Blank(void)
     u16 mouse;                          /* where the mouse is, last seen */
     u16 held;                           /* Shift, Ctrl, Alt and the locks */
     u16 ticks = 0;                      /* the timer's, at the last turn */
-    u16 place, clock, number, kind, mode, look, vacant, now, i;
+    u16 place, number, look, now;
+    u32 clock, kind, mode, vacant, i;
 
     CurMous(0);
     cursor = CursorWhere(ScreenState().page);

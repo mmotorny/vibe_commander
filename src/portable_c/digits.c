@@ -13,9 +13,9 @@ const u8 *TxtNum(const u8 *text, u16 *number);
 /* Write the low byte of `byte` to the screen buffer as two hex digits,
    leaving the colours as they are, and return the address of the cell
    behind them. HexCod in the assembly is one digit of this. */
-u16 *HexByt(u16 *screen, u16 byte)
+u16 *HexByt(u16 *screen, u32 byte)
 {
-    u16 shift = 4;
+    u32 shift = 4;
     u16 digit;
 
     for (;;) {
@@ -36,7 +36,7 @@ u16 *HexByt(u16 *screen, u16 byte)
    What is above 0FFh has in its low byte what the assembly leaves in AL
    for a character that is no digit: the character if it comes before '0',
    and else its capital. */
-u16 TstHex(u16 digit)
+u32 TstHex(u16 digit)
 {
     digit &= 0xFF;
     if (digit < '0')
@@ -54,11 +54,11 @@ u16 TstHex(u16 digit)
    begins with none. A number too large for 16 bits is read as 0FFFFh. */
 const u8 *TxtNum(const u8 *text, u16 *number)
 {
-    u16 value = 0;
-    u16 digit;
+    u32 value = 0;
+    u32 digit;
 
     for (;;) {
-        digit = (u16)*text - '0';
+        digit = (u16)(*text - '0');
         if (digit > 9)
             break;
         text++;

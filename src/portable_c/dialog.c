@@ -127,7 +127,7 @@ u16 F38_10(u16 answer);                                 /* dirfunc.c */
 u16 F35_61(u16 answer, u16 place);                      /* copy.c */
 
 /* C routines of other files that vc.h does not have. */
-u16 LnStr(const struct LineArgs *args);                 /* line.c */
+u32 LnStr(const struct LineArgs *args);                 /* line.c */
 void NormStr(u8 *text);                                 /* string.c */
 
 /* Copy a text that a box puts into its lines to where the lines have it,

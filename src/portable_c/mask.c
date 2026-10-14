@@ -21,7 +21,7 @@ u8 *UnConv(u8 *name, const u8 *buffer);
    `field`, from the text at `name`, which ends with a zero byte or with
    `end`. Returns the address of what follows the part in the text: the
    end, or the asterisk that stands for the rest. Conv10 in the assembly. */
-static const u8 *Part(const u8 *name, u8 *field, u16 length, u16 end)
+static const u8 *Part(const u8 *name, u8 *field, u32 length, u16 end)
 {
     u16 c;
 
@@ -60,7 +60,7 @@ void Convert(const u8 *name, u8 *buffer)
 u8 *UnConv(u8 *name, const u8 *buffer)
 {
     u8 *end = name;                     /* behind the last that is no space */
-    u16 i;
+    u32 i;
     u8 c;
 
     for (i = 0; i < 11; i++) {
@@ -77,16 +77,16 @@ u8 *UnConv(u8 *name, const u8 *buffer)
     return end;
 }
 
-/* Whether a file name fits a mask in its fixed form: 1 if it does, 0 if
-   not. The name is put into its fixed form at TmpBuf+20. */
-u16 TstMas(const u8 *name, const u8 *mask)
+/* Whether a file name fits a mask in its fixed form. The name is put into
+   its fixed form at TmpBuf+20. */
+bool TstMas(const u8 *name, const u8 *mask)
 {
     u8 *fixed = md.TmpBuf + 20;
-    u16 i;
+    u32 i;
 
     Convert(name, fixed);
     for (i = 0; i < 11; i++)
         if (mask[i] != '?' && mask[i] != fixed[i])
-            return 0;
-    return 1;
+            return false;
+    return true;
 }

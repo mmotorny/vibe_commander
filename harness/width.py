@@ -210,6 +210,8 @@ class Widths(int16.Finder):
             type_ = {"qualType": type_.get("qualType", "").split("(")[0]}
         found = narrow(type_)
         name = "" if what == "returns" else node.get("name", "")
+        if what == "field" and name == "holds":
+            return                      # HOLDS of vc.h: no number
         if found:
             if file in HEADERS and what != "field":
                 return
