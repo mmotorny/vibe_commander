@@ -15621,6 +15621,58 @@ pointers that name the same in both".
 
 It took some 75 tool calls to hand back.
 
+### B, three broken things: done
+
+Three things that the user decided on 14 October 2026, each a commit of
+its own.
+
+- **The marker.** A line `||||||| parent of 367661c (...)` that a
+  landing had left between entries 19 and 20 of
+  `src/portable_c/DEVIATIONS.md` is gone. No other `.md` of the
+  repository has a marker of a conflict.
+- **The label that ends in S** (`DEVIATIONS.md`, 22). `struct Label` of
+  `vc.h` has `failed` beside `answer` and `local`: `GetVol` of `read.c`
+  says whether DOS could not say what the drive is or found no label,
+  with the error then and 0 otherwise, and `RdInfo` goes by `failed`.
+  The original's AX for a label found, AH of 4Eh and the eleventh
+  character, is not kept; `F54_00`, which takes only `local`, is as it
+  was. What the original then does was read, not tried: the Info shows
+  all that it read, and stays marked as changed, so it is read from the
+  disk again at every drawing of the panels. No scenario: the bench's
+  three labels are its own and none is eleven characters, and Ctrl+F4
+  makes no label on FreeDOS.
+- **The help's text of no bytes** (`DEVIATIONS.md`, 23). `RdEntry` of
+  `help.c` refuses `HlpSize` 0 where it refused a text too long, and
+  the help says so in its box for a file that cannot be read;
+  `StRdHelp` of `sthelp.c` refuses the index's text of no bytes and a
+  count of 0 for the setup's pages, and the setup then has none, F1
+  saying "Help contents is not available", as it does for any file
+  that it cannot read. `DeCode` is as it was and is handed no 0 now;
+  its reason in `harness/width.txt` says so. The wrapping of the help's
+  lines past 65,535 is untouched, as the user decided.
+
+**What a scenario can do here, and why none was added.** The editor's
+F4 types the bytes of a file in hex, so a broken help file can be made
+through the program: `"1a1a"` over the length of a page is a text of
+no bytes (the mark of 1Ah on 0). That holds for a tree's file too
+(entry 21). A scenario of it, `help-empty-page`, the third page of
+`VC.HLP` made so and gone to, was made and derived (twice, the same
+golden): the original decodes all of its main data's segment and shows
+the index a row higher; the portable C passed it with a patch, the box
+of the error over the index. But the C translation shows a blank screen
+there, by its own bytes past its main data, and the tree `c` has no
+way to declare a scenario not run. The user decided on 14 October 2026
+that it is not added. The setup's two places can be made as well, at
+`1C4h` (the index's length, `"1a1a"`) and at `34Ch` (the 62nd line's
+place made the 55th's, `"3cf21a1a"`), but the original's setup program
+does not come back to wait for a key from either: no golden. The
+portable C shows the box of no help for both (`harness/show.py
+--program`, F1 in the setup).
+
+The program: `VC.EXE` 28b4d5f6... after the label, eb1eac96... after
+the help, from 7073d21d... of `main` at 60343ec; brought onto F9,
+`main` at 766d5e0, c58ae126... The whole suite passes on that.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

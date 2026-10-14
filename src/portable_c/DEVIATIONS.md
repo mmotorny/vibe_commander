@@ -2141,9 +2141,10 @@ count, and had kept the cut of 16 bits until this was decided
 
 **Which scenarios show it.** None. A scenario sets up what it needs
 through the program's own menus, and such a file has bytes that are no
-characters, a count and two sums that are worked out, which the editor
-would have to be typed into by their codes; nothing of the original's
-writes one. `tree`, `tree-box`, `tree-choose`, `tree-deep`, `copy-tree`
+characters, a count and two sums that are worked out; nothing of the
+original's writes one. The editor's hex mode, F4, could type such a
+file byte for byte, as entry 23 has for the help file, and no scenario
+was added for it. `tree`, `tree-box`, `tree-choose`, `tree-deep`, `copy-tree`
 and `mouse-tree`, which read a tree from the disk and from its file, are
 held to the original's goldens as they are.
 
@@ -2219,8 +2220,8 @@ whose length is typed as 1A 1A, the mark on 0, is one. But what the
 original does then rests on every byte of the 64K that it goes round,
 and the C translation, which is taken through every scenario of the
 main program, has other bytes there past its main data and shows
-another screen: such a scenario was made, and is not in the tree for
-that. The setup's two places have none either: the original's setup
+another screen: such a scenario was made, and on the user's word of 14
+October 2026 is not in the tree for that. The setup's two places have none either: the original's setup
 program does not come back from such a file to wait for a key, so no
 golden can be derived of it, as was tried with both on the bench.
 `help-broken` and `setup-help-file`, which have the help refuse files

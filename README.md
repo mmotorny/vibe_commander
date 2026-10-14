@@ -667,19 +667,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 284,451 bytes, of which the extender's stub is 27,536 |
+| `VC.EXE` | 284,479 bytes, of which the extender's stub is 27,536 |
 | as a multiple of the original's 65,090 bytes | 4.37 |
-| more than the C translation's 133,056 bytes | 151,395 bytes |
-| Its code, and what the file has of its data | 117,046 and 104,507 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 222,282 bytes |
+| more than the C translation's 133,056 bytes | 151,423 bytes |
+| Its code, and what the file has of its data | 117,088 and 104,507 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 222,324 bytes |
 | The addresses in it that the extender sets when it loads it | 4,434 |
-| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, each block with the extender's 16 bytes in front | 15,244,112 bytes |
-| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 361,456 bytes |
+| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, each block with the extender's 16 bytes in front | 15,244,080 bytes |
+| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 361,488 bytes |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
 | How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c-layout` holds them | 24,056 and 16,692 bytes |
 | How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,532 and 2,251 bytes |
-| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 375,223 bytes, 204,973 of them code |
+| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 375,223 bytes, 205,089 of them code |
 | Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `dos32.c` |
 | Lines of `#pragma aux` | 17, of which 5 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
