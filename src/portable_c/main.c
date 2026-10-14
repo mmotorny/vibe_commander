@@ -37,8 +37,8 @@
 #include "vc.h"
 
 /* The registers that go round the loop are struct Regs of vc.h. */
-static u16 CmdEnd(struct Onward next, struct Regs *r);
-static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r);
+static i32 CmdEnd(struct Onward next, struct Regs *r);
+static i32 Command(i32 command, struct WCBdef *panel, struct Regs *r);
 u16 ErrRdy(u16 letter);
 static void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
@@ -181,24 +181,25 @@ static void PtFs00(struct WCBdef *panel)
 }
 
 /* Whether a character ends the command that the program was started
-   with: 1 or 0. */
-static u16 Init46(u16 c)
+   with. */
+static bool Init46(u16 c)
 {
     return c == 0 || c == '\r' || c == '\n';
 }
 
 /* Find the row of the command line and keep what DOS has on the screen.
-   Returns 1 if the program has been started with a command to run, which
-   is in DosBuf then.
+   Returns true if the program has been started with a command to run,
+   which is in DosBuf then.
 
    Ported as it is: where the panels are, their row and size are asked
    for with DS on the main data, not on a panel. BegBX then answers for
    the right panel, and only the row is used. */
-static u16 Init40(void)
+static bool Init40(void)
 {
     const u8 *tail;
     u8 *to;
-    u16 page, row, line, bottom, count, i, c;
+    u16 page, c;
+    i32 row, line, bottom, count, i;
 
     page = ScreenState().page;
     row = CursorWhere(page).place >> 8;
@@ -221,17 +222,17 @@ static u16 Init40(void)
     HidCur();
     SavScr();
     IniMous();
-    count = (u16)(u8)(md.Lines - 1) * 80;
+    count = (u8)(md.Lines - 1) * 80;
     for (i = 0; i < count; i++)
         md.UserScr[i] = md.ScrBuf[i];
 
     /* The command the program was started with, once. */
     if (md.LoadRes != 0xFF)
-        return 0;
+        return false;
     md.LoadRes = 0;
     tail = FndLet(ProgramTail());
     if (Init46(*tail))
-        return 0;
+        return false;
     to = md.DosBuf;
     for (;;) {                          /* Init43 */
         c = *tail++;
@@ -246,7 +247,7 @@ static u16 Init40(void)
     md.DosLin = (u8)(md.MenuBuf[0] - 1);
     md.LoadRes = md.LoadFl;
     md.LoadFl = 0x81;
-    return 1;
+    return true;
 }
 
 /* Give a panel that could not be read something to show: no files, a
@@ -254,7 +255,7 @@ static u16 Init40(void)
 static void Init90(struct WCBdef *panel)
 {
     struct DIRENT *root;
-    u16 i;
+    i32 i;
 
     if (panel->WinTyp == 0) {
         panel->EndBuf = DSKBUF;
@@ -269,7 +270,7 @@ static void Init90(struct WCBdef *panel)
         md.InfoLen = 0xFFFF;
     } else if (panel->WinTyp < 2) {       /* Init92 */
         root = TRELIST;
-        for (i = 0; i < sizeof(struct DIRENT); i++)
+        for (i = 0; i < (i32)sizeof(struct DIRENT); i++)
             ((u8 *)root)[i] = 0;
         root->DirName[0] = '\\';
         root->DirShift = 1;
@@ -303,14 +304,16 @@ static void Init50(void)
 {
     struct WCBdef *wcb;
     struct WCBdef *panel;
-    u16 size, drive, keep, failed, letter, length, same, i;
+    u16 size, drive, letter;
+    bool keep, failed, same;
+    i32 length, i;
 
     HidCur();
     panel = CurrentPanel;
     if (OtherPanel->WinTyp < panel->WinTyp)
         panel = OtherPanel;
     wcb = panel;
-    size = (u16)md.Lines << 8 | 80;     /* Init51 */
+    size = (u16)(md.Lines << 8 | 80);   /* Init51 */
     drive = 0;
     if (wcb->ChgFlg == 0)
         goto Init53;
@@ -320,8 +323,8 @@ Init52:
     md.BlocEr = 0;
 Init53:
     PutPrm(panel);
-    keep = 0;
-    failed = 0;
+    keep = false;
+    failed = false;
     if (wcb->Visible == 0)
         goto Init70;
     Panel(panel);                       /* Init54 */
@@ -331,29 +334,28 @@ Init53:
             /* The directory of DOS is the panel's now. Whether it was
                before says whether the cursor and the marks are kept. */
             length = StrLen(wcb->WinPath);
-            same = 1;
+            same = true;
             for (i = 0; i < length; i++)
                 if (md.DosPth[i] != wcb->WinPath[i]) {
-                    same = 0;
+                    same = false;
                     break;
                 }
             for (i = 0; i < LenPath; i++)
                 wcb->WinPath[i] = md.DosPth[i];
-            md.OldFlg = (u8)same;
+            md.OldFlg = same;
         }
         if (md.PathEr != 0) {           /* Init55 */
             Init90(panel);
-            failed = 1;
+            failed = true;
         } else {
             if (drive == 0 && md.OldFlg != 0)   /* Init56 */
-                keep = 1;
+                keep = true;
             if (wcb->WinTyp == 0)       /* Init57 */
                 md.BlocEr = 1;
             failed = ReDir(panel, keep);
             md.BlocEr = 0;
         }
         if (failed) {                   /* Init59 */
-            failed = 1;
             if (drive == 0)
                 drive = wcb->WinPath[0];
         }
@@ -380,28 +382,26 @@ Init53:
 Init70:
     panel = InvWCB(panel);
     wcb = panel;
-    keep = 1;
+    keep = true;
     if (wcb->Visible == 0)
         return;
     for (;;) {
         Panel(panel);                   /* Init71 */
-        failed = 0;
+        failed = false;
         if (wcb->ChgFlg != 0) {
             Window(0, size);
             if (wcb->WinTyp == 0 && drive == wcb->WinPath[0]) {
                 wcb->WinPath[3] = 0;
                 Init90(panel);          /* Init73 */
-                failed = 1;
+                failed = true;
             } else if (wcb->WinTyp != 0 && md.PathEr != 0) {   /* Init72 */
                 Init90(panel);
-                failed = 1;
+                failed = true;
             } else {
                 if (wcb->WinTyp == 0)   /* Init74 */
                     md.BlocEr = 1;
                 failed = ReDir(panel, keep);    /* Init75 */
                 md.BlocEr = 0;
-                if (failed)
-                    failed = 1;
             }
         }
         PutPath(panel);                 /* Init77 */
@@ -424,7 +424,7 @@ Init70:
             if (!failed)
                 drive = 0;
         }
-        keep = 0;                       /* Init78 */
+        keep = false;                   /* Init78 */
     }
 }
 
@@ -432,31 +432,31 @@ Init70:
    a command, or nothing, and then the place where the loop goes round
    from. */
 struct Asked {
-    u8  nothing;                        /* not 0 if no command is asked
+    bool nothing;                       /* true if no command is asked
                                            for: the loop goes round, */
-    u8  entry;                          /* from this place of it */
-    u16 command;                        /* else the command, a CMD_ of
+    i32 entry;                          /* from this place of it */
+    i32 command;                        /* else the command, a CMD_ of
                                            vc.h */
 };
 
 /* It asks for a command, */
-static struct Asked Asks(u16 command)
+static struct Asked Asks(i32 command)
 {
     struct Asked asked;
 
-    asked.nothing = 0;
+    asked.nothing = false;
     asked.entry = 0;
     asked.command = command;
     return asked;
 }
 
 /* or for nothing, and the loop goes round from `entry`. */
-static struct Asked Nothing(u16 entry)
+static struct Asked Nothing(i32 entry)
 {
     struct Asked asked;
 
-    asked.nothing = 1;
-    asked.entry = (u8)entry;
+    asked.nothing = true;
+    asked.entry = entry;
     asked.command = 0;
     return asked;
 }
@@ -484,8 +484,8 @@ static struct Asked Func21(struct Regs *r)
     struct WCBdef *wcb;
     struct Place place;
     struct Mouse mouse;
-    u16 look, lines, rows, kind, answer;
-    i32 column;
+    u16 look, kind;
+    i32 lines, rows, column, answer;
 
     ClrKbd();
     if (md.WinMous != 0)
@@ -515,7 +515,7 @@ static struct Asked Func21(struct Regs *r)
         return Asks(CMD_F39_00);
     r->bx = BegBX(r->ds);               /* Func26 */
     r->dx = SizDX();
-    r->dx = r->dx & 0xFF | (u16)(u8)((r->dx >> 8) + (r->bx >> 8)) << 8;
+    r->dx = (u16)(r->dx & 0xFF | (u8)((r->dx >> 8) + (r->bx >> 8)) << 8);
     if ((r->cx >> 8) >= (r->dx >> 8))
         return Nothing(FUNC07);
     if ((r->cx & 0xFF) < 40) {          /* Change panel */
@@ -549,11 +549,13 @@ Func40:                                 /* Move the cursor */
     *(u16 *)md.TmpBuf = r->cx;          /* TmpMous */
     r->bp = r->ax;
     AdrNum(r->ds, &place);
-    r->si = place.cursor;
-    r->di = place.first;
-    r->dx = place.last;
+    /* The numbers fit: a panel holds 2,703 entries, ReDr00, which the
+       piece P lifts. */
+    r->si = (u16)place.cursor;
+    r->di = (u16)place.first;
+    r->dx = (u16)place.last;
     lines = place.lines;
-    r->ax = lines;
+    r->ax = (u16)lines;
     r->bx = BegBX(r->ds);
     column = r->cx & 0xFF;
     if (column < (r->bx & 0xFF) || column >= (u8)((r->bx & 0xFF) + 40))
@@ -562,7 +564,7 @@ Func40:                                 /* Move the cursor */
     if (wcb->WinTyp == 0)
         r->bx += 0x100;
     rows = r->cx >> 8;                  /* Func41 */
-    r->cx = r->cx & 0xFF | (u16)(u8)(rows - (r->bx >> 8)) << 8;
+    r->cx = (u16)(r->cx & 0xFF | (u8)(rows - (r->bx >> 8)) << 8);
     if (rows < r->bx >> 8) {            /* Func50: scroll up */
         r->si = r->di;
         return Asks(CMD_F00_05);
@@ -580,16 +582,16 @@ Func40:                                 /* Move the cursor */
         return Asks(CMD_F01_05);
     }
     column = (u8)(column - (r->bx & 0xFF));     /* Set cursor position */
-    r->cx = r->cx & 0xFF00 | column;
+    r->cx = (u16)(r->cx & 0xFF00 | column);
     if (column >= 39)
         return Nothing(FUNC07);
     r->bx = r->bx & 0xFF00 | kind;
     if (kind == 0) {                    /* three columns of names */
         r->bx = r->bx & 0xFF00 | 13;
-        r->ax = (column / 13) * (lines & 0xFF);
+        r->ax = (u16)((column / 13) * (lines & 0xFF));
         column %= 13;
         rows = (u8)(rows + r->ax);
-        r->cx = rows << 8 | column;
+        r->cx = (u16)(rows << 8 | column);
     }
     if (column == 0)                    /* Func42 */
         return Nothing(FUNC07);
@@ -598,7 +600,9 @@ Func40:                                 /* Move the cursor */
        of the third column on a panel of 43 lines or more, full screen
        and brief, on a screen of 48 lines or more. The cursor then goes
        256 entries back, or to the last entry if there are not as many. */
-    r->ax = (signed char)rows + r->di;
+    r->ax = (u16)((signed char)rows + r->di);   /* wraps: below the
+                                                   first entry is above
+                                                   the last */
     r->si = r->ax;
     if (r->si > r->dx) {
         r->si = r->dx;
@@ -616,7 +620,7 @@ Func40:                                 /* Move the cursor */
     if (kind == 0) {
         column = (u8)(r->cx - (r->bx & 0xFF));
         column = column / 13 * 13;
-        r->ax = column;
+        r->ax = (u16)column;
         r->cx = 13;
         r->bx = r->bx & 0xFF00 | (u8)(r->bx + column);
         r->dx = 0x10C;
@@ -645,7 +649,7 @@ Func40:                                 /* Move the cursor */
    The original's table has two keys more, Alt+F5, the map of the
    memory, and Alt+F9, EGA lines, which the portable C has not (see
    DEVIATIONS.md): here each is a key that has no command. */
-static u16 Func12(u16 key)
+static i32 Func12(u16 key)
 {
     if (key >> 8 == 0)
         return CMD_F73_00;
@@ -730,7 +734,7 @@ static u16 Func12(u16 key)
 /* The main loop as far as a command: see the top of this file. `entry`
    is where it is entered and `r` the registers as they are there; it
    returns the command, with the registers as the command gets them. */
-static u16 Loop(u16 entry, struct Regs *r)
+static i32 Loop(i32 entry, struct Regs *r)
 {
     struct WCBdef *wcb;
     u8 *saved;
@@ -739,7 +743,9 @@ static u16 Loop(u16 entry, struct Regs *r)
     struct Time moment;
     struct Mouse mouse;
     struct Asked asked;
-    u16 i, length, same, time, seconds, hundredths, menu, key;
+    u16 time, seconds, hundredths, key;
+    i32 i, length, menu;
+    bool same;
 
     for (;;) {
         switch (entry) {
@@ -761,7 +767,7 @@ static u16 Loop(u16 entry, struct Regs *r)
         case FUNC02:
         Func02:
             r->bx = 0;
-            r->dx = (u16)md.Lines << 8 | 80;
+            r->dx = (u16)(md.Lines << 8 | 80);
             Window(r->bx, r->dx);       /* Func03 */
             /* fall through */
         case FUNC04:
@@ -789,10 +795,10 @@ static u16 Loop(u16 entry, struct Regs *r)
                 saved[INI_CMN(Active)] = image[INI_CMN(Active)];
                 saved[INI_CMN(Ctrl_O)] = image[INI_CMN(Ctrl_O)];
                 r->bx = INI_CMN(Ctrl_O);
-                same = 1;
+                same = true;
                 for (i = 0; i < INI_LEN - 2; i++)
                     if (saved[i] != image[i]) {
-                        same = 0;
+                        same = false;
                         break;
                     }
                 if (!same && md.AutoSav != 0) {
@@ -819,11 +825,11 @@ static u16 Loop(u16 entry, struct Regs *r)
             time = 0xFFFF;
             if (md.AutoCD != 0 && wcb->WinTyp == 1 && wcb->Visible != 0) {
                 length = StrLen(md.DosPth);
-                same = 1;
+                same = true;
                 for (i = 0; i < length; ) {
                     i++;
                     if (md.CrnPath[i - 1] != md.DosPth[i - 1]) {
-                        same = 0;
+                        same = false;
                         break;
                     }
                 }
@@ -850,14 +856,14 @@ static u16 Loop(u16 entry, struct Regs *r)
                                 time &= 0xFF;
                         }
                     }
-                    r->dx = seconds << 8 | hundredths;
+                    r->dx = (u16)(seconds << 8 | hundredths);
                 }
             }
             md.AutoTim = (u32)r->dx << 16 | time;       /* Func10 */
             md.HlpPage = 0;
             menu = md.MenuFl;
             md.MenuFl = 0;
-            r->cx = menu << 8;
+            r->cx = (u16)(menu << 8);
             r->ax = 0x3C00;             /* F2, for the menu that comes up
                                            by itself */
             if (menu == 0) {
@@ -878,11 +884,11 @@ static u16 Loop(u16 entry, struct Regs *r)
                 if (wcb->Visible != 0 && wcb->WinTyp <= 1
                     && (key & 0xFF) == 0) {
                     keys = AltSr_T;
-                    same = 0;
+                    same = false;
                     for (i = 0; i < ALT_KEYS; ) {
                         i++;
                         if (keys[i - 1] == key >> 8) {
-                            same = 1;
+                            same = true;
                             break;
                         }
                     }
@@ -890,7 +896,7 @@ static u16 Loop(u16 entry, struct Regs *r)
                        in the table, or behind the table: a table is a
                        pointer, `r->di` is not set to it, and nothing
                        reads DI as this leaves it. */
-                    r->cx = ALT_KEYS - i;
+                    r->cx = (u16)(ALT_KEYS - i);
                     if (same)
                         return CMD_F77_00;
                 }
@@ -926,14 +932,14 @@ static u16 Loop(u16 entry, struct Regs *r)
 /* Open the file ViewFil and show it in the viewer, or in the editor if
    `edit` is not 0: V00_00, V00_01 and V00_02 of the original, which are
    one piece of code entered with this or that in its registers. `menu`
-   is the item of the menu bar to mark meanwhile, and `whole` is 0 for the
-   window that an Info panel has for its dirinfo. The editor may have the
+   is the item of the menu bar to mark meanwhile, and `whole` is false
+   for the window that an Info panel has for its dirinfo. The editor may have the
    file viewed instead, where it is too large to edit. */
-static u16 V00_03(u16 menu, u16 edit, u16 whole)
+static i32 V00_03(i32 menu, bool edit, bool whole)
 {
     struct Open open;
     struct EditEnd end;
-    u16 what;
+    i32 what;
 
     what = V00_02(menu, edit, whole, &open);
     if (what == 0)
@@ -954,7 +960,7 @@ static u16 V00_03(u16 menu, u16 edit, u16 whole)
 }
 
 /* After a command of the menus, of commands.c: MnuEnd. */
-static u16 MnuEnd(u16 answer, struct Regs *r)
+static i32 MnuEnd(i32 answer, struct Regs *r)
 {
     switch (answer) {
     case MNU_FUNC04:
@@ -965,7 +971,7 @@ static u16 MnuEnd(u16 answer, struct Regs *r)
         return CmdEnd(F24_01(r->ds, md.TmpBuf), r);
     default:                            /* MnuV00, MNU_V00_01: the menu of
                                            the command is in CL */
-        return V00_03(r->cx & 0xFF, 1, 1);
+        return V00_03(r->cx & 0xFF, true, true);
     }
 }
 
@@ -977,9 +983,9 @@ static u16 MnuEnd(u16 answer, struct Regs *r)
    Func07 is the one place of the loop where the next command gets BX and
    DX as this one leaves them. Only the keys of the cursor go there, and
    they have put into `r` what the original leaves in the two. */
-static u16 CmdEnd(struct Onward next, struct Regs *r)
+static i32 CmdEnd(struct Onward next, struct Regs *r)
 {
-    u16 item = next.item;
+    i32 item = next.item;
     struct WCBdef *panel = next.panel;
 
     switch (next.place) {
@@ -1008,12 +1014,12 @@ static u16 CmdEnd(struct Onward next, struct Regs *r)
         return INIT50;
     case NEXT_M01_01:                   /* CmdM01: in the order and the
                                            form that the panel has */
-        return MnuEnd(M01_01(panel, (u16)panel->BrfFul << 8
-                                    | panel->SortTyp), r);
+        return MnuEnd(M01_01(panel, (u16)(panel->BrfFul << 8
+                                          | panel->SortTyp)), r);
     case NEXT_M03_00:                   /* CmdM03 */
-        return MnuEnd(M03_00(panel, item << 8), r);
+        return MnuEnd(M03_00(panel, (u16)(item << 8)), r);
     case NEXT_M06_00:                   /* CmdM06 */
-        return MnuEnd(M06_00(panel, item << 8 | item), r);
+        return MnuEnd(M06_00(panel, (u16)(item << 8 | item)), r);
     case NEXT_INIT11:                   /* CmdIni */
         return END_INIT11;
     case NEXT_EXEC:                     /* CmdExe */
@@ -1021,11 +1027,11 @@ static u16 CmdEnd(struct Onward next, struct Regs *r)
     case NEXT_VIEW:                     /* V00_00: with the Files menu
                                            marked, and in DL whether to
                                            edit */
-        return V00_03(2, 0, 1);
+        return V00_03(2, false, true);
     case NEXT_EDIT:
-        return V00_03(2, 1, 1);
+        return V00_03(2, true, true);
     case NEXT_DIRINFO:                  /* CmdV02 */
-        return V00_03(2, 1, 0);
+        return V00_03(2, true, false);
     default:                            /* NEXT_EXIT */
         return END_EXIT;
     }
@@ -1034,9 +1040,9 @@ static u16 CmdEnd(struct Onward next, struct Regs *r)
 /* After a command of dirfunc.c, and after the file search: F1Next. The
    files that are selected, or the panels read again if something has
    been written, or whatever has. */
-static u16 F1Next(u16 answer)
+static i32 F1Next(i32 answer)
 {
-    u16 read;
+    bool read;
 
     if (answer == TO_FUNC04)
         return FUNC04;
@@ -1050,7 +1056,7 @@ static u16 F1Next(u16 answer)
 }
 
 /* After Copy and Rename, of copy.c: F35_90. */
-static u16 F35_90(struct Copied copied)
+static i32 F35_90(struct Copied copied)
 {
     switch (copied.place) {
     case GO_KEYS:
@@ -1070,11 +1076,11 @@ static u16 F35_90(struct Copied copied)
 /* The box of the drives for a panel, and the panel switched on if a
    drive was chosen: F62_01 of the original, where Alt-F1 and Alt-F2 go
    on. `item` is the menu to mark meanwhile. */
-static u16 F62_02(struct WCBdef *panel, u16 item, struct Regs *r)
+static i32 F62_02(struct WCBdef *panel, i32 item, struct Regs *r)
 {
-    if (F62_01(panel, item) == 0)
+    if (!F62_01(panel, item))
         return FUNC04;                  /* F62_46 */
-    return MnuEnd(M06_10(panel, item), r);
+    return MnuEnd(M06_10(panel, (u16)item), r);
 }
 
 /* The menu bar, F9, and with `again` Shift-F10, which goes back to the
@@ -1103,18 +1109,18 @@ static u16 F62_02(struct WCBdef *panel, u16 item, struct Regs *r)
    The command is read in the menu's table at half of what BX holds,
    which is below 256 and even: a table is asked only with an item
    chosen, 1 to 254. */
-static u16 F39_01(u16 again, struct Regs *r)
+static i32 F39_01(bool again, struct Regs *r)
 {
     struct Picked picked = F39_00(again, r->ds);
-    u16 menu = picked.menu;
-    u16 item = picked.item;
-    u16 table = picked.table;
+    i32 menu = picked.menu;
+    i32 item = picked.item;
+    i32 table = picked.table;
     struct WCBdef *panel = r->ds;
 
-    r->cx = item << 8 | menu;
+    r->cx = (u16)(item << 8 | menu);
     if (table == 0)
         return FUNC04;
-    r->ax = item << 8 | table;
+    r->ax = (u16)(item << 8 | table);
     r->bx = (item - 1) & 0xFF00 | (item - 1) << 1 & 0xFF;
     r->dx = 0x100 | picked.held;
     if (table == 1)
@@ -1130,15 +1136,14 @@ static u16 F39_01(u16 again, struct Regs *r)
    `panel` is the panel that the command is for, which the original has
    in DS when it jumps to the command: the current panel, `r->ds`, but for
    a command of the Left or the Right menu. */
-static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r)
+static i32 Command(i32 command, struct WCBdef *panel, struct Regs *r)
 {
     struct SpeedKey ended;
     struct Searched searched;
-    u16 answer;
 
     switch (command) {
-    case CMD_F39_00: return F39_01(0, r);
-    case CMD_F40_00: return F39_01(1, r);
+    case CMD_F39_00: return F39_01(false, r);
+    case CMD_F40_00: return F39_01(true, r);
 
     /* The command line, cmdline.c. */
     case CMD_F73_00:
@@ -1146,8 +1151,7 @@ static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r)
         return FUNC05;
     case CMD_F74_00:                     /* Esc: the panels off or on, if
                                            the command line was empty */
-        answer = F74_00();
-        if (answer == 0)
+        if (!F74_00())
             return FUNC05;
         return CmdEnd(F11_00(panel), r);
     case CMD_F77_00:
@@ -1171,7 +1175,7 @@ static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r)
         F82_01(RightPanel, r->ax);
         return FUNC04;
     case CMD_F68_00:                     /* the history: a command to run? */
-        if (F68_00() == 0)
+        if (!F68_00())
             return FUNC04;
         return CmdEnd(F21_25(), r);
 
@@ -1311,12 +1315,12 @@ static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r)
 /* The main loop: see the top of this file. It is entered where the
    original falls into it when the program has started, Init40, and
    returns when the loop is left, with why: an END_ above. */
-static u16 MainLoop(void)
+static i32 MainLoop(void)
 {
     struct Regs regs;
     struct Regs *r = &regs;
-    u16 entry = INIT40;
-    u16 command;
+    i32 entry = INIT40;
+    i32 command;
 
     /* What the start of the program leaves in the registers: nothing of
        it is read. Loop sets each before it is. */
@@ -1418,11 +1422,11 @@ ErRdy7:
    what DOS had on the screen above it. */
 void Quit(void)
 {
-    u16 line = (u8)(md.Lines - 1);
+    i32 line = (u8)(md.Lines - 1);
 
     if (md.KeyBar != 0)
-        ClsLine(line << 8, &md);
-    ResUser(0, line << 8 | 80);
+        ClsLine((u16)(line << 8), &md);
+    ResUser(0, (u16)(line << 8 | 80));
 }
 
 /* Give Ctrl-Break back to whoever had it. */
@@ -1477,7 +1481,8 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
     const u8 *text;
     u8 *to = md.TmpErr + 1;
     u8 *name;
-    u16 i, answer;
+    u16 answer;
+    i32 i;
     u8 clock, delay, page, setup;
 
     if (md.ErrDat | md.BlocEr)
@@ -1571,10 +1576,10 @@ static void Exit(void)
 {
     RstVc1();
     Quit();
-    ClsLine((u16)md.DosLin << 8, &md);
-    Window(0, (u16)md.Lines << 8 | 80);
+    ClsLine((u16)(md.DosLin << 8), &md);
+    Window(0, (u16)(md.Lines << 8 | 80));
     CurMous(0);
-    Cursor((u16)(u8)(md.DosLin - 1) << 8);
+    Cursor((u16)((u8)(md.DosLin - 1) << 8));
 }
 
 /* The loop, time after time: the program finds out about the machine,
@@ -1592,7 +1597,7 @@ static void Exit(void)
 static void Round(void)
 {
     struct Answer memory;
-    u16 end;
+    i32 end;
 
     for (;;) {
         IniData();                      /* IniOk */

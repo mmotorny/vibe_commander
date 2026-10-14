@@ -9389,7 +9389,7 @@ for.
 | N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | **Done**: "N13, `tree.c`, `treebox.c`, `extfile.c`" below, with its question answered and its fix: a tree file of no entry or of 4,096 or more is refused, entry 21 |
 | N14 † | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | **Done**, with the answer to question 4 carried out: "N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know" below |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
-| N16 | `main.c` | 1,601; 117 | F8 | |
+| N16 | `main.c` | 1,601; 117 | F8 | **Done**: "N16, `main.c`: done, and what a later cluster should know" below, with what the stack of `Command` was found to be |
 | N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | **Done**: "N17a, `keys.c`: done, and what a later cluster should know" below |
 | N17b | `commands.c` | 604 lines; in the record's table | F8 | **Done**: "N17b, `commands.c`: done, and what a later cluster should know" below |
 | N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | **Done**: "N18, `menu.c`, `help.c`: done, and what a later cluster should know" below. The help's lines widened with the original's cuts written where a help file that is not true to its text takes them past 16 bits |
@@ -15049,6 +15049,102 @@ plan and the sections 15; the file and the finder's lists 5; the types,
 the casts and the record by scripts 12; the tests, the images and the
 documents the rest, while the images of the base were saved on a
 machine that other clusters were testing on.
+
+### N16, `main.c`: done, and what a later cluster should know
+
+**What there is.** `main.c` sorted by "The rule for a number", and
+`struct Regs` of `vc.h` in the record as laid out: the original's
+registers that go round the main loop, which the commands read as the
+original has them. clang's warnings of a conversion are silent for the
+file. The whole suite passes, no golden and no patch changed, and the
+image of each scenario is that of the build before (below).
+
+**The numbers.** Of the 95 of 8 or 16 bits, none a `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 45 | The places of the loop and the commands, `entry`, `command`, `answer`, `what`, `end` and what `Loop`, `Func12`, `V00_03`, `MnuEnd`, `CmdEnd`, `F1Next`, `F35_90`, `F62_02`, `F39_01`, `Command` and `MainLoop` answer, with `entry` and `command` of `struct Asked`; the counts and the indexes; the rows of `Init40`, `Func21` and `Quit`; the lines of a panel in `Func21` and what `DoublMo` answers there; the menu, the item and the table that the menu bar answers, and the item of `CmdEnd` and of `F62_02`; the menu that comes up by itself in `Loop` |
+| Made `bool` | 11 | What `Init46` and `Init40` answer; `keep`, `failed` and `same` of `Init50`; `nothing` of `struct Asked`; `same` of `Loop`; `edit` and `whole` of `V00_03`, as `V00_02` takes them; `read` of `F1Next`, what `FncSel`, `FncExt` and `FncEx1` answer; `again` of `F39_01` |
+| Gone | 1 | `answer` of `Command`, which kept what `F74_00` answers to ask it once: the call is asked |
+| Kept by a word | 37 | `character` 10 (the letters of drives and the mouse's pointer in `ErrRdy`, which takes and answers a letter in its low byte; the characters of the command that the program was started with), `text` 5, `system` 5 (the page that the display shows; what `FtErr1` takes and answers, which `DeviceErrorFn` of `sys.h` says), `key` 4, `setup` 3, `bits` 3 (the kind of a panel or'ed with brief, as BL has it; the mouse's buttons), `time` 3 (the time at which the directory under a tree's cursor becomes the current one, in the bytes of DOS's answer), `place` 2, `small` 1, `flag` 1 |
+| Kept by a sentence | 1 | `letter` of `Init50`: the letter of a drive that `ErrRdy` answers, and then that drive's number as DOS takes it, which the original also puts into the width of the window; two forms of one drive |
+
+Three places of a sign, all in `Func21` and all of `column`, a byte
+by the line that sets the cursor's position: they were in the record
+before, and have their reasons now. No limit of the original moved: the
+lines of a panel and its entries are put into the original's registers
+with a cast that names the limit of 2,703 entries of `ReDr00`, which the
+piece P lifts.
+
+**The casts.** clang named 37 places. 13 went by a type: the seven
+calls of `F1Next` with what the commands of `dirfunc.c` answer, the
+place that the file search answers, `StrLen` twice, what `V00_02` and
+`DoublMo` answer, and the lines of a panel. 24 have a cast, and the
+widening made three more, each a cast: the lines of a panel put into
+AX, the count left behind the table of Alt's keys put into CX, and the
+item handed to `M06_10`, which `commands.c` still takes as a `u16`.
+Most are a register of `struct Regs`, or a place that a function of
+another cluster takes, made of a row and a column or of an item and a
+menu by `<< 8 |`; where the old form widened first and
+shifted after, `(u16)md.Lines << 8 | 80`, it narrows now,
+`(u16)(md.Lines << 8 | 80)`, which is the form that "N0c" has as
+safe. One has `wraps`: the line under the mouse is a byte with a sign,
+and `(signed char)rows + r->di` is below the first entry for a line of
+128 or more, which the original takes for one above the last. One has a
+comment of what is further off, the limit of 2,703 entries; the rest
+fit by the line above or by being of bytes.
+
+**`harness/int16.txt`** lost the four places of the file: three `back`,
+the indexes of `Loop` and the table of `F39_01`, `i32` now, and one
+`widen`, `rows << 8 | column` of `Func21`, which has its cast.
+
+**The stack of `Command`**, which F2 and F8 left to this cluster: a
+variable that the fifty calls share does not take it back. Tried:
+`next = F00_00(panel, r); break;` in every case and `CmdEnd(next, r)`
+once behind the switch made the frame 408 bytes where it was 436,
+since `wcc386` still gives each call its own room for what it answers
+and copies that into the variable. A function of its own for those
+calls, each `return F00_00(panel, r);`, made the two frames 84 and 120
+bytes, 204 in all: in a toy of three calls the rooms are one, but of
+fifty some fourteen are. Neither is in the program. The least that a
+scenario leaves of the stack is far above the half that the test asks,
+and a split of `Command` for a hundred bytes is more code to read for
+nothing that a user or a test sees; and on Linux, at step 6, a
+structure of 16 bytes comes back in two registers, with no room at all. If the stack is ever
+short, the function of its own is the way, and its frame is what to
+read in `build/portable_c/main.lst`, `enter` at the top of the routine.
+
+**Across clusters.** No line outside `main.c` and the records changed.
+
+- `ErrRdy` keeps its `u16` and its letter in the low byte, as `drive.c`
+  calls it.
+- `M01_01`, `M03_00`, `M06_00` and `M06_10` of `commands.c` take a
+  `u16`, and are handed a cast: N17b may widen `item` where it is a
+  number, and the casts at the calls of `CmdEnd` stay, since what they
+  hand is two bytes made one word.
+- `F39_00` of `menu.c` takes `again` as a `u16` and is handed a `bool`;
+  `struct Picked` of `vc.h` is N18's, read here into three `i32`.
+- `struct Onward` of `vc.h` is still two bytes and a pointer, read here
+  into an `i32` and through `next.place`; its fields are those of the
+  files that make it, `keys.c` above all.
+- `F32_00` of `usermenu.c` answers a `u16` that `Command` asks `== 0`:
+  N15's.
+
+**The program.** `VC.EXE` is another, by the types, `d1f1796d...` for
+`25a4cdc7...` of the head that the cluster began on: its code 132
+bytes shorter, the file as long as it was; of the listings only
+`main.lst` differs. The whole suite passes, fourteen tests, no golden
+and no patch changed. The image of every scenario, `python3
+harness/dataimage.py compare`, against the build of that head saved
+before anything was changed: "156 scenarios, 4 with nothing that
+differs; 0 differences, 0 more in what was declared as changed, 187 in
+what may differ", and "345 pointers that name the same in both".
+
+It took some 90 tool calls to hand back: reading the brief, the plan
+and the sections 20; the file read with the finder's lists beside it
+10; the types and the casts by scripts 10; the record's reasons by one
+script 3; the stack of `Command`, two trials, 10; the tests, the
+images and the documents the rest.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

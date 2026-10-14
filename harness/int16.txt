@@ -185,25 +185,6 @@ keys.c, F00_50: widen
     has moved, back or on, and is held only against 0 and a step either
     way, -step where the original had it in 16 bits.
 
-main.c, F39_01: back
-    | return Command(Menu_T[table - 1][r->bx >> 1], panel, r);
-    table is not 0: the function has returned for that, above.
-
-main.c, Func21: widen
-    | r->cx = rows << 8 | column;
-    column is a remainder of 13, by the line above, and rows a byte: the
-    two bytes of CX.
-
-main.c, Loop: back
-    | if (keys[i - 1] == key >> 8) {
-    The line above has stepped i up from what was below ALT_KEYS: 1 at
-    the least.
-
-main.c, Loop: back
-    | if (md.CrnPath[i - 1] != md.DosPth[i - 1]) {
-    The line above has stepped i up from what was below length: 1 at the
-    least.
-
 panel.c, PutFls: compare
     | if (text - md.TmpBuf > 36) {
     text is behind TmpBuf, where the lines above have written two
