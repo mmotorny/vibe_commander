@@ -604,9 +604,10 @@ close:
    Ported as they are: a source that turns out to be the console, or
    whose attributes DOS will not tell, stays open; so does a target that
    is the console; a target that was appended to is deleted like any
-   other when the copying stops; and after a piece that took more than
-   one call of DOS to read, which only a device gives, the room left in
-   the memory is counted down by the last of them only. */
+   other when the copying stops. Not as the original: after a piece that
+   took more than one call of DOS to read, which only a device gives,
+   the room left is counted down by all of them, where the original
+   counts it down by the last of them only. */
 static u16 C20_00(i32 fits)
 {
     struct Box box;
@@ -718,9 +719,14 @@ read:
                 goto ended;
             offset += got;
             count -= got;
+            /* The original counts the room down behind this loop, by the
+               last read alone, while the buffer goes on by the whole
+               piece: a device that answers a piece in several reads has
+               it read on behind the room's end. Its bug, fixed on the
+               user's word (DEVIATIONS.md, 17): every read counts. */
+            left -= got;
         } while (count != 0);
         buffer += 0x8000;
-        left -= got;
     } while (left != 0);
     goto target;
 ended:

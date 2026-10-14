@@ -1912,3 +1912,40 @@ the extender's, and in the original as many as its room on the bench
 has, less 505. The bench has no such directory, and making one in the
 scenario would take thousands of files written by a command of DOS; the
 original's screen there would be by whatever lies behind its memory.
+
+### 17. A copy from a device counts its room down by every read
+
+**What the original does.** F5 and F6 read the source into the memory
+behind the panels before they write, in pieces of 8000h bytes, as many
+as the room holds, rounded down to 512 bytes. A piece is read by calls
+of DOS until it is whole or DOS gives nothing; a file gives a piece in
+one call, a device may give it in several. The room left is counted
+down behind that loop, by what the last call gave, while the buffer
+goes on by the whole piece: of a device that gives a piece in several
+reads, the room is counted down by less than was read, and the reading
+goes on behind the room's end for as long as the device gives, into
+whatever lies behind the original's block of the memory. That is known
+by reading the assembly, `C20_10` to `C20_13` of `VCCOPY.INC`, and was
+not tried.
+
+**What the portable C does.** Every read counts the room down, so a
+piece that came in several reads takes as much of the room as it is
+long, and the reading stops at the room's end; what was read is then
+written and the copy goes on, as it does for a file that is larger than
+the room. A file, and a device that gives each piece in one read, are
+copied as before. `C20_00` of `copy.c`.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed. The program of 32
+bits wrote into its own memory behind the room there, and from the
+memory of the extender on it would be ended by the extender for it. The
+cluster N9 met it where it counted the room in bytes (`TODO.md`, "N9,
+`copy.c`").
+
+**Which scenarios show it.** None, and none can on the bench. The one
+device that a scenario copies from, `nul` in `copy`, gives nothing; the
+console, which gives a line at a time, is refused as a source, by the
+original and the portable C alike; and the bench has no device that
+answers a read with less than it was asked for and more after it.
+`copy`, `copy-big` and the other scenarios of the copy are held to the
+original's goldens as they are.

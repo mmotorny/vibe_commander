@@ -9382,7 +9382,7 @@ for.
 | N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
-| N9 † | `copy.c` | 1,571; 147 | F6 | **Done**, the buffer in bytes: "N9, `copy.c`: done, and what a later cluster should know" below. Meets a question of the user's, prepared there |
+| N9 † | `copy.c` | 1,571; 147 | F6 | **Done**, the buffer in bytes, with its question answered and its fix: "N9, `copy.c`: done, and what a later cluster should know" below |
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | |
@@ -11719,6 +11719,8 @@ the step written to stay right when widened; the documents the rest.
   cannot happen: a piece is read whole or the file has ended. This is
   what N9 says when it writes how it knows that nothing writes behind
   the block's end, and whether it is to be mended is the user's.
+  (Mended, on the user's word: entry 17 of `DEVIATIONS.md`, and "N9,
+  `copy.c`" below.)
 - The short write on a full disk, the 15 bytes written twice, is the
   same entry of "Known and not dealt with", and `got >> 4 << 4` is it.
 - `count = to - CpDest` of `C00_01` is a difference of two pointers
@@ -13704,40 +13706,23 @@ images ran once before the rebase and once behind it.
 
 ### N9, `copy.c`: done, and what a later cluster should know
 
-**A question for the user, prepared and not decided.** Copying reads
-the source into the room, in pieces of 32K, before it writes. Of a
-device that gives a piece in more than one call of DOS, the room left
-is counted down by the last call alone while the buffer goes on by
-the whole piece (`C20_10` to `C20_13` of `VCCOPY.INC`: `SUB SI,AX`
-behind the loop of the calls). So the reading runs on behind the end of
-the room for as long as the device gives, over whatever lies there; a
-file gives each piece in one call, or ends, and is not touched by it.
-The original has it as it is; "Known and not dealt with" has it, by
-reading. It cannot be tried on the bench: the one device that the
-copying reads there, `nul` in `copy`, gives nothing, and the console,
-which would give a line at a time, is refused as a source. In the 640
-KB of today the bytes go into whatever lies behind the room; from F9
-on the extender ends the program for it, "What could go wrong", 14.
-The ways:
-
-- A. Leave it as the original has it. From F9 on, copying from such a
-  device ends the program with the extender's message.
-- B. Count the room down by every call, so that a piece that came in
-  several calls takes as much room as it is long, and the reading
-  stops at the room's end. A file and a device that gives a piece in
-  one call are copied as before, byte for byte; no scenario changes. A
-  deviation, with its entry in `DEVIATIONS.md`.
-- C. Keep the original's count and stop the reading where the buffer
-  reaches the room's end. As much code as B, and a second count beside
-  the first that says the same thing.
-
-Recommended: B. It is what the code is evidently for, it is one line
-(`left -= got` inside the loop of the calls, in place of behind it),
-and it changes nothing that a scenario or a file can show. In a
-dialog: "Copying from a device that answers a piece in several reads
-runs past the end of its buffer, a bug of the original. Fix it (count
-every read; nothing else changes), or keep it (from F9 on the
-extender ends the program)?"
+**The question that it met: answered.** Copying reads the source into
+the room, in pieces of 32K, before it writes. Of a device that gives a
+piece in more than one call of DOS, the original counts the room left
+down by the last call alone while the buffer goes on by the whole piece
+(`C20_10` to `C20_13` of `VCCOPY.INC`: `SUB SI,AX` behind the loop of
+the calls), so the reading runs on behind the end of the room for as
+long as the device gives; a file gives each piece in one call, or ends.
+It cannot be tried on the bench: the one device that the copying reads
+there, `nul` in `copy`, gives nothing, and the console is refused as a
+source. Put to the user as three ways, A to keep it, B to count the
+room down by every call, C to keep the count and stop at the room's
+end, with B recommended. **Answered** on 14 October 2026 (`CLAUDE.md`,
+"The portable C"): B, a bug of the original fixed, entry 17 of
+`src/portable_c/DEVIATIONS.md`. N9 made it in its third commit, the
+one line `left -= got` inside the loop of the calls, with a comment at
+the place, and landed with it, so F9 does not wait for it. No scenario
+shows it, and none changed.
 
 **What there is.** `copy.c` sorted by "The rule for a number", with
 `struct Copied` of `vc.h`, which its commands answer in; clang's
@@ -13814,14 +13799,18 @@ harness/dataimage.py compare`, against the build of `main` that it
 began on: "155 scenarios, 151 with nothing that differs; 0 differences,
 0 more in what was declared as changed, 39 in what may differ", in
 `blank-timed`, `command-line`, `cursor` and `mouse-dialog`, which the
-tool lets differ. `VC.EXE` is another, by the types: the listings of
+tool lets differ. Behind the rebase onto N5, N3 and N11, with the fix
+of the question, against the build of `main` that it landed on: "155
+scenarios, 153 with nothing that differs; 0 differences, 0 more in
+what was declared as changed, 27 in what may differ", in `blank-timed`
+and `mouse-dialog`. `VC.EXE` is another, by the types: the listings of
 `copy.c` and `start.c` changed, of `dialog.c` where it tests what
 `F35_61` answers, a byte now, which the compiler then lays out anew
 around it, and of `main.c`, which reads `struct Copied`.
 
-It took some 75 tool calls, of which waiting for the images and the
-suite on a machine that four other clusters were testing on was a
-dozen: reading the plan and the sections 15,
+It took some 75 tool calls to hand back, of which waiting for the
+images and the suite on a machine that four other clusters were
+testing on was a dozen, and some 40 more for the fix and to land: reading the plan and the sections 15,
 the file read whole once with the finder's lists beside it 10, the
 types by one script 10, the record's reasons by another 5, the tests
 and the documents the rest.
@@ -15410,9 +15399,9 @@ than it is would pass.
     copies to new files now, so no scenario has it.
   - Of a device that gives its bytes in several calls of DOS to a
     piece, the room left in the memory is counted down by the last
-    call only. By reading: the bench has no such device. Whether it is
-    mended is a question for the user, prepared in "N9, `copy.c`: done,
-    and what a later cluster should know".
+    call only. By reading: the bench has no such device. The portable C
+    counts it down by every call, on the user's word: entry 17 of
+    `src/portable_c/DEVIATIONS.md`.
   - Where DOS will not tell the date and the time of a file that it has
     just opened, the copying goes on with CX and DX as they are, and
     the target is given that for a time and a date when it is closed.
