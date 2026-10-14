@@ -8672,6 +8672,7 @@ that. Steps 3 to 6 are not planned here.
 | The sixth way: three blocks where there was one, with a panel's block fixed at 1000h paragraphs from F1 on; F9 as the piece that takes the memory from the extender, and the trial X at once | Accepted by the session, 13 October 2026 |
 | The clusters N0 to N21 with S, M and P, and their order; that no cap is in a program that has landed, with F9 behind the five clusters that count the room, and the cap as the fallback, which wants the session's word; the answer of `FileRead` and `FileWrite` as a structure of their own; the 16 bytes round each block of the 640 KB, in the program as it is shipped from F1 to F9, held by F0's tool | Accepted by the session, 13 October 2026 |
 | That no name is given to an integer type for what a number means: a number has the type of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`, and what crosses to the system is a `u32` until the layer's design says what it is; where the compiler is to hold two things apart, they are structures. It takes back the named type of the answer to question 1, the three names that the session had accepted for `sys.h`, and five that the session had asked of N0 for a character, a colour, a cell and a place, which never landed | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
+| N17 and N19 as two clusters each, `start.c` by itself behind F9; and the program's own structures of the headers with the cluster of the functions that return them, those of `sys.h` with S | The session, 13 October 2026, on what N0 counted |
 | Questions 3, 4, 5, 8 and 9 | With the user, each when the work comes to it: "The questions for the user" |
 
 For an hour of that day question 1 was answered otherwise: the
@@ -9245,9 +9246,11 @@ for.
 | N14 | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | Carries out the answer to question 4 |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
 | N16 | `main.c` | 1,601; 117 | F8 | |
-| N17 | `keys.c`, `commands.c` | 1,414; 183 | F8 | |
+| N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | |
+| N17b | `commands.c` | 604 lines; in the record's table | F8 | |
 | N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | |
-| N19 | `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` | 1,602; 185 | F8, and F9 for `start.c`, which has the lines that ask for memory | |
+| N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | |
+| N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | |
 | N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | |
 | N21 | `stmain.c`, `sthelp.c` | 1,086; 121 | F8 | |
 
@@ -9256,7 +9259,19 @@ cluster starts when the piece that has its files has landed, and of
 `vc.h` each has the lines that declare the functions of its own files.
 F9 has `sys.h`, the system's file and the lines that ask for memory,
 and F10 the words of `vc.h` and the test of the layout: every cluster
-but N19 can run beside both. What has to wait, and for what:
+but N19b can run beside both.
+
+Cut again by what N0 counted, and accepted by the session on 13 October
+2026: N17 and N19 are two clusters each, a and b, the first by file and
+the second with `start.c` by itself behind F9. From N0 on the measure
+of a cluster is the record's, its numbers and its cuts in the table at
+the top of `harness/width.txt`, and not the lines. And the structures
+of the headers that are the program's own, what a function answers in,
+133 numbers that no row above has: each goes with the cluster of the
+functions that return it, and those of `sys.h` with S. That too is the
+session's, of the same day.
+
+What has to wait, and for what:
 
 - A number that counts a block in paragraphs is widened when the
   block is a pointer's, which is why N3, N5, N6 and N9 stand behind F4
@@ -9280,8 +9295,8 @@ The order:
     F5 and N3 landed             N6† > N7  N8            questions 8, 5, 9 asked
     F6 landed                    N9†  N10
     F7 landed                    N11†  N12  N13  N14  N15    question 3 asked
-    F8 landed                    N16  N17  N18  N20  N21
-    F2 to F8 and the five †      F9 > F10                N19 behind F9
+    F8 landed                    N16  N17a  N17b  N18  N19a  N20  N21
+    F2 to F8 and the five †      F9 > F10                N19b behind F9
     every cluster landed         M > P, if question 3 says so
 
 What a piece goes by:
@@ -10522,8 +10537,8 @@ the record's table are what to cut by, not the lines:
 |---|---|---|
 | N3 and N4, `view.c` | 197; 211 | Two halves are right |
 | N6 to N8, `edit.c` | 248; 278 | Three thirds are right, and no fewer |
-| N17, `keys.c`, `commands.c` | 222; 58 | The largest by numbers. 116 are of `commands.c` with 13 cuts, most of them what a command is handed; F2 makes many of those pointers. Cut in two by file if it is still so after F8 |
-| N19, five files | 163; 74 | `start.c` waits for F9 anyway: a cluster of its own, 49; 30 |
+| N17, `keys.c`, `commands.c` | 222; 58 | The largest by numbers. 116 are of `commands.c` with 13 cuts, most of them what a command is handed; F2 makes many of those pointers. Two clusters by file, N17a and N17b: accepted |
+| N19, five files | 163; 74 | `start.c` waits for F9 anyway: a cluster of its own, N19b, 49; 30: accepted |
 | N12, N13, N15 | 88; 113, 71; 101, 114; 108 | More cuts than numbers, `treebox.c`, `usermenu.c`, `panel.c`, `drive.c`: arithmetic on places. Right as they are, and the slow ones |
 | The others | 90 to 140; 50 to 100 | Right |
 

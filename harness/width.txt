@@ -70,9 +70,11 @@ N13             71         71       0     0   102     0     0      0  tree.c tre
 N14            128        128       0     0    95     0     0      0  cmdline.c enter.c exec.c
 N15            114        114       0     0   109     3     0      0  input.c usermenu.c
 N16            108        108       0     0    75     0     0      0  main.c
-N17            222        222       0     0    58     0     0      0  keys.c commands.c
+N17a           106        106       0     0    45     0     0      0  keys.c
+N17b           116        116       0     0    13     0     0      0  commands.c
 N18            116        116       0     0   106     1     0      0  menu.c help.c
-N19            156        156       0     0    61     1     0      0  bars.c window.c system.c setup.c start.c
+N19a           114        114       0     0    44     1     0      0  bars.c window.c system.c setup.c
+N19b            42         42       0     0    17     0     0      0  start.c
 N20            120        120       0     0    89     0     0      0  stcolor.c stopts.c
 N21             88         88       0     0    59     3     0      0  stmain.c sthelp.c
 as a whole     582          0       0     0    57    65     0      0  the tables, dos32.c stack.c

@@ -141,9 +141,11 @@ CLUSTERS = [
     ("N14", "cmdline.c enter.c exec.c"),
     ("N15", "input.c usermenu.c"),
     ("N16", "main.c"),
-    ("N17", "keys.c commands.c"),
+    ("N17a", "keys.c"),
+    ("N17b", "commands.c"),
     ("N18", "menu.c help.c"),
-    ("N19", "bars.c window.c system.c setup.c start.c"),
+    ("N19a", "bars.c window.c system.c setup.c"),
+    ("N19b", "start.c"),
     ("N20", "stcolor.c stopts.c"),
     ("N21", "stmain.c sthelp.c"),
 ]
