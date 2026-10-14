@@ -3530,9 +3530,15 @@ waiting for the user between its steps.
   the time stamp of a file it has made, does so within the first minute of
   its machine. The machine's clock is counted in the instructions it
   executes, and a C tree takes more of them than the original to get to
-  the same step: up to a sixth more. The first screen is at about five
-  seconds past the minute, so such a scenario is done showing the time
-  by about fifty seconds past in the original. A scenario that switches
+  the same step: a tenth to a third more as a rule, and twice as many
+  where a step searches a text, as counted over every scenario on 13
+  October 2026 (the top of `harness/scenarios.py` and `TODO.md` have
+  the figures; the sixth that stood here was of two scenarios). The
+  first screen is at about five seconds past the minute. So such a
+  scenario is tried in every tree that it is run for, and is done
+  showing the time by about fifty seconds past in the slowest of them,
+  which for most scenarios is by about forty in the original. A scenario
+  that switches
   the Info panel on takes some five seconds more, once, when the panel
   is first drawn.
 - A figure on the screen that follows the time of day or the size of the
