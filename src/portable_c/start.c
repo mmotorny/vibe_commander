@@ -385,15 +385,8 @@ static void Memory(u16 segment, u16 size)
     RoomEnd = Room + ((u32)size << 4);
 }
 
-/* How long the room is, in paragraphs. The original works that out
-   wherever it wants it, of FreMem2 and ViewSeg. */
-u16 RoomParas(void)
-{
-    return (u16)((RoomEnd - Room) >> 4);
-}
-
-/* How long the room is, in bytes: what the five clusters that count the
-   room take in place of RoomParas, which goes when nothing calls it. */
+/* How long the room is, in bytes. The original works that out wherever
+   it wants it, in paragraphs, of FreMem2 and ViewSeg. */
 i32 RoomBytes(void)
 {
     return (i32)(RoomEnd - Room);

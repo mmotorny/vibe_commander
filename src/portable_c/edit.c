@@ -38,41 +38,58 @@
 #pragma pack(push, 1)
 
 /* What the editor keeps, in the main data from TmpBuf+100 on: EdData of
-   the assembly, from EdOffst. What has no name here is the viewer's. */
+   the assembly, from EdOffst. What has no name here is the viewer's.
+
+   Its last 38 bytes are the first 38 of the viewer's ViewDat, and six
+   things there are the two's in common, which stay where they are and as
+   wide as they are: EdLen, the viewer's ViLen; EdBase, EdSizeX and
+   EdSizeY, its ViBase and ViSize; EdTxHex, its ViTxHex; and Reserved2,
+   Reserved3 and Reserved4, which the viewer reads behind the editor and
+   the editor does not write. The structure cannot grow either: it ends
+   18 bytes before TmpBuf does. So each field that counts or is a place
+   in the text is a variable of this file beside it, of 32 bits, of the
+   same name, and its bytes here are not written. The flags are
+   booleans, a byte as before. */
 struct EdData {
-    u32 EdOffst;                        /* Offset of begin of the current line */
-    u32 EdEndBf;                        /* Offset of end of part of current line */
-    u16 EdSizLn;                        /* Length of part of line in buffer */
-    u8  EdUpdat;                        /* Update line buffer */
-    u8  EdWhole;                        /* The whole line allocates buffer */
-    u16 EdCursr;                        /* Offset of the cursor in line buffer */
-    u16 EdCol1;                         /* Cursor position for Up & Down */
-    u8  EdUpDwn;                        /* Up & Down flag */
-    u8  EdHex1;                         /* Cursor digit pointer for Up & Down */
-    u8  EdScrn;                         /* Output all edit window */
-    u8  EdCurLn;                        /* It doesn't need to output line */
-    u16 EdUndo;                         /* Length of line in undo buffer */
+    u32 EdOffst;                        /* the variable EdOffst */
+    u32 EdEndBf;                        /* the variable EdEndBf */
+    u16 EdSizLn;                        /* the variable EdSizLn */
+    bool EdUpdat;                       /* Update line buffer */
+    bool EdWhole;                       /* The whole line allocates buffer */
+    u16 EdCursr;                        /* the variable EdCursr */
+    u16 EdCol1;                         /* the variable EdCol1 */
+    bool EdUpDwn;                       /* Up & Down flag */
+    bool EdHex1;                        /* Cursor digit for Up & Down: the
+                                           second, as EdHxCur */
+    bool EdScrn;                        /* Output all edit window */
+    bool EdCurLn;                       /* It doesn't need to output line */
+    u16 EdUndo;                         /* the variable EdUndo */
     u8  Reserved1[77];
-    u8  EdWrite;                        /* File was written */
-    u16 EdSpace;                        /* Edit buffer size in paragraphs */
+    bool EdWrite;                       /* File was written */
+    u16 EdSpace;                        /* the variable EdSpace */
     u8  Reserved2;
-    u8  EdStat;                         /* Status line */
-    u8  EdHexAs;                        /* Hex / ASCII field in HEX mode */
-    u8  EdHxCur;                        /* Cursor points 1 or 2 digit in HEX */
-    u32 EdLen;                          /* Size of file in edit buffer */
-    u16 EdCol;                          /* Cursor position */
-    u16 EdLine;                         /* Cursor line */
+    bool EdStat;                        /* Status line */
+    bool EdHexAs;                       /* Hex / ASCII field in HEX mode */
+    bool EdHxCur;                       /* Cursor points 1 or 2 digit in HEX:
+                                           true for the second */
+    i32 EdLen;                          /* Size of file in edit buffer: the
+                                           viewer's ViLen, the length of the
+                                           file, which T00_00 holds against
+                                           the room as such, and from there
+                                           on the length of the text */
+    u16 EdCol;                          /* the variable EdCol */
+    u16 EdLine;                         /* the variable EdLine */
     u16 Reserved3;
-    u8  EdTxHex;                        /* Text / Hex mode */
-    u8  EdChng;                         /* File was changed */
+    bool EdTxHex;                       /* Text / Hex mode */
+    bool EdChng;                        /* File was changed */
     u32 Reserved4;
-    u16 EdCol0;                         /* First column displayed on the screen */
-    u16 EdLin0;                         /* First line displayed on the screen */
+    u16 EdCol0;                         /* the variable EdCol0 */
+    u16 EdLin0;                         /* the variable EdLin0 */
     u16 Reserved5;
     u16 EdBase;                         /* The base of the edit window */
     u8  EdSizeX;                        /* The size of the edit window: */
     u8  EdSizeY;                        /* its columns and its rows */
-    u32 EdFirst;                        /* Offset of first line on the screen */
+    u32 EdFirst;                        /* the variable EdFirst */
     u16 EdShape;                        /* Original cursor shape */
 };
 
@@ -84,17 +101,17 @@ LAID_OUT(EdData, 138);
    counted from 0. DS:SI and DI of the assembly, which has the address of
    the byte where this has its place. */
 struct Where {
-    u32 place;
-    u16 line;
+    i32 place;
+    i32 line;
 };
 
 /* What T53_10 returns: where a line ends. */
 struct Ending {
-    u32 at;                             /* the place behind the line; with
+    i32 at;                             /* the place behind the line; with
                                            none, the place that was
                                            given */
-    u16 none;                           /* 1 if that place is at the end
-                                           of the text or behind it */
+    bool none;                          /* that place is at the end of the
+                                           text or behind it */
 };
 
 /* What Column, T57_00 and T57_01 return: how far characters of the line
@@ -121,29 +138,47 @@ struct Drawn {
 
 #define ed (*(struct EdData *)(md.TmpBuf + 100))
 
-/* Which help the editor shows below its window: 1 for the menu file, 2
-   for an extension file. A name for the first byte of EdOffst, which is
-   set when the help has been drawn. */
-#define EdHelp (*(u8 *)&ed.EdOffst)
+/* The fields of EdData that count, as variables. The room for the text,
+   in bytes: EdSpace counted paragraphs in the assembly. Places in the
+   text: where the line in the buffer begins and where the part of it
+   that the buffer holds ends, and where the first line of the window
+   begins. In the line buffer: how much of the line it holds, where the
+   cursor is in it, and how long the line in the undo buffer is. The
+   column of the cursor, and the one that Up and Down keep to; the line
+   of the cursor and the first line and column shown. Each is set before
+   it is read, when the editor begins (T00_00) or the cursor first comes
+   to the screen (T00_20). */
+static i32 EdSpace;                     /* Edit buffer size */
+static i32 EdOffst;                     /* Offset of begin of the current line */
+static i32 EdEndBf;                     /* Offset of end of part of current line */
+static i32 EdFirst;                     /* Offset of first line on the screen */
+static i32 EdSizLn;                     /* Length of part of line in buffer */
+static i32 EdCursr;                     /* Offset of the cursor in line buffer */
+static i32 EdUndo;                      /* Length of line in undo buffer */
+static i32 EdCol;                       /* Cursor position */
+static i32 EdCol1;                      /* Cursor position for Up & Down */
+static i32 EdLine;                      /* Cursor line */
+static i32 EdCol0;                      /* First column displayed on the screen */
+static i32 EdLin0;                      /* First line displayed on the screen */
 
 void T50_00(void);
 void T51_00(void);
 u16 T53_00(struct Where *where);
-struct Ending T53_10(u32 place);
+struct Ending T53_10(i32 place);
 u16 T54_00(struct Where *where);
 u16 T55_00(u16 cursor);
-void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low);
+void T56_00(i32 place, i32 line, i32 target);
 struct Reached T57_00(void);
 struct Reached T57_01(u16 limit);
 u16 T57_02(void);
-u16 T63_01(u16 high, u16 low);
-u16 T64_00(const u8 *name, const u8 *text, u16 count);
+i32 T63_01(i32 place);
+bool T64_00(const u8 *name, const u8 *text, i32 count);
 void T71_00(u16 function, u16 place, u16 step);
 void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base);
 void T73_00(void);
 struct Drawn T73_10(void);
 void T74_00(void);
-void T75_00(u16 number, u16 *screen, u16 color);
+void T75_00(i32 number, u16 *screen, u16 color);
 void T76_00(u16 place, const u8 *text, const u8 *colors);
 u16 T80_00(void);
 
@@ -232,9 +267,6 @@ static const u8 MainExt_F[] = "VC.EXT";
 #define ERR_NOT_READY 0x53
 #define ERR_DISK_FULL 0xFF
 
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
-#define PAIR(high, low) ((u32)(high) << 16 | (low))
 
 /* The column that `count` characters of the line buffer end in, with
    tabs to every eighth, and how many of them were not counted, because
@@ -271,12 +303,12 @@ static struct Reached Column(u16 count, u16 limit)
    `limit`. */
 struct Reached T57_00(void)
 {
-    return Column(ed.EdSizLn, LenEdit - 100);
+    return Column((u16)EdSizLn, LenEdit - 100);
 }
 
 struct Reached T57_01(u16 limit)
 {
-    return Column(ed.EdSizLn, limit);
+    return Column((u16)EdSizLn, limit);
 }
 
 /* The column of the cursor, counted from 0: in hex mode the number of the
@@ -284,18 +316,16 @@ struct Reached T57_01(u16 limit)
 u16 T57_02(void)
 {
     if (ed.EdTxHex != 0)
-        return ed.EdCursr;
-    return Column(ed.EdCursr, 0xFFFF).column;
+        return (u16)EdCursr;
+    return Column((u16)EdCursr, 0xFFFF).column;
 }
 
 /* Where an offset is in the text: 0 before its end, 1 at the end and 2
    behind it. */
-u16 T63_01(u16 high, u16 low)
+i32 T63_01(i32 place)
 {
-    if (high != HIGH(ed.EdLen))
-        return high < HIGH(ed.EdLen) ? 0 : 2;
-    if (low != LOW(ed.EdLen))
-        return low < LOW(ed.EdLen) ? 0 : 2;
+    if (place != ed.EdLen)
+        return place < ed.EdLen ? 0 : 2;
     return 1;
 }
 
@@ -320,17 +350,17 @@ void T50_00(void)
 
     if (ed.EdTxHex != 0)
         return;
-    text = Room + ed.EdOffst;
+    text = Room + EdOffst;
     for (count = 0; count < LenEdit - 100; count++)
         EditBuf[count] = text[count];
     ed.EdWhole = 1;
     size = 0;
-    if (T63_01(HIGH(ed.EdOffst), LOW(ed.EdOffst)) == 0) {
-        end = T53_10(ed.EdOffst);
+    if (T63_01(EdOffst) == 0) {
+        end = T53_10(EdOffst);
         /* From a place before the end of the text to one that is no
            further than its end: a length of the room, which is not
            below 0. */
-        length = (i32)(end.at - ed.EdOffst);
+        length = (i32)(end.at - EdOffst);
         if (length >= 2 && ENDS_LINE(*(const u16 *)(Room + end.at - 2)))
             length -= 2;
         if (length > LenEdit - 100) {
@@ -340,8 +370,8 @@ void T50_00(void)
             size = (u16)length;
         }
     }
-    ed.EdEndBf = ed.EdOffst + size;
-    ed.EdSizLn = size;
+    EdEndBf = EdOffst + size;
+    EdSizLn = size;
     ed.EdUpdat = 0;
 }
 
@@ -349,7 +379,7 @@ void T50_00(void)
    bytes given, or downwards. The assembly does it a piece of 0FF00h
    bytes at a time, each from a segment that much further on or back, a
    byte after the other in the same direction all through. */
-static void T51_30(const u8 *source, u8 *target, u32 count, u16 down)
+static void T51_30(const u8 *source, u8 *target, i32 count, u16 down)
 {
     if (down) {
         for (; count; count--)
@@ -371,12 +401,13 @@ static void T51_30(const u8 *source, u8 *target, u32 count, u16 down)
    is lost and not the end of the line; of the line only what would go
    beyond the memory by itself is cut off.
 
-   The room is counted in paragraphs, EdSpace, and the assembly holds
-   the segment of where the text would end against it: a sixteenth of
-   the place. */
+   The assembly counts the room in paragraphs, EdSpace, and holds the
+   segment of where the text would end against it, a sixteenth of the
+   place: which is the place held against the room in bytes, the room
+   being whole paragraphs. */
 void T51_00(void)
 {
-    u32 old, less, end, tail;
+    i32 old, less, end, tail;
     const u8 *buffer;
     u8 *text;
     u16 size, more, grown, count;
@@ -385,41 +416,45 @@ void T51_00(void)
         return;
     ed.EdUpdat = 0;
     ed.EdChng = 1;
-    old = ed.EdEndBf - ed.EdOffst;
-    size = ed.EdSizLn;
-    if (HIGH(old) != 0 || LOW(old) > size) {
+    old = EdEndBf - EdOffst;
+    size = (u16)EdSizLn;
+    if (old > size) {
         less = old - size;
-        T51_30(Room + ed.EdEndBf, Room + ed.EdOffst + size,
-               ed.EdLen - ed.EdEndBf, 0);
+        T51_30(Room + EdEndBf, Room + EdOffst + size,
+               ed.EdLen - EdEndBf, 0);
         ed.EdLen -= less;
-    } else if (LOW(old) < size) {
-        more = size - LOW(old);
+    } else if (old < size) {
+        more = size - (u16)old;
         grown = more;
         end = ed.EdLen + more;
-        if (end >> 4 >= ed.EdSpace) {
+        if (end >= EdSpace) {
             ed.EdScrn = 1;
             Beep();
-            end = ((u32)ed.EdSpace << 4) - 1;
-            if (HIGH(end) == HIGH(ed.EdOffst)
-                && (u16)(LOW(end) - LOW(ed.EdOffst)) < ed.EdSizLn)
-                ed.EdSizLn = LOW(end) - LOW(ed.EdOffst);
-            grown = LOW(end) - LOW(ed.EdLen);
+            end = EdSpace - 1;
+            /* The assembly holds the high word of the end's place
+               against that of the line's, and the low words apart:
+               a line whose place is in another 64K than the end is
+               not cut, though the end be in it. */
+            if (end >> 16 == EdOffst >> 16
+                && (u16)(end - EdOffst) < EdSizLn)
+                EdSizLn = end - EdOffst;
+            grown = (u16)(end - ed.EdLen);
         }
         /* From the last byte to read to the last to write, downwards. */
         tail = end - more;
-        if (tail >= ed.EdEndBf)
-            T51_30(Room + tail - 1, Room + end - 1, tail - ed.EdEndBf, 1);
+        if (tail >= EdEndBf)
+            T51_30(Room + tail - 1, Room + end - 1, tail - EdEndBf, 1);
         ed.EdLen += grown;
     }
-    text = Room + ed.EdOffst;
+    text = Room + EdOffst;
     buffer = EditBuf;
-    for (count = ed.EdSizLn; count; count--)
+    for (count = (u16)EdSizLn; count; count--)
         *text++ = *buffer++;
 }
 
 /* What T53_10 returns: a line that ends at a place, or none, with the
    place that T53_10 was given. */
-static struct Ending EndsAt(u32 place)
+static struct Ending EndsAt(i32 place)
 {
     struct Ending ending;
 
@@ -428,7 +463,7 @@ static struct Ending EndsAt(u32 place)
     return ending;
 }
 
-static struct Ending NoEnd(u32 start)
+static struct Ending NoEnd(i32 start)
 {
     struct Ending ending;
 
@@ -451,16 +486,16 @@ static struct Ending NoEnd(u32 start)
    same two characters, the first from the place on, or the end of the
    text. What the two did otherwise, for a line of more than 64K less 17
    bytes, is said at T50_00 and at T00_20. */
-struct Ending T53_10(u32 place)
+struct Ending T53_10(i32 place)
 {
-    u32 start = place;
+    i32 start = place;
     u16 word;
 
-    if (T63_01(HIGH(place), LOW(place)))
+    if (T63_01(place))
         return NoEnd(start);
     if (ed.EdTxHex != 0) {
         place = (place | 0x0F) + 1;
-        if (T63_01(HIGH(place), LOW(place)))
+        if (T63_01(place))
             place = ed.EdLen;
         return EndsAt(place);
     }
@@ -482,12 +517,12 @@ struct Ending T53_10(u32 place)
    mode the next line is the next 16 bytes, if the text has that many. */
 u16 T53_00(struct Where *where)
 {
-    u32 place = where->place;
+    i32 place = where->place;
     struct Ending end;
 
     if (where->line == 0xFFFF)
         return 1;
-    if (T63_01(HIGH(place), LOW(place)))
+    if (T63_01(place))
         return 1;
     end = T53_10(place);
     if (ed.EdTxHex != 0) {
@@ -519,8 +554,8 @@ u16 T53_00(struct Where *where)
 u16 T54_00(struct Where *where)
 {
     struct Where line;
-    u32 place = where->place;
-    u32 from, next;
+    i32 place = where->place;
+    i32 from, next;
     i32 at;
     u16 found = 0, pair, word;
 
@@ -538,7 +573,7 @@ u16 T54_00(struct Where *where)
     /* Two bytes behind the word that is looked at: with a sign, since
        from the second byte of the text that is the byte before the
        text. */
-    at = (i32)place - 2;
+    at = place - 2;
     for (;;) {
         if (at < 2) {
             /* The text has no more. */
@@ -552,7 +587,7 @@ u16 T54_00(struct Where *where)
                 pair = word;
             }
         } else {
-            pair = pair << 8 | pair >> 8;
+            pair = (u16)(pair << 8 | pair >> 8);
             if (word != pair) {
                 at++;
                 break;
@@ -560,7 +595,7 @@ u16 T54_00(struct Where *where)
         }
         at--;
     }
-    from = (u32)at;
+    from = at;
     for (;;) {
         line.place = from;
         line.line = 0;
@@ -580,11 +615,11 @@ u16 T54_00(struct Where *where)
    and filled again. */
 static u16 T55_10(u16 cursor)
 {
-    if (cursor >= ed.EdSizLn && ed.EdWhole == 0) {
+    if (cursor >= EdSizLn && ed.EdWhole == 0) {
         T51_00();
         T50_00();
     }
-    return cursor < ed.EdSizLn;
+    return cursor < EdSizLn;
 }
 
 /* Where the next word is, from the character `cursor` of the line buffer
@@ -617,18 +652,16 @@ u16 T55_00(u16 cursor)
    the line buffer. In it the cursor is no further than the editor goes
    in a line, and in the last character that it keeps of one if the byte
    is 64K or more into the line. */
-void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low)
+void T56_00(i32 place, i32 line, i32 target)
 {
     struct Where where;
-    u32 place = PAIR(high, low);
-    u32 target = PAIR(target_high, target_low);
     u16 cursor, last;
 
     where.place = place;
     where.line = line;
     for (;;) {
-        ed.EdOffst = place;
-        ed.EdLine = where.line;
+        EdOffst = place;
+        EdLine = where.line;
         if (T53_00(&where))
             break;
         place = where.place;
@@ -636,21 +669,21 @@ void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low)
             break;
     }
     T50_00();
-    target -= ed.EdOffst;
-    cursor = HIGH(target) != 0 ? 0xFFFF : LOW(target);
-    last = ed.EdSizLn - T57_00().left;
+    target -= EdOffst;
+    cursor = target > 0xFFFF ? 0xFFFF : (u16)target;
+    last = (u16)(EdSizLn - T57_00().left);
     if (cursor > last)
         cursor = last;
-    ed.EdCursr = cursor;
+    EdCursr = cursor;
 }
 
 /* Whether `count` bytes at `name` and at `text` are the same. */
-u16 T64_00(const u8 *name, const u8 *text, u16 count)
+bool T64_00(const u8 *name, const u8 *text, i32 count)
 {
     for (; count; count--)
         if (*name++ != *text++)
-            return 0;
-    return 1;
+            return false;
+    return true;
 }
 
 /* Clear a line of the window in the screen buffer; only the low byte of
@@ -659,10 +692,10 @@ u16 T64_00(const u8 *name, const u8 *text, u16 count)
 struct Cleared T70_00(u16 line)
 {
     struct Cleared cleared;
-    u16 place = ed.EdBase + (line << 8);
+    u16 place = (u16)(ed.EdBase + (line << 8));
     u16 *screen = BasAdr(place);
     u16 *cell = screen;
-    u16 blank = Color(Back_C) << 8 | ' ';
+    u16 blank = (u16)(Color(Back_C) << 8 | ' ');
     u16 count;
 
     for (count = ed.EdSizeX; count; count--)
@@ -705,7 +738,7 @@ void T71_00(u16 function, u16 place, u16 step)
         to += stride;
     } while (--count);
     Scroll(function >> 8 == 7, Color(Back_C),
-           ed.EdBase + ((function & 0xFF) << 8),
+           (u16)(ed.EdBase + ((function & 0xFF) << 8)),
            *(u16 *)&ed.EdSizeX + ed.EdBase - 0x101);
 }
 
@@ -738,7 +771,7 @@ void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base)
     u16 *screen = T70_00(line).screen;
     u16 *cell;
     u8 *ascii;
-    u32 offset;
+    i32 offset;
     u16 column, place, c, count;
 
     if (ed.EdTxHex == 0) {
@@ -755,21 +788,21 @@ void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base)
                 c = ' ';
             }
             place = column++;
-            if (place < ed.EdCol0)
+            if (place < EdCol0)
                 continue;
-            place -= ed.EdCol0;
+            place -= EdCol0;
             if ((u8)place >= ed.EdSizeX) {
-                screen[(u16)(ed.EdSizeX - 1)] = Color(Arrow_C) << 8 | 0x1A;
+                screen[(u16)(ed.EdSizeX - 1)] = (u16)(Color(Arrow_C) << 8 | 0x1A);
                 break;
             }
             *(u8 *)(screen + place) = (u8)c;
         }
-        if (ed.EdCol0 != 0)
-            *screen = Color(Arrow_C) << 8 | 0x1B;
+        if (EdCol0 != 0)
+            *screen = (u16)(Color(Arrow_C) << 8 | 0x1B);
         return;
     }
     /* In hex the line is of the text, and no place in it is below 0. */
-    offset = (u32)(from - Room);
+    offset = from - Room;
     cell = screen + 1;
     cell = HexByt(cell, (u16)(offset >> 24));
     cell = HexByt(cell, (u16)(offset >> 16));
@@ -800,28 +833,28 @@ void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base)
 struct Drawn T73_10(void)
 {
     struct Drawn drawn;
-    u16 line = ed.EdLine - ed.EdLin0;
-    u16 place = ed.EdBase + (line << 8);
+    u16 line = (u16)(EdLine - EdLin0);  /* a row of the window */
+    u16 place = (u16)(ed.EdBase + (line << 8));
     const u8 *from;
     const u8 *end;
 
     if (ed.EdTxHex == 0) {
-        if ((u16)(ed.EdSizLn - ed.EdCursr)
-                < (u16)((signed char)ed.EdSizeX + ed.EdCol0 - ed.EdCol)
+        if ((u16)(EdSizLn - EdCursr)
+                < (u16)((signed char)ed.EdSizeX + EdCol0 - EdCol)
             && ed.EdWhole == 0) {
             T51_00();
             T50_00();
         }
         from = EditBuf;
-        end = from + ed.EdSizLn;
+        end = from + EdSizLn;
         T70_00(line);
         /* The segment of the buffer is the main data in the assembly,
            where the buffer is far from the start. */
         if (from < end)
             T72_00(line, from, end, (const u8 *)&md);
     } else {
-        from = Room + ed.EdOffst;
-        end = Room + T53_10(ed.EdOffst).at;
+        from = Room + EdOffst;
+        end = Room + T53_10(EdOffst).at;
         T72_00(line, from, end, Room);
     }
     drawn.begin = place;
@@ -858,10 +891,12 @@ void T74_00(void)
 /* Write a number counted from 0 as one counted from 1, at the left of
    five cells of the screen buffer, in the colour in the high byte of
    `color`. */
-void T75_00(u16 number, u16 *screen, u16 color)
+void T75_00(i32 number, u16 *screen, u16 color)
 {
-    u8 *end = Number(md.TmpBuf, 0, number + 1, 0);
-    u16 count;
+    /* wraps: the assembly counts in 16 bits, and shows the 65,536th
+       line as 0 (TODO.md, question 5). */
+    u8 *end = Number(md.TmpBuf, 0, (u16)(number + 1), 0);
+    i32 count;
 
     for (count = 5; count; count--)
         *end++ = ' ';
@@ -950,7 +985,7 @@ static struct Answer T80_02(u16 attributes)
     struct Answer answer;
     struct Device device;
     const u8 *piece;
-    u32 left;
+    i32 left;
     u16 handle, count, error, failed;
 
     if (attributes & 1) {
@@ -977,8 +1012,8 @@ static struct Answer T80_02(u16 attributes)
         piece = Room;
         do {
             count = PIECE;
-            if (HIGH(left) == 0 && LOW(left) < count)
-                count = LOW(left);
+            if (left < count)
+                count = (u16)left;
             answer = FileWrite(handle, piece, count);
             failed = answer.failed;
             error = answer.value;
@@ -1056,11 +1091,11 @@ static void T80_14(void)
     }
     if (md.TmpBuf + LenPath + 13 <= to)
         return;
-    for (count = md.TmpBuf + LenPath + 13 - to; count; count--)
+    for (count = (u16)(md.TmpBuf + LenPath + 13 - to); count; count--)
         *to++ = *name++;
     PathLin(md.TmpBuf);
     file = CutPath(md.TmpBuf);
-    count = file - md.TmpBuf;
+    count = (u16)(file - md.TmpBuf);
     for (c = 0; c < count; c++)
         if (md.TmpBuf[c] != md.NcPath[c])
             return;
@@ -1070,8 +1105,8 @@ static void T80_14(void)
         if (file[c] != MainExt_F[c])
             return;
     count = LenExt - 1;
-    if (HIGH(ed.EdLen) == 0 && count > LOW(ed.EdLen))
-        count = LOW(ed.EdLen);
+    if (count > ed.EdLen)
+        count = (u16)ed.EdLen;
     text = Room;
     for (c = 0; c < count; c++)
         md.ExtMain[c] = text[c];
@@ -1138,15 +1173,15 @@ done:
    screen, are nothing here: a line is known by its place. */
 static void T60_10(struct Where *where)
 {
-    where->place = ed.EdOffst;
-    where->line = ed.EdLine;
+    where->place = EdOffst;
+    where->line = EdLine;
 }
 
 /* Make the line `where` the one that the cursor is in. */
 static void T60_20(const struct Where *where)
 {
-    ed.EdLine = where->line;
-    ed.EdOffst = where->place;
+    EdLine = where->line;
+    EdOffst = where->place;
 }
 
 /* Put the cursor in the column `limit` of the line, counted from 1, or
@@ -1155,7 +1190,7 @@ static void T60_20(const struct Where *where)
 static void T14_12(u16 limit)
 {
     T50_00();
-    ed.EdCursr = ed.EdSizLn - T57_01(limit).left;
+    EdCursr = EdSizLn - T57_01(limit).left;
 }
 
 /* End, where the line is one that the cursor has just come to: as text,
@@ -1171,7 +1206,7 @@ static void T14_11(void)
         return;
     }
     ed.EdHxCur = 0;                     /* T14_00 */
-    end = T53_10(ed.EdOffst);
+    end = T53_10(EdOffst);
     /* With no end, the assembly has the offset of the line's address
        here, which is less than 16. */
     cursor = (u16)(end.at & 0x0F);
@@ -1179,7 +1214,7 @@ static void T14_11(void)
         cursor = 0x0F;
         ed.EdHxCur++;
     }
-    ed.EdCursr = cursor;
+    EdCursr = cursor;
 }
 
 /* End. As text the buffer is put back into the text first, and filled
@@ -1194,22 +1229,22 @@ static void T14_00(void)
         return;
     }
     left = T57_00().left;
-    if (left == 0 && ed.EdSizLn != 0 && ed.EdWhole == 0) {
+    if (left == 0 && EdSizLn != 0 && ed.EdWhole == 0) {
         T51_00();
         T14_11();
         return;
     }
-    ed.EdCursr = ed.EdSizLn - left;
+    EdCursr = EdSizLn - left;
 }
 
 /* Keep the cursor from the columns behind the last one the editor goes
    to. */
 static void T08_01(void)
 {
-    u16 last = ed.EdSizLn - T57_00().left;
+    u16 last = (u16)(EdSizLn - T57_00().left);
 
-    if (last < ed.EdCursr)
-        ed.EdCursr = last;
+    if (last < EdCursr)
+        EdCursr = last;
 }
 
 /* Go to the start of the next line, if there is one. */
@@ -1221,7 +1256,7 @@ static void T06_14(void)
     T60_10(&where);
     if (T53_00(&where) == 0) {
         T60_20(&where);
-        ed.EdCursr = 0;
+        EdCursr = 0;
     }
     T50_00();
 }
@@ -1230,7 +1265,7 @@ static void T06_14(void)
    window, which does not go on to the next line. */
 static void T06_10(u16 mouse)
 {
-    if (ed.EdCursr >= ed.EdSizLn) {
+    if (EdCursr >= EdSizLn) {
         if (ed.EdWhole != 0) {
             if (mouse == 0)             /* T06_13 */
                 T06_14();
@@ -1240,7 +1275,7 @@ static void T06_10(u16 mouse)
         T50_00();
     }
     if (T57_02() < LenEdit - 100 - 1)   /* T06_11 */
-        ed.EdCursr++;
+        EdCursr++;
 }
 
 /* Right. In hex from the first digit of a byte to the second, where the
@@ -1248,16 +1283,16 @@ static void T06_10(u16 mouse)
    but not from behind the last byte. */
 static void T06_00(void)
 {
-    u32 place;
+    i32 place;
     u16 cursor;
 
     if (ed.EdTxHex == 0) {
         T06_10(0);
         return;
     }
-    cursor = ed.EdCursr;
-    place = ed.EdOffst + cursor;
-    if (T63_01(HIGH(place), LOW(place)) != 0)
+    cursor = (u16)EdCursr;
+    place = EdOffst + cursor;
+    if (T63_01(place) != 0)
         return;
     if (ed.EdHexAs == 0 && ed.EdHxCur == 0) {
         ed.EdHxCur++;
@@ -1269,7 +1304,7 @@ static void T06_00(void)
         T06_14();
         return;
     }
-    ed.EdCursr = cursor;
+    EdCursr = cursor;
 }
 
 /* What follows a character typed: the text is changed, and the cursor
@@ -1287,17 +1322,17 @@ static void T01_03(u16 key)
     u8 *to;
     u16 count;
 
-    if (ed.EdSizLn >= LenEdit) {
+    if (EdSizLn >= LenEdit) {
         T51_00();
         T50_00();
     }
-    ed.EdSizLn++;                       /* T01_04 */
+    EdSizLn++;                       /* T01_04 */
     to = EditBuf + LenEdit - 1;
-    for (count = LenEdit - 1 - ed.EdCursr; count; count--) {
+    for (count = (u16)(LenEdit - 1 - EdCursr); count; count--) {
         *to = to[-1];
         to--;
     }
-    EditBuf[ed.EdCursr] = (u8)key;      /* T01_05 */
+    EditBuf[EdCursr] = (u8)key;      /* T01_05 */
     ed.EdUpdat = 1;
     T01_20();
 }
@@ -1309,36 +1344,40 @@ static void T01_03(u16 key)
    line below is drawn too. */
 static void T01_10(u16 key)
 {
-    u32 place = ed.EdOffst + ed.EdCursr;
+    i32 place = EdOffst + EdCursr;
     u8 *byte = Room + place;
     u16 digit;
 
     if (ed.EdHexAs == 0) {
-        digit = TstHex(key);
+        digit = (u16)TstHex(key);
         if (digit > 0xFF)
             return;
         if (ed.EdHxCur == 0)
-            key = digit << 4 | *byte & 0x0F;
+            key = (u16)(digit << 4 | *byte & 0x0F);
         else
             key = digit | *byte & 0xF0;
     }
     *byte = (u8)key;                    /* T01_12 */
-    if (T63_01(HIGH(place), LOW(place)) != 0) {
+    if (T63_01(place) != 0) {
         if (ed.EdHexAs == 0)
             *byte &= 0xF0;
-        /* The last byte of the last paragraph of the room. */
-        if ((place & 0x0F) == 0x0F      /* T01_13 */
-            && (place >> 4) + 1 >= ed.EdSpace) {
+        /* The last byte of the room: the assembly asks for an offset
+           of 0Fh in its last paragraph. */
+        if (place + 1 >= EdSpace) {     /* T01_13 */
             Beep();
         } else {
             ed.EdLen++;                 /* T01_14 */
-            if ((LOW(ed.EdLen) & 0x0F) == 0
-                && (u8)(ed.EdLine - ed.EdLin0 + 1) < ed.EdSizeY) {
-                ed.EdLine++;
-                *(u16 *)&ed.EdOffst += 0x10;
+            if ((ed.EdLen & 0x0F) == 0
+                && (u8)(EdLine - EdLin0 + 1) < ed.EdSizeY) {
+                /* The place of the line below, as the assembly makes it:
+                   it steps the low word of EdOffst alone, so the place
+                   of a line within 16 bytes of a multiple of 64K wraps
+                   64K back, and the line drawn is that one. */
+                EdLine++;
+                EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst + 0x10);
                 T73_00();
-                *(u16 *)&ed.EdOffst -= 0x10;
-                ed.EdLine--;
+                EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst - 0x10);
+                EdLine--;
             }
         }
     }
@@ -1355,10 +1394,10 @@ static void T02_03(void)
 
     T50_00();
     T73_00();
-    row = ed.EdLine - ed.EdLin0 + 2;
+    row = (u16)(EdLine - EdLin0 + 2);
     if ((u8)row < ed.EdSizeY)
         T71_00(0x700 | (u8)(row - 1),
-               ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8), (u16)-160);
+               (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)), (u16)-160);
     T06_14();
 }
 
@@ -1370,17 +1409,17 @@ static void T02_00(void)
     u8 *to;
     u16 count;
 
-    if (ed.EdSizLn >= LenEdit - 1) {
+    if (EdSizLn >= LenEdit - 1) {
         T51_00();
         T50_00();
     }
-    ed.EdSizLn += 2;                    /* T02_01 */
+    EdSizLn += 2;                    /* T02_01 */
     to = EditBuf + LenEdit - 1;
-    for (count = LenEdit - 2 - ed.EdCursr; count; count--) {
+    for (count = (u16)(LenEdit - 2 - EdCursr); count; count--) {
         *to = to[-2];
         to--;
     }
-    *(u16 *)(EditBuf + ed.EdCursr) = CR_LF;     /* T02_02 */
+    *(u16 *)(EditBuf + EdCursr) = CR_LF;     /* T02_02 */
     ed.EdUpdat = 1;
     T51_00();
     T02_03();
@@ -1405,12 +1444,12 @@ static void T05_11(void)
    where the cursor is among the digits. */
 static void T05_02(u16 digit)
 {
-    if (ed.EdCursr != 0) {
+    if (EdCursr != 0) {
         ed.EdHxCur = (u8)digit;
-        ed.EdCursr--;                   /* T05_03 */
+        EdCursr--;                   /* T05_03 */
         return;
     }
-    if (ed.EdOffst == 0)                /* T05_05 */
+    if (EdOffst == 0)                /* T05_05 */
         return;
     ed.EdHxCur = 1;
     T05_11();
@@ -1421,8 +1460,8 @@ static void T05_02(u16 digit)
 static void T05_00(void)
 {
     if (ed.EdTxHex == 0) {
-        if (ed.EdCursr != 0)            /* T05_10 */
-            ed.EdCursr--;
+        if (EdCursr != 0)            /* T05_10 */
+            EdCursr--;
         else
             T05_11();
         return;
@@ -1459,18 +1498,18 @@ static void T10_02(u16 down, u16 count)
     T60_20(&where);                             /* T10_06 */
     ed.EdUpDwn = 1;
     if (ed.EdTxHex == 0) {
-        T14_12(ed.EdCol1 + 1);
+        T14_12((u16)(EdCol1 + 1));
         return;
     }
-    ed.EdCursr = ed.EdCol1;             /* T10_10 */
+    EdCursr = EdCol1;             /* T10_10 */
     ed.EdHxCur = ed.EdHex1;
-    end = T53_10(ed.EdOffst);
+    end = T53_10(EdOffst);
     if (!end.none && (end.at & 0x0F) == 0)
         return;
     cursor = (u16)(end.at & 0x0F);      /* T10_11 */
-    if (cursor > ed.EdCursr)
+    if (cursor > EdCursr)
         return;
-    ed.EdCursr = cursor;
+    EdCursr = cursor;
     ed.EdHxCur = 0;
 }
 
@@ -1485,7 +1524,7 @@ static void T12_01(u16 down)
     T51_00();
     T60_10(&where);
     count = (u16)ed.EdSizeY - 1;
-    row = ed.EdLine - ed.EdLin0;
+    row = (u16)(EdLine - EdLin0);
     if (down == 0) {
         if (row != 0)
             count = row;
@@ -1500,9 +1539,9 @@ static void T12_01(u16 down)
         if (failed)
             break;
     } while (--count);
-    if (where.line != ed.EdLine) {      /* T12_06 */
+    if (where.line != EdLine) {      /* T12_06 */
         T60_20(&where);
-        ed.EdCursr = 0;
+        EdCursr = 0;
         ed.EdHxCur = 0;
     }
     T50_00();                           /* T12_07 */
@@ -1521,8 +1560,8 @@ static void T16_00(void)
             ;
         T60_20(&where);
     } else {
-        ed.EdLine = (u16)(ed.EdLen >> 4);       /* T16_10 */
-        ed.EdOffst = ed.EdLen & 0xFFFFFFF0UL;
+        EdLine = ed.EdLen >> 4;       /* T16_10 */
+        EdOffst = ed.EdLen & ~0x0F;
     }
     T14_11();                           /* T16_11 */
 }
@@ -1532,17 +1571,17 @@ static void T16_00(void)
 static void T20_02(u8 *from, u8 *end)
 {
     u8 *undo = UndoBuf;
-    u16 count = end - from;
+    u16 count = (u16)(end - from);
     u16 cut = count;
     const u8 *source = from;
 
-    ed.EdUndo = count;
+    EdUndo = count;
     for (; count; count--)
         *undo++ = *source++;
-    if (EditBuf + ed.EdSizLn > end)
-        for (count = EditBuf + ed.EdSizLn - end; count; count--)
+    if (EditBuf + EdSizLn > end)
+        for (count = (u16)(EditBuf + EdSizLn - end); count; count--)
             *from++ = *end++;
-    ed.EdSizLn -= cut;                  /* T20_03 */
+    EdSizLn -= cut;                  /* T20_03 */
     ed.EdUpdat = 1;
     ed.EdChng = 1;
 }
@@ -1553,24 +1592,24 @@ static void T20_02(u8 *from, u8 *end)
    up by one, and the line that comes into the last row of the window is
    drawn there. Where the text has no line for that row, the row is
    cleared. */
-static void T20_06(u32 end, u16 drawn)
+static void T20_06(i32 end, u16 drawn)
 {
     struct Where where;
-    u32 place, offset;
+    i32 place, offset;
     u16 line, row, count;
 
-    ed.EdEndBf = end;
+    EdEndBf = end;
     ed.EdUpdat = 1;
     T51_00();
     T50_00();
     if (!drawn)
         return;
     T73_00();
-    line = ed.EdLine;
-    row = line - ed.EdLin0;
+    line = (u16)EdLine;
+    row = (u16)(line - EdLin0);
     if ((u8)(row + 1) < ed.EdSizeY)
         T71_00(0x600 | (u8)(row + 1),
-               ed.EdBase + ((u16)(u8)(row + 1) << 8), 160);
+               (u16)(ed.EdBase + ((u16)(u8)(row + 1) << 8)), 160);
     count = (u16)ed.EdSizeY - 1;        /* T20_07 */
     if (count <= row)
         return;
@@ -1586,13 +1625,13 @@ static void T20_06(u32 end, u16 drawn)
             break;
         }
     }
-    offset = ed.EdOffst;                /* T20_09 */
-    ed.EdOffst = place;
-    ed.EdLine = where.line + count;
+    offset = EdOffst;                /* T20_09 */
+    EdOffst = place;
+    EdLine = where.line + count;
     T50_00();
     T73_00();
-    ed.EdOffst = offset;
-    ed.EdLine = line;
+    EdOffst = offset;
+    EdLine = line;
     T50_00();
 }
 
@@ -1610,7 +1649,7 @@ static void T20_05(u16 drawn)
     where.line = 0;
     if (T53_00(&where) != 0)
         return;
-    ed.EdUndo = 2;
+    EdUndo = 2;
     *(u16 *)UndoBuf = CR_LF;
     T20_06(where.place, drawn);
 }
@@ -1623,11 +1662,11 @@ static void T20_00(void)
 
     if (ed.EdTxHex != 0)
         return;
-    if (ed.EdCursr >= ed.EdSizLn) {
+    if (EdCursr >= EdSizLn) {
         T20_05(1);
         return;
     }
-    at = EditBuf + ed.EdCursr;          /* T20_01 */
+    at = EditBuf + EdCursr;          /* T20_01 */
     T20_02(at, at + 1);
 }
 
@@ -1640,30 +1679,30 @@ static void T20_00(void)
 static void T21_00(void)
 {
     struct Where where;
-    u32 place;
+    i32 place;
     u16 cursor, row;
     u8 *at;
 
     if (ed.EdTxHex != 0) {
-        place = ed.EdOffst + ed.EdCursr;
+        place = EdOffst + EdCursr;
         if (place == 0)
             return;
-        if (T63_01(HIGH(place), LOW(place)) == 0) {
+        if (T63_01(place) == 0) {
             T05_00();                   /* T21_02 */
             return;
         }
         ed.EdChng = 1;
         ed.EdLen--;
-        if ((LOW(place) & 0x0F) == 0)
-            Window(T70_00(ed.EdLine - ed.EdLin0).place,
+        if ((place & 0x0F) == 0)
+            Window(T70_00((u16)(EdLine - EdLin0)).place,
                    0x100 | ed.EdSizeX);
         T05_02(0);                      /* T21_01 */
         return;
     }
-    cursor = ed.EdCursr;                /* T21_10 */
+    cursor = (u16)EdCursr;           /* T21_10 */
     if (cursor != 0) {
         cursor--;
-        ed.EdCursr = cursor;
+        EdCursr = cursor;
         at = EditBuf + cursor;
         T20_02(at, at + 1);
         return;
@@ -1674,11 +1713,11 @@ static void T21_00(void)
     T51_00();
     T60_20(&where);
     T50_00();
-    ed.EdCursr = ed.EdSizLn - T57_00().left;
-    row = ed.EdLine + 1 - ed.EdLin0;
+    EdCursr = EdSizLn - T57_00().left;
+    row = (u16)(EdLine + 1 - EdLin0);
     if (row == 0) {
-        ed.EdLin0 = ed.EdLine;
-        ed.EdFirst = ed.EdOffst;
+        EdLin0 = EdLine;
+        EdFirst = EdOffst;
     }
     T20_05(row);                        /* T21_12 */
 }
@@ -1688,7 +1727,7 @@ static void T21_00(void)
 static void T24_00(void)
 {
     struct Where where;
-    u32 end;
+    i32 end;
 
     if (ed.EdTxHex != 0)
         return;
@@ -1700,12 +1739,12 @@ static void T24_00(void)
         end = ed.EdLen;
         if (T53_00(&where) == 0)
             end = where.place - 2;
-        ed.EdEndBf = end;               /* T24_01 */
+        EdEndBf = end;               /* T24_01 */
         ed.EdWhole = 1;
     }
-    if (ed.EdCursr >= ed.EdSizLn)       /* T24_02 */
+    if (EdCursr >= EdSizLn)       /* T24_02 */
         return;
-    T20_02(EditBuf + ed.EdCursr, EditBuf + ed.EdSizLn);
+    T20_02(EditBuf + EdCursr, EditBuf + EdSizLn);
 }
 
 /* Ctrl-Y: cut the line. What the buffer has of it is kept to be put
@@ -1713,7 +1752,7 @@ static void T24_00(void)
 static void T25_00(void)
 {
     struct Where where;
-    u32 end;
+    i32 end;
     u16 count, size;
 
     if (ed.EdTxHex != 0)
@@ -1722,18 +1761,18 @@ static void T25_00(void)
         T51_00();
         T50_00();
     }
-    size = ed.EdSizLn;                  /* T25_01 */
+    size = (u16)EdSizLn;             /* T25_01 */
     for (count = 0; count < size; count++)
         UndoBuf[count] = EditBuf[count];
-    ed.EdUndo = size + 2;
+    EdUndo = size + 2;
     *(u16 *)(UndoBuf + size) = CR_LF;
     T60_10(&where);
     where.line = 0;                     /* see T20_05 */
     end = ed.EdLen;
     if (T53_00(&where) == 0)
         end = where.place;
-    ed.EdSizLn = 0;                     /* T25_02 */
-    ed.EdCursr = 0;
+    EdSizLn = 0;                     /* T25_02 */
+    EdCursr = 0;
     T20_06(end, 1);
 }
 
@@ -1744,8 +1783,8 @@ static void T25_00(void)
    at the cursor. */
 static void T26_00(void)
 {
-    u32 offset;
-    u16 count = ed.EdUndo;
+    i32 offset;
+    u16 count = (u16)EdUndo;
     u16 line = 0;
     u16 i;
     i32 left;
@@ -1755,17 +1794,17 @@ static void T26_00(void)
         return;
     if (count >= 2 && ENDS_LINE(*(const u16 *)(UndoBuf + count - 2)))
         line = 1;
-    else if (ed.EdSizLn < (u16)(LenEdit + 1 - count)) {
-        ed.EdSizLn += count;            /* T26_01 */
+    else if (EdSizLn < (u16)(LenEdit + 1 - count)) {
+        EdSizLn += count;            /* T26_01 */
         to = EditBuf + LenEdit - 1;
         from = to - count;
         /* The bytes from the cursor to `from`, both of them counted:
            none, if the cursor is behind that. */
-        left = (i32)(from - (EditBuf + ed.EdCursr - 1));
+        left = (i32)(from - (EditBuf + EdCursr - 1));
         if (left > 0)
             for (; left; left--)
                 *to-- = *from--;
-        ed.EdCursr += count;            /* T26_02 */
+        EdCursr += count;            /* T26_02 */
         to = from + 1;
         for (i = 0; i < count; i++)
             to[i] = UndoBuf[i];
@@ -1774,21 +1813,21 @@ static void T26_00(void)
         return;
     }
     T51_00();                           /* T26_04 */
-    offset = ed.EdOffst;
-    ed.EdOffst = offset + ed.EdCursr;
-    ed.EdEndBf = ed.EdOffst;
+    offset = EdOffst;
+    EdOffst = offset + EdCursr;
+    EdEndBf = EdOffst;
     for (i = 0; i < count; i++)
         EditBuf[i] = UndoBuf[i];
-    ed.EdSizLn = count;
+    EdSizLn = count;
     ed.EdUpdat = 1;
     T51_00();
-    ed.EdOffst = offset;
+    EdOffst = offset;
     if (line) {
         T02_03();
         return;
     }
     T50_00();                           /* T26_05 */
-    ed.EdCursr += count;
+    EdCursr += count;
     T08_01();
 }
 
@@ -1797,27 +1836,27 @@ static void T26_00(void)
    narrower than the screen. */
 static void T30_00(void)
 {
-    u32 place;
+    i32 place;
 
     if (ed.EdSizeX < 80)
         return;
     T51_00();
-    ed.EdCol0 = 0;
+    EdCol0 = 0;
     ed.EdScrn = 1;
     ed.EdTxHex = ed.EdTxHex == 0;
     if (ed.EdTxHex != 0) {
         ed.EdHxCur = 0;
-        place = ed.EdOffst + ed.EdCursr;
-        ed.EdCursr = (u16)(place & 0x0F);
-        ed.EdLine = (u16)(place >> 4);
-        ed.EdLin0 = ed.EdLine;
-        ed.EdOffst = place & 0xFFFFFFF0UL;
+        place = EdOffst + EdCursr;
+        EdCursr = (u16)(place & 0x0F);
+        EdLine = place >> 4;
+        EdLin0 = EdLine;
+        EdOffst = place & ~0x0F;
     } else {
-        place = ed.EdOffst + ed.EdCursr;        /* T30_10 */
-        T56_00(0, 0, 0, HIGH(place), LOW(place));
-        ed.EdLin0 = ed.EdLine;
+        place = EdOffst + EdCursr;        /* T30_10 */
+        T56_00(0, 0, place);
+        EdLin0 = EdLine;
     }
-    ed.EdFirst = ed.EdOffst;            /* T30_11 */
+    EdFirst = EdOffst;            /* T30_11 */
 }
 
 /* Shift-F7: look for the text SrchStr again, from the cursor on, with a
@@ -1829,7 +1868,7 @@ static void T30_00(void)
 static void T32_00(void)
 {
     struct Box box;
-    u32 place, left, base;
+    i32 place, left, base;
     struct Sought sought;
     u16 count;
 
@@ -1837,7 +1876,7 @@ static void T32_00(void)
         return;
     T51_00();
     V80_00(EdFl_S, &box);
-    place = ed.EdOffst + ed.EdCursr;
+    place = EdOffst + EdCursr;
     for (;;) {                          /* T32_01 */
         if (TstBrk())
             goto done;
@@ -1845,13 +1884,13 @@ static void T32_00(void)
             goto none;
         left = ed.EdLen - place;
         count = 0x8000;
-        if (HIGH(left) == 0 && LOW(left) < count)
-            count = LOW(left);
+        if (left < count)
+            count = (u16)left;
         /* T32_02. The viewer's search takes the paragraph of the place
            and an offset from there, and answers with one: so the
            assembly had them, a segment and an offset of less than 16. */
-        base = place & 0xFFFFFFF0UL;
-        sought = V82_00(Room + base, (i32)(place - base), count);
+        base = place & ~0x0F;
+        sought = V82_00(Room + base, place - base, count);
         if (sought.found < 0x100)
             break;
         if (count < SrchLen)
@@ -1860,16 +1899,15 @@ static void T32_00(void)
     }
     if (TstBrk())                       /* T32_05 */
         goto done;
-    place = base + (u32)sought.end;
+    place = base + sought.end;
     if (ed.EdTxHex != 0) {
-        ed.EdHexAs = (u8)sought.found;
+        ed.EdHexAs = sought.found != 0;
         ed.EdHxCur = 0;
-        ed.EdOffst = place & 0xFFFFFFF0UL;
-        ed.EdLine = (u16)(place >> 4);
-        ed.EdCursr = LOW(place) & 0x0F;
+        EdOffst = place & ~0x0F;
+        EdLine = place >> 4;
+        EdCursr = place & 0x0F;
     } else {
-        T56_00(HIGH(ed.EdOffst), LOW(ed.EdOffst), ed.EdLine,   /* T32_06 */
-               HIGH(place), LOW(place));
+        T56_00(EdOffst, EdLine, place);               /* T32_06 */
     }
     goto done;
 none:
@@ -1936,19 +1974,19 @@ static u16 T00_83(u16 key)
         case 0x17:                      /* ^W: T22_00 */
             if (ed.EdTxHex != 0)
                 return 0;
-            cursor = EdSub1(EditBuf, ed.EdCursr);
-            if (cursor == ed.EdCursr)
+            cursor = EdSub1(EditBuf, (u16)EdCursr);
+            if (cursor == EdCursr)
                 return 0;
-            T20_02(EditBuf + cursor, EditBuf + ed.EdCursr);
-            ed.EdCursr = cursor;
+            T20_02(EditBuf + cursor, EditBuf + EdCursr);
+            EdCursr = cursor;
             return 0;
         case 0x14:                      /* ^T: T23_00 */
             if (ed.EdTxHex != 0)
                 return 0;
-            cursor = T55_00(ed.EdCursr);
-            if (cursor == ed.EdCursr)
+            cursor = T55_00((u16)EdCursr);
+            if (cursor == EdCursr)
                 return 0;
-            T20_02(EditBuf + ed.EdCursr, EditBuf + cursor);
+            T20_02(EditBuf + EdCursr, EditBuf + cursor);
             return 0;
         case 0x0B:                      /* ^K */
             T24_00();
@@ -1975,12 +2013,12 @@ right:
         case 0x73:                      /* ^Left: T07_00 */
 word_left:
             if (ed.EdTxHex == 0)
-                ed.EdCursr = EdSub1(EditBuf, ed.EdCursr);
+                EdCursr = EdSub1(EditBuf, (u16)EdCursr);
             return 0;
         case 0x74:                      /* ^Right: T08_00 */
 word_right:
             if (ed.EdTxHex == 0) {
-                ed.EdCursr = T55_00(ed.EdCursr);
+                EdCursr = T55_00((u16)EdCursr);
                 T08_01();
             }
             return 0;
@@ -2001,7 +2039,7 @@ page_down:
             T12_01(1);
             return 0;
         case 0x47:                      /* Home: T13_00 */
-            ed.EdCursr = 0;
+            EdCursr = 0;
             ed.EdHxCur = 0;
             return 0;
         case 0x4F:                      /* End */
@@ -2010,10 +2048,10 @@ page_down:
         case 0x84:                      /* ^PgUp */
         case 0x77:                      /* ^Home: T15_00 */
             T51_00();
-            ed.EdOffst = 0;
+            EdOffst = 0;
             T50_00();
-            ed.EdCursr = 0;
-            ed.EdLine = 0;
+            EdCursr = 0;
+            EdLine = 0;
             ed.EdHxCur = 0;
             return 0;
         case 0x76:                      /* ^PgDn */
@@ -2108,8 +2146,8 @@ static u16 T00_71(u16 mouse)
     row = mouse >> 8;
     column = (u8)mouse;
     if (ed.EdTxHex == 0) {
-        where = column + ed.EdCol0;
-        if (row == (u8)(ed.EdLine - ed.EdLin0)
+        where = column + EdCol0;
+        if (row == (u8)(EdLine - EdLin0)
             && (u8)mouse >= (u8)(size - 1)) {
             T06_10(1);
             return 1;
@@ -2125,7 +2163,8 @@ static u16 T00_71(u16 mouse)
             column %= 13;
             if (column >= 12)
                 column--;
-            ed.EdHex1 = (u8)(column % 3);
+            ed.EdHex1 = column % 3 != 0;   /* 2, the space behind
+                                                   the byte, as 1 */
             where = column / 3 | where;
         }
     } else {                            /* T00_76 */
@@ -2134,11 +2173,11 @@ static u16 T00_71(u16 mouse)
         if (where >= 16)
             where = 15;
     }
-    ed.EdCol1 = where;                  /* T00_77 */
-    count = row - (u16)(ed.EdLine - ed.EdLin0);
+    EdCol1 = where;                  /* T00_77 */
+    count = row - (u16)(EdLine - EdLin0);
     down = 1;
-    if (row < (u16)(ed.EdLine - ed.EdLin0)) {
-        count = -count;
+    if (row < (u16)(EdLine - EdLin0)) {
+        count = (u16)-count;
         down = 0;
     }
     T10_02(down, count);                /* T00_78 */
@@ -2154,21 +2193,21 @@ static void T00_20(void)
     struct Where where;
     struct Ending end;
     const u8 *base;
-    u32 place, free, start;
+    i32 place, free, start;
     u16 column, first_column, first_line, line, old_column, old_line;
     u16 delta, row, count, size, state, color, i;
     u16 *saved;
 
     column = T57_02();
-    ed.EdCol = column;
+    EdCol = column;
     if (ed.EdUpDwn == 0) {
-        ed.EdCol1 = column;
+        EdCol1 = column;
         ed.EdHex1 = ed.EdHxCur;
     }
     ed.EdUpDwn = 0;                     /* T00_21 */
-    line = ed.EdLine;
-    first_column = ed.EdCol0;
-    first_line = ed.EdLin0;
+    line = (u16)EdLine;
+    first_column = (u16)EdCol0;
+    first_line = (u16)EdLin0;
     if (ed.EdTxHex == 0) {
         if (column < first_column
             || column == first_column && first_column != 0) {
@@ -2190,35 +2229,35 @@ static void T00_20(void)
             first_line = line < size ? 0 : line - size;
         }
     }
-    old_column = ed.EdCol0;             /* T00_26 */
-    ed.EdCol0 = first_column;
-    old_line = ed.EdLin0;
-    ed.EdLin0 = first_line;
+    old_column = (u16)EdCol0;        /* T00_26 */
+    EdCol0 = first_column;
+    old_line = (u16)EdLin0;
+    EdLin0 = first_line;
     delta = first_line - old_line;
     if (delta != 0) {
         /* Where the first line of the window is now: so many lines on
            from where it was, or back, or back from the cursor's line if
            that is nearer. */
-        row = ed.EdLine - ed.EdLin0;
+        row = (u16)(EdLine - EdLin0);
         T60_10(&where);
         where.line = 0;
         place = 0;
         if (first_line >= old_line) {
             count = delta;
             if (count <= row) {
-                where.place = ed.EdFirst;
+                where.place = EdFirst;
                 do                      /* T00_27 */
                     T53_00(&where);
                 while (--count);
                 goto first;
             }
         } else {
-            if (ed.EdLin0 == 0)         /* T00_28 */
+            if (EdLin0 == 0)         /* T00_28 */
                 goto top;
-            count = -delta;
+            count = (u16)-delta;
             if (count <= row) {
                 row = count;
-                where.place = ed.EdFirst;
+                where.place = EdFirst;
             }
         }
         count = row;                    /* T00_29 */
@@ -2231,16 +2270,16 @@ static void T00_20(void)
 first:
         place = where.place;            /* T00_31 */
 top:
-        ed.EdFirst = place;             /* T00_32 */
+        EdFirst = place;             /* T00_32 */
     }
     if (ed.EdScrn == 0) {               /* T00_33 */
-        if (old_column == ed.EdCol0) {
+        if (old_column == EdCol0) {
             if (delta == 1) {
                 T71_00(0x600, ed.EdBase, 160);
                 ed.EdCurLn = 0;
             } else if (delta == 0xFFFF) {       /* T00_34 */
                 T71_00(0x700,
-                       ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8),
+                       (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)),
                        (u16)-160);
                 ed.EdCurLn = 0;
             } else if (delta != 0) {
@@ -2264,10 +2303,10 @@ whole:
     /* The assembly has the lines as offsets in the segment of the first
        of them, the paragraph that EdFirst is in, and T72_00 goes by how
        far into that segment a line ends. */
-    start = ed.EdFirst;
-    base = Room + (start & 0xFFFFFFF0UL);
+    start = EdFirst;
+    base = Room + (start & ~0x0F);
     do {                                /* T00_41 */
-        state = T63_01(HIGH(start), LOW(start));
+        state = (u16)T63_01(start);
         if (state == 1 && ed.EdTxHex == 0) {
             /* The end of the text: a line of nothing, if the text ends
                with the two characters. */
@@ -2317,18 +2356,20 @@ shown:
             color = '"';
         *(u8 *)(md.ScrBuf + 39) = (u8)color;
         color |= md.ScrBuf[0] & 0xFF00;
-        T75_00(ed.EdLine, md.ScrBuf + 46, color);
-        T75_00(ed.EdCol, md.ScrBuf + 56, color);
+        T75_00(EdLine, md.ScrBuf + 46, color);
+        T75_00(EdCol, md.ScrBuf + 56, color);
         /* What is free: the room less the text, and less what the line
            in the buffer has grown by. Nothing, if that is more than
-           there is. */
-        free = ((u32)ed.EdSpace << 4) - ed.EdLen;
+           there is: the assembly counts in 32 bits without a sign and
+           takes 20 bits or more for less than nothing, which is that
+           while the room is less than a megabyte. */
+        free = EdSpace - ed.EdLen;
         if (ed.EdTxHex == 0) {
-            free += ed.EdEndBf - ed.EdOffst - ed.EdSizLn;
-            if (HIGH(free) >= 0x10)
+            free += EdEndBf - EdOffst - EdSizLn;
+            if (free < 0)
                 free = 0;
         }
-        Number(md.TmpBuf, HIGH(free), LOW(free),        /* T00_54 */
+        Number(md.TmpBuf, (u16)(free >> 16), (u16)free, /* T00_54 */
                NUM_SEPARATED | NUM_PADDED);
         MvsBw(md.ScrBuf + 62, md.TmpBuf + 6, 7, color);
         for (i = 0; i < 80; i++)
@@ -2338,7 +2379,7 @@ shown:
             }
     }
 
-    column = (u8)(ed.EdCol - ed.EdCol0);        /* T00_60 */
+    column = (u8)(EdCol - EdCol0);        /* T00_60 */
     if (ed.EdTxHex != 0) {
         if (ed.EdHexAs != 0) {
             column += 63;
@@ -2348,7 +2389,7 @@ shown:
                 column++;
         }
     }
-    Cursor((u16)(((u16)(u8)(ed.EdLine - ed.EdLin0) << 8 | (u8)column)
+    Cursor((u16)(((u16)(u8)(EdLine - EdLin0) << 8 | (u8)column)
                  + ed.EdBase));
 }
 
@@ -2438,12 +2479,17 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     u16 *cell;
     u16 *screen;
     u8 *piece;
-    u32 left;
+    i32 left;
     const u8 *file;
-    u16 help, count, place, color, i;
+    i32 help, count, i;
+    u16 place, color;
 
-    ed.EdSpace = RoomParas();
-    if ((u32)ed.EdSpace << 4 <= ed.EdLen) {
+    /* The room in bytes, as whole paragraphs, which the lines of hex
+       mode, of 16 bytes each, go by. A file that is not shorter is too
+       large: its length is the viewer's, of 32 bits without a sign,
+       and from here on below the room. */
+    EdSpace = RoomBytes() & ~0x0F;
+    if ((u32)ed.EdLen >= (u32)EdSpace) {
         /* T00_01. The assembly leaves in DX for the text that ^I stands
            for, and in BX and SI for a box that is on the screen, what the
            box before had there. Nothing reads the three: the box has no
@@ -2461,11 +2507,11 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     end = MvzLine(md.TmpBuf, name, 13);
     *end++ = 0;
     PathLin(md.TmpBuf);
-    count = (u16)(end - md.TmpBuf);
-    help = 0x0A01;
+    count = end - md.TmpBuf;
+    help = 1;
     file = Menu_F;
     if (!T64_00(file, md.TmpBuf, count)) {
-        help = 0x0A02;
+        help = 2;
         file = Ext_F;
         if (!T64_00(file, md.TmpBuf, count)) {
             file = ViewE_F;
@@ -2476,8 +2522,8 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
             }
         }
     }
-    EdHelp = (u8)help;                  /* T00_04 */
-    ed.EdSizeY -= help >> 8;
+    if (help != 0)                      /* T00_04 */
+        ed.EdSizeY -= 10;               /* the rows of the help */
     if (handle == 0xFFFF) {
         /* A new file. */
         if ((u8)(md.Lines - 2) <= ed.EdSizeY
@@ -2488,9 +2534,9 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
         piece = Room;
         for (;;) {
             count = PIECE;              /* T00_07 */
-            if (HIGH(left) == 0 && LOW(left) < count)
-                count = LOW(left);
-            read = FileRead(handle, piece, count);      /* T00_08 */
+            if (left < count)
+                count = left;
+            read = FileRead(handle, piece, (u16)count); /* T00_08 */
             if (read.failed)
                 goto closed;            /* T00_09 */
             if (TstBrk())
@@ -2512,7 +2558,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     ed.EdStat = 0;
     if (ed.EdSizeX >= 79) {
         /* The status line. */
-        color = Color(Menu_C) << 8 | ' ';
+        color = (u16)(Color(Menu_C) << 8 | ' ');
         for (i = 0; i < 80; i++)
             md.ScrBuf[i] = color;
         cell = MovDz0(BasAdr(0), EdFl_S + 1);
@@ -2523,19 +2569,19 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
         T74_00();
         ed.EdStat = 1;
     }
-    if (EdHelp != 0) {                  /* T00_14 */
+    if (help != 0) {                    /* T00_14 */
         /* The help below the window: a box between two rows of half
            blocks, its title, and six lines in each of two columns. */
-        place = ed.EdBase + ((u16)ed.EdSizeY << 8);
+        place = (u16)(ed.EdBase + ((u16)ed.EdSizeY << 8));
         screen = BasAdr(place);
-        color = Color(HlBrd_C) << 8;
+        color = (u16)(Color(HlBrd_C) << 8);
         for (i = 0; i < 80; i++)
             *screen++ = color | 0xDC;
-        screen = BoxDubl(screen, Color(*EdtH_P) << 8 | 0xDC, 6, 1, 76);
+        screen = BoxDubl(screen, (u16)(Color(*EdtH_P) << 8 | 0xDC), 6, 1, 76);
         for (i = 0; i < 80; i++)
             *screen++ = color | 0xDF;
         file = EdtH1_S;
-        if (EdHelp != 1)
+        if (help != 1)
             file = EdtH2_S;
         line.value = (place & 0xFF00) + 0x100 | 40;     /* T00_15 */
         line.screen = screen;
@@ -2557,13 +2603,13 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     ed.EdChng = 0;
     ed.EdUpDwn = 0;
     ed.EdCurLn = 0;
-    ed.EdLine = 0;
-    ed.EdCol0 = 0;
-    ed.EdLin0 = 0;
-    ed.EdFirst = 0;
-    ed.EdOffst = 0;
-    ed.EdCursr = 0;
-    ed.EdUndo = 0;
+    EdLine = 0;
+    EdCol0 = 0;
+    EdLin0 = 0;
+    EdFirst = 0;
+    EdOffst = 0;
+    EdCursr = 0;
+    EdUndo = 0;
     md.Clock = 0;
     md.KeyBar = 1;
     ed.EdScrn = 1;

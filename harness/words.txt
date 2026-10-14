@@ -20,7 +20,7 @@ dirfunc.c     MD_PLACE 1, ENTRY 7, DSKBUF 2
 dirfunc_t.c   MD_AT 75, NUMBER 9
 dos32.c       ARENA 1, AT 1
 drive.c       DSKBUF 2
-edit.c        RoomParas 1
+edit.c        none
 edit_t.c      MD_AT 15, NUMBER 1
 enter.c       ENTRY 10, DSKBUF 10, MAIN_AS_PANEL 1
 exec.c        MD_PLACE 2
@@ -48,7 +48,7 @@ read.c        PANEL_BLOCK 1, ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1
 screen.c      none
 setup.c       none
 stack.c       none
-start.c       AT 2, SEG_OF 1, RoomParas 1, PANEL_BLOCK 1, ROOM_LEAST 2, u16 segment 1, DSKBUF 3
+start.c       AT 2, SEG_OF 1, PANEL_BLOCK 1, ROOM_LEAST 2, u16 segment 1, DSKBUF 3
 stcolor.c     none
 stcolor_t.c   MD_AT 2
 sthelp.c      none
@@ -66,7 +66,7 @@ tree.c        TRELIST 8
 treebox.c     MD_POINTER 1, TRELIST 7, TREE_OFFSET 11, TREE_ENTRY 3, NUMBER 2
 treebox_t.c   MD_AT 3
 usermenu.c    ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
-vc.h          ARENA 2, AT 1, RoomParas 1, TRELIST 2
+vc.h          ARENA 2, AT 1, TRELIST 2
 view.c        SEG_OF 3, ROOM_LEAST 1, ENTRY 1
 view_t.c      MD_AT 21, NUMBER 2
 window.c      none

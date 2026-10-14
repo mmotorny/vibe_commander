@@ -489,11 +489,10 @@ extern struct WCBdef *RightPanel;
    the second panel ends, wherever that is. The room is given back for
    a command and taken again, and may then be elsewhere and of another
    length: nothing keeps a pointer into it across GiveMem, TakeMem or
-   Aexec0 of view.c. RoomParas, of start.c, says how long it is, in
-   paragraphs, and RoomBytes in bytes. */
+   Aexec0 of view.c. RoomBytes, of start.c, says how long it is, in
+   bytes. */
 extern u8 *Room;
 extern u8 *RoomEnd;
-u16 RoomParas(void);
 i32 RoomBytes(void);
 
 /* Places of the main data that the program keeps, of main.c: each is a

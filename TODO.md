@@ -9380,8 +9380,8 @@ for.
 | N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | **Done**: "N3, `view.c`, its first part" below, with what `ViewDat` and `EdData` share and where the file is cut |
 | N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | **Done**, with question 11 answered and its fix: "N4, `view.c`, its second part" below |
 | N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
-| N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
-| N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
+| N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | **Done**, the room in bytes; questions 8, 5 and 9 prepared, and where the file is cut: "N6, `edit.c`, its data" below |
+| N7, N8 | `edit.c`, the rest, in two halves by its routines: N7 to `T80_00`, N8 the keys ("N6" below) | 76 and 65 numbers | N6 | Whoever carries out the answer to question 5 has three places of the lines ("N6") |
 | N9 † | `copy.c` | 1,571; 147 | F6 | **Done**, the buffer in bytes, with its question answered and its fix: "N9, `copy.c`: done, and what a later cluster should know" below |
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | **Done**: "N10, `dirfunc.c`: done, and what a later cluster should know" below |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
@@ -14342,6 +14342,159 @@ lists beside them 10; the types and the casts by scripts 10; the
 record's reasons by one script 5; the tests and the documents the
 rest, the images and the suite once each on a machine that four
 other clusters were testing on.
+### N6, `edit.c`, its data: done, and what a later cluster should know
+
+**The questions for the user, prepared and not decided** (8, 5 and 9 of
+"The questions for the user"; one hand-back):
+
+- **5, lines beyond 65,535.** *The original*, on the bench, with a text
+  of 116,673 short lines (65,504 empty, `A01` to `A64`, 51,104 empty,
+  `zebra`; 233,541 bytes, made by copies with append as `editor-big`
+  makes its file): the cursor goes no further than line 65,536, which
+  the status line shows as `Line 0` (the line counted from 0, 0FFFFh,
+  plus one in 16 bits); `Line 65535` above it. Down, Right at the end
+  of the line, PgDn, Ctrl+End and Ctrl+PgDn all stop there; the lines
+  behind it are never shown in text. A search for a text behind it,
+  F7 and Shift+F7, says nothing is wrong: no "Could not find" box, the
+  cursor on line 65,536 at its end. In hex everything is reached, and
+  F2 saves the whole text, also after a change on that last line. So
+  the text is not harmed: it is a limit, `T53_00` refusing the next
+  line from 0FFFFh, and a status line that shows 0 there. A line of
+  102,208 bytes: the line buffer keeps its first 3,900 characters,
+  `Col 3900` at End, and the line is saved whole: no limit of 64K.
+  *Recommended*: lines counted in 32 bits, the whole text reached in
+  text as in hex, and the number shown as it is (with question 8 for
+  how). *Or*: as the original, the limit kept as a number of the
+  program's own. *The test* either way: a scenario of both, the file
+  made as above (some 25 steps, half a minute on the bench), with the
+  original's golden and, for the first, a patch on the status line
+  and the window behind line 65,536.
+- **8, the room's figures in the status line.** *What it is*: `Line`
+  in cells 46 to 50, `Col` 56 to 60, the free bytes 62 to 68, `Free`
+  from 70. Nothing is free around them: `Col` takes all five cells for
+  a line of tabs (3,900 characters of eight columns is 31,200), cell
+  61 is the one space between `Col`'s number and the free bytes, 69
+  the one before `Free`. So the field cannot be three cells wider.
+  *If nothing is done*: from 1,000,000 free bytes on the cells show the
+  last seven characters of the figure as `Number` pads it to thirteen,
+  `009,232` for 15,009,232; a `Line` of six digits shows its first
+  five, 123,456 as `12345` (T75_00 writes five cells). The place in
+  hex, eight digits, has room to 4 GB, so nothing else grows.
+  *Recommended*: in thousands with K from 1,000,000 free bytes on,
+  `15,009K`, seven cells to 9,999,999K; and, if 5 is answered so, a
+  line of six digits in cells 46 to 51 (51 being the space before
+  `Col`) and in K from 1,000,000 lines on. *Or*: no figure from a
+  million on. The pattern of `IGNORED` that leaves the free bytes out
+  follows the new form, a change of what the comparison leaves out:
+  asked with it.
+- **9, a scenario of the portable C's own**: as the plan has it,
+  `editor-huge`, after F9, which alone gives a text larger than the
+  original's room. What this cluster adds to it: the file can be made
+  as for 5, by doubling, in some 30 steps for 1.4 MB, and it would hold
+  what no golden reaches: the free bytes from a million on, a line in
+  hex beyond 0FFFFh, a place beyond 20 bits, and, if 5 is answered so,
+  lines beyond 65,536 in text. *Recommended*: yes, that one and no
+  other.
+
+**What there is.** The data of `edit.c` sorted by "The rule for a
+number", by the steps of "N0d": `struct EdData`, `struct Where`,
+`struct Ending`, and `T00_00` where the editor takes its room and reads
+its file, and with them every place of the text in the file, so that
+nothing that counts the room or a place in the text is 16 bits or
+without a sign when F9 lands. clang's warnings are silent for all of
+`edit.c`. The room is counted in bytes, `RoomBytes() & ~0x0F`, whole
+paragraphs, since the lines of hex are 16 bytes and the last byte of
+the room is the last of one; `RoomParas` is gone from `start.c` and
+`vc.h`, nothing calling it, and `harness/words.txt` has it at nothing.
+
+**`EdData`.** The table of N3's section held: the six things that the
+viewer shares stay where they are and as wide. Twelve fields count or
+are places, and leave the structure as variables of `edit.c` of the
+same name, `i32`, as N3's did, their bytes `unused` in the record:
+`EdSpace`, `EdOffst`, `EdEndBf`, `EdFirst`, `EdSizLn`, `EdCursr`,
+`EdUndo`, `EdCol`, `EdCol1`, `EdLine`, `EdCol0`, `EdLin0`. Each is set
+before it is read, in `T00_00` or the first `T00_20`. `EdLen` stays in
+the structure, the viewer's `ViLen`, and is an `i32` there, the same
+four bytes: `T00_00` holds it against the room as a `u32`, the length
+of the file, and from there on it is the length of the text, below the
+room. The twelve flags are `bool`, a byte as before. `EdHxCur` and
+`EdHex1` among them: `EdHex1` was `column % 3`, 2 for a click on the
+space behind a byte, and every read of either asks whether it is 0, so
+it is `column % 3 != 0`; the byte holds 1 where the original has 2,
+which only the image sees. `EdHelp`, the first byte of `EdOffst`, is
+`help` of `T00_00`, which alone read it.
+
+**The places of the text.** All 37 that were a `u32` are `i32`, F5's
+places, `struct Where`'s and `struct Ending`'s among them; `T63_01` and
+`T56_00` take places where they took halves, and `HIGH`, `LOW` and
+`PAIR` are gone. Two tests of the original by 64K are kept and written
+out: `T51_00` cuts the line when the room is full only if its place and
+the end are in one 64K (`end >> 16 == EdOffst >> 16`), and `T01_10`
+steps the low word of `EdOffst` alone (`EdOffst & ~0xFFFF |
+(u16)(EdOffst + 0x10)`, F5's `*(u16 *)&`), each with its comment. The
+free bytes are 0 for less than nothing (`free < 0`), where the original
+took 20 bits or more for that, which is the same under a megabyte.
+
+**The lines.** `EdLine`, `EdLin0` and `where.line` are `i32`; a line of
+hex is `place >> 4`, no longer cut. What they do is the original's,
+until question 5 is answered: `T53_00` refuses the next line from
+0FFFFh, in text and in hex, and `T75_00` shows the line plus one in 16
+bits, with `wraps` in its comment. So under the cap of today nothing is
+otherwise; for a line of hex beyond 0FFFFh, which only F9 makes
+possible, three things are left to whoever carries out the answer to
+5: that test in `T53_00` (in hex at least), the `u16` lines of `T00_20`
+and `T20_06`, which take `(u16)EdLine` and `(u16)EdLin0` at the border
+now, and `T75_00`'s cut. F9 waits for that answer anyway.
+
+**The numbers**, by the record's table for `edit.c`: 65 `i32` (4
+before), 14 `bool`, 28 kept by a word (21 fields of `EdData`: 12
+`unused` as variables, 5 `unused` reserved bytes, 3 `place`, 1
+`system`; `word` of `T53_10`, `text`; the colour of `T75_00`, `cell`;
+`T00_00`'s `handle`, `begin`, `size`, `place`, `color`), 0 by a
+sentence, 2 places of a sign with their reasons (`T16_00`, `T30_00`, a
+line of hex) and 10 in scopes that N7 and N8 sort: `T51_00` and `T00_20`
+by this cluster's `>> 16`, `T32_00`'s `>> 4`, the rest as they were.
+`T63_01` answers an `i32`, `T64_00` a `bool`.
+
+**The casts.** clang named 23 places before and 65 after the widening.
+10 went by a type or by a mask written as an int (`& ~0x0F` for
+`& 0xFFFFFFF0UL`, four places of two warnings each; `T75_00` taking an
+`i32`); 55 by a cast, most at the border with what N7 and N8 sort: a
+count of the line buffer, a row of the window, `(u16)EdLine` in
+`T00_20`. None of those needs a comment: each fits by the line buffer
+or the window. One counts on the wrap, `T75_00`. `harness/int16.txt`:
+`RoomParas` gone, five places of `edit.c` written anew on lines that
+changed, with their reasons, two new, `count` of `T00_00` and `EdUndo`
+of `T25_00`, each with why it fits.
+
+**Where the file is cut for N7 and N8.** N7: from the top to `T80_00`
+with `T60_10` and `T60_20`, the lines, the text, the screen and saving,
+and `struct Reached`, `struct Drawn` and the texts: 76 numbers, 4 of a
+sign. N8: the keys, `T14_12` to `T00_19` and `Ends`: 65 numbers, 6 of
+a sign. Each takes out the casts at the border that its widening makes
+needless.
+
+**The program.** The whole suite passes, fourteen tests, 156
+scenarios behind the rebase onto N13, no golden and no patch changed. `VC.EXE` is 400 bytes
+shorter. The image of every scenario, `compare` of the build of
+`main` that the cluster began on, saved before anything changed, with
+this one and `--changed EdData`: "155 scenarios, 0 with nothing that
+differs; 4 differences, 135 more in what was declared as changed, 759
+in what may differ", and "493 pointers that name the same in both";
+against a full copy of the build of `bcc5a1d`, N13, on which it
+landed, "156 scenarios, ... 4 differences, 135 more in what was
+declared as changed, 756 in what may differ", 497 pointers.
+The 135 are the bytes of the fields that are variables now, which the
+editor no longer writes: `EdSpace` 32, `EdCol` 19, `EdHelp` (of
+`EdOffst`) 18, `EdUndo` 17, `EdLine` 15, `EdCursr` 15, `EdFirst` 6,
+`EdLin0` 5, `EdCol1` 4, `EdEndBf` 2, `EdCol0` 2; no flag differs. The
+four are the byte behind a name copied as 13 bytes in `copy` and
+`copy-dirs`, 80h before and 81h after (7Fh and 81h on N13), which follows the program's
+file, as in N3's and F5's images. The twelve variables are "not there
+before: not compared".
+
+It took some 105 tool calls, of which the bench for question 5 was a
+helper's 19, run beside the work.
 
 ### N13, `tree.c`, `treebox.c`, `extfile.c`: done, and what a later cluster should know
 

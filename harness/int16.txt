@@ -105,20 +105,40 @@ drive.c, F62_01: widen
     Cut to 16 bits by the cast on the line itself; the letters are in
     the box, which is on the screen.
 
+edit.c, T00_00: widen
+    | count = end - md.TmpBuf;
+    The length of a name, with its zero: MvzLine copies 13 bytes at the
+    most to TmpBuf, and `end` is behind them, a byte further on.
+
 edit.c, T00_20: minus
     | (u16)-160);
     The step of T71_00, which adds it to a place of the main data, a
     number, and makes the pointer of the sum: MD_POINTER(MD_PLACE(to) +
     step). The sum wraps round there in both builds.
 
+edit.c, T01_10: widen
+    | EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst + 0x10);
+    wraps: written so. The low word of the place alone is stepped by a
+    line of hex and back, as the assembly steps it, and the cast is that.
+
+edit.c, T01_10: widen
+    | EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst - 0x10);
+    wraps: written so. The low word of the place alone is stepped by a
+    line of hex and back, as the assembly steps it, and the cast is that.
+
 edit.c, T02_03: minus
-    | ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8), (u16)-160);
+    | (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)), (u16)-160);
     The step of T71_00, which adds it to a place of the main data, a
     number, and makes the pointer of the sum: MD_POINTER(MD_PLACE(to) +
     step). The sum wraps round there in both builds.
 
+edit.c, T25_00: widen
+    | EdUndo = size + 2;
+    `size` is what the line buffer holds of the line, EdSizLn, no more
+    than LenEdit - 100 bytes, which T50_00 keeps it to.
+
 edit.c, T26_00: widen
-    | left = (i32)(from - (EditBuf + ed.EdCursr - 1));
+    | left = (i32)(from - (EditBuf + EdCursr - 1));
     Two places of the line buffer, which has 4,000 bytes: how far
     `from` is behind the cursor, or before it, within 16 bits either
     way. The line below asks whether it is above 0.
@@ -132,10 +152,9 @@ edit.c, T72_00: compare
     before `end` at every call.
 
 edit.c, T72_00: widen
-    | offset = (u32)(from - Room);
-    Written for an int of 32 bits and meant so: the place of a byte
-    of the text, an address less the address of the text, which is
-    not below 0 and is shown as eight digits of hex.
+    | offset = from - Room;
+    The place of a byte of the text, an address less the address of the
+    text, which is not below 0 and is shown as eight digits of hex.
 
 find.c, FindFil: widen
     | left = (i32)(RoomEnd - part);
@@ -239,13 +258,6 @@ start.c, MnPth0: index
     | for (i = 0; i < length && env[at + i] == name[i]; i++)
     at is a place in the environment, which DOS holds to 32K, and i is
     below the length of a name of a variable, which the callers write.
-
-start.c, RoomParas: shift
-    | return (u16)((RoomEnd - Room) >> 4);
-    RoomEnd is behind Room, in the same block: Memory, just above, makes
-    it of Room and a count of paragraphs of 16 bits, and nothing else
-    sets either. So the difference is not below 0, and its sixteenth is
-    that count again.
 
 stcolor.c, StCol00: index
     | chosen.color = StPalets[ColAddr(sd.ColCur) - md.ColTab];
