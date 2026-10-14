@@ -247,7 +247,8 @@ static u8 *MnPth0(u8 *to, const u8 *env,
 static i32 ReadOne(const u8 *path, u8 *end,
                    const u8 *name, u8 *buffer, i32 count)
 {
-    struct Answer opened, read;
+    struct Answer opened;
+    struct Moved read;
     i32 i;
 
     for (i = 0; i < 13; i++)
@@ -255,12 +256,10 @@ static i32 ReadOne(const u8 *path, u8 *end,
     opened = FileOpenBare(path, 0x20);  /* to read; others may read */
     if (opened.failed)
         return FAILED;                  /* RdOne1 */
-    read = FileReadBare(opened.value, buffer,
-                        (u16)count);    /* fits: the callers ask for
-                                           less than 64K */
+    read = FileReadBare(opened.value, buffer, count);
     if (FileCloseBare(opened.value).failed || read.failed)
         return FAILED;
-    return read.value;
+    return read.count;
 }
 
 /* The program has been started. Read its setup file and its main

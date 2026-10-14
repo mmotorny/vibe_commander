@@ -921,7 +921,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 96 functions
+In the portable C that place is `src/portable_c/sys.h`: 97 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test
 `portable_c-host` has the file clean. `dos32.c` is those functions for
@@ -933,7 +933,7 @@ another system will be another file beside it.
 
 | What | Functions |
 |---|---|
-| Files: made, opened, closed, read, written, a place in one, deleted, renamed, their attributes and their date and time, what a handle is, a full path | 17 |
+| Files: made, opened, closed, read, written, a place in one and a step from where one is, deleted, renamed, their attributes and their date and time, what a handle is, a full path | 18 |
 | Files by a file control block: a mask deleted at one call, a label | 2 |
 | Directories: what is in one, made, removed, the current one | 8 |
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |

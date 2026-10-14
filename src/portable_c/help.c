@@ -167,7 +167,7 @@ void DeCode(u8 *at, u16 count)
 static bool SeekDsk(u16 high, u16 low)
 {
     u32 place = (u32)high << 16 | low;
-    struct FilePlace sought = FileSeek(hd.HlpHndl, 0, place);
+    struct FilePlace sought = FileSeek(hd.HlpHndl, place);
 
     if (sought.failed)
         return true;
@@ -178,11 +178,11 @@ static bool SeekDsk(u16 high, u16 low)
    would not, or read fewer. */
 static bool ReadDsk(u8 *to, i32 count)
 {
-    struct Answer read = FileRead(hd.HlpHndl, to, (u16)count);
+    struct Moved read = FileRead(hd.HlpHndl, to, count);
 
     if (read.failed)
         return true;
-    return read.value != count;
+    return read.count != count;
 }
 
 /* Read the entry at HlpOffs. For a page that follows the index, the first

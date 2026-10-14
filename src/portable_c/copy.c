@@ -612,7 +612,8 @@ static u16 C20_00(i32 fits)
 {
     struct Box box;
     u32 size, free;
-    struct Answer opened, moved, asked;
+    struct Answer opened, asked;
+    struct Moved moved;
     struct Device device;
     struct FileAttr attr;
     struct FileStamp stamp;
@@ -673,8 +674,8 @@ static u16 C20_00(i32 fits)
             goto unopened;
         }
         CpAttr = attr.attributes & 0x27 | 0x20;
-        CpSize = FileSeek(CpHndl1, 2, 0).place;
-        FileSeek(CpHndl1, 0, 0);
+        CpSize = FileStep(CpHndl1, 2, 0).place;
+        FileSeek(CpHndl1, 0);
     }
     stamp = FileTime(CpHndl1);
     if (stamp.failed && CpDev1 != 0) {
@@ -708,10 +709,10 @@ read:
         do {
             got = 0;
             if (count != 0) {
-                moved = FileRead(CpHndl1, buffer + offset, (u16)count);
+                moved = FileRead(CpHndl1, buffer + offset, count);
                 if (moved.failed)
                     goto terminate;
-                got = moved.value;
+                got = moved.count;
             }
             CpRead += (u32)got;
             PerCent();
@@ -855,14 +856,14 @@ append:
     }
     CpDate = stamp.date;
     CpTime = stamp.time;
-    size = FileSeek(CpHndl2, 2, 0).place;
+    size = FileStep(CpHndl2, 2, 0).place;
     if (size != 0) {
         size--;
-        FileSeek(CpHndl2, 0, size);
+        FileSeek(CpHndl2, size);
         if (FileRead(CpHndl2, md.TmpErr, 1).failed)
             goto terminate;
         if (md.TmpErr[0] == 0x1A)
-            FileSeek(CpHndl2, 0, size);
+            FileSeek(CpHndl2, size);
     }
 
 write:
@@ -880,10 +881,10 @@ write:
             count = left;
         got = 0;
         if (count != 0) {
-            moved = FileWrite(CpHndl2, buffer, (u16)count);
+            moved = FileWrite(CpHndl2, buffer, count);
             if (moved.failed)
                 goto terminate;
-            got = moved.value;
+            got = moved.count;
             if (got == 0)
                 goto full;
         }
@@ -958,10 +959,10 @@ full:
         /* The bytes of a cluster as 16 bits, times the clusters. */
         free = (u32)(u16)(space.value * space.sector) * space.free;
         if (free < (u32)count) {
-            moved = FileWrite(CpHndl2, buffer, (u16)free);
+            moved = FileWrite(CpHndl2, buffer, (i32)free);
             if (moved.failed)
                 goto terminate;
-            got = moved.value;
+            got = moved.count;
         }
     }
     CpWrite += (u32)got;
@@ -969,7 +970,7 @@ full:
     rest = buffer + (got >> 4 << 4);         /* in paragraphs, as above */
     SetDate(CpHndl2);
     /* Is anything in the file? */
-    filled = FileSeek(CpHndl2, 2, 0).place != 0;
+    filled = FileStep(CpHndl2, 2, 0).place != 0;
     if (FileClose(CpHndl2).failed)
         goto forget;
     if (!filled) {

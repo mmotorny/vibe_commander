@@ -555,7 +555,8 @@ u16 FindFil(u16 attributes)
     u16 handle;
     i32 length, suffix, left, chunk, count, i;
     bool found;
-    struct Answer entry, opened, read;
+    struct Answer entry, opened;
+    struct Moved read;
     u8 c, kind;
 
     if (!(attributes & ATTR_DIRECTORY))
@@ -652,17 +653,17 @@ next:
             /* FnFl46 */
             if (!FndBack())
                 goto stopped;
-            read = FileRead(handle, part, (u16)chunk);   /* 8050h at most */
+            read = FileRead(handle, part, chunk);   /* 8050h at most */
             if (read.failed)
                 goto stopped;
-            count = read.value;
+            count = read.count;
             if (V82_00(part, 0, count).found != 0x100) {
                 found = true;
                 break;
             }
             if (count < chunk)
                 break;
-            FileSeek(handle, 1, (u32)-80L);
+            FileStep(handle, 1, -80);
         }
         /* FnFl49 */
         FileClose(handle);

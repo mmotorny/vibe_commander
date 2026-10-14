@@ -244,12 +244,12 @@ opened:
     VI->ViHandle = handle;
     length = 0;
     if (handle != 0xFFFF) {
-        end = FileSeek(handle, 2, 0);
+        end = FileStep(handle, 2, 0);
         if (!end.failed)
             length = end.place;
     }
     VI->ViLen = length;
-    FileSeek(handle, 0, 0);
+    FileSeek(handle, 0);
     VI->ViKeyBar = (u16)(md.KeyBar << 8 | md.Clock);
     open->handle = handle;
     if (VI->ViewEdit)
@@ -659,7 +659,7 @@ bool V40_00(void)
    `count` bytes to `to` in the text. */
 static void Load(u8 *text, u32 position, i32 to, i32 count)
 {
-    if (FileSeek(VI->ViHandle, 0, position).place == position)
+    if (FileSeek(VI->ViHandle, position).place == position)
         V55_00(text, to, count, VI->ViHandle);
 }
 
@@ -755,7 +755,7 @@ void V55_00(u8 *text, i32 to, i32 count, u16 handle)
 
     for (left = count; left; left--)
         *at++ = 0;
-    FileRead(handle, part, (u16)count);   /* ViSpace at the most */
+    FileRead(handle, part, count);      /* ViSpace at the most */
 }
 
 /* Make the table of lines for the text from `at` on: `table` is the
@@ -857,7 +857,7 @@ void V00_10(u16 handle)
                                            the viewer has it */
     struct Line line;
     struct Box box;
-    struct Answer read;
+    struct Moved read;
     u32 rest, position;
     struct Sought sought;
     struct Mouse pointer;
@@ -1212,7 +1212,7 @@ V09_00:                                 /* Home */
     if (HIGH(VI->ViLen) == 0 && count > LOW(VI->ViLen))
         count = LOW(VI->ViLen);
     ViLoaded = count;
-    FileSeek(VI->ViHandle, 0, 0);
+    FileSeek(VI->ViHandle, 0);
     V55_00(text, 0, count, VI->ViHandle);
     goto V00_15;
 
@@ -1294,10 +1294,10 @@ V15_04:                                 /* and on in the file, a piece of
     count = LenMenu;
     if (HIGH(rest) == 0 && count > LOW(rest))
         count = LOW(rest);
-    if (FileSeek(VI->ViHandle, 0, VI->ViSearch).place != VI->ViSearch)
+    if (FileSeek(VI->ViHandle, VI->ViSearch).place != VI->ViSearch)
         goto V15_07;
-    read = FileRead(VI->ViHandle, md.MenuBuf, (u16)count);
-    count = read.value;
+    read = FileRead(VI->ViHandle, md.MenuBuf, count);
+    count = read.count;
     if (read.failed) {
         result = 2;
         goto V15_22;
@@ -1864,7 +1864,8 @@ static struct Onward F34_11(u16 how)
     const u8 *from;
     struct Named named;
     struct Next next;
-    struct Answer file, read, found;
+    struct Answer file, found;
+    struct Moved read;
     bool edit = (how & 0xFF) != 0;
     bool own = how >> 8 != 0;
     i32 count, i;
@@ -1899,7 +1900,7 @@ static struct Onward F34_11(u16 how)
         }
     }
     read = FileRead(file.value, md.MenuBuf, LenMenu - 1);
-    count = read.value;
+    count = read.count;
     if (FileClose(file.value).failed)
         return To(NEXT_FUNC04);
     if (read.failed)

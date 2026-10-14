@@ -1006,6 +1006,7 @@ static void T80_Name(void)
 static struct Answer T80_02(u16 attributes)
 {
     struct Answer answer;
+    struct Moved wrote;
     struct Device device;
     const u8 *piece;
     i32 left, count;
@@ -1038,13 +1039,13 @@ static struct Answer T80_02(u16 attributes)
             count = PIECE;
             if (left < count)
                 count = left;
-            answer = FileWrite(handle, piece, (u16)count);
-            failed = answer.failed;
-            error = answer.value;
+            wrote = FileWrite(handle, piece, count);
+            failed = wrote.failed;
+            error = wrote.error;
             if (failed)
                 goto close;
-            if (answer.value != count) {
-                failed = answer.value < count;
+            if (wrote.count != count) {
+                failed = wrote.count < count;
                 error = ERR_DISK_FULL;
                 goto close;
             }
@@ -2497,7 +2498,7 @@ static struct EditEnd Ends(i32 how, bool written)
    and the extension files have ten lines of help below theirs. */
 struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
 {
-    struct Answer read;
+    struct Moved read;
     struct LineArgs line;
     const u8 *name;
     u8 *end;
@@ -2561,13 +2562,13 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
             count = PIECE;              /* T00_07 */
             if (left < count)
                 count = left;
-            read = FileRead(handle, piece, (u16)count); /* T00_08 */
+            read = FileRead(handle, piece, count);      /* T00_08 */
             if (read.failed)
                 goto closed;            /* T00_09 */
             if (TstBrk())
                 goto closed;
-            if (read.value != count) {
-                left -= read.value;     /* T00_11 */
+            if (read.count != count) {
+                left -= read.count;     /* T00_11 */
                 ed.EdLen -= left;
                 break;
             }

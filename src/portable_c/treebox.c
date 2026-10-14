@@ -135,7 +135,8 @@ bool ReadTre(void)
     struct DIRENT *entry;               /* DI: where the next one goes */
     u8 *end = md.TreeBuf + sizeof md.TreeBuf;           /* BP */
     u8 *text;
-    struct Answer opened, moved, found;
+    struct Answer opened, found;
+    struct Moved moved;
     struct FileAttr had;
     i32 count, done, error, size, i;
     bool first;
@@ -167,7 +168,7 @@ RdTr02:                                 /* the file */
         goto RdTr01;
     if (moved.failed)
         goto RdTr01;
-    done = moved.value;
+    done = moved.count;
     if (done >= (i32)sizeof md.TreeBuf)         /* longer than there is room
                                                    for */
         goto RdTr10;
@@ -358,10 +359,9 @@ RdTr26:
             Beep();
         goto RdTr37;
     }
-    moved = FileWrite(opened.value, md.TreeBuf, (u16)size);    /* in
-                                                   TreeBuf */
+    moved = FileWrite(opened.value, md.TreeBuf, size);  /* in TreeBuf */
     if (!FileClose(opened.value).failed && !moved.failed
-        && moved.value != size)
+        && moved.count != size)
         Beep();
 
 RdTr37:

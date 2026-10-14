@@ -2382,6 +2382,11 @@ in "The portable C".
     functions in the README, in its text and in its table by group;
     and the layout of the block below the megabyte, where what stands
     behind the bytes that go moves down.
+  - No test builds that toy, and a change to what a function of
+    `sys.h` takes leaves it broken without a word: the piece F9 did, and
+    S found it so. After such a change, `harness/trial32/build.sh sys
+    32`, run from `build/` so that the compiler's `.err` lands there,
+    and `harness/trial32/asked.py` for its pages.
   - The piece waited while two others landed, and what bringing it
     onto them met is in its section of `TODO.md`, "What landing it
     met": above all a count that both sides had each taken one from,
@@ -3359,7 +3364,7 @@ is called both ways the bare function says so in its name.
 | 3Fh | asked, bare | `FileRead(handle, to, count)`, `FileReadBare` |
 | 40h | asked | `FileWrite(handle, from, count)` |
 | 41h | asked | `FileDelete(name)` |
-| 4200h to 4202h | asked | `FileSeek(handle, from, offset)`, with `from` 0 to 2 |
+| 4200h to 4202h | asked | `FileSeek(handle, place)` for 4200h, and `FileStep(handle, from, step)`, with `from` 1 or 2, a step that may be back: two since the piece S, a place having no sign and a step one |
 | 4300h, 4301h | asked | `FileAttributes(name)`, `FileSetAttributes(name, attributes)` |
 | 4400h | asked | `FileDevice(handle)` |
 | 4408h, 4409h | bare | `DriveFixed(drive)`, `DriveRemote(drive)` |

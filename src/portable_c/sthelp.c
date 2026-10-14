@@ -135,7 +135,7 @@ static u8 *StHelpBuf(void)
    elsewhere. */
 static bool SeekDsk(u16 handle, u32 place)
 {
-    struct FilePlace sought = FileSeek(handle, 0, place);
+    struct FilePlace sought = FileSeek(handle, place);
 
     if (sought.failed)
         return true;
@@ -146,11 +146,11 @@ static bool SeekDsk(u16 handle, u32 place)
    fewer. */
 static bool ReadDsk(u16 handle, u8 *to, i32 count)
 {
-    struct Answer read = FileRead(handle, to, (u16)count);
+    struct Moved read = FileRead(handle, to, count);
 
     if (read.failed)
         return true;
-    return read.value != count;
+    return read.count != count;
 }
 
 /* Read the setup's pages of the help file, when the setup is entered:
@@ -180,6 +180,7 @@ void StRdHelp(void)
     u8 *buffer = StHelpBuf();
     struct StHlpData *index = (struct StHlpData *)buffer;
     struct Answer answer;
+    struct Moved read;
     u16 handle;
     i32 count, lines, i;
     u32 first, between;
@@ -232,10 +233,10 @@ void StRdHelp(void)
         if (count == 0)                 /* the next page is the first */
             goto RdHlp1;
     }
-    answer = FileRead(handle, buffer + 2, (u16)count);
-    if (answer.failed)
+    read = FileRead(handle, buffer + 2, count);
+    if (read.failed)
         goto RdHlp1;
-    *(u16 *)buffer = answer.value;
+    *(u16 *)buffer = (u16)read.count;   /* below the room's LIMIT */
     /* The mark comes off as many bytes as were asked for, read or not. */
     DeCode(buffer + 2, (u16)count);
 

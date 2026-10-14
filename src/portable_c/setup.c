@@ -93,7 +93,8 @@ static struct Answer Failed(u16 error)
 struct Answer SaveSet(void)
 {
     struct FileAttr had;
-    struct Answer opened, wrote, closed;
+    struct Answer opened, closed, written;
+    struct Moved wrote;
     i32 length;
 
     length = MakeIni();
@@ -109,13 +110,15 @@ struct Answer SaveSet(void)
     opened = FileCreate(md.TmpBuf, had.attributes | ARCHIVE);   /* SavSt1 */
     if (opened.failed)
         return opened;
-    wrote = FileWrite(opened.value, md.MenuBuf, (u16)length);
+    wrote = FileWrite(opened.value, md.MenuBuf, length);
     closed = FileClose(opened.value);
     if (closed.failed)
         return closed;
     if (wrote.failed)
-        return wrote;
-    if (wrote.value != length)
-        return Failed(wrote.value & 0xFF00);    /* SavSt2 */
-    return wrote;
+        return Failed(wrote.error);
+    if (wrote.count != length)
+        return Failed((u16)(wrote.count & 0xFF00));     /* SavSt2 */
+    written.value = (u16)wrote.count;   /* the setup, which is not 64K */
+    written.failed = 0;
+    return written;
 }

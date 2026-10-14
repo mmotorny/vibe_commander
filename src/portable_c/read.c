@@ -104,7 +104,8 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
     u16 limit, file;
     u16 oldCursor, oldFirst;
     u16 attributes, found, answer;
-    struct Answer opened, asked, got, closed;
+    struct Answer opened, asked, closed;
+    struct Moved got;
 
     /* Expand, in the original: it moves the panel behind this one as
        far up as it goes, but no further than 64K from here, and the
@@ -260,7 +261,7 @@ ended:
             got = FileRead(opened.value, panel->ExtBuf, LenExt - 1);
             closed = FileClose(opened.value);
             if (!closed.failed && !got.failed) {
-                panel->ExtBuf[got.value] = 0x1A;
+                panel->ExtBuf[got.count] = 0x1A;
                 goto done;
             }
             /* A drive that was not ready has the panel read again: for
@@ -277,7 +278,7 @@ ended:
                ready, and that is what is said here. On a DOS that
                leaves something else in AX the original goes by that
                (see DEVIATIONS.md). */
-            answer = got.value;
+            answer = got.error;
             if (closed.failed)
                 answer = closed.value;
         }
@@ -369,7 +370,8 @@ static void RdInfo(struct WCBdef *panel)
     i32 drive;
     u16 handle;
     struct Label label;
-    struct Answer opened, read;
+    struct Answer opened;
+    struct Moved read;
 
     if (panel->WinTyp != 2)
         return;
@@ -400,7 +402,7 @@ static void RdInfo(struct WCBdef *panel)
         read = FileRead(handle, md.InfBuf, sizeof md.InfBuf);
         if (FileClose(handle).failed || read.failed)
             return;
-        md.InfoLen = read.value;
+        md.InfoLen = (u16)read.count; /* below the room of InfBuf */
     }
     label = GetVol(md.Volume);
     if (label.failed && label.answer == ERR_NOT_READY)

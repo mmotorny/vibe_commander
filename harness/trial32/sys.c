@@ -77,6 +77,7 @@ struct MainDat md;
    one behind the other, 38,016 bytes of them. */
 #define BIG      ((u8 *)md.ScrBuf)
 #define BIG_SIZE 30000
+#define BIGGER   0x18000                /* more than DOS takes at once */
 #define SMALL    md.TmpBuf
 
 static u16 Row, Col;
@@ -185,6 +186,22 @@ static void Answer(const u8 *name, struct Answer answer)
 }
 
 #define ANSWER(name, call) { TEXT(said, name); Answer(said, call); }
+
+/* What reading or writing answered, behind its name: the count, and
+   behind a slash whether it failed and the error. */
+static void Moved(const u8 *name, struct Moved moved)
+{
+    Put(name);
+    Cell(' ');
+    Digits((u32)moved.count, 8);
+    Cell('/');
+    Hex(moved.failed, 1);
+    Cell(' ');
+    Digits(moved.error, 4);
+    Cell(' ');
+}
+
+#define MOVED(name, call) { TEXT(said, name); Moved(said, call); }
 
 static void Copy(u8 *to, const u8 *from, u16 count)
 {
@@ -414,20 +431,20 @@ static void Files(void)
     asked = FileCreate(Toy_S, 0);
     ANSWER("FileCreate", asked);
     handle = asked.value;
-    ANSWER("FileWrite 30000:", FileWrite(handle, BIG, BIG_SIZE));
-    PLACE("FileSeek 0,100:", FileSeek(handle, 0, 100));
-    PLACE("2,0:", FileSeek(handle, 2, 0));
+    MOVED("FileWrite 30000:", FileWrite(handle, BIG, BIG_SIZE));
+    PLACE("FileSeek 100:", FileSeek(handle, 100));
+    PLACE("FileStep 2,0:", FileStep(handle, 2, 0));
     Line();
-    PLACE("FileSeek 2,-10:", FileSeek(handle, 2, 0xFFFFFFF6UL));
-    PLACE("1,5:", FileSeek(handle, 1, 5));
-    PLACE("0,12345678h:", FileSeek(handle, 0, 0x12345678UL));
+    PLACE("FileStep 2,-10:", FileStep(handle, 2, -10));
+    PLACE("1,5:", FileStep(handle, 1, 5));
+    PLACE("FileSeek 12345678h:", FileSeek(handle, 0x12345678UL));
     Line();
-    PLACE("FileSeek 3,89ABh:", FileSeek(handle, 3, 0x89ABUL));
-    PLACE("no handle:", FileSeek(99, 0, 0x12345UL));
-    PLACE("0,20000:", FileSeek(handle, 0, 20000));
+    PLACE("FileStep 3,89ABh:", FileStep(handle, 3, 0x89AB));
+    PLACE("FileSeek, no handle:", FileSeek(99, 0x12345UL));
+    PLACE("20000:", FileSeek(handle, 20000));
     Line();
-    ANSWER("FileWrite 0:", FileWrite(handle, BIG, 0));
-    PLACE("FileSeek 2,0:", FileSeek(handle, 2, 0));
+    MOVED("FileWrite 0:", FileWrite(handle, BIG, 0));
+    PLACE("FileStep 2,0:", FileStep(handle, 2, 0));
     ANSWER("FileSetTime", FileSetTime(handle, 0x6000, 0x28D0));
     Line();
     STAMP("FileTime", FileTime(handle));
@@ -446,24 +463,24 @@ static void Files(void)
     handle = asked.value;
     for (at = 0; at < BIG_SIZE; at++)
         BIG[at] = 0;
-    ANSWER("FileRead 30000:", FileRead(handle, BIG, BIG_SIZE));
+    MOVED("FileRead 30000:", FileRead(handle, BIG, BIG_SIZE));
     for (at = wrong = 0; at < 20000; at++)
         wrong += BIG[at] != Pattern(at);
     for (; at < BIG_SIZE; at++)
         wrong += BIG[at] != 0;
     SAY("wrong bytes "); H4(wrong);
-    ANSWER("at the end:", FileRead(handle, BIG, 100));
+    MOVED("at the end:", FileRead(handle, BIG, 100));
     Line();
     STAMP("FileTime", FileTime(handle));
-    PLACE("FileSeek 0,300:", FileSeek(handle, 0, 300));
-    ANSWER("FileReadBare 5:", FileReadBare(handle, SMALL, 5));
+    PLACE("FileSeek 300:", FileSeek(handle, 300));
+    MOVED("FileReadBare 5:", FileReadBare(handle, SMALL, 5));
     H2(SMALL[0]); H2(SMALL[4]); H2(Pattern(300)); H2(Pattern(304));
     Line();
-    ANSWER("FileReadBare, no handle:", FileReadBare(99, SMALL, 5));
-    ANSWER("FileRead, no handle:", FileRead(99, SMALL, 5));
-    ANSWER("FileWrite, opened to read:", FileWrite(handle, SMALL, 5));
+    MOVED("FileReadBare, no handle:", FileReadBare(99, SMALL, 5));
+    MOVED("FileRead, no handle:", FileRead(99, SMALL, 5));
+    MOVED("FileWrite, opened to read:", FileWrite(handle, SMALL, 5));
     Line();
-    ANSWER("FileWrite, no handle:", FileWrite(99, SMALL, 5));
+    MOVED("FileWrite, no handle:", FileWrite(99, SMALL, 5));
     ANSWER("FileCloseBare", FileCloseBare(handle));
     ANSWER("FileOpen, none:", FileOpen(None_S, 0));
     ANSWER("no directory:", FileOpen(NoDir_S, 0));
@@ -484,7 +501,7 @@ static void Names(void)
     Line();
     for (at = 0; at < 32; at++)
         SMALL[at] = 0;
-    ANSWER("FileReadBare 30:", FileReadBare(handle, SMALL, 30));
+    MOVED("FileReadBare 30:", FileReadBare(handle, SMALL, 30));
     Quoted(SMALL, 30);
     STAMP("FileTime", FileTime(handle));
     ANSWER("FileClose", FileClose(handle));
@@ -1054,102 +1071,131 @@ static void Older(void)
     Line();
 }
 
+/* More than DOS takes at one call, 18000h bytes, written to a file at
+   once and read back at once, in a block of the memory: dos32.c asks
+   DOS a piece at a time for that, which the program never has it do. */
+static void Bigger(void)
+{
+    struct Block block;
+    struct Answer asked;
+    u8 *big;
+    u16 handle;
+    i32 at, wrong;
+
+    block = MemTake(BIGGER);
+    big = block.block;
+    SAY("MemTake 18000h: "); H4(block.failed);
+    if (block.failed) {
+        Line();
+        return;
+    }
+    for (at = 0; at < BIGGER; at++)
+        big[at] = Pattern((u16)(at + at / 0x10000));
+    asked = FileCreate(Toy_S, 0);
+    handle = asked.value;
+    ANSWER(" FileCreate", asked);
+    Line();
+    MOVED("FileWrite 18000h:", FileWrite(handle, big, BIGGER));
+    PLACE(" FileSeek 0:", FileSeek(handle, 0));
+    Line();
+    for (at = 0; at < BIGGER; at++)
+        big[at] = 0;
+    MOVED("FileRead 18000h:", FileRead(handle, big, BIGGER));
+    for (at = wrong = 0; at < BIGGER; at++)
+        wrong += big[at] != Pattern((u16)(at + at / 0x10000));
+    SAY(" wrong bytes "); H8((u32)wrong);
+    Line();
+    MOVED("FileReadBare at the end:", FileReadBare(handle, big, BIGGER));
+    PLACE(" FileSeek 10000h:", FileSeek(handle, 0x10000));
+    MOVED(" FileWrite 0:", FileWrite(handle, big, 0));
+    Line();
+    PLACE("FileStep 2,0:", FileStep(handle, 2, 0));
+    ANSWER(" FileClose", FileClose(handle));
+    ANSWER(" FileDelete", FileDelete(Toy_S));
+    ANSWER(" MemGive", MemGive(big));
+    Line();
+}
+
 /* What a block of the memory is answered with, behind its name: the
    error if it failed, and else how far what is answered is behind the
-   block `from`. DOS leaves the block's segment in AX where it has made
-   one longer or shorter. */
-static void Block(const u8 *name, struct Block block, u16 from)
+   block `from`, in bytes; and the bytes that it says. */
+static void Block(const u8 *name, struct Block block, const u8 *from)
 {
     Put(name);
     Cell(' ');
-    Digits(block.failed ? block.value : block.value - from, 4);
+    Hex(block.failed ? block.value : (u32)(block.block - from), 8);
     Cell('/');
     Hex(block.failed, 4);
-    H4(block.largest);
+    H8((u32)block.largest);
 }
 
 #define BLOCK(name, call, from) { TEXT(said, name); Block(said, call, from); }
 
-/* The memory, in blocks by their segments, and what the PSP says. How
-   much memory there is and where a block lies follow the program's
-   length and what it is built for: of the first only that it is
+/* The memory, in blocks of the extender's that are counted in bytes, and
+   what the PSP says. How much memory there is and where a block lies
+   follow the machine and the extender: of the first only that it is
    plausible is written, and of the second how far a block is behind the
    first one. The first is all that there is, as the program asks for
-   it, and is written to at both ends, through the segment that it was
-   answered with. */
+   it, and is written to at both ends. Until the piece S this page asked
+   DOS's blocks by their segments, as the functions did before F9. */
 static void Memory(void)
 {
     struct Block block;
     const u8 *text;
-    u16 all, first, second, third, at;
+    u8 *first, *second, *third;
+    i32 all;
+    u16 at;
 
-    block = MemTake(0xFFFF);
+    block = MemTake(0x7FFFFFFF);
     all = block.largest;
-    SAY("MemTake FFFF: "); H4(block.value); H4(block.failed);
-    SAY("at least 256 KB and no more than 640 ");
-    H2(all >= 0x4000 && all <= 0xA000);
+    SAY("MemTake 7FFFFFFF: "); H4(block.value); H4(block.failed);
+    SAY("at least 1 MB "); H2(all >= 0x100000);
     Line();
     block = MemTake(all);
-    first = block.value;
+    first = block.block;
     SAY("MemTake of all that: "); H4(block.failed);
     H2(block.largest == all);
-    *(u8 *)AT(first, 0) = 0x12;
-    *(u8 *)AT(first + all - 1, 15) = 0x34;
-    SAY("written at its ends: "); H2(*(const u8 *)AT(first, 0));
-    H2(*(const u8 *)AT(first + all - 1, 15));
+    first[0] = 0x12;
+    first[all - 1] = 0x34;
+    SAY("written at its ends: "); H2(first[0]); H2(first[all - 1]);
     Line();
-    /* DOS on the bench has a block or two free besides that one, lower
-       in its memory, and how many and how long depends on the bench:
-       they are taken too, and kept, so that what is asked for below is
-       given of what the first block leaves when it is made shorter. */
-    for (;;) {
-        block = MemTake(0xFFFF);
-        if (block.largest == 0)
-            break;
-        MemTake(block.largest);
-    }
-    BLOCK("MemResize of it to 100:", MemResize(first, 0x100), first);
-    block = MemTake(0x80);
-    second = block.value;
-    SAY("MemTake 80: "); H4(block.failed); H4(second - first);
-    block = MemTake(0x40);
-    third = block.value;
-    SAY("MemTake 40: "); H4(block.failed); H4(third - first);
+    block = MemResize(first, 0x1000);
+    BLOCK("MemResize of it to 1000:", block, first);
     Line();
-    block = MemTake(0xFFFF);
-    SAY("what is left is less by "); H4(all - block.largest);
+    if (!block.failed)                  /* a block may move */
+        first = block.block;
+    block = MemTake(0x800);
+    second = block.block;
+    SAY("MemTake 800: "); H4(block.failed);
+    block = MemTake(0x400);
+    third = block.block;
+    SAY("MemTake 400: "); H4(block.failed);
+    Line();
+    block = MemTake(0x7FFFFFFF);
+    SAY("what is left is less "); H2(block.largest < all);
     ANSWER("MemGive of the second:", MemGive(second));
-    block = MemTake(0x20);
-    second = block.value;
-    SAY("MemTake 20: "); H4(block.failed); H4(second - first);
     Line();
-    block = MemTake(0x60);
-    SAY("MemTake 60: "); H4(block.failed); H4(block.value - first);
-    MemGive(block.value);
-    BLOCK("MemResize of the first to 200:", MemResize(first, 0x200), first);
+    block = MemResize(first, 0x2000);
+    BLOCK("MemResize of the first to 2000:", block, first);
+    if (!block.failed)
+        first = block.block;
+    block = MemResize(first, 0x80);
+    BLOCK(" to 80:", block, first);
+    if (!block.failed)
+        first = block.block;
     Line();
-    MemGive(second);
-    BLOCK("with the second given:", MemResize(first, 0x200), first);
-    BLOCK("to 181:", MemResize(first, 0x181), first);
-    Line();
-    BLOCK("to 80:", MemResize(first, 0x80), first);
-    block = MemTake(0x100);
-    SAY("MemTake 100: "); H4(block.failed); H4(block.value - first);
-    MemGive(block.value);
-    Line();
-    /* A block that is none: what is in front of it is the first
-       paragraph of a block, written here. */
-    for (at = 0; at < 16; at++)
-        *(u8 *)AT(first, at) = 0;
+    /* A block that is none. */
     ANSWER("MemGive of what is no block:", MemGive(first + 1));
     BLOCK("MemResize of it:", MemResize(first + 1, 1), first);
     Line();
     ANSWER("MemGive of the third:", MemGive(third));
     ANSWER("of the first:", MemGive(first));
     ANSWER("again:", MemGive(first));
-    block = MemTake(0xFFFF);
+    Line();
+    block = MemTake(0x7FFFFFFF);
     SAY("all is left again "); H2(block.largest == all);
     Line();
+    Bigger();
     MemSetSearch(0);
     MemSetUpper(0);
     SAY("MemSetSearch, MemSetUpper");
@@ -1260,7 +1306,7 @@ static void Devices(void)
        bench has not. */
     asked = FileOpen(Com2_S, 1);
     SAY("FileWrite to COM2:");
-    ANSWER("", FileWrite(asked.value, Com2_S, 1));
+    MOVED("", FileWrite(asked.value, Com2_S, 1));
     SAY("asked "); H4(Asked);
     FileClose(asked.value);
     Line();

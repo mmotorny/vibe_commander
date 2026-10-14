@@ -254,7 +254,7 @@ FiLs13:
     file = ENTRY(wcb, at);
     for (length = 0; file->NameF[length] != 0; length++)
         ;
-    if (FileWrite(handle, file->NameF, (u16)length).failed)
+    if (FileWrite(handle, file->NameF, length).failed)
         goto FiLs17;
     if (file->AttrF & ATTR_DIRECTORY)
         if (FileWrite(handle, Mask_S, 4).failed)
@@ -486,7 +486,8 @@ bool F32_00(bool main)
     struct Named named;
     struct Next found;
     struct Key pressed;
-    struct Answer opened, read;
+    struct Answer opened;
+    struct Moved read;
     const u8 *text;                     /* SI */
     u16 *screen;                        /* DI */
     u16 *key;                           /* BP */
@@ -539,7 +540,7 @@ F32_05:                                 /* read it */
         goto F32_04;
     if (read.failed)
         goto F32_04;
-    md.MenuBuf[read.value] = EOF_CHAR;
+    md.MenuBuf[read.count] = EOF_CHAR;
     include = md.MenuBuf;
     item = FndItem(md.MenuBuf);
     if (item.end)

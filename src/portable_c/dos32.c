@@ -549,25 +549,59 @@ struct Answer FileCloseBare(u16 handle)
     return Tell(&regs);
 }
 
-struct Answer FileRead(u16 handle, u8 *to, u16 count)
-{
-    return Handled(0x3F00, handle, ADDRESS(to), count);
-}
+/* DOS takes a count of 16 bits: as many bytes at the most at one call of
+   3Fh or 40h. */
+#define PIECE_MOST 0xFFFF
 
-struct Answer FileReadBare(u16 handle, u8 *to, u16 count)
+/* Read (3Fh) or write (40h) `count` bytes at `at`, with the program's
+   errors or bare: at one call where DOS takes the count, which is every
+   count that the program asks, and else a piece of PIECE_MOST bytes at a
+   time, for as long as each comes back whole. A count of 0 is one call,
+   which is how a file is cut off. */
+static struct Moved Move(u16 ax, u16 handle, const u8 *at, i32 count,
+                         bool asked)
 {
     struct DosRegs regs;
+    struct Answer answer;
+    struct Moved moved;
+    i32 piece;
 
-    Set(&regs, 0x3F00, handle, count, ADDRESS(to));
-    return Tell(&regs);
+    moved.count = 0;
+    moved.error = 0;
+    moved.failed = 0;
+    do {
+        piece = count - moved.count;
+        if (piece > PIECE_MOST)
+            piece = PIECE_MOST;
+        Set(&regs, ax, handle, (u32)piece, ADDRESS(at + moved.count));
+        answer = asked ? Ask(&regs, 0) : Tell(&regs);
+        if (answer.failed) {
+            moved.error = answer.value;
+            moved.failed = answer.failed;
+            break;
+        }
+        moved.count += answer.value;
+    } while (answer.value == piece && moved.count < count);
+    return moved;
 }
 
-struct Answer FileWrite(u16 handle, const u8 *from, u16 count)
+struct Moved FileRead(u16 handle, u8 *to, i32 count)
 {
-    return Handled(0x4000, handle, ADDRESS(from), count);
+    return Move(0x3F00, handle, to, count, true);
 }
 
-struct FilePlace FileSeek(u16 handle, u16 from, u32 offset)
+struct Moved FileReadBare(u16 handle, u8 *to, i32 count)
+{
+    return Move(0x3F00, handle, to, count, false);
+}
+
+struct Moved FileWrite(u16 handle, const u8 *from, i32 count)
+{
+    return Move(0x4000, handle, from, count, true);
+}
+
+/* 42h, with AL the place that it counts from and CX:DX how far. */
+static struct FilePlace Seek(u16 handle, u16 from, u32 offset)
 {
     struct DosRegs regs;
     struct FilePlace sought;
@@ -576,6 +610,17 @@ struct FilePlace FileSeek(u16 handle, u16 from, u32 offset)
     sought.failed = Ask(&regs, 0).failed;
     sought.place = (u32)(u16)regs.edx << 16 | (u16)regs.eax;
     return sought;
+}
+
+struct FilePlace FileSeek(u16 handle, u32 place)
+{
+    return Seek(handle, 0, place);
+}
+
+/* A step back is the same 32 bits to DOS as a place far on. */
+struct FilePlace FileStep(u16 handle, u16 from, i32 step)
+{
+    return Seek(handle, from, (u32)step);
 }
 
 struct Answer FileDelete(const u8 *name)
@@ -833,7 +878,7 @@ struct Space DriveSpace(u16 drive, u16 flagged)
     asked = Ask(&regs, flagged);
     space.value = asked.value;
     space.failed = asked.failed;
-    space.free = (u16)regs.ebx;
+    space.free = (u16)regs.ebx;         /* the registers have 16 bits */
     space.sector = (u16)regs.ecx;
     space.total = (u16)regs.edx;
     return space;

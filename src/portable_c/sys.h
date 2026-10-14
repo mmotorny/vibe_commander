@@ -54,7 +54,8 @@
  * went on with whatever it had there itself, and a caller that goes by
  * that says what it was, where it reads the answer.
  *
- * vc.h includes this file, and the types u8, u16 and u32 are vc.h's.
+ * vc.h includes this file, and the types u8, u16, u32 and i32 are
+ * vc.h's.
  */
 #ifndef SYS_H
 #define SYS_H
@@ -95,28 +96,46 @@ struct Answer FileOpenBare(const u8 *name, u16 mode);
 struct Answer FileClose(u16 handle);
 struct Answer FileCloseBare(u16 handle);
 
+/* What reading or writing answers. A structure of its own, where
+   struct Answer has one word for the count or the error: here the two
+   are beside each other, and the count is as wide as what is asked. */
+struct Moved {
+    i32 count;                          /* how many bytes were read or
+                                           written; if it failed, how many
+                                           the pieces before the one that
+                                           failed moved, which is 0 for a
+                                           count that DOS takes at once */
+    u16 error;                          /* if it failed, the error: AX as
+                                           DOS left it; else 0 */
+    u16 failed;                         /* not 0 if it failed */
+};
+
 /* Read up to `count` bytes of a file to `to`, from where the file is at.
-   Answers with how many were read: fewer at the end of the file. */
-struct Answer FileRead(u16 handle, u8 *to, u16 count);
-struct Answer FileReadBare(u16 handle, u8 *to, u16 count);
+   Answers with how many were read: fewer at the end of the file. A count
+   is 0 or more. DOS takes 0FFFFh bytes at the most at one call: more is
+   asked a piece at a time, for as long as each piece comes back whole. */
+struct Moved FileRead(u16 handle, u8 *to, i32 count);
+struct Moved FileReadBare(u16 handle, u8 *to, i32 count);
 
 /* Write `count` bytes at `from` to a file, at where the file is at.
    Answers with how many were written: fewer on a disk that is full.
-   None, 0, cuts the file off there. */
-struct Answer FileWrite(u16 handle, const u8 *from, u16 count);
+   None, 0, cuts the file off there. In pieces as FileRead reads. */
+struct Moved FileWrite(u16 handle, const u8 *from, i32 count);
 
-/* Go to a place of a file: `offset` bytes from its start (`from` 0),
-   from where it is at (1) or from its end (2); with 1 and 2 the offset
-   may be below 0. Answers with the place then, counted from the start.
-   If it failed, `place` is none: its low word is the error and its high
-   word the low word of `offset`. The two words are what DOS left in AX
-   and DX, and some callers hold them against the place that they asked
-   for without looking at `failed`. */
+/* Go to a place of a file, counted from its start; or `step` bytes from
+   where it is at (`from` 1) or from its end (2), which may be back.
+   Answers with the place then, counted from the start. If it failed,
+   `place` is none: its low word is the error and its high word the low
+   word of what was asked, `place` or `step`. The two words are what DOS
+   left in AX and DX, and some callers hold them against the place that
+   they asked for without looking at `failed`. A place is a size of a
+   file, which has no sign; a step has one. */
 struct FilePlace {
     u32 place;
     u16 failed;
 };
-struct FilePlace FileSeek(u16 handle, u16 from, u32 offset);
+struct FilePlace FileSeek(u16 handle, u32 place);
+struct FilePlace FileStep(u16 handle, u16 from, i32 step);
 
 /* Delete a file. */
 struct Answer FileDelete(const u8 *name);
@@ -231,9 +250,9 @@ struct Space {
     u16 value;                          /* the sectors of a cluster: AX as
                                            DOS left it, or the error */
     u16 failed;
-    u16 free;                           /* the clusters that are free */
-    u16 sector;                         /* the bytes of a sector */
-    u16 total;                          /* the clusters of the drive */
+    u32 free;                           /* the clusters that are free */
+    u32 sector;                         /* the bytes of a sector */
+    u32 total;                          /* the clusters of the drive */
 };
 struct Space DriveSpace(u16 drive, u16 flagged);
 

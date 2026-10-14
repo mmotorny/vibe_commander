@@ -241,7 +241,8 @@ static u8 *StFile(void)
    setup is what the program has without one: StDefault. */
 static void StInit15(void)
 {
-    struct Answer opened, read, closed;
+    struct Answer opened, closed;
+    struct Moved read;
     const u8 *file = sd.File;
     i32 i;
 
@@ -253,7 +254,7 @@ static void StInit15(void)
         closed = FileClose(opened.value);
         if (!closed.failed && !read.failed) {
             sd.IniStat = 1;
-            if (read.value == INI_LEN
+            if (read.count == INI_LEN
                 && file[0] == 'V' && file[1] == 'V' && file[2] == 'V'
                 && ChkSum(file, INI_LEN - 2) == SUM) {
                 for (i = 0; i < CmnIni; i++)
@@ -446,7 +447,8 @@ static void StExit(void)
 {
     const struct MainDat *aside = (const struct MainDat *)sd.Aside;
     struct FileAttr had;
-    struct Answer opened, wrote, closed;
+    struct Answer opened, closed;
+    struct Moved wrote;
     i32 i;
     bool save = false, failed = true;
     u8 edited;
@@ -484,7 +486,7 @@ static void StExit(void)
             wrote = FileWrite(opened.value, sd.File, INI_LEN);
             closed = FileClose(opened.value);
             failed = closed.failed || wrote.failed
-                     || wrote.value != INI_LEN;
+                     || wrote.count != INI_LEN;
         }
     }
     if (failed)                         /* Exit5 */

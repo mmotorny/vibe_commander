@@ -838,7 +838,8 @@ u16 DirFunc(void)
    may not be written it is DOS's 5. */
 struct Answer DelTr0(const u8 *path)
 {
-    struct Answer opened, wrote, marked;
+    struct Answer opened, marked;
+    struct Moved wrote;
     i32 count;
     u16 written;
     bool carry;
@@ -859,7 +860,8 @@ struct Answer DelTr0(const u8 *path)
     } else {
         md.TmpErr[0] = 0;
         wrote = FileWrite(opened.value, md.TmpErr, 1);
-        written = wrote.value;
+        /* AX as DOS left it: the error, or the 1 byte written. */
+        written = wrote.failed ? wrote.error : (u16)wrote.count;
         carry = true;
         if (!FileClose(opened.value).failed && !wrote.failed) {
             carry = false;
