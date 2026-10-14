@@ -471,6 +471,20 @@ IGNORED_OF = {
 # scenario is held against the original's golden as the rules leave it,
 # which is as it is on every screen that has nothing of what a rule is
 # of.
+#
+# One scenario is held against no golden of the original at all, where the
+# original cannot go: `own` below, and OWN, which says which scenario may
+# be. Its expectation is the tree's own, recorded from the tree's build
+# and read row by row by whoever recorded it ("What a tree is expected to
+# show where the original cannot go" at the top of goldens.py).
+
+# The scenarios that a tree may be held in to an expectation of its own,
+# recorded from its build, where the original cannot go: `editor-huge`
+# alone, on the user's word of 14 October 2026, a text larger than the
+# original's editor has room for, when the memory comes from the
+# extender (CLAUDE.md, "The portable C"). goldens.read refuses any other,
+# and the scenarios' test fails for a tree that declares one.
+OWN = ("editor-huge",)
 
 
 @dataclass(frozen=True)
@@ -549,6 +563,14 @@ class Declared:
     # (scenarios.Scenario.setup), whichever there are, or None if it is
     # taken through them: for a tree that has no setup program.
     no_setup: str = None
+    # Scenarios that the tree alone is taken through, and is held to an
+    # expectation of its own in, which is recorded from its build:
+    # scenario -> why the original cannot go there. Only those of OWN
+    # may be. Neither the original nor any other tree is taken through
+    # them (scenarios.not_run), and nothing else is declared of them:
+    # no patch, no step left out or taken in place of another, and the
+    # rules of the tree are not made to what is its own already.
+    own: dict = field(default_factory=dict)
 
     def taken(self, steps, name=None):
         """How the tree is taken through `steps`, those of the scenario
@@ -712,6 +734,18 @@ TREES = {
             # code that each shows: an entry goes with the commit that
             # makes its scenario pass (TODO.md, "The setup program in the
             # portable C: the plan"). None waits now.
+        },
+        # On the user's word of 14 October 2026 (DEVIATIONS.md, 13):
+        # its expectation is harness/goldens/portable_c/editor-huge.txt.
+        own={
+            "editor-huge": "it has the editor open a text of 750,264 "
+                           "bytes and 75,028 lines, which the original's "
+                           "editor has no room for, go to its last line, "
+                           "and find a text near its end, where the "
+                           "original counts no further than the 65,536th "
+                           "line: the original would refuse the file, and "
+                           "what the portable C is to show there is its "
+                           "own",
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "
@@ -985,6 +1019,13 @@ def ruled(screen, rule):
     """Whether `rule`, a rule of a tree, expects anything of `screen` of
     the original that the original does not show there."""
     return expected(screen, (rule,)).cells != screen.cells
+
+
+def owner(name):
+    """The tree whose own expectation the scenario `name` is held to,
+    or None for a scenario of the original (Declared.own)."""
+    return next((tree for tree, declared in TREES.items()
+                 if name in declared.own), None)
 
 
 def declared(tree):

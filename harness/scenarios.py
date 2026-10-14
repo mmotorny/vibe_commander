@@ -4656,6 +4656,53 @@ SCENARIOS = {
             "Esc",
         )),
 
+    # Of the portable C alone, and held to an expectation of its own:
+    # `own` of deviations.TREES["portable_c"], and "What a tree is
+    # expected to show where the original cannot go" at the top of
+    # goldens.py.
+    "editor-huge": Scenario(
+        "The editor on a text of 750,264 bytes and 75,028 lines, more "
+        "than the original's editor has room for and more lines than it "
+        "counts, its end, a search near it, and the text saved whole",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Space",  # typing in the editor
+            "Enter",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of a file made
+            "Shift+F4",                   # a new file of a line
+            '"x" Enter',
+            "Enter",
+            '"abcdefgh" Enter',
+            "F2",
+            "Esc",
+            "Shift+F4",                   # and one of zebra
+            '"z" Enter',
+            "Enter",
+            '"zebra" Enter',
+            "F2",
+            "Esc",
+            # Each file appended to the other in turn: 75,025 lines of
+            # abcdefgh in x, 750,250 bytes.
+            'Shift+F5 "x" Tab "y" Enter',
+            *('Shift+F5 "y" Tab "x" Enter p '
+              'Shift+F5 "x" Tab "y" Enter p',) * 11,
+            'Shift+F5 "y" Tab "x" Enter p',
+            # And zebra behind them twice, in the 75,026th line and the
+            # 75,027th: 75,028 lines, the last one empty.
+            'Shift+F5 "z" Tab "x" Enter p',
+            'Shift+F5 "z" Tab "x" Enter p',
+            "Shift+F4",
+            '"x" Enter',
+            "Ctrl+End",                   # the last line
+            "Ctrl+Home",
+            'F7 "zebra" Enter',           # the first, from the top
+            "Shift+F7",                   # the second
+            "Ctrl+End",
+            '"end" F2',                   # the text saved, with that
+            "Esc",
+        )),
+
     "find": Scenario(
         "Looking for files by name and by what they contain, with keys "
         "that a search finds waiting when it begins",
@@ -7428,19 +7475,29 @@ SCENARIOS = {
 def not_run(tree=None):
     """The scenarios that a program of the tree `tree` is not taken
     through, each with the reason: those that are declared so by name,
-    and every scenario of the setup program for a tree that is declared
-    to have none (see deviations.TREES). None for the original."""
+    every scenario of the setup program for a tree that is declared to
+    have none, and every scenario that another tree is held to an
+    expectation of its own in (see deviations.TREES): for the original,
+    None, those last ones alone."""
     declared = deviations.declared(tree)
-    return {name: declared.not_run.get(name) or declared.no_setup
-            for name, scenario in SCENARIOS.items()
-            if name in declared.not_run
-            or scenario.setup and declared.no_setup}
+    found = {}
+    for name, scenario in SCENARIOS.items():
+        owner = deviations.owner(name)
+        if owner is not None and owner != tree:
+            found[name] = (
+                f"it is of {owner} alone, and holds it to an expectation "
+                f"of its own: {deviations.TREES[owner].own[name]}")
+        elif name in declared.not_run \
+                or scenario.setup and declared.no_setup:
+            found[name] = declared.not_run.get(name) or declared.no_setup
+    return found
 
 
 def names(tree=None, setup=None):
     """The scenarios that a program of the tree `tree` is taken through:
-    all of them for the original, None, and for a tree that is declared
-    to have nothing otherwise (see deviations.TREES). With `setup` True
+    all of them but those that a tree is held to an expectation of its
+    own in for the original, None, and for a tree that is declared to
+    have nothing otherwise (see deviations.TREES). With `setup` True
     or False, of those only the scenarios of the setup program, or only
     those of the main program."""
     left = not_run(tree)

@@ -153,8 +153,57 @@ change that was not meant, and is mended in the program, not committed.
 What is committed is the author's statement, and from then on the tests
 hold the program to it, not to another run. A patch with a header that
 is not filled in fails them.
+
+
+What a tree is expected to show where the original cannot go: its own
+
+One scenario, `editor-huge`, is held against no golden of the original:
+the original cannot go where it goes, a text larger than its editor has
+room for, and the user allowed on 14 October 2026 that the portable C be
+held there to an expectation of its own (CLAUDE.md, "The portable C").
+deviations.OWN names it, `own` of deviations.TREES says which tree it is
+of and why, and an entry of the tree's DEVIATIONS.md names it as a patch
+is named. Neither the original nor another tree is taken through it
+(scenarios.not_run), so it has no golden of the original, no list of what
+ran of the original, and no patch.
+
+Its expectation is a file of the tree's directory, harness/goldens/TREE/
+NAME.txt, written as a golden is, with a header of its own:
+
+    The portable C in the scenario editor-huge: its own expectation, ...
+    Deviation: 13 of src/portable_c/DEVIATIONS.md
+    Why: ...
+    Read: every row of every screen and the disks, against ...
+    code page 437
+
+and then the screens and the disks as in a golden of the original.
+
+    goldens.py record --tree portable_c SCENARIO
+                                        take the tree's build through the
+                                        scenario and write what it showed
+                                        and left as the expectation
+
+`record` writes what the build did, as `patch` does, and that is not yet
+the expectation. It keeps "Deviation" and "Why" of the file that was
+there, and always writes "Read: TO BE WRITTEN", and the tests fail for
+that until whoever recorded it has read it row by row, every screen
+against the step that it follows and against the entry, and the disks,
+and has written in that line what was read and against what. Recorded
+again, it prints what is otherwise than in the file that was there, which
+is then the reading list, as `git diff` of the file is. It is recorded
+again only for a change that is meant to change what the scenario shows,
+never to make the test pass.
+
+The test says what it holds the build to: "as the portable C's own
+expectation", and in a row that differs "its own" where it says
+"original" for every other scenario. goldens.read refuses an expectation
+of a tree's own for any scenario but those of deviations.OWN, and the
+scenarios' test (ported.py) fails for a tree that declares another, or
+that has a file of its directory that is neither a patch nor the
+expectation of a scenario of its own.
 """
 import argparse
+import itertools
 import os
 import re
 import sys
@@ -215,6 +264,9 @@ class Golden:
     places: list = None
     original_steps: list = None
     patch: "Patch" = None
+    # Of the expectation of a tree's own (see the top): its file. Such a
+    # golden has no places, no original steps and no patch.
+    own: Path = None
 
 
 @dataclass
@@ -262,6 +314,12 @@ def patch_path(name, tree):
     """Where the patch of the tree `tree` for the scenario `name` is, if
     it has one."""
     return DIRECTORY / tree / f"{name}.patch"
+
+
+def own_path(name, tree):
+    """Where the expectation of the tree `tree`'s own for the scenario
+    `name` is, if the tree is held to one there (see the top)."""
+    return DIRECTORY / tree / f"{name}.txt"
 
 
 def patches(tree):
@@ -365,13 +423,16 @@ def blink_of(line, codes):
                       int(match[4], 16))
 
 
-def write(golden):
+def write(golden, header=None):
+    """Write the golden `golden`: the original's, or with `header`, the
+    lines in front of its code page, the expectation of a tree's own, to
+    the file that its `own` is."""
     chars = charset(golden.codepage)
-    out = [f"Volkov Commander 4.05 in the scenario {golden.scenario}: "
-           "what the original shows and",
-           "leaves on its disks. Derived by harness/goldens.py; not to "
-           "be edited.",
-           f"code page {golden.codepage}"]
+    out = (header or
+           [f"Volkov Commander 4.05 in the scenario {golden.scenario}: "
+            "what the original shows and",
+            "leaves on its disks. Derived by harness/goldens.py; not to "
+            "be edited."]) + [f"code page {golden.codepage}"]
     steps = ("the start",) + scenarios.SCENARIOS[golden.scenario].steps
     for number, (step, screen) in enumerate(zip(steps, golden.screens)):
         out += ["", f"== {number}: {step}", cursor_line(screen)]
@@ -381,8 +442,8 @@ def write(golden):
     for drive in sorted(golden.disks):
         for name in sorted(golden.disks[drive]):
             out.append(disk_line(drive, name, golden.disks[drive][name]))
-    path(golden.scenario).write_text("\n".join(out) + "\n",
-                                     encoding="utf-8")
+    (golden.own or path(golden.scenario)).write_text(
+        "\n".join(out) + "\n", encoding="utf-8")
 
 
 def read(name, tree=None, patched=True):
@@ -393,7 +454,11 @@ def read(name, tree=None, patched=True):
     has for the scenario, if it has one, or no patch if `patched` is
     false, or the Patch that `patched` is; and the screens of the steps
     that it is not taken through left out. A patch that cannot be made
-    to the golden is a Misfit."""
+    to the golden is a Misfit. Of a scenario that a tree is held to an
+    expectation of its own in, that expectation (read_own)."""
+    if deviations.owner(name) is not None or \
+            tree is not None and own_path(name, tree).exists():
+        return read_own(name, tree)
     golden = read_original(name)
     if tree is None:
         return golden
@@ -444,11 +509,89 @@ def read_original(name):
     if not file.exists():
         raise FileNotFoundError(
             f"{file} is not there: derive it, goldens.py derive {name}")
+    return parsed(name, file.read_text(encoding="utf-8").split("\n"), 2)
+
+
+# What the line of a tree's own expectation says when it has been read,
+# which `record` leaves to be written: see the top.
+READ = "Read: "
+
+
+def own_header(name, tree, numbers=None, why=None):
+    """The lines in front of the code page of the expectation of the
+    tree `tree`'s own for the scenario `name`, with what `record` leaves
+    to be written: the entry's number and why if they are not given, and
+    always what was read."""
+    return (textwrap.wrap(
+        f"{TREES[tree]} in the scenario {name}: its own expectation, what "
+        "it is expected to show and to leave on its disks where the "
+        "original cannot go. Recorded from a run of its build by "
+        "harness/goldens.py record, and read row by row by whoever "
+        "recorded it: see the top of harness/goldens.py. There is no "
+        "golden of the original for this scenario.", width=78,
+        break_on_hyphens=False) + [
+            "",
+            f"Deviation: {', '.join(map(str, numbers)) if numbers else 'N'}"
+            f" of src/{tree}/DEVIATIONS.md"]
+            + textwrap.wrap(f"Why: {why or TO_WRITE}", width=78)
+            + ["", f"{READ}{TO_WRITE}", ""])
+
+
+def read_own(name, tree):
+    """The expectation of the tree `tree`'s own for the scenario `name`
+    (see the top), with its header filled in: a Misfit for a scenario
+    that is not of deviations.OWN or not of that tree, and for a header
+    that is not filled in."""
+    owner = deviations.owner(name)
+    file = own_path(name, tree) if tree else path(name)
+    if name not in deviations.OWN:
+        raise Misfit(
+            f"{shown(file)} would hold {tree} to an expectation of its own "
+            f"in {name}: only {', '.join(deviations.OWN)} may be held so, "
+            "on the user's word of 14 October 2026, and every other "
+            "scenario is held against the original's golden (the top of "
+            "harness/goldens.py)")
+    if owner != tree:
+        raise Misfit(
+            f"{name} is of {owner} alone, which is held to an expectation "
+            f"of its own there, and is not run for "
+            f"{tree or 'the original'}")
+    if not file.exists():
+        raise FileNotFoundError(
+            f"{file} is not there: record it, goldens.py record --tree "
+            f"{tree} {name}, and read it")
     lines = file.read_text(encoding="utf-8").split("\n")
-    codepage = int(lines[2].split()[-1])
+    at = next((at for at, line in enumerate(lines)
+               if line.startswith("code page ")), len(lines))
+    header = lines[:at]
+    numbers, why = read_header(header, tree)
+    # What was read, from its line to the empty line behind it.
+    read_ = next((" ".join([line[len(READ):]] + list(
+        itertools.takewhile(bool, header[number + 1:])))
+        for number, line in enumerate(header) if line.startswith(READ)),
+        "")
+    if numbers is None or not read_.strip():
+        raise Misfit(
+            f"{shown(file)}: its header is not filled in. It wants a line "
+            f"\"Deviation: N of src/{tree}/DEVIATIONS.md\", the entry that "
+            "names the scenario; \"Why: \" with a sentence on why the "
+            f"original cannot go there; and \"{READ}\" with what was read "
+            "of what the build showed and left, and against what. That "
+            "is the statement of whoever recorded it, who has read every "
+            "row: the top of harness/goldens.py says how")
+    golden = parsed(name, lines, at)
+    golden.tree = tree
+    golden.own = file
+    return golden
+
+
+def parsed(name, lines, at):
+    """The golden of the scenario `name` of the lines of its file, whose
+    code page is the line `at`."""
+    codepage = int(lines[at].split()[-1])
     codes = {char: code for code, char in enumerate(charset(codepage))}
     golden = Golden(name, codepage, [], [], {})
-    at = 3
+    at += 1
     while at < len(lines):
         line = lines[at]
         at += 1
@@ -906,7 +1049,8 @@ def departures(golden, run, programs):
         return found
     lines = disk_differences(
         golden.disks, disk_lines(run.disks, programs),
-        golden.patch.files if golden.patch else ())
+        golden.patch.files if golden.patch else (),
+        mine="its own expectation has" if golden.own else None)
     if lines:
         found.append((None, lines))
     return found
@@ -924,7 +1068,8 @@ def screen_departs(golden, number, screen):
     place = golden.places[number] if golden.places else number
     return screen_differences(
         deviations.compared(golden.screens[number]),
-        deviations.compared(screen, golden.tree), made.get(place))
+        deviations.compared(screen, golden.tree), made.get(place),
+        mine="its own" if golden.own else "original")
 
 
 def differences(golden, run, programs):
@@ -945,12 +1090,28 @@ def differences(golden, run, programs):
             "the program, or, if it is meant to show this now, declare "
             "that first and then change the patch. A patch is not made "
             "again to make a test pass.", width=78, break_on_hyphens=False)
+    if report and golden.own:
+        report += textwrap.wrap(
+            f"What is called its own is what {shown(golden.own)} says "
+            f"{golden.tree} is to show and leave, its own expectation: the "
+            "original cannot go where this scenario goes, and there is no "
+            "golden of it here. The expectation was recorded from a build "
+            "and read row by row, and states what is right: mend the "
+            "program, or, if it is meant to show this now, record the "
+            "expectation again and read every row that it changes. It is "
+            "not recorded again to make a test pass.",
+            width=78, break_on_hyphens=False)
     return report
 
 
 def measure(golden):
     """What a golden as it was read is called in a line of a report: the
-    original, with what was made to it for the tree it was read for."""
+    original, with what was made to it for the tree it was read for; or
+    the expectation of the tree's own."""
+    if golden.own:
+        return (f"{TREES[golden.tree].replace('The', 'the', 1)}'s own "
+                f"expectation, {shown(golden.own)}, where there is no "
+                "golden of the original")
     gone = len(scenarios.SCENARIOS[golden.scenario].steps) + 1 \
         - len(golden.screens) if golden.places else 0
     return ("the original"
@@ -971,17 +1132,19 @@ def _in_golden(golden, number):
     return f"   (== {place}: {step} in the original's golden)"
 
 
-def disk_differences(want, got, stated=(), build="this build"):
+def disk_differences(want, got, stated=(), build="this build", mine=None):
     """Describe how the disks `got` depart from `want`, both as
     disk_lines() has them, as text lines. `stated` are the files that a
-    patch speaks of, (drive, path), and `build` is what `got` is called."""
+    patch speaks of, (drive, path), and `build` is what `got` is called;
+    `mine`, if it is given, what `want` is called for every file."""
     report = []
     for drive in sorted(want):
         for name in sorted(want[drive].keys() | got[drive].keys()):
             a, b = want[drive].get(name), got[drive].get(name)
             if a != b:
-                measure = "the patch has" if (drive, name) in stated \
-                    else "the original leaves"
+                measure = mine or (
+                    "the patch has" if (drive, name) in stated
+                    else "the original leaves")
                 report.append(f"{drive}:\\{name}: {measure} "
                               f"{a or 'nothing'}, {build} "
                               f"{b or 'nothing'}")
@@ -1000,13 +1163,15 @@ def settled(expected, actual):
     return bytes(cells)
 
 
-def screen_differences(expected, actual, stated=None, build="this build"):
+def screen_differences(expected, actual, stated=None, build="this build",
+                       mine="original"):
     """Describe how screen `actual` departs from `expected`, as text lines.
 
     A cell that the original was seen to blink may be in either state.
     `stated` is what a patch says of the screen, a PatchedScreen, or
     None: a row or a cursor of `expected` that is the patch's is called
-    so. `build` is what `actual` is called.
+    so. `build` is what `actual` is called, and `mine` what `expected`
+    is called where it is not the patch's.
     """
     cells = settled(expected, actual)
     report = []
@@ -1026,14 +1191,14 @@ def screen_differences(expected, actual, stated=None, build="this build"):
                 marks += " "
         count += COLUMNS - marks.count(" ")
         measure = "the patch" if stated and row in stated.rows \
-            else "original"
+            else mine
         report += [f"row {row:2}  {measure:<11}|{expected.lines()[row]}|",
                    f"        {build:<11}|{actual.lines()[row]}|",
                    f"                    {marks}"]
     if count:
         report.append(f"{count} of {COLUMNS * ROWS} cells differ "
                       "(^ character, ~ colour only)")
-    measure = "the patch" if stated and stated.cursor else "original"
+    measure = "the patch" if stated and stated.cursor else mine
     for name in ("cursor", "cursor_lines", "video_mode"):
         want, got = getattr(expected, name), getattr(actual, name)
         if want != got:
@@ -1064,6 +1229,67 @@ def derive(name, benches):
           f"{'s' if len(run.screens) > 1 else ''}"
           + (f", {sum(run.executed.values())} bytes of "
              f"{setups.SETUP_PROGRAM} ran" if scenario.setup else ""))
+
+
+def record(name, program, benches):
+    """Take `program`, the build of a tree, through the scenario `name`,
+    which the tree is held to an expectation of its own in, and write
+    what it showed and left as that expectation, with "Deviation" and
+    "Why" of the file that was there and "Read" to be written (see the
+    top). Returns the lines to print: what was written, and what is
+    otherwise than in the file that was there."""
+    tree = program.tree
+    if deviations.owner(name) != tree or name not in deviations.OWN:
+        raise Misfit(
+            f"{name} is no scenario that {tree} is held to an expectation "
+            "of its own in: that is declared in `own` of deviations.TREES "
+            f"and allowed by deviations.OWN, which has "
+            f"{', '.join(deviations.OWN)}")
+    file = own_path(name, tree)
+    numbers = why = old = None
+    if file.exists():
+        lines = file.read_text(encoding="utf-8").split("\n")
+        header = lines[:next((at for at, line in enumerate(lines)
+                              if line.startswith("code page ")),
+                             len(lines))]
+        # What was read is not kept, whatever it said.
+        numbers, why = read_header(
+            [line for line in header if not line.startswith(READ)], tree)
+        try:
+            old = read_own(name, tree)
+        except Misfit:
+            # Not read yet: what was there is still what to hold the
+            # new one against.
+            old = parsed(name, lines, len(header))
+    scenario = scenarios.SCENARIOS[name]
+    run = scenarios.run(scenario, program, benches[scenario.bench],
+                        blinking=True)
+    golden = Golden(name, setups.codepage(scenario.country), [],
+                    [deviations.compared(screen, tree)
+                     for screen in run.screens],
+                    disk_lines(run.disks, {program.filename}),
+                    tree=tree, own=file)
+    write(golden, own_header(name, tree, numbers, why))
+    report = [f"{name}: {shown(file)} recorded from a run of {tree}, "
+              f"{len(golden.screens)} screens and the disks"
+              + (", under the header that it had, but for what was read"
+                 if numbers else ", its header to be written")]
+    if old is not None:
+        steps = ("the start",) + scenario.steps
+        for number, step in enumerate(steps):
+            if number >= len(old.screens):
+                report.append(f"--- after step {number}: {step}: new")
+                continue
+            found = screen_differences(
+                deviations.compared(old.screens[number]),
+                golden.screens[number], build="recorded", mine="was")
+            if found:
+                report += [f"--- after step {number}: {step}"] + found
+        report += disk_differences(old.disks, golden.disks,
+                                   build="recorded", mine="was")
+        if len(report) == 1:
+            report.append("as the file that was there, row for row")
+    return report + ["", AFTER_RECORD]
 
 
 def from_run(name, program, benches):
@@ -1237,6 +1463,17 @@ another run: where they fail, it is the program or the golden that is
 looked at, and the patch is not made again to make them pass."""
 
 
+AFTER_RECORD = """\
+What was written is what the build showed and left, and not yet the
+expectation. Read every row of every screen against the step that it
+follows and against the entry of DEVIATIONS.md, and the disks: what is
+there that the scenario does not explain is the program's to mend. Then
+fill in the header, the number of the entry, why the original cannot go
+there, and what was read and against what, and commit the file as your
+statement of what the tree is to show. Recorded again, the lines above
+say what is otherwise than before, and are the reading list."""
+
+
 def changes(name, tree, patch=None):
     """Describe what the patch of the tree `tree` for the scenario `name`
     says, as text lines: of each screen the rows that are expected
@@ -1283,12 +1520,14 @@ def otherwise(tree):
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("command", choices=["derive", "patch", "changes"])
+    parser.add_argument("command",
+                        choices=["derive", "patch", "changes", "record"])
     parser.add_argument("scenario", nargs="*",
                         help=", ".join(scenarios.SCENARIOS))
     parser.add_argument("--tree", choices=sorted(TREES),
-                        help="for patch and changes: the tree whose "
-                             "patches are meant")
+                        help="for patch, changes and record: the tree "
+                             "whose patches, or expectation of its own, "
+                             "are meant")
     parser.add_argument("--together", type=int, metavar="N",
                         default=TOGETHER,
                         help="for derive: so many scenarios side by side "
@@ -1301,7 +1540,11 @@ def main():
         if args.tree:
             parser.error("derive is of the original: a tree has patches "
                          "of the original's goldens, and none of its own")
-        names = args.scenario or list(scenarios.SCENARIOS)
+        for name in args.scenario:
+            if deviations.owner(name) is not None:
+                parser.error(f"{name} is not run for the original: "
+                             + scenarios.not_run()[name])
+        names = args.scenario or scenarios.names()
         with setups.Benches() as benches, \
                 ThreadPoolExecutor(args.together) as pool:
             # Each says that it is done when it is; a failure ends the
@@ -1315,7 +1558,24 @@ def main():
         if name not in run:
             parser.error(f"{name} is not run for {args.tree}: "
                          + scenarios.not_run(args.tree)[name])
+        own = deviations.owner(name) == args.tree
+        if own != (args.command == "record"):
+            parser.error(
+                f"{name} is held to an expectation of {args.tree}'s own, "
+                "which is recorded: goldens.py record" if own else
+                f"{name} is held against the original's golden, and "
+                "record is for a scenario that a tree is held to an "
+                "expectation of its own in")
     try:
+        if args.command == "record":
+            if not args.scenario:
+                parser.error("record wants the scenario named")
+            program = setups.Program.load(
+                deps.ROOT / "build" / args.tree / "VC.EXE")
+            with setups.Benches() as benches:
+                for name in args.scenario:
+                    print("\n".join(record(name, program, benches)))
+            return
         if args.command == "changes":
             for name in args.scenario or otherwise(args.tree):
                 if not patch_path(name, args.tree).exists():

@@ -39,6 +39,7 @@ from concurrent.futures import ThreadPoolExecutor
 import compare
 import coverage
 import deps
+import deviations
 import goldens
 import scenarios
 import setups
@@ -113,18 +114,23 @@ def scenarios_running(routines, tree):
     # recorded as having run is of VCSETUP.COM, at other offsets.
     main = set(scenarios.names(tree, setup=False))
     return [name for name in with_goldens(tree)
-            if name in main and addresses & goldens.read_ran(name)]
+            if name in main and deviations.owner(name) is None
+            and addresses & goldens.read_ran(name)]
 
 
 def with_goldens(tree):
     """The scenarios that the tree `tree` is taken through and that have
     a golden to be held against; the others of them are named."""
-    names = scenarios.names(tree)
-    for name in names:
-        if not goldens.derived(name):
+    found = []
+    for name in scenarios.names(tree):
+        # Or the expectation of the tree's own, where it is held to one.
+        if goldens.derived(name) or deviations.owner(name) == tree \
+                and goldens.own_path(name, tree).exists():
+            found.append(name)
+        else:
             print(f"{name} has no golden yet and is left out",
                   file=sys.stderr)
-    return [name for name in names if goldens.derived(name)]
+    return found
 
 
 def noticed(program, names):

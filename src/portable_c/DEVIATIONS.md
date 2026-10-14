@@ -1710,6 +1710,24 @@ the first of those steps. The scenario is not run for that program:
 for the C translation, and held against the original's golden as it is.
 No patch and no rule is of this entry.
 
+`editor-huge` shows what the program of 32 bits does there, on the
+user's word of 14 October 2026, the one scenario that is held to an
+expectation of the portable C's own: the original cannot go there, and
+there is no golden of it. It makes a text of 750,264 bytes and 75,028
+lines through the program's own keys, two files appended to each other
+in turn with Shift+F5, has the editor open it, go to its last line, find
+`zebra` from the top in the 75,026th line and again in the 75,027th, and
+save it with three characters more; what it leaves on the disk is the
+text, byte for byte. The text is larger than the original's room and
+than the 640 KB that the program of 32 bits had before its room came
+from the extender, and has more lines than the original counts (entry
+25). The expectation is `harness/goldens/portable_c/editor-huge.txt`,
+recorded from the build and read row by row (the top of
+`harness/goldens.py`, "What a tree is expected to show where the
+original cannot go"); `own` of `TREES["portable_c"]` of
+`harness/deviations.py` declares it, and neither the original nor the C
+translation is taken through the scenario.
+
 What the scenario has behind that file is not run for the program of 32
 bits either, and some of it no other scenario has: a file that is
 shorter than its directory entry says, and the editor's box left

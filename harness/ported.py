@@ -1719,13 +1719,55 @@ def check_declared(tree, names):
                 print(f"  {tree} is declared to be taken through other "
                       f"steps in place of some that {name} has not one "
                       f"behind the other: {', '.join(some)}")
+    # The scenarios that the tree is held to an expectation of its own
+    # in (goldens.py, "What a tree is expected to show where the
+    # original cannot go"): those of deviations.OWN alone, each named by
+    # an entry, and with nothing else declared of it. That the file is
+    # there and its header filled in was seen before anything was run.
+    own = {}
+    for name in sorted(declared.own):
+        if name not in deviations.OWN:
+            passed = False
+            print(f"  {tree} is declared to be held to an expectation of "
+                  f"its own in {name}: only "
+                  f"{', '.join(deviations.OWN)} may be, on the user's "
+                  "word of 14 October 2026, and every other scenario is "
+                  "held against the original's golden")
+            continue
+        if name not in names:
+            passed = False
+            print(f"  {tree} is declared to be held to an expectation of "
+                  f"its own in {name}, which is not run for it")
+            continue
+        if name in declared.left_out_of or name in declared.in_place_in:
+            passed = False
+            print(f"  {tree} is held to an expectation of its own in "
+                  f"{name}, and steps of it are declared to be left out "
+                  "or taken in place of others: its steps are its own")
+        golden = goldens.read(name, tree)
+        own[name] = golden.own
+        lines = golden.own.read_text(encoding="utf-8").split("\n")
+        for number in goldens.read_header(
+                lines[:next(at for at, line in enumerate(lines)
+                            if line.startswith("code page "))], tree)[0]:
+            if f"`{name}`" not in entries.get(number, ""):
+                passed = False
+                print(f"  {goldens.shown(golden.own)} says that it is of "
+                      f"deviation {number}, and {document} "
+                      + ("does not name the scenario there, as "
+                         f"`{name}`" if number in entries else
+                         "has no such entry"))
     patched = {}
     for file in goldens.patches(tree):
         name = file.stem
-        if file.suffix != ".patch" or name not in names:
+        if file.suffix == ".txt" and own.get(name) == file:
+            continue
+        if file.suffix != ".patch" or name not in names or name in own:
             passed = False
-            print(f"  {goldens.shown(file)} is the patch of no scenario "
-                  f"that {tree} is taken through")
+            print(f"  {goldens.shown(file)} is neither the patch of a "
+                  f"scenario that {tree} is held against the original's "
+                  "golden in nor the expectation of its own of a "
+                  "scenario that deviations.OWN allows")
             continue
         patch = goldens.read(name, tree).patch
         patched[name] = patch.count()
@@ -1741,11 +1783,13 @@ def check_declared(tree, names):
                if len(declared.kept(scenarios.SCENARIOS[name].steps, name))
                < len(scenarios.SCENARIOS[name].steps)]
     held = [name for name in names
-            if name not in patched and name not in shorter]
+            if name not in patched and name not in shorter
+            and name not in own]
     # The rules of the tree: what each makes of the goldens. A rule that
     # finds nothing to change on any screen says nothing any more.
     counts, screens, some = [0] * len(declared.rules), 0, 0
-    for name in names if declared.rules else ():
+    for name in [name for name in names if name not in own] \
+            if declared.rules else ():
         each, any_ = goldens.ruled(name, tree)
         counts = [a + b for a, b in zip(counts, each)]
         screens += any_
@@ -1775,6 +1819,19 @@ def check_declared(tree, names):
                 f"{what}: {', '.join(some)}", width=78,
                 initial_indent="  ", subsequent_indent="    ",
                 break_on_hyphens=False))
+    for name, file in own.items():
+        print(textwrap.fill(
+            f"held against {tree}'s own expectation, "
+            f"{goldens.shown(file)}, which was recorded from its build and "
+            f"read row by row, and not against the original's: {name}, "
+            f"{declared.own[name]}", width=78, initial_indent="  ",
+            subsequent_indent="    ", break_on_hyphens=False))
+    for name, why in scenarios.not_run(tree).items():
+        if name in declared.not_run or deviations.owner(name) is None:
+            continue
+        print(textwrap.fill(f"not run for {tree}: {name}, {why}", width=78,
+                            initial_indent="  ", subsequent_indent="    ",
+                            break_on_hyphens=False))
     for name, why in declared.not_run.items():
         print(textwrap.fill(f"not run for {tree}: {name}, {why}", width=78,
                             initial_indent="  ", subsequent_indent="    ",

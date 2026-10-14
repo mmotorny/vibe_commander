@@ -2244,7 +2244,10 @@ harness, which has no word for a scenario that is run and does not
 reach its point.
 
 **What would test it again.** None of it is for the piece that wrote
-this.
+this. What the program of 32 bits does with a text that the original
+has no room for, which `editor-big` does not run, `editor-huge` holds
+since the piece H, to an expectation of the portable C's own: the
+editor opens such a text and has all of it.
 
 | Way | What it tests again | Against |
 |---|---|---|
@@ -10422,6 +10425,67 @@ the session's word.
 
 **For a cluster that sorts these files**: F10 adds no number. The two
 lines of `NO_RETURN` in `main.c` and `exec.c` change no type.
+
+### H, `editor-huge`: done
+
+The one scenario that the portable C is held to an expectation of its
+own in, on the user's word of 14 October 2026: no line of the program
+changed, and `VC.EXE` is the same bytes.
+
+**The scenario.** `editor-huge` of `harness/scenarios.py`: as
+`editor-lines` begins, but the file `x` is one line, `abcdefgh`; 23
+appends of `x` and `y` to each other in turn with Shift+F5 make 75,025
+such lines, 750,250 bytes, and two of `zebra` behind them: 750,264
+bytes and 75,028 lines, above the original's room on the bench, 358,752,
+above the 640 KB that the program had before F9, and past the 65,536th
+line. Then the editor on it: Ctrl+End, Ctrl+Home, F7 for `zebra` from
+the top (75,026), Shift+F7 (75,027), Ctrl+End, `end` typed and F2. The
+disk has `X` of 750,267 bytes with the sum of exactly that text, which
+says that every byte went through the editor. 41 screens, 19 seconds on
+a quiet host and 90 under a load of 16. The search from the top is the
+slow step, every byte's capital asked of DOS (F4); a text of a megabyte
+and more would take the whole scenario past a minute for that.
+
+**The mechanism**, the least that was needed (the top of
+`harness/goldens.py`, "What a tree is expected to show where the
+original cannot go", says how it is used):
+
+- `deviations.OWN`, the scenarios that may be held so: `editor-huge`
+  alone. `own` of a tree's `Declared`, scenario -> why, and
+  `deviations.owner(name)`.
+- `scenarios.not_run` gives every other tree, and the original, such a
+  scenario with its reason; `names()` of the original leaves it out, so
+  `goldens.py derive` and `goldens.ran` do not ask for a golden of it.
+- The expectation is `harness/goldens/portable_c/editor-huge.txt`, in
+  the tree's directory beside its patches, written as a golden with a
+  header of "Deviation", "Why" and "Read". `goldens.py record --tree
+  portable_c editor-huge` writes it from a run of the build, keeps
+  Deviation and Why, and writes "Read: TO BE WRITTEN", which fails the
+  test until whoever recorded it has read it row by row and said so
+  there; recorded again, it prints what is otherwise than before.
+  `goldens.read` returns it for that scenario and refuses one for any
+  other (a Misfit, before anything is run); `patch`, `changes` and
+  `derive` refuse the scenario.
+- The test says "as the portable C's own expectation, harness/goldens/
+  portable_c/editor-huge.txt, where there is no golden of the
+  original", a row "its own" where it says "original" elsewhere, and a
+  paragraph on what that means. `check_declared` of `ported.py` fails
+  for a tree that declares a scenario outside `OWN`, for a file of the
+  tree's directory that is neither a patch nor such an expectation, and
+  for a header whose entry does not name the scenario.
+- Tried by hand and put back: a stray `editor-lines.txt` there, `own`
+  with `editor` in it, and the Read line not filled in, each failed.
+- `notice.py` takes the scenario as one with something to be held
+  against.
+
+Declared in entry 13 of `DEVIATIONS.md`. What the comparison leaves
+out and every golden of the original are as they were.
+
+**For whoever records it again**: only for a change that is meant to
+change what it shows. The rows that come out otherwise are printed, and
+are the reading list with `git diff`; the screens 0 to 16 are those of
+`editor-lines` but for 8 and 9, and the reading in the header says how
+the first expectation was read.
 
 ### F0, the net and the record: done, and what a later piece should know
 
