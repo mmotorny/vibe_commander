@@ -1,13 +1,15 @@
 # The layer: the screen and input
 
-**Draft. Nothing in it is decided.** It is one area of step 3 of the
-road (`CLAUDE.md`, "The portable C"), surveyed from the platforms' side
-as the user asked on 13 October 2026: what each target platform gives
-for drawing a text screen and for taking keys and the mouse, where they
-agree, where one has another shape, the common ground, and only then
-how the program's needs map onto it. The program's needs are those of
-`../LAYER.md`, "What the program needs: the inventory", the groups "The
-console", "The keyboard", "The screen", "The mouse" and "The timer".
+**Draft of 13 October 2026. What the user has decided of it is under
+"Decided in this area", and nothing else here is decided.** It is one
+area of step 3 of the road (`CLAUDE.md`, "The portable C"), surveyed
+from the platforms' side as the user asked on 13 October 2026: what
+each target platform gives for drawing a text screen and for taking
+keys and the mouse, where they agree, where one has another shape, the
+common ground, and only then how the program's needs map onto it. The
+program's needs are those of `../LAYER.md`, "What the program needs:
+the inventory", the groups "The console", "The keyboard", "The screen",
+"The mouse" and "The timer".
 
 What is read and what is inferred. Every cell of the tables that has a
 source behind it, `[W1]` and the like, is what that page says, read on
@@ -17,6 +19,80 @@ what was read, not checked in documentation. Nothing was tried on any
 platform. What is said of DOS is read in `dos32.c` and in the program,
 which the scenarios judge; nothing was run for this survey there
 either.
+
+## Decided in this area
+
+The user's answers to the ten questions at the end, 13 and 14 October
+2026, as the session passed them on. Each question is marked there with
+its answer.
+
+1. **The shape: A.** The program keeps its grid of cells, each a code
+   point and a colour, names what has changed, and the layer presents
+   it. Input is asked for as now: is a key waiting, which modifiers are
+   held, where the pointer is; and one wait besides. DOS keeps its
+   calls.
+2. **The screen of commands outside DOS: answered by
+   `programs.md`, decision 2.** The shadow grid comes later, with
+   libvterm. Until then a command has the real terminal, and Ctrl-O
+   shows the terminal's own screen.
+3. **The tap on Alt: the kitty keyboard protocol, or Windows Terminal's
+   win32-input-mode, where the terminal offers them.** Elsewhere there
+   is no tap and no key bar of modifiers, and F9 opens the menu. A
+   deviation, to be declared when it is built.
+4. **Terminal or window: a terminal on Windows, Linux and macOS**, as
+   Midnight Commander runs (`programs.md`, decisions 2 and 9); iOS draws
+   a view of its own. No window of the program's own on a desktop: no
+   native app is planned on macOS.
+5. **The size of the screen: 80 columns and any number of rows from 25
+   up**, as now. A wider screen shows the 80 at the left or centred; a
+   smaller one is refused.
+6. **The 16 colours in a terminal: the PC's exact colours in 24 bits**
+   where the terminal has them, the named 16 otherwise.
+7. **A character's width: answered by `i18n.md`, decision 7.** The
+   layer answers each character's width, and the panels count cells.
+8. **Touch on iPhone and iPad:** a tap is the left button, a long press
+   the right; the key bar is tapped for F1 to F10; a row of Esc, Tab,
+   Ctrl, Alt and arrows stands above the on-screen keyboard; on an
+   iPhone, landscape only.
+9. **What names a key: named keys and the character only**, chosen by
+   the user against the recommendation of the key's physical place. So
+   Alt with a Cyrillic letter searches by that Cyrillic letter, not by
+   the Latin key under it. What follows:
+   - A key event is a named key (F1, the arrows, Enter, Esc and the
+     like) or a character, with the modifiers held. The layer has no
+     scan code and no USB HID usage; the kitty protocol's base layout
+     key [K1] is not asked for.
+   - The speed search is Alt with a character, any character, where it
+     is Alt with one of 38 keys today. `AltSr_T` of `keys_t.c`, by
+     which the main loop starts it, and `AltSr_T` and `Ascii_T` of
+     `cmdline.c`, by which it turns the key into a letter, are scan
+     codes of a US keyboard and leave the common code. The three are
+     constants of the original's, which `portable_c-data` holds and
+     `harness/reads.py` lists: where they go is declared there when it
+     is built. The program's other comparisons of keys, the `case`
+     labels on scan codes, become comparisons of named keys and
+     characters as shape A has it.
+   - A point to settle, DOS: the BIOS reports Alt with a letter key as
+     the scan code with 0 for the character. The program starts the
+     speed search only for a key with 0 there, and `command-line` shows
+     it starting on the bench. So DOS's implementation has no character
+     to report for it and has to make one of the scan code, and the
+     only table it has is the US order of `Ascii_T`: Alt with a letter
+     is then a Latin letter on DOS whatever the layout, as in the
+     original, and the decision holds off DOS only. Whether FreeDOS's
+     KEYB with the Russian layout, on the Russian bench with its
+     Cyrillic letters selected, gives a character with Alt was not
+     tried; DOS has no call that tells a program the layout of the
+     keyboard *(i)*. No scenario would show
+     a change on DOS: the one scenario that presses Alt with a letter,
+     `command-line`, runs on the US bench, where the table gives the
+     letter that the original searches by, and no scenario of the
+     Russian bench presses Alt with a letter at all. What is to settle
+     is whether that stands: DOS keeping the original's Latin letter,
+     with nothing declared, or a way sought for DOS to give the letter
+     of the layout too.
+10. **Function keys where the keyboard has none** (iPad, some Macs):
+    Cmd with a digit for F1 to F10, and the key bar tapped or clicked.
 
 ## What the program does today
 
@@ -166,8 +242,8 @@ These are where a platform has another shape, not another spelling.
    as its "scancode", a key by its place "independent of language or
    keyboard mapping" [S1]. A terminal names only the character, or a
    few named keys, unless the kitty protocol adds the key of a US
-   layout [K1]. Alt with a Cyrillic letter for the speed search depends
-   on that.
+   layout [K1]. Alt with a Cyrillic letter for the speed search depended
+   on that; the layer goes by the character (decision 9).
 6. **Polling and events.** Only DOS is polled. Everywhere else input
    arrives as events, and on macOS and iOS the program cannot hold the
    main thread in a loop: drawing and events belong to it *(i)*. State
@@ -285,17 +361,19 @@ read a screen back, and only DOS has to be polled. A asks the polled
 questions, which every platform can answer from its events, and so the
 DOS file keeps today's calls in today's order. The program already is
 this shape, and a test can be a platform of its own: a grid in memory
-and a script of events, which A2 and B make harder *(i)*.
+and a script of events, which A2 and B make harder *(i)*. The user
+chose A (decision 1).
 
-What it does not settle, and the questions below ask:
+What it does not settle, and the questions below asked (decisions 2
+and 3 answer them):
 
 - The screen of commands. Under A it is a second grid that the layer
   keeps and can say it does not know: on DOS the screen itself, read
   as today; in the Windows console's classic API, read back; on the
   Linux console, read from `/dev/vcsa`; in a terminal, unknown unless
   the program runs commands in a pseudo-terminal and keeps their screen
-  with an emulator of its own; in a window of its own, only by that
-  emulator; on iOS, empty.
+  with an emulator of its own, which is the shadow grid that comes
+  later, with libvterm; on iOS, empty.
 - The tap on Alt and the key bar of modifiers in a terminal that does
   not report modifiers: the layer says it cannot, and the program does
   without (F9 still opens the menu).
@@ -312,13 +390,13 @@ the function and does nothing.
 | `ScreenSize` | columns, rows, whether colours are shown | BIOS 0Fh, 1130h, 12h (`ScreenState`, `ScreenFont`, `ScreenEga`) | the terminal's size, the view's |
 | `ScreenShow(rectangle)` | the cells of a rectangle shown | copies to B800h, characters through the code page (`ScreenPut`) | sends the changes, or redraws |
 | `ScreenMove(rectangle, lines, colour)` | what a rectangle shows moved up or down, the program's grid already written so | BIOS 06h, 07h (`ScreenScroll`) | shows the rectangle from the grid |
-| `CellsOf(character)` | how many cells a character takes: 1 or 2 | always 1 | the platform's answer, see question 7 |
+| `CellsOf(character)` | how many cells a character takes: 1 or 2 | always 1 | the platform's answer, see decision 7 |
 | `CursorTo`, `CursorLook` | a place; hidden, a line or a block | BIOS 02h, 01h (`CursorTo`, `CursorShape`) | DECSCUSR, DECTCEM; drawn |
 | `CursorWhere` | the place and the look | BIOS 03h | what was set |
 | `Bell` | the bell | BIOS 0Eh with 07h (`ScreenType`) | BEL, a sound |
 | `CommandsType(character)` | a character written on the screen of commands as a terminal writes it | BIOS 0Eh (`ScreenType`) | written to the terminal's main screen, or to the emulator |
 | `CommandsGet(rectangle)` | the screen of commands, if known | the display's memory (`ScreenGet`) | see above; "unknown" from a plain terminal |
-| `CommandsColour` | the colour that commands write in | BIOS 08h around DOS's space (`ScreenCell`, `ConsoleChar`) | the terminal's default colours, a colour of their own in the cell's vocabulary (question 6) |
+| `CommandsColour` | the colour that commands write in | BIOS 08h around DOS's space (`ScreenCell`, `ConsoleChar`) | the terminal's default colours, a colour of their own in the cell's vocabulary (decision 6) |
 | `InputWaiting`, `InputTake` | the next event, if any; and taken | INT 16h 01h, 00h (`KeyWaiting`, `KeyRead`) | the queue |
 | `ModifiersHeld` | Shift, Ctrl, Alt held, the locks; or "not known" | INT 16h 02h (`KeysHeld`) | from the events; "not known" from a plain terminal |
 | `PointerState` | the cell, the buttons down; or "no pointer" | INT 33h 03h (`MouseWhere`) | from the events |
@@ -326,11 +404,12 @@ the function and does nothing.
 | `InputWait(until)` | nothing to do until an event or a time | INT 28h once (`Idle`) | blocks on the queue or input until the time |
 | `ConsoleCan` | what this platform can: modifiers alone, keys let go, a pointer, the screen of commands, blinking | answers all but keys let go | its answers |
 
-An event is a key pressed, repeated or let go (the key, by question 9,
-the character it types, the modifiers), a button, the size changed, or
-the program's own (the timer, the tap on Alt, as `Input0` makes today).
-`KeyForgetIns`, the BIOS's bit for Ins held, is of DOS alone and stays
-in the DOS file, said by the key's repeats elsewhere *(i)*.
+An event is a key pressed, repeated or let go (a named key or the
+character it types, by decision 9, and the modifiers), a button, the
+size changed, or the program's own (the timer, the tap on Alt, as
+`Input0` makes today). `KeyForgetIns`, the BIOS's bit for Ins held, is
+of DOS alone and stays in the DOS file, said by the key's repeats
+elsewhere *(i)*.
 
 ### DOS under the recommendation
 
@@ -375,8 +454,8 @@ in those loops: a deviation of the calls, to be asked if wanted.
   of emoji presentation behind it, is shown as an emoji, which
   terminals count as one or two cells [U1][U3] *(i)*.
 - What the speed search makes of Alt with a letter is the physical key
-  on DOS (a US letter whatever the layout); elsewhere it depends on
-  question 9.
+  on DOS (a US letter whatever the layout); elsewhere the character
+  typed, Cyrillic too (decision 9, with its point to settle for DOS).
 
 ## How the program's needs map onto it
 
@@ -402,52 +481,64 @@ in those loops: a deviation of the calls, to be asked if wanted.
 
 ## Questions for the user
 
-Each with its ways, the recommendation first.
+Each with its ways, the recommendation first. All are answered, on 13
+and 14 October 2026: see "Decided in this area". They are kept here as
+they were put, each marked with the answer.
 
 1. **The shape of the screen and input.** (a) The program keeps its
    grid and asks for input as it does now; the layer presents and
    answers; DOS keeps its calls. (b) The same grid, and the program
    waits for events; DOS's order of calls changes. (c) A stream of
-   text and terminal sequences. Recommended: (a).
+   text and terminal sequences. Recommended: (a). **Answered:** (a);
+   see decision 1.
 2. **The screen of commands, outside DOS.** (a) In a terminal, panels
    on the alternate screen, commands on the main one; Ctrl-O shows the
    main one; behind half the panels nothing, as a terminal cannot be
    read back. (b) Commands in a pseudo-terminal with an emulator of our
    own, as on DOS. Recommended: (a) now, (b) with a window of our own.
+   **Answered:** (a) now and (b) later, with libvterm, in a terminal
+   and not with a window of our own; see decision 2.
 3. **The tap on Alt, in a terminal that cannot report it.** (a) Use the
    kitty protocol or win32-input-mode where the terminal has them;
    elsewhere no tap and no key bar of modifiers, F9 opens the menu; a
    declared deviation. (b) Make Esc, tapped, open the menu there.
-   Recommended: (a).
+   Recommended: (a). **Answered:** (a); see decision 3.
 4. **Terminal or window, on each desktop.** (a) A terminal on Linux,
    macOS and Windows first, one implementation over VT sequences; a
    view of its own written for iOS, used on macOS later through Mac
    Catalyst. (b) A window of its own on each desktop from the start.
-   Recommended: (a).
+   Recommended: (a). **Answered:** a terminal on all three, with no
+   native app on macOS later; iOS draws a view of its own; see
+   decision 4.
 5. **The size of the screen.** (a) 80 columns, any number of rows
    from 25 up, as now; a larger screen shows the 80 at the left, or
    centred, and a smaller one is refused. (b) Columns follow the
    screen too: every layout of the program changes. Recommended: (a).
+   **Answered:** (a); see decision 5.
 6. **The 16 colours in a terminal.** (a) The PC's exact colours in 24
    bits where the terminal has them, the named 16 otherwise. (b) The
    terminal's named 16 always: the user's theme. Recommended: (a).
+   **Answered:** (a); see decision 6.
 7. **Characters two cells wide**, in names of files and in the iPhone's
    drives. (a) The layer says each character's width, and the panels
    count cells. (b) Every character one cell; one that a platform shows
-   wider is replaced by a substitute. Recommended: (a).
+   wider is replaced by a substitute. Recommended: (a). **Answered:**
+   (a); see decision 7.
 8. **Touch, on iPhone and iPad.** (a) A tap is the left button, a long
    press the right one; the key bar is tapped for F1 to F10; a row of
    Esc, Tab, Ctrl, Alt and arrows above the on-screen keyboard; on an
    iPhone, landscape only. (b) The same, portrait too, with a small
-   font. Recommended: (a).
+   font. Recommended: (a). **Answered:** (a); see decision 8.
 9. **What names a key.** (a) Its place on the keyboard, as a USB HID
    usage, which iOS and SDL use, and the character it typed; Alt with a
    Cyrillic letter searches by the Latin key, as on DOS. (b) Only named
    keys and the character; such a search by the Cyrillic letter.
-   Recommended: (a).
+   Recommended: (a). **Answered:** (b), against the recommendation;
+   see decision 9, with a point to settle for DOS.
 10. **Function keys where the keyboard has none** (iPad, Mac). (a) Cmd
     with a digit for F1 to F10, and the key bar tapped or clicked. (b)
-    The key bar only. Recommended: (a).
+    The key bar only. Recommended: (a). **Answered:** (a); see
+    decision 10.
 
 ## What is unsure
 

@@ -85,6 +85,20 @@ else in this document is decided.
   DOS as the original's; the setup's Country info kept off DOS without
   the code page's table; no Unicode library. The answers are under
   "Decided in this area" there.
+- **The screen and input**, the ten questions of `layer/console.md`, 13
+  and 14 October 2026: the program keeps its grid of cells, a code point
+  and a colour, names what changed, and the layer presents it, with
+  input asked for as now and one wait, DOS keeping its calls; the
+  screen of commands as `layer/programs.md` decided; the tap on Alt by
+  the kitty protocol or win32-input-mode where the terminal has them,
+  F9 elsewhere, a deviation; a terminal on Windows, Linux and macOS, a
+  view of its own on iOS; 80 columns and 25 rows or more; the PC's
+  colours in 24 bits where a terminal has them; a character's width as
+  `layer/i18n.md` decided; touch on iPhone and iPad, landscape only on
+  an iPhone; a key named by a named key or the character only, against
+  the recommendation of its physical place, with a point to settle on
+  DOS; Cmd with a digit for F1 to F10. The answers are under "Decided
+  in this area" there.
 
 Each of these stands in the design that is being made anew.
 
