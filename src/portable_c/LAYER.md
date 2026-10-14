@@ -47,6 +47,16 @@ else in this document is decided.
   October 2026: paths under named roots; no Android, but archives and
   FTP some day; the drives of Linux, macOS and iOS. The answers are
   under "Decided in this area" there.
+- **File systems**, questions 5 to 15 of "Area: file systems", and one
+  that followed from 6, 13 and 14 October 2026: a Mac build outside the
+  sandbox; F8 to the trash and Shift-F8 deleting outright; the
+  platform's copy where it has one; files not downloaded listed with a
+  mark and downloaded behind a box; the platform's attributes; the
+  layer's own time and errors; directories watched; the program's loop
+  on a thread of its own; names that are not UTF-8 kept as bytes; and
+  the setup file one format of the program's own everywhere, DOS
+  included, against the recommendation. The answers are under "Decided
+  in this area" there.
 
 Each of these stands in the design that is being made anew.
 
@@ -492,6 +502,51 @@ user's.
 4. **iOS:** ⛁: the app's Documents, ☁️: its iCloud folder, and each
    folder the user picks as a drive of its own.
 
+The user's answers to questions 5 to 15, and to one that followed from
+6, 13 and 14 October 2026, as the session passed them on:
+
+5. **The Mac build:** outside the App Store, not sandboxed; paths reach
+   everything. The layer still allows a sandboxed build later.
+6. **Delete:** both, by two keys. Asked next which key does which: **F8
+   moves to the platform's trash where it has one, Shift-F8 deletes
+   outright**, as Far Manager has it. On DOS both delete. That is a
+   deviation from the original, to be declared when it is built.
+7. **Copy:** the platform's own copy where it has one, `CopyFile` on
+   Windows, `copyfile` or `clonefile` on Apple's, keeping streams,
+   extended attributes and clones; the program's own loop on DOS and
+   Linux. The progress and the prompts stay the program's.
+8. **Files not yet downloaded** (iCloud, OneDrive): listed with a mark.
+   Opening, viewing or copying one downloads it behind a box that Esc
+   gives up: the critical error's box, widened.
+9. **Attributes off DOS and Windows:** the dialog shows and changes what
+   the platform has, read-only and hidden on a Mac, permissions on
+   POSIX; DOS's four on DOS and Windows.
+10. **Time:** the layer's own instant, seconds since 1970 in UTC as 64
+    bits, and nanoseconds; shown in local time.
+11. **Errors:** the layer's own list of some fifteen kinds that the
+    program tells apart, with the platform's own number kept for a
+    message.
+12. **Changes made by others:** the layer watches the panels'
+    directories, and the program reads one again when it is told,
+    polled with the keys. Nothing on DOS, where no call is added.
+13. **Long waits:** the program's loop runs on a thread of its own. A
+    call of the layer may wait, and asks the program to show a box that
+    Esc gives up.
+14. **Names that are not UTF-8:** kept as bytes, shown with a mark, and
+    handed back to the system exactly as they came.
+15. **The setup file off DOS:** **one format everywhere**, chosen
+    against the recommendation. The setup file becomes a format of the
+    program's own on every platform, DOS included. On DOS that is a
+    deviation from the original, and every scenario that saves the
+    setup or reads a saved one will show it: it is to be declared, held
+    by patches, and asked about in its details when it is built, what
+    the format is and whether DOS can still read an old `VC.INI`.
+
+What the design must settle for 15: the format, whether text, in which
+encoding, and how roots, paths and the bookmarks of iOS are kept in it;
+and what becomes of the scenarios that hold the setup file byte for
+byte against the original's.
+
 ### The survey
 
 #### 1. Volumes and roots
@@ -639,16 +694,20 @@ begins with a root: `C:\` on DOS; `C:\` or `\\server\share\` on Windows;
 `/`, the home folder and each mounted removable or network volume on
 Linux and macOS; `⛁:/`, `☁️:/` and one for each folder the user picked
 on iOS (decisions 3 and 4); and, some day, a root that the program
-serves itself (decision 2). The layer lists the roots, says of each its
-kind and whether it is ready, and takes and answers paths. An open file
-and a listing under way are handles, as today.
+serves itself (decision 2). A name that is not UTF-8 is kept as its
+bytes and handed back as it came (decision 14). The layer lists the
+roots, says of each its kind and whether it is ready, and takes and
+answers paths. An open file and a listing under way are handles, as
+today.
 
 - **DOS:** the paths are today's, in the code page; the DOS file turns
   UTF-8 into the code page and back, and asks the same calls in the
-  same order.
+  same order, but where the setup file is written and read in the
+  program's own format (decision 15).
 - **Windows:** UTF-8 to UTF-16, `\\?\` in front of a long path. Close
   to DOS: the same drives, bits and errors.
-- **Linux, macOS:** the path as it is. Mounts are roots by choice.
+- **Linux, macOS:** the path as it is. Mounts are roots by choice. The
+  Mac build is not sandboxed (decision 5).
 - **iOS:** the layer keeps a table of roots: its name, the base URL,
   the bookmark. It turns a path into a URL by appending the components,
   starts the scope, coordinates the read or write, and asks the program
@@ -662,7 +721,9 @@ and a listing under way are handles, as today.
   become text of a length the layer says; the backslash and the colon
   as characters (86 places) become the layer's separator and the root's
   length; a drive by its letter (46 places, and 41 by number) becomes a
-  root by its name or index. The code that walks a path stays.
+  root by its name or index. The code that walks a path stays. The
+  setup file, a copy of the main data today, becomes a format of the
+  program's own everywhere (decision 15).
 
 #### B. Opaque handles to places
 
@@ -770,8 +831,9 @@ its own.
 
 ### How the program's needs map onto shape A
 
-Proposed names; nothing is decided. "DOS" says what the DOS file asks,
-which is what the program asks today.
+Proposed names; the names are not decided. What a row does by a
+decision of "Decided in this area" names the decision. "DOS" says what
+the DOS file asks, which is what the program asks today.
 
 | What the program does | Today | Proposed | DOS |
 |---|---|---|---|
@@ -780,20 +842,20 @@ which is what the program asks today.
 | Free space | `DriveSpace`, in clusters | `RootSpace(root)`: free and total, `int64_t` bytes | 36h, multiplied |
 | The current directory of each drive | `DirCurrent`, `DirChange`, `DriveSelect`, `DriveCurrent` | `DirCurrent(root)`, `DirChange(path)`; the layer keeps one for each root where the system keeps one for the process | The same calls |
 | Listing a panel, the tree, the search | `SetDTA`, `FindFirst(pattern, 37h)`, `FindNext` | `DirOpen(path, pattern, what)` answering the first entry, `DirNext`, `DirClose`; the pattern matched by the layer, by DOS's rules, where the system does not | 1Ah, 4Eh, 4Fh; `DirClose` asks nothing |
-| One entry | 13 bytes of name, attributes, time, date, 32 bits of size | Name in UTF-8; size `int64_t`; the time of the last write; the layer's flags (below); whether the content is on the device | The DTA, converted |
+| One entry | 13 bytes of name, attributes, time, date, 32 bits of size | Name in UTF-8, or its bytes where it is not UTF-8, shown with a mark (decision 14); size `int64_t`; the time of the last write; the layer's flags (below); whether the content is on the device, shown with a mark (decision 8) | The DTA, converted |
 | Open, read, write, seek, close | 3Dh, 3Fh, 40h, 42h, 3Eh with a `u16` handle | The same functions, with `size_t` counts and `int64_t` places; the handle the layer's | The same calls; a place of 4 GB or more is refused |
 | Make, delete, rename | 3Ch, 41h, 56h | `FileCreate`, `FileDelete`, `FileRename` (which does not replace) | The same calls |
 | Delete by a mask | 29h and 13h with an FCB | `FileDeleteMatching(dir, pattern)`, which lists and deletes where no system does it at once | The same FCB calls |
-| Copy | The program's loop of reads and writes | `FileCopy(from, to, progress)`, answering "none here" on DOS; the program's loop where it does | Nothing: the loop, as today |
-| Trash | None | `FileTrash(path)`, "none here" on DOS (question 6) | Nothing |
-| Attributes | 4300h, 4301h, DOS's bits | The layer's flags: read-only, hidden, system, archive, directory, link, not on the device; and which of them a root has and lets the program set | The same calls; the flags are DOS's bits, renamed |
-| A file's time | 5700h, 5701h, packed | `FileTime(handle)`, `FileSetTime(handle, time)` in the layer's time (below) | The same calls. DOS knows no time zone: its local time is taken for the instant and shown as it is, so that a copy keeps the stamp to the bit |
+| Copy | The program's loop of reads and writes | `FileCopy(from, to, progress)`: the platform's copy on Windows and Apple's, answering "none here" on DOS and Linux, where the program's loop copies; the progress and the prompts the program's (decision 7) | Nothing: the loop, as today |
+| Trash | None | `FileTrash(path)`, for F8, "none here" on DOS; Shift-F8 is `FileDelete` (decision 6) | Nothing: F8 deletes, as Shift-F8 does |
+| Attributes | 4300h, 4301h, DOS's bits | The layer's flags: read-only, hidden, system, archive, directory, link, not on the device; the permissions of POSIX; and which of them a root has and lets the program set: DOS's four on DOS and Windows, read-only and hidden on a Mac, the permissions on POSIX (decision 9) | The same calls; the flags are DOS's bits, renamed |
+| A file's time | 5700h, 5701h, packed | `FileTime(handle)`, `FileSetTime(handle, time)` in the layer's time (decision 10; below) | The same calls. DOS knows no time zone: its local time is taken for the instant and shown as it is, so that a copy keeps the stamp to the bit |
 | A device, `CON` | 4400h | `FileKind(handle)`: a file, or something else | The same call |
 | A path made whole | 60h | `PathTrue(path)`, as `realpath` | The same call |
-| A wait, a drive not ready | `DeviceErrorTake(FtErr1)` | The same, widened: the system asks the program about a wait or a failure that can be tried again, with what it is waiting for | The same: the critical error |
-| Being told of changes | None | `DirWatch(path)`, and `DirChanged(watch)` polled in the loop of keys: "read again" | Never changed, no call |
-| Granting a root | None | `RootGrant()`: on iOS and a sandboxed Mac, the picker; "none here" elsewhere | Nothing |
-| Keeping a root | The path, in the setup file | `RootKeep(root)`: bytes to store; `RootRestore(bytes)` | The path, as today |
+| A wait, a drive not ready | `DeviceErrorTake(FtErr1)` | The same, widened: the system asks the program about a wait or a failure that can be tried again, with what it is waiting for, a download among them; the program shows a box that Esc gives up, its loop being on a thread of its own (decisions 8 and 13) | The same: the critical error |
+| Being told of changes | None | `DirWatch(path)` for each panel's directory, and `DirChanged(watch)` polled in the loop of keys: "read again" (decision 12) | Never changed, no call |
+| Granting a root | None | `RootGrant()`: on iOS, and on a Mac if it is ever sandboxed (decision 5), the picker; "none here" elsewhere | Nothing |
+| Keeping a root | The path, in the setup file | `RootKeep(root)`: bytes to store; `RootRestore(bytes)`; kept in the setup file, of the program's own format (decision 15) | The path, in that format: no longer the original's file |
 | A root that the program serves (decision 2; not built now) | None | The same functions, sent by the table of roots to the root's server | Nothing: no such root on DOS |
 
 #### What the DOS file could not keep
@@ -807,6 +869,14 @@ values has no place for either. Each such caller either gets a field of
 the DOS file's that no other platform fills, or is a deviation to be
 declared. The places are to be counted before the design is approved.
 
+Nor does the DOS file keep two things that the user has decided
+otherwise. The setup file is written and read in the program's own
+format on DOS too (decision 15), so it is no longer the original's, and
+every scenario that saves the setup or reads a saved one shows that: a
+deviation to be declared and held by patches. And delete by two keys,
+F8 and Shift-F8, both deleting on DOS (decision 6), is a deviation from
+the original too. Both are declared when they are built.
+
 #### Standard C and Open Watcom, for this area
 
 - **Enough:** `int64_t` and `<stdint.h>` for sizes and places, with the
@@ -815,10 +885,11 @@ declared. The places are to be counted before the design is approved.
   need nothing of `<uchar.h>`; `struct tm` to show a date.
 - **Not enough, so the layer's own:** time, since `time_t` is 32 bits
   without a sign on Open Watcom and a signed 64 elsewhere: a structure
-  of `int64_t` seconds since 1970 in UTC and nanoseconds (question 10).
+  of `int64_t` seconds since 1970 in UTC and nanoseconds (decision 10).
   Errors, since `errno`'s numbers are not POSIX's on Open Watcom and say
   nothing of a drive not ready or a file shared: an enumeration of the
-  layer's, with the platform's own number kept beside it for a message.
+  layer's, with the platform's own number kept beside it for a message
+  (decision 11).
   The place in a file, since `fseek` is 32 bits with a sign. Names of
   a length that differs by platform: the longest name and path are the
   layer's constants.
@@ -828,9 +899,10 @@ declared. The places are to be counted before the design is approved.
 
 ### Questions for the user
 
-Each with the ways, the recommended one first. Questions 1 to 4 are
-answered, 13 October 2026: see "Decided in this area". They are kept
-here as they were put, and 5 to 15 are open.
+Each with the ways, the recommended one first. All are answered,
+1 to 4 on 13 October 2026, 5 to 15 on 13 and 14 October 2026: see
+"Decided in this area". They are kept here as they were put, and 5 to
+15 are each marked with the answer.
 
 1. **The shape.** (a) Paths under named roots, text in UTF-8 with the
    platform's slash; iOS keeps its roots behind it. (b) Opaque handles,
@@ -853,46 +925,56 @@ here as they were put, and 5 to 15 are open.
 5. **The Mac build.** (a) Outside the App Store, not sandboxed: paths
    reach everything. (b) In the App Store, sandboxed: roots granted as
    on iOS. Recommended: (a); the layer allows (b) later without change.
+   **Answered:** (a); see decision 5.
 6. **Delete.** (a) To the trash where the platform has one, deleted on
    DOS. (b) Deleted everywhere, as the original. (c) Both, by two keys.
    Recommended: (a); a file manager that deletes past the trash
    surprises users of Windows, macOS and iOS.
+   **Answered:** (c): F8 to the trash, Shift-F8 deletes outright, both
+   delete on DOS; see decision 6.
 7. **Copy.** (a) The platform's copy where it has one, keeping streams,
    extended attributes and clones; the program's loop on DOS and Linux.
    (b) The program's loop everywhere. Recommended: (a); the loop loses
-   what it cannot see.
+   what it cannot see. **Answered:** (a); see decision 7.
 8. **Files not downloaded (iCloud, OneDrive).** (a) Listed with a mark;
    opening one downloads it behind a box that Esc gives up. (b)
    Refused until downloaded elsewhere. (c) Everything downloaded when a
    panel is read. Recommended: (a), the critical error's box widened.
+   **Answered:** (a); see decision 8.
 9. **Attributes off DOS and Windows.** (a) The dialog shows what the
    platform has: read-only, hidden on a Mac, permissions on POSIX.
    (b) Only DOS's four, mapped. Recommended: (a); system and archive
-   mean nothing there.
+   mean nothing there. **Answered:** (a); see decision 9.
 10. **Time.** (a) The layer's own: 64-bit seconds since 1970, UTC, and
     nanoseconds; shown in local time. (b) `struct tm` in local time.
     Recommended: (a); a local time is ambiguous at the change of
     summer time, and `time_t` is unusable on Open Watcom.
+    **Answered:** (a); see decision 10.
 11. **Errors.** (a) The layer's own list of some fifteen kinds, with the
     platform's number kept for a message. (b) `errno`'s names.
     Recommended: (a); `errno` has no "not ready" or "in use", and Open
-    Watcom's numbers are not POSIX's.
+    Watcom's numbers are not POSIX's. **Answered:** (a); see decision
+    11.
 12. **Changes made by others.** (a) The layer watches a panel's
     directory and the program reads it again when told, polled with the
     keys. (b) Read again only as now. Recommended: (a), nothing on DOS,
-    where no call is added.
+    where no call is added. **Answered:** (a); see decision 12.
 13. **Long waits.** (a) The program's loop runs on a thread of its own;
     the layer's calls may wait, and ask the program to show a box that
     Esc gives up. (b) Every call of the layer asynchronous, with events.
     Recommended: (a); it keeps the program a loop, as on DOS.
+    **Answered:** (a); see decision 13.
 14. **Names that are not UTF-8** (bytes on Linux, lone halves on
     Windows). (a) Kept as bytes, shown with a mark, and handed back as
     they came. (b) Left out of the panel. Recommended: (a); a file one
-    cannot see cannot be renamed or deleted.
+    cannot see cannot be renamed or deleted. **Answered:** (a); see
+    decision 14.
 15. **The setup file off DOS.** (a) DOS's file stays as it is, byte for
     byte; elsewhere a file of the program's, text, with roots and paths
     and the bookmarks iOS needs. (b) One format everywhere.
     Recommended: (a); the DOS file is held against the original's.
+    **Answered:** (b), against the recommendation: the program's own
+    format on every platform, DOS included; see decision 15.
 
 ### What this survey is unsure of
 
