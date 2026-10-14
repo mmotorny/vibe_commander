@@ -2070,7 +2070,6 @@ shows one, so the line says 2,001,050,624 bytes where the original says
 1,967,496,192, and neither says the 6 GB that the files take. The
 other scenarios that show the Info panel are held to the original's
 goldens as they are.
-||||||| parent of 367661c (Keep a panel whole while a command runs, and what was selected in it)
 
 ### 20. A panel keeps all of its files while a command runs
 
