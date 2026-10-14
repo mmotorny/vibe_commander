@@ -9379,7 +9379,7 @@ for.
 | N2 | `dialog.c` | 1,126; 110 | F3 | **Done**: "N2, `dialog.c`: done, and what a later cluster should know" below |
 | N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | The viewer's room in bytes. It names what `ViewDat` and `EdData` share, for N6. It says where it cut the file |
 | N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | |
-| N5 † | `find.c` | 1,044; 125 | F4 | **Done**, but for question 10: "N5, `find.c`: done, and what a later cluster should know" below |
+| N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
 | N9 † | `copy.c` | 1,571; 147 | F6 | The buffer in bytes |
@@ -9822,8 +9822,12 @@ recommendation first.
      bench's disk where no other scenario lists it. A change of the
      bench that changes a golden is asked first.
 
-10. **A part of a file read behind the end of the room** (open; the
-   cluster N5 met it, and its section has the reading).
+10. **A part of a file read behind the end of the room.** **Answered**
+   by the user on 14 October 2026 (`CLAUDE.md`, "The portable C"): the
+   recommended way below, a bug of the original fixed, entry 16 of
+   `src/portable_c/DEVIATIONS.md`. The cluster N5 met it, made the fix
+   in its third commit and landed with it, so F9 does not wait for it.
+   What was asked:
    - *When*: before F9, which would have the extender end the program
      there. Nothing else waits for it.
    - *The original*: a file that is searched for a text is read in
@@ -13290,9 +13294,14 @@ written by one script; and some 20 more to land.
 steps of "N0d" in their order, the room counted in bytes where the file
 search takes it, and `struct Searched` of `vc.h`, which `F67_00`
 answers in. clang's warnings of a conversion are silent for the file.
-One question for the user is open, question 10 of "The questions for
-the user": a part of a file read behind the end of the room. The code
-there is the original's, in bytes, with a comment that says so.
+The question that it met, question 10 of "The questions for the
+user", a part of a file read behind the end of the room, the user
+answered on 14 October 2026, and the piece's third commit fixes that
+bug of the original: a part is as long as what is left of the room
+behind the list, 8000h and 80 bytes at the most, and with less than
+4,000 bytes left the search stops as it stops when the whole room is
+that short. `src/portable_c/DEVIATIONS.md`, 16, declares it; no
+scenario shows it.
 
 **The numbers.** Of the 120 of 8 or 16 bits that the record had, and
 none that was a `u32`:
@@ -13309,13 +13318,17 @@ none that was a `u32`:
 **The room in bytes.** The plan has the first of the five clusters that
 count the room add a function that answers it in bytes: `RoomBytes` of
 `start.c`, an `i32`, beside `RoomParas`, which `copy.c`, `edit.c`,
-`read.c` and `view.c` still call. `FindFil` takes the part as long as
+`read.c` and `view.c` still call. `FindFil` took the part as long as
 the room or 8000h and 80 bytes, the shorter, which is what the
-original's two tests of paragraphs come to; `FndSize` is the room's
+original's two tests of paragraphs come to, until the fix of question
+10 took it of what is left; `FndSize` is the room's
 bytes over 65, less one, where the original divides 32 bits by 16. No
 cap: what keeps a line inside the room is `FndSize`, which `FndStuf`
 holds a new line to, and two lines more where a directory is listed,
-both as they were. What writes behind it is the question.
+both as they were. What wrote behind it was the part that is read,
+and that is question 10 and its fix: `left`, what is left of the room
+behind the place that the part is read to, an `i32` that is below 0
+where the list is full, and a reason in `harness/int16.txt`.
 
 **`struct FndData` grew**, from 18 bytes to 28, the five counts of 32
 bits; `LAID_OUT` says 28, and a `HOLDS` line that it ends before byte

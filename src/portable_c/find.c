@@ -553,7 +553,7 @@ u16 FindFil(u16 attributes)
     const u8 *from;
     u8 *end, *to, *name, *part;
     u16 handle;
-    i32 length, suffix, room, chunk, count, i;
+    i32 length, suffix, left, chunk, count, i;
     bool found;
     struct Answer entry, opened, read;
     u8 c, kind;
@@ -627,25 +627,27 @@ next:
             goto next;
         }
         handle = opened.value;
-        /* A part is as long as the room or 8000h and 80 bytes, the
-           shorter. That is of the whole room, as the original has it,
-           not of what is left of it behind the list: with the list
-           within that many bytes of the room's end, a part is read
-           behind the end. A bug of the original, which stays until the
-           user has decided its fix (TODO.md, "N5"). */
-        room = RoomBytes();
-        chunk = 0x8000 + 80;
-        if (room < chunk)
-            chunk = room;
-        found = false;
-        if (chunk < 4000)
-            goto stopped;
         /* Where a part is read to: the paragraph that the line behind
            the next one begins in. The assembly has DS there from FndAdr
            and reads at 0 of it, not at the line: up to 15 bytes in front
            of that, the end of the line that is still free. */
         part = Line(FND->FndNumb + 1);
         part -= InParagraph(part);
+        /* A part is as long as what is left of the room behind that, or
+           8000h and 80 bytes, the shorter, and with less than 4,000
+           bytes there the search stops. The original takes the part's
+           length from the whole room, not from what is left of it, and
+           with the list within that many bytes of the room's end reads
+           a part behind the end: a bug of the original, fixed on the
+           user's word (DEVIATIONS.md, 16). What is left may be below 0,
+           a line or two behind the end where the list is full. */
+        left = (i32)(RoomEnd - part);
+        chunk = 0x8000 + 80;
+        if (left < chunk)
+            chunk = left;
+        found = false;
+        if (chunk < 4000)
+            goto stopped;
         for (;;) {
             /* FnFl46 */
             if (!FndBack())

@@ -1868,3 +1868,47 @@ drive that shares the floppy drive with another, B: while the drive
 goes by A:, from a third drive: the original then has DOS's prompt for
 the disk, and the portable C its box. It is to be written
 (`TODO.md`, "F4, the viewer and the file search").
+
+### 16. The file search reads no part of a file behind the end of its room
+
+**What the original does.** Alt-F7 with a text to look for reads each
+file that it finds by name in parts, into the memory behind its list of
+what was found, and looks for the text in each part; a part begins 80
+bytes before the end of the one before. A part is 8000h and 80 bytes
+long, or as long as the whole room behind the panels where that is
+shorter, and the search stops if that is less than 4,000 bytes. The
+length is of the whole room, not of what is left of it behind the list,
+which grows by a line of 65 bytes for every file found. So once the list
+is within 8000h and 80 bytes of the room's end, its last 505 lines or
+so, a part is read behind the end: DOS writes the file's bytes behind
+the original's block of the memory, which is the last on the machine,
+into what lies above DOS's memory, and the text is looked for in what
+that memory then gives back. That is known by reading the assembly,
+`FnFl44` to `FnFl46` of `VCFIND.INC`, and was not tried: it takes some
+thousands of files found by one search.
+
+**What the portable C does.** A part is as long as what is left of the
+room behind the list, from where the part is read to, or 8000h and 80
+bytes where that is shorter; with less than 4,000 bytes left, the search
+stops, as it stops in both when the whole room is that short, and the
+box says how many files were found and offers its menu, as for a list
+that is full. Before the list is within 8000h and 80 bytes of its end,
+nothing differs. `FindFil` of `find.c`.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed. The program of 32
+bits wrote into its own memory behind the room there, and from the
+memory of the extender on it would be ended by the extender for it. The
+cluster N5 met it where it counted the room in bytes (`TODO.md`, "N5,
+`find.c`", and question 10).
+
+**Which scenarios show it.** None. `find`, `find-drives`, `mouse-find`,
+`stamps` and `stamps-russia` search for a text with a list of a few
+lines, and are held to the original's goldens as they are. A scenario
+that showed it would have a search with a text find more files than the
+room has lines for, less some 505: some 7,560 with the room that the
+program of 32 bits has on the bench today, some 230,000 once the room is
+the extender's, and in the original as many as its room on the bench
+has, less 505. The bench has no such directory, and making one in the
+scenario would take thousands of files written by a command of DOS; the
+original's screen there would be by whatever lies behind its memory.
