@@ -159,7 +159,12 @@ These held while `src/c/` was made, and they say what it is.
   3. The abstraction layer is designed: what the program asks of the
      system it is on, and how. The user approves the design before
      anything is built on it. `sys.h` is what there is until then, a
-     seam that keeps the registers in one file, and not that design.
+     seam that keeps the registers in one file, and not that design. On the user's word of 13 October 2026 the
+     design begins while step 2 is still landing, interactively, a
+     group of functions at a time: a draft in
+     `src/portable_c/LAYER.md`, each decision put to the user and
+     written there with its date. The types that step 2 is still
+     changing may be settled last.
   4. The implementation for DOS moves under the layer.
   5. A second implementation is made that builds and is not meant to
      run: a stub.
