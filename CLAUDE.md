@@ -2786,6 +2786,58 @@ in "The portable C".
     scenarios, as on the C translation: the file that it is given says
     which tree.
 
+- The numbers of 8 and 16 bits are held by a test of their own,
+  `portable_c-width`, since the piece N0 of step 2 (`TODO.md`, "N0, the
+  finder, the record, the types", which has what a cluster does, in
+  order). `harness/width.py` finds every such number that a file
+  declares and every cut, where a number that may not fit by the types
+  is put into so few bits; `harness/width.txt` has them, with a reason
+  for each in what has been sorted and the counts of the rest. Using it
+  and keeping it up:
+  - It fails for a count that has moved, fewer as well as more, in a
+    file that is not sorted, and prints the lines of the record that
+    differ: `python3 harness/width.py --record`, and read what moved.
+    A number or a cut that is new in something sorted is written
+    without a reason, and the test fails until the reason is under it
+    in the record, or the number is widened.
+  - A function that is widened moves the counts of other files: one
+    that returns 32 bits where it returned 16 is a cut more in every
+    file that keeps its answer in 16 bits, and one that takes 32 bits
+    is a cut fewer where a caller counted on it to cut. Those are for
+    the cluster of that file, and are committed as counts.
+  - Before a parameter is widened, `--show NAME` lists the calls of the
+    tree that hand the function more than it takes. Afterwards nothing
+    lists them.
+  - A file may declare another file's function for itself, and that
+    line changes with the function: `grep` the name in the whole tree.
+    The compiler stops for one that was left.
+  - What the finder does not name, and a widening can get wrong: a mask
+    that was written for 16 bits and now cuts, `length & 0xFF00` for
+    all but the low byte, which is `length & ~(u32)0xFF` of 32 bits; a
+    `~` or a `-` of the variable; a line that holds it against 0FFFFh,
+    for a number that got there by stepping 0 back; and that a number
+    is only ever 0 or 1. Each is read, at every line that names the
+    variable.
+  - A number that the program counts on wrapping at one place is
+    widened, and the cut is written there with `wraps:` in front of its
+    reason: `more = (u16)((second << 8 | second & 0x7F) - 1);` in
+    `LnStr` of `line.c`, where `more` was a `u16` and the line had no
+    cast.
+  - A character, a colour, a place of a row and a column, and what the
+    system answers in stay as wide as the translation has them, 16 bits
+    as a rule, with one word for the reason: half of the numbers of the
+    first five files did.
+  - A reason is written into `harness/width.txt` by hand, or for many
+    at once by a script of a dozen lines that is kept in `build/`: the
+    entries are divided by empty lines, the first line of one is its
+    key, a cut has its line behind `    | `, and what follows is the
+    reason. `--record` puts the file into its form again and keeps
+    them.
+  - `harness/int16.py` knows `bool` and `i32`. Its test stays, and a
+    widening moves its places too: one that makes 32 bits of a
+    difference of two numbers of 16 is a new place, `widen`, with its
+    reason.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through

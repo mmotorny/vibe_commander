@@ -8,6 +8,13 @@ portable_c-width holds the tree to this. `python3 harness/width.py
 --record` writes it anew and keeps the reasons; `--sort FILE`
 makes entries of a file that is not sorted.
 
+The columns: the numbers of 8 or 16 bits that there are; of those,
+how many are in what nobody has sorted, and how many are kept with
+a reason, the rest being of a structure that is laid out or of a
+file as a whole; the cuts; and how many numbers are declared as
+u32, as bool and with a sign. A cluster takes the `not sorted` of
+its row to nothing.
+
 cluster    8 or 16 not sorted  kept  cuts   u32  bool signed  its files
 N0              34          0    34    29    29     3      0  digits.c mask.c line.c mouse.c blank.c
 N1             133        133     0    48     2     0      0  string.c format.c box.c screen.c misc.c

@@ -9176,7 +9176,7 @@ scenario of the program's own: questions 8 and 9.
 | The 16 bytes round a block, new (F1) | A pattern in front of each block of the 640 KB and behind the last, held by the image's tool at the end of every scenario: a write just behind the end of a block, or in front of one, is named with its scenario from F1 on, where the extender ends the program for it from F9 on. "What could go wrong", 15 |
 | `portable_c-host` | Clean already in every file of the common code, since gcc reads the flat bodies, which cast nothing: it does not measure step 2. It guards it: a file must stay clean. Of what it still counts, `aborts` (5 places) can go to a word of `vc.h` in F10; `data_seg` and all of the system's file wait for the layer |
 | Not counted by it, and worth knowing | gcc's `-Wcast-align=strict` names 376 casts that make a pointer to something wider of a pointer to bytes, `copy.c` 85, `view.c` 64, `stcolor.c` 53. Right on the 386 and on x86-64; what clang's sanitizer will name first in step 6. Not step 2's to mend, and not held to |
-| `portable_c-int16` | Its question, whether two builds differ, is gone with the second build. Its finder is the finder of the widths (N0), and its record the start of theirs. Until N0 it stays as it is and its record is kept up; from N0 on the record of the widths holds what it held |
+| `portable_c-int16` | Its question, whether two builds differ, is gone with the second build. Its finder is the finder of the widths (N0), and its record the start of theirs. N0 has made that finder, `harness/width.py`, and left this test, its record and its reasons beside it: a widening moves its places, and each is read as before |
 | The test of the data and `harness/reads.py` | Unchanged by the plan, since no table and no layout changes. `reads.py` goes by the text `OFFSET(name)`: F3 teaches it the new form |
 | The test of the layout | Loses in F10 the three rules that are of the megabyte: what a segment names within it, the tables within 32K of `Title_S`, `IniSave` within 64K of the main data |
 | `CHECKED`, the debug program's checks | Not worth writing now. They were to be a third body of the words, and the words are what goes; and C1 showed that the fault to fear goes through no word. The image is the better net and costs less |
@@ -9204,7 +9204,7 @@ thought and long in lines.
 | F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
 | F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes in `MemSize`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
-| N0, the finder, the record, the types | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and the type with a sign for kind 4; `FileSize`, `ByteCount` and `MemSize` in `sys.h`, defined and not yet used; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
+| N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and the type with a sign for kind 4; `FileSize`, `ByteCount` and `MemSize` in `sys.h`, defined and not yet used; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
 | N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; each cut that the program counts on written out; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's three warnings silent; the test of the record | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
 | S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a `ByteCount` and answer with a structure of their own; `FileSeek` takes and answers a `FileSize`; `DriveSpace`'s three figures are `u32`; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
 | M, the main data's numbers | Each field of the main data or of a panel that the record has as to be widened: a variable beside the structure, its word left unused, and every line that names it | Those lines, in whatever file | Every cluster; alone | The scenarios; the images, the main data equal but for those words | |
@@ -10141,6 +10141,190 @@ to know:
   does not hold a piece to it. `SEG_OF`, `OFFSET_IN_SEG` and `AT` go up
   first, at every place where a piece meets what another still has as
   a segment.
+
+### N0, the finder, the record, the types: done, and what a cluster goes by
+
+**What there is.** `harness/width.py`, its record `harness/width.txt`
+and the test `portable_c-width`; `bool` and `i32` in `vc.h`;
+`FileSize`, `FileStep`, `ByteCount` and `MemSize` in `sys.h`, defined
+and not used; the fields of the main data and of a panel sorted, in the
+record; and the rule tried whole on `digits.c`, `mask.c`, `line.c`,
+`mouse.c` and `blank.c`. Every scenario passes and the data's image of
+each of the 155 is that of the build before, with no difference.
+
+**The finder** is the finder of `harness/int16.py` with two things
+more, and its top says all of it. It finds the numbers, everything of 8
+or 16 bits that a file declares, and the cuts, where a number that may
+not fit, by the types alone, is put into 8 or 16 bits: `cast`, `store`,
+`step`, `handed`, `returned`. The plan said that the finder named every
+store that cuts and had two things to learn. It named none: its kinds
+are where a number is looked at before it is cut. So `store`, `cast`
+and `returned` are new as `step` and `handed` are.
+
+**The record.** A file, a function or a structure is in it as `not
+sorted` with its counts, as sorted with an entry and a reason for every
+number that is left and every cut that is left, as `laid out` with
+whose it is, or `as a whole`, the files of tables and the system's
+file. At its top is a table by cluster and by file: the numbers of 8 or
+16 bits that there are, how many of them nobody has sorted, how many
+are kept with a reason, the cuts, and how many numbers a file declares
+as `u32`, as `bool` and with a sign. A cluster's commit shows in that
+table what it widened, and the count that it takes to nothing is the
+column `not sorted` of its row. It is 1,019 lines with five files and
+the two structures sorted; a file that is sorted has some four lines
+for every number and cut that is left, so the whole of it will be some
+5,000 lines if half of the numbers stay as they did here, and fewer if
+the clusters keep fewer.
+
+Three things of the plan are otherwise:
+
+- `harness/int16.py`, its record and its test stay beside it. What it
+  finds is still where the int of the code as it was written shows, and
+  a widening moves it: two places came and two went with the five
+  files. Folding its record into this one would be a second kind of
+  entry for no gain.
+- A cast is in the record only where it cuts, by the finder's ranges:
+  `(u16)*text` is no entry, `(u8)mode` is.
+- A number that was widened or made a boolean is no entry. The record
+  is what is narrow, and the table counts the rest.
+
+**The types.** `bool`, `true` and `false` are of `<stdbool.h>`, which
+Open Watcom has in the directory that the build names for `<stddef.h>`
+and gcc and clang have without a library; a `bool` is one byte for all
+three, which a `HOLDS` line holds. clang will want nothing else at step
+6. `i32` is `int`, with a `HOLDS` line for its length and its sign. No
+number of the five files wanted it. The program was the same bytes with
+the types defined.
+
+**The rule as it stood up**, by what the 66 numbers of the five files
+became:
+
+| | Numbers | Which |
+|---|---|---|
+| Widened to `u32` | 29 | Counts, indexes, lengths; what `TstHex`, `LnStr`, `DoublMo` and two static functions answer |
+| Made `bool` | 3 | What `TstMas` and `InWind` answer, what `CurMous` is handed |
+| Kept, as wide as it is by what it is | 34 | 15 a character, a colour or a cell; 9 a place, a row and a column in two bytes; 6 what the system answers in, the mouse's buttons, the keys that are held, the page, the timer's low word; 2 a time of DOS's; 2 a random number |
+| Counted on to wrap all its life | 0 | |
+| With a sign | 0 | |
+
+And of the 41 cuts that the finder named before, 29 are left, each
+with its reason: 12 are a cast that is written, of which 5 say where
+the program counts on wrapping (`wraps:` in the record), and the others
+are a number that what stands at the place keeps within.
+
+- Half of the numbers stay. A character, a place or a colour that the
+  translation has in 16 bits, since the assembly had it in a register,
+  is kind 1 by the rule, and widening it gains nothing. The cost is a
+  reason for each and one for every cut into it.
+- Few are booleans, and the finder does not say which: a number is
+  one when every value put into it and every use says so, and of what
+  another file calls that is a `grep` for its calls. `CurMous` took
+  "the low byte of `show`" and is handed 0 or 1 by all 13 calls.
+  `DoublMo` answers 0, 1 or 2 and is a number.
+- A number that wraps at one place: the variable is widened and the cut
+  written there. As it was and as it is, in `LnStr` of `line.c`:
+
+      u16 more;
+      more = (second << 8 | second & 0x7F) - 1;
+
+      u32 more;
+      more = (u16)((second << 8 | second & 0x7F) - 1);
+
+- A mask that meant "all but the low byte" of 16 bits cuts a number of
+  32. Nothing names it, since it is no cut by the types. In the same
+  routine:
+
+      length = length & 0xFF00 | length + more & 0xFF;
+
+      length = length & ~(u32)0xFF | length + more & 0xFF;
+
+  Before a variable is widened, look at every mask of it that is
+  written for 16 bits, `0xFF00`, `0xFFFF`, `0xFFF0`, at every `~` and
+  `-` of it, and at every line that holds it against `0xFFFF`.
+- A variable that takes two things in turn, `now` of `Blank`, the keys
+  that are held and then the timer's low word, stays as it is with both
+  said.
+
+**Across clusters**, as "The rule for a number" has it, and it held.
+
+- A return that is widened: `TstHex`, `LnStr` and `DoublMo` answer
+  `u32`. No caller changed. The record counts a cut more in each file
+  that keeps the answer in 16 bits, nine in nine files, and the commit
+  shows them as counts that moved: the cluster of that file meets the
+  cut when it sorts the file.
+- A parameter that is widened: `python3 harness/width.py --show NAME`,
+  before the change, lists every call in the tree that counts on the
+  parameter to cut what it is handed. There was none for `HexByt` and
+  `DoublMo`.
+- What it did not say: a file that declares another file's function for
+  itself. `edit.c` has `HexByt` so and `dialog.c` `LnStr`, and each
+  line changes with the function, in a file that is another cluster's.
+  The compiler stops for it, so it cannot be missed; it is a line of a
+  file that someone else may have open.
+- A number that is widened and then kept in a field of the main data
+  is a cut with a reason, until M: `md.MousPos = cursor`.
+
+**The fields of the main data and of a panel** are entries of the
+record, under `vc.h`, each with one word and what is not plain: `setup`
+46, which stay bytes; `flag` 16; `text` 22 and `cells` 5; `address` 16,
+which a piece of the addresses takes out, or question 3 for the four
+places of a panel; `small` 10; `system` 6; `unused` 7; `wraps` 2, the
+random numbers; and `M` 5, which the piece M takes out to widen:
+`ComSpec`, `ClstSiz`, `Total`, `FreeDsk`, `MousPos`. They were sorted
+by name, by comment and by one `grep` of what the code puts into each,
+not by reading every use, so a cluster may find one otherwise and
+changes its line then. One thing was seen on the way and not looked
+into: `ClstSiz` is a sector's bytes times its sectors in 16 bits, which
+is 0 for a cluster of 64K. Whether the original shows something wrong
+there is for the cluster that has the Info to see and the user to
+decide.
+
+Eleven structures of the headers are `laid out`. The others are the
+program's own, what a function answers in, and are not sorted: each
+goes with the cluster of the functions that answer in it, and those of
+`sys.h` with S and the layer. No cluster owns them by the table of the
+clusters, which is by file: 133 numbers.
+
+**What one agent holds.** The five files, 66 numbers and 41 cuts in 738
+lines, took some 12 tool calls of the piece, with the files read whole,
+one script for the edits, one for the reasons, one build and one run of
+the suite: nothing failed and nothing had to be read in another file
+but the calls of eight functions. That is no measure of a cluster.
+What it does say: the reading is cheap and the writing is not. 63
+entries wanted a reason, six of every ten things that the finder
+named, and a reason is a sentence that somebody has to have checked.
+By that, a cluster is some 150 numbers and 100 cuts, 150 reasons, for
+an agent that hands back after a hundred tool calls, and the counts of
+the record's table are what to cut by, not the lines:
+
+| Cluster | Numbers; cuts | |
+|---|---|---|
+| N3 and N4, `view.c` | 197; 211 | Two halves are right |
+| N6 to N8, `edit.c` | 248; 278 | Three thirds are right, and no fewer |
+| N17, `keys.c`, `commands.c` | 222; 58 | The largest by numbers. 116 are of `commands.c` with 13 cuts, most of them what a command is handed; F2 makes many of those pointers. Cut in two by file if it is still so after F8 |
+| N19, five files | 163; 74 | `start.c` waits for F9 anyway: a cluster of its own, 49; 30 |
+| N12, N13, N15 | 88; 113, 71; 101, 114; 108 | More cuts than numbers, `treebox.c`, `usermenu.c`, `panel.c`, `drive.c`: arithmetic on places. Right as they are, and the slow ones |
+| The others | 90 to 140; 50 to 100 | Right |
+
+**What a cluster does**, in this order:
+
+1. `python3 harness/dataimage.py save` of the build that it starts
+   from, into `build/`.
+2. `python3 harness/width.py --show FILE`: the numbers and the cuts,
+   function by function. Read the file with that beside it and say of
+   each number which of the five kinds it is. For a parameter or a
+   return of a function that other files call, `grep` its calls, and
+   `--show NAME` for what is cut in being handed to it.
+3. Change the types, in the file, in `vc.h` and in whatever file
+   declares the function for itself; write the cut where the program
+   counts on wrapping; look at the masks. Build.
+4. `python3 harness/width.py --sort FILE`, or `FILE:FUNCTION` for a
+   part, and write the reason under every entry that has none, in
+   `harness/width.txt`. `python3 harness/int16.py`, and its record anew
+   with the reason of whatever is new there.
+5. clang's three warnings for the files ("Booleans"), the tests that
+   start no machine, then the whole suite and the images held against
+   those of step 1.
 
 ## An implementation of the layer for tests: future work
 

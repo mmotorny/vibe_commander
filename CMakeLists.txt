@@ -339,8 +339,9 @@ function(add_portable_c target directory)
     #        pointer is an offset of 32 bits
     # -s -zl -zls -wx -we   as in c_compile above: no check of the stack,
     #        no library, and every warning an error
-    # -i=    the compiler's own headers, for one of them: vc.h has
-    #        offsetof of <stddef.h>, as any other compiler has it
+    # -i=    the compiler's own headers, for two of them: vc.h has
+    #        offsetof of <stddef.h> and bool of <stdbool.h>, as any
+    #        other compiler has them
     # -fr    no file of the errors beside what the compiler writes out:
     #        it would be build/<file>.err, which is where the compiler
     #        for 16 bits leaves its own of a file of the same name, of

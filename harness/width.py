@@ -506,7 +506,13 @@ def written(tree, record, said):
         "under an entry was written by whoever read it. The test",
         "portable_c-width holds the tree to this. `python3 harness/width.py",
         "--record` writes it anew and keeps the reasons; `--sort FILE`",
-        "makes entries of a file that is not sorted.", ""]
+        "makes entries of a file that is not sorted.", "",
+        "The columns: the numbers of 8 or 16 bits that there are; of those,",
+        "how many are in what nobody has sorted, and how many are kept with",
+        "a reason, the rest being of a structure that is laid out or of a",
+        "file as a whole; the cuts; and how many numbers are declared as",
+        "u32, as bool and with a sign. A cluster takes the `not sorted` of",
+        "its row to nothing.", ""]
     lines += table(tree, record)
     lines += ["", "----"]
     bare = []

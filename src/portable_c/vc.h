@@ -82,7 +82,8 @@ HOLDS(a_bool_is_one_byte, sizeof(bool) == 1);
 #endif
 
 /* Where in a structure a field is, as a number: offsetof of <stddef.h>,
-   which is the one header of a compiler that the program has. */
+   which with <stdbool.h> above is what the program has of a compiler's
+   headers. */
 #include <stddef.h>
 #define OFFSET_IN(type, field) ((u16)offsetof(type, field))
 
