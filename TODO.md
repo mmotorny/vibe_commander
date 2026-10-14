@@ -8894,7 +8894,7 @@ is asked the same question, and is of kind 1, 3, 4 or 5:
 |---|---|---|---|
 | 1 | As wide as it is by what it is, and without a sign. Laid out by someone else: a field of a structure that a file, DOS, the BIOS or the screen has, or of the main data and a panel, whose layout is the original's. Or a thing that has its width: a character, a colour, a key with its scan code, a cell of the screen, a handle, a byte of the setup. Or bits and no number: a mask, flags, what is only taken apart and put together by shifts and masks | Stays. A number that is taken out of a structure into a variable is of the other kinds | The structure says whose it is, once, in the record; a variable by one word there, `character`, `colour`, `key`, `bits` |
 | 2 | True or false and nothing else: every value put into it is 0, 1 or a comparison, and every use asks whether it is 0 | `bool` | The finder: a range of 0 to 1 and no use in arithmetic, in a shift, or held against a number other than 0 and 1. A number that is tested by its bits, held against 0FFh, or returned as "1, 0, or 100h to stop" is none |
-| 3 | Counted on to wrap round | Stays 16 bits and without a sign if it wraps all its life, a random number, a sum. If it wraps at one place, the variable is widened, to an `i32`, and the cut is written there, `(u16)(a - b)`, with the reason in the record | Read, at every place where the finder says that what is kept is cut |
+| 3 | Counted on to wrap round | Stays 16 bits and without a sign if it wraps all its life, a random number, a sum. If it wraps at one place, the variable is widened, to an `i32`, and the cut is written there, `(u16)(a - b)`, with a comment that has the word `wraps` and says what the program counts on | Read, at every cut that `--show` lists of the file, before the variable is widened: a cut that is not written is where a wider variable keeps another number |
 | 4 | A quantity that can pass two gigabytes: the size of a file and a place in one, the size of a disk and of what is free on it, the sum of what is selected, which the original shows up to four gigabytes | A `u32`, until the layer's design gives the size of a file its type, which is then signed. There is no signed type of 64 bits to keep it in meanwhile: "Left for the layer's design" | By what it counts: the word `size` of the record |
 | 5 | Anything else: a count, an index, a length, a number of a line, a column, a size in the memory, a step that may be back | An `i32`, also where it is handed to the system or comes from it | What is left |
 
@@ -8944,7 +8944,9 @@ whatever follows the number; a `u32` would have kept 4,294,967,280.
 That is wrapping that the program counts on, kind 3, and the cut is
 written: `digit = (u16)(*text - '0')`. The finder names every such
 store, as a cut, before the variable is widened, so it is read; the
-mistake is to widen the variable and take the cast for noise.
+mistake is to widen the variable and take the cast for noise. clang
+names no such store, before or after: to it a `u16` less a number that
+is written stays a `u16` ("N0d", below).
 
 **What a sign changes**, to be read for at every number that is made an
 `i32`, and what names the places:
@@ -8955,7 +8957,7 @@ mistake is to widen the variable and take the cast for noise.
 | A division and a remainder | -7 / 2 is -3 and -7 % 16 is -7; without a sign the remainder was 9. Of numbers that are 0 or more both are what they were | The same |
 | A comparison with a `u32` | C makes the `i32` a number without a sign first: -1 is above everything. Against a `u8` or a `u16` nothing changes, since those become an `int` | clang, `-Wsign-compare`, which the test of the record asks of every file that is sorted |
 | Made a `u32` without a word: handed to a parameter that is one, in another cluster's file or in `sys.h`, kept in a field, returned; or a `u32` made an `i32` | A number below 0 becomes a huge one, and one beyond two gigabytes a negative one | clang, `-Wsign-conversion`, held the same way. The place gets the type that the number is, or the cast, which then says that the number is not below 0 there |
-| Put into 8 or 16 bits | A number below 0 is cut as one that is too large is | The finder's cuts as they were, `store`, `handed`, `returned`, `cast` |
+| Put into 8 or 16 bits | A number below 0 is cut as one that is too large is | clang, `-Wimplicit-int-conversion`, where it names the place, which then gets its type or its cast. A step or a sum in the number's own width it does not name, and that stays as it is written |
 | An index into a table, a number added to a pointer | Nothing for 0 or more. Below 0 it steps back, which is what a sign is for, and what a machine of 64 bits gets wrong of a `u32`: FFFFFF60h added to a pointer of 64 bits is 4 GB on. That the index is within its table is the reader's, as it was | Nothing new: `harness/int16.txt` has the places where one could be below 0, as `back` |
 | A mask written for 16 bits | `~0xFF` is an `int`, -256, every bit but the low eight: `length & ~0xFF` of a number that is 0 or more is what `length & 0xFF00` was in 16 bits, with no cast. `LnStr` has it so, where N0 wrote `~(u32)0xFF` | Reading: nothing names a mask |
 | A loop that counts down to nothing, `while (--count)` | For a count of 0 a `u16` went round 65,536 times, which the editor counts on for its rows; an `i32` goes below 0 and on to an overflow, which C leaves undefined | Reading: look at whether 0 can get there. Where the program counts on the 65,536, the count stays a `u16`, kind 3 |
@@ -8967,14 +8969,36 @@ a function answers whose comment says so. That is the sentence under
 the `sign` entry. A number of which it cannot be said keeps the type
 that the program counted on, with the cut written.
 
-Which of clang's warnings a cluster holds its files to: `-Wsign-compare`
-and `-Wsign-conversion`, with the three of "Booleans". All five are
-silent for the five files, and the test `portable_c-width` asks them of
-every file that is sorted, so they are held and not only tried. They
-say nothing of a `u8` or a `u16` against an `i32`, rightly: nothing
-changes there. `-Wimplicit-int-conversion` is not held: it names every
-store into 8 or 16 bits, 14 in the five files, which are the finder's
-cuts and have their reasons.
+**A change of sign or of width is said by a cast**, on the user's word
+of 13 October 2026 (`CLAUDE.md`, "The portable C"), and no list beside
+the code has such a place. A file that is sorted is held to clang's
+`-Wconversion`, all of it, which has `-Wimplicit-int-conversion` and
+`-Wsign-conversion`, to `-Wsign-compare`, and to the two of "Booleans"
+that are not of that group. The test `portable_c-width` asks them of
+every file that is sorted, no line exempted, and fails for a line that
+switches a warning off. A place that is named goes by making the type
+right, which is tried first, or by a cast written there: with a
+comment where the program counts on what the cast cuts off, with none
+where the number fits by the lines just above, and with a comment that
+says by what where it fits by something further off. Which cast the
+compiler keeps is "N0c".
+
+**Exactly what clang names is held**, on the user's word of the same
+day, asked with what "N0d" found: clang leaves out, on purpose, a sum
+or a difference of numbers of 8 or 16 bits that is kept in as many,
+`word = word + 1`, `byte = a - b`, and every step, `++`, `+=`, `|=`,
+which are three quarters of the places where a number that may not
+fit, by the types, is put into fewer bits. Such a place, on a variable
+that stays 8 or 16 bits for a reason, stays as it is written: it
+wraps in its own width, which is what C says and what a reader
+expects. No rule of the project's own stands on top of the
+compiler's, the finder refuses nothing, and no list has those places.
+They are read all the same, once, when a cluster decides which
+variables are widened, `python3 harness/width.py --show FILE`, which
+is how most of them go; and where a variable is widened that the
+program counted on to wrap at such a place, the cut is written there,
+kind 3 of the table above. "N0d, a cut is said by a cast", below, has
+what each warning names and what a cluster goes by.
 
 And three rules for what a reader finds at a place where a result is
 cut today and would not be:
@@ -9022,39 +9046,39 @@ may name the same bytes for another use: the tables have `TmpBuf[100]`
 fifteen times, which is where `EdData` begins.
 
 **Across clusters.** A parameter that is widened changes no caller,
-but one that counted on the call to cut what it hands over: the finder
-names those, and the cluster writes the cut at the call, in whichever
-file that is. A return that is widened is cut by a caller that keeps
-it in 16 bits, as it was: the place is in the record of the caller's
-file, and its cluster sorts it, or the widening cluster does if that
-file is done. So the clusters need no order among themselves. With a
-sign there is one thing more at the border. An `i32` that is handed to
-a function of a file not yet sorted, which still takes a `u16`, is a
-cut, `handed`, as it was. One that is handed to a parameter that is a
-`u32` there, or held against what such a function answers, is named by
-clang's two warnings in the file of the cluster that is at work: if
-the other's number is of kind 4, a size, the place gets its cast, and
-if it is a count that only waits for its cluster, the cluster that met
-it gives it its sign, in the other's file, as it would write a cut
-there.
+but one that counted on the call to cut what it hands over: `--show
+NAME` lists those before the change, and the cluster writes the cut at
+the call, in whichever file that is. A return that is widened is cut
+by a caller that keeps it in 16 bits, as it was: once that caller's
+file is sorted, clang names the place and it has its cast, written by
+its cluster, or by the widening cluster if the file is done, where the
+test then fails for it. So the clusters need no order among
+themselves. With a sign there is one thing more at the border. An
+`i32` that is handed to a function of a file not yet sorted, which
+still takes a `u16`, is named by clang and has its cast at the call
+until the other's cluster widens the parameter and takes the cast out.
+One that is handed to a parameter that is a `u32` there, or held
+against what such a function answers, is named by clang's two warnings
+of the sign in the file of the cluster that is at work: if the other's
+number is of kind 4, a size, the place gets its cast, and if it is a
+count that only waits for its cluster, the cluster that met it gives
+it its sign, in the other's file, as it would write a cut there.
 
 **The record.** `harness/width.txt`, held by a test as
 `harness/int16.txt` is, so that a reviewer reads one file: every
 structure of kind 1 by name with whose it is; and every variable,
-parameter, return and cast that is still 8 or 16 bits outside those,
-and every one that is a `u32`,
-with its reason, by file, function and the text of its line. For the
-common reasons it has one word, as `harness/int16.txt` has `index` and
-`back`, and a sentence for the others. The test fails for a number
-that is not in the record. A file that no cluster has had yet is in
-it as a whole, `not sorted yet`; when the clusters are done the record
-is the list of everything narrow that is left and why.
-`harness/int16.py` is its finder: what that test said of two builds,
-where a number is looked at before it is back in 16 bits, is with one
-build exactly where a wider variable changes a result, and its
-reasons are the first entries. Two things the finder has to learn in
-N0: a variable stepped beyond its width by `++`, `--`, `+=`, `-=`, and
-a number cut by being handed to a parameter that takes fewer bits.
+parameter and return that is still 8 or 16 bits outside those, and
+every one that is a `u32`, with its reason, by file, function and the
+text of its line. For the common reasons it has one word, as
+`harness/int16.txt` has `index` and `back`, and a sentence for the
+others. That is what the compiler cannot know: why a number is as wide
+as it is and has no sign. With it, the places of the kind `sign`,
+where a number with a sign is shifted to the right or divided, which no
+cast says and no warning names. A cut is not in it, since "N0d", as
+an entry or as a count. The test fails for a number that is not in the
+record. A file that no cluster has had yet is in it as a whole, `not
+sorted yet`, with its counts; when the clusters are done the record is
+the list of everything narrow that is left and why.
 
 ### What crosses to the system
 
@@ -9306,7 +9330,9 @@ scenario of the program's own: questions 8 and 9.
 | The 16 bytes round a block, new (F1) | A pattern in front of each block of the 640 KB and behind the last, held by the image's tool at the end of every scenario: a write just behind the end of a block, or in front of one, is named with its scenario from F1 on, where the extender ends the program for it from F9 on. "What could go wrong", 15 |
 | `portable_c-host` | Clean already in every file of the common code, since gcc reads the flat bodies, which cast nothing: it does not measure step 2. It guards it: a file must stay clean. Of what it still counts, `aborts` (5 places) can go to a word of `vc.h` in F10; `data_seg` and all of the system's file wait for the layer |
 | Not counted by it, and worth knowing | gcc's `-Wcast-align=strict` names 376 casts that make a pointer to something wider of a pointer to bytes, `copy.c` 85, `view.c` 64, `stcolor.c` 53. Right on the 386 and on x86-64; what clang's sanitizer will name first in step 6. Not step 2's to mend, and not held to |
-| `portable_c-int16` | Its question, whether two builds differ, is gone with the second build. Its finder is the finder of the widths (N0), and its record the start of theirs. N0 has made that finder, `harness/width.py`, and left this test, its record and its reasons beside it: a widening moves its places, and each is read as before |
+| `portable_c-width` | The numbers of step 2 (N0): what is narrow or without a sign, with why, in a record; and, since N0d, every file that is sorted held to the casts, by clang's `-Wconversion` and `-Wsign-compare`, and to nothing beyond what clang names. Its finder also prints the cuts of a file, a step and a sum of a narrow number among them, which a cluster reads and no test holds. It is the measure of the clusters: the two `not sorted` of a row, to nothing |
+| `portable_c-cut` | That every cast which narrows is one that the compiler keeps (N0c): the form that it loses is refused in the tree, and the compiler is held to the instructions of the forms that the tree writes. It matters more since N0d, with every cut a cast |
+| `portable_c-int16` | Its question, whether two builds differ, is gone with the second build. Its finder is the finder of the widths (N0), and its record the start of theirs. N0 has made that finder, `harness/width.py`, and left this test, its record and its reasons beside it: a widening moves its places, and each is read as before. What it still holds that no cast and no warning does is in "N0d". Accepted by the session on 13 October 2026: it stays until the clusters are done, each cluster reading the places of its file before it widens, and is decided on then by what is left |
 | The test of the data and `harness/reads.py` | Unchanged by the plan, since no table and no layout changes. `reads.py` goes by the text `OFFSET(name)`: F3 teaches it the new form |
 | The test of the layout | Loses in F10 the three rules that are of the megabyte: what a segment names within it, the tables within 32K of `Title_S`, `IniSave` within 64K of the main data |
 | `CHECKED`, the debug program's checks | Not worth writing now. They were to be a third body of the words, and the words are what goes; and C1 showed that the fault to fear goes through no word. The image is the better net and costs less |
@@ -9335,7 +9361,7 @@ thought and long in lines.
 | F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
 | N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below, and "N0b, the rule turned to a sign" behind it | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and `i32`, the type with a sign; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
-| N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; each cut that the program counts on written out; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's five warnings silent, which the test of the record asks; the test of the record | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
+| N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; every cut that clang names written as a cast, with a comment where the program counts on it; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's warnings of a conversion silent, which the test of the record asks; the test of the record; `portable_c-cut` | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
 | S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
 | M, the main data's numbers | Each field of the main data or of a panel that the record has as to be widened: a variable beside the structure, its word left unused, and every line that names it | Those lines, in whatever file | Every cluster; alone | The scenarios; the images, the main data equal but for those words | |
 | P, a panel as long as its directory. Only if question 3 is answered so | "The questions for the user", 3: a panel's block longer than 64K, its four offsets beside it in 32 bits, `ENTRY` without its cut, and a scenario that fills what the original can hold | `files.c`, `read.c`, `place.c`, `panel.c`, `enter.c`, `start.c`, and the lines of other files that keep an offset in a panel; `harness/scenarios.py`, `DEVIATIONS.md` | M; alone | The scenarios, with the new one held to the original's golden and its patch; the images | |
@@ -9383,7 +9409,9 @@ Cut again by what N0 counted, and accepted by the session on 13 October
 2026: N17 and N19 are two clusters each, a and b, the first by file and
 the second with `start.c` by itself behind F9. From N0 on the measure
 of a cluster is the record's, its numbers and its cuts in the table at
-the top of `harness/width.txt`, and not the lines. And the structures
+the top of `harness/width.txt`, and not the lines; since N0d that is
+its numbers alone, the record counting no cuts, and "N0d" has by
+cluster what clang names. And the structures
 of the headers that are the program's own, what a function answers in,
 133 numbers that no row above has: each goes with the cluster of the
 functions that return it, and those of `sys.h` with S. That too is the
@@ -11828,6 +11856,13 @@ has three places more, each with its reason: `left` of `T26_00`, `end
 
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 
+Since "N0d, a cut is said by a cast", below, a cut is no entry of the
+record and is not counted there: where clang names it, it is a cast in
+the code, and where clang does not, it stays as it is written. What
+this section and the next say of the cuts' entries, of their counts
+and of their reasons is how the record was made, and is not how it
+is.
+
 **What there is.** `harness/width.py`, its record `harness/width.txt`
 and the test `portable_c-width`; `bool` and `i32` in `vc.h`; the
 fields of the main data and of a panel sorted, in the
@@ -12028,35 +12063,9 @@ numbers of each cluster that are a `u32` beside them:
 | N12, N13, N15 | 80; 114, 69; 102, 114; 109 | More cuts than numbers, `treebox.c`, `usermenu.c`, `panel.c`, `drive.c`: arithmetic on places. Right as they are, and the slow ones |
 | The others | 88 to 142; 48 to 106 | Right |
 
-**What a cluster does**, in this order:
-
-1. `python3 harness/dataimage.py save` of the build that it starts
-   from, into `build/`.
-2. `python3 harness/width.py --show FILE`: the numbers and the cuts,
-   function by function, the numbers that are a `u32` among them. Read
-   the file with that beside it and say of each number which of the
-   five kinds it is. For a parameter or a return of a function that
-   other files call, `grep` its calls, and `--show NAME` for what is
-   cut in being handed to it.
-3. Change the types, in the file, in `vc.h` and in whatever file
-   declares the function for itself: an `i32` for what is widened and
-   for a `u32` that has no reason to be one. Write the cut where the
-   program counts on wrapping, above all where a variable was given a
-   difference and then held against a limit; look at the masks, at the
-   loops that count down, and at every `(u16)(signed char)` that the
-   number comes from ("N0b", below). Build.
-4. `python3 harness/width.py --sort FILE`, or `FILE:FUNCTION` for a
-   part, and write the reason under every entry that has none, in
-   `harness/width.txt`: for a number that has its width or no sign by
-   what it is, its word of the list at the top of the record, with
-   what is not plain behind a colon; for any other number that stays,
-   and for every cut, a sentence; under a cut of the kind `sign`, why
-   the number is not below 0 there. `python3 harness/int16.py`, and
-   its record anew with the reason of whatever is new there.
-5. The tests that start no machine: `portable_c-width` asks clang's
-   five warnings of every file that is sorted, and says what a place
-   that it names wants. Then the whole suite and the images held
-   against those of step 1.
+**What a cluster does** is in "N0d", below, in six steps: the five
+that stood here, with the casts as a step of their own, for what clang
+names, where a reason was written under every cut.
 
 ### N0b, the rule turned to a sign: done, and what a cluster goes by
 
@@ -12160,6 +12169,8 @@ held to.
   not. The five files have three, on 28 numbers.
 - The test asks clang for five warnings of every file that is sorted,
   and fails for one: the two of the sign and the three of "Booleans".
+  Since "N0d" it asks for all of `-Wconversion`, which has three of
+  the five in it.
 - `harness/int16.txt` lost two places, both of `TstHex`, where an
   `int` that could have been below 0 was made a `u32` by being
   returned: an `i32` takes it as it is.
@@ -12360,6 +12371,371 @@ What a later piece should know:
 - A listing of the build can be searched for the fault's mark, a byte
   extended with its sign into a register of 32 bits: `movsx e..,` with
   a byte behind the comma. After this piece only `menu.c` has it.
+
+### N0d, a cut is said by a cast: done, and what a cluster goes by
+
+**What there is.** The user's word of 13 October 2026 (`CLAUDE.md`,
+"The portable C"): a change of sign or of width is said by a cast in
+the code and held by the compiler's warnings, and no list beside the
+code is kept in place of that; and, asked the same day with what this
+piece found, that it is clang's warnings and nothing on top of them.
+The test `portable_c-width` holds every file that is sorted to clang's
+`-Wconversion`, all of it, to `-Wsign-compare` and to the two warnings
+of the booleans; the record has no cut any more, as an entry or as a
+count; and the five files of N0 are written so. The whole suite passes,
+fourteen tests, no golden and no patch changed, and the image of each
+of the 155 scenarios is that of the build before, with no difference.
+
+**The warnings**, as the clang of this computer has them, 23.1.3, by
+its `diagtool tree -Wconversion`. All of the group is held, so that
+nothing has to be said of a part that is left out; in the tree as it
+is, no part of it but the first two says anything of any file.
+
+| Warning | Held | What it names here |
+|---|---|---|
+| `-Wimplicit-int-conversion` | Yes | A number put into fewer bits by `=`, in a declaration, at a call, by `return`, through `?:`: 244 places of the tree as it is, 14 of them in the five files before this piece |
+| `-Wimplicit-int-conversion-on-negation`, a part of it | Yes | `byte = -byte`, where the int that `-` makes is below 0. Nothing in the tree |
+| `-Wshorten-64-to-32`, a part of it | Yes, and silent | A number of 64 bits put into 32. The tree is read for a machine of 32 bits and has no number of 64, which `portable_c-cut` fails for. When clang reads the tree for 64 bits, step 6, a difference of two pointers and a `sizeof` are 64 bits, and this names each that is kept in an `i32` |
+| `-Wobjc-signed-char-bool-implicit-int-conversion`, a part of it | Yes | Of Objective-C: nothing |
+| `-Wsign-conversion` | Yes, as before | A number made one of the other sign with no cast: 3 places of the tree as it is, in `place.c`; many more once a file's numbers have a sign |
+| `-Wconstant-conversion`, with `-Wbitfield-constant-conversion` | Yes, as before | A constant that does not fit where it is put |
+| `-Wenum-conversion` and its parts, `-Wbitfield-enum-conversion` | Yes | A value of one enumeration taken for one of another. Nothing |
+| `-Wbool-conversion`, `-Wnull-conversion`, `-Wnon-literal-null-conversion`, `-Wint-conversion`, `-Wstring-conversion` | Yes | A pointer or a constant taken for true or false or for no pointer, a number for a pointer. Nothing: the host check's matter |
+| `-Wfloat-conversion`, `-Wimplicit-float-conversion`, `-Wliteral-conversion` and their parts | Yes, and silent | Of floating numbers, which the tree has none of, and `portable_c-cut` fails for one |
+| `-Wcharacter-conversion`, `-Woverflow-behavior-conversion`, `-Wobjc-literal-conversion` | Yes, and silent | Of `char8_t` and its like, of clang's own types that say how they overflow, of Objective-C |
+| `-Wsign-compare`, not of the group | Yes, as before | A number with a sign held against one of 32 bits without |
+| `-Wtautological-constant-out-of-range-compare`, `-Wint-in-bool-context`, not of the group | Yes, as before | The booleans |
+
+Nothing is switched off for a line: the test fails for `#pragma clang
+diagnostic`, `#pragma GCC diagnostic` and `system_header` anywhere in
+the tree, and it hands clang no option that takes a warning out. A
+cast in a macro is a cast and is read where the macro is used; the
+five files had one such, `LOW` of `blank.c`, used once, and have the
+cast at the place.
+
+**What no warning of clang names, and what was decided of it.**
+clang's warning of a conversion works out between which numbers an
+expression lies, as the finder does, but on purpose not exactly: it
+takes arithmetic on numbers that are narrower than an int to stay
+within them, so that `word = word + 1` and `byte = a - b` say nothing,
+where `word = number` and `word = byte << 8` do. And it says nothing of
+an assignment that has an operator in it or of a step: `+=`, `-=`,
+`|=`, `<<=`, `++`, `--`. A file of forty forms, each tried with every
+warning that clang has, `-Weverything`: the ones that nothing names are
+those two kinds and no other. gcc's `-Wconversion` names `word +=
+number` and `word |= number`, and not `++`, a step by a number that is
+written, or `word = word + 1`.
+
+In the tree as it was when this piece began, clang named 247 places
+and the finder 1,074 cuts that are not written, of which clang named
+172: of the 902 that it did not, 576 are a step, 234 are kept, 86
+handed and 6 returned. So clang's warnings hold a quarter of what the
+finder calls a cut. This piece first had the finder refuse the others
+in a file that is sorted, each to be written as a cast, `word =
+(u16)(word + 1)`, and handed that back as its own reading. The user
+decided otherwise, on 13 October 2026: **exactly what clang names is
+held.** A step or a sum in its own width on a variable that stays 8 or
+16 bits for a reason, `word++`, `word += n`, `byte = a - b`, stays as
+it is written: it wraps in its own width, which is what C says and
+what a reader expects. No rule of the project's own stands on top of
+the compiler's, and no list. That a cast should be written wherever a
+wrap is intended was not chosen as a rule either, so none is added for
+that; a cast that N0 or the test of the int had written where the
+program counts on a wrap stays, with its comment.
+
+What is left of the finder's cuts is the reading: `python3
+harness/width.py --show FILE` prints them, the steps and the stores of
+a file's narrow numbers, and a cluster reads them when it decides which
+variables are widened, since a wider variable keeps another number
+exactly there. That is how most of them go: a step of a count that
+becomes an `i32` is no cut. They are printed and not recorded, and no
+test holds them.
+
+**Where clang and Open Watcom read a line otherwise.** clang reads the
+tree for a machine of 32 bits with a `char` that has no sign, which is
+what `wcc386` has: an int, a long and a pointer are 32 bits for both
+and the promotions are C's for both, so a line converts the same
+numbers in both. Three things differ.
+
+- An enumeration is an int for clang and as few bytes as its values
+  need for `wcc386`: one byte for three values, two if one is below 0
+  and another above 127, four for 70,000, as a toy compiled with the
+  build's options has them. A number kept in a variable of an
+  enumeration would be cut by `wcc386` and named by nobody. The tree
+  has no variable, parameter or field of an enumeration at all, only
+  their constants, which are an int for both; a piece that makes one
+  has this to think of.
+- A cast that is written and that `wcc386` loses, a byte with a sign
+  made a `u16`: clang knows nothing of it. `portable_c-cut` holds it.
+- For 64 bits, as above.
+
+**The five files.** clang named 14 places.
+
+- By a type, 2, both by one variable. `NgLine` of `line.c` read the
+  second of two hex digits into `count`, an `i32`, handed it to
+  `TstHex` and then kept the character that the two digits say in it:
+  a character in a variable that is a count. It has a `u16` of its own
+  now, `code`, with the word `character` in the record, and two of the
+  three conversions are gone.
+- By a cast, 12. Six are into a number that stays narrow by a word, a
+  cell, a place, a time; three into a field of the main data or of a
+  structure that another cluster has (`MousPos`, `StarMod`, the
+  `value` of `struct LineArgs`); two are handed to a function of
+  `sys.h` (`MouseRows`, `ScreenScroll`); one goes through a pointer
+  that the callers of other clusters own (`*number` of `TxtNum`).
+
+Four places more are cuts by the finder and nothing to clang, and are
+as they were written: `digit += 'A' - '9' - 1` of `HexByt`, `seconds +=
+0x100` and `hours += 0x100` of `DoublMo`, `place |= Below(80)` of
+`Blank`. None of them is counted on to wrap; each was written as a
+cast while the finder refused it, which changed no instruction, and is
+back.
+
+Why so few by a type: N0 and N0b had given every count and index of
+these files its type already, 28 an `i32` and 3 a `bool`. What the
+warnings name afterwards is the border of a number that is narrow for
+a reason, and a cast is what says a border. The type was tried at each:
+`digit` of `HexByt` as an `i32` wants a cast where it is made of bits
+without a sign, and `TstHex` taking an `i32` wants one where it hands
+the character to `UpCase`: a cast moved, and none saved. A cluster
+that starts with a file whose numbers are all `u16` will find most of
+its places go by the type, which is its second step, below; this
+measure is of what is left then.
+
+The comments. Of the 12 casts that the files had, 5 have the program
+count on what is cut, and each has `wraps` in a comment at its place
+now, where the record had `wraps:`; two say what they take, the low
+word of the timer and the two words of `MousTim`; one, the clock of a
+star kept as a byte, is said at the head of `Blank`; four fit by the
+line above and have none. Of the 12 that are new, three fit by
+something that is not just above, the mouse kept to the rows of the
+screen, `NgLine` reading the low byte, every caller handing a line in
+16 bits, and say so; nine have none.
+
+The program. With the casts written and the variables as they were,
+`VC.EXE` was the same bytes as the build before, `3305e3342899ab6b...`
+of the head that the piece began on: a cut that is written is the
+instructions of the cut that was not. So were the four places of the
+finder's alone, written as a cast and back again. With `code`,
+`NgLine` is one byte shorter, 465 for 466, the compiler laying its
+registers out for a variable more, and the file as long as it was, on
+the head of `main` that the piece landed on; nothing else of the five
+files' listings moved.
+
+**The casts and the compiler.** Every cast written narrows, which
+"N0c" has as safe by how the fault is made. Two forms that the five
+files write were not among the functions that `harness/cutcheck.c`
+holds the compiler to, and are now, 65 functions for 63: a number that
+a shift has made, `(u16)(number << 8)`, and one of a shift and an
+`or`. Each is cut before it is used in 32 bits.
+
+**The finder and the record**, `harness/width.py` and
+`harness/width.txt`.
+
+- Gone: the kind `cast`, a cut that is written, which is the code's
+  to say; and every entry of a cut, 29 of them in the five files, 12
+  `cast`, 12 `store`, 3 `step`, 2 `handed`. The record's diff is those
+  entries, the table, one entry that is new, `code`, and its head.
+- A cut is now only one that is not written, `store`, `step`,
+  `handed`, `returned`, and the finder prints them, `--show FILE`, to
+  be read before a number is widened. The record counts none: the
+  column `cuts` of its table is gone, and a line of what is not sorted
+  says its numbers and no more, so a commit that writes a cast or
+  widens a parameter moves no count of another file.
+- Stays, with its entries and their reasons: `sign`, a shift to the
+  right, a division or a remainder of an `i32` that may be below 0 by
+  its type. No warning names it and no cast says it: `(length + 1 >>
+  1)` has no conversion in it, and a cast to a type without a sign
+  would be another instruction, and would take from the sanitizer what
+  the sign was given for. Three entries on the five files. The table
+  has them in a column of their own.
+- Stays: every number that is narrow or has no sign, with its word or
+  its sentence; the structures that are laid out; the table by cluster
+  and by file of what is sorted and what is not.
+- New: `--warned FILE`, what clang says of a file under the warnings
+  whether it is sorted or not, which is what a cluster mends before it
+  sorts.
+- The finder is still held against `harness/widthcheck.c` for its
+  cuts, each time it runs, so that what it prints is right.
+
+**`harness/int16.py` and its record: what it still holds, and what is
+to become of it, accepted by the session on 13 October 2026.** It is a
+list beside the code of places with reasons, 60 of them, and it is not
+a list in place of casts: a place of it is no conversion. It is where
+a number that C has made an int on the way, of operands of 16 bits, is
+looked at before it is put anywhere: held against another, `cursor - 5
+< first`; shifted right or divided, `item - table >> 1`; made 32 bits;
+added to a pointer. Nothing is cut or changes its sign there, so no
+warning of clang names such a place, with any option, and no cast
+belongs there but where the program counts on the wrapping, where that
+test has asked for the cast from its first day, `(u16)(a - b) < c`.
+Its question as it was asked, whether two builds agree, is gone with
+the second build. What it holds now is the same thing under another
+name: that the code as it is compiled, with an int of 32 bits, does
+what it was written and judged to do with one of 16, at the places
+where the types alone do not say so and a scenario may not get to.
+Three things about it:
+
+- It is the record of what is not sorted. A place is of numbers of 16
+  bits; when a cluster gives them a sign and 32 bits the place is
+  gone, for a comparison, or is a place of the kind `sign` of the
+  other record, for a shift or a division, with the same reason. None
+  of the 59 is in the five files that are sorted, and the reason under
+  a place is exactly why widening the numbers there changes nothing:
+  it is read by the cluster that has the file.
+- It did not move by this piece: 60 places before and after, on the
+  head that it landed on. A place is known by the text of its line, so
+  a cast written on a line that has a place makes the place new and
+  its reason is written again; that did not happen on the lines of
+  this piece.
+- Of the 60, 40 are a number added to a pointer that may be 64K or
+  more, or below 0, `index` and `back`: those are of the addresses as
+  much as of the widths, a sum that wrapped in a segment and does not
+  in a flat memory.
+
+Accepted: it stays as it is until the clusters are done, and is not
+folded into the other record, which would be a second kind of entry
+for no gain, as N0 found. Each cluster reads the places of its file
+with `python3 harness/int16.py --show FILE` before it widens, and its
+commit shows them go. When the last cluster has landed, what is left
+of it is counted, a place among numbers that stay narrow by a word or
+a sum added to a pointer, and it is decided then on that count whether
+the test goes, with its record.
+
+**How the work of a cluster changes.** On the five files: N0 wrote 29
+sentences under cuts; this piece wrote 12 casts, 2 lines for a type,
+and 9 comments, and took 29 entries out. A cast is the same reading as
+a sentence, the place and the lines above it, and less writing where
+the number fits, since nothing is said then: 9 of the 12. And 16
+places of the 29 want nothing written at all now: the 12 casts that
+were there, and the 4 that clang does not name. What is more is the
+check, and it is cheap: the build, and `VC.EXE` the same bytes for the
+casts. So a cluster has less to write than it had, in its own files
+and not in the record, and the record is half as long for it: the five
+files are 133 lines of it where they were 264.
+
+The places by cluster, of the tree as it is when this piece lands,
+behind the sweep of the tables, F4 to F7, which made pointers of some of
+the numbers: what clang names under the warnings, which is what a
+cluster has to mend; and the finder's cuts, which it reads and need
+not mend. What clang names of a file moves as its numbers are widened,
+down where a count that was kept in 16 bits is an `i32`, up where an
+`i32` then meets a number that stays narrow or a `u32` that stays: the
+five files had 10 before N0 and 14 behind it, and the trial of "N0b"
+had 28 places more of an `i32` against a `u32` in `edit.c`, 9 in
+`view.c` and 7 in `copy.c`.
+
+| Cluster | Numbers of 8 or 16 bits; `u32` | clang names | The finder's cuts, to read |
+|---|---|---|---|
+| N0, the five files | 35; 1 | 0, and 14 before this piece | 4 |
+| N1, `string.c` `format.c` `box.c` `screen.c` `misc.c` | 130; 2 | 4 | 32 |
+| N2, `dialog.c` | 112; 0 | 23 | 47 |
+| N3 and N4, `view.c` | 156; 13 | 16 | 126 |
+| N5, `find.c` | 121; 0 | 10 | 50 |
+| N6 to N8, `edit.c` | 196; 41 | 23 | 121 |
+| N9, `copy.c` | 81; 6 | 5 | 25 |
+| N10, `dirfunc.c` | 98; 0 | 3 | 15 |
+| N11, `files.c` `read.c` `place.c` | 91; 1 | 9 | 48 |
+| N12, `panel.c` `info.c` `drive.c` | 80; 3 | 8 | 83 |
+| N13, `tree.c` `treebox.c` `extfile.c` | 65; 0 | 14 | 68 |
+| N14, `cmdline.c` `enter.c` `exec.c` | 107; 0 | 10 | 41 |
+| N15, `input.c` `usermenu.c` | 110; 3 | 15 | 59 |
+| N16, `main.c` | 96; 0 | 18 | 43 |
+| N17a, `keys.c` | 65; 0 | 2 | 28 |
+| N17b, `commands.c` | 74; 0 | 4 | 2 |
+| N18, `menu.c` `help.c` | 113; 1 | 21 | 73 |
+| N19a, `bars.c` `window.c` `system.c` `setup.c` | 110; 1 | 11 | 29 |
+| N19b, `start.c` | 41; 0 | 1 | 9 |
+| N20, `stcolor.c` `stopts.c` | 113; 0 | 19 | 46 |
+| N21, `stmain.c` `sthelp.c` | 82; 3 | 13 | 36 |
+| All | 2,076; 75 | 229 | 985 |
+
+No cluster has many hundreds of either, and none has more than 23
+places of clang's as it stands, so the casts cut no cluster anew: the
+measure of a cluster is its numbers, as "N0" has it, and `view.c` in
+two halves and `edit.c` in three thirds stand for those.
+
+**What a cluster does**, in this order, in the place of the list that
+"N0" had:
+
+1. `python3 harness/dataimage.py save` of the build that it starts
+   from, into `build/`, and a copy of that build's `VC.EXE` and of the
+   listings of its files, `build/portable_c/NAME.lst`.
+2. `python3 harness/width.py --show FILE`: the numbers and the cuts,
+   function by function, the numbers that are a `u32` among them; and
+   `python3 harness/int16.py --show FILE`, the places where a number
+   is looked at before it is cut, each with its reason in
+   `harness/int16.txt`. Read the file with those beside it and say of
+   each number which of the five kinds it is. For a parameter or a
+   return of a function that other files call, `grep` its calls, and
+   `--show NAME` for what is cut in being handed to it.
+3. The types, in the file, in `vc.h` and in whatever file declares the
+   function for itself: an `i32` for what is widened and for a `u32`
+   that has no reason to be one, a `bool`. Before a variable is
+   widened, every cut into it is read, of step 2's list, a step and a
+   sum above all, since it is no cut afterwards and nothing names it
+   then: where the program counts on it, the cast is written there,
+   with `wraps` in its comment. Look at the masks, at the loops that count
+   down, and at every `(u16)(short)(signed char)` that the number
+   comes from. A variable that holds two things in turn, a count and
+   then a character, gets a second variable. Build; the scenarios and
+   the images of step 1, since the types change the program.
+4. `python3 harness/width.py --sort FILE`, or `FILE:FUNCTION` for a
+   part, and the reason under every entry that has none, in
+   `harness/width.txt`: a word of the list for a number that has its
+   width or no sign by what it is, a sentence for any other that
+   stays, and under a place of the kind `sign` why the number is not
+   below 0 there.
+5. The casts. `python3 harness/width.py` prints what clang says of
+   the file. At each place, the type once more: a place that is left
+   is the border of a number that is narrow for a reason, a field, a
+   parameter of another cluster or of `sys.h`. Then the cast, of a
+   form that narrows and nothing else, with a comment where the
+   program counts on what it cuts off or where it fits by something
+   that is not just above. Nothing else gets a cast: a step or a sum
+   of a number that stays narrow, which clang does not name, stays as
+   it is written. Build: `VC.EXE` is the bytes of step 3, and where it
+   is not, the listings of the files against those of step 3 say which
+   routine, and it is read. `portable_c-cut`, and a function in
+   `harness/cutcheck.c` for a form that it has not.
+6. `python3 harness/int16.py`, and its record anew: the places of the
+   file should be gone, and one that is left or new has its reason.
+   The whole suite.
+
+What a later piece should know:
+
+- The casts change no instruction, so they are checked by the bytes
+  and need no scenario; the types do, and are judged by the scenarios
+  and the images. Two commits, or two stages of one, in that order.
+- A type is not made right by moving a call. `NgLine` could have
+  handed the second digit to `TstHex` where it is read, a line
+  earlier, and saved its variable: `TstHex` calls `UpCase`, which has
+  DOS's routine for capitals asked of every character behind '9', and
+  the original does not ask there when the first digit is none.
+- Two calls in one expression have no order: `place = Below(rows) << 8
+  | Below(80)` would save a cast and let the compiler choose which
+  random number is the row. It stays two statements.
+- `--record` writes a new number of something sorted without a
+  reason, and the test fails until it has one: `code` of `NgLine` was
+  that.
+- The record counts no cuts, so a cast written or a parameter widened
+  in one file moves no line of the record for another. A cluster that
+  was cut by "N0"'s table of numbers and cuts goes by the numbers.
+
+What was not sure, and what became of it:
+
+- Whether the finder should refuse the cuts which clang does not
+  name: decided by the user, no, as above.
+- `sign` stays a list, three entries today and by "N0b"'s measure one
+  for every ten numbers that are widened: accepted by the session.
+  Nothing in the code can say it short of an assertion, which the
+  tree has none of.
+- A comment where a cast fits "by something further off" is this
+  piece's own middle between the two that the user named, a comment
+  where the program counts on the cut and none.
+- Whether a number put into fewer bits through a pointer of another
+  type, `*(u8 *)&star->StarMod = (u8)mode`, wants more than its cast:
+  it has the cast, and nothing names the pointer.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 
