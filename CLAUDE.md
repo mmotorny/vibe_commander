@@ -244,6 +244,13 @@ These held while `src/c/` was made, and they say what it is.
   from this one, is cut off from its interrupts when this one is left,
   with the extender's lines of warning on the screen. A mend of the
   last was built and dropped on the user's word: `TODO.md` has it.
+- Of the limits of the original that step 2 comes to, each asked as
+  the work reaches it, the user has decided, on 13 October 2026: the
+  cut of each panel to 256 files while a command runs goes, since a
+  panel keeps its memory through a command now, and what was selected
+  beyond the 256th file stays selected; that is the removal of what
+  only made sense on DOS, and the piece that has `enter.c` makes it
+  and declares it.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
