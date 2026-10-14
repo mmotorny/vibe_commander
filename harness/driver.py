@@ -235,7 +235,9 @@ def facts(program, stack=False):
     flat = le.linear(code)
     if flat:
         return flat_facts(name, flat, le.Map(program.linked),
-                          ("_md", auto_time), ("_md", clock), stack)
+                          ("_md", auto_time), ("_md", clock), stack,
+                          kept=le.KEPT if program.tree == "portable_c"
+                          else ())
     found = Facts(name, auto_time, clock)
     if stack:
         if program.linked:
@@ -256,7 +258,7 @@ def facts(program, stack=False):
 
 
 def flat_facts(name, program, linked, auto_time, clock, stack=False,
-               base=le.BENCH):
+               base=le.BENCH, kept=()):
     """The Facts of a flat program, an le.Linear with its le.Map, that
     DOS has under `name`: where the driver finds in the machine's memory
     what it watches. `auto_time` and `clock` are each a symbol of the map
@@ -269,7 +271,8 @@ def flat_facts(name, program, linked, auto_time, clock, stack=False,
     by nothing: a run with QEMU's log of the code says where the program
     was, as harness/drivercheck.py --trace asks it. The copies that the
     Facts have besides are where le.Linear.copies has them, by the same
-    token."""
+    token, each keeping blocks of the lengths `kept` in front of the next:
+    le.KEPT for the portable C."""
     def address(where, base):
         if where is None:
             return 0
@@ -291,7 +294,7 @@ def flat_facts(name, program, linked, auto_time, clock, stack=False,
     first, *others = (
         (address(auto_time, base), address(clock, base),
          base + bottom if stack else 0)
-        for base in program.copies(COPIES, base))
+        for base in program.copies(COPIES, base, kept))
     return Facts(name, first[0], first[1], first[2], top - bottom,
                  program.image()[bottom:top], flat=True,
                  copies=tuple(others))

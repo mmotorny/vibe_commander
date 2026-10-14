@@ -294,8 +294,11 @@ class Bench:
     of another to use.
     """
 
-    def __init__(self, workdir, country="us", setup=None):
+    def __init__(self, workdir, country="us", setup=None, memory=None):
         self._workdir = Path(workdir)
+        # The machine's memory in megabytes, dos.MEMORY if None: a state
+        # is loaded into a machine of the memory that it was saved of.
+        self._memory = memory or dos.MEMORY
         self._workdir.mkdir(parents=True, exist_ok=True)
         self._floppy = _floppy(self._workdir, BENCH_COMMANDS,
                                COUNTRIES[country], KEYBOARDS.get(country),
@@ -311,7 +314,8 @@ class Bench:
         blank.write_bytes(bytes(driver.SCRIPT_DISK))
         with Machine(self._floppy,
                      [self._work, self._new_disk("boot.img", None, shipped),
-                      blank], self._workdir, CLOCK) as machine:
+                      blank], self._workdir, CLOCK,
+                     memory=self._memory) as machine:
             machine.wait_for_boot()
             # The driver stops the machine when it is loaded and has
             # found no script.
@@ -386,7 +390,8 @@ class Bench:
             file.write(script)
             file.truncate(driver.SCRIPT_DISK)
         machine = Machine(self._floppy, [*disks.values(), image], workdir,
-                          CLOCK, trace=trace, state=self._state)
+                          CLOCK, trace=trace, state=self._state,
+                          memory=self._memory)
         machine.disks = disks
         return machine
 
@@ -424,7 +429,10 @@ def _work_disk(path, workdir):
 
 class Benches:
     """A bench for each country that is asked for, booted when first used:
-    benches[country]. To be used in a `with` statement, which removes them.
+    benches[country], or benches[country, memory] for a machine of so
+    many megabytes (see `memory` of scenarios.Scenario; a scenario says
+    which by its `bench`). To be used in a `with` statement, which
+    removes them.
     """
 
     def __enter__(self):
@@ -436,10 +444,13 @@ class Benches:
     def __exit__(self, *exc):
         self._directory.cleanup()
 
-    def __getitem__(self, country):
+    def __getitem__(self, key):
+        country, memory = key if isinstance(key, tuple) else (key, None)
         with self._lock:                # scenarios may run side by side
-            if country not in self._benches:
+            if key not in self._benches:
                 made = [bench.setup for bench in self._benches.values()]
-                self._benches[country] = Bench(
-                    Path(self._directory.name) / country, country, *made[:1])
-            return self._benches[country]
+                directory = country + (f"-{memory}" if memory else "")
+                self._benches[key] = Bench(
+                    Path(self._directory.name) / directory, country,
+                    *made[:1], memory=memory)
+            return self._benches[key]

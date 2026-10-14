@@ -1050,7 +1050,7 @@ def derive(name, benches):
     the setup program's."""
     scenario = scenarios.SCENARIOS[name]
     original = setups.original_vc()
-    run = scenarios.run(scenario, original, benches[scenario.country],
+    run = scenarios.run(scenario, original, benches[scenario.bench],
                         trace=True, blinking=True)
     programs = {original.filename}
     if scenario.setup:
@@ -1093,7 +1093,7 @@ def from_run(name, program, benches):
         except Misfit:
             pass                  # not filled in, or not a patch: no
                                   # statement to hold the new one against
-    run = scenarios.run(scenario, program, benches[scenario.country],
+    run = scenarios.run(scenario, program, benches[scenario.bench],
                         blinking=True)
     chars = charset(golden.codepage)
     patch = Patch(file, numbers or (), why or TO_WRITE, {}, [])

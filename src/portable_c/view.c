@@ -1780,8 +1780,7 @@ command:
 static void Aexec0(bool edit)
 {
     struct Box where;
-    struct Answer ran;
-    struct Block all;
+    struct Answer ran, taken;
     const struct BOXTOP *box;
     const u8 *include;
     const u8 *from;
@@ -1815,14 +1814,22 @@ static void Aexec0(bool edit)
        at the least: the room is made that long. In the original the
        panels and the room are one block, which begins with the main
        data. */
-    MemResize(SEG_OF(Room), ROOM_LEAST);
+    MemResize(Room, LEAST_ROOM);
     LetLin(md.TmpBuf);
     ran = ProgramRun(md.TmpBuf, md.TmpBuf + 100);
     error = ran.value;
-    /* All the memory that there is, again: DOS says how much that is
-       when it is asked for more. */
-    all = MemResize(SEG_OF(Room), 0xFFFF);
-    MemResize(SEG_OF(Room), all.largest);
+    /* All the memory that there is, again. The original makes its block
+       as long as DOS will, which DOS says when it is asked for more; the
+       extender says nothing of that (TODO.md, "X, the extender's memory
+       on the bench"), so the room is given back and the largest block
+       that there is taken, as after a command, which on the bench is
+       where the room was. Nothing of what it held is read again. Should
+       there be too little, the program ends as it does where that is so
+       after a command, which the original cannot meet here. */
+    GiveMem();
+    taken = TakeMem();
+    if (taken.failed)
+        AlocEr(taken.value);
     HidCur();
     SavMous();
     IniMous();

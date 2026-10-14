@@ -144,6 +144,9 @@ def main():
                         help="the country DOS is configured for")
     parser.add_argument("--program", help="the VC.COM or VC.EXE to run "
                                           "(default: the original)")
+    parser.add_argument("--memory", type=int,
+                        help="the machine's memory in megabytes (default: "
+                             "the bench's)")
     parser.add_argument("--setup", action="store_true",
                         help="have the original's setup program on the "
                              "bench, next to the original")
@@ -153,9 +156,9 @@ def main():
     program = setups.Program.load(args.program) if args.program \
         else setups.original_vc()
     scenario = scenarios.Scenario("", tuple(args.step), args.country,
-                                  setup=args.setup)
+                                  setup=args.setup, memory=args.memory)
     with setups.Benches() as benches:
-        made = run(scenario, program, benches[args.country], args.limit)
+        made = run(scenario, program, benches[scenario.bench], args.limit)
     print_screens(scenario.steps, made.screens,
                   setups.codepage(args.country),
                   args.changes, args.last)

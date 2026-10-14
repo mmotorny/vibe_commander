@@ -23,6 +23,9 @@ from image import Image
 ROOT = Path(__file__).resolve().parent.parent
 
 COLUMNS, ROWS = 80, 25
+# The memory of the machine, in megabytes, where nothing else is asked:
+# a scenario may ask for less (`memory` of scenarios.Scenario).
+MEMORY = 16
 TEXT_MEMORY = 0xB8000             # the colour text screen: character, attribute
 BIOS_DATA = 0x400
 KEYBOARD_BUFFER = 0x41A           # where it is read, where it is filled
@@ -371,7 +374,7 @@ class Machine:
     """
 
     def __init__(self, floppy, hard_disks, workdir, clock, trace=None,
-                 state=None):
+                 state=None, memory=MEMORY):
         self._workdir = Path(workdir)
         self._serial = self._workdir / "serial.log"
         self._scratch = self._workdir / "scratch.bin"
@@ -386,7 +389,8 @@ class Machine:
                 "temporary files lies too deep, or BELOW of dos.py is no "
                 "longer how far down the harness goes in one")
         command = [
-            "qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
+            "qemu-system-i386", "-machine", "pc", "-cpu", "486",
+            "-m", str(memory),
             "-nodefaults", "-vga", "std", "-display", "none", "-no-reboot",
             "-rtc", f"base={clock},clock=vm", "-boot", "a",
             "-icount", f"shift={CLOCK_SHIFT},sleep=off",

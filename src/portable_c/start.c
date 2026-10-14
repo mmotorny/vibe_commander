@@ -378,11 +378,41 @@ Init04:                                 /* Output Report */
     TakeEnd();
 }
 
-/* The room is the block at `segment`, of `size` paragraphs. */
-static void Memory(u16 segment, u16 size)
+/* The room is the block at `block`, of `bytes`. */
+static void Memory(u8 *block, i32 bytes)
 {
-    Room = AT(segment, 0);
-    RoomEnd = Room + ((u32)size << 4);
+    Room = block;
+    RoomEnd = block + bytes;
+}
+
+/* What Init11 answers with where it fails: paragraphs, as the original
+   has them in BX, and 0FFFFh for more than that holds. It is read only
+   where it failed, and is then fewer than a panel's block has. */
+static u16 Paragraphs(i32 bytes)
+{
+    if (bytes >> 4 > 0xFFFF)
+        return 0xFFFF;
+    return (u16)(bytes >> 4);
+}
+
+/* Take the largest block that there is for the room. Answers as Init11
+   does. */
+static struct Answer TakeRoom(void)
+{
+    struct Answer answer;
+    struct Block block;
+    i32 largest;
+
+    largest = MemTake(0x7FFFFFFF).largest; /* a block of more than there
+                                              is, which is refused, with
+                                              how large one can be */
+    block = MemTake(largest);
+    answer.value = Paragraphs(largest);
+    answer.failed = LEAST_ROOM > largest;
+    if (answer.failed)
+        return answer;
+    Memory(block.block, largest);
+    return answer;
 }
 
 /* How long the room is, in bytes. The original works that out wherever
@@ -401,7 +431,9 @@ i32 RoomBytes(void)
    panel that got none, and whether that is too few for the least that
    the program needs: the assembly has them in BX where it says that
    there is no memory, and the BIOS takes a page of the screen there
-   (see AlocEr of exec.c).
+   (see AlocEr of exec.c). The blocks are the extender's, anywhere above
+   the megabyte (MemTake of dos32.c): the two panels are taken first, so
+   that the room has nothing behind it.
 
    The original asks DOS for one block, the largest that there is, and
    cuts it up itself: its main data at the start, behind it the two
@@ -415,16 +447,16 @@ struct Answer Init11(void)
     struct Block block;
     struct WCBdef *wcb;
     const u8 *from = IMAGE + 3;
-    u16 largest, panel, i;
+    u16 side, i;
 
-    for (panel = 0; panel < 2; panel++) {
-        block = MemTake(PANEL_BLOCK);
-        answer.value = block.largest;
+    for (side = 0; side < 2; side++) {
+        block = MemTake(PANEL_BYTES);
+        answer.value = Paragraphs(block.largest);
         answer.failed = block.failed != 0;
         if (answer.failed)
             return answer;
-        wcb = (struct WCBdef *)AT(block.value, 0);
-        if (panel == 0)                 /* Init13 */
+        wcb = (struct WCBdef *)block.block;
+        if (side == 0)                  /* Init13 */
             LeftPanel = wcb;
         else
             RightPanel = wcb;
@@ -434,16 +466,7 @@ struct Answer Init11(void)
         wcb->First = DSKBUF;
         wcb->EndBuf = DSKBUF;
     }
-    largest = MemTake(0xFFFF).largest;  /* a block of the memory: of all
-                                           of it, which is refused, with
-                                           how large one can be */
-    block = MemTake(largest);
-    answer.value = largest;
-    answer.failed = ROOM_LEAST > largest;
-    if (answer.failed)
-        return answer;
-    Memory(block.value, largest);
-    return answer;
+    return TakeRoom();
 }
 
 /* Give the room back, for the commands that are about to be run. The
@@ -455,7 +478,7 @@ struct Answer Init11(void)
    there, and in DEVIATIONS.md what follows from the difference. */
 void GiveMem(void)
 {
-    MemGive(SEG_OF(Room));
+    MemGive(Room);
 }
 
 /* Take the room again, when the commands have been run: the largest
@@ -465,18 +488,7 @@ void GiveMem(void)
    asks for the largest that there is now, wherever that is. */
 struct Answer TakeMem(void)
 {
-    struct Answer answer;
-    u16 largest;
-    struct Block block;
-
-    largest = MemTake(0xFFFF).largest;  /* asked for as Init11 asks */
-    block = MemTake(largest);
-    answer.value = largest;
-    answer.failed = ROOM_LEAST > largest;
-    if (answer.failed)
-        return answer;
-    Memory(block.value, largest);
-    return answer;
+    return TakeRoom();
 }
 
 /* If the cursor is below the last line that the program counts, put it

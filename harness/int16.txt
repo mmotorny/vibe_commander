@@ -81,12 +81,6 @@ dialog.c, MnMn11: shift
     | key = (u16)(button - table >> 1);
     button steps up from table, two at a time, in the loop above.
 
-dos32.c, OwnSet: widen
-    | u32 first = (u32)(Own + 15 - ARENA) >> 4;
-    Written for an int of 32 bits and meant so: how far Own is behind
-    ARENA, an address less an address, in the system's file. The line
-    below asks that its paragraphs fit 16 bits.
-
 drive.c, F62_01: widen
     | at = first - md.ScrBuf;
     first is a cell of the box, which is on the screen: within the
@@ -215,10 +209,6 @@ place.c, CorPar: widen
     The lines that show entries, LINES of ROWS() or ROWS() less 4: a
     panel has 15 rows or more, half of a screen of 25 and three, so
     those are 10 or more, the same number in 32 bits as it was in 16.
-
-read.c, ReDr00: widen
-    | limit = ((PANEL_BLOCK - 1) << 4) - 2 * SIZE_FILENT;
-    A constant, FFF0h less two entries of 24 bytes: FFC0h.
 
 setup.c, MakeIni: widen
     | length = to - md.MenuBuf;

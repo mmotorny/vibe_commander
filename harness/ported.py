@@ -1624,7 +1624,7 @@ def check_place(program, outcomes):
     flat = le.linear(program.contents)
     if not flat:
         return True
-    places = flat.copies(COPIES)
+    places = flat.copies(COPIES, kept=le.KEPT)
     ran = {outcome.name: outcome.run.executed.at for outcome in outcomes
            if outcome.run is not None}
     elsewhere = {name: at for name, at in ran.items()

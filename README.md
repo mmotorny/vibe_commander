@@ -667,18 +667,20 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 284,595 bytes, of which the extender's stub is 27,536 |
+| `VC.EXE` | 284,451 bytes, of which the extender's stub is 27,536 |
 | as a multiple of the original's 65,090 bytes | 4.37 |
-| more than the C translation's 133,056 bytes | 151,539 bytes |
-| Its code, and what the file has of its data | 117,203 and 104,463 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 877,786 bytes |
-| The addresses in it that the extender sets when it loads it | 4,457 |
+| more than the C translation's 133,056 bytes | 151,395 bytes |
+| Its code, and what the file has of its data | 117,046 and 104,507 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 222,282 bytes |
+| The addresses in it that the extender sets when it loads it | 4,434 |
+| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, each block with the extender's 16 bytes in front | 15,244,112 bytes |
+| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 361,456 bytes |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
-| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c-layout` holds them | 24,052 and 16,696 bytes |
-| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,576 and 2,251 bytes |
-| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 375,391 bytes, 205,250 of them code |
-| Inline assembly | 98 instructions in 13 pieces: 98 in 13 of `dos32.c` |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c-layout` holds them | 24,056 and 16,692 bytes |
+| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,532 and 2,251 bytes |
+| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 375,223 bytes, 204,973 of them code |
+| Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `dos32.c` |
 | Lines of `#pragma aux` | 17, of which 5 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
@@ -764,8 +766,7 @@ place):
 - The main data, `md`, a variable of `main.c`, which the file has as
   zeros.
 - What has no value, which the file does not hold: the variables of the
-  files, which a file may have here, and last 640 KB of `dos32.c`, out
-  of which the program is handed its memory.
+  files, which a file may have here, those of `dos32.c` last.
 
 A segment and an offset are still numbers of 16 bits in the program, as
 they are in the original: the program keeps the memory of a program of
@@ -791,20 +792,25 @@ a word as the pointer that it is. So the tables are held against the original's 
 by the test `portable_c-data`: [the figures](#the-figures) have how
 many such words there are.
 
-The memory of the panels, the viewer and the editor is not DOS's. The
-program asks for it as the original asks DOS, and `dos32.c` hands it
-out of those 640 KB, as DOS hands out its memory: a block of 64K for
+The memory of the panels, the viewer and the editor is not DOS's but
+the extender's, above the megabyte, as much as the machine has. The
+program asks for it as the original asks DOS, all that there is, and
+`dos32.c` asks the extender, DPMI 0500h to 0503h: a block of 64K for
 each panel, which is kept for as long as the program runs and never
 moved, and one for the room that the viewer, the editor, a copy and
-the file search take, where the original has one block that it cuts up
-and moves its panels in. In front of each block and behind the last are
-16 bytes of a pattern, which the tests look at when a scenario ends: a
-write just outside a block fails the scenario. So
-a command that the program runs has DOS's memory below the megabyte,
-all but the extender's part, and finds none above it, which the
-extender holds; and the editor has room for a larger file than the
-original's has. Entries 1 and 13 of `DEVIATIONS.md` say what follows
-from each.
+the file search take, all that the extender has behind the panels,
+where the original has one block that it cuts up and moves its panels
+in. [The figures](#the-figures) have how long the room is on the bench
+of the tests. The extender keeps 16 bytes of its own in front of each
+block and ends the program at its next call for memory where something
+has written into them; the tests look at them when a scenario ends,
+and a write just outside a block fails the scenario. So a command that
+the program runs has DOS's memory below the megabyte, all but the
+extender's part, and finds none above it, which the extender holds; a
+program of the same extender that it runs, a second copy of it among
+them, gets the room that it has given back; and the editor has room for
+a larger file than the original's has. Entries 1 and 13 of
+`DEVIATIONS.md` say what follows from each.
 
 `VC.EXE` of the portable C is longer than the C translation's: it is
 compiled for 32 bits, the main data is in the file, every word that
@@ -842,7 +848,7 @@ What this program rests on is where the linker puts things:
 |---|---|---|---|
 | 1 | The linker's `order` directive: the classes of the segments in the order that its command names, each class linked whole | `CMakeLists.txt`, the linker's command | `portable_c-layout`, in each of the rows below |
 | 2 | `#pragma data_seg` makes a segment of the name and of the class that it names: the main data is of a class of its own, `MAIN`, and the stack of the class `STACK`, which the linker takes for the stack, naming its end in the file's header | `src/portable_c/main.c`, `src/portable_c/stack.c` | `portable_c-layout`: the stack is the segment that ends where the header has the stack's top, and is in the file as zeros, by which the scenarios' test tells how much of it a scenario has left |
-| 3 | A segment holds what the object files have of it in the order in which the linker is given them: `dos32.c` is linked last, so its 640 KB are behind everything else that has no value | `CMakeLists.txt` | `portable_c-layout`: `IniSave` ends within 64K of where the main data begins, and the program ends within the megabyte that a segment can name |
+| 3 | A segment holds what the object files have of it in the order in which the linker is given them: `dos32.c` is linked last, so its variables are behind everything else that has no value | `CMakeLists.txt` | `portable_c-layout`: `IniSave` ends within 64K of where the main data begins, and the program ends within the megabyte that a segment can name |
 | 4 | The tables, with those that the program writes to, are of one class, and the main data follows it: every table lies within 32K of `Title_S`, and `Title_S` no more than 32K in front of the main data | `CMakeLists.txt` | `portable_c-layout` |
 | 5 | What has no value is of the class `BSS`, the last, and is not in the file; everything in front of it is | `CMakeLists.txt` | `portable_c-layout` |
 | 6 | The compiler puts nothing between the fields of a box or a dialog, nor between two objects of a file | `src/portable_c/tables.h`, by `#pragma pack(1)` | `portable_c-data`: an object is as long as its declaration makes it |

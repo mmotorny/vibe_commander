@@ -158,7 +158,7 @@ def compare(names, program, trace=False, together=None, stack=False,
         began = time.monotonic()
         try:
             run = scenarios.run(
-                scenario, program, benches[scenario.country], trace,
+                scenario, program, benches[scenario.bench], trace,
                 stack=stack,
                 limit=(limits or {}).get(name, scenarios.STEP_TIME),
                 until=departs if first else None, image=taker)

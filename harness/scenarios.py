@@ -1496,6 +1496,24 @@ and `copy-full`, and none of them shows a time of day of its run
 there. The latest file that any scenario makes is `mouse-edit`'s, 54
 seconds past noon where the original makes it at 40, and its time is
 on no screen; the next is `move`'s, at 34.
+
+A machine with less memory
+
+The bench has 16 MB, dos.MEMORY. The original looks at nothing above the
+megabyte, and the portable C has all that the extender has there, some
+15 MB, for its room: the text of the editor, a copy's buffer, the list of
+the file search (src/portable_c/DEVIATIONS.md, 1 and 13). Where what a
+scenario is about is the original's limit, a file too large for the
+editor, it may say `memory`, the machine's megabytes, and is then run on
+a bench of that many, which is booted for it and kept for the others
+that ask the same: setups.Benches, by the scenario's `bench`. Its golden
+is derived on that machine too, and has to come out as it was on the
+bench's: if it does not, the scenario does not take the memory, since a
+golden of the original does not change. 2 MB leave the portable C a room
+of some 550 KB, behind its objects and its panels, where the original's
+is what DOS has, the same as on the bench. `view-window` has that, for
+its file of a megabyte by its entry: TODO.md, "F9, the memory from the
+extender", has what was tried.
 """
 import re
 from dataclasses import dataclass, field, replace
@@ -1542,6 +1560,17 @@ class Scenario:
     # and the driver of the tests is told of that program in place of
     # the main one while the original is taken through it.
     setup_clock: bool = False
+    # The machine's memory in megabytes, where the bench's, dos.MEMORY,
+    # is not what the scenario is about: see "A machine with less
+    # memory" at the top.
+    memory: int = None
+
+    @property
+    def bench(self):
+        """What setups.Benches is asked for the bench of the scenario."""
+        if self.memory is None:
+            return self.country
+        return self.country, self.memory
 
 
 @dataclass
@@ -4110,7 +4139,11 @@ SCENARIOS = {
             "End",                        # the window
             "Home",
             "Esc",
-        )),
+        ),
+        # A machine in which the program's room is less than the
+        # megabyte that the entry says: see "A machine with less memory"
+        # at the top.
+        memory=2),
 
     "view-search": Scenario(
         "A text looked for in a file larger than the memory the viewer "

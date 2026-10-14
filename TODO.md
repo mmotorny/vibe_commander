@@ -2161,7 +2161,9 @@ of the low words alone, would refuse the file as well. So for the
 program of 32 bits what goes untested is not a comparison that the
 scenario held to be right for any C tree, but that a file a little
 above the room is refused at all; the statement is the same for both
-builds, and `view-window` runs it with a megabyte.
+builds, and `view-window` runs it with a megabyte, on a machine of 2
+MB since the memory is the extender's (F9), where the room is less than
+that.
 
 **What the program of 32 bits does with the scenario, seen once and
 held by nothing.**
@@ -2229,8 +2231,11 @@ says that they no longer test what their titles say.
   the scenario answers with Skip, by the comments at its steps. Since
   F1 of step 2 the room is 524,240 bytes, the panels having 64K each,
   and the file is read in two parts again, the first of 523,776 bytes:
-  both are tested again, until the memory is the extender's ("F1, three
-  blocks where there was one").
+  both were tested again, until the memory was the extender's ("F1,
+  three blocks where there was one"). Since F9 the room is some 15 MB,
+  and the file is one part again; on a machine of 2 MB, as
+  `view-window` has, the room is some 550 KB, more than the file, so
+  that machine does not get it there either.
 - The list of the file search is in the same memory. No scenario fills
   it in any build.
 
@@ -8082,9 +8087,9 @@ the program shows any of these, and no scenario does.
 | 7 | What the extender is in the machine while the program runs, a command of it included | Nothing: a program of real mode, a part of which stays in the memory while a command runs | A program of real mode, all of it in the memory while a command runs, by entry 1 | The extender's part of real mode, 51,696 bytes below the megabyte, and 512 bytes more that the system's functions keep there; INT 21h of real mode goes to the extender, and INT 15h (1); the timer's counter 0 is set anew when it starts, to mode 3 where the BIOS has mode 2; the line A20 is left on; the program runs at privilege level 0; and the program's idle call, INT 28h, comes from the extender, on a stack of its own, with DS and ES 0 | In part: entry 1 has the 52 KB and the 512 bytes | (a) A sentence in entry 1: it is what an extender is, and the road names this one. Nothing to mend |
 | 8 | When DOS ends the program by another program's hand | Releases what it has on its list, tells DOS to look for Ctrl-C as before, and leaves registers for the program that started it. Ctrl-Break, INT 1Bh, is never given back and goes into memory that is free from then on; INT 22h goes into the ended program | DOS told and the registers left, as entries 7 and 8 have them; INT 1Bh and 22h as the original | DOS told and the registers left as in 16 bits, by the routine of real mode that the user decided for (E). But INT 1Bh is given back, by the extender, before DOS sees the call; INT 22h goes into the block below the megabyte, which DOS has freed, as the ended program is in 16 bits; and at the routine's call 3301h DH, DS and the registers that the call does not read are as they came from the program that started this one, which is what the original hands DOS there, where 16 bits has DH 0 and DS on the main data | Yes, since L: a point of entry 8, as the program is; the registers of the routine's call are in 6 | (a) A sentence in entry 8: the program of 32 bits leaves the machine with less astray than the original does, and making INT 1Bh point into free memory would be breaking the machine on purpose. Taken. It was to be seen again if 2 was mended by its bit; that mend was dropped, and whatever is decided of 2 that changes what the extender puts back wants this point read again |
 | 9 | The registers that a call of DOS or the BIOS does not read: entry 6 | As the code before left them | By entry 6: 0 in AL and in the half of BX that is not taken; DS on the main data; elsewhere 0 or what the stack holds, "as it comes" in the rows of its table | 0 in AX, BX, CX, DX, SI and DI wherever a call takes nothing there, at every call. DS and ES of real mode are the extender's: seen, at a call that takes no address DS holds the number that is in AX and ES 0; at a call that the extender translates DS is on the extender's buffer below the megabyte; at the thirteen functions that are made in real mode both are on the program's block there. The carry flag is clear at the two calls that the original makes with it set, 36h and 13h, and counted as set afterwards, which is the same for a DOS that leaves it. At 4Bh the environment is named, where the original and 16 bits name none and DOS copies the program's own: the same environment, since the word of the PSP through which DOS would find it is a selector of the extender's; and CX, SI and DI are 0 | No: entry 6 is of the program of 16 bits, and D2 and E left its sentence for 32 bits to W | (a) A paragraph in entry 6, with no table: it is the entry's own rule, DOS handed nothing that it is not asked, kept more strictly. Nothing to mend |
-| 10 | Which calls DOS is asked, and in which order | | The original's, call for call: entry 6 says so | Fewer, and one more: seen, call for call. Not asked: 51h, where the PSP is, the first call of 16 bits; 4Ah for the program's own block; 48h, 49h and 4Ah for the memory of the panels, the viewer and the editor, at the start and around every command, which are the program's own 640 KB; 35h and 25h for the critical error, Ctrl-Break and Ctrl-C, which are taken and given back through the extender, so that `ErrVct` and `BrkVct` of the main data are never written. More: 48h for the 512 bytes, when the program starts. Every other call is made by both, in the same order and with the same AX. And through the extender, where DOS does not see it: INT 22h read before a program is run and put back behind it, and the three interrupts given back when the program ends | In part: entry 1 has the 640 KB and the 512 bytes; the calls are said nowhere | (a) A paragraph in entry 6, which says of both builds that "the calls, their order and every register that a call takes are the original's": not so of this one. To mend it would be to take the memory from DOS, below the megabyte, which the session's choice 2 of the plan gave up and step 2 of the road changes again |
+| 10 | Which calls DOS is asked, and in which order | | The original's, call for call: entry 6 says so | Fewer, and one more: seen, call for call. Not asked: 51h, where the PSP is, the first call of 16 bits; 4Ah for the program's own block; 48h, 49h and 4Ah for the memory of the panels, the viewer and the editor, at the start and around every command, which are the program's own 640 KB and since F9 the extender's; 35h and 25h for the critical error, Ctrl-Break and Ctrl-C, which are taken and given back through the extender, so that `ErrVct` and `BrkVct` of the main data are never written. More: 48h for the 512 bytes, when the program starts. Every other call is made by both, in the same order and with the same AX. And through the extender, where DOS does not see it: INT 22h read before a program is run and put back behind it, and the three interrupts given back when the program ends | In part: entry 1 has the 640 KB and the 512 bytes; the calls are said nowhere | (a) A paragraph in entry 6, which says of both builds that "the calls, their order and every register that a call takes are the original's": not so of this one. To mend it would be to take the memory from DOS, below the megabyte, which the session's choice 2 of the plan gave up and step 2 of the road changes again |
 | 11 | What DOS left in AX where a call did not fail, on a DOS that changes AX there | As DOS left it | As DOS left it | As DOS left it at the calls that are made in real mode for that reason, the search, the current directory, the attributes set. At the other calls that the extender translates, 39h, 3Ah, 3Bh, 41h, 4300h, 56h, it may be the AX that the call was made with: FreeDOS leaves AX alone there, so the bench cannot tell | No | Nothing to decide today: not known to differ on any DOS. Written here so that it is not lost |
-| 12 | Memory that the program reads before it has written it | What the last program left in DOS's block | The same | Zeros, in the 640 KB of its own | No | Nothing to decide: no place is known where it shows, and every scenario that passes went by it |
+| 12 | Memory that the program reads before it has written it | What the last program left in DOS's block | The same | Zeros, in the 640 KB of its own, until F9; since F9 what the extender's memory held, which is what the program had there before it gave the room back, or what a program of the same extender left, a second copy among them: toward the original | Since F9, in entry 1 | Nothing to decide: no place is known where it shows, and every scenario that passes went by it |
 
 **Not a difference of the program.** A wait costs more of the host's
 time while the program of 32 bits idles, `blank-timed` above all: that
@@ -9358,7 +9363,7 @@ thought and long in lines.
 | F6, a copy and what goes through files. **Done**: "F6, a copy and what goes through files" below | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands. **Done**: "F7, the tree, the history, the commands" below, and the commands of a line, which waited for F4, by the small piece F7b: "F7b, the commands of a line" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest. **Done**: "F8, the rest" below | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
-| F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
+| F9, the memory from the extender. **Done**: "F9, the memory from the extender" below | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
 | N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below, and "N0b, the rule turned to a sign" behind it | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and `i32`, the type with a sign; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
 | N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; every cut that clang names written as a cast, with a comment where the program counts on it; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's warnings of a conversion silent, which the test of the record asks; the test of the record; `portable_c-cut` | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
@@ -10155,6 +10160,109 @@ this extender's, and nothing of DPMI promises them.
 - *DOS is asked nothing* (row 16): entry 6 of `DEVIATIONS.md` loses
   nothing and gains nothing by it, and `calls.asm` with `listed.py`
   holds F9 to that.
+
+### F9, the memory from the extender: done, and what a later piece should know
+
+The panels and the room are blocks of the extender's, DPMI 0500h to
+0503h, and the 640 KB are gone from `dos32.c`. All 156 scenarios pass
+with no golden and no patch changed; the whole suite passes.
+
+**What it is now.**
+
+- `sys.h`: `MemTake(i32 bytes)`, `MemGive(u8 *block)`, `MemResize(u8
+  *block, i32 bytes)`; `struct Block` has `block`, a pointer, `value`,
+  the error, `failed`, and `largest`, an `i32`. The program asks as it
+  did, all of it first, `MemTake(0x7FFFFFFF)`, refused with how much
+  there is. `MemResize` refused answers with the length that the block
+  keeps, since the extender does not say how long it could be. `MemOwn`,
+  `MemSetSearch` and `MemSetUpper` are as they were.
+- `dos32.c`: a table of the blocks that the program holds, `Blocks` and
+  `BlocksHeld`, each with where it begins, its bytes and the extender's
+  name for it (SI:DI), which the image's tool reads. `Dpmi` hands ESI and
+  EDI back too, for the names. DOS is asked nothing for the memory.
+- `start.c`: `Init11` takes the two panels, `PANEL_BYTES` each, and then
+  the room, `TakeRoom`, which `TakeMem` is too; `GiveMem` gives the
+  room back. `LEAST_ROOM` is the least, 8,000 bytes. What `Init11`
+  answers for `AlocEr` is paragraphs, 0FFFFh for more, and is read only
+  where it failed, below a panel's 1000h.
+- `view.c`, `Aexec0`: the room made `LEAST_ROOM` long by 0503h for a
+  viewer or an editor of another's, and behind it given back and taken
+  anew, `GiveMem` and `TakeMem`, as X said to write it; with too little
+  then, `AlocEr`, which the original cannot meet there. Declared in
+  entry 1.
+- `read.c`, one line of N11's: the list's limit in bytes of
+  `PANEL_BYTES`. `vc.h`: the two macros, in bytes.
+- The room on the bench is the README's figure, 15 MB and some; the
+  least that the program gets to its panels with is the row below it.
+  Both are worked out by `tools/figures.py` from `le.py` and the bench's
+  end of memory, FE0000h, and the first was the image's to the byte.
+
+**The harness.**
+
+- `harness/dataimage.py` takes each block of `Blocks` as a stretch of
+  its own, with the extender's 16 bytes in front, and holds those 16
+  bytes to what X saw there (`_in_front`): 12345678h, the length rounded
+  to 16 with the top bit set, 0, 12345678h. That is the net that the
+  pattern was: a write in front of a block fails the scenario, and
+  `check` catches a byte changed there. It reads the images of a build
+  from before F9 as it did. An address of nothing known is the same in
+  two images of one build where it is the same number: the room given
+  back in `start-memory`.
+- `harness/le.py`: `behind()` and `copies()` take the blocks that a
+  program keeps in front of the next, `KEPT`, the two panels of the
+  portable C; `driver.py` hands that for the portable C alone, and
+  `ported.py`. A second copy is at 001566B0h or so, where it was at
+  001D6710h.
+- A scenario may say `memory`, the machine's megabytes: `Machine`, `Bench`
+  and `Benches` take it, a bench being booted for each that is asked for,
+  and `scenario.bench` is what a tool asks `Benches` for. `show.py` has
+  `--memory`. `view-window` has 2: its golden, derived again on that
+  machine, came out as it was, and the program's room there is 563,552
+  bytes, so the file of a megabyte is refused as in the original. The
+  top of `harness/scenarios.py` says so, "A machine with less memory".
+  The memory of a machine of 2 MB has what the machine's start left in
+  it some 300 KB into the room, at a place that does not move: the
+  images show it.
+
+**The two runs**, as the plan has them. The room cut to 524,240 bytes
+by a line of `TakeRoom`, not committed, in `build/f9cut/portable_c`:
+156 of 156 pass. Then all of it: the suite passes.
+
+**The images**, of origin's build saved before anything changed:
+
+| Held | Declared | What was left |
+|---|---|---|
+| Origin's against the cut run | `ViewSeg`, `FreMem2`, `the blocks`, `behind the panels`, `MenuBuf`, `the panel of WCB1seg` | The six bytes of `copy` and `copy-dirs`. What the declared names had, read scenario by scenario: 117 scenarios equal with nothing declared; `start-memory` the room given back; `view-commands` the extender's 16 bytes behind the room made short, where the old hand-out wrote three bytes; `setup-defaults` the panel of a program started anew, given what the first run had left there (row 12 of "The program of 32 bits: what differs"); the six scenarios that start a second copy, the room, where the copy now lives, and in `comspec` and `start-setup` `MenuBuf`, the editor's line, copied from behind the text in that room; `view-window` what the machine of 2 MB has in its memory |
+| The cut run against all of it | Those, with `TmpErr`, `TmpBuf`, `ErrBuf`, `edit.EdSpace`, `dos32.Blocks` | Nothing. What was declared: the room's length and what follows it, the editor's free bytes as digits, `EdSpace`, the file search's `FndSize`, `copy-big` read in one part, `copy-full` another part of its file in the room; the second copy's code, which differs by the line that cuts; addresses 16 bytes apart, the cut build being a paragraph longer |
+
+**The records.** The words that were F9's are at nothing: `PANEL_BLOCK`
+2, `ROOM_LEAST` 3; and with them `SEG_OF` 4 and `AT` 2 of F10's and
+`u16 segment` 1 of F6's. The host check has one place more in
+`dos32.c`, a number made a pointer, the address that the extender
+answers with; `int16.txt` two places fewer; `width.txt` 14 numbers fewer
+in `dos32.c` and two places of a sign in `start.c`, in `Paragraphs`,
+which N19b sorts.
+
+**What is left of F9**, for whoever goes on:
+
+- `harness/trial32/calls.asm` was not run on the program: X saw that
+  0500h to 0503h reach no DOS, and entry 6 is written so. Building
+  `calls.com` and listing a run of the program before and after is what
+  the plan's row asks.
+- `editor-big` at a machine small enough that the room is below 381,338
+  bytes was not tried: QEMU's `-m` is in megabytes, and 2 MB leave
+  563,552. It stays not run, as the user decided.
+- The editor's count of free bytes shows the last seven characters of a
+  figure of 15 million; the user has decided that every figure of free
+  memory goes, which is the editor's piece, and the pattern of
+  `IGNORED` follows it.
+
+**For N19b, which sorts `start.c`.** `Paragraphs` has two places of a
+sign, `bytes >> 4` of what the extender answers, which is not below 0.
+`side` and `i` of `Init11` are counts of 16 bits. `largest` of
+`TakeRoom` is an `i32` of bytes. No cut of the room is left to 16 bits
+anywhere: `RoomBytes` is an `i32`, and every caller of it took bytes
+before F9.
 
 ### F0, the net and the record: done, and what a later piece should know
 

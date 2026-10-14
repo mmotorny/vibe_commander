@@ -36,13 +36,18 @@ coverage.py finds where a program is from a trace of what ran.
 A program that this one runs, with this one still in the memory. If it
 has DOS/32A for its extender too, that one takes no memory of its own:
 it asks the first for it, and its first object is the next block of the
-same memory, behind the last object of this program as an object is
-behind the one before. So a copy of the program that is started from a
+same memory that is free, behind the last object of this program as an
+object is behind the one before, and behind what blocks this program
+has taken there and keeps while it runs another. The portable C keeps
+its two panels, KEPT: it takes them first, right behind its objects,
+and gives the room behind them back before it runs anything (Init11 and
+GiveMem of start.c). So a copy of the program that is started from a
 command of the program is at behind(), a copy that that one starts is
 behind it by as much again, and copies() has them. Seen on the bench as
 the rest was, with the program in every scenario that starts it twice
 and with a toy three deep (harness/drivercheck.py), and promised by as
-little.
+little; the blocks kept in front of a copy, with toys (TODO.md, "X, the
+extender's memory on the bench", row 27).
 
 The relocations. A flat program is linked for no address: every place
 where code or a table names something by its address has a relocation
@@ -73,6 +78,10 @@ from dataclasses import dataclass
 # tests, and what it keeps for itself in front of each object.
 BENCH = 0x00100010
 IN_FRONT = 16
+# What the portable C keeps of the extender's memory while a program
+# that it has run is in the memory, in bytes: the blocks of its two
+# panels (PANEL_BYTES of vc.h), which it takes behind its objects.
+KEPT = (0x10000, 0x10000)
 
 # The header of a linear executable, as offsets in it. The tables are
 # counted from the header, the pages from the beginning of the file.
@@ -236,20 +245,24 @@ class Linear:
             raise ValueError(f"object {number} has no offset {offset:X}h")
         return found.place + offset
 
-    def behind(self, base=BENCH):
+    def behind(self, base=BENCH, kept=()):
         """Where the extender puts the first object of a program that is
         started while this one is in the memory with its first object at
-        `base`: see the top."""
+        `base`, and with blocks of the lengths `kept` taken behind its
+        objects: see the top."""
         ends = base + self.place(len(self.objects), self.objects[-1].size)
+        for size in kept:
+            ends = -(-ends // IN_FRONT) * IN_FRONT + IN_FRONT + size
         return -(-ends // IN_FRONT) * IN_FRONT + IN_FRONT
 
-    def copies(self, count, base=BENCH):
+    def copies(self, count, base=BENCH, kept=()):
         """Where the first object of each of `count` copies of this
         program is, each started while those before it are in the
-        memory: `base` for the first."""
+        memory, and each keeping blocks of the lengths `kept` behind its
+        objects meanwhile: `base` for the first."""
         found = [base]
         while len(found) < count:
-            found.append(self.behind(found[-1]))
+            found.append(self.behind(found[-1], kept))
         return tuple(found)
 
     def in_file(self, number, offset=0):

@@ -138,7 +138,7 @@ def noticed(program, names):
         scenario = scenarios.of(name, program.tree)
         try:
             run = scenarios.run(scenario, program,
-                                benches[scenario.country])
+                                benches[scenario.bench])
         except MachineError as error:
             return str(error).splitlines()
         return goldens.differences(goldens.read(name, program.tree), run,

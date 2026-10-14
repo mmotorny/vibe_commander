@@ -52,6 +52,7 @@ import coverage  # noqa: E402  (of harness/, not the package of that name)
 import datacheck  # noqa: E402
 import hostcheck  # noqa: E402
 import layoutcheck  # noqa: E402
+import le  # noqa: E402
 
 README = ROOT / "README.md"
 SOURCE = ROOT / "src" / "portable_c"
@@ -60,6 +61,13 @@ BUILD = ROOT / "build"
 BEGIN = ("<!-- The figures: written by `python3 tools/figures.py --write`, "
          "not by hand. -->")
 END = "<!-- The end of the figures. -->"
+
+# Where the memory ends that DOS/32A hands out on the bench of the tests,
+# a machine of 16 MB, as was seen there (TODO.md, "X, the extender's
+# memory on the bench", row 1): the BIOS's 15,232K above the megabyte.
+BENCH_END = 0xFE0000
+# The least of the room, LEAST_ROOM of vc.h.
+LEAST_ROOM = 8000
 
 
 def number(value):
@@ -119,6 +127,9 @@ def table():
     _, tables = datacheck.check(BUILD / "shareware-layout", directory,
                                 SOURCE, say=lambda line: None)
     size = len(program.contents)
+    # Where the room begins on the bench: behind the two panels, which
+    # are behind the objects, as a second copy of the program would be.
+    room_begins = program.behind(le.BENCH, le.KEPT)
 
     rows = [
         ("`VC.EXE`",
@@ -135,6 +146,19 @@ def table():
          f"{number(instructions.size + data.size)} bytes"),
         ("The addresses in it that the extender sets when it loads it",
          number(len(program.relocations))),
+        ("What it has for its room on the bench of the tests, a machine "
+         "of 16 MB, where the extender's memory ends at FE0000h: all "
+         "that is behind its objects and its two panels, each block "
+         "with the extender's 16 bytes in front",
+         f"{number(BENCH_END - room_begins)} "
+         "bytes"),
+        ("The least of that memory with which it gets to its panels: its "
+         "objects, its two panels and the least of the room, `LEAST_ROOM`, "
+         "8,000 bytes, each block with the extender's 16 bytes, worked out "
+         "of the same; with less, the extender or the program says that "
+         "there is not enough",
+         f"{number(room_begins + LEAST_ROOM - le.BENCH + le.IN_FRONT)} "
+         "bytes"),
         ("The words of its boxes, dialogs and tables that are pointers, "
          "four bytes where the original has a word of two; and how many "
          "of them are among those addresses, the others holding a "

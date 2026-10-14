@@ -16,9 +16,9 @@
  * attributes, dates and times are DOS's bits; an error is DOS's number
  * for it; a key is a character with the scan code of the key above it; a
  * cell of the screen is a character with its colour above it; a tick is
- * the 18.2th part of a second; and a block of the memory is known by its
- * segment, and counted in paragraphs of 16 bytes. Another system has to
- * answer in these.
+ * the 18.2th part of a second. Another system has to answer in these. A
+ * block of the memory is the one thing that is not DOS's: it is known by
+ * where it begins and counted in bytes.
  *
  * One function is one thing asked. Where the program asks several
  * things in a row, the row is in the program, in the order of the
@@ -255,25 +255,42 @@ struct Answer DriveFixed(u16 drive);
 u16 DriveCd(u16 drive);
 
 /*
- * Memory, in blocks that are known by their segment and counted in
- * paragraphs. All Bare.
+ * Memory, in blocks that are known by where they begin and counted in
+ * bytes. All Bare.
+ *
+ * DOS hands out blocks of the megabyte by their segments and counts them
+ * in paragraphs, and the original asks it so: for all of the memory,
+ * which is refused with how much there is, and then for that. What is
+ * asked here is the same, in the same order, of memory that has no
+ * segments: a block begins where the system has it and is as long as
+ * was asked for, and nothing is promised of what it holds. A block may
+ * be anywhere, and one that is given back and taken again may be
+ * elsewhere.
  */
 
 /* What MemTake and MemResize answer with. */
 struct Block {
-    u16 value;                          /* the block, for MemTake; else AX
-                                           as DOS left it, or the error */
+    u8 *block;                          /* where it begins, of MemTake
+                                           and MemResize; 0 if it failed */
+    u16 value;                          /* 0, or the error: DOS's number
+                                           for it */
     u16 failed;
-    u16 largest;                        /* if it failed for want of memory,
-                                           how many paragraphs there are:
-                                           else `paragraphs` as it came */
+    i32 largest;                        /* if MemTake failed for want of
+                                           memory, how many bytes the
+                                           largest block has that it could
+                                           give; if MemResize did, how many
+                                           the block has, which it keeps;
+                                           else `bytes` as it came */
 };
 
-/* Take a block of so many paragraphs; give one back; make one longer or
-   shorter. */
-struct Block MemTake(u16 paragraphs);
-struct Answer MemGive(u16 block);
-struct Block MemResize(u16 block, u16 paragraphs);
+/* Take a block of so many bytes, more than none; give one back; make
+   one longer or shorter, which may move it, with what it holds, to
+   where the answer says. A block that is asked for with more bytes than
+   any system has, 7FFFFFFFh, is refused, and says how many there are:
+   that is how the program asks. */
+struct Block MemTake(i32 bytes);
+struct Answer MemGive(u8 *block);
+struct Block MemResize(u8 *block, i32 bytes);
 
 /* Where the system looks for a block that it is asked for: `how` is as
    DOS has it, 0 for the lowest block that fits, which is how DOS looks

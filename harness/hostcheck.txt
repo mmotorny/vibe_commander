@@ -18,7 +18,7 @@ dialog.c      clean
 digits.c      clean
 dirfunc.c     clean
 dirfunc_t.c   clean
-dos32.c       to-number 15, to-pointer 24, naked 2, asm 2, asm-pragma 11, registers 1, intrinsic 1
+dos32.c       to-number 15, to-pointer 25, naked 2, asm 2, asm-pragma 11, registers 1, intrinsic 1
 drive.c       clean
 edit.c        clean
 edit_t.c      clean

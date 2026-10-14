@@ -88,16 +88,16 @@ N17a            26          0     0              0      24     2     0     2    
 N17b            28          0     0              0      28     0     0     5    41  commands.c
 N18             70          0     1              0      50     1     0     5    40  menu.c help.c
 N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
-N19b            40         40     0              0       0     0     0     0     1  start.c
+N19b            37         37     0              0       0     0     2     0     4  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
-as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        271         69    12              1     162     5     0     0     0  vc.h sys.h tables.h
-all           1965        109   115              1    1182    65    52   170   916
+as a whole     568          0    58              0       0     0     0     0    13  the tables, dos32.c stack.c
+headers        270         68    12              1     162     5     0     0     0  vc.h sys.h tables.h
+all           1947        105   108              1    1182    65    54   170   932
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               214         12    11              0     162     5     0     0     0
-sys.h               37         37     1              1       0     0     0     0     0
+sys.h               36         36     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              19          0     0              0      19     0     2     0    21
 blank.c             12          0     0              0      12     0     2     0     7
@@ -131,7 +131,7 @@ place.c              5          0     0              0       5     0     0     1
 read.c              20          0     1              0      20     1     1     5    11
 screen.c            12          0     0              0      10     2     0     0     3
 setup.c              3          0     0              0       3     0     0     0     5
-start.c             40         40     0              0       0     0     0     0     1
+start.c             37         37     0              0       0     0     2     0     4
 stcolor.c           43          0     0              0      43     0     0     3    39
 sthelp.c            37          0     3              0      25     5     0     2    11
 stmain.c            17          0     0              0      16     1     0     3    16
@@ -729,7 +729,7 @@ vc.h, struct Key: field key, u16
 
 vc.h, struct Mouse: not sorted, 2 numbers
 
-sys.h: not sorted, 37 numbers, 1 u32
+sys.h: not sorted, 36 numbers, 1 u32
 
 tables.h: not sorted, 20 numbers
 
@@ -1881,7 +1881,7 @@ dirfunc.c, FncSel: sign
 dirfunc_t.c: as a whole, 60 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-dos32.c: as a whole, 163 numbers, 65 u32
+dos32.c: as a whole, 149 numbers, 58 u32
     the system's file: what DOS, the BIOS and the extender take and answer in, and the layer's to shape, step 3
 
 drive.c, (): variable DrLe_S, u8[14]
@@ -3706,7 +3706,7 @@ setup.c, Failed: parameter error, u16
 stack.c: as a whole, 1 number
     the stack, an array of bytes
 
-start.c: not sorted, 40 numbers
+start.c: not sorted, 37 numbers, 2 of a sign
 
 stcolor.c, (): variable StColor_S, u8[]
     text

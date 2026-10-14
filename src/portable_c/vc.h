@@ -520,13 +520,14 @@ extern struct DIRENT *TreeCurrent;
 extern const u8 *HistoryPlace;
 extern u8 *NextCommand;
 
-/* The paragraphs of a panel's block: 64K, which is as far as the
-   offsets of 16 bits reach that a panel keeps its places in. And the
-   paragraphs that the room has at the least, which is what the viewer
-   needs: with less the program does not start. */
+/* The bytes of a panel's block: 64K, which is as far as the offsets of
+   16 bits reach that a panel keeps its places in. And the bytes that the
+   room has at the least, which is what the viewer needs, in whole
+   paragraphs as the original counts it: with less the program does not
+   start. */
 #define MinView     8000                /* Minimum view buffer size */
-#define PANEL_BLOCK 0x1000
-#define ROOM_LEAST  (((MinView - 1) >> 4) + 1)
+#define PANEL_BYTES 0x10000
+#define LEAST_ROOM  ((MinView + 15) & ~15)
 
 /* The stack, of stack.c: LenStk bytes in a segment of their own. */
 extern u8 Stack[];

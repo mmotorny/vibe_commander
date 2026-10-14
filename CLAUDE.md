@@ -4010,6 +4010,17 @@ facts row for row and what the piece F9 goes by):
   extender's 16 bytes at two dozen places, and the first reading of
   "what a machine that has just started has in its memory" was of
   those.
+- The memory is the extender's since the piece F9 (`TODO.md`, "F9, the
+  memory from the extender"). What that met: a bench's state is loaded
+  only into a machine of the memory that it was saved of, so a scenario
+  that asks for less memory, `memory` of `harness/scenarios.py`, gets a
+  bench of its own, booted for it; the room of all that there is holds
+  what a second copy, or the program before, or the machine's start,
+  left there, and a routine that copies from behind the end of a text,
+  the editor's line, shows that in the main data; and a tool that is
+  run while the build changes reads the linker's map again at every
+  scenario, so "before" is saved from a copy of the build in a
+  directory of its own, `build/NAME/portable_c`.
 - `harness/trial32/run.py` starts a machine for every file that it is
   given. Two programs on one machine are one file and steps that type
   the second at DOS's prompt, `q '"d:\vc\vc" Enter'`, with `--extra`

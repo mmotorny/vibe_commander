@@ -66,16 +66,17 @@ what it compares:
     image is taken, so a write into them shows with no second build.
 
 Where the blocks are. The tool learns that from the image itself and the
-map: the main data at `_md`; the blocks by what dos32.c keeps of them,
-a table beside `Own`, both of which the map names, and in a build from
-before that table a paragraph in front of each block inside `Own`.
-When the memory comes from the extender, a block lies wherever the
+map: the main data at `_md`; the blocks by what dos32.c keeps of them.
+Since the memory comes from the extender, a block lies wherever the
 extender put it and is a stretch of its own in the image: taken by the
-same `pmemsave` at the address and with the length that a table of
-dos32.c has, which the map names and `_handed` below reads. Nothing else
-here knows that the blocks are in one stretch today: they are compared
-block by block, and an address is compared by the block that it is in
-and how far.
+same `pmemsave` at the address and with the length that the table of
+dos32.c has, `Blocks`, which the map names and `_handed` below reads,
+with the extender's 16 bytes in front of it. A build from before that,
+which handed out 640 KB of its own, `Own`, has its blocks inside the
+program's data: by a table beside `Own`, `OwnBlocks`, and in a build
+from before that table by a paragraph in front of each block. The
+blocks are compared block by block whichever they are, and an address
+is compared by the block that it is in and how far.
 
 What differs by design, and is not compared as bytes:
 
@@ -104,13 +105,15 @@ What differs by design, and is not compared as bytes:
     compared, and what differs there is counted and not held against
     the piece.
 
-The pattern round a block. Where the extender keeps 16 bytes of its
-own between two blocks and ends a program that has written into them,
-the program's own hand-out of memory is to keep 16 bytes of a pattern,
-GUARD below: in front of each block that is taken and behind the last
-block. They are looked at when an image is taken, by guards(): a
-scenario whose image has them otherwise fails the scenarios' test, with
-the block and the place, and `save` and `compare` say the same. In a
+The bytes round a block. The extender keeps 16 bytes of its own in front
+of every block and ends a program that has written into them, at its
+next call for memory; the program's own hand-out of memory, before the
+memory was the extender's, kept 16 bytes of a pattern, GUARD below, in
+front of each block that is taken and behind the last block. Either is
+looked at when an image is taken, by guards(): a scenario whose image
+has them otherwise than the extender or the pattern has them fails the
+scenarios' test, with the block and the place, and `save` and `compare`
+say the same. What the extender has there is EXTENDER below. In a
 build from before dos32.c wrote the pattern, which is known by its
 having no table of its blocks, nothing is looked at.
 
@@ -155,6 +158,15 @@ OWN_BLOCKS = ("dos32", "_OwnBlocks")
 OWN_HELD = ("dos32", "_OwnHeld")
 OWN_ENTRY = "<HHH"
 OWN_MOST = 8                      # as many as the table has room for
+# What dos32.c keeps of the blocks that the extender gave it, since the
+# memory is the extender's: the table, Blocks, and how many it has,
+# BlocksHeld. An entry is where the block begins, how many bytes it has
+# and the extender's name for it, four bytes each. Only the blocks that
+# are taken are in it.
+BLOCKS = ("dos32", "_Blocks")
+BLOCKS_HELD = ("dos32", "_BlocksHeld")
+BLOCKS_ENTRY = "<IiI"
+BLOCKS_MOST = 8
 STACK = "STACK"                   # segments of the map
 TABLES = ("CONST", "CONST2")
 VARIABLES = ("_DATA", "_BSS")
@@ -269,6 +281,11 @@ UNSTEADY_VARIABLES = {
                        "begin in: by where the linker has the memory. "
                        "How many blocks there are, how long each is "
                        "and which are taken is held as `the blocks`",
+    # Found by F9, against a build whose objects are a paragraph longer.
+    "dos32.Blocks": "where the extender gave each block, and its name "
+                    "for it: by where it has the program's objects. How "
+                    "many blocks there are and how long each is is held "
+                    "as `the blocks`",
     "dos32.Below": "the stack pointer at the last call of DOS or of "
                    "the extender: by the frames of the build's "
                    "functions, as the stack is, which is left out",
@@ -315,6 +332,24 @@ DTA_NAME = 30                   # where the name is in the DTA
 # dos32.c writes it, and _guarded() says where it is, by the blocks of
 # _blocks().
 GUARD = bytes(0xF0 - at for at in range(16))   # Guard() of dos32.c
+
+# What DOS/32A keeps in front of a block that it has given, as was seen
+# on the bench (TODO.md, "X, the extender's memory on the bench", row
+# 5): four words of four bytes, 12345678h, the block's length rounded up
+# to 16 with the highest bit set while it is taken, 0, and 12345678h
+# again. The image has them as the first 16 bytes of the stretch that
+# it takes of a block.
+IN_FRONT = 16
+EXTENDER_MARK = 0x12345678
+TAKEN_BIT = 0x80000000
+
+
+def _in_front(size):
+    """The 16 bytes that the extender has in front of a block of `size`
+    bytes that is taken."""
+    return struct.pack("<IIII", EXTENDER_MARK,
+                       (-(-size // PARAGRAPH) * PARAGRAPH) | TAKEN_BIT, 0,
+                       EXTENDER_MARK)
 
 
 class Spoilt(Exception):
@@ -393,7 +428,7 @@ class Taker:
         known = self.facts
         data = machine.memory(known["address"], known["size"])
         stretches = [(PROGRAM, known["address"], data)]
-        for name, address, size in _handed(known, data):
+        for name, address, size in _handed(self._build, data):
             stretches.append((name, address, machine.memory(address, size)))
         image = Image(stretches,
                       _tables_written(known, data, self._loaded))
@@ -404,14 +439,30 @@ class Taker:
         return image
 
 
-def _handed(known, data):
+def _handed(build, data):
     """The blocks that the program was handed and that are no part of
     its own data: (name, address, length) of each, for the image to
-    take. There are none while the program hands out memory of its own,
-    the blocks being inside `Own`; when dos32.c asks the extender, it
-    is to keep a table of them that the map names, and this reads it in
-    `data`."""
-    return []
+    take, with the extender's 16 bytes in front of it. dos32.c keeps a
+    table of them, Blocks, which the map names, and this reads it in
+    `data`. There are none in a build that hands out memory of its own,
+    the blocks being inside `Own`."""
+    table, held = build._symbol(*BLOCKS), build._symbol(*BLOCKS_HELD)
+    if table is None or held is None:
+        return []
+    count = int.from_bytes(data[held:held + 4], "little", signed=True)
+    if not 0 <= count <= BLOCKS_MOST:
+        raise Spoilt(f"dos32.c's table of its blocks says that it has "
+                     f"{count} of them")
+    found = []
+    for number in range(count):
+        address, size, _ = struct.unpack_from(
+            BLOCKS_ENTRY, data, table + number * struct.calcsize(BLOCKS_ENTRY))
+        if size <= 0 or address < IN_FRONT:
+            raise Spoilt(f"dos32.c's table has block {number} where it "
+                         "cannot be")
+        found.append((f"block {number}", address - IN_FRONT,
+                      size + IN_FRONT))
+    return found
 
 
 def _tables_written(known, data, loaded):
@@ -610,6 +661,13 @@ class Read:
                 or len(self.data) != build.size:
             raise Spoilt("the image is not of the build whose facts are "
                          "next to it")
+        # The blocks that the extender gave, each a stretch of its own:
+        # offset in the program's data -> (the extender's 16 bytes in
+        # front of it, the block's bytes).
+        self.handed = {
+            stretch_address + IN_FRONT - build.address:
+                (stretch[:IN_FRONT], stretch[IN_FRONT:])
+            for _, stretch_address, stretch in image.stretches[1:]}
         self.blocks = self._blocks()
         self.addresses = {one.name: self._address(one) for one in ADDRESSES}
         self.things = self._things()
@@ -617,14 +675,31 @@ class Read:
     def word(self, offset, size=2):
         return int.from_bytes(self.data[offset:offset + size], "little")
 
+    def span(self, begins, size):
+        """The bytes of the image from `begins`, an offset in the
+        program's data, as far as `size`: in the program's data, or in a
+        block that the extender gave, which may lie anywhere."""
+        for at, (_, data) in self.handed.items():
+            if at <= begins < at + len(data):
+                return data[begins - at:begins - at + size]
+        return self.data[max(begins, 0):begins + size] if begins >= 0 \
+            else b""
+
     def _blocks(self):
-        """The blocks of the memory that the program hands out to
-        itself, in their order: (offset in the program's data, length,
-        taken). dos32.c keeps them in a table, which the map names. A
-        build from before it had the table keeps a paragraph in front of
-        each block: whether a block follows, whether this one is taken,
-        and its paragraphs."""
+        """The blocks of the memory that the program was handed, in
+        their order: (offset in the program's data, length, taken).
+        dos32.c keeps them in a table, which the map names: of the
+        blocks that the extender gave, each a stretch of the image, or
+        of the memory that the program handed out to itself, which a
+        build from before it had the table keeps in a paragraph in front
+        of each block: whether a block follows, whether this one is
+        taken, and its paragraphs."""
         build = self.build
+        if build._symbol(*BLOCKS) is not None:
+            found = []
+            for begins, (_, data) in self.handed.items():
+                found.append((begins, len(data), True))
+            return found
         own = build._symbol(*OWN)
         if own is None:
             raise Spoilt("the map has no {1} of {0}.c: where the blocks "
@@ -757,7 +832,7 @@ class Read:
             "the main data", build.field_name)}
         for begins, size, name, one in self.things:
             found[name] = Part(name, build.address + begins,
-                               self.data[begins:begins + size], "a block",
+                               self.span(begins, size), "a block",
                                self._namer(one))
         for name, (begins, size) in build.variables.items():
             if name in POINTERS:        # held by what it names
@@ -794,7 +869,10 @@ def _guarded(read):
     """Where the pattern is to be in the Read's image: (offset in the
     program's data, what it is said to be) for the bytes in front of
     each block that is taken and for those behind the last block of
-    the memory."""
+    the memory. Of a build whose blocks the extender gave, none: see
+    _extender()."""
+    if read.handed:
+        return []
     found = [(begins - len(GUARD or b""), f"in front of block {number}")
              for number, (begins, _, taken) in enumerate(read.blocks)
              if taken]
@@ -810,6 +888,8 @@ def guards(read, pattern=None, places=None):
     text, each with the block and the first byte that is another. None
     is looked for in a build that has no table of its blocks, which is
     one from before dos32.c wrote the pattern: see GUARD."""
+    if not pattern and read.build._symbol(*BLOCKS) is not None:
+        return _extender(read)
     if not pattern and read.build._symbol(*OWN_BLOCKS) is None:
         return []                 # a build from before there was one
     pattern = pattern or GUARD
@@ -834,6 +914,27 @@ def guards(read, pattern=None, places=None):
                "before it" if "front" in said else
                "behind the end of the block")
             + ", or the block was not taken as dos32.c takes one")
+    return found
+
+
+def _extender(read):
+    """Where what the extender keeps in front of a block is not as it
+    has it, EXTENDER: as lines of text, each with the block and the
+    first byte that is another."""
+    found = []
+    for number, (begins, (front, data)) in enumerate(read.handed.items()):
+        expected = _in_front(len(data))
+        if front == expected:
+            continue
+        first = next(index for index in range(len(expected))
+                     if index >= len(front) or front[index] != expected[index])
+        found.append(
+            f"the extender's {IN_FRONT} bytes in front of block {number} "
+            f"are not as it has them, from the byte at +{first} of them "
+            f"on: {_hex(front)}, where it has {_hex(expected)}. Something "
+            "has written in front of the block, or behind the end of the "
+            "one before it, and the extender ends the program for that "
+            "at its next call for memory")
     return found
 
 
@@ -965,7 +1066,11 @@ def compare_one(before, after, changed=()):
         was, where_was = before.addresses[one.name]
         has, where_has = after.addresses[one.name]
         named = before.place(was), after.place(has)
-        if named[0] != named[1] or None in named:
+        # An address of nothing known is the same only where it is the
+        # same number: a pointer into a block that has been given back,
+        # which the image of the same build has at the same place.
+        if named[0] != named[1] or None in named and (
+                was != has or before.build.known != after.build.known):
             said = [f"{place[0]} +{place[1]}" if place else
                     f"nothing known, {address:08X}h"
                     for place, address in zip(named, (was, has))]
@@ -1210,7 +1315,7 @@ def save(program, directory, names=None, together=None, early=False,
             # every step, the program gets to a step some instructions
             # later, and what follows the time follows that.
             return scenarios.run(scenario, program,
-                                 benches[scenario.country],
+                                 benches[scenario.bench],
                                  stack=not early, image=taker)
         except MachineError as error:
             return str(error)
@@ -1255,6 +1360,20 @@ def show(directory, name, out=print):
         f"{sum(size for _, size in build.variables.values())} bytes")
     out(f"  the tables: {len(read.image.written)} places that are not as "
         "the program's file has them")
+
+
+def _changed(read, offset):
+    """The stretches of the Read's image with the byte at `offset` of
+    the program's data changed, in whichever stretch it is."""
+    address = read.build.address + offset
+    found = []
+    for name, at, data in read.image.stretches:
+        if at <= address < at + len(data):
+            data = bytearray(data)
+            data[address - at] ^= 0x40
+            data = bytes(data)
+        found.append((name, at, data))
+    return found
 
 
 def check(directory, out=print):
@@ -1312,10 +1431,7 @@ def check(directory, out=print):
     with tempfile.TemporaryDirectory(dir=Path(directory).parent) as copy:
         shutil.copyfile(Path(directory) / FACTS, Path(copy) / FACTS)
         for offset, expected in trials:
-            data = bytearray(read.data)
-            data[offset] ^= 0x40
-            stretches = [(PROGRAM, build.address, bytes(data))] \
-                + read.image.stretches[1:]
+            stretches = _changed(read, offset)
             Image(stretches, read.image.written).write(
                 Path(copy) / (name + SUFFIX))
             lines = []
@@ -1328,17 +1444,16 @@ def check(directory, out=print):
                 out(f"  a byte changed at +{offset:X}h of {name} was to "
                     f"be named with \"{expected}\", and this was said:")
                 out("\n".join("      " + line for line in lines))
-    # The pattern round a block: the one that is declared, or, in a
-    # build from before dos32.c wrote one, what the image has in front
-    # of its first block that is taken, held there alone.
+    # The bytes round a block: what the extender has in front of a
+    # block, or the pattern that the program's own hand-out wrote, or,
+    # in a build from before dos32.c wrote one, what the image has in
+    # front of its first block that is taken, held there alone.
     front = begins - 16
-    old = build._symbol(*OWN_BLOCKS) is None
-    pattern = read.data[front:begins] if old else GUARD
+    old = build._symbol(*OWN_BLOCKS) is None \
+        and build._symbol(*BLOCKS) is None
+    pattern = read.data[front:begins] if old else None
     places = [(front, f"in front of block {block}")] if old else None
-    data = bytearray(read.data)
-    data[begins - 1] ^= 0x40
-    spoilt = Read(build, Image([(PROGRAM, build.address, bytes(data))]
-                               + read.image.stretches[1:], []))
+    spoilt = Read(build, Image(_changed(read, begins - 1), []))
     said = guards(spoilt, pattern, places)
     if guards(read, pattern, places) or len(said) != 1 \
             or f"in front of block {block}" not in said[0]:

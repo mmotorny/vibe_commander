@@ -112,7 +112,7 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
        its 64K from the start, and nothing is moved. Where the list has
        to end is what the original has with memory enough: a paragraph
        short of 64K, which is as far as it counts in 16 bits. */
-    limit = ((PANEL_BLOCK - 1) << 4) - 2 * SIZE_FILENT;
+    limit = PANEL_BYTES - 16 - 2 * SIZE_FILENT;
 
     /* Keep the old list in the room, as much of it as there is room for
        in whole entries, and no more than a paragraph short of 64K, which

@@ -105,29 +105,50 @@ below the megabyte stays the extender.
   file is deleted while a command runs.
 - The main data is of the program, not a block that it asks DOS for. The
   panels and the memory of the viewer, the room, are not of DOS either:
-  the program has 640 KB of its own, above the megabyte, which it hands
-  out to itself as DOS hands out its memory. They are three blocks where
-  the original has one that it cuts up: one for each panel, 64K, which
-  is as long as a panel's list of files can get, asked for when the
-  program starts and kept for as long as it runs; and the room, the
-  largest block that there is then. The original has each panel as long
-  as its list and the room behind them, and moves the second panel and
-  the room when a list grows or shrinks; here nothing is moved. For a
-  command the room is given back, and afterwards the program asks for
-  the largest block that there is, as the original does; DOS gains
-  nothing by it.
+  they are the extender's, above the megabyte, which the program asks
+  for as the original asks DOS for its block, and of which it gets as
+  much as the machine has. They are three blocks where the original has
+  one that it cuts up: one for each panel, 64K, which is as long as a
+  panel's list of files can get, asked for when the program starts and
+  kept for as long as it runs; and the room, the largest block that
+  there is then, which is all that the extender has behind the panels:
+  the README's figures have how much that is on the bench of the tests,
+  some 15 MB, and 13 says what follows for the editor. The original has
+  each panel as long as its list and the room behind them, and moves
+  the second panel and the room when a list grows or shrinks; here
+  nothing is moved. For a command the room is given back, and
+  afterwards the program asks for the largest block that there is, as
+  the original does. DOS gains nothing by that; a program that the same
+  extender starts, a second copy of the program among them, gets its
+  memory there. And for a viewer or an editor of another's, which the
+  original runs with its block made as short as its panels and the
+  least that its own viewer needs and then makes as long as DOS lets
+  it, the room is made that short and is then given back and taken
+  again, since the extender says nothing of how long a block could be;
+  should there then be less than the least, the program says "Program
+  too big to fit in memory" and ends, as it does after a command, where
+  the original cannot meet that. A block is given with what the memory
+  held there, as DOS gives the original its block: what the program
+  had there before it gave the room back, what a program run meanwhile
+  left. While the memory was 640 KB of the program's own, it was zeros
+  until the program wrote there.
 - A panel keeps all of its files for a command, where the original
   keeps 256, and is read again afterwards: what was selected stays
   selected. That is entry 20.
 - What the main data has behind the command line, which the original
   has as whatever the memory holds after a command until it is set
   again, is as it was before the command.
-- "Program too big to fit in memory" is never said after a command: the
-  memory that the viewer needs is of those 640 KB, which no command
-  takes. The program says it when it starts and DOS has not the 512
-  bytes below the megabyte that the system's functions keep there; with
-  less memory above the megabyte than the program wants, the extender
-  does not start it, and says so in words of its own.
+- "Program too big to fit in memory" is said, as by the original, when
+  the program starts or comes back from a command and has too little
+  memory for its two panels and the least that the viewer needs: on a
+  machine with too little memory above the megabyte, or behind a
+  command that has kept some of it, as a program of the same extender
+  that stays in the memory would. No scenario shows that: a command of
+  DOS takes no memory of the extender's. The program says it too when
+  it starts and DOS has not the 512 bytes below the megabyte that the
+  system's functions keep there; and with less memory above the
+  megabyte than its objects need, the extender does not start it, and
+  says so in words of its own.
 - The Info panel, which says in the original how much memory a command
   gets, says nothing of the memory: see 11.
 - The map of the memory, which lists in the original what a command
@@ -196,13 +217,17 @@ word of 13 October 2026:
   setting would cost.
 - What it wants of the machine, where it cannot start. It is compiled
   for the 386 and started by an extender that needs one, and it wants
-  memory above the megabyte for all of itself, its 640 KB among it,
-  some 900 KB; the original runs on any PC that DOS runs on, and wants
-  no memory there. Without that memory the extender does not start it
-  and says so in its own words, not in the program's: "DOS/32A fatal
-  (4003): not enough extended memory to load application exec" is what
-  a second copy was told on the bench when the first had been left a
-  megabyte for the two of them. What a machine without a 386 is told is
+  memory above the megabyte for all of itself, for its two panels and
+  for the least of its room: the README's figures have how much, some
+  360 KB. The original runs on any PC that DOS runs on, and wants no
+  memory there. With too little for its objects the extender does not
+  start it and says so in its own words, not in the program's:
+  "DOS/32A fatal (4003): not enough extended memory to load application
+  exec" is what a second copy was told on the bench when the first had
+  been left a megabyte for the two of them, and the program ends with
+  FFh. With enough for its objects and too little for the rest, the
+  program says "Program too big to fit in memory", in the original's
+  words. What a machine without a 386 is told is
   the extender's as well, and was not seen: the bench has no such
   machine. And where the program itself says "Program too big to fit in
   memory", for want of the 512 bytes, the words are the original's,
@@ -574,7 +599,9 @@ font loaded, Print Screen told of the rows and the font asked about
 again, went with EGA lines (see 12); and INT 2Eh, a command handed to
 the COMMAND.COM that is in the memory, went with Quick execute commands,
 as did DOS asked for the current drive in two places for that way alone
-(see 14).
+(see 14); and DOS asked for memory, 48h and 4Ah in `Init11`, `TakeMem`
+and `Aexec0`, which are asked of the extender since the memory is its
+own (see 1, and the table of the calls below).
 
 | Routine | Call | The original | The C translation, where it differed |
 |---|---|---|---|
@@ -625,7 +652,6 @@ as did DOS asked for the current drive in two places for that way alone
 | `SaveSet`, `setup.c` | DOS 4300h, 3Ch, 40h and 3Eh, the setup file written | 4300h: BX the length of the file. 3Ch: AL the low byte of what 4300h answered, BX the length still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still |  |
 | `ReadOne`, `start.c` | DOS 3Dh, 3Fh and 3Eh, a file read | 3Dh: BX, CX, SI and DI 0. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  |
 | `Init00`, `start.c` | DOS 19h and 47h, the current drive and its directory; BIOS 00h, the mode set; DOS 09h, the banner written | BX 1 if the setup file was not one of the program's and 0 if it was or there is none, and from the BIOS's call on the page that is shown above that. CX 0 at 19h and 47h |  |
-| `Init11`, and `TakeMem`, which asks as it does, `start.c` | DOS 48h, a block of the memory, the second time | AL the low byte of the error of the first time, 8 for too little memory |  |
 | `IniData`, `start.c` | DOS 38h, the country, and DOS's routine for capitals, 128 times | 38h: BX and CX as the BIOS left them at the call before, the page and the shape of the cursor. The routine: AH as 38h left it |  |
 | `IniData`, `start.c`, where a command has left a screen that is not text of 80 columns | BIOS 01h, the cursor hidden; 00h, the mode set; 0Fh, the mode | 01h: AL the mode, as 0Fh left it (see below), and BX the page and the columns. 00h: BX the same, and CX 2000h, the shape that hides the cursor. 0Fh: AL as 00h left it, BX and CX the same |  |
 | `IniData`, `start.c` | BIOS 03h and 01h, the shape of the cursor asked for and set | 03h: AL the mode; BL, CX and DX as the calls before left them. 01h: AL as 03h left it, the mode from a BIOS that leaves AX alone (see below); BH the page; DX where the cursor is, as 03h answered |  |
@@ -650,7 +676,7 @@ as did DOS asked for the current drive in two places for that way alone
 | `Load`, and Home and the search of `V00_10`, `view.c` | DOS 4200h, a place of the file gone to | DS on the segment of the text |  |
 | `V13_00`, `view.c` | DOS 3Eh, the file closed | DS on the segment of the text. DX as the key before left it | DX the address of `TmpBuf` |
 | `Aexec0`, `view.c` | BIOS 03h, the shape of the cursor | BL the column that the box begins in |  |
-| `Aexec0`, `view.c` | DOS 4Ah, the block of the memory made shorter, 4B00h, the viewer run, and 4Ah twice, the block made longer | 4Ah: DX as the code or DOS before left it; the third time AL the low byte of the error of the second, 8. 4Ah the first time and 4B00h: CX, SI and DI as the code before left them | 4Ah: DX the address of the viewer's name. 4Ah the first time and 4B00h: CX, SI and DI 0 |
+| `Aexec0`, `view.c` | DOS 4B00h, the viewer run | CX, SI and DI as the code before left them | CX, SI and DI 0 |
 | `F34_11`, `view.c` | DOS 3Fh and 3Eh, the extension file read and closed, and 4Eh, the viewer looked for | 3Eh: CX and DS:DX the count and the buffer still. 3Fh and 4Eh: SI and DI, and at 4Eh BX, as the code before left them | 3Fh and 4Eh: SI and DI 0, and BX 0 at 4Eh |
 | `ChkMode`, `window.c` | BIOS 0Fh, the mode | BX as the caller has it |  |
 | `Cursor`, `window.c` | BIOS 0Fh and 02h, the cursor placed | 0Fh: AL the column, DX the place. 02h: AL the mode, as 0Fh left it |  |
@@ -750,8 +776,9 @@ which the portable C does not make, and one that it makes besides:
 | When | The original | The portable C |
 |---|---|---|
 | It starts | 4Ah, its own block made as long as the program is | Not that: the block is the extender's, which has asked DOS for it before the program is entered. Where the PSP is, the extender is asked, and not DOS. One call more, before the first of the program's: 48h for 20h paragraphs, the 512 bytes below the megabyte |
-| It starts, and comes back from a command | 2523h, Ctrl-C taken; 48h twice, how much memory there is and all of it taken; 3524h and 351Bh, who has the critical error and Ctrl-Break; 2524h and 251Bh, both taken. Behind a command 49h first, the memory given back | None of them. The memory of the panels, the viewer and the editor is the program's own 640 KB, handed out by `dos32.c` as DOS hands out its memory, and the three interrupts are taken through the extender, which DOS does not see: so `ErrVct` and `BrkVct` of the main data, where the original keeps who had the two, are never written |
-| It runs a command | 2524h and 251Bh, the two given back; 4Ah, the block of the panels made shorter | Neither, for the same two reasons. The extender is asked where INT 22h of real mode goes before 4B00h and has it put back behind it, since DOS changes it for the program that is run and the extender would write a warning of that when the program ends |
+| It starts, and comes back from a command | 2523h, Ctrl-C taken; 48h twice, how much memory there is and all of it taken; 3524h and 351Bh, who has the critical error and Ctrl-Break; 2524h and 251Bh, both taken. Behind a command 49h first, the memory given back | None of them. The memory of the panels, the viewer and the editor is the extender's, which it is asked for in the same order, by DPMI 0500h, 0501h and 0502h, and the three interrupts are taken through the extender: DOS sees neither. So `ErrVct` and `BrkVct` of the main data, where the original keeps who had the two, are never written |
+| It runs a command | 2524h and 251Bh, the two given back; 4Ah, the block of the panels made shorter | Neither, for the same two reasons: the room is given back to the extender, 0502h. The extender is asked where INT 22h of real mode goes before 4B00h and has it put back behind it, since DOS changes it for the program that is run and the extender would write a warning of that when the program ends |
+| It runs a viewer or an editor of another's | 4Ah, the block made as short as the panels and the least of the viewer, before 4B00h; behind it 4Ah twice, how long the block could be and the block made that long | None of them: the room is made that short by the extender, 0503h, and behind 4B00h given back and taken anew, as after a command, by 0502h, 0500h and 0501h |
 | It is left | 251Bh, Ctrl-Break given back | Not that: the extender gives back the three that the program took through it |
 
 Every other call is made as the original makes it, in the same order,
@@ -1635,27 +1662,32 @@ And the file search keeps its list of what it found there, which is
 full when the memory is.
 
 **What the portable C does.** The same, by the same statements, with
-the room that each of its builds has. In the program of 16 bits that is
-what DOS has left, as in the original, and less than the original's by
-what the program is larger. The program of 32 bits has its panels and
-its text in memory of its own, 640 KB that are a part of the program
-and that it hands out to itself where the program of 16 bits asks DOS
-(`TODO.md`, "The portable C in 32 bits: the plan", "The memory"): its
-editor has all of that but the two panels, 64K each, whatever DOS has
-free and however large the program is: 524,240 bytes, on any machine.
-On the bench of the tests that is half as much again as the original's
-room, 345,840 bytes. Until the panels had blocks of their own, of 64K
-from the start, it was 641,824 bytes with the lists that the bench has;
-`TODO.md`, "C1, the editor", has the figures as they were measured
-then, with that of the program of 16 bits.
+the room that it has. The program of 16 bits that it was had what DOS
+had left, as the original. The program of 32 bits has its panels and
+its text in the extender's memory, above the megabyte, of which it asks
+for as much as there is, as the original asks DOS (`TODO.md`, "The
+portable C in a flat memory: the plan", "The memory from the
+extender"): its editor has all of that but its own objects and its two
+panels, 64K each, whatever DOS has free. The README's figures have how
+much that is on the bench of the tests, some 15 MB: more than forty
+times the original's room there, 345,840 bytes. From when it was
+switched to 32 bits until the memory was the extender's, on 14 October
+2026, the program handed out 640 KB of its own instead, and its room
+was 641,824 bytes and then, with the panels in blocks of their own of
+64K from the start, 524,240 bytes on any machine; `TODO.md`, "C1, the
+editor", has the figures as they were measured then.
 
 So the program of 32 bits opens a file in the editor that the original
 refuses with its box, if the file is larger than the original's room
 and smaller than its own. A file that is larger than its own room it
 refuses as the original does, with the same box. A copy reads a file
-of that size in one piece where the original reads and writes it in
-two, and the file search has room for a longer list, 8,064 lines on the
-bench.
+of up to that size in one piece where the original reads and writes it
+in parts, and the file search has room for a list as long as that room
+holds. The editor's count of free bytes in its status line has seven
+cells, and from a million on shows the last seven characters of the
+number: that figure is left out of the comparison, and goes with every
+figure of free memory, on the user's word of 14 October 2026, in a
+piece of its own.
 
 **Why.** The user's decision, on 13 October 2026: the editor of the
 program of 32 bits has room for a file that the original's has none
@@ -1664,9 +1696,11 @@ much room there is was never the program's to say: the original has
 another room on every machine, and a file that it refuses on the bench
 it opens where less is loaded. A length chosen so that this build
 refuses what the original refuses on the bench would be a number made
-for a test, and would go with step 2 of the road, when the memory is
-the extender's and no longer a stretch of the program's own. It is no
-removal of something that only made sense on DOS, and was asked first.
+for a test. And the same day: from step 2 of the road on, the memory
+for the panels and the texts comes from the extender, as much as the
+machine has, and what a user then sees otherwise is declared, "an
+editor that opens whatever fits". It is no removal of something that
+only made sense on DOS, and was asked first.
 
 **Which scenarios show it.** `editor-big`, which makes a file of
 381,338 bytes, above the room of the original's editor on the bench
@@ -1684,6 +1718,14 @@ without View. `TODO.md`, "The editor's room: untested in the program of
 32 bits", lists what the scenario alone tested, what that program was
 seen to do with its other steps, and what would test it again.
 
+`view-window` has the editor refuse a file whose entry says a megabyte,
+which the room of the bench holds. It is run on a machine of 2 MB, for
+the original and for both C trees, where the program of 32 bits has a
+room of some 550 KB, and is refused the file as the original is: the
+original looks at nothing above the megabyte, and its golden, derived
+again on that machine, is what it was on the bench's (`memory` of a
+scenario, `harness/scenarios.py`, "A machine with less memory").
+
 Two scenarios are run for the program of 32 bits and pass, and do not
 get it where they get the original, for the same memory. Nothing says
 so when they are run, since a count of free memory is left out of the
@@ -1692,8 +1734,8 @@ much room a build has:
 
 | Scenario | What it is for | In the program of 32 bits |
 |---|---|---|
-| `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has 130,270 bytes free where the original has none. Seen, in the count of its status line |
-| `copy-big` | A file that the memory does not hold, 526,632 bytes, read and written in two parts, and skipped when not all of it has been read | As the original, since the room is 524,240 bytes: two parts, the first of 523,776 bytes where the original's is of 345,600, and skipped with not all of it read. Seen, in what the program has in its memory at the end of the scenario. While the room was 641,824 bytes, the memory held the file: one part |
+| `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has nearly all of its room free where the original has none. Seen, in the count of its status line. It was never full in the 640 KB either |
+| `copy-big` | A file that the memory does not hold, 526,632 bytes, read and written in two parts, and skipped when not all of it has been read | The memory holds the file: one part. While the room was 524,240 bytes, it was two parts as in the original, the first of 523,776 bytes where the original's is of 345,600, and skipped with not all of it read. A machine of 2 MB does not get it there either: its room is larger than the file |
 
 ### 14. No Quick execute commands
 

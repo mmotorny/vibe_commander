@@ -44,9 +44,9 @@
  *     protected mode, on a stack of its own. And the extender is
  *     entered on the program's stack at every call, and keeps there
  *     what it needs of the call that is under way.
- *   - The memory that the program asks for is neither DOS's nor the
- *     extender's, but 640 KB of the program's own, handed out as DOS
- *     hands out its memory: see MemTake.
+ *   - The memory that the program asks for is not DOS's but the
+ *     extender's, which hands it out in blocks that it knows by names
+ *     of its own: see MemTake.
  *
  * The memory of the machine that the program reads and writes, the
  * BIOS's data and the cells of the display, is at the addresses that it
@@ -130,10 +130,10 @@ static u32 Dos(struct DosRegs *regs);
     parm [ebx] value [eax] modify exact [eax ebx ecx edx esi edi]
 
 /* INT 31h, the extender's own services, which are DPMI's, with the
-   registers of `regs`, as Dos has DOS's: EAX, EBX, ECX and EDX go back
-   into `regs`, and what is returned is not 0 if the extender leaves the
-   carry flag set, which is how it says that it refused. EDI is the
-   address of what a service takes at ES:EDI. */
+   registers of `regs`, as Dos has DOS's: EAX, EBX, ECX, EDX, ESI and EDI
+   go back into `regs`, and what is returned is not 0 if the extender
+   leaves the carry flag set, which is how it says that it refused. EDI
+   is the address of what a service takes at ES:EDI. */
 static u32 Dpmi(struct DosRegs *regs);
 #pragma aux Dpmi = \
     "push ebp" \
@@ -149,6 +149,8 @@ static u32 Dpmi(struct DosRegs *regs);
     "mov [ebx],eax" \
     "mov [ebx+8],ecx" \
     "mov [ebx+12],edx" \
+    "mov [ebx+16],esi" \
+    "mov [ebx+20],edi" \
     "pop eax" \
     "mov [ebx+4],eax" \
     "pop ebp" \
@@ -261,6 +263,17 @@ static u16 LowSeg = 0;
 #define DPMI_VECTOR 0x0204              /* where the interrupt in BL goes
                                            in protected mode: CX:EDX */
 #define DPMI_SET_VECTOR 0x0205          /* and that set */
+#define DPMI_FREE      0x0500           /* what memory is free: ES:EDI 48
+                                           bytes, of which the first four
+                                           are the largest block that there
+                                           is, in bytes */
+#define DPMI_TAKE      0x0501           /* a block of BX:CX bytes: where it
+                                           is in BX:CX, its name in SI:DI */
+#define DPMI_GIVE      0x0502           /* the block named in SI:DI given
+                                           back */
+#define DPMI_RESIZE    0x0503           /* the block named in SI:DI made
+                                           BX:CX bytes: where it is then in
+                                           BX:CX, and its name in SI:DI */
 #define DPMI_REAL_INT  0x0300           /* an interrupt in real mode: BL
                                            which, CX words of the stack to
                                            take along, ES:EDI the
@@ -291,8 +304,9 @@ static u32 StackNow(void);
 static u32 Below = 0;
 
 /* The extender, asked for the service `ax` with these registers, and
-   with `at` for what the service takes at ES:EDI. EAX, EBX, ECX and EDX
-   are in `regs` afterwards as it leaves them. Not 0 if it refused. */
+   with `at` for what the service takes at ES:EDI. EAX, EBX, ECX, EDX,
+   ESI and EDI are in `regs` afterwards as it leaves them. Not 0 if it
+   refused. */
 static u16 Extender(struct DosRegs *regs, u16 ax, u32 ebx, u32 ecx, u32 edx,
                     void *at)
 {
@@ -873,242 +887,188 @@ u16 DriveCd(u16 drive)
     return (u16)(pair >> 16) == 0xADAD && (u16)pair != 0;
 }
 
-/* Memory. In 16 bits it is DOS's, in blocks that DOS hands out by their
-   segments. Here a block is still known by its segment, as long as a
-   segment is a number in the program (vc.h, "The words of the
-   addresses"): so the memory that it gets has to be where a segment can
-   name it, in the megabyte that begins 64K below the main data, and
-   that is no memory of DOS's nor a block that the extender gives
-   wherever it likes. It is of the program's own: 640 KB among what has
-   no value, which the linker is to have behind the main data, with a
-   paragraph more.
+/* Memory: the extender's, above the megabyte, in blocks that it gives
+   wherever it has them, DPMI 0500h to 0503h. DOS is asked nothing for
+   it, and has no memory of its own there. A block is known to the
+   extender by a name of its own, which it answers with when it gives the
+   block and which it is told when the block is given back or made
+   longer or shorter; to the program by where it begins. So what is kept
+   here of each block that the program holds, where it begins, how long
+   it is and its name, is in a table, Blocks, in the order in which the
+   blocks were taken. The tests read it, to take each block into the
+   image of the program's data (harness/dataimage.py, _handed).
 
-   It is handed out as DOS hands out its own, since the program goes by
-   that: a block is known by its paragraph in the megabyte, the lowest
-   block that is long enough is given, a refusal says how long the
-   longest is, and free blocks that lie one behind the other become one
-   when the memory is looked through and not when a block is given
-   back. What it answers with, DOS's AX and its numbers for an error, is
-   what the DOS of the test bench answers, FreeDOS.
+   An address that the extender answers with is of the machine's memory,
+   and is a pointer as it is: the program's segments begin at 0.
 
-   What is kept of the blocks, where each begins, how long it is and
-   whether it is taken, is in a table beside the memory, OwnBlocks, and
-   not in the memory itself, where DOS has it. In the memory there is a
-   paragraph in front of each block and one behind the last, and each
-   holds 16 bytes of a pattern, GUARD_FIRST on: in front of a block from
-   when it is taken, behind the last from the start. Nothing reads
-   them here. The extender, when the memory is its own, keeps 16 bytes
-   between two blocks and ends a program that has written into them;
-   the pattern is there so that such a write is seen before that day,
-   by the tests, which look at the pattern at the end of every scenario
-   (harness/dataimage.py, GUARD). */
+   What the extender was seen to do with its blocks on the bench is in
+   TODO.md, "X, the extender's memory on the bench": a block is given
+   with what the memory held there; it keeps 16 bytes of its own in front
+   of every block and ends the program, at its next call for memory,
+   where a write has gone into them; and refused a longer block it does
+   not say how long the block could be, where DOS does. */
 
-#define OWN_PARAGRAPHS 0xA000           /* 640 KB */
-#define OWN_BLOCKS     8                /* as many as the table has room
-                                           for: the program has three,
-                                           and what is free between */
+#define BLOCKS_MOST 8                   /* as many as the table has room
+                                           for: the program has three */
 
-static u8 Own[((u32)OWN_PARAGRAPHS + 1) * 16 + 15];
-
-/* The first paragraph of it in the megabyte, and how many paragraphs
-   there are from there on: none if it is not where a segment can name
-   all of it. */
-static u16 OwnFirst = 0, OwnCount = 0;
-
-/* A block: the paragraph of the megabyte that it begins in, its
-   paragraphs, and whether it is taken. The blocks of the table are in
-   the order in which they lie, each a paragraph behind the end of the
-   one before, and together they are all of the memory. */
 struct Held {
-    u16 block;
-    u16 paragraphs;
-    u16 taken;
+    u8 *block;                          /* where it begins */
+    i32 bytes;                          /* how many it has */
+    u32 name;                           /* the extender's name for it: SI
+                                           above DI */
 };
 
-static struct Held OwnBlocks[OWN_BLOCKS] = { { 0, 0, 0 } };
-static u32 OwnHeld = 0;                 /* how many blocks there are */
+static struct Held Blocks[BLOCKS_MOST] = { { 0, 0, 0 } };
+static i32 BlocksHeld = 0;              /* how many there are */
 
-#define GUARD_BYTES 16
-#define GUARD_FIRST 0xF0                /* the pattern: F0h, EFh, EEh, and
-                                           so on down to E1h */
+#define BYTES_MOST 0x7FFFFFFF           /* more than a block can have */
 
-#define ERR_NO_FUNCTION 1               /* DOS's error for a call that it
-                                           does not know */
-#define ERR_BAD_CHAIN   7               /* for what it keeps of its blocks
-                                           being spoilt */
-#define ERR_NO_MEMORY   8               /* for want of memory */
+#define ERR_NO_MEMORY   8               /* DOS's error for want of
+                                           memory */
 #define ERR_NO_BLOCK    9               /* and for a block that is none */
 
-/* The pattern, in the paragraph in front of `paragraph`. */
-static void Guard(u16 paragraph)
+/* How many bytes the largest block has that the extender can give: the
+   first number of 0500h. 0501h gives that many, and refuses one more. */
+static i32 Largest(void)
 {
-    u8 *to = AT(paragraph - 1, 0);
-    u16 i;
+    struct DosRegs regs;
+    u32 free[12];                       /* the 48 bytes of 0500h */
 
-    for (i = 0; i < GUARD_BYTES; i++)
-        to[i] = (u8)(GUARD_FIRST - i);
+    free[0] = 0;
+    if (Extender(&regs, DPMI_FREE, 0, 0, 0, free) != 0)
+        return 0;
+    if (free[0] > BYTES_MOST)
+        return BYTES_MOST;
+    return (i32)free[0];
 }
 
-/* The start of the program has all of it be one block that is free,
-   with the pattern behind it. */
-static void OwnSet(void)
+/* Which block of the table `block` is: BlocksHeld if it is none. */
+static i32 Known(const u8 *block)
 {
-    u32 first = (u32)(Own + 15 - ARENA) >> 4;
+    i32 i;
 
-    if (first > 0xFFFF - OWN_PARAGRAPHS)
-        return;
-    OwnFirst = (u16)first;
-    OwnCount = OWN_PARAGRAPHS + 1;
-    OwnBlocks[0].block = OwnFirst + 1;
-    OwnBlocks[0].paragraphs = OWN_PARAGRAPHS - 1;
-    OwnBlocks[0].taken = 0;
-    OwnHeld = 1;
-    Guard(OwnFirst + OwnCount);
-}
-
-/* Which block of the table `block` is: OwnHeld if it is none. */
-static u32 Known(u16 block)
-{
-    u32 i;
-
-    for (i = 0; i < OwnHeld; i++)
-        if (OwnBlocks[i].block == block)
+    for (i = 0; i < BlocksHeld; i++)
+        if (Blocks[i].block == block)
             break;
     return i;
 }
 
-/* The free blocks that follow the block `at` of the table become part
-   of it. */
-static void Join(u32 at)
-{
-    struct Held *held = &OwnBlocks[at];
-    u32 i;
-
-    while (at + 1 < OwnHeld && !held[1].taken) {
-        held->paragraphs += held[1].paragraphs + 1;
-        OwnHeld--;
-        for (i = at + 1; i < OwnHeld; i++)
-            OwnBlocks[i] = OwnBlocks[i + 1];
-    }
-}
-
-/* The block `at` of the table made so many paragraphs, which is no more
-   than it has: what is left behind it becomes a block that is free. A
-   table that is full leaves the block as long as it is. */
-static void Split(u32 at, u16 paragraphs)
-{
-    struct Held *held = &OwnBlocks[at];
-    u32 i;
-
-    if (held->paragraphs == paragraphs || OwnHeld == OWN_BLOCKS)
-        return;
-    for (i = OwnHeld; i > at + 1; i--)
-        OwnBlocks[i] = OwnBlocks[i - 1];
-    OwnHeld++;
-    held[1].block = held->block + paragraphs + 1;
-    held[1].paragraphs = held->paragraphs - paragraphs - 1;
-    held[1].taken = 0;
-    held->paragraphs = paragraphs;
-}
-
-static struct Block Refused(u16 error, u16 largest)
+static struct Block Refused(u16 error, i32 largest)
 {
     struct Block block;
 
+    block.block = 0;
     block.value = error;
     block.failed = 0xFFFF;
     block.largest = largest;
     return block;
 }
 
-struct Block MemTake(u16 paragraphs)
+/* What the extender has answered with in BX:CX, where a block is. */
+static u8 *Where(const struct DosRegs *regs)
 {
+    return (u8 *)((u32)(u16)regs->ebx << 16 | (u16)regs->ecx);
+}
+
+/* And in SI:DI, the block's name. */
+static u32 NameOf(const struct DosRegs *regs)
+{
+    return (u32)(u16)regs->esi << 16 | (u16)regs->edi;
+}
+
+/* The extender asked for the service `ax` of the block that it calls
+   `name`, with `bytes` in BX:CX. Not 0 if it refused. */
+static u16 OfBlock(struct DosRegs *regs, u16 ax, u32 name, i32 bytes)
+{
+    regs->eax = ax;
+    regs->ebx = (u32)bytes >> 16;
+    regs->ecx = (u32)bytes & 0xFFFF;
+    regs->edx = 0;
+    regs->esi = name >> 16;
+    regs->edi = name & 0xFFFF;
+    regs->low = 0;
+    Below = StackNow() - STACK_KEPT;
+    return (u16)Dpmi(regs);
+}
+
+struct Block MemTake(i32 bytes)
+{
+    struct DosRegs regs;
     struct Block block;
     struct Held *held;
-    u32 at;
-    u16 largest = 0;
+    i32 largest = Largest();
 
-    if (OwnCount == 0)
-        return Refused(ERR_NO_MEMORY, 0);
-    for (at = 0; ; at++) {
-        held = &OwnBlocks[at];
-        if (!held->taken) {
-            Join(at);
-            if (held->paragraphs >= paragraphs)
-                break;
-            if (held->paragraphs > largest)
-                largest = held->paragraphs;
-        }
-        if (at + 1 == OwnHeld)
-            return Refused(ERR_NO_MEMORY, largest);
-    }
-    Split(at, paragraphs);
-    held->taken = 1;
-    Guard(held->block);
-    block.value = held->block;
+    if (bytes <= 0 || bytes > largest || BlocksHeld == BLOCKS_MOST)
+        return Refused(ERR_NO_MEMORY, largest);
+    if (Extender(&regs, DPMI_TAKE, (u32)bytes >> 16, (u32)bytes & 0xFFFF, 0,
+                 0) != 0)
+        return Refused(ERR_NO_MEMORY, Largest());
+    held = &Blocks[BlocksHeld++];
+    held->block = Where(&regs);
+    held->bytes = bytes;
+    held->name = NameOf(&regs);
+    block.block = held->block;
+    block.value = 0;
     block.failed = 0;
-    block.largest = paragraphs;
+    block.largest = bytes;
     return block;
 }
 
-/* A block that is given back stays as long as it is, and is given back
-   a second time without a word, as DOS has it. */
-struct Answer MemGive(u16 block)
+struct Answer MemGive(u8 *block)
 {
+    struct DosRegs regs;
     struct Answer answer;
-    u32 at = Known(block);
+    i32 at = Known(block), i;
 
-    if (at == OwnHeld) {
-        answer.value = ERR_NO_BLOCK;
-        answer.failed = 0xFFFF;
+    answer.value = ERR_NO_BLOCK;
+    answer.failed = 0xFFFF;
+    if (at == BlocksHeld)
         return answer;
-    }
-    OwnBlocks[at].taken = 0;
-    answer.value = 0x4900;
+    if (OfBlock(&regs, DPMI_GIVE, Blocks[at].name, 0) != 0)
+        return answer;
+    BlocksHeld--;
+    for (i = at; i < BlocksHeld; i++)
+        Blocks[i] = Blocks[i + 1];
+    answer.value = 0;
     answer.failed = 0;
     return answer;
 }
 
-/* A block that is to be longer is first made as long as it can be, by
-   what is free behind it, and stays so where that is not long enough:
-   the refusal says how long it is then. */
-struct Block MemResize(u16 block, u16 paragraphs)
+/* The extender says nothing of how long a block could be where it will
+   not make it as long as it is asked: the refusal answers with how long
+   the block is, which it keeps, and where it is. */
+struct Block MemResize(u8 *block, i32 bytes)
 {
+    struct DosRegs regs;
     struct Block made;
     struct Held *held;
-    u32 at = Known(block);
+    i32 at = Known(block);
 
-    if (at == OwnHeld)
-        return Refused(ERR_BAD_CHAIN, paragraphs);
-    held = &OwnBlocks[at];
-    if (paragraphs > held->paragraphs) {
-        Join(at);
-        if (paragraphs > held->paragraphs)
-            return Refused(ERR_NO_MEMORY, held->paragraphs);
-    }
-    if (paragraphs < held->paragraphs) {
-        Split(at, paragraphs);
-        if (at + 1 < OwnHeld && !held[1].taken)
-            Join(at + 1);
-    }
-    if (!held->taken)
-        Guard(held->block);
-    held->taken = 1;
-    made.value = block;
+    if (at == BlocksHeld)
+        return Refused(ERR_NO_BLOCK, 0);
+    held = &Blocks[at];
+    if (bytes <= 0)
+        return Refused(ERR_NO_MEMORY, held->bytes);
+    if (OfBlock(&regs, DPMI_RESIZE, held->name, bytes) != 0)
+        return Refused(ERR_NO_MEMORY, held->bytes);
+    held->block = Where(&regs);
+    held->bytes = bytes;
+    held->name = NameOf(&regs);
+    made.block = held->block;
+    made.value = 0;
     made.failed = 0;
-    made.largest = paragraphs;
+    made.largest = bytes;
     return made;
 }
 
 /* The memory that the program is in is the extender's to hand out, and
-   it has given the program what its file says and no more; what
-   MemTake hands out is of the program's own. So there is nothing to
-   make shorter, and nothing has failed: `paragraphs` is as it came,
-   none. */
+   it has given the program what its file says and no more. So there is
+   nothing to make shorter, and nothing has failed. */
 struct Block MemOwn(void)
 {
     struct Block block;
 
+    block.block = 0;
     block.value = 0;
     block.failed = 0;
     block.largest = 0;
@@ -1117,7 +1077,7 @@ struct Block MemOwn(void)
 
 /* How DOS looks through its own memory, which is what a program that
    this one runs is given of: DOS is told as it is in 16 bits, though
-   the program's own blocks are not DOS's here. */
+   the program's blocks are not DOS's here. */
 void MemSetSearch(u16 how)
 {
     struct DosRegs regs;
@@ -1997,7 +1957,6 @@ static const u8 NoStart_S[] = "Program too big to fit in memory\r\n$";
        mode: DOS has it for the program, and takes it back when the
        program ends. A command that the program runs finds that much
        less of DOS's memory.
-     - The program's own memory, for MemTake.
 
    A program that does not get the block says that it is too big to
    fit in the memory, in the original's words, and ends at once, with
@@ -2020,6 +1979,5 @@ void Start(void)
         ProgramEnd(ERR_NO_MEMORY);
     }
     LowSeg = (u16)regs.eax;
-    OwnSet();
     Main();
 }
