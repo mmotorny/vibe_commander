@@ -72,6 +72,19 @@ else in this document is decided.
   are under "Decided in this area" there; how the saving sits with
   decision 15 of the file systems is under "Decided in this area" of
   "Area: file systems" below.
+- **Language, text and time**, the ten questions of `layer/i18n.md`, 14
+  October 2026: the layer reports the country's facts and the program
+  writes dates, times and numbers in its columns, DOS unchanged; a
+  panel's names in the order of the platform's file manager off DOS;
+  capitals beyond ASCII by each platform's own call off DOS, against
+  the recommendation of a pinned table, DOS still asked for every byte;
+  the code page asked of DOS once at the start, 6601h, a deviation; the
+  program in English only for now; conventions from the environment on
+  Linux and from the user's settings on macOS and iOS; a character's
+  width answered by the layer; the ticks starting again at midnight on
+  DOS as the original's; the setup's Country info kept off DOS without
+  the code page's table; no Unicode library. The answers are under
+  "Decided in this area" there.
 
 Each of these stands in the design that is being made anew.
 
