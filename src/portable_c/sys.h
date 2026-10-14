@@ -59,25 +59,6 @@
 #ifndef SYS_H
 #define SYS_H
 
-/* What crosses to the system in a number that says how much, by what
-   the number counts. Each is 32 bits wide here, on DOS with an
-   extender. The design of the layer may give each another width, a
-   file's size above all, which is more than 32 bits elsewhere, and
-   other names: nothing of the program is to count on 32. Until the
-   functions below take and answer in them, they are defined and not
-   used (TODO.md, "What crosses to the system").
-
-   FileSize   the length of a file, and a place in one, counted from
-              its start
-   FileStep   a step in a file from where it is at or from its end,
-              which may be back: FileSize with a sign
-   ByteCount  how many bytes are read or written at once
-   MemSize    a size in the memory, in bytes */
-typedef u32 FileSize;
-typedef i32 FileStep;
-typedef u32 ByteCount;
-typedef u32 MemSize;
-
 struct DTAs;                            /* what is known of a file that
                                            was found, */
 struct CNTRY;                           /* and how a country writes

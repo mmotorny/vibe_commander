@@ -9,84 +9,124 @@ portable_c-width holds the tree to this. `python3 harness/width.py
 makes entries of a file that is not sorted.
 
 The columns: the numbers of 8 or 16 bits that there are; of those,
-how many are in what nobody has sorted, and how many are kept with
-a reason, the rest being of a structure that is laid out or of a
-file as a whole; the cuts; and how many numbers are declared as
-u32, as bool and with a sign. A cluster takes the `not sorted` of
-its row to nothing.
+how many are in what nobody has sorted, how many have their width
+by what they are and say so by a word of the list below, and how
+many are kept with a reason of their own, the rest being of a
+structure that is laid out or of a file as a whole; the cuts; and
+how many numbers are declared as u32, as bool and with a sign. A
+cluster takes the `not sorted` of its row to nothing.
 
-cluster    8 or 16 not sorted  kept  cuts   u32  bool signed  its files
-N0              34          0    34    29    29     3      0  digits.c mask.c line.c mouse.c blank.c
-N1             133        133     0    48     2     0      0  string.c format.c box.c screen.c misc.c
-N2             142        142     0    71     0     0      0  dialog.c
-N3, N4         197        197     0   211    13     0      0  view.c
-N5             125        125     0    78     1     0      0  find.c
-N6 to N8       248        248     0   278    37     0      0  edit.c
-N9             111        111     0    68     6     0      0  copy.c
-N10            137        137     0    55     0     0      0  dirfunc.c
-N11            112        112     0    61     1     0      0  files.c read.c place.c
-N12             88         88     0   113     3     0      0  panel.c info.c drive.c
-N13             71         71     0   102     0     0      0  tree.c treebox.c extfile.c
-N14            128        128     0    95     0     0      0  cmdline.c enter.c exec.c
-N15            114        114     0   109     3     0      0  input.c usermenu.c
-N16            108        108     0    75     0     0      0  main.c
-N17            222        222     0    58     0     0      0  keys.c commands.c
-N18            116        116     0   106     1     0      0  menu.c help.c
-N19            156        156     0    61     1     0      0  bars.c window.c system.c setup.c start.c
-N20            120        120     0    89     0     0      0  stcolor.c stopts.c
-N21             88         88     0    59     3     0      0  stmain.c sthelp.c
-as a whole     582          0     0    57    65     0      0  the tables, dos32.c stack.c
-headers        305        133   139     0     0     0      0  vc.h sys.h tables.h
-all           3337       2549   173  1823   165     3      0
+The words, for a number that has its width by what it is. Such a
+number has its word for a reason, alone or with what is not plain
+behind a colon. The code has no name for any of them.
 
-file           8 or 16 not sorted  kept  cuts   u32  bool signed
-vc.h               248         76   139     0     0     0      0
-sys.h               37         37     0     0     0     0      0
-tables.h            20         20     0     0     0     0      0
-bars.c              42         42     0    22     0     0      0
-blank.c             12          0    12     6     7     0      0
-box.c               50         50     0    16     0     0      0
-cmdline.c           64         64     0    55     0     0      0
-commands.c         116        116     0    13     0     0      0
-copy.c             111        111     0    68     6     0      0
-dialog.c           142        142     0    71     0     0      0
-digits.c             2          0     2     5     5     0      0
-dirfunc.c          137        137     0    55     0     0      0
-drive.c             28         28     0    39     0     0      0
-edit.c             248        248     0   278    37     0      0
-enter.c             48         48     0    27     0     0      0
-exec.c              16         16     0    13     0     0      0
-extfile.c            8          8     0     3     0     0      0
-files.c             42         42     0    24     0     0      0
-find.c             125        125     0    78     1     0      0
-format.c            38         38     0     9     2     0      0
-help.c              58         58     0    55     1     0      0
-info.c              18         18     0    27     2     0      0
-input.c             59         59     0    37     3     0      0
-keys.c             106        106     0    45     0     0      0
-line.c               4          0     4     7    10     0      0
-main.c             108        108     0    75     0     0      0
-mask.c               4          0     4     2     3     1      0
-menu.c              58         58     0    51     0     0      0
-misc.c              16         16     0     9     0     0      0
-mouse.c             12          0    12     9     4     2      0
-panel.c             42         42     0    47     1     0      0
-place.c             26         26     0    20     0     0      0
-read.c              44         44     0    17     1     0      0
-screen.c            15         15     0     4     0     0      0
-setup.c              9          9     0     2     0     0      0
-start.c             42         42     0    17     0     0      0
-stcolor.c           86         86     0    73     0     0      0
-sthelp.c            48         48     0    41     3     0      0
-stmain.c            40         40     0    18     0     0      0
-stopts.c            34         34     0    16     0     0      0
-string.c            14         14     0    10     0     0      0
-system.c            22         22     0     7     1     0      0
-tree.c              22         22     0    25     0     0      0
-treebox.c           41         41     0    74     0     0      0
-usermenu.c          55         55     0    72     0     0      0
-view.c             197        197     0   211    13     0      0
-window.c            41         41     0    13     0     0      0
+    character   a character: a byte as a text has it, or in 16 bits as
+                the original has it in a register, the character being
+                the low byte
+    colour      the number of one of the program's colours, or the
+                attribute of a cell that Color makes of it: a byte, in
+                16 bits where the original has it in a register
+    cell        a cell of the screen as the display's memory has it, the
+                character in the low byte and its colour in the high
+                one, or an array of them; or the colour alone in its
+                place
+    place       a row and a column of the screen in two bytes, the row
+                in the high one, as the BIOS has the place of the
+                cursor; or as many rows and columns, the size of a
+                window
+    key         a key as the BIOS answers it, the character in the low
+                byte and the scan code in the high one
+    time        a time or a date as DOS has it, in the bytes or the bits
+                of its answer
+    handle      the handle of a file, as DOS answers it
+    attributes  the attributes of a file, in DOS's bits
+    random      one of the program's random numbers, or of the two words
+                that they are made of: 16 bits, which wrap round
+    system      something else that the system answers in or takes,
+                which is said behind the word
+    setup       a byte of the setup file, which stays a byte
+    flag        true or false, in a byte of the layout: the code asks
+                whether it is 0
+    text        characters, or the bytes of a file or of a buffer
+    address     a segment or a place of DOS's memory, which a piece of
+                the addresses takes out of the structure as a pointer
+    small       a number that what it counts keeps within its width,
+                which is said behind the word
+    unused      of the original, and neither set nor read here
+    M           to be widened: the piece M takes it out of the structure
+
+cluster    8 or 16 not sorted by word  kept  cuts   u32  bool signed  its files
+N0              34          0      34     0    29    29     3      0  digits.c mask.c line.c mouse.c blank.c
+N1             133        133       0     0    48     2     0      0  string.c format.c box.c screen.c misc.c
+N2             142        142       0     0    71     0     0      0  dialog.c
+N3, N4         197        197       0     0   211    13     0      0  view.c
+N5             125        125       0     0    78     1     0      0  find.c
+N6 to N8       248        248       0     0   278    37     0      0  edit.c
+N9             111        111       0     0    68     6     0      0  copy.c
+N10            137        137       0     0    55     0     0      0  dirfunc.c
+N11            112        112       0     0    61     1     0      0  files.c read.c place.c
+N12             88         88       0     0   113     3     0      0  panel.c info.c drive.c
+N13             71         71       0     0   102     0     0      0  tree.c treebox.c extfile.c
+N14            128        128       0     0    95     0     0      0  cmdline.c enter.c exec.c
+N15            114        114       0     0   109     3     0      0  input.c usermenu.c
+N16            108        108       0     0    75     0     0      0  main.c
+N17            222        222       0     0    58     0     0      0  keys.c commands.c
+N18            116        116       0     0   106     1     0      0  menu.c help.c
+N19            156        156       0     0    61     1     0      0  bars.c window.c system.c setup.c start.c
+N20            120        120       0     0    89     0     0      0  stcolor.c stopts.c
+N21             88         88       0     0    59     3     0      0  stmain.c sthelp.c
+as a whole     582          0       0     0    57    65     0      0  the tables, dos32.c stack.c
+headers        305        133     138     1     0     0     0      0  vc.h sys.h tables.h
+all           3337       2549     172     1  1823   165     3      0
+
+file           8 or 16 not sorted by word  kept  cuts   u32  bool signed
+vc.h               248         76     138     1     0     0     0      0
+sys.h               37         37       0     0     0     0     0      0
+tables.h            20         20       0     0     0     0     0      0
+bars.c              42         42       0     0    22     0     0      0
+blank.c             12          0      12     0     6     7     0      0
+box.c               50         50       0     0    16     0     0      0
+cmdline.c           64         64       0     0    55     0     0      0
+commands.c         116        116       0     0    13     0     0      0
+copy.c             111        111       0     0    68     6     0      0
+dialog.c           142        142       0     0    71     0     0      0
+digits.c             2          0       2     0     5     5     0      0
+dirfunc.c          137        137       0     0    55     0     0      0
+drive.c             28         28       0     0    39     0     0      0
+edit.c             248        248       0     0   278    37     0      0
+enter.c             48         48       0     0    27     0     0      0
+exec.c              16         16       0     0    13     0     0      0
+extfile.c            8          8       0     0     3     0     0      0
+files.c             42         42       0     0    24     0     0      0
+find.c             125        125       0     0    78     1     0      0
+format.c            38         38       0     0     9     2     0      0
+help.c              58         58       0     0    55     1     0      0
+info.c              18         18       0     0    27     2     0      0
+input.c             59         59       0     0    37     3     0      0
+keys.c             106        106       0     0    45     0     0      0
+line.c               4          0       4     0     7    10     0      0
+main.c             108        108       0     0    75     0     0      0
+mask.c               4          0       4     0     2     3     1      0
+menu.c              58         58       0     0    51     0     0      0
+misc.c              16         16       0     0     9     0     0      0
+mouse.c             12          0      12     0     9     4     2      0
+panel.c             42         42       0     0    47     1     0      0
+place.c             26         26       0     0    20     0     0      0
+read.c              44         44       0     0    17     1     0      0
+screen.c            15         15       0     0     4     0     0      0
+setup.c              9          9       0     0     2     0     0      0
+start.c             42         42       0     0    17     0     0      0
+stcolor.c           86         86       0     0    73     0     0      0
+sthelp.c            48         48       0     0    41     3     0      0
+stmain.c            40         40       0     0    18     0     0      0
+stopts.c            34         34       0     0    16     0     0      0
+string.c            14         14       0     0    10     0     0      0
+system.c            22         22       0     0     7     1     0      0
+tree.c              22         22       0     0    25     0     0      0
+treebox.c           41         41       0     0    74     0     0      0
+usermenu.c          55         55       0     0    72     0     0      0
+view.c             197        197       0     0   211    13     0      0
+window.c            41         41       0     0    13     0     0      0
 
 ----
 
@@ -114,112 +154,112 @@ vc.h, struct STAR: laid out, 2 numbers
     The original's: a star of the main data, whose layout is kept.
 
 vc.h, struct MainDat: field ColTab, u8[240]
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field FulScr, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field MenuVs, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field KeyBar, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field Prompt, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field InsDwn, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field AutoMnu, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field MiniSta, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field Clock, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field AutoCD, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field AutoSav, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ColTyp, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field BlDelay, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field LoadFl, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field UnSlct, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ErrSnd, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field LftMous, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ZoomWin, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field AltBar, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field EscBar, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ExecTyp, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field AutoSiz, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field HidDirs, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field QuitAck, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field SnowMod, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field AltView, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field AltEdit, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ClrBuf, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field Active, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field Ctrl_O, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ChkTSR, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ChgTree, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field DriveB, u8
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field DelayTm, u8[2]
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field StarTab, u8[5]
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field ResIni, u8[51]
-    setup: a byte of the setup file, which stays a byte.
+    setup
 
 vc.h, struct MainDat: field LoadRes, u8
     setup: LoadFl as the setup has it, kept while a command has it
@@ -229,24 +269,22 @@ vc.h, struct MainDat: field ScrMod, u8
     system: the mode of the display, as the BIOS has it.
 
 vc.h, struct MainDat: field Mouse, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field BreakFl, u8
     system: what DOS answers of its check for Ctrl-Break.
 
 vc.h, struct MainDat: field MenuFl, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field SelMas, u8[13]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field HstBuf, u8[512]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field ExtMain, u8[512]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field MouseX, u16
     system: where the mouse is, in dots as its driver answers, or 0FFFFh
@@ -257,42 +295,41 @@ vc.h, struct MainDat: field MouseY, u16
     for nowhere.
 
 vc.h, struct MainDat: field BatAdr, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field BatPoin, u16
-    unused: of the original, and neither set nor read here.
+    unused
 
 vc.h, struct MainDat: field LastMnu, u16
     small: a menu and its item, a byte each.
 
 vc.h, struct MainDat: field OvlPth, u16
-    unused: of the original, and neither set nor read here.
+    unused
 
 vc.h, struct MainDat: field ComSpec, u16
     M: a place in the environment, counted from its start, which is
     longer than 64K on other systems.
 
 vc.h, struct MainDat: field CrnPath, u8[68]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field ViewFil, u8[65]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field ToFile, u8[65]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field FindStr, u8[65]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field SrchStr, u8[65]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field DosChg, u8[5]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field DosBuf, u8[1000]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field DosLin, u8
     small: a row or a column of the screen, a byte as the BIOS has them.
@@ -310,129 +347,107 @@ vc.h, struct MainDat: field ScrPage, u8
     system: the page that the display shows.
 
 vc.h, struct MainDat: field TstEGA, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field Lines, u8
     small: the rows of the screen, a byte as the BIOS has them.
 
 vc.h, struct MainDat: field Snow, u8
-    unused: of the original, and neither set nor read here.
+    unused
 
 vc.h, struct MainDat: field TopView, u8
-    unused: of the original, and neither set nor read here.
+    unused
 
 vc.h, struct MainDat: field DesqVie, u8
-    unused: of the original, and neither set nor read here.
+    unused
 
 vc.h, struct MainDat: field WinLeav, u8
-    unused: of the original, and neither set nor read here.
+    unused
 
 vc.h, struct MainDat: field CrntCol, u8
     colour
 
 vc.h, struct MainDat: field Quote, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field BarPrev, u8
     small: the number of a key bar, or 0FFh for none.
 
 vc.h, struct MainDat: field SftErr, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field BlocEr, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field PathEr, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field FlagCD, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field TreeTyp, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field WinMous, u8
-    bits: what the mouse has done in a window, each asked by itself.
+    flag: several, a bit each, of what the mouse has done in a window.
 
 vc.h, struct MainDat: field MousEnt, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field OldFlg, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field HlpPage, u8
     small: the page of the help, or 0FFh for none.
 
 vc.h, struct MainDat: field ZoomOne, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field OneFile, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field ErrDat, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct MainDat: field VerDOS, u16
     system: DOS's version, as it answers it.
 
 vc.h, struct MainDat: field WCBcrn, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field WCBsec, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field WCB1seg, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field WCB2seg, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field ViewSeg, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field MemSeg, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field FreMem2, u16
     address: the room in paragraphs, which the piece F1 takes out of the
     main data. The clusters that count the room count it in bytes.
 
 vc.h, struct MainDat: field Memorys, u16
-    unused: of the original, and neither set nor read here.
+    unused
 
 vc.h, struct MainDat: field HstAdr, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field TreAdr, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field TreFrst, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field TreCrnt, u16
-    address: a segment or a place of DOS's memory, which a piece of the
-    addresses takes out of the main data as a pointer.
+    address
 
 vc.h, struct MainDat: field ClstSiz, u16
     M: the bytes of a cluster, a sector's bytes times its sectors. On a
@@ -453,12 +468,10 @@ vc.h, struct MainDat: field InfoLen, u16
     or 0FFFFh for none.
 
 vc.h, struct MainDat: field Rand1, u16
-    wraps: one of the two words that the program's random numbers are
-    made of.
+    random
 
 vc.h, struct MainDat: field Rand2, u16
-    wraps: one of the two words that the program's random numbers are
-    made of.
+    random
 
 vc.h, struct MainDat: field FncAddr, u16
     small: the number of a function, in the table of dirfunc.c.
@@ -468,56 +481,56 @@ vc.h, struct MainDat: field MousPos, u16
     lines of the lists are, and widened with them.
 
 vc.h, struct MainDat: field Volume, u8[12]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field DosPth, u8[68]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field NcPath, u8[68]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field TempDir, u8[68]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field LowTab, u8[128]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field TmpBuf, u8[256]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field TmpErr, u8[256]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field MenuBuf, u8[4000]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field InfBuf, u8[1406]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field Even, u8
-    layout: a byte that has the screen's buffer begin at an even place.
+    unused: a byte that has the screen's buffer begin at an even place.
     Nothing names it.
 
 vc.h, struct MainDat: field ScrBuf, u16[4000]
-    cells: of the screen, a character and a colour each.
+    cell
 
 vc.h, struct MainDat: field UserScr, u16[3920]
-    cells: of the screen, a character and a colour each.
+    cell
 
 vc.h, struct MainDat: field WinBuf, u16[3696]
-    cells: of the screen, a character and a colour each.
+    cell
 
 vc.h, struct MainDat: field ErrBuf, u16[3696]
-    cells: of the screen, a character and a colour each.
+    cell
 
 vc.h, struct MainDat: field ErrBuf1, u16[3696]
-    cells: of the screen, a character and a colour each.
+    cell
 
 vc.h, struct MainDat: field HelpBuf, u8[3000]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct MainDat: field TreeBuf, u8[12299]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct WCBdef: field WinTyp, u8
     setup: of the part of a panel that the setup file has, which stays
@@ -568,19 +581,17 @@ vc.h, struct WCBdef: field EndBuf, u16
     Widened only if question 3 of the plan says so, by the piece P.
 
 vc.h, struct WCBdef: field ExtBuf, u8[512]
-    text: characters, or the bytes of a file or of a buffer.
+    text
 
 vc.h, struct WCBdef: field EndFul, u16
     address: a place in the panel's block, 16 bits while a panel is 64K.
     Widened only if question 3 of the plan says so, by the piece P.
 
 vc.h, struct WCBdef: field ChgFlg, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct WCBdef: field SizDir, u8
-    flag: true or false, in a byte of the layout. The code asks whether
-    it is 0.
+    flag
 
 vc.h, struct Label: not sorted, 2 numbers, 0 cuts
 
@@ -651,46 +662,43 @@ bars_t.c: as a whole, 1 number, 0 cuts
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
 blank.c, Below: variable number, u16
-    random: one of the program's random numbers, 16 bits as Rnd makes
-    them.
+    random
 
 blank.c, Star: parameter color, u16
-    colour: the number of one of the program's colours.
+    colour
 
 blank.c, Star: parameter look, u16
     character
 
 blank.c, Star: parameter place, u16
-    place: a row and a column, the row in the high byte.
+    place
 
 blank.c, Star: variable page, u16
-    The page that the display shows, as the system answers it and takes
-    it.
+    system: the page that the display shows.
 
 blank.c, Blank: variable mouse, u16
     place: where the mouse was last seen, as GetMous answers.
 
 blank.c, Blank: variable held, u16
-    The keys that are held, in the bits that the system answers in.
+    system: the keys that are held, in the bits that it answers in.
 
 blank.c, Blank: variable ticks, u16
-    The low word of the timer's count, as the original keeps it: it is
-    asked only whether it has changed.
+    system: the low word of the timer's count, as the original keeps it.
+    It is asked only whether it has changed.
 
 blank.c, Blank: variable look, u16
     character
 
 blank.c, Blank: variable now, u16
-    What the system has just answered, to hold against what was kept of
-    it: the bits of the keys that are held, and then the low word of the
+    system: what it has just answered, to hold against what was kept of
+    it, the bits of the keys that are held and then the low word of the
     timer's count.
 
 blank.c, Blank: variable number, u16
-    random: one of the program's random numbers, 16 bits as Rnd makes
-    them.
+    random
 
 blank.c, Blank: variable place, u16
-    place: a row and a column, the row in the high byte.
+    place
 
 blank.c, Blank: cast
     | ScreenScroll(0, 0, Color(Sky1_C), 0, (u16)(u8)(md.Lines - 1) << 8 | 79);
@@ -885,8 +893,8 @@ menu.c: not sorted, 58 numbers, 51 cuts
 misc.c: not sorted, 16 numbers, 9 cuts
 
 mouse.c, IniMous: variable answer, u16
-    What the mouse's driver answers, as sys.h has it: 21h, 0FFFFh for a
-    mouse, or anything else.
+    system: what the mouse's driver answers, 21h, 0FFFFh for a mouse, or
+    anything else.
 
 mouse.c, IniMous: handed
     | MouseRows(0, ((u16)md.Lines << 3) - 1);
@@ -897,10 +905,10 @@ mouse.c, TypMous: parameter pointer, u16
     character: its low byte alone counts, which the first line says.
 
 mouse.c, GetMous: parameter place, u16
-    place: a row and a column, the row in the high byte.
+    place
 
 mouse.c, GetMous: variable buttons, u16
-    The buttons of the mouse that are held, in the bits that the system
+    system: the buttons of the mouse that are held, in the bits that it
     answers in.
 
 mouse.c, GetMous: store
@@ -910,10 +918,10 @@ mouse.c, GetMous: store
     nothing is cut.
 
 mouse.c, DoublMo: parameter begin, u16
-    place: a row and a column, the row in the high byte.
+    place
 
 mouse.c, DoublMo: parameter size, u16
-    place: rows and columns, the rows in the high byte.
+    place
 
 mouse.c, DoublMo: variable hours, u16
     time: the hours and the minutes as DOS answers them, a byte each. In
@@ -950,13 +958,13 @@ mouse.c, DoublMo: store
     it out: every caller hands a line of a list that it has in 16 bits.
 
 mouse.c, InWind: parameter begin, u16
-    place: a row and a column, the row in the high byte.
+    place
 
 mouse.c, InWind: parameter size, u16
-    place: rows and columns, the rows in the high byte.
+    place
 
 mouse.c, InWind: parameter where, u16
-    place: a row and a column, the row in the high byte.
+    place
 
 mouse.c, InWind: cast
     | if ((u8)((size >> 8) - 1) < row)

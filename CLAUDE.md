@@ -2840,10 +2840,17 @@ in "The portable C".
     reason: `more = (u16)((second << 8 | second & 0x7F) - 1);` in
     `LnStr` of `line.c`, where `more` was a `u16` and the line had no
     cast.
-  - A character, a colour, a place of a row and a column, and what the
-    system answers in stay as wide as the translation has them, 16 bits
-    as a rule, with one word for the reason: half of the numbers of the
-    first five files did.
+  - A character, a colour, a cell of the screen, a place of a row and
+    a column, and what the system answers in stay as wide as the
+    translation has them, 16 bits as a rule: half of the numbers of the
+    first five files did. Each has one word for its reason, of a fixed
+    list, `WORDS` of `harness/width.py`, which the record prints at its
+    top with what each word says; what is not plain goes behind a
+    colon, and the table counts them in the column `by word`. The code
+    has no type for any of them, by the rule of "The portable C". A cut
+    into such a number wants a sentence like any other cut, and a
+    single word that is not of the list fails the test. A word is added
+    to the list for a thing that recurs and has none.
   - A reason is written into `harness/width.txt` by hand, or for many
     at once by a script of a dozen lines that is kept in `build/`: the
     entries are divided by empty lines, the first line of one is its

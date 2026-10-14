@@ -76,11 +76,19 @@ structure is made `laid out` by hand there: the line `FILE, struct
 NAME: laid out, 1 numbers` with the reason under it, in the place of
 its entries or of its line `not sorted`.
 
-What a reason is: for a number that is as wide as it is by what it is,
-the word for that, `character`, `colour`, `key`, `cell`, `place`,
-`handle`, with what is not plain behind it; for one that the program
-counts on wrapping round, where it wraps; for a cut, what at the place
-or just above it keeps the number within, as harness/int16.txt has it.
+What a reason is. For a number that is as wide as it is by what it is,
+a character, a colour, a cell of the screen, a row and a column, it is
+one word of a fixed list, WORDS below, which has what each word says,
+once; what is not plain of the one number goes behind a colon. The
+table counts those in a column of their own, `by word`, and a single
+word that is not of the list fails the test. The code has no type for
+such a thing: no name is given to an integer type for what a number
+means (CLAUDE.md, "The portable C"), so the word is in the record and
+nowhere else. For any other number that stays it is a sentence. For a
+cut it is always a sentence, also for a cut into a number that has a
+word: what at the place or just above it keeps the number within, as
+harness/int16.txt has it, or `wraps:` and where the program counts on
+that.
 
 What it cannot see is what int16.py cannot see, and this besides: a
 number that is only ever 0 or 1 is not named as one. Whether a number
@@ -97,6 +105,7 @@ import argparse
 import difflib
 import json
 import re
+import textwrap
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -149,11 +158,58 @@ WHOLE = {
     "stack.c": "the stack, an array of bytes",
 }
 
-# The types that a number is widened to, by the name that vc.h and
-# sys.h have for each, and the column of the table that counts it.
-WIDE = {"u32": "u32", "bool": "bool", "_Bool": "bool", "i32": "signed",
-        "FileSize": "u32", "FileStep": "signed", "ByteCount": "u32",
-        "MemSize": "u32"}
+# The types that a number is widened to, by the name that vc.h has for
+# each, and the column of the table that counts it.
+WIDE = {"u32": "u32", "bool": "bool", "_Bool": "bool", "i32": "signed"}
+
+# The words for a number that has its width by what it is, each with
+# what it says, once: such a number has the word for its reason, alone
+# or with what is not plain behind a colon, `place` or `system: the
+# keys that are held`. The code has no name for any of them: a number
+# has the type of its width there, and what it is, its name and a
+# comment say (CLAUDE.md, "The portable C"). The second part is for a
+# field of the main data or of a panel, whose layout is the original's.
+WORDS = {
+    "character": "a character: a byte as a text has it, or in 16 bits as "
+                 "the original has it in a register, the character being "
+                 "the low byte",
+    "colour": "the number of one of the program's colours, or the "
+              "attribute of a cell that Color makes of it: a byte, in 16 "
+              "bits where the original has it in a register",
+    "cell": "a cell of the screen as the display's memory has it, the "
+            "character in the low byte and its colour in the high one, or "
+            "an array of them; or the colour alone in its place",
+    "place": "a row and a column of the screen in two bytes, the row in "
+             "the high one, as the BIOS has the place of the cursor; or as "
+             "many rows and columns, the size of a window",
+    "key": "a key as the BIOS answers it, the character in the low byte "
+           "and the scan code in the high one",
+    "time": "a time or a date as DOS has it, in the bytes or the bits of "
+            "its answer",
+    "handle": "the handle of a file, as DOS answers it",
+    "attributes": "the attributes of a file, in DOS's bits",
+    "random": "one of the program's random numbers, or of the two words "
+              "that they are made of: 16 bits, which wrap round",
+    "system": "something else that the system answers in or takes, which "
+              "is said behind the word",
+    "setup": "a byte of the setup file, which stays a byte",
+    "flag": "true or false, in a byte of the layout: the code asks "
+            "whether it is 0",
+    "text": "characters, or the bytes of a file or of a buffer",
+    "address": "a segment or a place of DOS's memory, which a piece of the "
+               "addresses takes out of the structure as a pointer",
+    "small": "a number that what it counts keeps within its width, which "
+             "is said behind the word",
+    "unused": "of the original, and neither set nor read here",
+    "M": "to be widened: the piece M takes it out of the structure",
+}
+
+
+def word(reason):
+    """The word of WORDS that a reason is, or begins with; None for a
+    sentence."""
+    first = reason.split(":")[0].strip()
+    return first if first in WORDS else None
 
 
 def narrow(type_):
@@ -452,7 +508,7 @@ def plural(number, what):
 def table(tree, record):
     """The counts, by cluster and by file."""
     def row(files):
-        numbers = kept = unsorted = cuts = 0
+        numbers = kept = words = unsorted = cuts = 0
         wider = {}
         for file in files:
             for column, count in tree.wider.get(file, {}).items():
@@ -461,14 +517,19 @@ def table(tree, record):
                 n, c = tree.count(file, scope[1])
                 numbers, cuts = numbers + n, cuts + c
                 if record.sorted_(file, scope[1]):
-                    kept += n
+                    said = sum(len(at) for entry, at in tree.numbers.items()
+                               if entry[:2] == scope
+                               and word(record.reasons.get(entry, "")))
+                    words += said
+                    kept += n - said
                 elif not whole(file) and (file, scope[1]) not in record.laid:
                     unsorted += n
-        return (f"{numbers:>8}{unsorted:>11}{kept:>6}{cuts:>6}"
+        return (f"{numbers:>8}{unsorted:>11}{words:>8}{kept:>6}{cuts:>6}"
                 f"{wider.get('u32', 0):>6}{wider.get('bool', 0):>6}"
                 f"{wider.get('signed', 0):>7}")
 
-    head = (f"{'8 or 16':>8}{'not sorted':>11}{'kept':>6}{'cuts':>6}"
+    head = (f"{'8 or 16':>8}{'not sorted':>11}{'by word':>8}{'kept':>6}"
+            f"{'cuts':>6}"
             f"{'u32':>6}{'bool':>6}{'signed':>7}")
     lines = [f"{'cluster':<10}{head}  its files"]
     named = set()
@@ -508,11 +569,20 @@ def written(tree, record, said):
         "--record` writes it anew and keeps the reasons; `--sort FILE`",
         "makes entries of a file that is not sorted.", "",
         "The columns: the numbers of 8 or 16 bits that there are; of those,",
-        "how many are in what nobody has sorted, and how many are kept with",
-        "a reason, the rest being of a structure that is laid out or of a",
-        "file as a whole; the cuts; and how many numbers are declared as",
-        "u32, as bool and with a sign. A cluster takes the `not sorted` of",
-        "its row to nothing.", ""]
+        "how many are in what nobody has sorted, how many have their width",
+        "by what they are and say so by a word of the list below, and how",
+        "many are kept with a reason of their own, the rest being of a",
+        "structure that is laid out or of a file as a whole; the cuts; and",
+        "how many numbers are declared as u32, as bool and with a sign. A",
+        "cluster takes the `not sorted` of its row to nothing.", "",
+        "The words, for a number that has its width by what it is. Such a",
+        "number has its word for a reason, alone or with what is not plain",
+        "behind a colon. The code has no name for any of them.", ""]
+    for name, what in WORDS.items():
+        rows = textwrap.wrap(what, 56)
+        lines += [f"    {name:<12}{rows[0]}"]
+        lines += [f"    {'':<12}{row}" for row in rows[1:]]
+    lines += [""]
     lines += table(tree, record)
     lines += ["", "----"]
     bare = []
@@ -561,6 +631,12 @@ def written(tree, record, said):
                     lines.append(f"    | {text}")
                 reason = record.reasons.get(entry, "")
                 lines += [f"    {row}" for row in reason.split("\n") if row]
+                if re.fullmatch(r"\w+", reason) and (
+                        text is not None or reason not in WORDS):
+                    # One word: of the list, and for a number.
+                    bare.append(f"{where}: {head}: `{reason}` is no "
+                                + ("reason for a cut" if text is not None
+                                   else "word of the list"))
                 if not reason:
                     bare.append(f"{where}: {head}"
                                 + (f": {text}" if text else ""))

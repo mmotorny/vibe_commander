@@ -8627,13 +8627,12 @@ that. Steps 3 to 6 are not planned here.
 - The numbers are the pieces N0 to N21, a cluster of files each, in
   which every number of 8 or 16 bits is sorted once and then widened,
   made a boolean, or kept with its reason in a record that a test
-  holds. N0 makes the finder, the record and the named types, and
-  tries the rule. A cluster starts when the piece of the addresses
+  holds. N0 makes the finder and the record, and tries the rule. A cluster starts when the piece of the addresses
   that has its files has landed, so most of them run beside F4 to F10.
 - What crosses to the system, the size of a file, a count of bytes
-  read or written, a size in the memory, gets a named type now, 32
-  bits wide, so that the layer can say later how wide it is (S). Sizes
-  beyond 32 bits are the layer's.
+  read or written, a size in the memory, is a `u32` like any other
+  count (S), with no type of its own, on the user's word. How wide it
+  is on another system, and sizes beyond 32 bits, are the layer's.
 - The main data keeps the original's layout through all of it. A word
   of it that held a segment or a place leaves it and is a pointer
   beside it, and a number of it that is widened does the same; its
@@ -8671,7 +8670,8 @@ that. Steps 3 to 6 are not planned here.
 | The first five ways under "The way taken" below, and the data's image as the net in the place of `CHECKED` (F0) | Accepted by the session, 13 October 2026 |
 | Questions 6 and 7 at the end: the flags of the setup file stay bytes, and the main data keeps its layout through step 2 | Taken by the session as recommended, 13 October 2026. Neither changes what the program does |
 | The sixth way: three blocks where there was one, with a panel's block fixed at 1000h paragraphs from F1 on; F9 as the piece that takes the memory from the extender, and the trial X at once | Accepted by the session, 13 October 2026 |
-| The clusters N0 to N21 with S, M and P, and their order; that no cap is in a program that has landed, with F9 behind the five clusters that count the room, and the cap as the fallback, which wants the session's word; `FileSize`, `ByteCount` and `MemSize` and the answer of `FileRead` and `FileWrite` as a structure of their own, as the names of this step, which the layer may change; the 16 bytes round each block of the 640 KB, in the program as it is shipped from F1 to F9, held by F0's tool | Accepted by the session, 13 October 2026 |
+| The clusters N0 to N21 with S, M and P, and their order; that no cap is in a program that has landed, with F9 behind the five clusters that count the room, and the cap as the fallback, which wants the session's word; the answer of `FileRead` and `FileWrite` as a structure of their own; the 16 bytes round each block of the 640 KB, in the program as it is shipped from F1 to F9, held by F0's tool | Accepted by the session, 13 October 2026 |
+| That no name is given to an integer type for what a number means: a number has the type of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`, and what crosses to the system is a `u32` until the layer's design says what it is; where the compiler is to hold two things apart, they are structures. It takes back the named type of the answer to question 1, the three names that the session had accepted for `sys.h`, and five that the session had asked of N0 for a character, a colour, a cell and a place, which never landed | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
 | Questions 3, 4, 5, 8 and 9 | With the user, each when the work comes to it: "The questions for the user" |
 
 For an hour of that day question 1 was answered otherwise: the
@@ -8681,8 +8681,8 @@ The plan had proposed that. It did not hold, for three reasons. Most
 of what is widened is the program's own and never crosses to the
 system: the number of a line, a column, a count of files, the length
 of a buffer, a room counted in bytes where it was in paragraphs. What
-does cross gets a named type now, so that widening it once more for
-the layer is a line. And with the memory from the extender the limits
+does cross is a `u32` like the rest, and the layer says later what
+it is. And with the memory from the extender the limits
 of 16 bits are within reach on DOS: the plan had to invent a guard for
 that, the room capped at 0FFFFh paragraphs, which was a way round the
 split and nothing else. One fault of the kind was real already, C1's,
@@ -8825,7 +8825,7 @@ memory from the extender" below.
    it, with what stands meanwhile: the shape is made first, inside the
    640 KB, and the blocks are the extender's once no segment names
    one. The three functions of `sys.h` stay three, asked in the order
-   in which the program asks today, in bytes of `MemSize` from F9 on;
+   in which the program asks today, in bytes from F9 on, a `u32`;
    what the layer makes of them is step 3's. The screen, the BIOS's
    data, the PSP and the environment
    are behind `sys.h` already and stay there; `md.Screen` and the
@@ -8867,7 +8867,7 @@ gave a cast to say what DOS does, 21 places.
 `DIRENT`, `DIRTREE`, the bytes of the setup), and what DOS and the
 BIOS take and answer in (a handle, attributes, a time and a date, a
 key, a cell of the screen, a place of the cursor, the mouse's). Of
-`sys.h` the counts of bytes and the sizes are widened, to named types:
+`sys.h` the counts of bytes and the sizes are widened, to `u32`:
 "What crosses to the system" below.
 
 ### The rule for a number
@@ -8881,7 +8881,7 @@ that reads a file says of each which:
 | 2 | True or false and nothing else: every value put into it is 0, 1 or a comparison, and every use asks whether it is 0 | `bool` | The finder: a range of 0 to 1 and no use in arithmetic, in a shift, or held against a number other than 0 and 1. A number that is tested by its bits, held against 0FFh, or returned as "1, 0, or 100h to stop" is none |
 | 3 | Counted on to wrap round | Stays 16 bits if it wraps all its life, a random number, a sum. If it wraps at one place, the variable is widened and the cut is written there, `(u16)(a - b)`, with the reason in the record | Read, at every place where the finder says that what is kept is cut |
 | 4 | A number that may stand for one below 0 and is added to a place or a pointer | A number with a sign, of 32 bits: a new type of `vc.h`, the tree's first | The same reading. It is what a machine of 64 bits gets wrong where 32 bits happen to get it right: FFFFFF60h added to a pointer of 64 bits is 4 GB on |
-| 5 | Anything else: a count, an index, a length, a number of a line, a size in the memory | `u32`, or the named type where it is handed to the system or comes from it | What is left |
+| 5 | Anything else: a count, an index, a length, a number of a line, a size in the memory | `u32`, also where it is handed to the system or comes from it | What is left |
 
 And three rules for what a reader finds at a place where a result is
 cut today and would not be:
@@ -8955,14 +8955,20 @@ a number cut by being handed to a parameter that takes fewer bits.
 
 ### What crosses to the system
 
-Three named types, defined in `sys.h` by N0 with what each counts,
-and 32 bits wide in step 2:
+What crosses to the system in a number that says how much is a `u32`
+in step 2, as any other count is, and has no type of its own: no name
+is given to an integer type for what a number means, on the user's
+word of 13 October 2026 (`CLAUDE.md`, "The portable C"). C holds such a
+name apart from nothing, so it is a comment that looks like a type.
+The piece N0 had defined four in `sys.h`, `FileSize`, `FileStep`,
+`ByteCount` and `MemSize`, which nothing used yet; they are gone. What
+a number counts, its name and a comment say:
 
-| Type | What it counts | Where |
+| What it counts | Its type | Where |
 |---|---|---|
-| `FileSize` | The length of a file and a place in one, counted from its start. With it a type with a sign for a step from where the file is or from its end, of kind 4 | `FileSeek`'s offset and the `place` that it answers with; the sizes that the program adds up and shows |
-| `ByteCount` | How many bytes are read or written at once | `FileRead`'s, `FileReadBare`'s and `FileWrite`'s `count`, and what they answer: a structure of their own in the place of `struct Answer`, with the count in this type and the error beside it, so that a caller which was not changed does not compile |
-| `MemSize` | A size in the memory, in bytes | What the three functions for the memory take and answer, from F9 on; what the room's function answers, from the first of the five clusters that count the room |
+| The length of a file and a place in one, counted from its start | `u32`. A step from where the file is or from its end, which may be back, is an `i32`, of kind 4 | `FileSeek`'s offset and the `place` that it answers with; the sizes that the program adds up and shows |
+| How many bytes are read or written at once | `u32` | `FileRead`'s, `FileReadBare`'s and `FileWrite`'s `count`, and what they answer: a structure of their own in the place of `struct Answer`, with the count and the error beside it, so that a caller which was not changed does not compile. That is a structure, which the compiler does hold apart |
+| A size in the memory, in bytes | `u32` | What the three functions for the memory take and answer, from F9 on; what the room's function answers, from the first of the five clusters that count the room |
 
 And `DriveSpace`'s three figures, the clusters that are free, the
 clusters of the drive and the bytes of a sector, become `u32`: plain
@@ -8984,8 +8990,9 @@ it; S gives the toy of `harness/trial32/` a read and a write of more
 than 64K, so that it has
 run once.
 
-**What is left for the layer**: sizes beyond 32 bits, and all of the
-shape of `sys.h`. "Left for the layer's design", at the end.
+**What is left for the layer**: sizes beyond 32 bits, how wide each
+of these numbers is on another system, and all of the shape of
+`sys.h`. "Left for the layer's design", at the end.
 
 ### Booleans
 
@@ -9099,7 +9106,7 @@ nothing that 15 MB can wrap:
 
 | Still 16 bits | What more memory would do | Widened by | If F9 had to land first |
 |---|---|---|---|
-| The room in paragraphs, as its one function answers it from F1 on, and what takes it: `EdSpace` of the editor, `count` of the viewer, `room` of the file search, a copy's `left`, `size` in `ReDr00` | Wrap at a megabyte: 15 MB would count as what is left of it beyond a multiple of a megabyte | The first of the five clusters to get there adds a function beside it that answers bytes in `MemSize`, each of N3, N5, N6, N9 and N11 moves the calls of its file to that, and F9 takes the one in paragraphs out, which nothing calls by then: a call that was left does not compile | The function in paragraphs answers no more than 0FFFFh, 1,048,560 bytes, as a number of the program's own, declared in entry 13; the last of the five takes that out |
+| The room in paragraphs, as its one function answers it from F1 on, and what takes it: `EdSpace` of the editor, `count` of the viewer, `room` of the file search, a copy's `left`, `size` in `ReDr00` | Wrap at a megabyte: 15 MB would count as what is left of it beyond a multiple of a megabyte | The first of the five clusters to get there adds a function beside it that answers bytes, a `u32`, each of N3, N5, N6, N9 and N11 moves the calls of its file to that, and F9 takes the one in paragraphs out, which nothing calls by then: a call that was left does not compile | The function in paragraphs answers no more than 0FFFFh, 1,048,560 bytes, as a number of the program's own, declared in entry 13; the last of the five takes that out |
 | How many lines the file search keeps, `FndSize`, and its other counts, `FndCur`, `FndFrst`, `FndNumb`, `FndFls` | Wrap at 4.2 MB of room | N5. The list is then full where the room is, some 230,000 lines on the bench | Some 16,130 under the cap |
 | The editor's line in hex, `EdLine` and `EdLin0`: a sixteenth of the place | Wrap at a megabyte | N6 | The cap is exactly what they count |
 | The editor's count of free bytes, which shows 0 for a megabyte or more in a text, and has seven cells; the 20 bits of a place in its text | A text beyond a megabyte | F5 takes `AddressOf` out, and with it the 20 bits. N6 the test of the count, and what is shown in the cells by the answer to question 8 | Not reached under the cap |
@@ -9107,7 +9114,7 @@ nothing that 15 MB can wrap:
 | The viewer's window on a file | Nothing: the viewer takes 0FFEh paragraphs at the most itself, and that stays its number. N3 writes it in bytes | N3 | None needed |
 | A panel's offsets | Nothing: its block is 1000h paragraphs whatever the machine has | Not widened in the clusters: question 3, and P if it is lifted | None needed |
 | What `Init11` answers with for `AlocEr`, paragraphs in 16 bits that the BIOS is then handed as a page | Cut | F9 answers 0FFFFh for more, with a row in entry 6 | The same |
-| What the functions of `sys.h` are asked for, paragraphs in 16 bits | No block of more than a megabyte could be asked for | F9: bytes in `MemSize` | The same |
+| What the functions of `sys.h` are asked for, paragraphs in 16 bits | No block of more than a megabyte could be asked for | F9: bytes, a `u32` | The same |
 
 Whether that order is the better one, since F9 could as well land
 first with the cap in the last column: it is, and the plan is made
@@ -9206,11 +9213,11 @@ thought and long in lines.
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
-| F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes in `MemSize`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
+| F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, a `u32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
-| N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and the type with a sign for kind 4; `FileSize`, `ByteCount` and `MemSize` in `sys.h`, defined and not yet used; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
+| N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and the type with a sign for kind 4; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
 | N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; each cut that the program counts on written out; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's three warnings silent; the test of the record | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
-| S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a `ByteCount` and answer with a structure of their own; `FileSeek` takes and answers a `FileSize`; `DriveSpace`'s three figures are `u32`; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
+| S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a count of 32 bits and answer with a structure of their own; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
 | M, the main data's numbers | Each field of the main data or of a panel that the record has as to be widened: a variable beside the structure, its word left unused, and every line that names it | Those lines, in whatever file | Every cluster; alone | The scenarios; the images, the main data equal but for those words | |
 | P, a panel as long as its directory. Only if question 3 is answered so | "The questions for the user", 3: a panel's block longer than 64K, its four offsets beside it in 32 bits, `ENTRY` without its cut, and a scenario that fills what the original can hold | `files.c`, `read.c`, `place.c`, `panel.c`, `enter.c`, `start.c`, and the lines of other files that keep an offset in a panel; `harness/scenarios.py`, `DEVIATIONS.md` | M; alone | The scenarios, with the new one held to the original's golden and its patch; the images | |
 
@@ -9478,7 +9485,9 @@ reads, that is known before twenty agents go by it.
 1. **The order.** The widening is of this step and does not wait for
    the layer: the pointers first, then the booleans and the widths
    together, with the reason written down for every number that stays
-   16 bits and a named type for what crosses to the system.
+   16 bits. A named type for what crosses to the system was part of
+   that answer, and the user took it back on the same day: it is a
+   `u32` ("What crosses to the system").
 2. **The memory for the panels and the text.** "From the extender
    now", as much as the machine has, and what a user then sees
    otherwise is declared: the editor opens whatever fits.
@@ -10329,9 +10338,8 @@ of the bridge.
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 
 **What there is.** `harness/width.py`, its record `harness/width.txt`
-and the test `portable_c-width`; `bool` and `i32` in `vc.h`;
-`FileSize`, `FileStep`, `ByteCount` and `MemSize` in `sys.h`, defined
-and not used; the fields of the main data and of a panel sorted, in the
+and the test `portable_c-width`; `bool` and `i32` in `vc.h`; the
+fields of the main data and of a panel sorted, in the
 record; and the rule tried whole on `digits.c`, `mask.c`, `line.c`,
 `mouse.c` and `blank.c`. Every scenario passes and the data's image of
 each of the 155 is that of the build before, with no difference.
@@ -10354,11 +10362,12 @@ file. At its top is a table by cluster and by file: the numbers of 8 or
 are kept with a reason, the cuts, and how many numbers a file declares
 as `u32`, as `bool` and with a sign. A cluster's commit shows in that
 table what it widened, and the count that it takes to nothing is the
-column `not sorted` of its row. It is 1,019 lines with five files and
-the two structures sorted; a file that is sorted has some four lines
-for every number and cut that is left, so the whole of it will be some
-5,000 lines if half of the numbers stay as they did here, and fewer if
-the clusters keep fewer.
+column `not sorted` of its row. It is 1,036 lines with five files and
+the two structures sorted, of which the fields of the main data and of
+a panel are some 450 and the five files 220: a number with a word has
+three lines, and a cut or a number with a sentence four or five. At
+that rate the whole of it is some 5,000 lines when the clusters are
+done.
 
 Three things of the plan are otherwise:
 
@@ -10380,6 +10389,32 @@ three, which a `HOLDS` line holds. clang will want nothing else at step
 number of the five files wanted it. The program was the same bytes with
 the types defined.
 
+Those two are all. N0 had also defined four names in `sys.h` for what
+crosses to the system, `FileSize`, `FileStep`, `ByteCount` and
+`MemSize`, and then, asked by the session, five in `vc.h` for a
+character, a colour, a cell and a place, with a finder that took a
+number of such a type for sorted. The user overruled both on 13
+October 2026: no name is given to an integer type for what a number
+means, since C holds such a name apart from nothing (`CLAUDE.md`, "The
+portable C"). The four are gone from `sys.h`, which left `VC.EXE` the
+same bytes, and the five never landed. What they were for is done in
+the record: "The words", below.
+
+**The words.** A number that has its width by what it is has one word
+for its reason, of a fixed list that the finder knows, `WORDS` of
+`harness/width.py`, and the record says at its top, once, what each
+word says: `character`, `colour`, `cell`, `place`, `key`, `time`,
+`handle`, `attributes`, `random`, `system`, and for a field of the main
+data or of a panel `setup`, `flag`, `text`, `address`, `small`,
+`unused` and `M`. What is not plain of the one number goes behind a
+colon, `system: the keys that are held`. The table counts such numbers
+in a column of their own, `by word`, beside `kept`, which is a number
+with a sentence. A single word that is not of the list fails the test,
+and so does a single word under a cut: a cut into such a number wants
+what a cut wants. A cluster that meets a thing of this kind a dozen
+times, which has no word, adds the word with its sentence to `WORDS`,
+in a commit of its own, before it sorts.
+
 **The rule as it stood up**, by what the 66 numbers of the five files
 became:
 
@@ -10387,7 +10422,7 @@ became:
 |---|---|---|
 | Widened to `u32` | 29 | Counts, indexes, lengths; what `TstHex`, `LnStr`, `DoublMo` and two static functions answer |
 | Made `bool` | 3 | What `TstMas` and `InWind` answer, what `CurMous` is handed |
-| Kept, as wide as it is by what it is | 34 | 15 a character, a colour or a cell; 9 a place, a row and a column in two bytes; 6 what the system answers in, the mouse's buttons, the keys that are held, the page, the timer's low word; 2 a time of DOS's; 2 a random number |
+| Kept, as wide as it is by what it is, each by a word of the record | 34 | 13 `character`, 1 `colour`, 1 `cell`; 9 `place`, a row and a column in two bytes; 6 `system`, the mouse's buttons, the keys that are held, the page, the timer's low word; 2 `time`; 2 `random` |
 | Counted on to wrap all its life | 0 | |
 | With a sign | 0 | |
 
@@ -10398,8 +10433,9 @@ are a number that what stands at the place keeps within.
 
 - Half of the numbers stay. A character, a place or a colour that the
   translation has in 16 bits, since the assembly had it in a register,
-  is kind 1 by the rule, and widening it gains nothing. The cost is a
-  reason for each and one for every cut into it.
+  is kind 1 by the rule: nothing of it wraps round unexpectedly, which
+  is what is widened. Each is a word of the record, and a cut into it
+  a sentence.
 - Few are booleans, and the finder does not say which: a number is
   one when every value put into it and every use says so, and of what
   another file calls that is a `grep` for its calls. `CurMous` took
@@ -10476,7 +10512,8 @@ the suite: nothing failed and nothing had to be read in another file
 but the calls of eight functions. That is no measure of a cluster.
 What it does say: the reading is cheap and the writing is not. 63
 entries wanted a reason, six of every ten things that the finder
-named, and a reason is a sentence that somebody has to have checked.
+named: 34 of them a word, and 29 a sentence that somebody has to have
+checked.
 By that, a cluster is some 150 numbers and 100 cuts, 150 reasons, for
 an agent that hands back after a hundred tool calls, and the counts of
 the record's table are what to cut by, not the lines:
@@ -10504,7 +10541,10 @@ the record's table are what to cut by, not the lines:
    counts on wrapping; look at the masks. Build.
 4. `python3 harness/width.py --sort FILE`, or `FILE:FUNCTION` for a
    part, and write the reason under every entry that has none, in
-   `harness/width.txt`. `python3 harness/int16.py`, and its record anew
+   `harness/width.txt`: for a number that has its width by what it
+   is, its word of the list at the top of the record, with what is
+   not plain behind a colon; for any other number that stays, and for
+   every cut, a sentence. `python3 harness/int16.py`, and its record anew
    with the reason of whatever is new there.
 5. clang's three warnings for the files ("Booleans"), the tests that
    start no machine, then the whole suite and the images held against
