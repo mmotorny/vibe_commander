@@ -227,6 +227,7 @@ S8, U8 = (True, 8), (False, 8)
 S16, U16 = (True, 16), (False, 16)
 S32, U32 = (True, 32), (False, 32)
 S64, U64 = (True, 64), (False, 64)
+BOOL = (False, 1)                       # 0 or 1, whatever it is made of
 INT, UNSIGNED = (S16, S32), (U16, U32)
 TYPES = {
     "u8": (U8, U8), "unsigned char": (U8, U8), "char": (U8, U8),
@@ -237,6 +238,8 @@ TYPES = {
     "ptrdiff_t": INT,
     "long": (S32, S32), "unsigned long": (U32, U32), "u32": (U32, U32),
     "long long": (S64, S64), "unsigned long long": (U64, U64),
+    # What step 2 of the road widens to: harness/width.py.
+    "_Bool": (BOOL, BOOL), "bool": (BOOL, BOOL), "i32": (S32, S32),
 }
 POINTER = "pointer"
 WORD = 1 << 16

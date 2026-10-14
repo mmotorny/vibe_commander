@@ -39,6 +39,20 @@ typedef unsigned char  u8;
 typedef unsigned short u16;
 typedef unsigned int   u32;
 
+/* A number of 32 bits with a sign, the one such type: for a number that
+   may be below 0 and is added to a place or to a pointer, a step back.
+   One without a sign that has wrapped round for that, FF60h for 160
+   back, is right only where what it is added to wraps round with it,
+   which a pointer does not. */
+typedef int            i32;
+
+/* True or false and nothing else: bool, with true and false, as C has
+   them since 1999, from the compiler's own header, which is no part of
+   a library. A number made one is 1 unless it is 0, and one byte in a
+   structure. A typedef of the program's own in their place would stop
+   a compiler whose C has bool as a word of the language. */
+#include <stdbool.h>
+
 /* Fails to compile when something that the code counts on is not so:
    the name says what. It is the tag of a structure and no typedef, as
    LAID_OUT below is: a typedef more can change the order of two
@@ -49,6 +63,8 @@ typedef unsigned int   u32;
 HOLDS(u8_has_8_bits, sizeof(u8) == 1 && (u8)-1 == 0xFF);
 HOLDS(u16_has_16_bits, sizeof(u16) == 2);
 HOLDS(u32_has_32_bits, sizeof(u32) == 4);
+HOLDS(i32_has_32_bits_and_a_sign, sizeof(i32) == 4 && (i32)-1 < 0);
+HOLDS(a_bool_is_one_byte, sizeof(bool) == 1);
 
 /* The low byte of a number is the first of it in the memory, as it is
    on DOS, and the code counts on that all over. The main data, DOS's

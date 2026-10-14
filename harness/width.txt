@@ -1,0 +1,232 @@
+The numbers of 8 and 16 bits of the portable C, src/portable_c/,
+and where a number is cut to so few: of what has been sorted by
+the rule of step 2, every one that is left with why it is as wide
+as it is; of the rest, how many. harness/width.py found them, with
+clang 23, and says what the columns and the kinds are; the reason
+under an entry was written by whoever read it. The test
+portable_c-width holds the tree to this. `python3 harness/width.py
+--record` writes it anew and keeps the reasons; `--sort FILE`
+makes entries of a file that is not sorted.
+
+cluster    8 or 16 not sorted  kept  cuts   u32  bool signed  its files
+N0              66         66     0    41     0     0      0  digits.c mask.c line.c mouse.c blank.c
+N1             133        133     0    48     2     0      0  string.c format.c box.c screen.c misc.c
+N2             142        142     0    70     0     0      0  dialog.c
+N3, N4         197        197     0   211    13     0      0  view.c
+N5             125        125     0    79     1     0      0  find.c
+N6 to N8       248        248     0   278    37     0      0  edit.c
+N9             111        111     0    68     6     0      0  copy.c
+N10            137        137     0    55     0     0      0  dirfunc.c
+N11            118        118     0    76     1     0      0  files.c read.c place.c
+N12             88         88     0   113     3     0      0  panel.c info.c drive.c
+N13             71         71     0   101     0     0      0  tree.c treebox.c extfile.c
+N14            128        128     0    95     0     0      0  cmdline.c enter.c exec.c
+N15            114        114     0   108     3     0      0  input.c usermenu.c
+N16            108        108     0    74     0     0      0  main.c
+N17            222        222     0    58     0     0      0  keys.c commands.c
+N18            116        116     0   105     1     0      0  menu.c help.c
+N19            163        163     0    74     1     0      0  bars.c window.c system.c setup.c start.c
+N20            120        120     0    88     0     0      0  stcolor.c stopts.c
+N21             89         89     0    59     3     0      0  stmain.c sthelp.c
+as a whole     584          0     0    57    55     0      0  the tables, dos32.c stack.c
+headers        311        311     0     0     0     0      0  vc.h sys.h tables.h
+all           3391       2807     0  1858   126     0      0
+
+file           8 or 16 not sorted  kept  cuts   u32  bool signed
+vc.h               254        254     0     0     0     0      0
+sys.h               37         37     0     0     0     0      0
+tables.h            20         20     0     0     0     0      0
+bars.c              42         42     0    22     0     0      0
+blank.c             19         19     0     7     0     0      0
+box.c               50         50     0    16     0     0      0
+cmdline.c           64         64     0    55     0     0      0
+commands.c         116        116     0    13     0     0      0
+copy.c             111        111     0    68     6     0      0
+dialog.c           142        142     0    70     0     0      0
+digits.c             7          7     0     8     0     0      0
+dirfunc.c          137        137     0    55     0     0      0
+drive.c             28         28     0    39     0     0      0
+edit.c             248        248     0   278    37     0      0
+enter.c             48         48     0    27     0     0      0
+exec.c              16         16     0    13     0     0      0
+extfile.c            8          8     0     3     0     0      0
+files.c             42         42     0    24     0     0      0
+find.c             125        125     0    79     1     0      0
+format.c            38         38     0     9     2     0      0
+help.c              58         58     0    54     1     0      0
+info.c              18         18     0    27     2     0      0
+input.c             59         59     0    37     3     0      0
+keys.c             106        106     0    45     0     0      0
+line.c              14         14     0    12     0     0      0
+main.c             108        108     0    74     0     0      0
+mask.c               8          8     0     4     0     0      0
+menu.c              58         58     0    51     0     0      0
+misc.c              16         16     0     9     0     0      0
+mouse.c             18         18     0    10     0     0      0
+panel.c             42         42     0    47     1     0      0
+place.c             26         26     0    20     0     0      0
+read.c              50         50     0    32     1     0      0
+screen.c            15         15     0     4     0     0      0
+setup.c              9          9     0     2     0     0      0
+start.c             49         49     0    30     0     0      0
+stcolor.c           86         86     0    72     0     0      0
+sthelp.c            49         49     0    41     3     0      0
+stmain.c            40         40     0    18     0     0      0
+stopts.c            34         34     0    16     0     0      0
+string.c            14         14     0    10     0     0      0
+system.c            22         22     0     7     1     0      0
+tree.c              22         22     0    25     0     0      0
+treebox.c           41         41     0    73     0     0      0
+usermenu.c          55         55     0    71     0     0      0
+view.c             197        197     0   211    13     0      0
+window.c            41         41     0    13     0     0      0
+
+----
+
+vc.h: not sorted, 254 numbers, 0 cuts
+
+sys.h: not sorted, 37 numbers, 0 cuts
+
+tables.h: not sorted, 20 numbers, 0 cuts
+
+bars.c: not sorted, 42 numbers, 22 cuts
+
+bars_t.c: as a whole, 1 number, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+blank.c: not sorted, 19 numbers, 7 cuts
+
+box.c: not sorted, 50 numbers, 16 cuts
+
+cmdline.c: not sorted, 64 numbers, 55 cuts
+
+commands.c: not sorted, 116 numbers, 13 cuts
+
+commands_t.c: as a whole, 72 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+copy.c: not sorted, 111 numbers, 68 cuts
+
+copy_t.c: as a whole, 38 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+dialog.c: not sorted, 142 numbers, 70 cuts
+
+digits.c: not sorted, 7 numbers, 8 cuts
+
+dirfunc.c: not sorted, 137 numbers, 55 cuts
+
+dirfunc_t.c: as a whole, 60 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+dos32.c: as a whole, 165 numbers, 57 cuts
+    the system's file: what DOS, the BIOS and the extender take and answer in, and the layer's to shape, step 3
+
+drive.c: not sorted, 28 numbers, 39 cuts
+
+edit.c: not sorted, 248 numbers, 278 cuts
+
+edit_t.c: as a whole, 26 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+enter.c: not sorted, 48 numbers, 27 cuts
+
+exec.c: not sorted, 16 numbers, 13 cuts
+
+extfile.c: not sorted, 8 numbers, 3 cuts
+
+files.c: not sorted, 42 numbers, 24 cuts
+
+find.c: not sorted, 125 numbers, 79 cuts
+
+find_t.c: as a whole, 6 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+format.c: not sorted, 38 numbers, 9 cuts
+
+help.c: not sorted, 58 numbers, 54 cuts
+
+help_t.c: as a whole, 8 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+info.c: not sorted, 18 numbers, 27 cuts
+
+input.c: not sorted, 59 numbers, 37 cuts
+
+keys.c: not sorted, 106 numbers, 45 cuts
+
+keys_t.c: as a whole, 20 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+line.c: not sorted, 14 numbers, 12 cuts
+
+main.c: not sorted, 108 numbers, 74 cuts
+
+main_t.c: as a whole, 19 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+mask.c: not sorted, 8 numbers, 4 cuts
+
+menu.c: not sorted, 58 numbers, 51 cuts
+
+misc.c: not sorted, 16 numbers, 9 cuts
+
+mouse.c: not sorted, 18 numbers, 10 cuts
+
+panel.c: not sorted, 42 numbers, 47 cuts
+
+place.c: not sorted, 26 numbers, 20 cuts
+
+read.c: not sorted, 50 numbers, 32 cuts
+
+screen.c: not sorted, 15 numbers, 4 cuts
+
+setup.c: not sorted, 9 numbers, 2 cuts
+
+stack.c: as a whole, 1 number, 0 cuts
+    the stack, an array of bytes
+
+start.c: not sorted, 49 numbers, 30 cuts
+
+stcolor.c: not sorted, 86 numbers, 72 cuts
+
+stcolor_t.c: as a whole, 24 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+sthelp.c: not sorted, 49 numbers, 41 cuts
+
+sthelp_t.c: as a whole, 5 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+stmain.c: not sorted, 40 numbers, 18 cuts
+
+stmain_t.c: as a whole, 29 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+stopts.c: not sorted, 34 numbers, 16 cuts
+
+stopts_t.c: as a whole, 71 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+string.c: not sorted, 14 numbers, 10 cuts
+
+system.c: not sorted, 22 numbers, 7 cuts
+
+system_t.c: as a whole, 9 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+tree.c: not sorted, 22 numbers, 25 cuts
+
+treebox.c: not sorted, 41 numbers, 73 cuts
+
+treebox_t.c: as a whole, 7 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+usermenu.c: not sorted, 55 numbers, 71 cuts
+
+view.c: not sorted, 197 numbers, 211 cuts
+
+view_t.c: as a whole, 23 numbers, 0 cuts
+    the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
+
+window.c: not sorted, 41 numbers, 13 cuts
