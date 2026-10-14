@@ -1825,3 +1825,46 @@ halves, with spaces declared behind. The box itself, `StConf_P`, is the
 original's. The instructions of real mode that the program had for the
 shell, `Shell_T`, a table of its own that was not compared, are gone
 from what that test lists.
+
+### 15. Go to of the file search asks for the disk of the drive that its line is on
+
+**What the original does.** Go to, in the list of what Alt-F7 has found,
+makes the directory of the line under the cursor the current one. Before
+it asks DOS to change there, it means to do what the program does before
+every such call: if the drive of the path shares the floppy drive with
+another, as B: does with A: on a machine with one floppy drive, and the
+drive goes by the other letter just now, it shows the box "Insert
+diskette for drive B:" and tells DOS of the answer, so that DOS does not
+ask at its own prompt, over the program's screen. The routine for that,
+`ChgDisk`, takes the path at ES:DX. Go to hands it the address of the
+line with DS on the memory of the list, where the line is, and ES is on
+the main data: the routine reads at the line's offset, which is below
+16, in the main data, two of its first 16 bytes, which are colours of
+the first palette. Those name no drive, their second byte being no
+colon unless a colour of the setup is 3Ah, so the routine takes the
+current drive, which needs no disk. The original then changes to the
+line's directory and makes its drive the current one, and where that
+drive wanted its disk asked for, DOS asks.
+
+**What the portable C does.** It hands `ChgDisk` the line. DOS is asked
+which letter the drive of the line goes by, and with Ok which it is to
+go by (AX 440Eh and 440Fh, with that drive), where the original asks of
+the current drive; the box is shown where the line's drive shares the
+floppy drive and goes by another letter, and Cancel there leaves the
+list for the panels with nothing changed, as it does wherever the
+program shows that box.
+
+**Why.** The user's decision, on 13 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed. The work on the
+addresses met it: the program of 32 bits had done so since it was one,
+by a cast that dropped a segment in 16 bits and drops nothing in a flat
+memory, without anybody having decided it.
+
+**Which scenarios show it.** None. `find`, `find-drives` and
+`mouse-find` take Go to, each from the drive that the line is on or to
+a drive that is no floppy's, and are held to the original's goldens as
+they are. A scenario that showed it would take Go to on a line of the
+drive that shares the floppy drive with another, B: while the drive
+goes by A:, from a third drive: the original then has DOS's prompt for
+the disk, and the portable C its box. It is to be written
+(`TODO.md`, "F4, the viewer and the file search").

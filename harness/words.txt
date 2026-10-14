@@ -26,7 +26,7 @@ enter.c       MD_POINTER 1, ENTRY 14, DSKBUF 11, MAIN_AS_PANEL 1
 exec.c        MD_PLACE 2
 extfile.c     NEAR 1, MD_PLACE 2, MD_POINTER 1
 files.c       ENTRY 7, DSKBUF 7
-find.c        AT 2, SEG_OF 2, RoomParas 2, NEAR 6, MD_PLACE 3, DSKBUF 3
+find.c        AT 2, SEG_OF 2, RoomParas 2, NEAR 5, MD_PLACE 3, DSKBUF 3
 find_t.c      MD_AT 2, NUMBER 2
 format.c      none
 help.c        NEAR 1, MD_PLACE 4

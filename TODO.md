@@ -13077,7 +13077,10 @@ than it is would pass.
   `ChgDisk` reads at that offset in the main data: two bytes of the
   first palette, since a line begins within 16 bytes of its segment. So
   the current drive is asked about, unless the second byte is 3Ah, a
-  colon, and then the "drive" of the first. Ported like that. Go to
+  colon, and then the "drive" of the first. Ported like that in the C
+  translation. **Dealt with in the portable C**, on the user's word of
+  13 October 2026: it asks for the disk of the line's drive
+  (`src/portable_c/DEVIATIONS.md`, 15). No scenario shows it yet. Go to
   also copies 69 bytes of the line into the path of the panel, which
   has 68; the last goes into the place of the cursor, which is set
   next.

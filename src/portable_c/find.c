@@ -764,11 +764,16 @@ static struct Searched Shows(struct WCBdef *panel)
    if no path is given. The name is then left out of the path: FindFil
    takes it from FindStr.
 
-   Ported as it is: Go to asks for the disk of a drive that shares the
-   floppy drive, ChgDisk, with the address of the line, which is in the
-   memory of the list, and ChgDisk reads there in the main data, two
-   bytes of the first palette. So it asks for the disk of the current
-   drive, unless the second of the two is a colon. And the path of the
+   Go to asks for the disk of the drive that the line is on, if that
+   drive shares the floppy drive with another: ChgDisk, with the line.
+   The original hands ChgDisk the address of the line, which is in the
+   memory of the list, and ChgDisk reads at that offset in the main
+   data, two bytes of the first palette: so it asks for the disk of the
+   current drive, unless the second of the two is a colon. That is a
+   bug of the original, fixed here on the user's word (DEVIATIONS.md,
+   15).
+
+   Ported as it is: the path of the
    line goes into the panel with what follows it, 69 bytes, one more
    than a path has room for there, which is the first of where the
    cursor is and is set next. */
@@ -1011,7 +1016,9 @@ close:
     do
         from = Line(number--);
     while (*from == ' ');
-    if (ChgDisk(NEAR(from)))
+    /* The disk of the line's drive. The original asks for that of the
+       current drive here, by a bug: see above. */
+    if (ChgDisk(from))
         return To(TO_FUNC04);
     if (DirChange(from).failed)
         return To(TO_FUNC04);
