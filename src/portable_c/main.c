@@ -102,7 +102,7 @@ void Panel(struct WCBdef *panel);                       /* panel.c */
 void PutPath(struct WCBdef *panel);
 void PutFls(struct WCBdef *panel);
 void PutTre(struct WCBdef *panel);                      /* tree.c */
-u16 StrLen(const u8 *text);                             /* string.c */
+i32 StrLen(const u8 *text);                             /* string.c */
 const u8 *FndLet(const u8 *text);
 
 /* What this reads or names of other files: the scan codes of Alt with a

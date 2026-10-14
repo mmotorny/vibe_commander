@@ -8,20 +8,21 @@
 #include "vc.h"
 
 /* Is `word` the two bytes that end a line, in either order? */
-u16 IsCrLf(u16 word)
+bool IsCrLf(u16 word)
 {
     return word == 0x0D0A || word == 0x0A0D;
 }
 
 /* Turn a switch over: a byte that is 0 becomes 1, and any other 0.
    Returns what it is then. */
-u16 InvVar(u8 *variable)
+bool InvVar(u8 *variable)
 {
     return *variable = *variable == 0;
 }
 
 /* The sum of `length` bytes of the main data, each a number of its own.
-   No bytes are 65536 of them. */
+   A length of 0 is one of 65536, as the original counts; the tree's
+   file of treebox.c may say 0. */
 u16 ChkSum(const u8 *data, u16 length)
 {
     u16 sum = 0;
@@ -36,8 +37,10 @@ u16 ChkSum(const u8 *data, u16 length)
    of the line the cursor is on and `first` that of the first line shown.
    The list moves by a line less than show, or as far as it goes, and the
    cursor stays in what shows; with the top of the list showing, the
-   cursor goes there. Returns the cursor and the first line then. */
-struct Paged PgUp(u16 cursor, u16 first, u16 rows)
+   cursor goes there. Returns the cursor and the first line then. Every
+   caller has `rows` from a box that is more than a row high, so it is at
+   least 1. */
+struct Paged PgUp(i32 cursor, i32 first, i32 rows)
 {
     struct Paged paged;
 
@@ -59,17 +62,19 @@ struct Paged PgUp(u16 cursor, u16 first, u16 rows)
    less than show, no further than to where its last lines fill the
    window, and the cursor stays in what shows; with the end of the list
    showing, the cursor goes to the last line. */
-struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines)
+struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines)
 {
     struct Paged paged;
-    u16 last = lines >= rows ? lines - rows : 0;
-    u16 next;
+    i32 last = lines >= rows ? lines - rows : 0;
+    i32 next;
 
     rows--;
     if (first >= last)
         cursor = lines != 0 ? lines - 1 : 0;
     else {
         next = first + rows;
+        /* The original's test of a sum that passed 64K, which these
+           numbers do not. */
         first = next < first || next > last ? last : next;
         if (cursor < first)
             cursor = first;

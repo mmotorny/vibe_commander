@@ -27,7 +27,7 @@ void PutPath(struct WCBdef *panel);                     /* panel.c */
 void PutFls(struct WCBdef *panel);
 void SetCur(struct WCBdef *panel, u16 set);
 void PutTre(struct WCBdef *panel);                      /* tree.c */
-u16 StrLen(const u8 *text);                             /* string.c */
+i32 StrLen(const u8 *text);                             /* string.c */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

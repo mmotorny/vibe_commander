@@ -15,11 +15,6 @@ bars.c, DosCom: compare
     | if (cursor >= width && cursor - width > first)
     The same line asks first that cursor is width or more.
 
-box.c, MinBx5: divide
-    | u16 less = (u8)(((u16)(u8)(size - least) >> 1) * step / (Diskret - 1));
-    What is shifted is cut to a byte first, so the half is below 128; and
-    step is 4 at the most, by the loop of MinBox, which alone calls this.
-
 cmdline.c, F68_00: widen
     | count = (begin >> 8) + (size >> 8) - 4 - row;
     The box is on the screen, and the cursor on a line of its list, which
@@ -193,21 +188,6 @@ panel.c, PutPath: shift
     | place = ADD_LOW(place, -((length - least >> 1) + 1));
     Three lines above ask that length is least or more.
 
-screen.c, BasAdr: index
-    | return md.ScrBuf + (row << 6) + (row << 4) + (place & 0xFF);
-    row is the high byte of place, by the line that declares it: 255 times
-    80 at the most, and a byte.
-
-screen.c, ColAddr: index
-    | return IN_TABLE(number, palette);
-    The lines above have made palette below 3, and IN_TABLE takes the low
-    byte of number: six times 255 and a little.
-
-screen.c, Color: index
-    | return *IN_TABLE(number, palette);
-    The lines above have made palette below 3, and IN_TABLE takes the low
-    byte of number: six times 255 and a little.
-
 start.c, IniData: back
     | md.LowTab[c - 128] = (u8)(0x80 + i);
     The line above asks that c is 80h or more.
@@ -282,10 +262,6 @@ stmain.c, StUserScr: index
 string.c, LowCase: back
     | return md.LowTab[letter - 0x80];
     The line above asks that letter is 80h or more.
-
-string.c, ShrtLin: back
-    | from = text + (length - limit);
-    The lines above return where length is limit or less.
 
 tree.c, PutTree: index
     | DESCEND(PATH, entry, text, i, n);

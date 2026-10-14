@@ -10,8 +10,8 @@
  */
 #include "vc.h"
 
-void FilZero(u8 *text, u16 length);
-u16 StrLen(const u8 *text);
+void FilZero(u8 *text, i32 length);
+i32 StrLen(const u8 *text);
 const u8 *FndLet(const u8 *text);
 void NormStr(u8 *text);
 u8 *MainFil(u8 *to, const u8 *name);
@@ -33,9 +33,9 @@ u8 *AddFile(u8 *end)
 
    A text without an end among these bytes is taken to end with the last
    of them, and if there are no bytes at all, with the one before. */
-u8 *MvzLine(u8 *to, const u8 *from, u16 length)
+u8 *MvzLine(u8 *to, const u8 *from, i32 length)
 {
-    u16 i;
+    i32 i;
 
     for (i = 0; i < length; i++)
         to[i] = from[i];
@@ -46,7 +46,7 @@ u8 *MvzLine(u8 *to, const u8 *from, u16 length)
 }
 
 /* Fill what follows a text with zeros, in a field of `length` bytes. */
-void FilZero(u8 *text, u16 length)
+void FilZero(u8 *text, i32 length)
 {
     while (length) {
         length--;
@@ -58,9 +58,9 @@ void FilZero(u8 *text, u16 length)
 }
 
 /* The length of a text, with its zero byte. */
-u16 StrLen(const u8 *text)
+i32 StrLen(const u8 *text)
 {
-    u16 length = 0;
+    i32 length = 0;
 
     do
         length++;
@@ -152,10 +152,10 @@ void LetLin(u8 *text)
    them is taken to be 255 long. A limit too small for the drive, the
    backslash and the dots is not checked for: the count of what remains
    to be moved up then passes zero, and 64K are moved. */
-void ShrtLin(u8 *text, u16 limit)
+void ShrtLin(u8 *text, i32 limit)
 {
     const u8 *from;
-    u16 length = 0;
+    i32 length = 0;
 
     while (length < 256 && text[length] != 0)
         length++;
@@ -178,8 +178,9 @@ void ShrtLin(u8 *text, u16 limit)
     *text++ = '.';
     *text++ = '.';
     from += 3;
-    /* What is left of the limit, and the zero byte. */
-    for (limit -= 2; limit; limit--)
+    /* What is left of the limit, and the zero byte. A limit too small
+       wraps here as the original's count does, to some 64K. */
+    for (limit = (u16)(limit - 2); limit; limit--)
         *text++ = *from++;
 }
 
@@ -187,7 +188,7 @@ void ShrtLin(u8 *text, u16 limit)
    NcPath, and the 13 bytes at `name`. Returns the address behind them. */
 u8 *MainFil(u8 *to, const u8 *name)
 {
-    u16 i;
+    i32 i;
 
     to = MvzLine(to, md.NcPath, LenPath);
     for (i = 0; i < 13; i++)

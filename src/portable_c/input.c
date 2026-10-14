@@ -56,7 +56,7 @@
  */
 
 /* C routines of other files that vc.h does not have. */
-u16 HexDec(u16 number);                                 /* format.c */
+u16 HexDec(i32 number);                                 /* format.c */
 void Help00(void);                                      /* help.c */
 
 /* The characters that words end at. */

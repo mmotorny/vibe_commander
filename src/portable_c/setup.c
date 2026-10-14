@@ -21,7 +21,7 @@
 extern const u8 Init_F[];
 
 /* C routines of other files that vc.h does not have. */
-void FilZero(u8 *text, u16 length);                     /* string.c */
+void FilZero(u8 *text, i32 length);                     /* string.c */
 u8 *MainFil(u8 *to, const u8 *name);
 
 #define ERR_NO_FILE 2

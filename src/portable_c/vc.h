@@ -789,12 +789,12 @@ bool TstMas(const u8 *name, const u8 *mask);
 void NgLine(struct LineArgs *args);                     /* line.c */
 void CntLine(struct LineArgs *args);
 u8 *AddFile(u8 *end);                                   /* string.c */
-u8 *MvzLine(u8 *to, const u8 *from, u16 length);
+u8 *MvzLine(u8 *to, const u8 *from, i32 length);
 u16 LowCase(u16 letter);
 const u8 *CutPath(const u8 *path);
 void PathLin(u8 *text);
 void LetLin(u8 *text);
-void ShrtLin(u8 *text, u16 limit);
+void ShrtLin(u8 *text, i32 limit);
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
 u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
             u16 *screen, u16 color);
@@ -1436,8 +1436,8 @@ void Window(u16 begin, u16 size);
 void SavScr(void);
 /* The frame of a box: see each in box.c. OncZoom takes a box of the
    assembly as DialBox does, in the main data. */
-u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
-u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
+u16 *BoxLine(u16 *screen, u16 cell, u16 ends, i32 margin, i32 width);
+u16 *BoxDubl(u16 *screen, u16 color, i32 rows, i32 margin, i32 width);
 void MinBox(u16 begin, u16 size, u16 color);
 u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
 void OncZoom(u16 place, const struct BOXTOP *head, const u8 *include,
@@ -1449,15 +1449,15 @@ void Blank(void);
 void LeaveTm(void);
 /* Small ones: see each in misc.c. PgUp and PgDn return where a list is
    after a page up or down. */
-u16 IsCrLf(u16 word);
-u16 InvVar(u8 *variable);
+bool IsCrLf(u16 word);
+bool InvVar(u8 *variable);
 u16 ChkSum(const u8 *data, u16 length);
 struct Paged {
-    u16 cursor;                         /* the line that the cursor is on */
-    u16 first;                          /* the first line shown */
+    i32 cursor;                         /* the line that the cursor is on */
+    i32 first;                          /* the first line shown */
 };
-struct Paged PgUp(u16 cursor, u16 first, u16 rows);
-struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
+struct Paged PgUp(i32 cursor, i32 first, i32 rows);
+struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
 
 /* The words of the addresses. The program keeps a place of the memory
    in numbers wherever the original kept it in registers: a segment, an

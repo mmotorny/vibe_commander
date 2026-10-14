@@ -53,7 +53,7 @@ u16 ChTree(u16 column);
    grows. */
 
 /* C routines of other files that vc.h does not have. */
-void FilZero(u8 *text, u16 length);                     /* string.c */
+void FilZero(u8 *text, i32 length);                     /* string.c */
 void TreeCur(void);                                     /* tree.c */
 void TrCr20(u16 lines);
 

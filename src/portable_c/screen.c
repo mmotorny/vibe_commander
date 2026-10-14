@@ -36,7 +36,7 @@ u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color);
 
 u8 *ColAddr(u16 number)
 {
-    u16 palette = md.ColTyp;
+    i32 palette = md.ColTyp;
 
     if (palette >= 3)
         palette = 1;
@@ -47,7 +47,7 @@ u8 *ColAddr(u16 number)
    cell. Only the low byte of `number` counts. */
 u16 Color(u16 number)
 {
-    u16 palette = md.ColTyp;
+    i32 palette = md.ColTyp;
 
     if (palette >= 3)
         palette = 1;
@@ -124,7 +124,7 @@ u16 *MovDz0(u16 *screen, const u8 *text)
    byte of `place`. */
 u16 *BasAdr(u16 place)
 {
-    u16 row = place >> 8;
+    i32 row = place >> 8;
 
     /* 80 cells to a row, without a multiplication: see IN_TABLE. */
     return md.ScrBuf + (row << 6) + (row << 4) + (place & 0xFF);

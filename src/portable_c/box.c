@@ -30,10 +30,10 @@ u16 *Shadow(u16 *cell);
    the cell behind it: `margin` spaces, the character in the high byte of
    `ends`, `width` times the cell `cell`, the character in the low byte of
    `ends`, and the spaces again, all in the colour of `cell`. */
-static u16 *BoxLn0(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width)
+static u16 *BoxLn0(u16 *screen, u16 cell, u16 ends, i32 margin, i32 width)
 {
     u16 color = cell & 0xFF00;
-    u16 count;
+    i32 count;
 
     for (count = margin; count != 0; count--)
         *screen++ = color | SPACE;
@@ -47,14 +47,14 @@ static u16 *BoxLn0(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width)
 }
 
 /* The same, and the address of the line below comes back. */
-u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width)
+u16 *BoxLine(u16 *screen, u16 cell, u16 ends, i32 margin, i32 width)
 {
     BoxLn0(screen, cell, ends, margin, width);
     return screen + 80;
 }
 
 /* The same with the two cells behind the line put into the shadow. */
-static u16 *ShadLin(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width)
+static u16 *ShadLin(u16 *screen, u16 cell, u16 ends, i32 margin, i32 width)
 {
     Shadow(Shadow(BoxLn0(screen, cell, ends, margin, width)));
     return screen + 80;
@@ -62,8 +62,8 @@ static u16 *ShadLin(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width)
 
 /* Write a box with a double frame and `rows` empty lines in it, in the
    colour in the high byte of `color`, and return the address of the line
-   below it. No lines are 65536 of them. */
-u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width)
+   below it. `rows` is at least 1: every caller has it so. */
+u16 *BoxDubl(u16 *screen, u16 color, i32 rows, i32 margin, i32 width)
 {
     color &= 0xFF00;
     screen = BoxLine(screen, color | DOUBLE, TOP_CORNERS, margin, width);
@@ -81,8 +81,10 @@ u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width)
 static void ShadBox(u16 begin, u16 size, u16 color)
 {
     u16 *screen = BasAdr(begin);
-    u16 rows = size >> 8;
-    u16 width = (u8)(size - 10);
+    i32 rows = size >> 8;
+    /* A box of fewer than ten columns wraps round to 256 more, as the
+       original's byte does. */
+    i32 width = (u8)(size - 10);
     u16 count;
 
     color &= 0xFF00;
@@ -122,11 +124,11 @@ static u16 MinBx3(u16 tick)
    as many quarters of that as the step says are taken off at either end.
    Returns the length in the low byte and the beginning in the high
    one. */
-static u16 MinBx5(u16 size, u16 begin, u16 step, u16 least)
+static u16 MinBx5(i32 size, i32 begin, i32 step, i32 least)
 {
-    u16 less = (u8)(((u16)(u8)(size - least) >> 1) * step / (Diskret - 1));
+    i32 less = (u8)(((u16)(u8)(size - least) >> 1) * step / (Diskret - 1));
 
-    return (u16)(u8)(begin + less) << 8 | (u8)(size - less - less);
+    return (u16)((u16)(u8)(begin + less) << 8 | (u8)(size - less - less));
 }
 
 /* Draw a box with its shadow into the screen buffer, at `begin` and of
@@ -140,7 +142,8 @@ void MinBox(u16 begin, u16 size, u16 color)
 {
     u8 *shadow;
     u8 shadows;
-    u16 tick, step, across, down;
+    u16 tick, across, down;
+    i32 step;
 
     md.Quote = 0;
     if (md.ZoomWin != 0) {
@@ -151,10 +154,13 @@ void MinBox(u16 begin, u16 size, u16 color)
         for (step = Diskret - 1; step != 0; step--) {
             across = MinBx5(size & 0xFF, begin & 0xFF, step, 11);
             down = MinBx5(size >> 8, begin >> 8, step, 5);
+            /* The sizes: the cast cuts off the beginning that `down` has
+               in its high byte. */
             ShadBox(down & 0xFF00 | across >> 8,
-                    down << 8 | across & 0xFF, color);
+                    (u16)(down << 8 | across & 0xFF), color);
             tick = MinBx3(tick);
-            Window(down & 0xFF00 | across >> 8, down << 8 | across & 0xFF);
+            Window(down & 0xFF00 | across >> 8,
+                   (u16)(down << 8 | across & 0xFF));
         }
         MinBx3(tick);
         *shadow = shadows;
@@ -167,6 +173,7 @@ void MinBox(u16 begin, u16 size, u16 color)
    of `size` has for the box. Returns the place a row below. */
 u16 StdLine(u16 place, u16 cell, u16 ends, u16 size)
 {
+    /* Fewer than ten columns wrap round, as in ShadBox. */
     BoxLine(BasAdr(place), cell, ends, 3, (u8)(size - 10));
     return place + 0x100;
 }

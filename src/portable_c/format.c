@@ -26,7 +26,7 @@ struct TimeText {
     u8  suffix;                         /* 'a' or 'p', or a space */
 };
 
-u16 HexDec(u16 number);
+u16 HexDec(i32 number);
 void PutDate(u16 date, struct DateText *text);
 u8 *BufDate(const struct DateText *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText *text);
@@ -47,18 +47,18 @@ static const u8 DirMarker[2][9] = {
 
 /* The two decimal digits of a number below 100, as characters: the tens in
    the low byte. Only the low byte of `number` counts. */
-u16 HexDec(u16 number)
+u16 HexDec(i32 number)
 {
-    u16 tens;
+    i32 tens;
 
     number &= 0xFF;
     tens = number / 10;
-    return tens + '0' + (number - tens * 10 + '0' << 8);
+    return (u16)(tens + '0' + (number - tens * 10 + '0' << 8));
 }
 
 /* Write a zero or a separator of a number. Before the first digit there is
    none; in a padded number a space takes its place. */
-static u8 *PutFill(u8 *buffer, u16 character, u16 started, u16 mode)
+static u8 *PutFill(u8 *buffer, u16 character, bool started, u16 mode)
 {
     if (started)
         *buffer++ = (u8)character;
@@ -79,8 +79,9 @@ static u8 *PutFill(u8 *buffer, u16 character, u16 started, u16 mode)
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode)
 {
     u32 number = (u32)high << 16 | low;
-    u16 started = 0;                    /* a digit has been written */
-    u16 i, digit;
+    bool started = false;               /* a digit has been written */
+    i32 i;
+    u16 digit;
 
     mode &= 0xFF;
     if (md.Country.Sep1000[0] == 0 && (mode & NUM_SEPARATED)) {
@@ -98,7 +99,7 @@ u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode)
             digit++;
         }
         if (digit != '0') {
-            started = 1;
+            started = true;
             *buffer++ = (u8)digit;
         } else {
             buffer = PutFill(buffer, '0', started, mode);
@@ -119,7 +120,7 @@ void PutDate(u16 date, struct DateText *text)
 {
     u16 day = HexDec(date & 0x1F);
     u16 month = HexDec(date >> 5 & 0x0F);
-    u16 year = (date >> 9 & 0x7F) + 80;         /* since 1900 */
+    i32 year = (date >> 9 & 0x7F) + 80;         /* since 1900 */
     u16 year2 = HexDec(year % 100);
 
     text->century = HexDec(year / 100 + 19);
@@ -160,7 +161,7 @@ u8 *BufDate(const struct DateText *text, u8 *buffer)
    space. A country with a 12-hour clock gets a suffix, 'a' or 'p'. */
 void PutTime(u16 time, struct TimeText *text)
 {
-    u16 hour = time >> 11;
+    i32 hour = time >> 11;
 
     text->second = HexDec((time & 0x1F) * 2);
     text->minute = HexDec(time >> 5 & 0x3F);
@@ -213,7 +214,7 @@ static u16 *PutPair(u16 *screen, u16 pair, u16 color)
 static u16 *PutSize(const struct WCBdef *wcb,
                     const struct FILENT *file, u16 *screen, u16 color)
 {
-    u16 i, marker;
+    i32 i, marker;
 
     color &= 0xFF00;
     if (file->AttrF & ATTR_DIRECTORY) {

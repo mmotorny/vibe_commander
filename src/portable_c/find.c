@@ -107,7 +107,7 @@ void PutDate(u16 date, struct DateText *text);
 u8 *BufDate(const struct DateText *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText *text);
 u8 *BufTime(const struct TimeText *text, u8 *buffer);
-void FilZero(u8 *text, u16 length);                     /* string.c */
+void FilZero(u8 *text, i32 length);                     /* string.c */
 void NormStr(u8 *text);
 u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
 void V81_00(void);                                      /* view.c */
