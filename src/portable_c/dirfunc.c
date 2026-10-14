@@ -72,7 +72,7 @@ void NormStr(u8 *text);                                 /* string.c */
 u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
 void PutFls(struct WCBdef *panel);                      /* panel.c */
 void PutTre(struct WCBdef *panel);                      /* tree.c */
-u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
+u8 *FilDir(u8 *buffer, i32 directories, i32 files);     /* panel.c */
 struct DateText {                                       /* format.c */
     u16 century;
     u16 first, second, third;
@@ -1012,8 +1012,7 @@ i32 F38_00(struct WCBdef *panel)
     selected = TotSel(panel);
     if ((selected.directories != 0 || selected.files != 0)
         && md.OneFile == 0) {
-        /* Counts of a panel's entries, which a panel keeps below 64K. */
-        FilDir(md.TmpBuf, (u16)selected.directories, (u16)selected.files);
+        FilDir(md.TmpBuf, selected.directories, selected.files);
         for (i = 0; i < LenPath; i++)
             md.TmpBuf[100 + i] = panel->WinPath[i];
         box = &DelSe_B;

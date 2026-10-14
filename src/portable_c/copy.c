@@ -93,7 +93,7 @@ bool F35_61(u16 answer, u16 place);
 const u8 *FndLet(const u8 *text);                       /* string.c */
 void NormStr(u8 *text);
 u8 *UnConv(u8 *name, const u8 *buffer);                         /* mask.c */
-u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
+u8 *FilDir(u8 *buffer, i32 directories, i32 files);     /* panel.c */
 u16 ChTree(u16 column);                                 /* treebox.c */
 
 /* Boxes and texts, which OncZoom and Dialog take a pointer to: those of
@@ -1490,8 +1490,7 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
         goto F35_06;
     }
     if ((directories | files) != 0) {
-        /* Both came in 16 bits: from TotSel, or BX and DX. */
-        to = FilDir(to, (u16)directories, (u16)files) - 1;
+        to = FilDir(to, directories, files) - 1;
     } else {
         from = ENTRY(panel, panel->CurAdr)->NameF;
         length = 13;

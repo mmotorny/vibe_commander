@@ -19,8 +19,8 @@
 void Panel(struct WCBdef *panel);
 void PutPath(struct WCBdef *panel);
 void PutFls(struct WCBdef *panel);
-void SetCur(struct WCBdef *panel, u16 set);
-u8 *FilDir(u8 *buffer, u16 directories, u16 files);
+void SetCur(struct WCBdef *panel, bool set);
+u8 *FilDir(u8 *buffer, i32 directories, i32 files);
 
 /* PtPt10 is in vc.h. */
 
@@ -93,8 +93,8 @@ void Panel(struct WCBdef *panel)
     struct LineArgs line;
     u16 place = BegBX(panel);
     u16 *screen = BasAdr(place);
-    u16 color = Color(Panel_P[0]) << 8;
-    u16 full, count, i;
+    u16 color = (u16)(Color(Panel_P[0]) << 8);
+    i32 full, count, i;
 
     screen = BoxDubl(screen, color, (SizDX() >> 8) - 2, 0, 38) - 3 * 80;
     if (panel->WinTyp == 1 || panel->WinTyp == 3) {
@@ -193,7 +193,7 @@ void PutPath(struct WCBdef *panel)
     struct WCBdef *wcb = panel;
     struct LineArgs line;
     u16 place = BegBX(panel);
-    u16 limit, least, length;
+    i32 limit, least, length;
 
     place = ADD_LOW(place, 20);
     if (wcb->WinTyp > 2)
@@ -251,7 +251,8 @@ void PutFls(struct WCBdef *panel)
     u8 *text;
     const u8 *from;
     u32 size;
-    u16 lines, count, place, bottom, address, color, c, i;
+    u16 place, address, color, c;
+    i32 lines, count, bottom, i;
 
     CorPar(panel);
     lines = LnsAX();
@@ -270,7 +271,7 @@ void PutFls(struct WCBdef *panel)
             color = Cursr_C;
         if (file->AttrF & ATTR_SELECTED)
             color += Slct_C;
-        color = Color(color) << 8;
+        color = (u16)(Color(color) << 8);
         screen = BasAdr(place);
 
         /* PutName in the assembly. */
@@ -322,7 +323,7 @@ void PutFls(struct WCBdef *panel)
     place = BegBX(panel);
     place += (SizDX() & 0xFF00) - 0x200;
     screen = BasAdr(place + 1);
-    color = Color(Back_C) << 8;
+    color = (u16)(Color(Back_C) << 8);
     for (i = 0; i < 38; i++)
         screen[i] = color | ' ';
     address = DSKBUF;
@@ -353,13 +354,14 @@ void PutFls(struct WCBdef *panel)
         text--;                         /* 1 byte */
     for (; i < 10; i++)
         *text++ = BytIn_S[i];
-    text = Number(text, 0, count, NUM_SEPARATED);
+    /* The count fits: a panel holds 2,703 entries, ReDr00. */
+    text = Number(text, 0, (u16)count, NUM_SEPARATED);
     for (; i < 25; i++)
         *text++ = BytIn_S[i];
     if (count == 1)
         text--;                         /* 1 selected file */
     *text = 0;
-    if ((u16)(text - md.TmpBuf) > 36) {
+    if (text - md.TmpBuf > 36) {
         /* The b of bytes is looked for in 25 characters. A K goes over
            the last three digits before it, and over the separator before
            those if the country has one, and the rest moves up: 40 bytes,
@@ -383,25 +385,25 @@ void PutFls(struct WCBdef *panel)
     CntLine(&line);
 }
 
-/* Show the cursor of a panel on the screen, if `set` is not 0, or take it
-   off: the colours of the entry it is on, which is the width of a column
-   in brief, of the panel in full, and in the tree 14 cells from the one
-   before the name, or 3 for the root. Only the low byte of `set` counts.
-   Nothing is done for a panel of another kind, or for one with no entry.
+/* Show the cursor of a panel on the screen, if `set`, or take it off:
+   the colours of the entry it is on, which is the width of a column in
+   brief, of the panel in full, and in the tree 14 cells from the one
+   before the name, or 3 for the root. Nothing is done for a panel of
+   another kind, or for one with no entry.
 
    The mark between the name and the extension of a file is written too.
    So is, in the tree, the cell before the name, which is a space under
    the cursor and without it a piece of the line that leads to the name;
    that piece is not given the colour of the rest. */
-void SetCur(struct WCBdef *panel, u16 set)
+void SetCur(struct WCBdef *panel, bool set)
 {
     struct Place at;
     u16 *screen;
     u8 *mark;
-    u16 color, place, below, width, lines;
+    u16 color, place;
+    i32 below, width, lines, level, indent;
     u8 attributes;
 
-    set &= 0xFF;
     color = set != 0 ? Cursr_C : Back_C;
     AdrNum(panel, &at);
     below = at.cursor - at.first;
@@ -443,12 +445,12 @@ void SetCur(struct WCBdef *panel, u16 set)
         /* A directory up to 11 levels down has its name at its level,
            two or three columns to each; one further down in the last
            column. */
-        lines = TreeCursor->DirLevel;
-        if (lines <= 11) {
-            width = lines + lines - 0x17;
+        level = TreeCursor->DirLevel;
+        if (level <= 11) {
+            indent = level + level - 0x17;
             if (md.TreeTyp != 0)
-                width += lines;
-            place = ADD_LOW(place, width);
+                indent += level;
+            place = ADD_LOW(place, indent);
         }
         screen = BasAdr(place);
         *(u8 *)screen = ' ';
@@ -456,27 +458,29 @@ void SetCur(struct WCBdef *panel, u16 set)
         if (TreeCursor > TRELIST) {
             width = 14;
             if (set == 0) {
-                *screen++ = Color(Back_C) << 8 | LINE;
+                *screen++ = (u16)(Color(Back_C) << 8 | LINE);
                 width--;
             }
         }
         if (TreeCursor == TreeCurrent)
             color += Slct_C;
     }
-    MvsColr(screen, width, Color(color));
-    Window(place, 0x100 | width + 1);
+    MvsColr(screen, (u16)width, Color(color));
+    Window(place, (u16)(0x100 | width + 1));
 }
 
 /* Write "3 files and 2 directories" to `buffer`, with a zero byte behind
    it, or of the two only what there is some of, and return the address
    behind the zero. With neither files nor directories that is
    "0 directories". */
-u8 *FilDir(u8 *buffer, u16 directories, u16 files)
+u8 *FilDir(u8 *buffer, i32 directories, i32 files)
 {
-    u16 i;
+    i32 i;
 
     if (files != 0) {
-        buffer = Number(buffer, 0, files, NUM_SEPARATED);
+        /* Both counts fit: they are of what a panel holds, 2,703
+           entries, ReDr00. */
+        buffer = Number(buffer, 0, (u16)files, NUM_SEPARATED);
         for (i = 0; i < 6; i++)
             *buffer++ = FilDi_S[i];
         if (files == 1)
@@ -486,7 +490,7 @@ u8 *FilDir(u8 *buffer, u16 directories, u16 files)
         for (; i < 11; i++)
             *buffer++ = FilDi_S[i];
     }
-    buffer = Number(buffer, 0, directories, NUM_SEPARATED);
+    buffer = Number(buffer, 0, (u16)directories, NUM_SEPARATED);
     for (i = 11; i < 23; i++)
         *buffer++ = FilDi_S[i];
     if (directories == 1) {

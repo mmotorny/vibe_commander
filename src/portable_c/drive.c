@@ -56,8 +56,8 @@ static const u8 Driv_S[7] = " drive:";
 
 /* Ask for the drive of the panel `panel`, with the item `item` of the
    menu bar marked, 1 for the left panel and 5 for the right one, and put
-   the panel on the drive that is chosen. Returns 0 if none was. */
-u16 F62_01(struct WCBdef *panel, u16 item)
+   the panel on the drive that is chosen. Returns false if none was. */
+bool F62_01(struct WCBdef *panel, i32 item)
 {
     struct Answer asked;
     struct Mouse pointer;
@@ -66,14 +66,17 @@ u16 F62_01(struct WCBdef *panel, u16 item)
     u16 *first;                         /* DI: where the first letter is */
     u8 *cell;
     u16 begin, size;                    /* BX and DX: the box */
-    u16 count;                          /* CL: how many drives */
-    u16 cursor;                         /* CH: the one of the cursor */
-    u16 apart;                          /* BP: cells between two letters */
-    u16 wide, letter, unit, active, place, right, color, c, i, key;
-    u16 state, look, mouse, at, index;
+    i32 count;                          /* CL: how many drives */
+    i32 cursor;                         /* CH: the one of the cursor */
+    i32 apart;                          /* BP: cells between two letters */
+    i32 wide;                           /* columns of the letters */
+    i32 unit, active, i, at, index;
+    u16 letter, place, color, c, key;
+    u16 state, look, shape, mouse;
+    bool right;
 
     HidCur();
-    PutMnu(item);
+    PutMnu((u16)item);
     count = 0;
     for (letter = 'A'; letter <= 'Z'; letter++) {
         if (!TstDrv(letter))
@@ -82,7 +85,7 @@ u16 F62_01(struct WCBdef *panel, u16 item)
            that the drive goes by now. */
         if (letter <= 'B' && md.DriveB == 0) {
             unit = letter - ('A' - 1);
-            asked = DriveLetter(unit);
+            asked = DriveLetter((u16)unit);
             active = 0;
             if (!asked.failed)
                 active = asked.value & 0xFF;
@@ -116,22 +119,22 @@ F62_06:
         size++;
     begin = ADD_LOW(begin, 21);
     if (wide > size)
-        size = wide;
+        size = (u16)wide;
     size = ADD_LOW(size, 10 + 2);
     begin = ADD_LOW(begin, -((size + 1 & 0xFF) >> 1));
     begin = 5 << 8 | begin & 0xFF;
     size = (6 + 1) << 8 | size & 0xFF;
     begin = SftEGA(begin);
     SavWin(begin, size, md.WinBuf);
-    color = Color(Box_C) << 8;
+    color = (u16)(Color(Box_C) << 8);
     MinBox(begin, size, color);
 
-    place = (u8)((begin >> 8) + 1) << 8 | (u8)(BegBX(panel) + 13);
+    place = (u16)((u8)((begin >> 8) + 1) << 8 | (u8)(BegBX(panel) + 13));
     MvsBw(BasAdr(place), DrLe_S, 14, color);
     right = (place & 0xFF) >= 30;
     place = (place & 0xFF00) + 0x100 | (right ? 11 + 39 : 11);
     next = MvsBw(BasAdr(place), Choo_S, 7, color);
-    c = Color(BoxBr_C) << 8;
+    c = (u16)(Color(BoxBr_C) << 8);
     if (right)
         next = MvsBw(next, Rght_S, 5, c);
     else
@@ -139,8 +142,8 @@ F62_06:
     MvsBw(next, Driv_S, 7, color);
 
     /* The letters. */
-    place = (begin & 0xFF00 | BegBX(panel) & 0xFF) + 0x314
-        - (wide + 1 >> 1);
+    place = (u16)((begin & 0xFF00 | BegBX(panel) & 0xFF) + 0x314
+                  - (wide + 1 >> 1));
     if (apart >= 2)
         place++;
     first = BasAdr(place);
@@ -181,14 +184,14 @@ F62_15:                                 /* the cursor */
 F62_21:
     state = state & 0x80 | pointer.buttons & 0xFF;
     mouse = pointer.place;
-    c = 'x';
+    shape = 'x';
     if (state & 4)
         goto F62_27;
-    c = CHECK;
+    shape = CHECK;
     if (state & 2)
         goto F62_27;
-    at = (u16)((u8 *)first - (u8 *)md.ScrBuf) >> 1;
-    place = (at / 80 & 0xFF) << 8 | at % 80;
+    at = first - md.ScrBuf;
+    place = (u16)((at / 80 & 0xFF) << 8 | at % 80);
     index = 0;
     for (;;) {
         if (!InWind(mouse, place, apart != 0 ? 0x103 : 0x101))
@@ -209,15 +212,15 @@ F62_21:
     cursor = (u8)index;
     goto F62_15;
 F62_25:
-    c = CHECK;
+    shape = CHECK;
     if ((u8)index == cursor)
         goto F62_27;
 F62_26:
-    c = 0;
+    shape = 0;
 F62_27:
-    if (c != look) {
-        look = c;
-        TypMous(c);
+    if (shape != look) {
+        look = shape;
+        TypMous(shape);
     }
     pointer = GetMous(mouse);
     if (pointer.buttons != 0)
@@ -292,12 +295,12 @@ F62_40:
 
 F62_41:                                 /* the drive, and where it is */
     if (letter == 0)
-        return 0;
+        return false;
     HidCur();
     unit = (u8)(letter - ('A' - 1));
-    DriveSetLetter(unit);
+    DriveSetLetter((u16)unit);
     md.BlocEr = 1;
-    asked = DirCurrent(unit, panel->WinPath + 3);
+    asked = DirCurrent((u16)unit, panel->WinPath + 3);
     if (!asked.failed) {
         panel->WinPath[0] = (u8)letter;
         asked = DirChange(panel->WinPath);
@@ -311,12 +314,12 @@ F62_41:                                 /* the drive, and where it is */
        and shows files. */
     if (panel != CurrentPanel && FilePan(InvWCB(panel)))
         goto F62_45;
-    DriveSelect(unit - 1);
+    DriveSelect((u16)(unit - 1));
 F62_45:
     panel->WinTyp = 0;
     panel->ChgFlg = 1;
     md.BlocEr = 1;
     panel->CurAdr = DSKBUF;
     panel->EndBuf = DSKBUF;
-    return 1;
+    return true;
 }

@@ -9385,7 +9385,7 @@ for.
 | N9 † | `copy.c` | 1,571; 147 | F6 | **Done**, the buffer in bytes, with its question answered and its fix: "N9, `copy.c`: done, and what a later cluster should know" below |
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | **Done**: "N10, `dirfunc.c`: done, and what a later cluster should know" below |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
-| N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | |
+| N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | **Done**: "N12, `panel.c`, `info.c`, `drive.c`" below. Two questions of the Info panel prepared there, a cluster of 64K and a file just under 65,536 clusters |
 | N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | |
 | N14 | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | Carries out the answer to question 4 |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
@@ -14044,6 +14044,171 @@ It took some 80 tool calls to hand back, of which 15 were reading the
 brief, the plan and the file, 10 the types by scripts, 5 the record's
 reasons, and the rest the tests, the images and this; the suite took
 18 minutes on a machine that four other clusters were testing on.
+
+### N12, `panel.c`, `info.c`, `drive.c`: done, and what a later cluster should know
+
+**What there is.** The three files sorted by "The rule for a number",
+with the steps of "N0d" in their order. clang's warnings of a
+conversion are silent for the three files. The whole suite passes, no
+golden and no patch changed, and the image of each of the 155
+scenarios is that of the build before (below).
+
+**Two questions for the user, prepared**, both of the Info panel, both
+bugs of the original that the portable C has as it is, and neither
+decided. Both by reading the assembly, `RdInfo` and `PutInf` of
+`VCSUB3.INC`, and neither tried on the bench: the bench's hard disks
+are made by `mformat` with its own size of a cluster, 32 MB of them,
+and a disk of 64K clusters or a file of 128 MB is not a few steps of
+a scenario.
+
+- *A, a cluster of 64K.* `RdInfo` keeps the bytes of a cluster in
+  `ClstSiz`, a word: what DOS answers for a sector times the sectors
+  of a cluster, `MUL CX`, of which the high word is lost. A cluster of
+  64K, 128 sectors of 512 bytes, is 0 there. The Info then says "0
+  total bytes" and "0 bytes free" for the disk, and the line of the
+  other panel's files counts each file by its size, not in whole
+  clusters, since a cluster of 1 byte or fewer is not rounded to
+  (`CMP CX,1`, `JBE PtIn04`). Such clusters are on a FAT16 disk of
+  more than 2 GB, as Windows NT formats one. The portable C does the
+  same: `ClstSiz` is a `u16` of the main data, and the piece M's.
+  *Recommended*: the piece M widens `ClstSiz` to 32 bits, so that the
+  Info says what the disk has: 65,535 clusters of 64K are
+  4,294,901,760 bytes, which a `u32` holds. *Or*: as the original. A
+  layer for other systems will want it wide in any case: their clusters
+  are 64K and more. For a dialog: *"On a disk with clusters of 64K
+  (FAT16 above 2 GB), the Info panel says 0 total bytes and 0 bytes
+  free, as the original does. Fix it when the piece M widens the field
+  (recommended), or keep it?"*
+- *B, a file just under 65,536 clusters.* The line "N files uses X
+  bytes in" counts every file of the other panel in whole clusters,
+  in 16 bits: the clusters of the high word's multiples of the cluster
+  first, then those of the rest, a quotient of 16 bits (`DIV CX`), one
+  more if there is a remainder (`INC AX`). Where the quotient is
+  65,535 and there is a remainder, it wraps round to 0: a file whose
+  size lies inside the last cluster below a multiple of 65,536
+  clusters, and not at its end, counts 65,536 clusters less. On a disk
+  of 2K clusters a file of 134,217,000 bytes counts 0 bytes, where it
+  takes 134,217,728; on one of 512 bytes, a file of 33,554,000. The
+  portable C does the same, with its own variable for the quotient,
+  `clusters` of `PutInf`, kept 16 bits and recorded so. *Recommended*:
+  count the clusters of a file in 32 bits, in `PutInf`, declared as a
+  fix, which no golden shows. *Or*: as the original. For a dialog:
+  *"The Info panel counts a file of just under 65,536 clusters (128 MB
+  on 2K clusters) as 65,536 clusters less, as the original does. Fix
+  it (recommended), or keep it?"*
+
+The two meet in `PutInf`: with `ClstSiz` 32 bits and a cluster of 64K,
+the 16-bit pieces there would divide by 65,536, which they cannot, so
+answer A wants the count of B in 32 bits too, or a word of its own for
+a cluster of 64K.
+
+**The numbers.** Of the 80 of 8 or 16 bits and the three `u32` of the
+three files:
+
+| | `drive.c` | `info.c` | `panel.c` | Which |
+|---|---|---|---|---|
+| Widened, to `i32` | 10 | 4 | 16 | The drives of the box, its cursor, the cells between the letters, the columns of the letters, the drive's unit and what DOS answers of it, the menu's item that `F62_01` takes, the index of a cell; the files counted, the lines and the room of dirinfo; the lines and the counts of `Panel` and `PutFls`, the columns of a path, the row of the cursor below the first, what `FilDir` takes |
+| Made `bool` | 2 | | 1 | What `F62_01` answers, `right` of it, what `SetCur` takes |
+| Kept by a word | 16 | 13 | 21 | `text` 19, the texts; `colour` 6, the tables of colours and two numbers of a colour; `cell` 3, `Color(...) << 8`; `place` 9; `character` 5; `key`, `bits`, `attributes` 1 each; `size` 3, the three `u32`; `address` 1, the place in a panel of `PutFls`; `small` 1, the columns of `Panel_T` |
+| Kept by a sentence | | 3 | | `cluster` and `high` of `PutInf`, which the original divides in 16 bits; `clusters`, which wraps, question B |
+| `sign` | 2 | | 3 | `wide + 1 >> 1` and `at / 80`, `at % 80` of `F62_01`; `length - least >> 1` of `PutPath`, `below / lines` and `below %= lines` of `SetCur`: none below 0 |
+
+Variables that held two things in turn got a second: `c` of `F62_01`,
+a colour and then the look of the mouse pointer, `shape`; `i` of
+`PutInf`, an index, two characters of dirinfo, `two`, and the columns
+to a tab, `skip`, with the quotient of the clusters, `clusters`; in
+`SetCur`, `lines` of the panel and the level of a directory, `level`,
+and `width`, a column that may be back and a count of cells, `indent`.
+So four `i32` and two `u16` more than there were numbers.
+
+**The casts.** clang named 11 places before anything changed; 3 went
+by a type (`count` of `Panel`, `lines` of `PutFls`, `below` of
+`SetCur`), 8 by a cast, each a `(u16)` of `Color(...) << 8` or of a
+place made of a row and a column. The widening made 13 more: the unit
+of a drive handed to `DriveLetter`, `DriveSetLetter`, `DirCurrent` and
+`DriveSelect` until `sys.h` is sorted, four; the item handed to
+`PutMnu`; the columns of the letters kept in `size` and in a place;
+the count of files handed to `Number`, twice, and the two counts of
+`FilDir`, which fit by a panel's limit and say so; the width of the
+cursor handed to `MvsColr` and `Window`. So 21 casts that narrow, none
+with `wraps`: what wraps is `clusters`, which stays 16 bits, with a
+comment at its step. Three that were there went, each a `(u16)` of a
+difference of two pointers that cannot leave 16 bits, `at` of
+`F62_01`, the offset in the other panel of `PutInf` and the length of
+the mini status in `PutFls`; and the two of `copy.c` at its call of
+`FilDir`, with their comment. `portable_c-cut` needed no function more.
+
+**`harness/int16.py`.** The six places of the three files went,
+`active == 3 - unit`, two indexes and a shift of `F62_01`, the index of
+a tab in `PutInf` and the shift of `PutPath`, whose numbers are `i32`
+now; the two shifts are of the kind `sign` of the other record, with
+their reasons. Four are new, each with its reason: the two differences
+of pointers that lost their cast, of `PutInf` and `PutFls`, compared;
+`at` of `F62_01`, and the place of its letters, `widen`.
+
+**Across clusters.** Each line in another's file is a declaration or
+its call:
+
+- `F62_01` answers a `bool` and takes the item as an `i32` (`vc.h`);
+  `main.c` asks `== 0` and hands a `u16`, unchanged.
+- `SetCur` takes a `bool`: `keys.c` declares it so, one line, and
+  hands 0 and 1.
+- `FilDir` takes two `i32`: `copy.c` and `dirfunc.c` declare it so,
+  one line each, and `copy.c` lost its two casts and their comment.
+  `dirfunc.c` hands `struct Selected`, which is `i32`: N10, which
+  landed first, had a `(u16)` on each with a comment, which went at the
+  rebase.
+- `PutMnu` of `menu.c` (N18) takes the item as a `u16`: the cast at
+  the call goes when N18 widens it. The four functions of `sys.h` that
+  take a drive: their casts go with S or the layer.
+- `LnsAX` answers an `i32`, which `Panel` and `PutFls` keep in one now.
+
+**The program.** `VC.EXE` is another, by the types: 288,351 bytes,
+48 fewer, `a4e3c849...` where the build of `main` that the cluster
+began on, `bf073d6`, is `957d0bed...`. The types and the casts were
+written together; the one cast written behind the build that the suite
+judged, of `SetCur`, left it the same bytes. The image of every
+scenario, `python3 harness/dataimage.py compare`, against that build:
+"155 scenarios, 42 with nothing that differs; 6 differences, 0 more in
+what was declared as changed, 148 in what may differ". The six are in
+`copy` and `copy-dirs`, each 80h before and 7Fh after, in `TmpBuf` and
+`TmpErr` just behind the zero of a name or a path: the byte behind a
+name that DOS found, of the program's file as the extender loaded it,
+in copies that no longer are what a field holds, which "F5" names and
+`NAME_TAIL` of the tool does not take. Of the main data's 158 bytes
+that differ in all, 119 are that pair, 80h and 7Fh. Shown by building
+the tree with `FilDir` as it was and the rest as it is: then `copy` has
+nothing that differs, so it is the length of the code and not what it
+does; `FilDir` writes the same text for every count that a panel can
+have.
+
+What a later cluster should know:
+
+- The six differences of the image above are what any change of the
+  file's length may give, in `copy`, `copy-dirs` and `russian`: read
+  them for 80h and 7Fh, or the pair that the fields of the names have,
+  behind a zero, before looking further.
+- The piece P, which lifts a panel's limit: the two counts of files
+  handed to `Number` in `PutInf` and `PutFls`, and the two of `FilDir`,
+  are cut to 16 bits with a comment that names the limit of 2,703
+  entries of `ReDr00`; with more than 65,535 entries they would want
+  the high word too. `address` of `PutFls` is a place in the panel, as
+  the fields are, and the compare of `PutInf` is an offset in it with a
+  reason in `harness/int16.txt` that names the limit.
+- `ADD_LOW` of `vc.h` takes a step that may be back and adds it to the
+  low byte alone: `indent` of `SetCur` is below 0 for every level of
+  the tree, and is an `i32` for that. Its result, a place, needs no
+  cast: clang knows that `& 0xFF00 | ... & 0xFF` fits.
+- A `(u8)` cast that a line has where the original takes a byte,
+  `(u8)index >= count`, `cursor = (u8)(count - 1)`, `(u8)((SizDX() >>
+  8) - 12)`, stays as it is written when the variable is widened: it
+  says what the original takes, and clang does not name it.
+
+It took some 100 tool calls to hand back: reading the brief, the plan
+and the sections 15, the three files and the finder's lists 10, the
+types and the record by scripts 15, the tests 10, and some 20 to find
+what the six differences of the image are, by building the tree three
+times with parts of it as they were, which the note above saves.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

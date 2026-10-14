@@ -64,7 +64,10 @@ void PutInf(struct WCBdef *panel)
     u8 *text, *cell;
     u16 *screen;
     u32 size, total;
-    u16 place, count, cluster, high, lines, room, i;
+    u16 place;
+    u16 cluster, high, clusters;        /* of a size, in 16 bits */
+    u16 two;                            /* two characters of dirinfo */
+    i32 count, lines, room, skip, i;
     struct WCBdef *other;
 
     if (panel->WinTyp != 2)
@@ -107,7 +110,7 @@ void PutInf(struct WCBdef *panel)
         count = 0;
         cluster = md.ClstSiz;
         for (file = ENTRY(other, DSKBUF);
-             (u16)((const u8 *)file - (const u8 *)other) < other->EndBuf;
+             (const u8 *)file - (const u8 *)other < other->EndBuf;
              file++) {
             if (file->AttrF & ATTR_DIRECTORY)
                 continue;
@@ -116,18 +119,23 @@ void PutInf(struct WCBdef *panel)
             if (cluster > 1) {
                 /* The clusters that the high half of the size fills, and
                    then those of the rest, of which one may be filled in
-                   part. They are counted in 16 bits. */
+                   part. They are counted in 16 bits, and the count of the
+                   rest wraps round to 0 where it is 65,535 and one more
+                   is filled in part, as in the original: a size that
+                   lies inside the last cluster below a multiple of
+                   65,536 clusters counts 65,536 clusters less. */
                 high = (u16)(size >> 16);
                 total += (u32)(u16)(high - high % cluster) << 16;
                 size = (u32)(high % cluster) << 16 | (u16)size;
-                i = (u16)(size / cluster);
-                if ((u16)((u16)size - i * cluster) != 0)
-                    i++;
-                size = (u32)i * cluster;
+                clusters = (u16)(size / cluster);
+                if ((u16)((u16)size - clusters * cluster) != 0)
+                    clusters++;
+                size = (u32)clusters * cluster;
             }
             total += size;
         }
-        Number(md.TmpErr + 1, 0, count, NUM_SEPARATED);
+        /* The count fits: a panel holds 2,703 entries, ReDr00. */
+        Number(md.TmpErr + 1, 0, (u16)count, NUM_SEPARATED);
         Number(md.TmpErr + 101, (u16)(total >> 16), (u16)total,
                NUM_SEPARATED);
         /* "files uses" without the one s or the other, and "bytes"
@@ -157,7 +165,8 @@ void PutInf(struct WCBdef *panel)
         CntLine(&line);
     }
     place += 0x400;
-    lines = (u8)((SizDX() >> 8) - 12);
+    lines = (u8)((SizDX() >> 8) - 12);  /* above 0: a panel has more
+                                           than 12 rows */
     if (md.InfoLen == 0xFFFF) {
         PUT(PtIn9_S);
         return;
@@ -170,23 +179,23 @@ void PutInf(struct WCBdef *panel)
         cell = (u8 *)screen;
         room = 36;
         for (;;) {
-            i = *(u16 *)text;
+            two = *(u16 *)text;
             text += 2;
-            if (i == LF_CR || i == CR_LF)
+            if (two == LF_CR || two == CR_LF)
                 break;
             text--;
             if (text > md.InfBuf + md.InfoLen)
                 break;
             if (room == 0)
                 continue;
-            i &= 0xFF;
-            if (i == TAB) {
-                i = 8 - (36 - room & 7);
-                cell += i + i;
-                room = room < i ? 0 : room - i;
+            two &= 0xFF;
+            if (two == TAB) {
+                skip = 8 - (36 - room & 7);
+                cell += skip + skip;
+                room = room < skip ? 0 : room - skip;
                 continue;
             }
-            *cell = (u8)i;
+            *cell = (u8)two;
             cell += 2;
             room--;
         }

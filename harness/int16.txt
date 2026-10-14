@@ -89,23 +89,15 @@ dos32.c, OwnSet: widen
     ARENA, an address less an address, in the system's file. The line
     below asks that its paragraphs fit 16 bits.
 
-drive.c, F62_01: compare
-    | if (active == 3 - unit)
-    unit is 1 or 2: the letter is A or B, by the lines above.
+drive.c, F62_01: widen
+    | at = first - md.ScrBuf;
+    first is a cell of the box, which is on the screen: within the
+    MaxLins * 80 cells of ScrBuf, 0 or more and below 64K.
 
-drive.c, F62_01: index
-    | cell = (u8 *)first + (u16)(u8)(apart + 2 + apart) * cursor + 1;
-    What cursor is multiplied by is cut to a byte, and cursor is the
-    number of a drive, below 26.
-
-drive.c, F62_01: index
-    | screen += apart + 1;
-    apart is 3 at the most, by the lines that count it up from 0.
-
-drive.c, F62_01: shift
-    | - (wide + 1 >> 1);
-    wide is four times the number of drives at the most, by the lines
-    above, and there are 26 letters.
+drive.c, F62_01: widen
+    | place = (u16)((begin & 0xFF00 | BegBX(panel) & 0xFF) + 0x314
+    Cut to 16 bits by the cast on the line itself; the letters are in
+    the box, which is on the screen.
 
 edit.c, T00_20: minus
     | (u16)-160);
@@ -170,9 +162,11 @@ help.c, Help05: widen
     size has the rows of the screen less 3, at the top of the function,
     of a screen of 25 to 50 lines: 13 to 38.
 
-info.c, PutInf: index
-    | cell += i + i;
-    The line above has made i 8 at the most.
+info.c, PutInf: compare
+    | (const u8 *)file - (const u8 *)other < other->EndBuf;
+    An offset in the other panel's block: the loop stops at the first
+    entry at or behind EndBuf, which is FFC0h at the most (ReDr00), so
+    it stays below 64K.
 
 main.c, F39_01: back
     | return Command(Menu_T[table - 1][r->bx >> 1], panel, r);
@@ -213,9 +207,10 @@ menu.c, F40_30: index
     item is the number of a line of a menu: the four calls, in F39_58,
     hand it 10, 12, 13 and 14.
 
-panel.c, PutPath: shift
-    | place = ADD_LOW(place, -((length - least >> 1) + 1));
-    Three lines above ask that length is least or more.
+panel.c, PutFls: compare
+    | if (text - md.TmpBuf > 36) {
+    text is behind TmpBuf, where the lines above have written two
+    numbers and 25 characters: 0 or more, and below 64K.
 
 place.c, AdrNum: widen
     | PLACE(panel, cursor, first, last, lines);

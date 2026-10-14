@@ -25,7 +25,7 @@ void F20_02(struct WCBdef *panel);
 u16 NumAdr(struct WCBdef *panel, i32 number);           /* place.c */
 void PutPath(struct WCBdef *panel);                     /* panel.c */
 void PutFls(struct WCBdef *panel);
-void SetCur(struct WCBdef *panel, u16 set);
+void SetCur(struct WCBdef *panel, bool set);
 void PutTre(struct WCBdef *panel);                      /* tree.c */
 i32 StrLen(const u8 *text);                             /* string.c */
 
