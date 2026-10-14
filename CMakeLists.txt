@@ -691,7 +691,9 @@ set_tests_properties(portable_c-int16 PROPERTIES SKIP_RETURN_CODE 77)
 # which stand for what a segment and an offset were on DOS, counted file
 # by file and held to what was counted last: the measure of the work
 # that takes them out. See harness/words.py. It reads the source and
-# builds nothing.
+# builds nothing. It also fails for a line that a merge's conflict has
+# left in any file that git tracks, but for src/asm and the goldens:
+# harness/conflicts.py.
 add_test(NAME portable_c-words
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/words.py)
 # The numbers of 8 and 16 bits of the portable C, which step 2 of the

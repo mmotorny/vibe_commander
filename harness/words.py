@@ -40,6 +40,10 @@ The table that a run prints says for every word how many places and
 files have it, which file the most, and which piece of the plan is to
 have it at nothing, or that it stays. The record does not hold a piece
 to that: it shows what went, and the table says what is left to go.
+
+The test also fails for a line that a merge's conflict has left in any
+file of the repository, `conflicts.py`: it is the test that every piece
+of the portable C runs and that starts no machine.
 """
 import argparse
 import re
@@ -47,6 +51,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+import conflicts
 from hostcheck import bare
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -292,6 +297,9 @@ def main():
         return
     table = counts(found, args.source)
     print(summary(table))
+    stray = conflicts.report(conflicts.stray())
+    if stray:
+        print("\n" + stray)
     if args.record:
         RECORD.write_text(written(table))
         print(f"\nWritten to {RECORD.relative_to(ROOT)}.")
@@ -303,6 +311,8 @@ def main():
               + "\n\nIf the change was to do that, write the record anew, "
                 "`python3 harness/words.py --record`, and commit it with "
                 "the change: its lines then say what went.")
+        sys.exit(1)
+    if stray:
         sys.exit(1)
     print("\nThe tree is as the record has it.")
 
