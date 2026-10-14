@@ -240,8 +240,8 @@ static void StF07_10(i32 cursor, i32 first)
     moved = first - sd.ColFrst;
     was = sd.ColCur;
     top = sd.ColFrst;
-    sd.ColCur = (u16)cursor;
-    sd.ColFrst = (u16)first;
+    sd.ColCur = cursor;
+    sd.ColFrst = first;
     if (moved == 0 && was == cursor)
         return;
 
@@ -534,7 +534,7 @@ static void StCol00(void)
     }
     Window(0, size);
 
-    chosen.color = Color(sd.ColCur);
+    chosen.color = Color((u16)sd.ColCur);  /* an item: below 40 */
     for (;;) {                          /* Col10 */
         color = chosen.color;
         chosen.what = WHAT_STAY;
@@ -574,7 +574,7 @@ static void StCol00(void)
                 chosen.color = color | 0xF0;
                 break;
             case 0x4200:                /* F8: the default colour */
-                chosen.color = StPalets[ColAddr(sd.ColCur) - md.ColTab];
+                chosen.color = StPalets[ColAddr((u16)sd.ColCur) - md.ColTab];
                 break;
             case 0x4400:                /* F10 */
                 chosen.what = WHAT_LEAVE;
@@ -593,8 +593,8 @@ static void StCol00(void)
             StCol30(chosen.color);
     }
     if (chosen.what == WHAT_ENTER)      /* Col50 */
-        *ColAddr(sd.ColCur) = (u8)color;
-    StF07_75(Color(sd.ColCur));         /* Col55 */
+        *ColAddr((u16)sd.ColCur) = (u8)color;
+    StF07_75(Color((u16)sd.ColCur));         /* Col55 */
     ResWin(0, size, md.WinBuf);
     Window(0, size);
     md.ColTyp = palette;

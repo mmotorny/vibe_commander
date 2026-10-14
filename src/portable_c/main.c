@@ -1483,7 +1483,8 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
     u8 *name;
     u16 answer;
     i32 i;
-    u8 clock, delay, page, setup;
+    u8 clock, delay, page;
+    bool setup;
 
     if (md.ErrDat | md.BlocEr)
         return DEVICE_FAIL;
@@ -1544,7 +1545,7 @@ FtErr5:
     md.Clock = clock;                   /* FtErr8 */
     md.BlDelay = delay;
     md.HlpPage = page;
-    if (setup != 0) {
+    if (setup) {
         StOpen = setup;
         md.BarPrev = 0xFF;
     }

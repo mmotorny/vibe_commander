@@ -9396,7 +9396,7 @@ for.
 | N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | **Done**: "N19a, `bars.c`, `window.c`, `system.c`, `setup.c`" below |
 | N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | |
 | N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | **Done**: "N20, `stcolor.c`, `stopts.c`: done, and what a later cluster should know" below |
-| N21 | `stmain.c`, `sthelp.c` | 1,086; 121 | F8 | |
+| N21 | `stmain.c`, `sthelp.c` | 1,086; 121 | F8 | **Done**: "N21, `stmain.c`, `sthelp.c`: done, and what a later cluster should know" below, with `struct StData` of `vc.h` |
 
 A cluster and a piece of the addresses never have the same lines: a
 cluster starts when the piece that has its files has landed, and of
@@ -14826,6 +14826,123 @@ the sections 12; the images of the build before, on a machine with a
 load of 60, the longest wait; the files read with the finder's lists
 beside them 4; the types, the casts and the reasons by three scripts
 6; the records, the suite and the documents the rest.
+
+### N21, `stmain.c`, `sthelp.c`: done, and what a later cluster should know
+
+**What there is.** The two files sorted by "The rule for a number",
+and with them `struct StData` of `vc.h`, which N20 left; clang's
+warnings of a conversion silent for both files. The whole suite passes,
+no golden and no patch changed, and the image of each scenario is that
+of the build before (below). Nothing a user sees, nothing that DOS is
+asked, and no limit moved: no question for the user.
+
+**The numbers.** Of the 94 of 8 or 16 bits, 35 of `stmain.c`, 46 of
+`sthelp.c` and 13 of `struct StData`, and the 3 `u32` of `sthelp.c`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 29 | The rows and the indexes of the loops, eight; `first` and `rows` of `StUser`, a row and a count, and the row of `StUserScr`; the item of the menu, where the cursor goes and the last item, in `StMain00`, and the item and the width of its line in `StMain40`; in `sthelp.c` the count of bytes that `ReadDsk` is handed, the length of the index's text, the lines of the index and the room in `StRdHelp`, and the first line shown, the one shown before and the last first line of `StHelp`; and five fields of `struct StData`: `IniStat`, `MnItem`, `ColCur`, `ColFrst` and `ColNum`. New: `left`, the bytes that the end of a line is looked for in, which `key` held before it held a key |
+| Made `bool` | 5 | `StOpen`; `save` and `failed` of `StExit`; what `SeekDsk` and `ReadDsk` answer. And `setup` of `FtErr1` in `main.c`, N16's, which keeps `StOpen` while the box is up |
+| Kept by a word | 44, and the 3 `u32` | `text` 9, `place` 9, `colour` 6, `setup` 6, `key` 3, `handle` 3, `cell` 3, `system` 2, `small` 2, `bits` 1 (the help's pages of the menu, and `page` of `StHelp`, HlpPage as it was, made a `u8` as `help.c` has it), and `size` for the 3 `u32`, places in the help file. New: `found`, what the mouse driver answers, which `answer` held before it held what `Dialog` answers; and `how`, AX as the original hands the scroll, which `key` held too |
+| Kept by a sentence | 6 | What `F32_70` answers, in `StMain00`; and in `StHelp` the addresses of 16 bits by which a page is looked for as the original looks for it, `at`, `next` and `end`, the count that `do ... while (--count)` takes for 65,536 at 0, and `moved` |
+| Laid out | 10 | `struct StHlpData` of `sthelp.c`, the 26 bytes in front of an entry of the help file |
+
+No place of the kind `sign`.
+
+**The help's lines.** As `help.c` has them (N18), and on the user's
+word of 14 October 2026 that the help wraps lines past 65,535 as the
+original does: `first`, `shown` and `last` of `StHelp` are `i32`, and
+the cut is written where a sum may leave 16 bits, three places with
+`wraps`. Down at line 65,535 goes to 0, `first = (u16)(first + 1)`,
+which the original's `INC DI` does where the test above it has gone
+round; `last` of PgDn is 65,535 for a page of no lines, the original's
+word less one; and `moved` stays a `u16`, the difference of two lines
+as the original's word has it, held against 1 and FFFFh: at the wrap
+from 65,535 to 0 it is 1, and the text moves by a line, as in the
+original. A help file that is true to its text never gets there.
+
+**The help trusts its file here too.** `StRdHelp` hands `DeCode` the
+length of the index's text, and later the room or the distance to the
+next page, and both may be 0: the first by an index whose entry says
+its text has no bytes, the second by an index whose page behind the
+setup's begins where the first of them does. `DeCode` takes 0 for
+65,536, which in 32 bits writes 64K from `TreeBuf` on, past the main
+data, where the original went round its segment. That is the bug that
+the user decided on 14 October 2026 is to be fixed by refusing such a
+file (`CLAUDE.md`, "The portable C"), and whoever fixes it in `help.c`
+fixes these two places of `sthelp.c` with it. This cluster changed
+nothing of it.
+
+**`struct StData`.** Its five fields that count, the state of the
+setup file, the item of the menu and the three of the palettes' list,
+are `i32`; `CurType` keeps the shape of the cursor, `system`, and the
+three colours their bytes. The structure is 14 bytes longer, 1,360 for 1,346
+as `wcc386` lays it out, and `Aside` and `Row50` stand 12 bytes further
+on in `MenuBuf`; the `HOLDS`
+line holds that it fits. `ColFrst` keeps FFF0h for no line shown, a
+number now and not a word. In `stcolor.c`, N20's, the two casts that
+put the cursor and the first line back into `sd` went, and four came
+where the item under the cursor is handed to `Color` and `ColAddr` as
+the number of a colour.
+
+**The casts.** clang named 13 places before anything changed, 8 in
+`stmain.c`, 5 in `sthelp.c`: none went by a type, each being a place,
+a cell or a colour made of a row and a column or shifted into the high
+byte, and handed on in 16 bits; 13 casts, around the whole expression
+where a cast had stood on its first operand. The widening made 11 more
+in the two files, at the border of a number that stays narrow: the
+width handed to `MvsColr` and `Window`; the count handed to
+`FileRead` of `sys.h` twice and to `DeCode` of `help.c` twice, which
+keeps a `u16`; the first line put back into the entry, `HlpFrst`; the
+difference of two lines into `moved`; and three loops to `(i32)sizeof`
+and `(i32)LEN_BUF`, the last where `(u16)LEN_BUF` stood. Two more that clang does not name are written for
+the wraps above. And in `stcolor.c` 4 came and 2 went (above). Gone:
+`StUser((u16)row, 1)` of `stopts.c`, as N20 said, and the `(u8)` that
+`sd.MnItem` and `HlpPage` were given. Comments: the three `wraps`, the
+first line of 16 bits, and the item that is below 40 in `stcolor.c`.
+
+**Across clusters.** `vc.h`: `StOpen` is a `bool`, which `dialog.c`,
+`bars.c` and `input.c` hold against 0 as before; `StUser` takes two
+`i32`. `main.c`, N16's: `setup` of `FtErr1` is a `bool`, two lines.
+`stopts.c` and `stcolor.c`, N20's: the casts above. Nothing else of
+another's file.
+
+**`harness/int16.py`.** The place of `StUserScr`, an index of 16 bits,
+went with its row; the four of `stcolor.c` that were fields of
+`StData` reckoned with into an `i32` went with the fields; the index of
+`StCol00` is the same place on a line that has its cast now; and one is
+new, `item = (key >> 8) - 0x3C` of `StMain00`, a scan code that the
+case above has from 3Ch to 43h. The three of `sthelp.c` are as they
+were.
+
+**The program.** `VC.EXE` is another, by the types: 284,615 bytes for
+284,599, `7073d21d...` where the build of `main` that the cluster began
+on, `92ff60c`, is `67d57477...`. Its code is shorter: `stmain.c` by 89
+bytes, 0888h for 08E1h, `sthelp.c` by 27, `stcolor.c` by 35 and
+`stopts.c` by 1; `main.c` is the bytes it was. The types and the casts
+were written together and judged together. The image of every scenario,
+`python3 harness/dataimage.py compare`, against the build of `92ff60c`:
+"156 scenarios, 127 with nothing that differs; 1670 differences, 0 more
+in what was declared as changed, 0 in what may differ". The 29 are the
+scenarios of the setup, every difference in `MenuBuf` from byte 513 to
+1,197, where `struct StData` lies, and no other: the tool does not know
+the structure, which is of the setup program and not in the original's
+listing, and `--changed MenuBuf` would pass anything there. So a script
+of `build/`, not kept, read each field at its place in either layout,
+the offsets taken from what `wcc386` makes of `offsetof` with the
+`vc.h` of before and of now: in 28 scenarios every field is the same
+number in both, and in `setup-help-file` all those that the scenario
+sets are, and six that it never sets, the palettes' five, which it does
+not open, and `Row50`, which a screen of 25 rows does not write, read
+what `MenuBuf` held before at their new places; every byte outside the
+fields that are set is the same in both images. A later piece that
+moves `StData` again can take the same way, or teach the tool the
+structure.
+
+It took some 70 tool calls to hand back: the brief, the plan and
+the sections 15; the two files read with the finder's lists beside them
+6; the types and the casts by three scripts 6; the reasons by one script
+2; the records, the suite, the images and the documents the rest.
 
 ### N17b, `commands.c`: done, and what a later cluster should know
 

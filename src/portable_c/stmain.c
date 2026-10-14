@@ -101,7 +101,7 @@ extern const struct BOXHD StDeflt_B;    /* "reset all options?" */
 extern const struct BOXHD StSvSt_B;     /* "save the current setup?" */
 
 /* Not 0 while the setup is open: see vc.h. */
-u8 StOpen;
+bool StOpen;
 
 /* The panel that the program has without a setup file: files in brief,
    shown, hidden ones too, no filter, unsorted, no mask, and the root of
@@ -141,7 +141,7 @@ static const u8 StStErr_S[49] =
    UserScr of the setup program, which has 50 rows. The main data's has
    the 49 that the main program keeps, so the last of 50 is with the
    setup's own data. */
-static u16 *StUserScr(u16 row)
+static u16 *StUserScr(i32 row)
 {
     if (row < MaxLins - 1)
         return md.UserScr + row * 80;
@@ -154,7 +154,7 @@ static void StKeep(void)
 {
     const u16 *from = md.ScrBuf;
     u16 *to;
-    u16 row, i;
+    i32 row, i;
 
     for (row = 0; row < md.Lines; row++) {
         to = StUserScr(row);
@@ -165,11 +165,11 @@ static void StKeep(void)
 
 /* Put into the screen buffer what DOS had on the screen: `rows` rows of
    it, from the row `first` on. */
-void StUser(u16 first, u16 rows)
+void StUser(i32 first, i32 rows)
 {
-    u16 *to = BasAdr(first << 8);
+    u16 *to = BasAdr((u16)(first << 8));
     const u16 *from;
-    u16 i;
+    i32 i;
 
     for (; rows != 0; rows--) {
         from = StUserScr(first++);
@@ -196,11 +196,11 @@ static void StDefault(void)
     const u8 *from = StPalets;
     u8 *first = (u8 *)WCB1;
     u8 *second = (u8 *)WCB2;
-    u16 i;
+    i32 i;
 
     for (i = 0; i < CmnIni; i++)
         ((u8 *)&md)[i] = from[i];
-    for (i = 0; i < sizeof StDefWCB; i++)
+    for (i = 0; i < (i32)sizeof StDefWCB; i++)
         first[i] = StDefWCB[i];
     for (; i < WCBini; i++)
         first[i] = 0;
@@ -224,11 +224,11 @@ static void StDefault(void)
 static u8 *StFile(void)
 {
     u8 *end = md.NcPath;
-    u16 i;
+    i32 i;
 
     while (*end != 0)
         end++;
-    for (i = 0; i < sizeof StInit_F; i++)
+    for (i = 0; i < (i32)sizeof StInit_F; i++)
         end[i] = StInit_F[i];
     return end;
 }
@@ -243,7 +243,7 @@ static void StInit15(void)
 {
     struct Answer opened, read, closed;
     const u8 *file = sd.File;
-    u16 i;
+    i32 i;
 
     sd.IniStat = 0;
     opened = FileOpen(md.NcPath, 0x40); /* to read, with nobody kept from
@@ -271,14 +271,14 @@ static void StInit15(void)
 /* Give the line of the item `item` of the menu the colour `color`, a
    number of the palette, and put it on the screen: `begin` and `size`
    are where the menu's box is and how large. */
-static void StMain40(u16 color, u16 item, u16 begin, u16 size)
+static void StMain40(u16 color, i32 item, u16 begin, u16 size)
 {
     u16 place = begin + 0x209;
-    u16 width = (u8)(size - 16);
+    i32 width = (u8)(size - 16);
 
-    place = (u16)(u8)((place >> 8) + item) << 8 | place & 0xFF;
-    MvsColr(BasAdr(place), width, Color(color));
-    Window(place, 0x100 | width);
+    place = (u16)((u8)((place >> 8) + item) << 8 | place & 0xFF);
+    MvsColr(BasAdr(place), (u16)width, Color(color));
+    Window(place, (u16)(0x100 | width));
 }
 
 /* Set default configuration: ask, and with Yes make the setup what the
@@ -314,7 +314,8 @@ static void StF08_00(void)
 static void StMain00(void)
 {
     struct Box where;
-    u16 item, to, last, key, mouse;
+    i32 item, to, last;
+    u16 key, mouse;
 
 Main00:
     PutKey(0);
@@ -394,7 +395,7 @@ Main31:
 Main32:                                 /* Enter */
     ResWin(where.begin, where.size, where.saved);
     Window(where.begin, where.size);
-    sd.MnItem = (u8)item;
+    sd.MnItem = item;
     switch (item) {
     case 0: StF02_00(); goto Main00;
     case 1: StF03_00(); goto Main00;
@@ -446,7 +447,8 @@ static void StExit(void)
     const struct MainDat *aside = (const struct MainDat *)sd.Aside;
     struct FileAttr had;
     struct Answer opened, wrote, closed;
-    u16 i, save = 0, failed = 1;
+    i32 i;
+    bool save = false, failed = true;
     u8 edited;
 
     for (i = 0; i < CmnIni; i++)        /* Compare VC.INI with source */
@@ -454,12 +456,12 @@ static void StExit(void)
             break;
     if (i != CmnIni
         && (u8)Dialog(&StSvSt_B, 0, 0, 0, &md) == 0)
-        save = 1;
+        save = true;
     StUser(0, md.Lines);                /* Exit1: Restore screen */
-    Window(0, (u16)md.Lines << 8 | 80);
+    Window(0, (u16)(md.Lines << 8 | 80));
     CurMous(0);                         /* Hide mouse */
     CursorShape(sd.CurType);            /* Restore cursor */
-    Cursor((u16)md.DosLin << 8);
+    Cursor((u16)(md.DosLin << 8));
     if (!save) {
         for (i = 0; i < CmnIni; i++)
             ((u8 *)&md)[i] = sd.Aside[i];
@@ -529,14 +531,15 @@ void StSetup(void)
     struct CursorAt cursor;
     u8 *name;
     const u8 *reason;
-    u16 page, answer, i;
+    u16 page, found, answer;
+    i32 i;
 
     md.LoadRes = md.LoadFl & 0x7F;      /* F21_30 */
     SavMous();                          /* F21_31 */
     Quit();
-    ClsLine((u16)md.DosLin << 8, &md);
-    Window(0, (u16)md.Lines << 8 | 80);
-    Cursor((u16)md.DosLin << 8);
+    ClsLine((u16)(md.DosLin << 8), &md);
+    Window(0, (u16)(md.Lines << 8 | 80));
+    Cursor((u16)(md.DosLin << 8));
     CurMous(0);
     page = ScreenState().page;
     ScreenType('\r', page, 0);
@@ -559,18 +562,18 @@ void StSetup(void)
     HidCur();
     SavScr();                           /* Save screen */
     StKeep();
-    answer = MouseFind();               /* Init mouse */
-    if (answer == 0x21)
-        answer = MouseReset();
-    md.Mouse = answer == 0xFFFF;        /* Init33 */
+    found = MouseFind();                /* Init mouse */
+    if (found == 0x21)
+        found = MouseReset();
+    md.Mouse = found == 0xFFFF;        /* Init33 */
     if (md.Mouse != 0) {
         TypMous(0);
         if (md.Lines != 25)
-            MouseRows(0, ((u16)md.Lines << 3) - 1);
+            MouseRows(0, (u16)((md.Lines << 3) - 1));
         CurMous(1);                     /* Init34 */
     }
 
-    StOpen = 1;
+    StOpen = true;
     answer = 0;
     if (sd.IniStat != 1) {              /* Error */
         if (sd.IniStat < 1)
@@ -584,7 +587,7 @@ void StSetup(void)
     if ((u8)answer == 0)
         StMain00();
     StExit();
-    StOpen = 0;
+    StOpen = false;
 
     RestVct();                          /* as F21_31 has it for a command:
                                            the program takes the two

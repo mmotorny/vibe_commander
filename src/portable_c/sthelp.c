@@ -133,23 +133,23 @@ static u8 *StHelpBuf(void)
 
 /* Go to a place in the help file. Not 0 if DOS would not, or went
    elsewhere. */
-static u16 SeekDsk(u16 handle, u32 place)
+static bool SeekDsk(u16 handle, u32 place)
 {
     struct FilePlace sought = FileSeek(handle, 0, place);
 
     if (sought.failed)
-        return 1;
+        return true;
     return sought.place != place;
 }
 
 /* Read `count` bytes of the help file. Not 0 if DOS would not, or read
    fewer. */
-static u16 ReadDsk(u16 handle, u8 *to, u16 count)
+static bool ReadDsk(u16 handle, u8 *to, i32 count)
 {
-    struct Answer read = FileRead(handle, to, count);
+    struct Answer read = FileRead(handle, to, (u16)count);
 
     if (read.failed)
-        return 1;
+        return true;
     return read.value != count;
 }
 
@@ -174,10 +174,11 @@ void StRdHelp(void)
     u8 *buffer = StHelpBuf();
     struct StHlpData *index = (struct StHlpData *)buffer;
     struct Answer answer;
-    u16 handle, count, lines, i;
+    u16 handle;
+    i32 count, lines, i;
     u32 first, between;
 
-    for (i = 0; i < (u16)LEN_BUF; i++)
+    for (i = 0; i < (i32)LEN_BUF; i++)
         buffer[i] = 0;
     MainFil(md.TmpBuf, StHelp_F);
     answer = FileOpen(md.TmpBuf, 0x40);
@@ -202,7 +203,7 @@ void StRdHelp(void)
         goto RdHlp1;
     if (ReadDsk(handle, buffer + HlpInfo, count))
         goto RdHlp1;
-    DeCode(buffer + HlpInfo, count);
+    DeCode(buffer + HlpInfo, (u16)count);
     if (index->HlpMode != 0)
         goto RdHlp1;
     lines = index->HlpLins;             /* has it pages for the setup? */
@@ -223,12 +224,12 @@ void StRdHelp(void)
         if (between >> 16 == 0 && count > (u16)between)
             count = (u16)between;
     }
-    answer = FileRead(handle, buffer + 2, count);
+    answer = FileRead(handle, buffer + 2, (u16)count);
     if (answer.failed)
         goto RdHlp1;
     *(u16 *)buffer = answer.value;
     /* The mark comes off as many bytes as were asked for, read or not. */
-    DeCode(buffer + 2, count);
+    DeCode(buffer + 2, (u16)count);
 
 RdHlp1:                                 /* read or not, the file is closed */
     FileClose(handle);
@@ -240,8 +241,8 @@ RdHlp1:                                 /* read or not, the file is closed */
 static const u8 *StHlpLine(u16 place, const u8 *text)
 {
     struct LineArgs line;
-    u16 cell = Color(StHelp_P[0]) << 8 | ' ';
-    u16 i;
+    u16 cell = (u16)(Color(StHelp_P[0]) << 8 | ' ');
+    i32 i;
 
     line.screen = BasAdr(place);
     for (i = 0; i < WIDTH; i++)
@@ -274,12 +275,12 @@ void StHelp(void)
     const u8 *lines;                    /* its text, with the title */
     const u8 *text;
     u16 place = GetCur();
-    u16 page = md.HlpPage;
-    u16 size = (u16)(u8)(md.Lines - 3) << 8 | 74;
-    u16 first;                          /* DI: the first line to show */
-    u16 at, next, end, count, shown, moved, color, key, where, held;
-    u16 buttons, mouse, last;
-    i32 third, step;
+    u8 page = md.HlpPage;
+    u16 size = (u16)((u8)(md.Lines - 3) << 8 | 74);
+    i32 first;                          /* DI: the first line to show */
+    i32 shown, last, left, third, step;
+    u16 at, next, end, count, moved, color, key, how, where, held;
+    u16 buttons, mouse;
     u16 *screen, *bottom;
     struct Mouse pointer;
 
@@ -314,7 +315,7 @@ Help02:                                 /* there is none */
 Help04:                                 /* the window */
     lines = (const u8 *)entry + HlpInfo;
     SavWin(BEGIN, size, md.ErrBuf);
-    color = Color(Help_C) << 8;
+    color = (u16)(Color(Help_C) << 8);
     MinBox(BEGIN, size, color);
     screen = BasAdr(BEGIN);
     MvsBw(screen + 80 + 33, Help_S, 6, color);
@@ -333,8 +334,9 @@ Help04:                                 /* the window */
 
 Help10:                                 /* the text from the line `first` */
     shown = entry->HlpFrst;
-    entry->HlpFrst = first;
-    moved = first - shown;
+    entry->HlpFrst = (u16)first;        /* a line of 16 bits: see Help32 */
+    moved = (u16)(first - shown);       /* wraps: a difference of two lines
+                                           as the original's word has it */
     if (moved != 0) {
         /* Where that line begins: behind the title and the lines before
            it, each of which ends in a zero byte. The end of a line is
@@ -343,10 +345,10 @@ Help10:                                 /* the text from the line `first` */
         text = lines;
         count = entry->HlpFrst + 1;
         do {
-            key = 0xFF00 | count & 0xFF;
+            left = 0xFF00 | count & 0xFF;
             do
-                key--;
-            while (*text++ != 0 && key != 0);
+                left--;
+            while (*text++ != 0 && left != 0);
         } while (--count);
         where = BEGIN + AT_TEXT;
         count = (u8)((size >> 8) - 9);
@@ -362,13 +364,13 @@ Help10:                                 /* the text from the line `first` */
         where = BEGIN + AT_TEXT;
         count = (u8)(md.Lines - 12);
         if (moved == 1 || moved == 0xFFFF) {
-            key = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
-            Scroll(key >> 8 == 7, Color(Help_C), where,
-                   ((count - 1 & 0xFF) << 8 | WIDTH - 1) + where);
-            where += key << 8;
+            how = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
+            Scroll(how >> 8 == 7, Color(Help_C), where,
+                   (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1) + where));
+            where += how << 8;
             count = 1;
         }
-        Window(where, count << 8 | WIDTH);
+        Window(where, (u16)(count << 8 | WIDTH));
     }
 
 Help20:                                 /* a key */
@@ -405,7 +407,8 @@ Help20:                                 /* a key */
         goto Help34;
     case 0x51:                          /* PgDn */
         step = md.Lines - 12;
-        last = entry->HlpLins - 1;
+        /* wraps: a page of no lines has 65,535 as the original's word */
+        last = (u16)(entry->HlpLins - 1);
         if (last < step)
             goto Help10;
         last -= step;
@@ -468,7 +471,9 @@ Help30:                                 /* Up */
 
 Help32:                                 /* Down */
     if ((u16)(md.Lines - 11 + first) < entry->HlpLins)
-        first++;
+        first = (u16)(first + 1);       /* wraps: from line 65,535 to 0, as
+                                           the original's word, where the
+                                           sum above has gone round */
     goto Help10;
 
 Help34:                                 /* back by `step` lines, */
@@ -485,6 +490,6 @@ Help40:                                 /* Esc */
     Window(BEGIN, size);
 
 Help41:
-    md.HlpPage = (u8)page;
+    md.HlpPage = page;
     Cursor(place);
 }

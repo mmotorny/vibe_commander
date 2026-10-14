@@ -682,7 +682,7 @@ void Main(void);
    elsewhere, and Input of input.c, where F1 is the help of the setup.
    Everything else that the setup program's copy of a routine has
    otherwise is the main program's here: each of the three says what. */
-extern u8 StOpen;
+extern bool StOpen;
 
 /* What the setup program has of its own, while it is open: in MenuBuf,
    where the main program makes the setup file too, and reads it when it
@@ -706,16 +706,17 @@ struct StData {
     u8  File[INI_LEN + 1];              /* the setup file, and a byte more,
                                            which is read to know a file
                                            that is too long */
-    u8  IniStat;                        /* 0 - not found, 1 - Ok, 2 - bad */
-    u8  MnItem;                         /* Item of main menu */
+    i32 IniStat;                        /* 0 - not found, 1 - Ok, 2 - bad */
+    i32 MnItem;                         /* Item of main menu */
     u16 CurType;                        /* Shape of cursor */
     u8  SrcIni[CmnIni];                 /* Source VC.INI */
     u8  BackC;                          /* of the palettes, stcolor.c */
     u8  HistC;
     u8  HstCuC;
-    u16 ColCur;
-    u16 ColFrst;
-    u16 ColNum;
+    i32 ColCur;                         /* the item under the cursor, */
+    i32 ColFrst;                        /* the first shown, or FFF0h while
+                                           none is, */
+    i32 ColNum;                         /* and how many there are */
     /* Not of the original: the setup of the program as it was when the
        setup was entered, which the original's main program keeps in its
        own memory meanwhile; and the 50th row of what DOS had on the
@@ -732,7 +733,7 @@ void StSetup(void);
 /* What DOS had on the screen when the setup was entered, which the setup
    keeps: StUser puts `rows` rows of it into the screen buffer, from the
    row `first` on. See stmain.c. */
-void StUser(u16 first, u16 rows);
+void StUser(i32 first, i32 rows);
 /* What the items of the setup's menu do, each of which returns when its
    screen has been left: the Configuration, Screen and Mouse, the Panel
    options and the Country info, of stopts.c; the three palettes, of

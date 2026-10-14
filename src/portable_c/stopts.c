@@ -76,7 +76,7 @@ void StF02_00(void)
     if (md.KeyBar != 0 || bar == 0)
         return;
     row = (u8)(md.Lines - 1);
-    StUser((u16)row, 1);
+    StUser(row, 1);
     Window((u16)(row << 8), 0x150);
     md.BarPrev = 0xFF;
 }

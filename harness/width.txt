@@ -83,20 +83,20 @@ N12             48          0     3              0      50     1     5     3    
 N13             30          0     0              0      30     0     1     9    35  tree.c treebox.c extfile.c
 N14             62          0     0              0      62     0     0     6    38  cmdline.c enter.c exec.c
 N15             64          0     3              0      65     2     3    14    39  input.c usermenu.c
-N16             38          0     0              0      37     1     3    11    46  main.c
+N16             37          0     0              0      36     1     3    12    46  main.c
 N17a            26          0     0              0      24     2     0     2    37  keys.c
 N17b            28          0     0              0      28     0     0     5    41  commands.c
 N18             70          0     1              0      50     1     0     5    40  menu.c help.c
 N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
 N19b            40         40     0              0       0     0     0     0     1  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
-N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
+N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        276         82    12              1     154     5     0     0     0  vc.h sys.h tables.h
-all           2094        343   115              4    1090    59    51   143   813
+headers        271         69    12              1     162     5     0     0     0  vc.h sys.h tables.h
+all           2061        249   115              1    1138    65    51   149   838
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               219         25    11              0     154     5     0     0     0
+vc.h               214         12    11              0     162     5     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              19          0     0              0      19     0     2     0    21
@@ -121,7 +121,7 @@ info.c              12          0     2              0      13     1     0     0
 input.c             36          0     3              0      39     0     3     6    20
 keys.c              26          0     0              0      24     2     0     2    37
 line.c               5          0     0              0       5     0     1     0    10
-main.c              38          0     0              0      37     1     3    11    46
+main.c              37          0     0              0      36     1     3    12    46
 mask.c               4          0     0              0       4     0     0     1     3
 menu.c              31          0     0              0      25     0     0     2    23
 misc.c               4          0     0              0       1     3     0     2     9
@@ -133,8 +133,8 @@ screen.c            12          0     0              0      10     2     0     0
 setup.c              3          0     0              0       3     0     0     0     5
 start.c             40         40     0              0       0     0     0     0     1
 stcolor.c           43          0     0              0      43     0     0     3    39
-sthelp.c            46         46     3              3       0     0     0     0     2
-stmain.c            35         35     0              0       0     0     0     0     0
+sthelp.c            37          0     3              0      25     5     0     2    11
+stmain.c            17          0     0              0      16     1     0     3    16
 stopts.c            18          0     0              0      15     3     0     0    10
 string.c             6          0     0              0       6     0     0     0     8
 system.c             8          0     1              0       9     0     0     6     7
@@ -630,7 +630,29 @@ vc.h, struct Label: field answer, u16
     system: AX as DOS left it, its error, or what it left in AH with the
     last character of a label.
 
-vc.h, struct StData: not sorted, 13 numbers
+vc.h, struct StData: field File, u8[512]
+    setup: the setup file as it is read and written, and a byte more.
+
+vc.h, struct StData: field CurType, u16
+    system: the shape of the cursor, as CursorWhere answers it.
+
+vc.h, struct StData: field SrcIni, u8[330]
+    setup: the setup as it was read, to know whether it has changed.
+
+vc.h, struct StData: field BackC, u8
+    colour
+
+vc.h, struct StData: field HistC, u8
+    colour
+
+vc.h, struct StData: field HstCuC, u8
+    colour
+
+vc.h, struct StData: field Aside, u8[330]
+    setup: the program's setup as it was when the setup was entered.
+
+vc.h, struct StData: field Row50, u16[80]
+    cell: the 50th row of what DOS had on the screen.
 
 vc.h, struct LineArgs: field value, u16
     The register that the original hands each routine: for CntLine a
@@ -3212,9 +3234,6 @@ main.c, FtErr1: variable page, u8
     small: HlpPage, the page of the help or 0FFh for none, kept while
     the box is up and put back.
 
-main.c, FtErr1: variable setup, u8
-    flag: StOpen, kept while the box is up and put back.
-
 main_t.c: as a whole, 19 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
@@ -3742,12 +3761,169 @@ stcolor.c, StF07_01: variable size, u16
 stcolor_t.c: as a whole, 24 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-sthelp.c: not sorted, 46 numbers, 3 u32
+sthelp.c, (): variable Help_S, u8[]
+    text
+
+sthelp.c, (): variable HlpMn_P, u8[]
+    colour
+
+sthelp.c, (): variable StHlpMn_D, u8[]
+    text: the buttons of the menu, bytes of the tables.
+
+sthelp.c, (): variable StOk_S, u8[]
+    text
+
+sthelp.c, (): variable StHelp_F, u8[20]
+    text
+
+sthelp.c, (): variable StHelp_P, u8[4]
+    colour
+
+sthelp.c, (): variable StEmpty_S, u8[1]
+    text
+
+sthelp.c, struct StHlpData: laid out, 10 numbers
+    A file's: the 26 bytes in front of the text of an entry of the
+    help file, as they are read and decoded, of which the window
+    keeps the first line shown in one.
+
+sthelp.c, SeekDsk: parameter handle, u16
+    handle
+
+sthelp.c, SeekDsk: parameter place, u32
+    size: a place in the help file.
+
+sthelp.c, ReadDsk: parameter handle, u16
+    handle
+
+sthelp.c, StRdHelp: variable handle, u16
+    handle
+
+sthelp.c, StRdHelp: variable between, u32
+    size: how far the page behind the setup's is from the first of
+    them, in the help file.
+
+sthelp.c, StRdHelp: variable first, u32
+    size: where the first page of the setup is in the help file.
+
+sthelp.c, StHlpLine: parameter place, u16
+    place
+
+sthelp.c, StHlpLine: variable cell, u16
+    cell
+
+sthelp.c, StHelp: variable place, u16
+    place: of the cursor.
+
+sthelp.c, StHelp: variable page, u8
+    small: HlpPage as it was, a byte of the main data, put back as it
+    is.
+
+sthelp.c, StHelp: variable size, u16
+    place: the size of the window.
+
+sthelp.c, StHelp: variable at, u16
+    Counted on to wrap: an address of 16 bits in the original's one
+    segment, from HELPBUF on, by which the page is looked for as the
+    original looks for it, with the tests of a sum that went round at
+    64 KB (see the top of StHelp).
+
+sthelp.c, StHelp: variable color, u16
+    cell: the colour alone in its place.
+
+sthelp.c, StHelp: variable count, u16
+    Counted on to wrap: counted down to nothing by do ... while
+    (--count), as the original's LOOP, so that a count of 0 is one of
+    65,536: the pages to go through, of which a page 0 has 65,536, the
+    lines in front of the first shown, the rows of the window.
+
+sthelp.c, StHelp: variable end, u16
+    Counted on to wrap: as at, where what was read ends, added up
+    without a look at whether it went round, as the original has it.
+
+sthelp.c, StHelp: variable held, u16
+    place: of the mouse when a button went down.
+
+sthelp.c, StHelp: variable how, u16
+    bits: AX as the original hands the scroll, 6 or 7 in the high byte
+    and the lines in the low one, which is added into the row of
+    `where` by a shift that cuts the high byte off.
+
+sthelp.c, StHelp: variable key, u16
+    key
+
+sthelp.c, StHelp: variable moved, u16
+    Counted on to wrap: the difference of two lines as the original's
+    word has it, held against 1 and FFFFh, so that the help wraps
+    lines past 65,535 as the original does, on the user's word of 14
+    October 2026.
+
+sthelp.c, StHelp: variable next, u16
+    Counted on to wrap: as at.
+
+sthelp.c, StHelp: variable where, u16
+    place
+
+sthelp.c, StHelp: variable buttons, u16
+    bits: the buttons of the mouse.
+
+sthelp.c, StHelp: variable mouse, u16
+    place: of the mouse.
 
 sthelp_t.c: as a whole, 5 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-stmain.c: not sorted, 35 numbers
+stmain.c, (): variable StPalets, u8[]
+    setup: the setup without a file, bytes of the tables.
+
+stmain.c, (): variable StNoFnd_S, u8[]
+    text
+
+stmain.c, (): variable StNoIni_S, u8[]
+    text
+
+stmain.c, (): variable StDefWCB, u8[24]
+    setup: the start of a panel as the setup file has it.
+
+stmain.c, (): variable StInit_F, u8[13]
+    text
+
+stmain.c, (): variable StMainHlp, u8[9]
+    small: a page of the help, as HlpPage keeps it in a byte.
+
+stmain.c, (): variable StStErr_S, u8[49]
+    text
+
+stmain.c, StMain40: parameter begin, u16
+    place: where the menu's box begins.
+
+stmain.c, StMain40: parameter color, u16
+    colour
+
+stmain.c, StMain40: parameter size, u16
+    place: the size of the menu's box.
+
+stmain.c, StMain40: variable place, u16
+    place
+
+stmain.c, StMain00: variable key, u16
+    key
+
+stmain.c, StMain00: variable mouse, u16
+    What F32_70 of usermenu.c answers, what the mouse did in the high
+    byte and the line in the low one, which are taken apart here.
+
+stmain.c, StExit: variable edited, u8
+    setup: LoadFl as it was edited.
+
+stmain.c, StSetup: variable answer, u16
+    key: what Dialog answers, the button in the low byte.
+
+stmain.c, StSetup: variable found, u16
+    system: what the mouse driver answers, FFFFh for a mouse.
+
+stmain.c, StSetup: variable page, u16
+    system: the page of the screen that is shown.
 
 stmain_t.c: as a whole, 29 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

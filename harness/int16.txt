@@ -238,31 +238,9 @@ start.c, MnPth0: index
     below the length of a name of a variable, which the callers write.
 
 stcolor.c, StCol00: index
-    | chosen.color = StPalets[ColAddr(sd.ColCur) - md.ColTab];
+    | chosen.color = StPalets[ColAddr((u16)sd.ColCur) - md.ColTab];
     ColAddr answers with a place in ColTab: IN_TABLE of screen.c adds to
     md.ColTab and takes nothing away.
-
-stcolor.c, StF07_10: widen
-    | StF07_75(md.ColTab[sd.ColCur * 6 + list.palette * 2
-    ColCur is the number of a colour of the list, of which there are
-    ColNum, 39, and palette is below 3: StCol00 is handed it so. The
-    index is below 240 in either width.
-
-stcolor.c, StF07_30: widen
-    | if (item > sd.ColNum - 1) {
-    ColNum is 1 at the least: StF07_01 counts the names of the colours in
-    a loop that goes round once before it asks, so ColNum - 1 is not
-    below 0, and item is a byte and a first line, as the next place has.
-
-stcolor.c, StF07_30: widen
-    | item = (u8)((mouse.place >> 8) - (list.begin >> 8) - 2) + sd.ColFrst;
-    A byte and ColFrst, the first line shown, which StF07_10 keeps below
-    ColNum, 39, once StF07_01 has drawn the list: the sum fits 16 bits.
-
-stcolor.c, StF07_41: widen
-    | i32 cursor = sd.ColCur + 1;
-    ColCur is the number of a colour of the list, below ColNum, 39: the
-    sum is 39 at the most.
 
 sthelp.c, StHelp: back
     | entry = (struct StHlpData *)(buffer + (at - HELPBUF));
@@ -279,9 +257,10 @@ sthelp.c, StHelp: widen
     Cut to a byte; third is 4 to 12, a third of the box's rows less 9,
     and less than the rows less 5.
 
-stmain.c, StUserScr: index
-    | return md.UserScr + row * 80;
-    The line above asks that row is below MaxLins - 1.
+stmain.c, StMain00: widen
+    | item = (key >> 8) - 0x3C;
+    The case above it has the scan code from 3Ch to 43h, F2 to F9: item
+    is 0 to 7 in either width.
 
 string.c, LowCase: back
     | return md.LowTab[letter - 0x80];
