@@ -36,7 +36,6 @@
 #define CpCntSz md.TmpBuf[95]           /* Length of the per cent counter */
 #define CpSize  (*(u32 *)(md.TmpBuf + 96))      /* File size */
 #define CopyMov md.TmpBuf[100]          /* Copy / Move / Rename */
-#define CpBgNam (*(u16 *)(md.TmpBuf + 102))     /* Start address of source filename */
 #define CpDev2  md.TmpBuf[104]          /* Destination is a device */
 #define CpRead  (*(u32 *)(md.TmpBuf + 106))     /* Was read */
 #define CpWrite (*(u32 *)(md.TmpBuf + 110))     /* Was written */
@@ -46,7 +45,15 @@
 #define CpDate  (*(u16 *)(md.TmpBuf + 122))     /* File date */
 #define CpTime  (*(u16 *)(md.TmpBuf + 124))     /* File time */
 #define CpCntBg (*(u16 *)(md.TmpBuf + 126))     /* Base of the per cent counter */
-#define CpCont  (*(u16 *)(md.TmpBuf + 128))     /* Start segment to continue copying */
+
+/* Two words of the assembly's that are not in TmpBuf here, since each
+   holds an address and a pointer is longer than its word: CpBgNam at
+   102, the start address of the source filename, and CpCont at 128, the
+   start segment to continue copying. Their bytes of TmpBuf are not set
+   or read by this file. CpBgNam is a place in CpSrc, between the
+   command that sets it and the files that it copies. What CpCont was is
+   `rest` of C20_00, which is where it is set and read. */
+static u8 *CpBgNam;
 
 #define LenName (LenPath + 13)          /* a path and a file name */
 
@@ -396,13 +403,13 @@ known:
         return 1;
 mask:
     Convert(name, md.TmpErr);
-    part = MD_POINTER(CpBgNam);
+    part = CpBgNam;
     do
         c = *part++;
     while (c != 0 && c != '\\');
     part--;
     *part = 0;
-    Convert(MD_POINTER(CpBgNam), md.TmpErr + 20);
+    Convert(CpBgNam, md.TmpErr + 20);
     *part = c;
     for (i = 0; i < 11; i++)
         if (md.TmpErr[i] == '?')
@@ -414,7 +421,7 @@ mask:
 directory:
     to[-1] = '\\';
 source:
-    from = MD_POINTER(CpBgNam);
+    from = CpBgNam;
     count = from - CpSrc;
 rest:
     if (count < LenName)
@@ -608,9 +615,10 @@ static u16 C20_00(u16 fits)
     const struct BOXTOP *shown;
     const struct BOXHD *report;
     u16 result, error, answer, info, attributes;
-    u16 segment, offset, count, got, i;
+    u16 offset, count, got, i;
     u16 *screen;
     u8 *part, *end;
+    u8 *buffer, *rest;
     u8 c;
 
     C50_00();
@@ -676,12 +684,12 @@ static u16 C20_00(u16 fits)
     CpRead = 0;
     CpWrite = 0;
     CpHndl2 = 0;
-    CpCont = 0;
+    rest = 0;
     SplitFl = 0;
 
 read:
     left = (u32)(RoomParas() & 0xFFE0) << 4;
-    segment = SEG_OF(Room);
+    buffer = Room;
     if (ChgDisk(CpSrc))
         goto terminate;
     do {
@@ -694,7 +702,7 @@ read:
         do {
             got = 0;
             if (count != 0) {
-                moved = FileRead(CpHndl1, AT(segment, offset), count);
+                moved = FileRead(CpHndl1, buffer + offset, count);
                 if (moved.failed)
                     goto terminate;
                 got = moved.value;
@@ -706,7 +714,7 @@ read:
             offset += got;
             count -= got;
         } while (count != 0);
-        segment += 0x800;
+        buffer += 0x8000;
         left -= got;
     } while (left != 0);
     goto target;
@@ -848,10 +856,10 @@ append:
 
 write:
     left = CpRead - CpWrite;
-    segment = SEG_OF(Room);
-    if (CpCont != 0)
-        segment = CpCont;
-    CpCont = 0;
+    buffer = Room;
+    if (rest != 0)
+        buffer = rest;
+    rest = 0;
     do {
         if (TstBrk())
             goto terminate;
@@ -860,7 +868,7 @@ write:
             count = LOW(left);
         got = 0;
         if (count != 0) {
-            moved = FileWrite(CpHndl2, AT(segment, 0), count);
+            moved = FileWrite(CpHndl2, buffer, count);
             if (moved.failed)
                 goto terminate;
             got = moved.value;
@@ -870,7 +878,10 @@ write:
         CpWrite += got;
         PerCent();
         left -= got;
-        segment += got >> 4;
+        /* The assembly steps a segment, by the paragraphs that were
+           written: what a piece has beyond a whole paragraph is not
+           stepped over. */
+        buffer += got >> 4 << 4;
     } while (left != 0);
     if (CpHndl1 != 0)
         goto read;
@@ -935,7 +946,7 @@ full:
         /* The bytes of a cluster as 16 bits, times the clusters. */
         free = (u32)(u16)(space.value * space.sector) * space.free;
         if (HIGH(free) == 0 && LOW(free) < count) {
-            moved = FileWrite(CpHndl2, AT(segment, 0), LOW(free));
+            moved = FileWrite(CpHndl2, buffer, LOW(free));
             if (moved.failed)
                 goto terminate;
             got = moved.value;
@@ -943,7 +954,7 @@ full:
     }
     CpWrite += got;
     PerCent();
-    CpCont = (got >> 4) + segment;
+    rest = buffer + (got >> 4 << 4);         /* in paragraphs, as above */
     SetDate(CpHndl2);
     /* Is anything in the file? */
     info = FileSeek(CpHndl2, 2, 0).place != 0;
@@ -1370,7 +1381,7 @@ struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
         CpSrc[i] = md.ViewFil[i];
     if (md.ViewFil[0] == 0 || md.ToFile[0] == 0)
         return Go(GO_PANELS);
-    CpBgNam = MD_PLACE(CutPath(CpSrc));
+    CpBgNam = (u8 *)CutPath(CpSrc);
     F35_70();
     return Masked(F35_40());
 }
@@ -1392,7 +1403,7 @@ static void F36_04(void)
 
     for (i = 0; i < LenPath; i++)
         CpSrc[i] = md.CrnPath[i];
-    CpBgNam = MD_PLACE(CutPath(CpSrc));
+    CpBgNam = (u8 *)CutPath(CpSrc);
     F35_70();
     md.ZoomOne = 0;
     if ((u8)C00_00(ATTR_DIRECTORY) == 0 || CopyMov == 0)
@@ -1490,7 +1501,7 @@ F35_06:
         return Go(GO_DONE);
     }
     F35_70();
-    CpBgNam = MD_PLACE(CpSrc);
+    CpBgNam = CpSrc;
     return Go(GO_SELECTED);
 
 F36_03:

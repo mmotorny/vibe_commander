@@ -72,7 +72,7 @@ N2             112        112     0              0       0     0    61     0    
 N3, N4         156        156    13             13       0     0   202     0     0  view.c
 N5             121        121     0              0       0     0    77     0     1  find.c
 N6 to N8       233        233    37             37       0     0   278     0     0  edit.c
-N9              82         82     6              6       0     0    67     0     0  copy.c
+N9              81         81     6              6       0     0    64     0     0  copy.c
 N10             98         98     0              0       0     0    55     0     0  dirfunc.c
 N11             91         91     1              1       0     0    60     0     0  files.c read.c place.c
 N12             80         80     3              3       0     0   112     0     0  panel.c info.c drive.c
@@ -89,7 +89,7 @@ N20            113        113     0              0       0     0    89     0    
 N21             82         82     3              3       0     0    59     0     0  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0    57     0     0  the tables, dos32.c stack.c
 headers        299        127    12              1     143     1     0     0     0  vc.h sys.h tables.h
-all           2994       2206   148             71     178     1  1793     3    30
+all           2993       2205   148             71     178     1  1790     3    30
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  cuts  bool   i32
 vc.h               242         70    11              0     143     1     0     0     0
@@ -100,7 +100,7 @@ blank.c             12          0     0              0      12     0     8     0
 box.c               48         48     0              0       0     0    16     0     0
 cmdline.c           59         59     0              0       0     0    55     0     0
 commands.c          74         74     0              0       0     0    13     0     0
-copy.c              82         82     6              6       0     0    67     0     0
+copy.c              81         81     6              6       0     0    64     0     0
 dialog.c           112        112     0              0       0     0    61     0     0
 digits.c             2          0     1              0       3     0     5     0     4
 dirfunc.c           98         98     0              0       0     0    55     0     0
@@ -777,7 +777,7 @@ commands.c: not sorted, 74 numbers, 13 cuts
 commands_t.c: as a whole, 72 numbers, 0 cuts
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-copy.c: not sorted, 82 numbers, 6 u32, 67 cuts
+copy.c: not sorted, 81 numbers, 6 u32, 64 cuts
 
 copy_t.c: as a whole, 38 numbers, 0 cuts
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
