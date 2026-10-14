@@ -9399,7 +9399,7 @@ for.
 | N17b | `commands.c` | 604 lines; in the record's table | F8 | **Done**: "N17b, `commands.c`: done, and what a later cluster should know" below |
 | N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | **Done**: "N18, `menu.c`, `help.c`: done, and what a later cluster should know" below. The help's lines widened with the original's cuts written where a help file that is not true to its text takes them past 16 bits |
 | N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | **Done**: "N19a, `bars.c`, `window.c`, `system.c`, `setup.c`" below |
-| N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | |
+| N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | **Done**: "N19b, `start.c`: done, and what a later cluster should know" below |
 | N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | **Done**: "N20, `stcolor.c`, `stopts.c`: done, and what a later cluster should know" below |
 | N21 | `stmain.c`, `sthelp.c` | 1,086; 121 | F8 | **Done**: "N21, `stmain.c`, `sthelp.c`: done, and what a later cluster should know" below, with `struct StData` of `vc.h` |
 
@@ -15442,6 +15442,94 @@ changed, 36 in what may differ". The README's figures moved with the
 code, `tools/figures.py --write`.
 
 It took some 60 tool calls: reading the brief, the plan and the sections 15; the files with the finder's lists beside them 10, the finder being slow, a minute or more for each call, since it has clang read the tree; the types and the casts by scripts 10; the record's reasons by one script 5; the tests, the images and the documents the rest to hand back.
+
+### N19b, `start.c`: done, and what a later cluster should know
+
+**What there is.** `start.c` sorted by "The rule for a number", clang's
+warnings of a conversion silent for it. It is the last of the
+clusters' files: what the record has not sorted now is of the headers
+alone, 68 numbers of 8 or 16 bits there. The
+whole suite passes, fourteen tests, no golden and no patch changed. No
+limit of the original moved, nothing that a user sees, and nothing that
+DOS is asked: no question for the user.
+
+**The numbers.** Of the 37 of 8 or 16 bits, none a `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 14 | The length of the name that `MnPth0` looks for, its place in the environment and its count; what `ReadOne` answers, how many bytes it is asked for and its count; the length read and the count of `Init00`; the side and the count of `Init11`; the count, the place of COMSPEC= in the environment, the lines and the rows of `IniData` |
+| Made `bool` | 1 | `wrong` of `Init00`, that the setup file is not the program's |
+| Kept by a word | 21 | `text` 9 and `setup` 3, the arrays of the file and those that it names of other files; `system` 8, the page that the display shows five times, the current drive as DOS answers it, the shape of the cursor, and the paragraphs that `Paragraphs` answers for the value of `struct Answer`; `character` 1, the capital that DOS answers; `cell` 1 |
+| Kept by a sentence | 1 | `sum` of `Init00`, the check sum of the setup file, 16 bits that wrap round, as `ChkSum` of `misc.c` has it |
+
+The four `i32` that F9 had made stay, and the two places of a sign
+that it left in `Paragraphs`, `bytes >> 4`, have their reason: the
+length of a block as the extender answers it, which is not below 0.
+`FAILED` of `ReadOne` stays 0FFFFh: no caller asks for that many bytes,
+so no count read can be it.
+
+**The casts.** clang named 1 place before anything changed, the
+cursor of `CurNl`, a byte shifted into the high one and handed to
+`Cursor`: `(u16)((u8)(md.Lines - 1) << 8)`. The widening made 6 more,
+none of which went by a type: the count handed to `FileReadBare` of
+`sys.h`, with a comment that the callers ask for less than 64K; the
+letter handed to `CaseMap`, which the loop just above keeps below
+100h; the place of COMSPEC= put into `md.ComSpec`, a field of the main
+data, with a comment that DOS keeps an environment within 32K; and
+three loops to `(i32)sizeof`. One more is `harness/int16.py`'s, of the
+kind `signed`, which clang does not name: `i == (i32)sizeof Comsp`
+behind the loop that has the same. So 8 casts, 0 by a type. The cut of the
+rows that the BIOS answers, `(u8)(rows + 1)`, was written already and
+has `wraps` in its comment now: the original adds one and goes by DL,
+so that a last row of 0FFh is none. The casts of `(i32)sizeof` make
+the three comparisons of those loops ask with a sign, `jl` and `jge`
+for `jb` and `jae`, which is no other answer for counts from 0: that
+is all that the listing of the file differs in between the types and
+the casts. No other file changed: every function of `start.c` that
+other files call has no number of 8 or 16 bits.
+
+**`harness/int16.py`.** The two places of the kind `index`, in
+`MnPth0` and `IniData`, went, their numbers being `i32` now. The one
+of the kind `back` stays, `md.LowTab[c - 128]`, `c` being a character.
+
+**The program.** `VC.EXE` is another by the types, `759ab1a6...` where
+the head that the work began on gave `966bc13e...`, and 86 bytes of
+code shorter, so the room is 96 bytes longer and begins 96 bytes
+earlier. The image of every scenario against the build of that head
+differs for that alone, which the tool does not know as such: "156
+scenarios, 0 with nothing that differs; 748220 differences, ... 324 in
+what may differ". Read three ways. By a script that held each byte of
+a block against the same address in the other image as well as at the
+same place in the block: every difference but the length that the
+extender keeps in front of the room is the memory that the room lies
+on, 96 bytes further on, but in the scenarios whose second copy of the
+program lives in the room. In the main data, the room's length as
+digits (`TmpErr`, `TmpBuf`), `ViewSeg`, and the file search's
+`FndSize`, which F9 had declared. And by a build that separates the
+layout from the code, not kept: this one with a function of 86 bytes
+put behind the last of `start.c`, so that the code ends where it did,
+against the build of the head: "156 scenarios, 149 with nothing that
+differs; 375 differences, 0 more in what was declared as changed, 11 in
+what may differ", the seven being the six scenarios that start a
+second copy, whose code differs, and `start-memory`, whose two are
+`ViewSeg` and `FreMem2` as F9 found them. The README's figures moved
+with the code, `tools/figures.py --write`.
+
+**What a later piece should know.** A cluster that makes the code
+shorter or longer moves the room, and the images of the build before
+then differ in all of it: pad a throwaway build to the old length of
+the code, a function of stores to a `volatile` pointer, `p[i] = k`, 4
+bytes each, behind the last function of the file, the listing's
+`Segment: _TEXT` saying how long the file's code is, and compare its
+images. `dataimage.py save` reads the program when it starts, so the
+build may change while it runs, but keep a copy of `VC.EXE` and
+`VC.MAP` before the first change all the same.
+
+It took some 65 tool calls: reading the brief, the plan and the
+sections 10; the file with the finder's lists 8; the types, the casts
+and the record's reasons by scripts 10; the suite 5; the images, which
+did not compare equal and were read three ways, 20; the documents the
+rest.
 
 ### N17a, `keys.c`: done, and what a later cluster should know
 

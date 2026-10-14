@@ -226,16 +226,6 @@ start.c, IniData: back
     | md.LowTab[c - 128] = (u8)(0x80 + i);
     The line above asks that c is 80h or more.
 
-start.c, IniData: index
-    | for (i = 0; i < sizeof Comsp && env[at + i] == Comsp[i]; i++)
-    at is a place in the environment, which DOS holds to 32K, and i is
-    below the length of Comsp.
-
-start.c, MnPth0: index
-    | for (i = 0; i < length && env[at + i] == name[i]; i++)
-    at is a place in the environment, which DOS holds to 32K, and i is
-    below the length of a name of a variable, which the callers write.
-
 stcolor.c, StCol00: index
     | chosen.color = StPalets[ColAddr((u16)sd.ColCur) - md.ColTab];
     ColAddr answers with a place in ColTab: IN_TABLE of screen.c adds to

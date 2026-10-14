@@ -88,12 +88,12 @@ N17a            26          0     0              0      24     2     0     2    
 N17b            28          0     0              0      28     0     0     5    41  commands.c
 N18             70          0     1              0      50     1     0     5    40  menu.c help.c
 N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
-N19b            37         37     0              0       0     0     2     0     4  start.c
+N19b            22          0     0              0      21     1     2     1    18  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
 as a whole     567          0    58              0       0     0     0     0    13  the tables, dos32.c stack.c
 headers        270         68    12              1     162     5     0     0     0  vc.h sys.h tables.h
-all           1945        105   108              1    1181    65    54   171   933
+all           1930         68   108              1    1202    66    54   172   947
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               214         12    11              0     162     5     0     0     0
@@ -131,7 +131,7 @@ place.c              5          0     0              0       5     0     0     1
 read.c              20          0     1              0      20     1     1     6    11
 screen.c            12          0     0              0      10     2     0     0     3
 setup.c              3          0     0              0       3     0     0     0     5
-start.c             37         37     0              0       0     0     2     0     4
+start.c             22          0     0              0      21     1     2     1    18
 stcolor.c           43          0     0              0      43     0     0     3    39
 sthelp.c            37          0     3              0      25     5     0     2    11
 stmain.c            17          0     0              0      16     1     0     3    16
@@ -3703,7 +3703,84 @@ setup.c, Failed: parameter error, u16
 stack.c: as a whole, 1 number
     the stack, an array of bytes
 
-start.c: not sorted, 37 numbers, 2 of a sign
+start.c, (): variable Init_F, u8[]
+    text: of the tables, system_t.c
+
+start.c, (): variable Ext_F, u8[]
+    text: of the tables, system_t.c
+
+start.c, (): variable IniSave, u8[]
+    setup: the bytes that the setup file would hold, of setup.c.
+
+start.c, (): variable Palets, u8[279]
+    setup: the colours and what follows them, as the setup file has
+    them.
+
+start.c, (): variable DefWCB, u8[8]
+    setup: the bytes of a panel, as the setup file has them.
+
+start.c, (): variable Copyr_S, u8[70]
+    text
+
+start.c, (): variable CrLf_S, u8[52]
+    text
+
+start.c, (): variable NoIni_S, u8[25]
+    text
+
+start.c, (): variable Comsp, u8[8]
+    text
+
+start.c, (): variable NcEnv, u8[3]
+    text
+
+start.c, (): variable TempEnv, u8[5]
+    text
+
+start.c, (): variable Mask_S, u8[5]
+    text
+
+start.c, OutStr1: parameter page, u16
+    system: the page that the display shows.
+
+start.c, Init00: variable drive, u16
+    system: the current drive as DOS answers it, 0 for A:.
+
+start.c, Init00: variable sum, u16
+    a sum of 16 bits, which wraps round: the check sum that the setup
+    file keeps in a word.
+
+start.c, Paragraphs: returns, u16
+    system: paragraphs, as the original has them in BX where it says
+    that there is no memory, and the value of struct Answer holds them.
+
+start.c, Paragraphs: sign
+    | if (bytes >> 4 > 0xFFFF)
+    The length of a block as the extender answers it, MemTake's
+    largest, which is not below 0.
+
+start.c, Paragraphs: sign
+    | return (u16)(bytes >> 4);
+    The length of a block as the extender answers it, MemTake's
+    largest, which is not below 0.
+
+start.c, CurNl: returns, u16
+    system: the page that the display shows.
+
+start.c, CurNl: variable page, u16
+    system: the page that the display shows.
+
+start.c, IniData: variable c, u16
+    character: the capital of a letter, as DOS answers it.
+
+start.c, IniData: variable cell, u16
+    cell
+
+start.c, IniData: variable page, u16
+    system: the page that the display shows.
+
+start.c, IniData: variable shape, u16
+    system: the shape of the cursor, as the BIOS has it.
 
 stcolor.c, (): variable StColor_S, u8[]
     text

@@ -208,12 +208,12 @@ static void OutStr1(const u8 *text, u16 page)
    writes into the part of the original that stays in the memory, at
    0B87h, and TempDir is at 0B99h of the main data. */
 static u8 *MnPth0(u8 *to, const u8 *env,
-                  const u8 *name, u16 length,
+                  const u8 *name, i32 length,
                   const u8 *other)
 {
     const u8 *from;
     u8 *end;
-    u16 at = 0, i;
+    i32 at = 0, i;
 
     for (;;) {                          /* MnPth1 */
         if (env[at] == 0) {             /* MnPth2: no such name */
@@ -244,18 +244,20 @@ static u8 *MnPth0(u8 *to, const u8 *env,
    behind it. Up to `count` bytes of the file are read to `buffer`.
    Returns how many were read, or FAILED if the file could not be opened,
    read or closed. */
-static u16 ReadOne(const u8 *path, u8 *end,
-                   const u8 *name, u8 *buffer, u16 count)
+static i32 ReadOne(const u8 *path, u8 *end,
+                   const u8 *name, u8 *buffer, i32 count)
 {
     struct Answer opened, read;
-    u16 i;
+    i32 i;
 
     for (i = 0; i < 13; i++)
         end[i] = name[i];
     opened = FileOpenBare(path, 0x20);  /* to read; others may read */
     if (opened.failed)
         return FAILED;                  /* RdOne1 */
-    read = FileReadBare(opened.value, buffer, count);
+    read = FileReadBare(opened.value, buffer,
+                        (u16)count);    /* fits: the callers ask for
+                                           less than 64K */
     if (FileCloseBare(opened.value).failed || read.failed)
         return FAILED;
     return read.value;
@@ -301,12 +303,14 @@ void Init00(void)
     u8 *path = md.TmpBuf;
     const u8 *env = ProgramEnvironment();
     u8 *end, *to;
-    u16 length, sum, drive, wrong, i;
+    i32 length, i;
+    u16 sum, drive;
+    bool wrong;
 
     end = MnPth0(path, env, NcEnv, sizeof NcEnv, 0);
     length = ReadOne(path, end, Init_F, image,
                      INI_LEN + 1);
-    wrong = 0;
+    wrong = false;
     if (length == INI_LEN) {
         sum = 0;
         for (i = 0; i < INI_LEN - 2; i++)       /* Init01 */
@@ -319,16 +323,16 @@ void Init00(void)
         }
     }
     if (length != FAILED)
-        wrong = 1;                      /* Init02: a file, but not one of
+        wrong = true;                   /* Init02: a file, but not one of
                                            the program's */
 
     /* Init03: the defaults, with both panels on the current directory
        and the first one switched off. */
-    for (i = 0; i < sizeof Palets; i++)
+    for (i = 0; i < (i32)sizeof Palets; i++)
         ((u8 *)&md)[i] = Palets[i];
     for (; i < CmnIni; i++)
         ((u8 *)&md)[i] = 0;
-    for (i = 0; i < sizeof DefWCB; i++)
+    for (i = 0; i < (i32)sizeof DefWCB; i++)
         ((u8 *)first)[i] = DefWCB[i];
     for (; i < WCBini; i++)
         ((u8 *)first)[i] = 0;
@@ -447,7 +451,7 @@ struct Answer Init11(void)
     struct Block block;
     struct WCBdef *wcb;
     const u8 *from = IMAGE + 3;
-    u16 side, i;
+    i32 side, i;
 
     for (side = 0; side < 2; side++) {
         block = MemTake(PANEL_BYTES);
@@ -499,7 +503,7 @@ static u16 CurNl(void)
     u16 page = ScreenState().page;
 
     if (CursorWhere(page).place >> 8 >= md.Lines)
-        Cursor((u16)(u8)(md.Lines - 1) << 8);
+        Cursor((u16)((u8)(md.Lines - 1) << 8));
     return page;
 }
 
@@ -542,7 +546,8 @@ void IniData(void)
     struct Screen screen;
     struct SysVersion system;
     const u8 *env;
-    u16 i, c, at, lines, rows, page, shape, cell;
+    i32 i, at, lines, rows;
+    u16 c, page, shape, cell;
 
     HookVct();                          /* Set Error Vectors */
 
@@ -577,7 +582,7 @@ void IniData(void)
     CountryInfo(&md.Country);           /* Country */
     for (i = 0; i < 128; i++) {         /* Lower case table */
         md.LowTab[i] = (u8)(0x80 + i);
-        md.TmpBuf[i] = (u8)CaseMap(0x80 + i);
+        md.TmpBuf[i] = (u8)CaseMap((u16)(0x80 + i));
     }
     for (i = 0; i < 128; i++) {         /* Init22 */
         c = md.TmpBuf[i];
@@ -595,15 +600,16 @@ void IniData(void)
             at = 0;                     /* Init25 */
             break;
         }
-        for (i = 0; i < sizeof Comsp && env[at + i] == Comsp[i]; i++)
+        for (i = 0; i < (i32)sizeof Comsp && env[at + i] == Comsp[i]; i++)
             ;
         at += i;
-        if (i == sizeof Comsp)
+        if (i == (i32)sizeof Comsp)
             break;
         while (env[at++] != 0)
             ;
     }
-    md.ComSpec = at;                    /* Init26 */
+    md.ComSpec = (u16)at;               /* Init26; fits: DOS keeps an
+                                           environment within 32K */
     MnPth0(md.NcPath, env, NcEnv, sizeof NcEnv, 0);
     PathLin(md.NcPath);
     MnPth0(md.TempDir, env, TempEnv, sizeof TempEnv, md.NcPath);
@@ -623,7 +629,9 @@ void IniData(void)
     if (md.TstEGA != 0) {
         rows = ScreenFont().last;
         if (rows != 0) {
-            rows = (u8)(rows + 1);
+            rows = (u8)(rows + 1);      /* wraps: the original adds one
+                                           and goes by DL, so a last row
+                                           of 0FFh is none */
             lines = rows;
             if (rows >= MaxLins)
                 lines = MaxLins;
