@@ -164,7 +164,14 @@ These held while `src/c/` was made, and they say what it is.
      group of functions at a time: a draft in
      `src/portable_c/LAYER.md`, each decision put to the user and
      written there with its date. The types that step 2 is still
-     changing may be settled last.
+     changing may be settled last. The user has also decided, on 14
+     October 2026, that the program saves its preferences and its
+     session (the panels' directories, the command line and its
+     history) by itself, when they change and when it is put away,
+     on every platform, DOS included, with no command to save the
+     setup; when that is built, the comparison of the scenarios'
+     disks leaves the setup file out by one rule of the harness, but
+     in the scenarios that are about the setup itself.
   4. The implementation for DOS moves under the layer.
   5. A second implementation is made that builds and is not meant to
      run: a stub.
