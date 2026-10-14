@@ -19,6 +19,8 @@ program needs, the inventory of `sys.h` and of what the program asks
 outside it, with the counts and findings that went with it. What does
 not stay is said in the last section, "Superseded: the first draft".
 
+Running programs and the program's life are surveyed in `layer/programs.md`.
+
 ## Decided
 
 What the user has decided, in the user's words, with the date. Nothing
