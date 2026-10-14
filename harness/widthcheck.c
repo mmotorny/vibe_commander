@@ -6,12 +6,14 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
+typedef int i32;
 typedef _Bool bool;
 
 struct Thing {
     u16 word;                           /* number: field */
     u8 bytes[4];                        /* number: field */
-    u32 wide;
+    u32 wide;                           /* number: field */
+    i32 count;
     bool flag;
     u16 *pointer;
 };
@@ -19,11 +21,14 @@ struct Thing {
 u16 Takes(u16 word, u8 byte);
 u32 Wide(u32 number);
 
-u16 Check(u16 a, u8 b, u32 c)           /* number: parameter, parameter, returns */
+i32 Count(i32 number);
+
+u16 Check(u16 a, u8 b, u32 c)           /* number: parameter, parameter, parameter, returns */
 {
     u16 kept = a;                       /* number: variable */
     u8 text[13];                        /* number: variable */
-    u32 wide = c;
+    u32 wide = c;                       /* number: variable */
+    i32 count = a - b;
     bool flag = a != 0;
     struct Thing thing;
     u16 i;                              /* number: variable */
@@ -42,6 +47,20 @@ u16 Check(u16 a, u8 b, u32 c)           /* number: parameter, parameter, returns
     wide = a + b;
     wide = c + 1;
     wide++;
+    count--;
+    count = Count(a - b);
+    count = count >> 1;                 /* cuts: sign */
+    count = count / 10 + c % 16;        /* cuts: sign */
+    count = a % count;                  /* cuts: sign */
+    count %= 16;                        /* cuts: sign */
+    count = (count & 0xFF) >> 4;
+    count = a - b >> 1;
+    count = count << 1;
+    count = wide >> count;
+    for (count = 0; count < 13; count++)
+        kept = count >> 1;
+    kept = count;                       /* cuts: store */
+    kept = (u16)count;                  /* cuts: cast */
     kept++;                             /* cuts: step */
     --kept;                             /* cuts: step */
     kept += 2;                          /* cuts: step */

@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
-"""The numbers of 8 and 16 bits of the portable C, and why each is one.
+"""The numbers without a sign of the portable C, and why each is one.
 
 Step 2 of the road has every number of the portable C, src/portable_c/,
-be as wide as what it counts: a number of 16 bits becomes one of 32 or
-a boolean, or stays as it is with its reason written down (TODO.md,
-"The portable C in a flat memory: the plan", "The rule for a number").
-This finds the numbers and where each is cut, and the test
-`portable_c-width` of the build holds the tree to a record of them,
-harness/width.txt, so that a number that is added later is sorted too,
-and so that a commit which widens shows in the record what it widened.
+be as wide as what it counts, and signed unless there is a reason for
+it not to be: a number of 8 or 16 bits becomes an i32 or a boolean, or
+stays as it is with its reason written down, and a u32 becomes an i32
+or stays with its reason (TODO.md, "The portable C in a flat memory:
+the plan", "The rule for a number"). This finds the numbers and where
+each is cut, and the test `portable_c-width` of the build holds the
+tree to a record of them, harness/width.txt, so that a number that is
+added later is sorted too, and so that a commit which widens shows in
+the record what it widened.
 
 What is found. clang reads every file as harness/int16.py has it read,
 and this walks what it understood with the finder of that tool, which
 knows of every expression between which two numbers it lies.
 
-A number is something of 8 or 16 bits that the file declares, a u8 or a
-u16, or an array of them: what a function returns, a parameter, a
-variable, a field of a structure. Of a function it is counted where the
+A number is something without a sign that the file declares, a u8, a
+u16 or a u32, or an array of them: what a function returns, a
+parameter, a variable, a field of a structure. The table counts those
+of 8 or 16 bits and those that are a u32 apart, since the first are
+widened and the second only given a sign. Of a function it is counted
+where the
 function is written, not where a header declares it. The structures of
 the headers are found too, once, under the header's name.
 
@@ -30,6 +35,11 @@ as int16.py takes it:
               `-=`: all of them, but the variable that a loop counts with
     handed    handed to a parameter of 8 or 16 bits
     returned  returned as 8 or 16 bits
+    sign      no cut, and held like one: a number of 32 bits with a sign,
+              an i32, which may be below 0 by its type, is shifted to the
+              right or divided, or a remainder is taken of it or by it.
+              That is what it was without a sign only for a number that
+              is not below 0, and the reason says why it is not
 
 A cut is where a wider variable would keep another number, so the cuts
 of a number are what is read before it is widened: `--show`. A
@@ -43,10 +53,11 @@ one of four ways.
 
   - `not sorted`, with how many numbers and cuts it has: nobody has
     read it for the rule yet.
-  - Sorted: every number that it still has of 8 or 16 bits, and every
-    cut that is left, is an entry with its reason, written by whoever
-    read it. A number that was widened or made a boolean is no entry:
-    the table at the top of the record counts those, by file.
+  - Sorted: every number that it still has without a sign, of 8, 16
+    or 32 bits, and every cut that is left, is an entry with its
+    reason, written by whoever read it. A number that was made an i32
+    or a boolean is no entry: the table at the top of the record
+    counts those, by file.
   - `laid out`, a structure whose layout is not the program's to
     change, with whose it is, once for all its fields.
   - `as a whole`, a file that no cluster of step 2 reads: WHOLE below
@@ -55,7 +66,11 @@ one of four ways.
 The test fails where the tree is not as the record has it: a count that
 has moved, fewer as well as more; a number or a cut of something sorted
 that the record has not; one of the record that is gone; an entry
-without a reason.
+without a reason. And it fails for what clang says of a file that is
+sorted under five warnings, WARNINGS below: a number with a sign held
+against a u32 or made one without a word, which the finder does not
+look for, and the three that name a boolean made of something that is
+none.
 
     python3 harness/width.py                 the table, and the test
     python3 harness/width.py --show FILE     the numbers and the cuts of
@@ -76,8 +91,9 @@ structure is made `laid out` by hand there: the line `FILE, struct
 NAME: laid out, 1 numbers` with the reason under it, in the place of
 its entries or of its line `not sorted`.
 
-What a reason is. For a number that is as wide as it is by what it is,
-a character, a colour, a cell of the screen, a row and a column, it is
+What a reason is. For a number that is as wide as it is, or without a
+sign, by what it is, a character, a colour, a cell of the screen, a row
+and a column, bits, the size of a file, it is
 one word of a fixed list, WORDS below, which has what each word says,
 once; what is not plain of the one number goes behind a colon. The
 table counts those in a column of their own, `by word`, and a single
@@ -121,7 +137,7 @@ RECORD = Path(__file__).resolve().parent / "width.txt"
 CHECK = Path(__file__).resolve().parent / "widthcheck.c"
 SKIPPED = 77
 
-CUTS = ["cast", "store", "step", "handed", "returned"]
+CUTS = ["cast", "store", "step", "handed", "returned", "sign"]
 HEADERS = ("vc.h", "sys.h", "tables.h")
 
 # The clusters of step 2, as TODO.md has them, each with its files. A
@@ -160,9 +176,24 @@ WHOLE = {
     "stack.c": "the stack, an array of bytes",
 }
 
+# What clang is asked of every file that is sorted, each of which names
+# a place that the finder does not: a number with a sign held against
+# one of 32 bits without, where C makes the first a huge number if it is
+# below 0; one made the other without a cast, as an i32 handed to a
+# function that takes a u32; and of the booleans, a comparison that a
+# type decides, a constant that does not fit, a number where true or
+# false is asked.
+WARNINGS = ["-Wsign-compare", "-Wsign-conversion",
+            "-Wtautological-constant-out-of-range-compare",
+            "-Wconstant-conversion", "-Wint-in-bool-context"]
+
 # The types that a number is widened to, by the name that vc.h has for
-# each, and the column of the table that counts it.
-WIDE = {"u32": "u32", "bool": "bool", "_Bool": "bool", "i32": "signed"}
+# each, and the column of the table that counts it. A u32 is none of
+# them: it is a number of the record, as one of 8 or 16 bits is.
+WIDE = {"bool": "bool", "_Bool": "bool", "i32": "i32", "int": "i32"}
+
+# A number of 32 bits without a sign, as it is written.
+UNSIGNED = ("u32", "unsigned int", "unsigned long", "unsigned")
 
 # The words for a number that has its width by what it is, each with
 # what it says, once: such a number has the word for its reason, alone
@@ -194,6 +225,12 @@ WORDS = {
               "that they are made of: 16 bits, which wrap round",
     "system": "something else that the system answers in or takes, which "
               "is said behind the word",
+    "bits": "bits and no number: a mask, flags, or what is only taken "
+            "apart and put together by shifts and masks",
+    "size": "the size of a file, a place in one, the size of a disk or of "
+            "what is free on it, or a sum of such: it can pass two "
+            "gigabytes, and there is no signed type of 64 bits. A u32 "
+            "until the layer's design gives the size of a file its type",
     "setup": "a byte of the setup file, which stays a byte",
     "flag": "true or false, in a byte of the layout: the code asks "
             "whether it is 0",
@@ -216,7 +253,8 @@ def word(reason):
 
 def narrow(type_):
     """Of what clang says the type of a thing is: the type as it is
-    written, if it is a number of 8 or 16 bits or an array of them."""
+    written, if it is a number of 8 or 16 bits, or one of 32 without a
+    sign, or an array of them."""
     def bare(name):
         name = " ".join(re.sub(r"\b(const|volatile)\b", "", name).split())
         return re.sub(r"\s*(\[\d*\])+$", "", name), name
@@ -226,9 +264,14 @@ def narrow(type_):
                 type_.get("qualType", ""))
     for element, _ in (written, real):
         if element in ("u8", "u16", "unsigned char", "unsigned short",
-                       "char", "signed char", "short"):
+                       "char", "signed char", "short") + UNSIGNED:
             return written[1].replace(" [", "[")
     return None
+
+
+def unsigned(written):
+    """Is a type, as narrow has it, of 32 bits without a sign?"""
+    return re.sub(r"(\[\d*\])+$", "", written) in UNSIGNED
 
 
 def wide(type_):
@@ -329,6 +372,16 @@ class Widths(int16.Finder):
             self.cut(node, node.get("_cut") or kind)
         return super().convert(value, types, node)
 
+    def arithmetic(self, op, a, b, node):
+        """What a sign changes: a shift to the right, a division and a
+        remainder of a number of 32 bits with a sign, which are those
+        of a number without one only while it is not below 0."""
+        if op in (">>", "/", "%"):
+            for value in (a,) if op == ">>" else (a, b):
+                if (value.t16 == value.t32 == int16.S32 and value.low < 0):
+                    self.cut(node, "sign")
+        return super().arithmetic(op, a, b, node)
+
     def value(self, node):
         kind = node.get("kind")
         inner = [x for x in node.get("inner", []) if isinstance(x, dict)]
@@ -394,6 +447,21 @@ def read(command, source, name, text=None):
     return finder
 
 
+def warned(command, source, name):
+    """What clang says of a file under WARNINGS, as lines."""
+    text = (source / name).read_text(encoding="latin-1")
+    _, text, _ = hostcheck.own(name, text)
+    options = [option for option in int16.OPTIONS
+               if option not in ("-w", "-Xclang", "-ast-dump=json")]
+    result = subprocess.run(
+        [command, *options, int16.OFFSETOF, *hostcheck.OWN, "-I",
+         str(source), "-Wno-everything", *WARNINGS, "-"],
+        input=text.encode("latin-1"), capture_output=True)
+    return [line.replace("<stdin>", name)
+            for line in result.stderr.decode("latin-1").splitlines()
+            if ": warning: " in line]
+
+
 class Tree:
     """What was found in every file."""
 
@@ -430,11 +498,14 @@ class Tree:
         return sorted(found, key=lambda key: (self.first.get(key, 0), key))
 
     def count(self, file, scope=None):
-        """(numbers, cuts) of a file, or of one scope of it."""
-        def of(table):
+        """(numbers of 8 or 16 bits, cuts, numbers that are a u32) of a
+        file, or of one scope of it."""
+        def of(table, wanted=None):
             return sum(len(lines) for key, lines in table.items()
-                       if key[0] == file and scope in (None, key[1]))
-        return of(self.numbers), of(self.cuts)
+                       if key[0] == file and scope in (None, key[1])
+                       and (wanted is None or wanted == unsigned(key[4])))
+        return (of(self.numbers, False), of(self.cuts),
+                of(self.numbers, True))
 
 
 def whole(file):
@@ -507,32 +578,40 @@ def plural(number, what):
     return f"{number} {what}{'' if number == 1 else 's'}"
 
 
+def counted(numbers, cuts, wide):
+    """The counts of something that has no entries, as the record says
+    them."""
+    return (plural(numbers, "number") + (f", {wide} u32" if wide else "")
+            + ("" if cuts is None else f", {plural(cuts, 'cut')}"))
+
+
 def table(tree, record):
     """The counts, by cluster and by file."""
     def row(files):
-        numbers = kept = words = unsorted = cuts = 0
+        numbers = wide = kept = words = unsorted = unsorted32 = cuts = 0
         wider = {}
         for file in files:
             for column, count in tree.wider.get(file, {}).items():
                 wider[column] = wider.get(column, 0) + count
             for scope in tree.scopes(file):
-                n, c = tree.count(file, scope[1])
-                numbers, cuts = numbers + n, cuts + c
+                n, c, w = tree.count(file, scope[1])
+                numbers, cuts, wide = numbers + n, cuts + c, wide + w
                 if record.sorted_(file, scope[1]):
                     said = sum(len(at) for entry, at in tree.numbers.items()
                                if entry[:2] == scope
                                and word(record.reasons.get(entry, "")))
                     words += said
-                    kept += n - said
+                    kept += n + w - said
                 elif not whole(file) and (file, scope[1]) not in record.laid:
                     unsorted += n
-        return (f"{numbers:>8}{unsorted:>11}{words:>8}{kept:>6}{cuts:>6}"
-                f"{wider.get('u32', 0):>6}{wider.get('bool', 0):>6}"
-                f"{wider.get('signed', 0):>7}")
+                    unsorted32 += w
+        return (f"{numbers:>8}{unsorted:>11}{wide:>6}{unsorted32:>15}"
+                f"{words:>8}{kept:>6}{cuts:>6}"
+                f"{wider.get('bool', 0):>6}{wider.get('i32', 0):>6}")
 
-    head = (f"{'8 or 16':>8}{'not sorted':>11}{'by word':>8}{'kept':>6}"
-            f"{'cuts':>6}"
-            f"{'u32':>6}{'bool':>6}{'signed':>7}")
+    head = (f"{'8 or 16':>8}{'not sorted':>11}{'u32':>6}"
+            f"{'u32 not sorted':>15}{'by word':>8}{'kept':>6}"
+            f"{'cuts':>6}{'bool':>6}{'i32':>6}")
     lines = [f"{'cluster':<10}{head}  its files"]
     named = set()
     for name, files in CLUSTERS:
@@ -560,26 +639,30 @@ def written(tree, record, said):
     """The record, as text; and the entries that have no reason."""
     found = re.search(r"(\d+)\.\d+", said)
     lines = [
-        "The numbers of 8 and 16 bits of the portable C, src/portable_c/,",
-        "and where a number is cut to so few: of what has been sorted by",
-        "the rule of step 2, every one that is left with why it is as wide",
-        "as it is; of the rest, how many. harness/width.py found them, with",
+        "The numbers without a sign of the portable C, src/portable_c/, of",
+        "8, 16 and 32 bits, and where a number is cut to 8 or 16: of what",
+        "has been sorted by the rule of step 2, every one that is left with",
+        "why it is as wide as it is and has no sign; of the rest, how many.",
+        "harness/width.py found them, with",
         f"clang {found.group(1) if found else '?'}, and says what the "
         "columns and the kinds are; the reason",
         "under an entry was written by whoever read it. The test",
         "portable_c-width holds the tree to this. `python3 harness/width.py",
         "--record` writes it anew and keeps the reasons; `--sort FILE`",
         "makes entries of a file that is not sorted.", "",
-        "The columns: the numbers of 8 or 16 bits that there are; of those,",
-        "how many are in what nobody has sorted, how many have their width",
-        "by what they are and say so by a word of the list below, and how",
-        "many are kept with a reason of their own, the rest being of a",
-        "structure that is laid out or of a file as a whole; the cuts; and",
-        "how many numbers are declared as u32, as bool and with a sign. A",
-        "cluster takes the `not sorted` of its row to nothing.", "",
-        "The words, for a number that has its width by what it is. Such a",
-        "number has its word for a reason, alone or with what is not plain",
-        "behind a colon. The code has no name for any of them.", ""]
+        "The columns: the numbers of 8 or 16 bits that there are, and how",
+        "many of those are in what nobody has sorted; the same of the",
+        "numbers that are a u32; of the numbers of any of those widths that",
+        "are sorted, how many are what they are by a word of the list below",
+        "and how many are kept with a reason of their own, the rest being",
+        "of a structure that is laid out or of a file as a whole; the cuts;",
+        "and how many numbers are declared as bool and as i32, which is",
+        "what a number becomes that is widened. A cluster takes the two",
+        "`not sorted` of its row to nothing.", "",
+        "The words, for a number that has its width, or no sign, by what it",
+        "is. Such a number has its word for a reason, alone or with what is",
+        "not plain behind a colon. The code has no name for any of them.",
+        ""]
     for name, what in WORDS.items():
         rows = textwrap.wrap(what, 56)
         lines += [f"    {name:<12}{rows[0]}"]
@@ -589,8 +672,7 @@ def written(tree, record, said):
     lines += ["", "----"]
     bare = []
     for file in tree.files:
-        numbers, cuts = tree.count(file)
-        counts = f"{plural(numbers, 'number')}, {plural(cuts, 'cut')}"
+        counts = counted(*tree.count(file))
         if whole(file):
             lines += ["", f"{file}: as a whole, {counts}",
                       f"    {whole(file)}"]
@@ -600,15 +682,15 @@ def written(tree, record, said):
             continue
         for key in tree.scopes(file):
             scope = key[1]
-            numbers, cuts = tree.count(file, scope)
-            counts = f"{plural(numbers, 'number')}, {plural(cuts, 'cut')}"
+            numbers, cuts, wide = tree.count(file, scope)
+            counts = counted(numbers, cuts, wide)
             where = f"{file}, {scope or '()'}"
             if key in record.scopes:
                 lines += ["", f"{where}: not sorted, {counts}"]
                 continue
             if key in record.laid:
                 lines += ["", f"{where}: laid out, "
-                              f"{plural(numbers, 'number')}"]
+                              f"{counted(numbers, None, wide)}"]
                 lines += [f"    {row}" for row in
                           record.laid[key].split("\n") if row]
                 if not record.laid[key]:
@@ -766,6 +848,20 @@ def main():
     if bare:
         print("\nThe record has no reason for:")
         print("\n".join(bare))
+        sys.exit(1)
+    done = [file for file in tree.names if not whole(file)
+            and file in record.known and file not in record.files]
+    with ThreadPoolExecutor() as pool:
+        said = [line for lines in pool.map(
+            lambda name: warned(command, arguments.source, name), done)
+            for line in lines]
+    if said:
+        print(f"\nclang says of what is sorted, under {' '.join(WARNINGS)}:")
+        print("\n".join(said))
+        print("\nA number with a sign that meets one of 32 bits without "
+              "wants the type that it\nis, or the cast that says it is not "
+              "below 0 there; a boolean that is none wants\nto be a "
+              "number.")
         sys.exit(1)
 
 
