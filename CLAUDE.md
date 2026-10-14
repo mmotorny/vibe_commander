@@ -294,6 +294,24 @@ These held while `src/c/` was made, and they say what it is.
   the room down by every read, where the original counts it down by
   the last one only and reads past the room's end: a bug of the
   original, fixed and declared.
+- More of what the user decided on 14 October 2026, as the clusters of
+  step 2 came to it. Fixes of bugs of the original, each declared: the
+  viewer counts the columns in front of a found text in 32 bits (entry
+  18); the Info panel counts a file's clusters in 32 bits (entry 19),
+  and the size of a cluster becomes 32 bits with the piece M, so that a
+  disk of clusters of 64K shows its room; the editor counts its lines
+  in 32 bits, so that a text of more than 65,535 lines can be reached,
+  held by a scenario of both programs; a tree's file that claims 4,096
+  entries or more, or none, is refused as a broken one; and the Info
+  panel's test of a label that ends in "S" goes by whether reading the
+  label failed. Every figure of free memory goes, on DOS too, as a
+  thing that only made sense on DOS: the editor's free bytes are the
+  last of them, and the rule that leaves that figure out of the
+  comparison follows. One scenario may be held to an expectation of
+  the portable C's own, where the original cannot go: `editor-huge`,
+  a file larger than the original's room, when the memory comes from
+  the extender. On DOS, Alt with a letter goes on naming the letter of
+  a US keyboard, as the BIOS gives it.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
