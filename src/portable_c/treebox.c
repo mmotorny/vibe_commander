@@ -20,8 +20,8 @@
  */
 #include "vc.h"
 
-u16 ReadTre(void);
-u16 ChTree(u16 column);
+bool ReadTre(void);
+bool ChTree(i32 column);
 
 /* ReDir of read.c calls ReadTre, and the tree in its box and Copy and
    Rename call ChTree: both return what the routines answered in the
@@ -55,7 +55,7 @@ u16 ChTree(u16 column);
 /* C routines of other files that vc.h does not have. */
 void FilZero(u8 *text, i32 length);                     /* string.c */
 void TreeCur(void);                                     /* tree.c */
-void TrCr20(u16 lines);
+void TrCr20(i32 lines);
 
 /* The tables of the tree, in treebox_t.c: the name of the tree
    file, which DelTr0 has too, and the boxes that are shown while the
@@ -128,7 +128,7 @@ static const u8 Empty_S[] = "";
    with, the disk of a drive that stands for two not put in, or a file
    that cannot be read leave a tree of the root alone, and that returns
    0. */
-u16 ReadTre(void)
+bool ReadTre(void)
 {
     struct LineArgs line;
     struct Box box;
@@ -137,7 +137,8 @@ u16 ReadTre(void)
     u8 *text;
     struct Answer opened, moved, found;
     struct FileAttr had;
-    u16 count, done, first, error, size, i;
+    i32 count, done, error, size, i;
+    bool first;
 
     box.begin = 0;
     box.size = 0;
@@ -152,7 +153,7 @@ u16 ReadTre(void)
 
 RdTr01:                                 /* no disk: the root alone */
     entry = LIST;
-    for (i = 0; i < sizeof *entry; i++)
+    for (i = 0; i < (i32)sizeof *entry; i++)
         ((u8 *)entry)[i] = 0;
     entry->DirName[0] = '\\';
     entry->DirShift = 1;
@@ -167,24 +168,28 @@ RdTr02:                                 /* the file */
     if (moved.failed)
         goto RdTr01;
     done = moved.value;
-    if (done >= sizeof md.TreeBuf)      /* longer than there is room for */
+    if (done >= (i32)sizeof md.TreeBuf)         /* longer than there is room
+                                                   for */
         goto RdTr10;
     for (i = 0; i < 5; i++)
         if (md.TreeBuf[i] != TreBeg[i])
             goto RdTr10;
-    count = TREE->TreeLen;
     if (ChkSum(md.TreeBuf, 7) != TREE->TreSum1)
         goto RdTr10;
-    count <<= 4;
-    if ((u16)(done - 11) != count)
+    /* The bytes of the list, in 16 bits as the original has them: this
+       wraps for a count of 4,096 entries or more, which a file that fits
+       TreeBuf has only if it says what it has not, and such a file is
+       held to a list of the low twelve bits of its count. */
+    count = (u16)(TREE->TreeLen << 4);
+    if (done - 11 != count)
         goto RdTr10;
-    if (ChkSum((const u8 *)TRELIST, count)
+    if (ChkSum((const u8 *)TRELIST, (u16)count)
         != *(const u16 *)((const u8 *)TRELIST + count))
         goto RdTr10;
     goto RdTr40;
 
 RdTr10:                                 /* the disk */
-    for (i = 0; i < sizeof md.TreeBuf; i++)
+    for (i = 0; i < (i32)sizeof md.TreeBuf; i++)
         md.TreeBuf[i] = 0;
     md.ZoomOne = 0;
     SCANNED[0] = '\\';
@@ -204,7 +209,8 @@ RdTr11:                                 /* one more: with five, a box that
             *(u16 *)md.MenuBuf = md.DosPth[0];  /* and the end */
             OncZoom(0x728, &Tree_P, 0, &box);
         }
-        Number(md.MenuBuf, 0, count, NUM_SEPARATED);
+        Number(md.MenuBuf, 0, (u16)count, NUM_SEPARATED);  /* at most the
+                                                   list's length */
         line.value = box.begin + 0x400 & 0xFF00 | 0x28;
         line.line = md.MenuBuf;
         line.colors = Scan_P;
@@ -216,12 +222,12 @@ RdTr11:                                 /* one more: with five, a box that
         goto RdTr15;
 
 RdTr14:                                 /* the next entry of the directory */
-    first = 0;
+    first = false;
     goto RdTr16;
 
 RdTr15:                                 /* the first */
     SetDTA();
-    first = 1;
+    first = true;
 
 RdTr16:
     error = READ_STOPPED;
@@ -329,10 +335,10 @@ RdTr26:
     OncZoom(0x728, &TrSav_P, 0, &box);
     for (i = 0; i < 5; i++)
         md.TreeBuf[i] = TreBeg[i];
-    count = TREE->TreeLen;
+    count = TREE->TreeLen << 4;
     TREE->TreSum1 = ChkSum(md.TreeBuf, 7);
-    count <<= 4;
-    *(u16 *)((u8 *)TRELIST + count) = ChkSum((const u8 *)TRELIST, count);
+    *(u16 *)((u8 *)TRELIST + count) = ChkSum((const u8 *)TRELIST,
+                                             (u16)count);   /* in TreeBuf */
     size = count + 11;
     had = FileAttributes(Tree_F);       /* with the attributes it has */
     if (had.failed) {
@@ -347,7 +353,8 @@ RdTr26:
             Beep();
         goto RdTr37;
     }
-    moved = FileWrite(opened.value, md.TreeBuf, size);
+    moved = FileWrite(opened.value, md.TreeBuf, (u16)size);    /* in
+                                                   TreeBuf */
     if (!FileClose(opened.value).failed && !moved.failed
         && moved.value != size)
         Beep();
@@ -364,20 +371,24 @@ RdTr40:
 
 /* The address of the entry with a number: NumAd1 of the assembly. An
    address is an offset in the list here, in bytes, TREE_OFFSET of vc.h,
-   where the assembly has a place of the main data: the box reckons with
-   addresses in 16 bits, a line that has moved up by a line is at an
-   offset below 0 that has wrapped round, and all of it is differences
-   and comparisons within the list, which are what they were. The number
-   of an entry, TreNum, is the pointer's own. */
-#define ADDRESS(number) ((u16)((number) << 4))
-#define NUMBER(entry) ((u16)((entry) - TRELIST))
+   where the assembly has a place of the main data. The box reckons with
+   them as numbers with a sign, where the original has addresses of 16
+   bits that wrap round: a line that has moved up by a line is at an
+   offset below 0, which the original has as one that has wrapped round,
+   and all of it is differences and comparisons within the list. The
+   number of an entry, TreNum, is the pointer's own. */
+#define ADDRESS(number) ((number) << 4)
+#define NUMBER(entry) ((entry) - TRELIST)
 
 /* Show a line of the list in the box that begins at `begin`: the one
-   that is `offset` bytes of the list behind the first one shown. */
-static void ChTr50(u16 begin, u16 offset)
+   that is `offset` bytes of the list behind the first one shown, which
+   is -16 for the line above it. */
+static void ChTr50(u16 begin, i32 offset)
 {
-    Window((begin & 0xFF | (u16)(u8)((begin >> 8) + (offset >> 4)) << 8)
-           + 0x205, 0x126);
+    i32 row = (begin >> 8) + (offset >> 4);
+
+    Window((u16)((row << 8 | (begin & 0xFF)) + 0x205), 0x126);    /* in the
+                                                   box, on the screen */
 }
 
 /* Where the table of the keys stands in the original, behind its entries
@@ -395,20 +406,23 @@ static void ChTr50(u16 begin, u16 offset)
    The cursor and the first line shown are those of the tree, TreeCursor
    and TreeFirst, which a panel that shows the tree has too: such a panel
    is marked as changed. */
-u16 ChTree(u16 column)
+bool ChTree(i32 column)
 {
     struct LineArgs line;
     u16 begin = 0x200 | column & 0xFF;                  /* BX */
-    u16 size = (u16)(u8)(md.Lines - 3) << 8 | 50;       /* DX */
+    u16 size = (u16)((u8)(md.Lines - 3) << 8 | 50);     /* DX */
     u16 color;                          /* AX: the colour in the high byte */
-    u16 cursor, first;                  /* BP and DI: where to go, as
+    i32 cursor, first;                  /* BP and DI: where to go, as
                                            numbers of entries from the keys
                                            and as addresses from ChTr11 */
-    u16 was, shown;                     /* where the screen is */
+    i32 was, shown;                     /* where the screen is */
     u16 key = 0;
     u16 path = 0;                       /* SI at ChTr55 */
     u16 state, mouse, held;             /* SI, CX and BP for the mouse */
-    u16 moved, scroll, place, count, cell, look, n, i;
+    u16 before;                         /* what state was */
+    u8 look;
+    u16 place, inner, cell;
+    i32 moved, row, count, click, n, i;
     i32 lines, under;
     u16 *screen;
     struct Paged paged;
@@ -416,7 +430,7 @@ u16 ChTree(u16 column)
 
     HidCur();
     SavWin(begin, size, md.WinBuf);
-    color = Color(ChTr_P[0]) << 8 | column & 0xFF;
+    color = (u16)(Color(ChTr_P[0]) << 8 | column & 0xFF);
     MinBox(begin, size, color);
     if (LeftPanel->WinTyp == 1)
         LeftPanel->ChgFlg = 1;
@@ -474,8 +488,8 @@ ChTr11:
 ChTr12:                                 /* the cursor within the lines */
     if (cursor < first)
         first = cursor;
-    n = (u16)(u8)((size >> 8) - 9) << 4;
-    if ((u16)(cursor - first) > n)
+    n = ((size >> 8) - 9) << 4;
+    if (cursor - first > n)
         first = cursor - n;
     was = TREE_OFFSET(TreeCursor);
     shown = TREE_OFFSET(TreeFirst);
@@ -487,8 +501,8 @@ ChTr12:                                 /* the cursor within the lines */
 
     /* The lines. */
     screen = BasAdr(begin) + 165;
-    cell = Color(ChTr_P[0]) << 8 | ' ';
-    count = (u8)((size >> 8) - 8);
+    cell = (u16)(Color(ChTr_P[0]) << 8 | ' ');
+    count = (size >> 8) - 8;
     do {
         for (i = 0; i < 38; i++)
             screen[i] = cell;
@@ -499,20 +513,19 @@ ChTr12:                                 /* the cursor within the lines */
         /* On the screen: all of them, or the screen moved by a line and
            the one that is new. */
         place = begin + 0x205;
-        n = size - 0x80C;
-        if (moved == sizeof(struct DIRENT)) {
-            scroll = 0x600 | (u8)((n >> 8) - 1);
-        } else if (moved == (u16)-(int)sizeof(struct DIRENT)) {
-            scroll = 0x700;
+        inner = size - 0x80C;
+        if (moved == (i32)sizeof(struct DIRENT)) {
+            row = (inner >> 8) - 1;     /* the line that is new */
+        } else if (moved == -(i32)sizeof(struct DIRENT)) {
+            row = 0;
         } else {
-            Window(place, n);
+            Window(place, inner);
             goto ChTr19;
         }
         was -= moved;                   /* the line that had the cursor has
                                            moved too */
-        Scroll(scroll >> 8 == 7, Color(ChTr_P[0]), place,
-               n + place - 0x101);
-        ChTr50(begin, (u8)scroll << 4);
+        Scroll(moved < 0, Color(ChTr_P[0]), place, inner + place - 0x101);
+        ChTr50(begin, row << 4);
     }
     ChTr50(begin, was - shown);         /* the line that had the cursor */
     ChTr50(begin, TREE_OFFSET(TreeCursor) - TREE_OFFSET(TreeFirst));    /* and
@@ -573,7 +586,8 @@ ChTr20:                                 /* the speed search, and a key */
     }
     /* Another key is for the speed search. */
     n = Search((const u8 *)TRELIST, TREE_OFFSET(TreeCursor), 0,
-               ADDRESS(TREE->TreeLen), sizeof(struct DIRENT), key);
+               (u16)ADDRESS(TREE->TreeLen),     /* the list, in TreeBuf */
+               sizeof(struct DIRENT), key);
     if (n == TREE_OFFSET(TreeCursor))
         goto ChTr20;
     cursor = n;
@@ -604,12 +618,12 @@ ChTr55:                                 /* the disk read again */
        file has such a name. The addresses are the original's here, since
        the table is not in the C. */
     place = begin + 0x205;
-    n = size - 0x80C;
-    cell = Color(ChTr_P[0]) << 8 | ' ';
-    count = n >> 8;
+    inner = size - 0x80C;
+    cell = (u16)(Color(ChTr_P[0]) << 8 | ' ');
+    count = inner >> 8;
     do {
         screen = BasAdr(place);
-        for (i = n & 0xFF; i; i--)
+        for (i = inner & 0xFF; i; i--)
             *screen++ = cell;
         place += 0x100;
     } while (--count);
@@ -620,7 +634,8 @@ ChTr60:                                 /* the mouse, while a button is
                                            down */
     state = 0;
     mouse = TREE->TreeLen;
-    held = cursor;
+    held = (u16)cursor;                 /* BP: read as a place only once
+                                           a button has been down */
 ChTr61:
     pointer = GetMous(mouse);
     mouse = pointer.place;
@@ -631,9 +646,10 @@ ChTr61:
     look = 'x';                         /* the middle button alone */
     if (pointer.buttons & 3)
         look = 0;
-    n = state;
-    state = look << 8 | pointer.buttons;
-    if (look != n >> 8)
+    before = state;
+    state = (u16)(look << 8 | pointer.buttons);     /* three bits of
+                                                   buttons */
+    if (look != before >> 8)
         TypMous(look);
     if ((state & 3) == 0)
         goto ChTr61;
@@ -669,16 +685,20 @@ ChTr65:                                 /* let go */
 ChTr67:                                 /* on a line */
     md.WinMous = 1;
     under = (u8)((u16)(held - begin) >> 8) - 2;
-    key = DoublMo(begin + 0x204 + (under << 8), 0x100 | (u8)(size - 10),
-                  under);
-    if (key == 2) {                     /* the cursor goes there */
+    click = DoublMo((u16)(begin + 0x204 + (under << 8)),   /* on the
+                                                   screen, by InWind */
+                    0x100 | (u8)(size - 10), under);
+    if (click == 2) {                   /* the cursor goes there */
         under += first;
-        cursor = TREE->TreeLen - 1;
+        /* This wraps for a list of no entries, which only a tree file that
+           no program writes leaves: the original takes the line under the
+           mouse then. */
+        cursor = (u16)(TREE->TreeLen - 1);
         if (cursor > under)
             cursor = under;
         goto ChTr10;
     }
-    if (key == 0)
+    if (click == 0)
         goto ChTr20;
     TypMous(0);                         /* a second click: Enter */
     key = 0x1C0D;

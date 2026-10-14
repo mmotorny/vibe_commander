@@ -44,7 +44,7 @@ void PutPath(struct WCBdef *panel);                     /* panel.c */
 void PutFls(struct WCBdef *panel);
 void PutTre(struct WCBdef *panel);                      /* tree.c */
 void F20_02(struct WCBdef *panel);                      /* keys.c */
-u16 ChTree(u16 column);                                 /* treebox.c */
+bool ChTree(i32 column);                                /* treebox.c */
 void DirSize(struct WCBdef *panel);                     /* read.c */
 void TstInfo(struct WCBdef *panel);
 void Help00(void);                                      /* help.c */

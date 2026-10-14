@@ -21,7 +21,7 @@
 #define IS_CRLF(pair) ((pair) == 0x0D0A || (pair) == 0x0A0D)
 
 /* Where FndItem stopped, and whether that is the end of the file. */
-static struct Entry Found(u16 end, const u8 *file)
+static struct Entry Found(bool end, const u8 *file)
 {
     struct Entry entry;
 
@@ -34,7 +34,7 @@ static struct Entry Found(u16 end, const u8 *file)
    the next one behind the line that `file` is in. At the end of the file
    the place returned is that of the byte 1Ah if an entry was looked for
    there, and one behind it if a line was being skipped. */
-static struct Entry Item(const u8 *file, u16 rest)
+static struct Entry Item(const u8 *file, bool rest)
 {
     u16 pair, c;
 
@@ -45,7 +45,7 @@ static struct Entry Item(const u8 *file, u16 rest)
             if (c != ' ' && c != '\t' && c != '\'' && !IS_CRLF(pair))
                 return Found(c == EOF_CHAR, file);
         }
-        rest = 0;
+        rest = false;
         for (;;) {                      /* FndIt1: to the end of the line */
             pair = *(const u16 *)file;
             if (IS_CRLF(pair)) {
@@ -54,7 +54,7 @@ static struct Entry Item(const u8 *file, u16 rest)
             }
             file++;
             if ((pair & 0xFF) == EOF_CHAR)
-                return Found(1, file);
+                return Found(true, file);
         }
     }
 }
@@ -62,7 +62,7 @@ static struct Entry Item(const u8 *file, u16 rest)
 /* The entry at `file`, or the first one behind it: see Item. */
 struct Entry FndItem(const u8 *file)
 {
-    return Item(file, 0);
+    return Item(file, false);
 }
 
 /* Find the entry of the extension file in MenuBuf for the file `name`,
@@ -73,7 +73,8 @@ u8 *FindExt(const u8 *name)
 {
     const u8 *file;
     const u8 *wanted;
-    u16 count, pair;
+    i32 count;
+    u16 pair;
     struct Entry item;
     u8 c;
 
@@ -135,6 +136,6 @@ u8 *FindExt(const u8 *name)
         }
         continue;
 FnEx12:
-        item = Item(file, 1);
+        item = Item(file, true);
     }
 }

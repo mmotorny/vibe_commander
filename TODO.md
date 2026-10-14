@@ -9386,7 +9386,7 @@ for.
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | **Done**: "N10, `dirfunc.c`: done, and what a later cluster should know" below |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | **Done**: "N12, `panel.c`, `info.c`, `drive.c`" below. Two questions of the Info panel, a cluster of 64K and a file just under 65,536 clusters, answered: fix both, the second by N12, entry 19 of `DEVIATIONS.md`, the first by M |
-| N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | |
+| N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | **Done**: "N13, `tree.c`, `treebox.c`, `extfile.c`" below, with two cuts of a tree file that no program writes kept as the original has them |
 | N14 † | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | **Done**, with the answer to question 4 carried out: "N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know" below |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
 | N16 | `main.c` | 1,601; 117 | F8 | |
@@ -14242,7 +14242,6 @@ and the sections 15, the three files and the finder's lists 10, the
 types and the record by scripts 15, the tests 10, and some 20 to find
 what the six differences of the image are, by building the tree three
 times with parts of it as they were, which the note above saves.
-||||||| parent of 9f0b41a (Sort the numbers of cmdline.c, enter.c and exec.c)
 
 ### N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know
 
@@ -14343,6 +14342,138 @@ lists beside them 10; the types and the casts by scripts 10; the
 record's reasons by one script 5; the tests and the documents the
 rest, the images and the suite once each on a machine that four
 other clusters were testing on.
+
+### N13, `tree.c`, `treebox.c`, `extfile.c`: done, and what a later cluster should know
+
+**What there is.** The three files sorted by "The rule for a number",
+with the field `end` of `struct Entry` of `vc.h`, which `extfile.c`
+answers in; clang's warnings of a conversion silent for them. The
+whole suite passes, no golden and no patch changed, and the image of
+each of the 155 scenarios is that of the build before (below).
+
+**The numbers.** Of the 64 of 8 or 16 bits, the 63 of the files and
+`end` of `struct Entry`, none a `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 27 | The counts of the loops and the indexes, the lines of the tree that `PutTree` writes and their width, the level that it counts down, `lines` of `TrCr20`; in `ReadTre` the count of entries and of their bytes, the bytes read and written, how the reading ended; in `ChTree` the six that counted on wrapping, `cursor`, `first`, `was`, `shown`, `moved` and `n`, the count of its rows, `column` and `offset` of `ChTr50` |
+| Made `bool` | 9 | `end` of `struct Entry` and of `Found`, `rest` of `Item`; `found` and `again` of `TreeCur` and `TrCr10`; what `ReadTre`, `ChTree` answer, `first` of `ReadTre` |
+| Kept by a word | 27 | `place` 8 (the places and sizes of boxes, and of the mouse), `text` 7 (five tables of texts, and two characters of the file read as one word, twice), `colour` 3, `cell` 3, `character` 3, `key` 1, `bits` 1 (the mouse's state), `address` 1 (`path`, the original's address that `DelTr0` is handed) |
+| Kept by a sentence | 0 | |
+| Gone | 1 | `scroll` of `ChTree`, which held the call of the BIOS that the original scrolls with and the row that is new: `moved < 0` says the first, and the row is an `i32` of its own |
+
+Eight numbers are new, each where a variable held two things in turn
+or a thing that the original had in a register beside another: in
+`PutTree`, `current`, a `bool`, where `color` held whether a line is
+the current directory, `which`, the colour among the four, and
+`level`, which `n` counted down, and `ends`, the brackets around the
+cursor, where `n` held them (a `u16`, `text`); the branch of a line is
+written as a `?:` of its two characters, where `n` held it too. In
+`ChTree`, `click`, what `DoublMo` answers, where `key` held it;
+`before`, the state of the mouse before, where `n` held it (`bits`);
+`inner`, the rows and columns of the lines, where `n` held them
+(`place`); and `row` there and in `ChTr50`. So 30 are kept by a word,
+10 are a `bool` and 35 an `i32` in the three files at the end.
+
+One place of the kind `sign`: `offset >> 4` of `ChTr50`, which is -16
+where the line that had the cursor has left the box at its top, and
+makes that the row above the lines; the original made that row of an
+offset that had wrapped round and a row cut to a byte.
+
+**The six of F7.** Rewritten as numbers with a sign: what they are
+held against stays the same, a difference of two offsets in the list
+being ±16 exactly where it was 16 or FFF0h in 16 bits, and nothing of
+them is cut any more but where `TREE_ENTRY` makes an entry of an offset,
+as before. `ChTr50` takes an `i32`. `TreeCursor` and `TreeFirst` stand
+two entries further on than they are for a moment still, which makes
+`moved` -32 at the first round, and every line is drawn then, as
+before. `n -= TreeFirst - TRELIST` of `PutTree` has lost its cast.
+
+**Two cuts that are kept, of a tree file that no program writes.**
+`ReadTre` holds a tree file to the count of entries that it says, by
+the bytes of the list: in 16 bits, as the original does, so a file
+that says 4,096 entries or more is held to the low twelve bits of the
+count, and taken if the file is as long as that and its sums are
+right; the program then shows that many entries of TreeBuf and what
+lies behind it. And a file of no entries passes the test too, and
+leaves the list empty, where the line under the mouse is what
+`ChTree` takes, `cursor = TreeLen - 1` wrapping round. Both are written
+as the cast, `(u16)(TREE->TreeLen << 4)` and `(u16)(TREE->TreeLen -
+1)`, with `wraps` in their comments: no program makes such a file, the
+original's own writes five entries or more, and refusing it would be
+a fix of the original, which is the user's (the question at the top
+of the hand back).
+
+**The casts.** clang named 20 places before anything changed, 4 in
+`tree.c` and 16 in `treebox.c`. Nine went by a type: what `PgUp` and
+`PgDn` answer, four, which N1 had left to this; `cursor = under`,
+`n` of the count of lines and of the rows in bytes, the row that is
+new, and what `DoublMo` answers, now `click`. Eleven are a cast, each
+a cell or a place of 16 bits that a shift made an int: the cells that
+`Color` makes, six, which fit by `Color` answering a byte; `size` and
+`color` at the top of `ChTree`; the place of `ChTr50` and of
+`DoublMo`, on the screen; the mouse's state. The widening made 12
+more: `(i32)sizeof` five times against a count with a sign; what is
+handed in 16 bits to `Number`, `ChkSum` twice, `FileWrite` and
+`Search`, and kept in `held`, which the original has the cursor in
+before the mouse; and the two cuts above. Eleven casts went: those of
+`ADDRESS` and `NUMBER`, of `ChTr50`, of the row counts that a `(u8)`
+cut, and `(u16)-(int)sizeof` against `moved`.
+
+**Across clusters.** `ChTree` answers a `bool` and takes an `i32`:
+its declarations in `copy.c` and `commands.c` changed, a line each,
+and their calls ask `!= 0` and `if`. `ReadTre` answers a `bool`: its
+declaration in `read.c`, one line. `TrCr20` takes an `i32`, called in
+`tree.c` and `treebox.c` alone. `struct Entry` has `end` as a `bool`,
+which `usermenu.c` asks with `if`.
+
+**`harness/int16.py`.** The five places that there were in the files
+are gone: the four of the kind `index` in `DESCEND`, `IS_PATH` and
+`FIND`, whose counts are `i32` now, and the `minus` of `moved`. Eleven
+are new, each a number of 16 bits made one of 32 in an `i32` or
+through a shift, with its reason; the place of `DoublMo` is the one
+that was there, on a line written otherwise.
+
+**The program.** `VC.EXE` is another, by the types, 6eed5424... where
+the build of `main` that the piece began on, bf073d6, is 957d0bed...;
+writing the casts on the types changed no byte. The image of every
+scenario, `python3 harness/dataimage.py compare`, against that build:
+"155 scenarios, 39 with nothing that differs; 6 differences, 0 more in
+what was declared as changed, 153 in what may differ". The six are in
+`copy` and `copy-dirs`, each one byte, 80h before and 7Fh after, behind
+the zero of `README.TXT` where a path is made of the name in `TmpBuf`
+and in `TmpErr`: the byte of DOS's memory behind a name that DOS found,
+which follows the build, of `NAME_TAIL` in `harness/dataimage.py`,
+which the tool knows in the DTA, in `NameF` and in 13 bytes that are
+the same as one of those, and not behind a name that is put into a
+path. It is the build's and not the code's: with `ReadTre` as it was
+and `ChTree` as it is now, neither of which those scenarios run, the
+two bytes are 7Fh too, and with `treebox.c` as it was, 80h. Nothing was
+changed in the tool for it: what it leaves out is not this piece's to
+widen. The six are the same in a second run of each build.
+
+**What a later cluster should know.**
+
+- N15, of `input.c`: `Search` takes the end of the list as a `u16`,
+  and `ChTree` hands it `(u16)ADDRESS(TREE->TreeLen)`, the tree's list
+  in bytes: the cast goes when the parameter is widened. What it
+  answers is kept in an `i32` here.
+- `ChkSum` of `misc.c` takes its count as a `u16`, by N1's sentence,
+  0 being 65,536, which a tree file of no entries or of 4,096 is summed
+  with; `Number` of `format.c` a `u16`, its low word, and `FileWrite` of
+  `sys.h` one: `ReadTre` casts the count of the list's bytes and of the
+  file's for them.
+- N17a, of `keys.c`, and N11's `place.c`: the tree's cursor is a number
+  with a sign in `ChTree` now, and still an offset of 16 bits through
+  `TREE_OFFSET` and `TREE_ENTRY` of `vc.h`, which `F00_50` and `ChgAdr`
+  use for the panel that shows the tree. Nothing here depends on how
+  those are kept.
+- `PutTree` takes the place and the size of its box as places, `u16`,
+  from `PutTre` and `ChTree`.
+
+It took some 80 tool calls to hand back, of which waiting for the
+images of the build before, on a machine that four other clusters were
+testing on, was some ten, and finding what the six bytes were, ten.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

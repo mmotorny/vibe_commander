@@ -24,7 +24,7 @@
 void PutTre(struct WCBdef *panel);
 void TreeCur(void);
 void TrCr10(void);
-void TrCr20(u16 lines);
+void TrCr20(i32 lines);
 
 /* PutTree is in vc.h. */
 
@@ -95,7 +95,7 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
    whether it was. The paths are made at the start of MenuBuf. */
 #define FIND(found, entry, count, text, i, n) \
     do { \
-        found = 0; \
+        found = false; \
         if (md.DosPth[0] != md.CrnPath[0]) \
             break; \
         md.MenuBuf[0] = md.DosPth[0]; \
@@ -156,7 +156,13 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
     struct DIRENT *entry;
     u16 *screen, *cell;
     u8 *goes_on, *text;
-    u16 lines, color, width, i, n;
+    u16 color;                          /* a cell, in the colour of its
+                                           directory, which Color answers
+                                           in a byte */
+    u16 ends;                           /* the two characters around the
+                                           cursor */
+    i32 lines, width, which, level, i, n;
+    bool current;
 
     STATUS = place + (size & 0xFF00) - 0x200 + 1;
     TreeCurrent = 0;
@@ -172,8 +178,8 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
     PATH[2] = '\\';
     PATH[3] = 0;
     screen = BasAdr(place + 0x102);
-    n -= (u16)(TreeFirst - TRELIST);
-    lines = (u8)((size >> 8) - 4);
+    n -= TreeFirst - TRELIST;
+    lines = (size >> 8) - 4;
     if (lines > n) {
         lines = n;
         if (n == 0)
@@ -185,15 +191,15 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
        shown are not written, but for the spaces of their line, which go
        where the first line will be. */
     for (;; entry++) {
-        color = Color(colors[0]) << 8 | ' ';
+        color = (u16)(Color(colors[0]) << 8 | ' ');
         cell = screen - 1;
         for (i = 38; i; i--)
             *cell++ = color;
         cell = screen;
         goes_on = GOES_ON;
-        n = entry->DirLevel;
-        if (n != 0) {
-            while (--n) {
+        level = entry->DirLevel;
+        if (level != 0) {
+            while (--level) {
                 if (entry >= TreeFirst && goes_on <= GOES_ON + 10) {
                     if (goes_on < GOES_ON + 10) {
                         if (*goes_on != 0)
@@ -205,15 +211,12 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
                 }
                 goes_on++;
             }
-            n = BRANCH;
-            if (entry->DirCont == 0) {
-                n = BRANCH_LAST;
+            if (entry->DirCont == 0)
                 *goes_on = 0;
-            }
             goes_on++;
             if (entry >= TreeFirst) {
                 if (goes_on < GOES_ON + 12)
-                    *(u8 *)cell = (u8)n;
+                    *(u8 *)cell = entry->DirCont == 0 ? BRANCH_LAST : BRANCH;
                 cell++;
                 *(u8 *)cell = LINE;
                 cell++;
@@ -233,25 +236,26 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
         width = 12;
         if (entry == TRELIST)
             width = 1;
-        IS_PATH(color, PATH, md.DosPth, i, n);
-        if (color) {
+        IS_PATH(current, PATH, md.DosPth, i, n);
+        /* `which` of the colours a directory has here, and the one after
+           it is that of the cursor. */
+        which = 0;
+        if (current) {
             TreeCurrent = entry;
-            screen[36] = Color(colors[2]) << 8 | MARK_CURRENT;
-            color = 2;
+            screen[36] = (u16)(Color(colors[2]) << 8 | MARK_CURRENT);
+            which = 2;
         }
-        /* `color` is which of the colours a directory has here, and the
-           one after it is that of the cursor. */
         if (entry != TreeCursor) {
-            color = Color(colors[color]) << 8;
+            color = (u16)(Color(colors[which]) << 8);
         } else {
-            n = BRACKETS;
+            ends = BRACKETS;
             if (panel == CurrentPanel) {
-                n = ' ' << 8 | ' ';
-                color++;
+                ends = ' ' << 8 | ' ';
+                which++;
             }
-            color = Color(colors[color]) << 8;
-            cell[-1] = color | n >> 8;
-            cell[width] = color | n & 0xFF;
+            color = (u16)(Color(colors[which]) << 8);
+            cell[-1] = color | ends >> 8;
+            cell[width] = color | ends & 0xFF;
             for (i = 0; i < LenPath + 13; i++)
                 SHOWN[i] = PATH[i];
             /* Without the backslash at its end, unless it is the root:
@@ -299,11 +303,12 @@ void TreeCur(void)
 {
     struct DIRENT *entry;
     u8 *text;
-    u16 count, found, again, i, n;
+    i32 count, i, n;
+    bool found, again;
 
     TreeFirst = TRELIST;
     TreeCursor = TRELIST;
-    for (again = 0;; again = 1) {
+    for (again = false;; again = true) {
         FIND(found, entry, count, text, i, n);
         if (found)
             break;
@@ -321,7 +326,8 @@ void TrCr10(void)
 {
     struct DIRENT *entry;
     u8 *text;
-    u16 count, found, i, n;
+    i32 count, i, n;
+    bool found;
 
     for (i = 0; i < LenPath; i++)
         md.CrnPath[i] = md.DosPth[i];
@@ -331,7 +337,7 @@ void TrCr10(void)
 /* Begin the lines of the tree half of `lines` above the cursor, the half
    of an even number, or with the root if there are not as many above it.
    Only the low byte of `lines` counts, and of that not the highest bit. */
-void TrCr20(u16 lines)
+void TrCr20(i32 lines)
 {
     /* The original takes eight bytes for each of them off the address
        of the cursor's entry, which is half as many entries of 16 bytes,

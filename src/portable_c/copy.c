@@ -94,7 +94,7 @@ const u8 *FndLet(const u8 *text);                       /* string.c */
 void NormStr(u8 *text);
 u8 *UnConv(u8 *name, const u8 *buffer);                         /* mask.c */
 u8 *FilDir(u8 *buffer, i32 directories, i32 files);     /* panel.c */
-u16 ChTree(u16 column);                                 /* treebox.c */
+bool ChTree(i32 column);                                /* treebox.c */
 
 /* Boxes and texts, which OncZoom and Dialog take a pointer to: those of
    copy_t.c, and some of deleting. A box and a dialog are declared as

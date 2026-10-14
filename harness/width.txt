@@ -80,7 +80,7 @@ N9              41          0     6              0      39     8     2     7    
 N10             55          0     0              0      49     6     3     9    37  dirfunc.c
 N11             47          0     1              0      46     2     2     9    34  files.c read.c place.c
 N12             48          0     3              0      50     1     5     3    33  panel.c info.c drive.c
-N13             63         63     0              0       0     0     0     0     3  tree.c treebox.c extfile.c
+N13             30          0     0              0      30     0     1     9    35  tree.c treebox.c extfile.c
 N14             62          0     0              0      62     0     0     6    38  cmdline.c enter.c exec.c
 N15            107        107     3              3       0     0     0     0     1  input.c usermenu.c
 N16             95         95     0              0       0     0     3     0     1  main.c
@@ -92,11 +92,11 @@ N19b            41         41     0              0       0     0     0     0    
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        280         96    12              1     153     3     0     0     0  vc.h sys.h tables.h
-all           2495       1149   152             50     717    45    38    70   429
+headers        279         95    12              1     153     3     0     0     0  vc.h sys.h tables.h
+all           2461       1085   152             50     747    45    39    79   461
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               223         39    11              0     153     3     0     0     0
+vc.h               222         38    11              0     153     3     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              40         40     0              0       0     0     0     0     0
@@ -112,7 +112,7 @@ drive.c             16          0     0              0      16     0     2     2
 edit.c             194        194    41             41       0     0     5     0     6
 enter.c             12          0     0              0      12     0     0     1    14
 exec.c              13          0     0              0      13     0     0     1     2
-extfile.c            7          7     0              0       0     0     0     0     0
+extfile.c            4          0     0              0       4     0     0     2     1
 files.c             22          0     0              0      21     1     1     3    12
 find.c              76          0     0              0      70     6     3     4    44
 format.c            29          0     2              0      31     0     4     2     7
@@ -138,8 +138,8 @@ stmain.c            35         35     0              0       0     0     0     0
 stopts.c            28         28     0              0       0     0     0     0     0
 string.c             6          0     0              0       6     0     0     0     8
 system.c            21         21     1              1       0     0     0     0     0
-tree.c              18         18     0              0       0     0     0     0     1
-treebox.c           38         38     0              0       0     0     0     0     2
+tree.c               5          0     0              0       5     0     0     4    14
+treebox.c           21          0     0              0      21     0     1     3    20
 usermenu.c          49         49     0              0       0     0     0     0     1
 view.c              56          0    13              0      67     2     7    22    88
 window.c            39         39     0              0       0     0     0     0     0
@@ -689,8 +689,6 @@ vc.h, struct Buttons: field chosen, u16
 
 vc.h, struct Taken: field key, u16
     key
-
-vc.h, struct Entry: not sorted, 1 number
 
 vc.h, struct Key: not sorted, 2 numbers
 
@@ -1826,7 +1824,21 @@ exec.c, Exec02: variable bx, u16
     own, whose high byte the BIOS is handed for the page of the
     screen.
 
-extfile.c: not sorted, 7 numbers
+extfile.c, Item: variable c, u16
+    character
+
+extfile.c, Item: variable pair, u16
+    text: the two characters at a place in the file, read in one word
+    as the original reads them, for a carriage return and a line feed
+    in either order.
+
+extfile.c, FindExt: variable pair, u16
+    text: the two characters at a place in the file, read in one word
+    as the original reads them, for a carriage return and a line feed
+    in either order.
+
+extfile.c, FindExt: variable c, u8
+    character
 
 files.c, (): variable Ext_S, u8[9]
     text
@@ -2703,9 +2715,94 @@ system.c: not sorted, 21 numbers, 1 u32
 system_t.c: as a whole, 9 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-tree.c: not sorted, 18 numbers
+tree.c, (): variable PutTr_P, u8[4]
+    colour
 
-treebox.c: not sorted, 38 numbers
+tree.c, PutTree: parameter place, u16
+    place
+
+tree.c, PutTree: parameter size, u16
+    place
+
+tree.c, PutTree: variable color, u16
+    cell
+
+tree.c, PutTree: variable ends, u16
+    text: the two characters around the cursor, in one word.
+
+treebox.c, (): variable Tree_F, u8[]
+    text
+
+treebox.c, (): variable TreBeg, u8[5]
+    text
+
+treebox.c, (): variable Scan_P, u8[4]
+    colour
+
+treebox.c, (): variable ChTr_P, u8[4]
+    colour
+
+treebox.c, (): variable ChTr0_S, u8[19]
+    text
+
+treebox.c, (): variable ChTr1_S, u8[45]
+    text
+
+treebox.c, (): variable Empty_S, u8[1]
+    text
+
+treebox.c, ChTr50: parameter begin, u16
+    place
+
+treebox.c, ChTr50: sign
+    | i32 row = (begin >> 8) + (offset >> 4);
+    offset is a difference of two lines of the list in bytes, a
+    multiple of 16, and -16 for the line above the first one shown,
+    where the line that had the cursor has left the box at its top:
+    `>> 4` makes that -1, the row above the lines, which the original
+    makes of an offset that has wrapped round by cutting the row to a
+    byte. Every other offset is 0 or more.
+
+treebox.c, ChTree: variable begin, u16
+    place
+
+treebox.c, ChTree: variable size, u16
+    place
+
+treebox.c, ChTree: variable color, u16
+    cell
+
+treebox.c, ChTree: variable key, u16
+    key
+
+treebox.c, ChTree: variable path, u16
+    address: the original's address in the main data that DelTr0 is
+    handed for a path, which ChTr55 says.
+
+treebox.c, ChTree: variable held, u16
+    place
+
+treebox.c, ChTree: variable mouse, u16
+    place
+
+treebox.c, ChTree: variable state, u16
+    bits: the shape of the mouse pointer and the buttons that are
+    down, a byte each.
+
+treebox.c, ChTree: variable before, u16
+    bits: what state was.
+
+treebox.c, ChTree: variable look, u8
+    character
+
+treebox.c, ChTree: variable cell, u16
+    cell
+
+treebox.c, ChTree: variable inner, u16
+    place
+
+treebox.c, ChTree: variable place, u16
+    place
 
 treebox_t.c: as a whole, 7 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

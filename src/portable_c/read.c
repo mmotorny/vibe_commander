@@ -43,7 +43,7 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old);
 static void ReDr45(struct WCBdef *panel);
 static void ReDr50(struct WCBdef *panel, struct OldList *old);
 static void RdInfo(struct WCBdef *panel);
-u16 ReadTre(void);                                      /* treebox.c */
+bool ReadTre(void);                                     /* treebox.c */
 void DirSize(struct WCBdef *panel);
 u16 DiSi10(u16 attributes);
 void TstInfo(struct WCBdef *panel);

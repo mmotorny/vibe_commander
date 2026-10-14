@@ -1346,7 +1346,7 @@ void DosCom(void);
    into DosBuf, and is 1 if there is one to run: see usermenu.c. */
 struct Entry {
     const u8 *at;                       /* where it is */
-    u16 end;                            /* 1 if the file ends there */
+    bool end;                           /* whether the file ends there */
 };
 struct Entry FndItem(const u8 *file);
 u8 *FindExt(const u8 *name);
