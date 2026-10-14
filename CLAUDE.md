@@ -1937,6 +1937,48 @@ in "The portable C".
     is worked out by hand first. Five of those written for it were
     wrong and the finder right: 65,530 written in decimal is a long on
     DOS, and what is added to it is added in 32 bits there too.
+- With one build of the portable C, the bytes of the program say
+  nothing of a change that is to leave it doing what it did. What says
+  it is the data's image: what the program has in its main data, in the
+  memory that it was handed and in its variables at the end of every
+  scenario, which `harness/dataimage.py` keeps and holds against what
+  another build has there. `TODO.md`, "F0, the net and the record", has
+  what was tried and what is left out. Using it:
+  - Before the first change of a piece, `python3 harness/dataimage.py
+    save build/portable_c/VC.EXE build/before`. The scenarios' test
+    writes the images of the build that it judges into
+    `build/portable_c/images`, anew at every run; then `python3
+    harness/dataimage.py compare build/before build/portable_c/images`,
+    and its last lines go into the commit.
+  - It names what differs: a field of the main data, by the original's
+    listing, a field of a panel or an entry of its list, a place behind
+    the panels, a variable by its file and its name. Read each. What a
+    piece means to change, it names with `--changed`; a word that it
+    takes out of the main data for a pointer gets the pointer's symbol
+    in `ADDRESSES` there, and is then held by what it names.
+  - Two builds differ with no fault in what follows the time, since
+    they get to a step by different counts of instructions: the random
+    numbers, the blanker's stars, the time of a file that the scenario
+    made. Those are in `UNSTEADY` with their reasons, and are counted
+    as "may differ". Before another is put there, `save --early` of
+    the same build says whether it follows the time: the driver then
+    writes less, the program gets to every step a little earlier, and
+    what differs from the build's own images follows the time.
+  - The same build gives the same image in every run, under load too.
+    One that does not has met a flaw of the bench, to report.
+  - The machine is not left to end for it: QEMU pauses it where the
+    driver resets it, `linger` of `harness/dos.py`, and the harness
+    waits for QEMU to say so. Asking QEMU for its state a hundred times
+    a second cost a quarter of a run.
+- The test `portable_c-words` holds every file of the tree to how often
+  it writes each word of the addresses, in `harness/words.txt`, fewer
+  as well as more, as `portable_c-host` holds it to its record:
+  `python3 harness/words.py --record` in the commit that moves a count,
+  and after a rebase the record is written anew, not merged. A run
+  prints which piece of step 2 is to have each word at nothing. A word
+  is counted where it is written, in the body of another word's
+  definition too, and a segment under another name than `panel` or
+  `segment` is not found.
 - The figures of the portable C that change with every step, the
   length of its file and what follows from that, what it keeps of the
   memory, where its code segments end, and the counts of what only

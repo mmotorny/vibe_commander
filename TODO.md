@@ -9039,7 +9039,7 @@ thought and long in lines.
 
 | Piece | What it changes | Owns | Needs; beside | Right when | Writes down |
 |---|---|---|---|---|---|
-| F0, the net and the record. At work | The data's image at the end of a scenario, of the main data and of the program's blocks by name, and the tool that holds two builds' images against each other. The record of the words, with its test | `harness/`, `CMakeLists.txt` for the test | Nothing | The image of a build against itself is equal; against a build with one byte of the main data written wrongly by hand, it is not. Every golden derived again leaves `harness/goldens/` clean | What differs between two runs of one build, if anything, and how a piece names what it means to change |
+| F0, the net and the record. **Done**: "F0, the net and the record" below | The data's image at the end of a scenario, of the main data and of the program's blocks by name, and the tool that holds two builds' images against each other. The record of the words, with its test | `harness/`, `CMakeLists.txt` for the test | Nothing | The image of a build against itself is equal; against a build with one byte of the main data written wrongly by hand, it is not. Every golden derived again leaves `harness/goldens/` clean | What differs between two runs of one build, if anything, and how a piece names what it means to change |
 | X, the extender's memory tried. **Done**: "X, the extender's memory on the bench" below | A toy on the bench, of `harness/trial32/memory.c`: what DPMI 0500h says is free of the 16 MB; the largest block taken, given back and taken again, and where it then is; a block made shorter and longer, 0503h, whether it moves and keeps what it held; a second copy of the toy while the first holds the largest block, and while it has given it back; what a command's `mem` prints either way; and by `harness/trial32/calls.asm`, that DOS is asked nothing by any of it | `harness/trial32/` | Nothing; beside F0 and F1 | It has run, and the table of what it found is in this plan | What F9 goes by: whether the room is all that the extender has or leaves some, and whether rows m and n of "What a user would see otherwise" stand |
 | F1, three blocks where there was one. The proof | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, which answers in paragraphs of 16 bits as the seven places did and needs no cap, since inside the 640 KB it cannot pass A000h; 16 bytes of a pattern in front of each block and behind the last, written when a block is taken, which the image's tool holds at the end of every scenario ("What could go wrong", 15); `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the hand-out of the 640 KB in the system's file and the image's tool, for the 16 bytes; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
 | F2, a panel is a pointer. A sweep | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
@@ -9743,6 +9743,251 @@ this extender's, and nothing of DPMI promises them.
 - *DOS is asked nothing* (row 16): entry 6 of `DEVIATIONS.md` loses
   nothing and gains nothing by it, and `calls.asm` with `listed.py`
   holds F9 to that.
+
+### F0, the net and the record: done, and what a later piece should know
+
+Two tools of the harness, and no line of the program: `VC.EXE` is the
+same bytes before and after.
+
+**The two commands of the image**, for a piece that is to change
+nothing that the program does:
+
+    python3 harness/dataimage.py save build/portable_c/VC.EXE build/before
+    python3 harness/dataimage.py compare build/before build/portable_c/images
+
+The first, with the build that the piece starts from, before anything
+is changed: it takes the program through every scenario and keeps what
+it has in its memory at the end of each, holding it to no golden; two
+to three and a half minutes by the load. The second, when the
+piece's own build has been through `portable_c-scenarios`, which writes
+the same images of the build that it judges into `images` next to the
+program. In place of the first, `cp -r build/portable_c/images
+build/before` does, if the test has just run on the build that the
+piece starts from; and where "before" has to be made again later, of
+the commit that the piece now stands on, `save` takes any `VC.EXE` with
+its `VC.MAP` next to it, in a directory called `portable_c`, as a copy
+of the tree that is built beside has it. The images are of a build, 3.7
+MB for all scenarios, and are under `build/`, never committed. The top
+of `harness/dataimage.py` says what an image is and how it is read.
+
+**When it is taken.** The driver of the tests resets the machine when
+it has written the last step's screen, which it does when the program
+waits for a key with nothing left to do. QEMU is told, by its
+`set-action`, to pause a machine that would end, and the memory is read
+there with `pmemsave` (`linger` and `memory` of `harness/dos.py`): the
+same instruction in every run. Nothing of the driver or of the bench
+changed for it, and every golden derived again leaves
+`harness/goldens/` as it was. That the machine has come to its end QEMU
+says by itself, and the harness listens: asking QEMU a hundred times a
+second, which was the first try, took 25 seconds of a run of 100.
+
+**What is steady**, tried with all 155 scenarios:
+
+| Held against each other | What differs |
+|---|---|
+| The same build, three times: twice by the scenarios' test, with QEMU's log of what ran, on a machine that did little else and on one that did more, and once by `save`, without the log, with ten other machines running | Nothing, in any scenario: not a byte of the program's data, the stack included (9 scenarios were held whole, the rest as the tool holds them) |
+| The same build with the driver writing the program's stack out at every step, as the test has it, and without | 20 scenarios, in `Rand1` and `Rand2`, `Stars`, `MousTim`, the time of a file in the `DTA` and in a panel's list. The program is the same, but it gets to a step some instructions later, and these follow the time. `save` takes the scenarios as the test does for that reason, and `save --early` as it does not: the way to see whether a thing follows the time, with one build |
+| A build whose data the linker has laid out otherwise, two variables added and nothing else: the main data 40 bytes on, the 640 KB 64 | `OwnFirst` of `dos32.c` in every scenario, a paragraph on; the seven words of the main data that hold a segment; two more segments that the program had left in its buffers, `TmpBuf+128` after a copy and `MenuBuf+48` after a dialog; and one pointer of a variable, in every scenario. No time, since no instruction is another |
+| A build that takes 20 instructions more for every round of its wait for a key | 9 scenarios, in the same fields as the second row but `MousTim` |
+
+So the image is steady from run to run and under load, which answers
+10 of "What could go wrong": no read of memory that was never written
+shows, in any scenario. And two builds differ, with no fault in either,
+in what follows the time and in what holds an address, and in nothing
+else that was seen.
+
+**What is left out, and how.** All of it is in `harness/dataimage.py`,
+each with its reason:
+
+- `ADDRESSES`: the seven words of the main data that hold a segment or
+  a count of paragraphs, `WCB1seg`, `WCB2seg`, `WCBcrn`, `WCBsec`,
+  `ViewSeg`, `MemSeg`, `FreMem2`. Not left out but held by what they
+  name: the block and how far into it. A word that names another place
+  in one build than in the other is a difference.
+- A word of the main data that differs and is a segment of the same
+  place of the same block in both builds, and a variable of four bytes
+  or a multiple whose words differ and name the same thing by the two
+  maps: counted in the last line of the summary, and no difference.
+  That is cheap, and it is all that is known of a pointer: where there
+  is one is not known, only that two numbers that differ name one
+  thing. A pointer in the main data or in a block is not looked for;
+  the plan has none there.
+- `UNSTEADY`, 140 bytes of the main data: `Rand1`, `Rand2`, `Stars`,
+  `MousTim`, and the time and date in the `DTA`. `UNSTEADY_VARIABLES`:
+  `OwnFirst`. `UNSTEADY_ENTRY`: `TimeF` of an entry of a panel's list,
+  and the same bytes where a copy of the list lies behind the panels.
+  These are compared, printed with `--all`, counted as "may differ",
+  and fail nothing.
+- The stack, 16 KB: return addresses, another thing in every build.
+- A block that is free, and the paragraph that `dos32.c` keeps in front
+  of each block: the lengths of the blocks and which are taken are held
+  in their place.
+- What is not the program's data at all: the registers, the screen, the
+  extender's memory and DOS's, where `dos32.c` has its block of real
+  mode.
+
+What is then held, in a scenario: the main data, 62,603 bytes but for
+those 140 and the 14 of the addresses; the blocks that are taken, all
+655,360 bytes in most scenarios, the panels and whatever is behind
+them, written or not; the 937 bytes of the variables that the map names
+outside the main data, by the file and the name of each; and the 25,080
+bytes of the tables, which are held against the program's own file as
+the extender loads it, when the image is taken, so a write into a table
+shows with no second build.
+
+`python3 harness/dataimage.py check DIRECTORY` holds a directory of
+images against itself and then against copies with one byte changed, in
+the main data, in a panel's structure, in an entry of its list, behind
+the panels, at the end of the block, in a variable and in a word that
+holds a segment: each has to be named, and is, as "the main data,
+TmpBuf+3" or "the panel of WCB1seg, entry 2 of its list, AttrF".
+
+**How a piece says what it means to change.**
+
+- `--changed NAME`, once for each: a field of the main data, a
+  structure that lies over one, `EdData`, `ViewDat`, `FndData` or
+  `HlpData`, a variable as `file.Name`, a thing in a block as `"the
+  panel of WCB1seg"` or `"behind the panels"`, or `"the blocks"` for
+  how many blocks there are and how long each is. What differs
+  there is printed with `[declared]` and fails nothing. The commit says
+  the same. A piece that widens a field of a structure laid over a
+  buffer names the structure so: the fields behind the one that grew
+  are then at other places, and the tool, which names a byte by the
+  original's listing, says the old names for them.
+- A word that leaves the main data for a pointer beside it, as F1's
+  three and F2's four: its line of `ADDRESSES` gets `variable=("main",
+  "_Name")`, the file and the symbol as the linker's map has them. A
+  build that has the variable is read there, as a pointer, and one that
+  has not is read in the field, so the build before and the build after
+  are held against each other by what the word names. The field's two
+  bytes are not compared in either. That edit is committed with the
+  piece.
+- A thing that differs and follows the time: `save --early` of the
+  piece's own build into a third directory, and `compare` of that with
+  the piece's images. If it differs there too, it follows the time and
+  gets a line of `UNSTEADY` with its reason, which is a change to the
+  net and is said in the commit; if it does not, the piece has changed
+  what the program writes.
+
+**Where the blocks are, now and when the extender has them.** The tool
+knows no address but that of the program's data on the bench, which the
+driver of the tests goes by too (`le.BENCH`): the main data is at `_md`
+of the map, and the blocks are read from what `dos32.c` keeps in front
+of each inside `Own`, which the map names. What is compared of the
+blocks is what the program has in them, by name: "the panel of
+WCB1seg", "the panel of WCB2seg" and "behind the panels", each from
+where its word of `ADDRESSES` says to the next of them or to the end
+of its block. So they are the same things whether the program cuts
+them out of one block, as today, or has a block for each, as from F1
+on, wherever the blocks lie; and an address is held by which of them
+it is in and how far. Where two builds have one of them of two
+lengths, as F1's will have each panel and the room, it is held as far
+as both have it and the two lengths are said, which `--changed "the
+blocks"` declares, with how many blocks there are and how long. What
+lies behind the end of a panel's list in the build that has the panel
+longer is then held against what the other build happens to have
+there: F1 reads those, if there are any.
+
+With the memory from the extender, F9, a block lies wherever the
+extender put it, outside the program's data. The image has room for that: it is
+a list of stretches, each with a name, an address and a length, and
+`_handed` of `harness/dataimage.py` is where the list is made, empty
+today. What it needs is a line of `dos32.c`, which was not F0's to
+make: **a table of the blocks that the program holds, each with its
+address and its length, as a variable that the linker's map names**,
+and the count of them. `dos32.c` will have such a table in any case,
+for the handle that the extender wants back with each block. The tool
+then takes each stretch with the same `pmemsave`, at the address of the
+table, which is right for as long as the extender's memory is where
+the machine's is, as it is on the bench. Whoever moves the memory
+writes `_handed` and `_blocks` for the table, and `check` says whether
+the net still catches a byte in a block.
+
+**The 16 bytes round a block, for F1.** The extender keeps 16 bytes
+of its own between two blocks and ends a program that has written into
+them; the 640 KB take such a write without a sign. So from F1 on the
+hand-out of the 640 KB keeps 16 bytes of a pattern round its blocks,
+and the tool holds them: `guards` of `harness/dataimage.py`, at the
+moment an image is taken. A scenario whose image has them otherwise
+fails `portable_c-scenarios` whatever its screens show, with a line
+that names the scenario, the block and the first byte that is another,
+and `save` and `compare` say the same of their images. It is built and
+tried, with what the image has in front of its first block today taken
+for a pattern, right and then wrong by a byte, through a scenario and
+in `check`; and it looks at nothing until a pattern is declared. What
+F1 tells the tool, in that file:
+
+- `GUARD`: the pattern, as the 16 bytes that `dos32.c` writes.
+- `_guarded`: where they are. As it stands: the bytes that end where
+  each block that is taken begins, and those that begin where the last
+  block of the memory ends, taken or not. Today the paragraph in front
+  of a block is where `dos32.c` keeps the block's length, and the last
+  block ends where `Own` does, to within the 15 bytes that round it to
+  a paragraph: F1 gives the pattern its room in both places, and makes
+  `_guarded` say what it has made.
+- `_blocks`: the blocks, which it reads from that paragraph in front of
+  each. If the hand-out keeps its blocks otherwise, a table, this reads
+  the table, by the symbol of the map that names it.
+
+A pattern that is not in the image, behind the end of the program's
+data, is said as that and fails too.
+
+**What the next pieces should know.**
+
+- The scenarios' test writes the images of every run, into
+  `build/portable_c/images`: the next run of the test overwrites them.
+  Keep "before" elsewhere, before the first build of the piece.
+- The test holds nothing by the images. A piece is held to them by its
+  own `compare`, and says in its commit what that printed in its last
+  lines.
+- A scenario that did not get to its end has no image, and `compare`
+  fails for one that only one side has.
+- An image is of the first copy of the program. Where a scenario ends
+  in a second copy, started from the command line, that one's memory
+  is not in it.
+- Two builds whose code differs are expected to print "as before, but
+  for what may differ" for some ten to twenty scenarios, and "0
+  differences".
+- The time that the saving costs: 0.4 seconds of reading the machines'
+  memory, 1.2 of packing and writing and 0.2 of asking QEMU, for all
+  155 scenarios together and summed over the four that run side by
+  side. Against the test's own time that is not to be measured on a
+  machine that others use: by the clock the test took 217 and 311
+  seconds with images and 222 and 322 without, by the load, and the
+  whole suite 271 and 478 seconds with them. By the processors' time,
+  which the load moves less, 48 scenarios as the test runs them took
+  190 and 204 seconds without images and 197 and 210 with, in the
+  order 190, 197, 204, 210 as the load rose from 3 to 7.
+
+**The record of the words.** `harness/words.py` counts how often each
+word of the addresses is written in each file of `src/portable_c`,
+`harness/words.txt` has the counts, and the test `portable_c-words`
+holds the tree to them, fewer as well as more, as `portable_c-host`
+holds it to its own: `python3 harness/words.py --record` in the commit
+that moves a count, and the record's lines there say what went. A run
+prints the table of the words: the places and the files of each, the
+file with the most, and the piece that is to have it at nothing. As F0
+leaves it, by that piece: F1 68 places, F2 536, F3 277, F5 45, F6 44,
+F7 67, F8 212, F10 198; `ENTRY`, `DSKBUF`, `TRELIST`, `NUMBER_OF` and
+the three of the tables stay. What it counts besides the words of
+`vc.h`: `md.NAME` for the twelve words of the main data that hold a
+segment or a place, `u16 panel` and `u16 segment` for a segment kept in
+a number, and `AddressOf` and `OFFSET_OF` of the editor. Three things
+to know:
+
+- A word is counted in the body of another's definition, so `vc.h` has
+  `AT` and `ARENA` for as long as `PANEL` and `OFFSET` are made of
+  them.
+- A word of the addresses that a piece adds to `vc.h` is named in
+  `WORDS` of `harness/words.py`, with the piece that is to have it at
+  nothing, as it is named in `WORDS` of `harness/int16.py`.
+- A segment that is kept under another name than `panel` or `segment`,
+  `other`, `top`, `behind`, is not counted: 4 of "What could go wrong"
+  stands.
+- The table says which piece is to have a word at nothing; the test
+  does not hold a piece to it. `SEG_OF`, `OFFSET_IN_SEG` and `AT` go up
+  first, at every place where a piece meets what another still has as
+  a segment.
 
 ## An implementation of the layer for tests: future work
 
