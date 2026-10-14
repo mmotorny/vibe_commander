@@ -3124,6 +3124,19 @@ in "The portable C".
   - The objects of two builds in two directories differ in length by
     the paths that are in them: hold listings against each other, or
     the places of the functions in the two maps, not the lengths.
+- A word of a buffer of the main data that leaves it for a pointer, as
+  two words of `TmpBuf` did in `copy.c` (`TODO.md`, "F6"), is "not set
+  or read here", and its bytes may still be read: what is copied by a
+  count and not by a text's zero carries them along. `DialBox` copies
+  81 bytes of a box's text whatever its length, to `TmpErr+1` or
+  `TmpErr+101`, so every text that a table names within 81 bytes in
+  front of the word takes it with it, and the image shows the bytes
+  there, `TmpErr+129` for `TmpBuf+128`. Before such a word goes, list
+  those texts from the files of tables, `{ MD_AT(TmpBuf[n]), how,
+  length }` and the names that a file defines for one, by a script, and
+  read whether the word's bytes can lie in front of the text's zero.
+  Reading the copies of the code alone, 68 bytes of a path, 13 of a
+  name, found none, and the image found this one.
 
 ### Moving a file to the system's functions
 

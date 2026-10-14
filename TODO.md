@@ -9329,7 +9329,7 @@ thought and long in lines.
 | F3, what a dialog is handed. A sweep, in two halves. **Done**, both: what the fields are in, "F3a, what a dialog's fields are in" below, and what a table is handed as, "F3b, what a table is handed as" behind it | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
 | F4, the viewer and the file search. **Done**: "F4, the viewer and the file search" below | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
-| F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
+| F6, a copy and what goes through files. **Done**: "F6, a copy and what goes through files" below | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands. **Done** but for the commands of a line, which wait for F4: "F7, the tree, the history, the commands" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
 | F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
@@ -10424,7 +10424,11 @@ the plan and F0's section 8; reading the code 9; the program and the
 tool written, to a build without warnings, 12; the records and the
 first run of the scenarios, which passed, 6; the images, with the third
 build, 16; the pattern's trial 4; the tool's own check, the records and
-the documents the rest. The change to the program is small: 185 lines
+the documents the rest. Landing behind F4 and F7: the records
+and the README's figures written anew, the section's lines on F7's
+words in `copy.c` brought up to date, the suite again, and the images
+held against those of origin's build, made in a copy under `build/`:
+the same 37 differences in the same places. The change to the program is small: 185 lines
 of `dos32.c`, 160 of `start.c`, 90 fewer in `read.c`, and the 22 places
 of the bridge.
 
@@ -11520,6 +11524,146 @@ build without warnings at the first try, 12; the tools and the records
 8; the rebase onto F3b, which landed while the piece was at work, with
 the base built and saved anew, 8; the suite, the images and the
 documents the rest. Waiting for origin to have F3b cost seven pulls.
+### F6, a copy and what goes through files: done, and what a later piece should know
+
+The piece F6, in `copy.c` and `dirfunc.c`, in two commits: `NEAR` out
+of both files, with `VC.EXE` the same bytes; then a copy's buffer as a
+pointer into the room, and the two words of `TmpBuf` that held an
+address taken out. All 155 scenarios pass with no golden and no patch
+changed, and the whole suite, 14 tests.
+
+**What it is now.**
+
+- `C20_00` keeps a pointer, `buffer`, where it was in the room, and
+  reads into `buffer + offset` and writes from `buffer`. Its steps are
+  the assembly's: 32K behind each piece that is read, whatever was
+  read; behind a piece that is written as many whole paragraphs as
+  were written, `got >> 4 << 4`, which leaves out what is beyond a
+  paragraph as the assembly does and stays right for a `got` that is
+  made wider. Nothing of it wrapped: the offset is 8000h at most, and
+  the room ended below A000h paragraphs.
+- CpCont, the word at `TmpBuf+128` that said where to go on after a
+  full disk, is `rest`, a variable of `C20_00`: that routine alone sets
+  and reads it, cleared for each file as the word was, and it is not
+  kept across anything that moves the room.
+- CpBgNam, the word at `TmpBuf+102` that held the place where the name
+  begins in the source's path, is a static pointer of `copy.c`, set by
+  the commands and read for each file. The bytes of the two words are
+  not set or read by the file, and a comment at the macros says so.
+- `NEAR` is gone from both files, 38 places. At 27 what it was handed
+  is a `u8 *`, or it is kept in a pointer to `const`. At 11, and 2 more
+  where CpBgNam is set, it took `const` off what `CutPath` answers, for
+  a name in a buffer of the program's own that is then written: those
+  say `(u8 *)CutPath(...)`, as `C20_00` said it of `C00_End` already.
+  `CutPath` takes and answers a pointer to `const`, as `strchr` does in
+  C, and a caller that writes there says so.
+
+**What was read by hand**, and what each kind became:
+
+| Kind | Places | What it became |
+|---|---|---|
+| A segment of the room kept in a number | `segment` of `C20_00`: set twice, by `SEG_OF(Room)`; stepped twice; three `AT` | `buffer`, a `u8 *`: `Room`, `+ 0x8000`, `+ (got >> 4 << 4)`, `buffer + offset` |
+| A segment kept in a word of the main data | CpCont, set by a sum of paragraphs and held against 0 | `rest`, a pointer, 0 for none |
+| A place of the main data kept in a word of it | CpBgNam, three `MD_PLACE` and three `MD_POINTER` | A pointer |
+| `NEAR` that did nothing | 27 | The call alone |
+| `NEAR` that took `const` off | 11 | `(u8 *)CutPath(...)` |
+| `MD_PLACE` of a name, as a number | Five: the address of the name that the assembly has in DX where DOS would not say what a handle is or tell a file's time, in `copy.c`, and one in `dirfunc.c` | Stay: each is a number that the program goes on with, the original's, and rests on no megabyte |
+| A word of another piece's in these files | `MD_PLACE(line)` handed to `InSt10` of `input.c`, which takes a place; `TRELIST` of `F35_01`, which F7 has made a pointer and keeps, with `TreeCursor` where `md.TreAdr` was, F7's own lines of `copy.c`; `RoomParas`, N9's | As they were |
+
+**The image.** `compare` of the build before, saved before anything
+was changed, with the piece's: "155 scenarios, 128 with nothing that
+differs; 37 differences, 0 more in what was declared as changed, 0 in
+what may differ", and "465 pointers that name the same in both". The
+six bytes of `copy` and `copy-dirs` that move with any change of code
+did not move this time. Nothing was given to `--changed`; the 37 were
+read one by one:
+
+- 36 are the two words, `TmpBuf+102` and `TmpBuf+128`, in the 27
+  scenarios that copy or move a file, many of them to set themselves
+  up: what the commands left there before the copy, where the copy
+  wrote the place of the name, and 0, or a segment after a full disk,
+  3F73h in `copy-full`. At 128 that is the bytes 8 and 9 of the title
+  that the command copies into CpVar1 as 20 bytes whatever its length:
+  "Mo" of " Copy ", " Move ".
+- One is not in `TmpBuf`: `delete`, `TmpErr+129`, 0 before and "Mo"
+  after. It was not foreseen, and it is the one read of the words' bytes
+  that a scenario reaches. `DialBox` copies `LenPath + 13`, 81, bytes
+  from where a box's text is, whatever the text's length (`DiBx30`), to
+  `TmpErr+1` for the first text and `TmpErr+101` for the second. The
+  box "You are DELETING", `DelCo_B` of `dirfunc_t.c`, has its second
+  text at `TmpBuf+100`, the count of what is selected, so it carries
+  `TmpBuf+128` and `+129` to `TmpErr+129` and `+130`. Every box with a
+  text at `TmpBuf+100` does the same, four of `dirfunc_t.c`, and the
+  copy's own two dialogs, whose text is at `TmpBuf+120`, carry 128 and
+  129. Nothing shows the bytes: where they are the copy's leftover, the
+  text at 100 or at 120 ends in front of them, since a text that
+  reached them would have been written over them; the copy's dialogs
+  write their text anew before they are shown; and `NormStr`, `PathLin`,
+  `LetLin` and `ShrtLin`, which a box puts its text through, and the line
+  on the screen go by the text's zero. So no screen can be another, and
+  the image says where the bytes went. The original carries its words
+  along in the same way, 0 after a copy that ended.
+
+**The program.** As it landed behind F4 and F7, 100 bytes shorter,
+293,255 where origin's was 293,355, its code 122 bytes, and 15 addresses
+fewer that the extender sets, 4,588: those of `AT`, `SEG_OF` and the
+places of the name. The table of the README has it. On the base that
+the piece was made on it was 108 bytes; the step written `got >> 4 <<
+4`, two instructions, against `got & 0xFFF0` made a build of a first
+try and the piece's differ.
+
+**The records.** The words' record, before and after, as it landed
+behind F4 and F7: `NEAR` 49 in 7 files and now 11 in 5, `copy.c` 13
+and `dirfunc.c` 25 at nothing; `AT` 22 in 5 and 19 in 4, `SEG_OF` 19 in
+4 and 17 in 3, `u16 segment` 10 in 3 and 9 in 2, the three of `copy.c`
+at nothing; `MD_PLACE` 74 and 71, and `MD_POINTER` 21 in 9 and 18 in 8,
+CpBgNam's, the last of `copy.c`. What `copy.c` has left: the five
+`MD_PLACE` of the table above and the one for `InSt10`, `TRELIST` 1, and
+`RoomParas` 1 of N9's; and of `dirfunc.c` one `MD_PLACE`, a number.
+The record of the widths has a number fewer in `copy.c`, `segment`,
+and three cuts fewer, the `MD_PLACE` of CpBgNam; the host check's
+record and `portable_c-int16`'s did not move.
+
+**How long it took**, in tool calls, some 95: waiting for F3b to land
+and reading the plan and the sections meanwhile, 30; `NEAR`, by a
+script of forty lines, `build/f6-near.py`, and then the compiler,
+which named the 11 that took `const` off, 8; the buffer and the two
+words by hand, 6; the images, saved and compared, and the one
+difference that was not foreseen, 15; the suite twice, the second for
+the step written to stay right when widened; the documents the rest.
+
+**N9, from here** (`copy.c`):
+
+- `left` is a `u32` of bytes, `(u32)(RoomParas() & 0xFFE0) << 4`: the
+  room rounded down to 512 bytes. When `RoomParas` goes to bytes, the
+  mask is the 512 bytes, not 0xFFE0 of a number that is wider.
+- `offset`, `count` and `got` are 8000h at most, by the piece of 32K
+  that DOS is asked for; S makes what `FileRead` and `FileWrite` take
+  and answer an `i32`. Where `got` is widened, `got >> 4 << 4` stays
+  right; a mask in its place would want writing anew.
+- Nothing bounds how far a read goes into the room but `left`, and for
+  a device that gives a piece in several calls `left` is counted down
+  by the last call alone while `buffer` goes on 32K: "Known and not
+  dealt with" has it, by reading. A read then runs behind the room's
+  end, as it ran behind it in the 640 KB, and from F9 on the extender
+  ends the program for that, "What could go wrong", 14. For a file it
+  cannot happen: a piece is read whole or the file has ended. This is
+  what N9 says when it writes how it knows that nothing writes behind
+  the block's end, and whether it is to be mended is the user's.
+- The short write on a full disk, the 15 bytes written twice, is the
+  same entry of "Known and not dealt with", and `got >> 4 << 4` is it.
+- `count = to - CpDest` of `C00_01` is a difference of two pointers
+  into `CpDest` kept in a `u16`: signed by nature, and within the 81
+  bytes of `CpDest`.
+- `rest` and CpBgNam are pointers now and no number to sort.
+
+**N10, from here** (`dirfunc.c`): nothing of the addresses is left in
+it but one `MD_PLACE`, the address of a name taken for a date as the
+assembly leaves DX, which is a number, and `ENTRY` and `DSKBUF`, which
+stay. The 9 `(u8 *)CutPath` are no numbers. Its texts at `TmpBuf+100`
+are copied as 81 bytes by `DialBox`, behind their zero too: a number
+that a cluster widens in what lies there, from `TmpBuf+100` to
+`TmpBuf+180`, is carried to `TmpErr+101` with the text.
 
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 
