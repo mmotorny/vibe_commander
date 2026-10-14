@@ -21,6 +21,7 @@ not stay is said in the last section, "Superseded: the first draft".
 
 Running programs and the program's life are surveyed in `layer/programs.md`.
 Language, text and time are surveyed in `layer/i18n.md`.
+The screen and input are surveyed in `layer/console.md`.
 
 ## Decided
 
