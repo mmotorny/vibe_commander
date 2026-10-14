@@ -2053,9 +2053,9 @@ as the original's does. `PutInf` of `info.c`.
 under "The portable C": a bug of the original, fixed. The cluster N12
 met it where it sorted the numbers of `info.c` (`TODO.md`, "N12,
 `panel.c`, `info.c`, `drive.c`", question B). Its other question there,
-a cluster of 64K, which the original keeps as 0 bytes, is decided to be
-fixed too, by the piece M, and is declared then: it rests on this
-count, which divides in 32 bits.
+a cluster of 64K, which the original keeps as 0 bytes, is fixed too,
+by the piece M, entry 26: it rests on this count, which divides in 32
+bits.
 
 **Which scenarios show it.** `enter` and `view-window`, by their
 patches, which have the line of the files of `C:\STAMPS` on the Info
@@ -2225,7 +2225,6 @@ program does not come back from such a file to wait for a key, so no
 golden can be derived of it, as was tried with both on the bench.
 `help-broken` and `setup-help-file`, which have the help refuse files
 for other reasons, are held to the original's goldens as they are.
-||||||| parent of ee7389f (Take the editor's figure of free bytes out, the last figure of free memory)
 
 ### 24. The editor says nothing of the free bytes
 
@@ -2294,3 +2293,49 @@ scenario of both programs. The clusters N6 to N8 counted the lines in
 its patch has the status line and the window where the original stops
 at the 65,536th line. Every other scenario of the editor has fewer
 lines, and is held to the original's golden as it is.
+
+### 26. The Info panel counts a cluster of 64K as its bytes
+
+**What the original does.** The Info panel says how many bytes the
+disk of the current drive has, and how many of them are free: the
+clusters that DOS answers for the drive, and those that are free, each
+times the bytes of a cluster. It keeps the bytes of a cluster in 16
+bits, a sector's bytes times the sectors of a cluster, of which the
+high word is lost: a cluster of 64K, 128 sectors of 512 bytes, is 0
+there. On such a disk the Info then says "0 total bytes" and "0 bytes
+free", and the line of the other panel's files counts each file by its
+size and not in whole clusters, since a cluster of 1 byte or fewer is
+not rounded to. Such clusters are on a FAT16 disk of more than 2 GB,
+as Windows NT formats one. That is known by reading the assembly,
+`RdInfo` and `PutInf` of `VCSUB3.INC`, and was not tried.
+
+**What the portable C does.** It keeps the bytes of a cluster in 32
+bits, and with them the clusters of the drive and those that are free,
+`ClusterBytes`, `DiskClusters` and `FreeClusters` of `main.c`, beside
+the main data, where the original's three words keep their places and
+nothing reads them. A cluster of 64K is 65,536 bytes: the Info says
+what the disk has, 65,535 clusters of 64K being 4,294,901,760 bytes,
+which 32 bits without a sign hold, and counts the other panel's files
+in whole clusters, by the count of entry 19. On a disk of any smaller
+cluster it says what the original says. `RdInfo` of `read.c`, `PutInf`
+of `info.c`.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed. The cluster N12
+met it where it sorted the numbers of `info.c` (`TODO.md`, "N12,
+`panel.c`, `info.c`, `drive.c`", question A), and the piece M made it
+when it took the numbers of the main data out to widen them (`TODO.md`,
+"M, the numbers of the main data and of a panel").
+
+**Which scenarios show it.** None. Every scenario has the same two
+hard disks, which the harness makes with `mformat` before a machine
+starts, of 32 MB and with clusters of 512 bytes, so that no screen of
+the bench shows a cluster of 64K. A disk with such clusters, for a
+scenario of its own, would be a third disk or another C: for that
+scenario alone, which the harness has no way to give one scenario: a
+change to the bench of its own, and a FAT16 disk of 64K clusters is
+at least 267 MB, as an image that may be sparse, or a FAT12 one of
+fewer clusters if FreeDOS takes clusters of 64K there, which was not
+tried. Every scenario that shows the Info panel is held to the
+original's golden as it is, which shows that a disk of smaller clusters
+is counted as the original counts it.

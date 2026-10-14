@@ -373,9 +373,9 @@ static void RdInfo(struct WCBdef *panel)
 
     if (panel->WinTyp != 2)
         return;
-    md.ClstSiz = 1;
-    md.Total = 0;
-    md.FreeDsk = 0;
+    ClusterBytes = 1;
+    DiskClusters = 0;
+    FreeClusters = 0;
     md.InfoLen = 0xFFFF;
     md.Volume[0] = 0;
     drive = (u8)(md.DosPth[0] - ('A' - 1));
@@ -386,9 +386,11 @@ static void RdInfo(struct WCBdef *panel)
         return;
     if (space.value == 0xFFFF)
         return;
-    md.Total = space.total;
-    md.FreeDsk = space.free;
-    md.ClstSiz = space.value * space.sector;
+    DiskClusters = space.total;
+    FreeClusters = space.free;
+    /* In 32 bits: a cluster of 64K is its bytes, where the original
+       keeps the product in 16 bits and has 0 (DEVIATIONS.md, 26). */
+    ClusterBytes = (u32)space.value * space.sector;
     opened = OpenFil(DrIn_F, 0x40);
     handle = opened.value;
     if (opened.failed != 0) {

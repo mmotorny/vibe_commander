@@ -231,10 +231,10 @@ static void Exec02(void)
         before[2] = 'C';
         before[3] = ' ';
         for (;;) {                      /* Exec05 */
-            if (md.ComSpec == 0) {
+            if (ShellPlace == 0) {
                 name = Command;
             } else {
-                name = ProgramEnvironment() + md.ComSpec;
+                name = ProgramEnvironment() + ShellPlace;
                 ran = ProgramRunBare(name, before);
                 SetBrk();
                 if (!ran.failed)

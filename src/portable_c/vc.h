@@ -299,7 +299,10 @@ struct MainDat {
     u16 LastMnu;                        /* The last pull down menu item */
     u16 OvlPth;                         /* Pointer to file name in
                                            environment: not set here */
-    u16 ComSpec;                        /* Pointer to COMSPEC= in environment */
+    u16 ComSpec;                        /* Of the original: where the
+                                           shell's name is in the
+                                           environment. Not set or read
+                                           here: see ShellPlace */
     u8  CrnPath[LenPath];               /* Current directory in the tree panel */
     u8  ViewFil[LenStr + 1];            /* Source filename */
     u8  ToFile[LenStr + 1];             /* Target filename */
@@ -380,19 +383,28 @@ struct MainDat {
                                            in it. Not set or read here:
                                            see HistoryPlace and
                                            TreeCursor */
-    u16 ClstSiz;
-    u16 Total;
-    u16 FreeDsk;
+    u16 ClstSiz;                        /* Of the original: the bytes of
+                                           a cluster, */
+    u16 Total;                          /* the clusters of the drive */
+    u16 FreeDsk;                        /* and those that are free, for
+                                           the Info. Not set or read here:
+                                           see ClusterBytes */
     u16 InfoLen;
     u16 Rand1;
     u16 Rand2;
     u16 FncAddr;
-    u16 MousPos;
+    u16 MousPos;                        /* Of the original: the line that
+                                           a first click was on. Not set
+                                           or read here: see ClickLine */
     u32 MousTim;
     u32 AutoTim;
     u32 Screen;                         /* Address of screen */
-    u32 ErrVct;                         /* Original vector 24h */
-    u32 BrkVct;                         /* Original vector 1Bh */
+    u32 ErrVct;                         /* Of the original: who had the
+                                           critical error, INT 24h, */
+    u32 BrkVct;                         /* and who had Ctrl-Break, INT
+                                           1Bh. Not set or read here:
+                                           dos32.c keeps them, as
+                                           addresses of protected mode */
     u8  Volume[12];                     /* Volume label */
     u8  DosPth[LenPath];                /* The current path */
     u8  NcPath[LenPath];                /* The path from VC= variable */
@@ -531,6 +543,34 @@ extern struct DIRENT *TreeFirst;
 extern struct DIRENT *TreeCurrent;
 extern const u8 *HistoryPlace;
 extern u8 *NextCommand;
+
+/* Numbers of the main data that are wider here, of main.c: each is a
+   word of the main data in the original, which is too narrow for what
+   it counts, and is beside the main data since its layout is the
+   original's.
+
+   ShellPlace is where the shell's name is in the environment, behind
+   "COMSPEC=", counted from the environment's start, or 0 if the
+   environment names none: ComSpec. An environment of another system
+   may be longer than 64K.
+
+   ClusterBytes is the bytes of a cluster of the drive that the Info
+   panel shows, DiskClusters the clusters of the drive and FreeClusters
+   those that are free: ClstSiz, Total and FreeDsk, which the Info sets
+   when it reads the drive (RdInfo of read.c) and multiplies into the
+   bytes of the disk. They are the factors of the size of a disk, and
+   are without a sign as that is. The original has the bytes of a
+   cluster in 16 bits, where a cluster of 64K is 0, and the Info then
+   says that the disk has no bytes: a bug of the original, fixed on the
+   user's word of 14 October 2026 (DEVIATIONS.md, 26).
+
+   ClickLine is the line of a list that a first click of the mouse was
+   on, for DoublMo of mouse.c to know a second one by: MousPos. */
+extern i32 ShellPlace;
+extern u32 ClusterBytes;
+extern u32 DiskClusters;
+extern u32 FreeClusters;
+extern i32 ClickLine;
 
 /* The bytes of a panel's block: 64K, which is as far as the offsets of
    16 bits reach that a panel keeps its places in. And the bytes that the

@@ -319,7 +319,6 @@ WORDS = {
     "small": "a number that what it counts keeps within its width, which "
              "is said behind the word",
     "unused": "of the original, and neither set nor read here",
-    "M": "to be widened: the piece M takes it out of the structure",
 }
 
 

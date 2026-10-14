@@ -65,7 +65,7 @@ void PutInf(struct WCBdef *panel)
     u16 *screen;
     u32 size, total;
     u16 place;
-    u16 cluster;                        /* bytes of a cluster */
+    u32 cluster;                        /* bytes of a cluster */
     u16 two;                            /* two characters of dirinfo */
     i32 count, lines, room, skip, i;
     struct WCBdef *other;
@@ -95,11 +95,11 @@ void PutInf(struct WCBdef *panel)
     PUT(PtIn4_S);
 
     /* PtIn21: a number of clusters as bytes. */
-    size = (u32)md.Total * md.ClstSiz;
+    size = DiskClusters * ClusterBytes;
     Number(md.TmpErr + 1, (u16)(size >> 16), (u16)size, NUM_SEPARATED);
     line.include = PtIn6_S;
     PUT(PtIn5_S);
-    size = (u32)md.FreeDsk * md.ClstSiz;
+    size = FreeClusters * ClusterBytes;
     Number(md.TmpErr + 1, (u16)(size >> 16), (u16)size, NUM_SEPARATED);
     line.include = PtIn7_S;
     PUT(PtIn5_S);
@@ -108,7 +108,7 @@ void PutInf(struct WCBdef *panel)
     if (FilePan(other)) {
         total = 0;
         count = 0;
-        cluster = md.ClstSiz;
+        cluster = ClusterBytes;
         for (file = ENTRY(other, DSKBUF);
              (const u8 *)file - (const u8 *)other < other->EndBuf;
              file++) {

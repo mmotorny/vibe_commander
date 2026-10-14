@@ -153,6 +153,15 @@ struct DIRENT *TreeCurrent;
 const u8 *HistoryPlace;
 u8 *NextCommand;
 
+/* Numbers of the main data that are wider here: see vc.h. Beside the
+   main data since a number of 32 bits is longer than the word that the
+   original has for each. */
+i32 ShellPlace;
+u32 ClusterBytes;
+u32 DiskClusters;
+u32 FreeClusters;
+i32 ClickLine;
+
 #define ALT_KEYS 38                     /* the length of AltSr_T */
 
 #define KEY_MOUSE 0xFC                  /* the scan code that Input has
@@ -263,9 +272,9 @@ static void Init90(struct WCBdef *panel)
         panel->CurAdr = DSKBUF;
         panel->First = DSKBUF;
     } else if (panel->WinTyp == 2) {
-        md.Total = 0;
-        md.FreeDsk = 0;
-        md.ClstSiz = 1;
+        DiskClusters = 0;
+        FreeClusters = 0;
+        ClusterBytes = 1;
         md.Volume[0] = 0;
         md.InfoLen = 0xFFFF;
     } else if (panel->WinTyp < 2) {       /* Init92 */

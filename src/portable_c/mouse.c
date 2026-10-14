@@ -128,7 +128,7 @@ i32 DoublMo(u16 begin, u16 size, i32 cursor)
     seconds = time.seconds;
     /* MousTim has the two words of the time, as they are here: its
        high word and its low one are each taken by a cast. */
-    if ((u16)(md.MousTim >> 16) != 0xFFFF && cursor == md.MousPos
+    if ((u16)(md.MousTim >> 16) != 0xFFFF && cursor == ClickLine
         && (hours < (u16)(md.MousTim >> 16)
             || hours == (u16)(md.MousTim >> 16)
                && seconds <= (u16)md.MousTim)) {
@@ -156,9 +156,7 @@ i32 DoublMo(u16 begin, u16 size, i32 cursor)
         }
     }
     md.MousTim = (u32)hours << 16 | seconds;
-    /* A line of a list, which every caller has in 16 bits, as the field
-       has it. */
-    md.MousPos = (u16)cursor;
+    ClickLine = cursor;
     return 2;
 }
 

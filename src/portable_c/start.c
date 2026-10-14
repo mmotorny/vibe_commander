@@ -608,8 +608,7 @@ void IniData(void)
         while (env[at++] != 0)
             ;
     }
-    md.ComSpec = (u16)at;               /* Init26; fits: DOS keeps an
-                                           environment within 32K */
+    ShellPlace = at;                    /* Init26 */
     MnPth0(md.NcPath, env, NcEnv, sizeof NcEnv, 0);
     PathLin(md.NcPath);
     MnPth0(md.TempDir, env, TempEnv, sizeof TempEnv, md.NcPath);
