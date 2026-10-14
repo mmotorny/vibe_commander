@@ -486,3 +486,21 @@ u32 KeptSum(signed char byte, u16 to)
 {
     return (u16)(byte + to);
 }
+
+/* What is cut is a number that a shift has made, or a shift and an
+   `or`, as where a colour is put into the high byte of a cell or a row
+   and a column into two bytes: each added to a number of 32 bits. */
+
+/* The cut and the sum are those of KeptIntWordAdded, which it goes on
+   in. */
+/* is: shl eax,0x08; jmp KeptIntWordAdded_ */
+u32 KeptShift(i32 number, u32 to)
+{
+    return (u16)(number << 8) + to;
+}
+
+/* is: shl eax,0x08; or edx,eax; movzx eax,dx; add eax,ebx; ret */
+u32 KeptShiftOr(i32 row, i32 column, u32 to)
+{
+    return (u16)(row << 8 | column) + to;
+}
