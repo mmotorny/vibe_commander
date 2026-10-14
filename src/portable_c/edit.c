@@ -235,9 +235,8 @@ extern const u8 Menu_F[];               /* the names of the menu file and */
 extern const u8 Ext_F[];                /* of the three extension files */
 extern const u8 ViewE_F[];
 extern const u8 EditE_F[];
-extern const u8 Line_S[];               /* "Line", "Col" and "Free" of the */
-extern const u8 Col_S[];                /* status line */
-extern const u8 FrBuf_S[];
+extern const u8 Line_S[];               /* "Line" and "Col" of the status */
+extern const u8 Col_S[];                /* line */
 extern const u8 EdtH_P[];               /* the colour of the help, */
 extern const u8 EdtH_S[];               /* its six lines on the right, */
 extern const u8 EdtH1_S[];              /* and for the menu file and for */
@@ -2208,7 +2207,7 @@ static void T00_20(void)
     struct Where where;
     struct Ending end;
     const u8 *base;
-    i32 place, free, start;
+    i32 place, start;
     i32 column, first_column, first_line, line, old_column, old_line;
     i32 delta, row, count, size, state, i;
     u16 color;
@@ -2374,20 +2373,9 @@ shown:
         color |= md.ScrBuf[0] & 0xFF00;
         T75_00(EdLine, md.ScrBuf + 46, color);
         T75_00(EdCol, md.ScrBuf + 56, color);
-        /* What is free: the room less the text, and less what the line
-           in the buffer has grown by. Nothing, if that is more than
-           there is: the assembly counts in 32 bits without a sign and
-           takes 20 bits or more for less than nothing, which is that
-           while the room is less than a megabyte. */
-        free = EdSpace - ed.EdLen;
-        if (ed.EdTxHex == 0) {
-            free += EdEndBf - EdOffst - EdSizLn;
-            if (free < 0)
-                free = 0;
-        }
-        Number(md.TmpBuf, (u16)(free >> 16), (u16)free, /* T00_54 */
-               NUM_SEPARATED | NUM_PADDED);
-        MvsBw(md.ScrBuf + 62, md.TmpBuf + 6, 7, color);
+        /* The assembly writes here, T00_54, what is free of the room
+           in seven cells from 62 on, behind "Free" at 70: a figure of
+           free memory, which goes (src/portable_c/DEVIATIONS.md, 24). */
         for (i = 0; i < 80; i++)
             if (saved[i] != md.ScrBuf[i]) {
                 Window(0, 0x150);
@@ -2582,7 +2570,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
         *(u8 *)(cell - 1) = ':';
         MovDz0(BasAdr(41), Line_S);
         MovDz0(BasAdr(52), Col_S);
-        MovDz0(BasAdr(70), FrBuf_S);
+        /* "Free" at 70 goes with the figure in front of it, T00_54. */
         T74_00();
         ed.EdStat = 1;
     }

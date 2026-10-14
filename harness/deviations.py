@@ -332,13 +332,6 @@ BLANK = "#"
 # each take a number of the same line. These hold for the builds of every
 # tree; what only those of one tree leave out is in IGNORED_OF, below.
 IGNORED = [
-    # The editor says in its first line how many bytes it has free for the
-    # text. That is what the program leaves of the memory, and the
-    # translation is larger than the original, by more with every routine
-    # translated. An expected number would have to follow the size of the
-    # build that is tested; the number says too little about the program to
-    # be worth that. The field is the number and the room in front of it.
-    re.compile(r"^Edit: .* Col \d+( [\d, ]+) Free"),
     # MEM of DOS, run as a command, says how much memory is in use and how
     # much is free while it runs: the first includes the part of the
     # program that stays, the second is what that part leaves. The fields
@@ -391,6 +384,22 @@ IGNORED = [
 # these figures, whichever tree it is read for.
 IGNORED_OF = {
     "c": [
+        # The editor says in its first line how many bytes it has free
+        # for the text. That is what the program leaves of the memory,
+        # and the translation is larger than the original. An expected
+        # number would have to follow the size of the build that is
+        # tested; the number says too little about the program to be
+        # worth that. The field is the number and the room in front of
+        # it.
+        #
+        # This is of the C translation alone. The portable C has no such
+        # figure, nor the word Free behind it (src/portable_c/
+        # DEVIATIONS.md, 24): where the golden has them, the rule of that
+        # tree for the editor's first line expects spaces, and nothing of
+        # that line is left out. That the portable C is held to what it
+        # shows there is the user's word of 14 October 2026, with the
+        # decision that every figure of free memory goes.
+        re.compile(r"^Edit: .* Col \d+( [\d, ]+) Free"),
         # The Info panel says how much memory is free. As the program is
         # configured that is what a command gets: all but the part of
         # the program that stays while one runs, which is larger in the
@@ -777,6 +786,13 @@ TREES = {
         # of it on many: each is a Part, known by twelve of its
         # characters that show.
         rules=(
+            # The editor's first line has no figure of free bytes and no
+            # word Free behind it (DEVIATIONS.md, 24): from behind the
+            # number of the column to the end of the word, which the
+            # golden has in BLANK but for the space in front of the word,
+            # it is spaces in the colour of the line, as the rest of the
+            # line behind it is in both.
+            (re.compile(r"^Edit: .* Col \d+(#+ Free)"), " " * 40, None),
             # The banner, which the program prints when it starts and
             # which stays on the screen behind the panels, grey on black
             # as DOS writes: its first line is the name with the version

@@ -1683,11 +1683,10 @@ and smaller than its own. A file that is larger than its own room it
 refuses as the original does, with the same box. A copy reads a file
 of up to that size in one piece where the original reads and writes it
 in parts, and the file search has room for a list as long as that room
-holds. The editor's count of free bytes in its status line has seven
-cells, and from a million on shows the last seven characters of the
-number: that figure is left out of the comparison, and goes with every
-figure of free memory, on the user's word of 14 October 2026, in a
-piece of its own.
+holds. The editor's count of free bytes in its status line, which had
+seven cells and from a million on showed the last seven characters of
+the number, has gone with every figure of free memory, on the user's
+word of 14 October 2026: entry 24.
 
 **Why.** The user's decision, on 13 October 2026: the editor of the
 program of 32 bits has room for a file that the original's has none
@@ -1728,13 +1727,13 @@ scenario, `harness/scenarios.py`, "A machine with less memory").
 
 Two scenarios are run for the program of 32 bits and pass, and do not
 get it where they get the original, for the same memory. Nothing says
-so when they are run, since a count of free memory is left out of the
-comparison and their steps were made to end on the same screen however
+so when they are run, since the program shows no count of free memory
+(entry 24) and their steps were made to end on the same screen however
 much room a build has:
 
 | Scenario | What it is for | In the program of 32 bits |
 |---|---|---|
-| `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has nearly all of its room free where the original has none. Seen, in the count of its status line. It was never full in the 640 KB either |
+| `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has nearly all of its room free where the original has none. Seen, in the count of its status line while there was one (entry 24). It was never full in the 640 KB either |
 | `copy-big` | A file that the memory does not hold, 526,632 bytes, read and written in two parts, and skipped when not all of it has been read | The memory holds the file: one part. While the room was 524,240 bytes, it was two parts as in the original, the first of 523,776 bytes where the original's is of 345,600, and skipped with not all of it read. A machine of 2 MB does not get it there either: its room is larger than the file |
 
 ### 14. No Quick execute commands
@@ -2226,3 +2225,37 @@ program does not come back from such a file to wait for a key, so no
 golden can be derived of it, as was tried with both on the bench.
 `help-broken` and `setup-help-file`, which have the help refuse files
 for other reasons, are held to the original's goldens as they are.
+||||||| parent of ee7389f (Take the editor's figure of free bytes out, the last figure of free memory)
+
+### 24. The editor says nothing of the free bytes
+
+**What the original does.** The editor's first line, its status line,
+has behind the number of the column how many bytes are free for the
+text: the room that the editor took of the memory, less the text and
+less what the line in its buffer has grown by, in seven cells from 62
+on, with `Free` behind it at 70. `T00_54` of `VCEDIT.INC` writes the
+figure, `T00_00` the word.
+
+**What the portable C does.** Neither the figure nor the word: the
+status line is empty from behind the number of the column to its end.
+`T00_20` and `T00_00` of `edit.c`; `FrBuf_S`, the word, is gone from
+`edit_t.c`. Nothing else of the editor changes: it still says when the
+room is full, as before.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": every figure of free memory goes, on DOS too,
+as a thing that only made sense on DOS, and this was the last of them
+(the Info panel's two lines on the memory went with entry 11, the map
+of the memory with entry 7). Where the room comes from the extender it
+is many megabytes, and the seven cells would show the last seven
+characters of the figure. The comparison left the figure out for
+every build, since it follows the size of the program; on the same
+word it leaves it out for the C translation alone now, and the portable
+C is held to what it shows there.
+
+**Which scenarios show it.** Every scenario that shows the editor with
+its status line, 42 of them, `editor`, `editor-full` and `editor-save`
+among them, by a rule of `harness/deviations.py` for the editor's first
+line: where the golden has the figure, which is blanked there, and the
+word, the rule expects spaces. No patch.
+

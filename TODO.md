@@ -10264,6 +10264,25 @@ sign, `bytes >> 4` of what the extender answers, which is not below 0.
 anywhere: `RoomBytes` is an `i32`, and every caller of it took bytes
 before F9.
 
+### E, the editor's lines and its free bytes: done, and what a later piece should know
+
+The two decisions of the user's of 14 October 2026 on the editor, each
+an entry of `src/portable_c/DEVIATIONS.md`.
+
+**The free bytes (entry 24).** The figure in cells 62 to 68 of the
+status line and the word `Free` at 70 are gone, `T00_20` and `T00_00`
+of `edit.c` and `FrBuf_S` of `edit_t.c`: the line is empty behind the
+number of the column. It was the last figure of free memory: `grep -i
+free` of the tree finds the free room of a disk in the Info panel and
+the copy, which stay, and nothing else. The pattern that left the
+figure out is in `IGNORED_OF["c"]` of `harness/deviations.py` now, where
+it was in `IGNORED` for every tree, on the user's word; the golden
+still has the figure in BLANK, and a rule of the portable C's `rules`
+expects spaces from behind the column's number to the end of `Free`.
+No patch: the rule changes 42 scenarios' screens of the editor. The
+text `Run2_S` of `view_t.c` still holds the bytes `Free`, which the
+original has behind its text and which are copied with it.
+
 ### F0, the net and the record: done, and what a later piece should know
 
 Two tools of the harness, and no line of the program: `VC.EXE` is the

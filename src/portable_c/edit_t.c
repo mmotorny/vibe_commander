@@ -25,7 +25,8 @@ static const u8 NewFi_D[5];
 
 /* Of the status line. */
 const u8 Line_S[] = "Line";
-const u8 FrBuf_S[] = "Free";
+/* FrBuf_S, "Free", goes with the editor's figure of free bytes
+   (src/portable_c/DEVIATIONS.md, 24). */
 
 /* In the lines of buttons and elsewhere, FFh and a number are that many
    spaces. */

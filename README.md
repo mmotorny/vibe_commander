@@ -1072,11 +1072,14 @@ steps that went there, against the original's golden without them:
 | 11 | The two lines on the memory in the Info panel, "Bytes Memory" and "Bytes Free": the part of `PutInf` of `info.c` that wrote them, with their three texts; and for the first, `MemEnd` of `sys.h`, which read in the PSP where the memory ends, with its call in `IniData` of `start.c` | Saying how much memory DOS has for programs and how much of it the next command gets. The panel is no row shorter for it: what the program is based on stands below its title, the line under the title a row further down, and the row below that is empty |
 | 12 | EGA lines, Alt+F9, of the Commands menu: `F69_00` of `commands.c`; its name in the key bar with Alt held, and the key bar that the panels had on a display without such lines; and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`, with their bodies in `dos32.c` | Giving the screen 43 rows on an EGA or 50 on a VGA, and 25 again, by having the BIOS load a font of 8 lines, and telling the Print Screen key of the rows. The program still asks how many rows the screen has, when it starts and behind every command, and draws on as many as it finds, up to 50: the rows are to come from the system that it runs on. No scenario has it on more than 25 for now |
 | 14 | Quick execute commands, of the Advanced options and of the setup's Configuration, where it was the last of the Execute options: the way through the shell in `Exec02` of `exec.c`; the command that went to the current drive first, which `F21_31` of `enter.c` left for it, with DOS asked for the drive there and in `IniData` of `start.c`; and `ShellRun` of `sys.h`, which `dos32.c` made in real mode, by 26 bytes of instructions that it put below the megabyte | Handing a command to the COMMAND.COM that the program was started from, by that shell's INT 2Eh, in place of running a COMMAND.COM for each: sooner, and with what the command set there kept. Every command is run the second way. The Advanced options are a row shorter, with Clear keyboard buffer the one line of Other options, and the right half of the setup's Configuration begins with the Keyboard options |
+| 24 | The editor's count of free bytes in its status line, with the word "Free" behind it: the block of `T00_20` of `edit.c` that wrote the figure, and `FrBuf_S` of `edit_t.c` | Saying how much of the memory that the editor took is left for the text. The editor still says when its room is full, as before |
 
 Quick execute commands is not of DOS alone by what it gave, only by
 how it was done, and was taken out on the user's word of 13 October
 2026, as EGA lines was, and not by the rule, as the two above them
-were: `DEVIATIONS.md` has it under 14 as it has those.
+were: `DEVIATIONS.md` has it under 14 as it has those. The editor's count
+of free bytes went on the user's word of 14 October 2026, that every
+figure of free memory goes, on DOS too: entry 24.
 
 What was left of the watch then was what was not for the map: the
 program still took INT 21h, for its own call, by which a setup program
