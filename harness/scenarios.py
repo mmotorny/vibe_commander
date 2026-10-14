@@ -1540,6 +1540,9 @@ class Run:
     # and there are no disks, the machine having been stopped in the
     # middle of whatever it was at.
     cut: bool = False
+    # What `image` of run() made of the machine as the scenario left it,
+    # if that was asked for.
+    image: object = None
 
 
 # From C:\WORK into C:\STAMPS, whose files have sizes and time stamps of
@@ -7331,7 +7334,7 @@ def of(name, tree=None):
 
 
 def run(scenario, program, bench, trace=False, blinking=False,
-        stack=False, limit=STEP_TIME, until=None):
+        stack=False, limit=STEP_TIME, until=None, image=None):
     """Run `scenario` on `program` (a setups.Program) and return the Run.
 
     `bench` is the setups.Bench for the scenario's country. The driver of
@@ -7359,6 +7362,15 @@ def run(scenario, program, bench, trace=False, blinking=False,
     scenario's keys do in a program that is no longer where the scenario
     takes it to be, says nothing, and may wait for a step's limit to
     run out.
+
+    `image`, if it is given, is handed the machine when the scenario
+    has ended, and what it returns is the Run's `image`. The machine
+    stands then where the driver of the tests resets it, which it does
+    when it has written the last step's screen, with the program
+    waiting for a key: the same instruction in every run, with the
+    memory as the program has left it (see dos.Machine.linger and
+    dataimage.py). It is not asked for a run that is cut or that did
+    not get through the scenario.
 
     In a scenario of the setup program the original, which is two
     programs, has the second next to it for the steps to start (see
@@ -7396,7 +7408,10 @@ def run(scenario, program, bench, trace=False, blinking=False,
                     return True
             return False
 
+        kept = None
         with bench.start(workdir, program, script, log, beside) as machine:
+            if image:
+                machine.linger()
             machine.resume()
             try:
                 whole = machine.wait_for_end(limit, until and enough)
@@ -7414,6 +7429,9 @@ def run(scenario, program, bench, trace=False, blinking=False,
                 # off: the last that the driver wrote may not have been
                 # looked at.
                 whole = not enough()
+            if image and whole and ended and len(done) == len(steps) \
+                    and machine.lingering():
+                kept = image(machine)
             disks = machine.disks
         if not whole:
             # Ended on the word of `until`, at the last screen that it
@@ -7433,7 +7451,8 @@ def run(scenario, program, bench, trace=False, blinking=False,
             codepage = setups.codepage(scenario.country)
             result = Run([step.screen for step in done],
                          {drive: fat.read_tree(path, codepage)
-                          for drive, path in disks.items()})
+                          for drive, path in disks.items()},
+                         image=kept)
         if trace and beside:
             # Two programs with routines of the same bytes ran here. What
             # ran of the main one is not looked for: every scenario of

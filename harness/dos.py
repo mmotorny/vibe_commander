@@ -5,6 +5,7 @@ Needs `qemu-system-i386` and `mtools` on the PATH.
 import calendar
 import json
 import os
+import select
 import shutil
 import socket
 import struct
@@ -66,6 +67,10 @@ PCI_ADDRESS, PCI_DATA = 0xCF8, 0xCFC      # the ports of that configuration
 # saved (see DRIVER.ASM).
 STOP_PORT = 0x505
 STOPPED = "guest-panicked"                # what QEMU calls a machine then
+# And one that has come to its end and was told to pause there: see
+# Machine.linger.
+SHUT_DOWN = "shutdown"
+SHUT_DOWN_EVENT = "SHUTDOWN"              # and what it says when one has
 
 # What DOS prints on the serial port once it has booted, just before it runs
 # the commands it was given.
@@ -371,6 +376,8 @@ class Machine:
         self._serial = self._workdir / "serial.log"
         self._scratch = self._workdir / "scratch.bin"
         self._written = self._workdir / "written.bin"
+        self._lingers = False
+        self._events = []             # what QEMU has said by itself
         control = self._workdir / "qmp.sock"
         if len(os.fsencode(control)) > SOCKET_PATH:
             raise MachineError(
@@ -460,6 +467,7 @@ class Machine:
             message = json.loads(line)
             if "event" not in message:
                 return message
+            self._events.append(message["event"])
 
     def _command(self, name, **arguments):
         try:
@@ -478,6 +486,46 @@ class Machine:
         self._command("pmemsave", val=address, size=size,
                       filename=str(self._scratch))
         return self._scratch.read_bytes()
+
+    def linger(self):
+        """Have the machine pause where it would end, when the guest
+        resets it or switches it off, with its memory as the guest left
+        it: wait_for_end() returns for that as for a machine that has
+        ended, and memory() can then be asked. The guest is not changed
+        by it, nor what it executes: QEMU is told what to do with a
+        machine that has shut down, and until then the machine runs as
+        any other."""
+        self._command("set-action", shutdown="pause")
+        self._lingers = True
+
+    def _shut_down(self, wait):
+        """Whether QEMU has said that the machine has shut down, which
+        it says of one that lingers too: waits up to `wait` seconds for
+        it to say something. QEMU is not asked: asking a hundred times
+        a second took a quarter of a test's time."""
+        if SHUT_DOWN_EVENT not in self._events:
+            try:
+                if select.select([self._socket], [], [], wait)[0]:
+                    line = self._channel.readline()
+                    if not line:
+                        return True      # QEMU has gone, and its socket
+                    self._events.append(json.loads(line).get("event"))
+            except (OSError, ValueError):
+                return True
+        return SHUT_DOWN_EVENT in self._events
+
+    def lingering(self):
+        """Whether the machine has come to its end and is paused there:
+        see linger()."""
+        return self._lingers and self._qemu.poll() is None \
+            and self._command("query-status")["status"] == SHUT_DOWN
+
+    def memory(self, address, size):
+        """`size` bytes of the machine's memory from `address` on, as
+        they are now. That is the same in every run only of a machine
+        that stands at a place of its own choosing: one that has stopped
+        itself, or that lingers at its end."""
+        return self._memory(address, size)
 
     def until(self, done, timeout, failure, pause=0.002):
         """Wait for done() to hold; raise MachineError(failure) if it does
@@ -587,6 +635,9 @@ class Machine:
         # when that last changed.
         asked = first = count = moved = None
         while self._qemu.poll() is None:
+            # Looked at before what it has written is: a machine that
+            # has shut down has written all that it will.
+            ended = self._lingers and self._shut_down(0)
             now = self._written.stat().st_size \
                 if self._written.exists() else 0
             clock = time.monotonic()
@@ -614,6 +665,11 @@ class Machine:
                              or clock - moved > limit):
                     self.pause()
                     raise MachineError(f"nothing for {limit} s")
+            if ended:
+                break
+            if self._lingers:
+                self._shut_down(0.01)
+                continue
             try:
                 self._qemu.wait(0.01)
             except subprocess.TimeoutExpired:

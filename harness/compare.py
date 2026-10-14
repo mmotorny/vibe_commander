@@ -39,7 +39,9 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from pathlib import Path
 
+import dataimage
 import goldens
 import scenarios
 import setups
@@ -91,7 +93,7 @@ class Outcome:
 
 
 def compare(names, program, trace=False, together=None, stack=False,
-            limits=None, first=False):
+            limits=None, first=False, images=None):
     """Take `program` through the scenarios of `names`, printing a line for
     each and how it departs from the golden.
 
@@ -108,6 +110,13 @@ def compare(names, program, trace=False, together=None, stack=False,
     program has not come to its first screen in another of the same
     country: every scenario starts the program in the same way, on the
     bench of its country, and would wait as long for the same thing.
+    With `images`, a directory, the image of the program's data at the
+    end of each scenario is written there, for a flat program of 32
+    bits: see dataimage.py. A scenario that did not get to its end, or
+    that was ended at its first screen that differs, leaves none. And
+    a scenario fails if the pattern that the program keeps round a
+    block of its memory has been written into by its end: see
+    dataimage.GUARD.
     Returns whether any failed, and of each what became of it, an
     Outcome, in the order of `names`.
 
@@ -123,6 +132,11 @@ def compare(names, program, trace=False, together=None, stack=False,
             misfits.append(str(misfit))
     if misfits:
         sys.exit("\n\n".join(misfits))
+
+    taker = None
+    if images:
+        taker = dataimage.Taker(program)
+        dataimage.write_facts(images, taker.facts)
 
     # With `first`: country -> a scenario of it in which the program
     # did not come to its first screen.
@@ -147,7 +161,7 @@ def compare(names, program, trace=False, together=None, stack=False,
                 scenario, program, benches[scenario.country], trace,
                 stack=stack,
                 limit=(limits or {}).get(name, scenarios.STEP_TIME),
-                until=departs if first else None)
+                until=departs if first else None, image=taker)
         except MachineError as error:
             # As scenarios.run() words it.
             if first and str(error).startswith(
@@ -175,6 +189,17 @@ def compare(names, program, trace=False, together=None, stack=False,
                       + ": " + "\n    ".join(lines))
                 continue
             run = outcome.run
+            if run.image:
+                run.image.write(Path(images)
+                                / (name + dataimage.SUFFIX))
+                # What the program keeps round each block of its memory
+                # was written into: that fails the scenario, whatever
+                # its screens show.
+                for said in run.image.guards:
+                    failed = True
+                    print(f"{name}: {said}")
+                # It is on the disk, and a test has many.
+                run.image = None
             outcome.departs = tuple(goldens.departures(
                 golden, run, {program.filename}))
             screens = len(run.screens)

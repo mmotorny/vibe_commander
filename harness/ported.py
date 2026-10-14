@@ -95,6 +95,7 @@ from pathlib import Path
 
 import compare
 import coverage
+import dataimage
 import deps
 import deviations
 from driver import COM_ORIGIN, COPIES
@@ -1890,8 +1891,13 @@ def main():
     if not check_layout(translation):
         sys.exit(1)
     names = scenarios.names(tree)
+    # What a flat program has in its memory at the end of each scenario
+    # is kept next to it, for a piece of work to hold against what the
+    # build before had: see dataimage.py. It judges nothing here.
+    images = Path(args.translation).parent / dataimage.DIRECTORY \
+        if le.linear(translation.contents) else None
     failed, outcomes = compare.compare(names, translation, trace=True,
-                                       stack=True)
+                                       stack=True, images=images)
     # What ran in the original is of every scenario, also of one that
     # the tree is not taken through: of VC.COM by the scenarios of the
     # main program, and of VCSETUP.COM by those of the setup program.
