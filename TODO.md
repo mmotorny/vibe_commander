@@ -11760,9 +11760,19 @@ program's file than `DTA+41` is on the other. It is not 6E25h, which
 is 00h in both files. A variant of this build with an unused function
 of four addresses moved `DTA+41`'s six, 82h to 83h, and not `DTA+42`,
 which is 00h in both: so it is not shown which byte of the file it
-is. The tool lists `DTA+41` alone as what may differ; `DTA+42` could
-go beside it, which this piece did not do. Nothing of the editor's
-data, of the room or of a table differs.
+is.
+
+The tool knows such a byte since by one rule, `NAME_TAIL` of
+`harness/dataimage.py`, which took the place of its entry for
+`DTA+41`: a byte may differ where it is behind the zero of a name of
+13 bytes that is the same, with its zero, in both builds, in the DTA's
+name, in `NameF` of an entry of a panel's list, or in 13 bytes that
+are in each build what one of those fields is. Of the 124 above it
+takes 116, and leaves 8 named: copies in `TmpBuf` and `TmpErr` of
+`copy`, `copy-dirs` and `russian` that are no longer what a field
+holds, which are known by being the pair that the fields have. `check`
+of the tool catches each of its nine bytes as before. Nothing of the
+editor's data, of the room or of a table differs.
 
 **The program.** 289,099 bytes, where F3b's build was 293,683; as it
 landed behind F4, F6 and F7, 288,663 where theirs is 293,255.

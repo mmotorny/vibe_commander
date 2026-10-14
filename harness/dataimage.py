@@ -258,24 +258,6 @@ UNSTEADY = (
                        "it: a colon in the second half of a second and "
                        "a space in the first. " + TIME),
     ("ScrBuf", 154, 1, "the same, of a clock of 24 hours"),
-    # Found by F2. The record of a search comes up from DOS's memory, 43
-    # bytes of it, and behind a name that is shorter than twelve
-    # characters is what that memory held before. What was seen: the
-    # byte is 95h in one build and 91h in the next, in every scenario
-    # that has it, and the files of the two builds have those two bytes
-    # at one offset and nowhere else, 6E24h, in the table that says
-    # where the relocations of each page begin. What is inferred from
-    # that, and was not looked at in DOS's memory: that it is a byte of
-    # the program's own file, left there by the extender's loading of
-    # it, so that a build with other relocations has another. The
-    # program copies a name as 13 bytes in places, so the same two
-    # bytes may differ in TmpBuf and TmpErr too, which are not listed:
-    # they are known by being this pair.
-    ("DTA", 41, 1, "a byte behind a name that DOS found, of what DOS's "
-                   "memory held before: by what was seen, and inferred "
-                   "from it, a byte of the program's file, left by the "
-                   "extender's loading of it, which follows the build's "
-                   "relocations"),
 )
 # Of the variables, by name.
 UNSTEADY_VARIABLES = {
@@ -297,6 +279,30 @@ UNSTEADY_ENTRY = {
 }
 COPIED = "the same bytes as the time of a file in a panel's list, in a " \
          "copy of that list"
+
+# Found by F2 at DTA+41 and by F5 at DTA+42. The record of a search
+# comes up from DOS's memory, 43 bytes of it, and behind the zero of a
+# name that is shorter than twelve characters is what that memory held
+# before. What was seen: such a byte is one value in one build and
+# another in the next, in every scenario that has it, and the files of
+# the two builds have F2's pair at one offset and nowhere else, 6E24h,
+# in the table that says where the relocations of each page begin. What
+# is inferred from that, and was not looked at in DOS's memory: that it
+# is a byte of the program's own file, left there by the extender's
+# loading of it, so that another build has another. The Russian bench
+# has another byte there behind DTA+42, which F5 did not find in the
+# files. The program copies the name as 13 bytes, into the entries of
+# a panel's list and into its buffers. So a byte may differ where it is
+# behind the zero of a name of 13 bytes, the name and its zero being
+# the same in both: in the DTA's name, in NameF of an entry of a
+# panel's list, or in 13 bytes that are, in each build, the same as
+# one of those fields.
+NAME_TAIL = "a byte behind the zero of a name that DOS found, of what " \
+            "DOS's memory held before: by what was seen, and inferred " \
+            "from it, a byte of the program's file, left by the " \
+            "extender's loading of it, which follows the build"
+NAME_SIZE = 13
+DTA_NAME = 30                   # where the name is in the DTA
 
 
 # The bytes that the program keeps round a block of the memory that it
@@ -866,6 +872,58 @@ def _unsteady(build):
     return found
 
 
+def _names(read):
+    """The fields of the Read that hold a name that DOS found, as 13
+    bytes each: the DTA's, and NameF of every entry that the list of a
+    panel has room for. A set of bytes, kept with the Read."""
+    if getattr(read, "_name_fields", None) is None:
+        build = read.build
+        main = build.main + build.fields["DTA"] + DTA_NAME
+        found = {bytes(read.data[main:main + NAME_SIZE])}
+        _, fields = build.structures[PANEL]
+        entry, entry_fields = build.structures[ENTRY]
+        name = dict(entry_fields)["NameF"]
+        for part in read.parts().values():
+            if part.kind != "a block" or part.namer is None:
+                continue
+            for at in range(dict(fields)[LIST] + name,
+                            len(part.data) - NAME_SIZE + 1, entry):
+                found.add(bytes(part.data[at:at + NAME_SIZE]))
+        read._name_fields = found
+    return read._name_fields
+
+
+def _name_tail(before, after, part, other, begins, ends):
+    """Whether every byte from `begins` to `ends` of a part is behind
+    the zero of a name of 13 bytes that is the same, with its zero, in
+    both builds: of a field that holds such a name, or of 13 bytes that
+    are in each build what one of those fields is. See NAME_TAIL."""
+    build = before.build
+    dta = build.fields["DTA"] + DTA_NAME
+
+    def field(at):
+        if part.kind == "the main data":
+            return at == dta
+        return part.namer is not None \
+            and "list, NameF, " in part.namer(at)
+
+    for byte in range(begins, ends):
+        for at in range(max(0, byte - NAME_SIZE + 1), byte + 1):
+            was = bytes(part.data[at:at + NAME_SIZE])
+            has = bytes(other.data[at:at + NAME_SIZE])
+            zero = was.find(0)
+            if len(was) < NAME_SIZE or len(has) < NAME_SIZE \
+                    or zero < 0 or at + zero >= byte \
+                    or was[:zero + 1] != has[:zero + 1]:
+                continue
+            if field(at) or (was in _names(before)
+                             and has in _names(after)):
+                break
+        else:
+            return False
+    return True
+
+
 def _same_segment(before, after, part, other, begins, ends):
     """Whether the bytes that differ are of a word that holds a segment
     of the same thing in both builds: a paragraph of the megabyte that
@@ -1016,6 +1074,9 @@ def _run(before, after, part, other, offset, length, masked, differs,
                     if f"{laid}." in where]
             reason = next((reason for at, size, reason in unsteady
                            if at <= begins < at + size), None)
+            if not reason and _name_tail(before, after, part, other,
+                                         begins, ends):
+                reason = NAME_TAIL
             if not reason and _same_segment(before, after, part, other,
                                             begins, ends):
                 held["segments that name the same in both"] += 1
@@ -1024,6 +1085,9 @@ def _run(before, after, part, other, offset, length, masked, differs,
             reason = next((reason for field, reason
                            in UNSTEADY_ENTRY.items()
                            if f"list, {field}" in where), None)
+            if not reason and _name_tail(before, after, part, other,
+                                         begins, ends):
+                reason = NAME_TAIL
         differs(part.name,
                 f"{part.name}, {where}"
                 + (f", {ends - begins} bytes" if ends - begins > 1 else "")
