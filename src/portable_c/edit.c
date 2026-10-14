@@ -1932,7 +1932,7 @@ static u16 T00_83(u16 key)
 {
     u16 scan = key >> 8;
     u16 c = key & 0xFF;
-    u16 cursor;
+    i32 cursor;
 
     /* The table of keys that the assembly has for Case: a character with
        any scan code, or a key that has no character. A key without a
@@ -1974,7 +1974,7 @@ static u16 T00_83(u16 key)
         case 0x17:                      /* ^W: T22_00 */
             if (ed.EdTxHex != 0)
                 return 0;
-            cursor = EdSub1(EditBuf, (u16)EdCursr);
+            cursor = EdSub1(EditBuf, EdCursr);
             if (cursor == EdCursr)
                 return 0;
             T20_02(EditBuf + cursor, EditBuf + EdCursr);
@@ -2013,7 +2013,7 @@ right:
         case 0x73:                      /* ^Left: T07_00 */
 word_left:
             if (ed.EdTxHex == 0)
-                EdCursr = EdSub1(EditBuf, (u16)EdCursr);
+                EdCursr = EdSub1(EditBuf, EdCursr);
             return 0;
         case 0x74:                      /* ^Right: T08_00 */
 word_right:

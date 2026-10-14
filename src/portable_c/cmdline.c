@@ -151,11 +151,11 @@ F80_05:                                 /* is there room for it */
         goto F80_10;
     column = md.DosCol;
     for (i = 0; (c = file->NameF[i]) != 0; i++)
-        column = EdLin(c, md.DosBuf, (u16)column, LenCmd - 1).cursor;
+        column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
     if (file->AttrF & ATTR_DIRECTORY)
         for (i = 0; (c = Mask_S[i]) != 0; i++)
-            column = EdLin(c, md.DosBuf, (u16)column, LenCmd - 1).cursor;
-    column = EdLin(' ', md.DosBuf, (u16)column, LenCmd - 1).cursor;
+            column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
+    column = EdLin(' ', md.DosBuf, column, LenCmd - 1).cursor;
     md.DosCol = (u8)column;
     if (!any)
         goto F80_10;
@@ -185,14 +185,14 @@ static i32 F68_25(const u8 *text, i32 column, u16 scan, u16 end)
         if (c == 0)
             goto F68_90;
         text++;
-        edited = EdLin(scan | c, md.DosBuf, (u16)column, LenCmd - 1);
+        edited = EdLin(scan | c, md.DosBuf, column, LenCmd - 1);
         column = edited.cursor;
         if (!edited.changed)
             goto F68_27;
     }
 F68_90:
     if ((end & 0xFF) != 0 && (end & 0xFF) != text[-1])
-        column = EdLin(end, md.DosBuf, (u16)column, LenCmd - 1).cursor;
+        column = EdLin(end, md.DosBuf, column, LenCmd - 1).cursor;
 F68_27:
     md.DosCol = (u8)column;
     DosCom();

@@ -1245,7 +1245,7 @@ bool F80_00(struct WCBdef *panel);
 void F82_01(struct WCBdef *panel, u16 key);
 bool F68_00(void);
 struct SpeedKey F77_00(u16 key, struct WCBdef *panel);
-u16 F32_00(u16 main);
+bool F32_00(bool main);
 bool F62_01(struct WCBdef *panel, i32 item);
 struct Picked F39_00(bool again, struct WCBdef *panel);
 
@@ -1342,39 +1342,39 @@ void DosCom(void);
    returns where the next one is, and whether that is the end of the
    file; FindExt where the command for a file's extension is, or 0. See
    extfile.c. Run_00 makes the commands of a line that begin at `text`
-   into DosBuf, and is 1 if there is one to run: see usermenu.c. */
+   into DosBuf, and is true if there is one to run: see usermenu.c. */
 struct Entry {
     const u8 *at;                       /* where it is */
     bool end;                           /* whether the file ends there */
 };
 struct Entry FndItem(const u8 *file);
 u8 *FindExt(const u8 *name);
-u16 Run_00(u8 *text, u16 view);
+bool Run_00(u8 *text, bool view);
 /* Waiting for a key, and a line that is typed into: see each in input.c.
    Input and Input0 return the key, the scan code in the high byte, where
    FCh says that the mouse did something; Input0 says besides whether
    the key was clicked on the key bar. EdLin returns the column of the
-   cursor, and whether anything changed. CmpSym is 1 for a
+   cursor, and whether anything changed. CmpSym is true for a
    character that words end at. Search is the speed search among names
    in the segment `segment`. Rnd is the next of the program's random
    numbers. */
 struct Key {
     u16 key;                            /* the key, the scan code in the
                                            high byte */
-    u16 clicked;                        /* not 0 if the mouse clicked it
+    bool clicked;                       /* true if the mouse clicked it
                                            on the key bar */
 };
 struct Edited {
-    u16 cursor;                         /* the column of the cursor */
-    u16 changed;                        /* 1 if the line or the cursor has
-                                           changed */
+    i32 cursor;                         /* the column of the cursor */
+    bool changed;                       /* true if the line or the cursor
+                                           has changed */
 };
-u16 Input(u16 bar);
-struct Key Input0(u16 bar);
+u16 Input(i32 bar);
+struct Key Input0(i32 bar);
 u16 Rnd(void);
-struct Edited EdLin(u16 key, u8 *text, u16 cursor, u16 length);
-u16 EdSub1(const u8 *line, u16 cursor);
-u16 CmpSym(u16 symbol);
+struct Edited EdLin(u16 key, u8 *text, i32 cursor, i32 length);
+i32 EdSub1(const u8 *line, i32 cursor);
+bool CmpSym(u16 symbol);
 u16 Search(const u8 *list, u16 at, u16 begin, u16 end, u16 step,
            u16 key);
 

@@ -9388,7 +9388,7 @@ for.
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | **Done**: "N12, `panel.c`, `info.c`, `drive.c`" below. Two questions of the Info panel, a cluster of 64K and a file just under 65,536 clusters, answered: fix both, the second by N12, entry 19 of `DEVIATIONS.md`, the first by M |
 | N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | **Done**: "N13, `tree.c`, `treebox.c`, `extfile.c`" below, with its question answered and its fix: a tree file of no entry or of 4,096 or more is refused, entry 21 |
 | N14 † | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | **Done**, with the answer to question 4 carried out: "N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know" below |
-| N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
+| N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | **Done**: "N15, `input.c`, `usermenu.c`: done, and what a later cluster should know" below |
 | N16 | `main.c` | 1,601; 117 | F8 | **Done**: "N16, `main.c`: done, and what a later cluster should know" below, with what the stack of `Command` was found to be |
 | N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | **Done**: "N17a, `keys.c`: done, and what a later cluster should know" below |
 | N17b | `commands.c` | 604 lines; in the record's table | F8 | **Done**: "N17b, `commands.c`: done, and what a later cluster should know" below |
@@ -15145,6 +15145,97 @@ and the sections 20; the file read with the finder's lists beside it
 10; the types and the casts by scripts 10; the record's reasons by one
 script 3; the stack of `Command`, two trials, 10; the tests, the
 images and the documents the rest.
+
+### N15, `input.c`, `usermenu.c`: done, and what a later cluster should know
+
+**What there is.** The two files sorted by "The rule for a number", and
+`struct Key` and `struct Edited` of `vc.h`, which `Input0` and `EdLin`
+answer in; clang's warnings of a conversion silent for both files. The
+whole suite passes, no golden and no patch changed, and the image of
+each scenario is that of the build before (below).
+
+**The numbers.** Of the 114 of 8 or 16 bits or a `u32` that there were
+(58 and 3 `u32` in `input.c`, 49 in `usermenu.c`, two in each of the
+two structures), and ten that are new where a variable held two
+things in turn:
+
+| | Numbers | Which |
+|---|---|---|
+| Widened, to `i32` | 39 | The counts and the indexes; the columns of a line that is typed into, which `EdLin`, `EdSub1` and `EdSub2` take and answer, and `cursor` of `struct Edited`; the hour and the minute of the clock and of the blanker; the key bar that `Input` and `Input0` are handed, and the bar of Shift or Alt that a button shows; the column of a key of the key bar under the mouse; the rows, the widths and the line of the cursor of the user menu |
+| Made `bool` | 16 | What `CmpSym`, `FileLst`, `Run_00` and `F32_00` answer; `view` of `Run_00` and `main` of `F32_00`; `clicked` of `struct Key` and `changed` of `struct Edited`; `AltLock`, `BlMouse`, `tracking` and `outside` of `Input0`; `any`, `path` and `unlisted` of the user menu |
+| Kept by a word | 66 | `character` 16, `system` 9 (the keys that are held, the mouse's buttons, and the timer's ticks and their difference, the three `u32`), `place` 9, `key` 8, `address` 7 (`Search`'s offsets and its step, as N13 and N14 hand them, and the panel's offset of `FileLst`), `text` 5, `time` 3, `cell` 3, `random` 3, `colour` 1, `handle` 1, `bits` 1 |
+| Kept by a sentence | 2 | What `F32_70` answers, the mouse's doing in the high byte and the line in the low one, which three files take apart; `answer` of `F32_00`, a key, that answer or two characters of the line in turn, as the original has them in AX |
+
+The ten new ones: `hour_digits` and `minute_digits` of `Input0`, where
+`hour` and `minute` became two digits as `HexDec` answers them;
+`color` of `Input0` and of `F32_00`, where `i` and `c` held a colour in
+its place; `shift` of `Input0`, the bar that `PutKey0` is handed, where
+`i` was an index; `count` of `Run_00`, the count of `DosCol`, and
+`unlisted`, what `FileLst` answers, where `c` was a character, as F7b
+had seen; and in `F32_00` `to` went into three, `scan`, the scan code
+of a line's key, `place`, the place of a line on the screen, and
+`target`, the row that the cursor goes to.
+
+Three places of the kind `sign`, each of a number that is 0 or more:
+the hour of the clock divided by 12 and its remainder, and the column
+of the key bar shifted down to the key's number.
+
+**The casts.** clang named 16 places before anything changed: two
+went by a type, `any`, now a comparison, and what `DoublMo` answers,
+now kept in an `i32`; 14 are casts, each a place, a cell or a key made
+of two bytes. The widening made 8 more: the bar and the shift handed
+to `PutKey` and `PutKey0` of `bars.c`, N19a's, until it widens them;
+the place handed to `BasAdr`; the cursor that `Search` keeps in the
+word of its buffer; and the length and the width handed to
+`FileWrite`, `MvsColr` and `Window`. So 22 casts, of which the two of
+the bar have a comment, the bar being a byte by the top of `Input0`.
+14 casts went in other clusters' files, as N2 and N14 asked: the
+column and the length handed to `EdLin` in `dialog.c` (2), `cmdline.c`
+(5) and `enter.c` (3), and the bar handed to `Input` in `dialog.c` (3)
+and `view.c` (1). Nothing else of those files changed. `(u16)` of the
+length that `Search` reads of `MvzLine` is `(i32)` now.
+
+**Across clusters.**
+
+- `EdSub1` answers an `i32`: `edit.c` keeps it in `cursor` of
+  `T00_83`, which became an `i32` for it when this cluster landed
+  behind the one of `edit.c`, and in `EdCursr`, an `i32` by then; the
+  two `(u16)` of `EdCursr` that `edit.c` handed `EdSub1` went with
+  that. `CmpSym` answers a `bool`, which `edit.c` and `enter.c`
+  ask as before.
+- `Run_00` takes and answers a `bool`: `enter.c` and `view.c` hand it
+  0 and 1 as before, and nothing changed there. `F32_00` too: `main.c`
+  holds it against 0.
+- `Search` keeps its offsets of 16 bits, `address`, as N13 and N14
+  hand them: `(u16)ADDRESS(TREE->TreeLen)` of `treebox.c` stays. The
+  piece P has them.
+- `F32_70` answers a `u16` still, so the lines by which `cmdline.c` and
+  `stmain.c` declare it for themselves did not change.
+- `PutKey` and `PutKey0` of `bars.c` take `u16`: the two casts in
+  `Input0` go when N19a widens them.
+
+**`harness/int16.py`.** One place went, `index`, `screen += keys + 1`
+of `F32_00`, `keys` an `i32` now; the `shift` of `F32_70` is on another
+line, the call being cast, with its reason as it was; four are new,
+`widen`, each with its reason: the row of the key bar handed to
+`InWind` with the column, the length that `MvzLine` answers, and two
+widths of the user menu's box cut to a byte.
+
+**The program.** Types and casts went in one build, not two: the
+scenarios and the images judge both, and `VC.EXE` is another by the
+types (`25a4cdc7...` before, `b4565627...` after, on the head that the
+work began on). The image of every scenario, `python3
+harness/dataimage.py compare`, against a build of that head: "156
+scenarios, 3 with nothing that differs; 0 differences, 0 more in what
+was declared as changed, 153 in what may differ", which is what the
+tool lets differ in every build. The figures of the README moved with
+the program.
+
+It took some 70 tool calls to hand back: reading the brief, the plan
+and the sections 15; reading the two files and the callers 8; the types
+and the casts by three scripts 6; the record's reasons by one script 4;
+the tests, the images, the suite and the documents the rest, on a
+machine that five other clusters were testing on.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

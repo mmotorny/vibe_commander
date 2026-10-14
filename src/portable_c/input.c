@@ -80,7 +80,7 @@ u16 Rnd(void)
 
 /* What Input0 returns: a key, and whether it was clicked on the key
    bar. */
-static struct Key Pressed(u16 key, u16 clicked)
+static struct Key Pressed(u16 key, bool clicked)
 {
     struct Key pressed;
 
@@ -92,24 +92,27 @@ static struct Key Pressed(u16 key, u16 clicked)
 /* Wait for a key with the key bar `bar` on the screen, of which only the
    low byte counts, and return it, and whether the key was clicked on the
    key bar with the mouse: the assembly has the carry flag for that. */
-struct Key Input0(u16 bar)
+struct Key Input0(i32 bar)
 {
     u16 ClkBuf[CLOCK_CELLS];            /* what the clock covers */
     u16 KbdFlgs;                        /* Shift, Ctrl, Alt and the locks */
-    u16 AltLock;                        /* Alt went down, and nothing else
+    bool AltLock;                       /* Alt went down, and nothing else
                                            has since */
     u16 ClkFlag;                        /* what the clock has between hours
                                            and minutes: it blinks */
-    u16 BlMouse;                        /* the mouse has been outside the
+    bool BlMouse;                       /* the mouse has been outside the
                                            corner that blanks the screen */
     u16 BlHigh, BlLow = 0;              /* when to blank the screen */
     u32 AltTime;                        /* the ticks one round before */
     u32 pair, now;
     struct Time moment;
     struct Mouse seen;
-    u16 key, time, flags, was, hour, minute, mouse, i;
+    u16 key, time, flags, was, mouse;
+    i32 hour, minute, i, shift, column;
+    u16 hour_digits, minute_digits, color;
     u16 separator, suffix = 0;
-    u16 column, held, buttons, look, shown, tracking, outside;
+    u16 held, buttons, look, shown;
+    bool tracking, outside;
     u16 *screen;
 
     bar &= 0xFF;
@@ -125,10 +128,10 @@ Inpt02:
     for (i = 0; i < CLOCK_CELLS; i++)
         ClkBuf[i] = CLOCK_AT[i];
     KbdFlgs = KeysHeld();
-    AltLock = 0;
+    AltLock = false;
 Inpt03:
     ClkFlag = 0;
-    BlMouse = 0;
+    BlMouse = false;
 Inpt04:
     /* The time to blank the screen at: now and the minutes of the setup.
        Without any, the assembly keeps here what it has in DX, which it
@@ -144,10 +147,11 @@ Inpt04:
             minute -= 60;
             hour = hour + 1 & 0xFF;
         }
-        BlHigh = hour << 8 | minute;
+        BlHigh = (u16)(hour << 8 | minute);
     }
 Inpt10:
-    PutKey(bar);
+    PutKey((u16)bar);                   /* a byte, as the top of the
+                                           function makes it */
     LeaveTm();
     if (md.BlDelay != 0) {
         moment = TimeOfDay();
@@ -158,7 +162,7 @@ Inpt10:
         if (time > BlHigh || time == BlHigh && moment.seconds >= BlLow) {
 Inpt12:
             Blank();
-            Window(0, md.Lines << 8 | 80);
+            Window(0, (u16)(md.Lines << 8 | 80));
             while (GetMous(0).buttons != 0)
                 ;
             goto Inpt03;
@@ -181,16 +185,17 @@ Inpt12:
             separator = md.Country.TimeSep[0];
         if (separator != ClkFlag) {
             ClkFlag = separator;
-            hour = HexDec(hour);
-            minute = HexDec(time);
-            i = Color(Clock_C) << 8;
-            *screen++ = i | ((hour & 0xFF) == '0' ? ' ' : hour & 0xFF);
-            *screen++ = i | hour >> 8;
-            *screen++ = i | separator;
-            *screen++ = i | minute & 0xFF;
-            *screen++ = i | minute >> 8;
+            hour_digits = HexDec(hour);
+            minute_digits = HexDec(time);
+            color = (u16)(Color(Clock_C) << 8);
+            *screen++ = color | ((hour_digits & 0xFF) == '0'
+                                 ? ' ' : hour_digits & 0xFF);
+            *screen++ = color | hour_digits >> 8;
+            *screen++ = color | separator;
+            *screen++ = color | minute_digits & 0xFF;
+            *screen++ = color | minute_digits >> 8;
             if (md.Country.TimeFmt == 0)
-                *screen++ = i | suffix;
+                *screen++ = color | suffix;
             Window(74, 0x106);
         }
     }
@@ -227,10 +232,10 @@ Inpt12:
         if ((u16)(HIGH(pair) * 2 + (LOW(pair) >= 3 ? 1 : 0)) == 0
             && (was ^ flags) == 8) {
             if (flags & 8) {
-                AltLock = 1;
+                AltLock = true;
                 goto Inpt04;
             }
-            if (AltLock != 0) {
+            if (AltLock) {
                 key = KEY_ALT;
                 goto Inpt40;
             }
@@ -241,7 +246,7 @@ Inpt12:
         /* A key among Shift, Ctrl and Alt is held, or a lock has changed:
            anything but Alt alone is no tap on Alt any more. */
         if ((flags & 0xF7) != 0)
-            AltLock = 0;
+            AltLock = false;
         goto Inpt04;
     }
     /* The mouse in the top right corner blanks the screen at once, when
@@ -249,10 +254,10 @@ Inpt12:
        the screen from being blanked. */
     mouse = GetMous(0).place;
     if (InWind(mouse, 78, 0x102))
-        BlMouse = 1;
-    else if (BlMouse != 0)
+        BlMouse = true;
+    else if (BlMouse)
         goto Inpt12;
-    if (!InWind(mouse, (u16)(u8)(md.Lines - 1) << 8 | 78, 0x102))
+    if (!InWind(mouse, (u16)((md.Lines - 1) << 8 | 78), 0x102))
         goto Inpt04;
     goto Inpt10;
 
@@ -265,7 +270,7 @@ Inpt40:
 Inpt41:
     *(u16 *)&md.AutoTim = 0xFFFF;
     if ((key & 0xFF00) != KEY_MOUSE || md.KeyBar == 0)
-        return Pressed(key, 0);
+        return Pressed(key, false);
     /* A button of the mouse is down: on the key bar it is held for a
        key, the left one as the key is, the middle one with Shift and the
        right one with Alt. The bar shows what the keys are then, the
@@ -276,14 +281,14 @@ Inpt41:
     mouse = seen.place;
     key = KEY_MOUSE | buttons;
     if ((u8)((mouse >> 8) + 1) != md.Lines)
-        return Pressed(key, 0);
+        return Pressed(key, false);
     column = mouse & 0xF8;              /* where the key begins: BL */
     held = 0;                           /* the buttons one round before:
                                            DH */
     shown = 0;                          /* the look of the pointer: SI */
-    tracking = 0;                       /* the key has a name: DI */
+    tracking = false;                   /* the key has a name: DI */
     for (;;) {                          /* Inpt50 */
-        outside = InWind(mouse, (u16)(u8)(md.Lines - 1) << 8 | column,
+        outside = InWind(mouse, (u16)((md.Lines - 1) << 8 | column),
                          0x108);
         look = 0;
         /* The first time round, on the key, the pointer is left as it
@@ -297,11 +302,11 @@ Inpt41:
             }
         }
         if (buttons & 2) {              /* Inpt52 */
-            i = 3;
+            shift = 3;
         } else if (buttons & 4) {
-            i = 1;
+            shift = 1;
         } else if (buttons & 1) {
-            i = 0;
+            shift = 0;
         } else {
             /* Inpt56: let go. */
             if (look == 0)
@@ -315,20 +320,22 @@ Inpt41:
                 key = KEY_F1;
             else
                 goto Inpt02;
-            return Pressed(key + (column >> 3 << 8), 1);
+            return Pressed((u16)(key + (column >> 3 << 8)), true);
         }
-        PutKey0(bar, i);                /* Inpt54 */
+        PutKey0((u16)bar, (u16)shift);  /* Inpt54; the bar is a byte, as
+                                           the top of the function makes
+                                           it */
         held = buttons;
         seen = GetMous(0);
         buttons = seen.buttons;
         mouse = seen.place;
         if (!tracking) {
             /* A key without a name is none: the click is the caller's. */
-            if ((*BasAdr((mouse & 0xFF00)
-                         | column + 1 + (column >= 72 ? 1 : 0))
+            if ((*BasAdr((u16)((mouse & 0xFF00)
+                               | column + 1 + (column >= 72 ? 1 : 0)))
                  & 0xFF) == ' ')
-                return Pressed(KEY_MOUSE | buttons, 0);
-            tracking = 1;
+                return Pressed(KEY_MOUSE | buttons, false);
+            tracking = true;
         }
     }
 }
@@ -338,7 +345,7 @@ Inpt41:
    the setup is open (StOpen of vc.h), that of the setup, which is
    another. The setup program has this routine word for word, with its
    own Help behind the name. */
-u16 Input(u16 bar)
+u16 Input(i32 bar)
 {
     u16 key;
 
@@ -353,21 +360,21 @@ u16 Input(u16 bar)
     }
 }
 
-/* Whether a character is one that words end at: 1 or 0. Only the low byte
-   of `symbol` counts. */
-u16 CmpSym(u16 symbol)
+/* Whether a character is one that words end at. Only the low byte of
+   `symbol` counts. */
+bool CmpSym(u16 symbol)
 {
-    u16 i;
+    i32 i;
 
-    for (i = 0; i < sizeof CtEn_T; i++)
+    for (i = 0; i < (i32)sizeof CtEn_T; i++)
         if (CtEn_T[i] == (u8)symbol)
-            return 1;
-    return 0;
+            return true;
+    return false;
 }
 
 /* Where the word begins that the cursor is in or behind: the column for
    the cursor at `cursor` in the line `line`. */
-u16 EdSub1(const u8 *line, u16 cursor)
+i32 EdSub1(const u8 *line, i32 cursor)
 {
     do {
         if (cursor == 0)
@@ -383,7 +390,7 @@ u16 EdSub1(const u8 *line, u16 cursor)
 }
 
 /* Where the word ends that the cursor is in or before, or the line. */
-static u16 EdSub2(const u8 *line, u16 cursor)
+static i32 EdSub2(const u8 *line, i32 cursor)
 {
     do {
         if (line[cursor] == 0)
@@ -400,21 +407,21 @@ static u16 EdSub2(const u8 *line, u16 cursor)
 
 /* What EdLin returns: the cursor at a column, with the line or the
    cursor changed, or neither. */
-static struct Edited Changed(u16 column)
+static struct Edited Changed(i32 column)
 {
     struct Edited edited;
 
     edited.cursor = column;
-    edited.changed = 1;
+    edited.changed = true;
     return edited;
 }
 
-static struct Edited Unchanged(u16 column)
+static struct Edited Unchanged(i32 column)
 {
     struct Edited edited;
 
     edited.cursor = column;
-    edited.changed = 0;
+    edited.changed = false;
     return edited;
 }
 
@@ -425,10 +432,10 @@ static struct Edited Unchanged(u16 column)
 
    Ctrl-Q has the next key typed as it is, whatever it does otherwise;
    Quote remembers that from one call to the next. */
-struct Edited EdLin(u16 key, u8 *text, u16 cursor, u16 length)
+struct Edited EdLin(u16 key, u8 *text, i32 cursor, i32 length)
 {
     u16 low = key & 0xFF;
-    u16 from, count;
+    i32 from, count;
     u8 *to;
 
     if (md.Quote != 0) {                /* E00_03 */
@@ -555,7 +562,7 @@ u16 Search(const u8 *list, u16 at, u16 begin, u16 end, u16 step, u16 key)
     u8 *typed = md.MenuBuf + 228;
     const u8 *name;
     u16 from = at;
-    u16 length, i;
+    i32 length, i;
 
     if ((key & 0xFF) == 0x0A) {
         at += step;
@@ -565,8 +572,8 @@ u16 Search(const u8 *list, u16 at, u16 begin, u16 end, u16 step, u16 key)
     for (i = 0; i < 15; i++)
         tried[i] = typed[i];
     if ((key & 0xFF) != 0x0A)
-        *(u16 *)tried = EdLin(key, tried + 2, *(u16 *)tried, 12).cursor;
-    length = (u16)(MvzLine(md.MenuBuf, tried + 2, 13) - md.MenuBuf);
+        *(u16 *)tried = (u16)EdLin(key, tried + 2, *(u16 *)tried, 12).cursor;
+    length = (i32)(MvzLine(md.MenuBuf, tried + 2, 13) - md.MenuBuf);
     PathLin(md.MenuBuf);
     if (length != 0) {
         if (end <= begin)

@@ -177,6 +177,17 @@ info.c, PutInf: compare
     entry at or behind EndBuf, which is FFC0h at the most (ReDr00), so
     it stays below 64K.
 
+input.c, Input0: widen
+    | outside = InWind(mouse, (u16)((md.Lines - 1) << 8 | column),
+    md.Lines is the rows of the screen, 25 to 50 by Init29 of start.c,
+    so the row above the last is 0 or more; column is the mouse's
+    column with a mask, 0 to F8h.
+
+input.c, Search: widen
+    | length = (i32)(MvzLine(md.MenuBuf, tried + 2, 13) - md.MenuBuf);
+    MvzLine copies no more than 13 bytes into MenuBuf, and answers
+    where it stopped: 0 to 13.
+
 keys.c, F00_50: widen
     | moved = was.first - first;
     was.first and first are offsets of entries in one list, a panel's
@@ -350,15 +361,23 @@ treebox.c, ReadTre: widen, 2 times
     4,096 entries or more is refused there, as the comment says. 32
     bits keep it whole, which is what refuses it.
 
-usermenu.c, F32_00: index
-    | screen += keys + 1;
-    keys is how many cells the widest key of the menu's lines takes: it
-    is counted up from 0 above, a name of a key at a time.
+usermenu.c, F32_00: widen
+    | room = (u8)(size - 14 - keys);
+    size is the box made just above, 14 columns more than its widest
+    line: size - 14 is 0 or more, and only the low byte of what keys
+    is taken from is kept, (u8).
+
+usermenu.c, F32_60: widen
+    | width = (u8)(size - 12 - keys);
+    size is the menu's box, 14 columns more than its widest line: size
+    - 12 is 0 or more, and only the low byte of what keys is taken
+    from is kept, (u8).
 
 usermenu.c, F32_70: shift
-    | answer = DoublMo((begin + 0x204 & 0xFF) | (u8)(((begin + 0x204) >> 8)
-    Only the low byte of what is shifted is kept, (u8): bits 8 to 15 of
-    the sum, which are the same whether or not it has a bit above them.
+    | | (u8)(((begin + 0x204) >> 8) + line) << 8),
+    Only the low byte of what is shifted is kept, (u8): bits 8 to 15
+    of the sum, which are the same whether or not it has a bit above
+    them.
 
 view.c, F34_40: compare
     | if (end - text >= LenPath + 12)

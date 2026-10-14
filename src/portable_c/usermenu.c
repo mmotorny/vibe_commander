@@ -119,16 +119,16 @@ static void F42_10(void)
 /* Give the line `row` of the menu, whose box is at `begin` and has the
    size `size`, the colour whose number is `color`: all of it behind the
    keys, which are `keys` cells wide. */
-static void F32_60(u16 color, u16 begin, u16 row, u16 keys, u16 size)
+static void F32_60(u16 color, u16 begin, i32 row, i32 keys, u16 size)
 {
-    u16 width;
+    i32 width;
 
     begin += 0x205;
     begin += row << 8;
     begin = ADD_LOW(begin, keys);
     width = (u8)(size - 12 - keys);
-    MvsColr(BasAdr(begin), width, Color(color));
-    Window(begin, 0x100 | width);
+    MvsColr(BasAdr(begin), (u16)width, Color(color));
+    Window(begin, (u16)(0x100 | width));
 }
 
 /* What the mouse does in a list that is in a box, at `begin` and of the
@@ -142,8 +142,8 @@ static void F32_60(u16 color, u16 begin, u16 row, u16 keys, u16 size)
 u16 F32_70(u16 begin, u16 size)
 {
     struct Mouse pointer;
-    u16 buttons, look, last = 0, mouse = 0, answer;
-    i32 line;
+    u16 buttons, look, last = 0, mouse = 0;
+    i32 answer, line;
 
 F32_71:
     pointer = GetMous(mouse);
@@ -157,7 +157,7 @@ F32_71:
         look = 0;
     if (look != last >> 8)
         TypMous(look);
-    last = look << 8 | buttons;
+    last = (u16)(look << 8 | buttons);
     if (!(last & 3))
         goto F32_71;
     if (InWind(mouse, begin + 0x204, size - 0x50A))
@@ -181,8 +181,8 @@ F32_76:
 
 F32_77:
     line = (u8)((u16)(mouse - begin) >> 8) - 2;
-    answer = DoublMo((begin + 0x204 & 0xFF) | (u8)(((begin + 0x204) >> 8)
-                                                   + line) << 8,
+    answer = DoublMo((u16)((begin + 0x204 & 0xFF)
+                           | (u8)(((begin + 0x204) >> 8) + line) << 8),
                      0x100 | (u8)(size - 10), line);
     if (answer == 2)
         return 0x100 | line & 0xFF;
@@ -196,16 +196,18 @@ F32_77:
    selected files of the current panel, or of the file under its cursor,
    each in a line, and "\*.*" behind the name of a directory. A list file
    that is there goes first. What was selected is not afterwards, and is
-   marked as having been. Not 0 if no list was written: the panel shows no
+   marked as having been. True if no list was written: the panel shows no
    files, the cursor is on "..", or DOS would not. */
-static u16 FileLst(void)
+static bool FileLst(void)
 {
     struct WCBdef *wcb;
     struct FILENT *file;
     u8 *end;
     struct Selected selected;
     struct Answer asked;
-    u16 i, handle, any, at, length;
+    i32 i, length;
+    u16 handle, at;
+    bool any;
 
     end = MvzLine(LIST_NAME, md.TempDir, LenPath);
     for (i = 0; i < 13; i++)
@@ -228,8 +230,8 @@ FiLs03:
     if (!FilePan(CurrentPanel))
         goto FiLs18;
     selected = TotSel(CurrentPanel);
-    any = selected.files | selected.directories;
-    if (any == 0) {
+    any = selected.files != 0 || selected.directories != 0;
+    if (!any) {
         if (wcb->CurAdr >= wcb->EndBuf)
             goto FiLs18;
         if (ENTRY(wcb, wcb->CurAdr)->NameF[0] == '.')
@@ -240,7 +242,7 @@ FiLs03:
         goto FiLs18;
     handle = asked.value;
     at = wcb->CurAdr;
-    if (any == 0)
+    if (!any)
         goto FiLs13;
     at = DSKBUF;
 FiLs12:
@@ -252,7 +254,7 @@ FiLs13:
     file = ENTRY(wcb, at);
     for (length = 0; file->NameF[length] != 0; length++)
         ;
-    if (FileWrite(handle, file->NameF, length).failed)
+    if (FileWrite(handle, file->NameF, (u16)length).failed)
         goto FiLs17;
     if (file->AttrF & ATTR_DIRECTORY)
         if (FileWrite(handle, Mask_S, 4).failed)
@@ -266,7 +268,7 @@ FiLs16:
 FiLs17:
     FileClose(handle);
 FiLs18:
-    return 1;
+    return true;
 
 FiLs20:
     if (FileClose(handle).failed)
@@ -279,20 +281,21 @@ FiLs20:
             file->AttrF |= 0x80;
         }
     }
-    return 0;
+    return false;
 }
 
 /* Make the commands of a line of a menu or of an extension file, which
    begin at `text` in MenuBuf, into DosBuf, and show the first of them in
-   the command line. `view` is not 0 for the file that is being viewed or
-   edited, whose name is in ViewFil, and 0 for the file under the cursor
-   of the current panel. Returns 1 if there is a command to run.
+   the command line. `view` is true for the file that is being viewed or
+   edited, whose name is in ViewFil, and false for the file under the
+   cursor of the current panel. Returns true if there is a command to
+   run.
 
    A first command that begins with "@" is run without the prompt and its
    line on the screen. Of a line no more than 123 characters are taken,
    but what stands for "!" is not counted in full, and all commands
    together have 998 bytes. */
-u16 Run_00(u8 *text, u16 view)
+bool Run_00(u8 *text, bool view)
 {
     const u8 *from = text;              /* SI */
     u8 *to = md.DosBuf;                 /* DI */
@@ -300,7 +303,9 @@ u16 Run_00(u8 *text, u16 view)
     const u8 *more;
     struct WCBdef *wcb;
     const struct MainDat *data = &md;
-    u16 pair, c, left, to_dot, path;
+    u16 pair, c, to_dot;
+    i32 left, count;
+    bool path, unlisted;
 
     ListFlg = 0;
 Run_01:
@@ -377,13 +382,13 @@ Run_10:                                 /* "!" and what follows it */
     if (c == '@') {
         from++;
         if (ListFlg == 0) {
-            c = FileLst();
+            unlisted = FileLst();
             ListFlg = 1;
-            if (c)
+            if (unlisted)
                 Beep();
         }
         more = LIST_NAME;
-        path = 0;
+        path = false;
         goto Run_15;
     }
     if (c != '\\')
@@ -391,7 +396,7 @@ Run_10:                                 /* "!" and what follows it */
     from++;
     if (md.PathEr != 0)
         goto Run_05;
-    path = 1;
+    path = true;
     more = md.DosPth + 2;
 Run_15:
     c = *more;
@@ -418,7 +423,7 @@ Run_18:                                 /* the name of the file */
         from += 2;
         to_dot = 0;
     }
-    if (view != 0) {
+    if (view) {
         name = CutPath(md.ViewFil);
         more = md.ViewFil;
         while (more != name) {          /* the path in front of it */
@@ -458,24 +463,24 @@ Run_23:
 Run_30:                                 /* that is all of them */
     *to = 0;
     *(u16 *)COMMANDS_END = 0;
-    for (c = 0; c < 255; c++)
-        if (md.DosBuf[c] == 0)
+    for (count = 0; count < 255; count++)
+        if (md.DosBuf[count] == 0)
             break;
-    md.DosCol = (u8)c;
+    md.DosCol = (u8)count;
     DosCom();
     Cursor1();
     if (md.DosBuf[0] == 0)
-        return 0;
+        return false;
     if (md.LoadFl & 0x80)
-        ClsLine((u16)md.DosLin << 8, data);
-    return 1;
+        ClsLine((u16)(md.DosLin << 8), data);
+    return true;
 }
 
 /* The user menu: that of the current directory, or else the main one, of
-   the program's directory; the main one at once if `main` is not 0.
-   Returns 1 if a line was chosen and has a command to run, which Run_00
-   has put into DosBuf then. */
-u16 F32_00(u16 main)
+   the program's directory; the main one at once if `main` is true.
+   Returns true if a line was chosen and has a command to run, which
+   Run_00 has put into DosBuf then. */
+bool F32_00(bool main)
 {
     struct Entry item;
     struct Named named;
@@ -486,11 +491,11 @@ u16 F32_00(u16 main)
     u16 *screen;                        /* DI */
     u16 *key;                           /* BP */
     u16 begin, size;                    /* BX and DX: the box */
-    u16 keys;                           /* CL: how wide the keys are */
-    u16 row;                            /* CH: the line of the cursor */
+    i32 keys;                           /* CL: how wide the keys are */
+    i32 row;                            /* CH: the line of the cursor */
     const u8 *include;                  /* DX: what ^I stands for in a box */
-    u16 c, next, width, widest, lines, length;
-    u16 limit, i, to, answer, room;
+    u16 c, next, color, scan, place, answer;
+    i32 width, widest, lines, length, limit, i, target, room;
     u8 *command;
 
     if (main)
@@ -526,7 +531,7 @@ F32_02:
 F32_03:
     Dialog(&UsrEr_B, include, 0, 0, &md);
 F32_04:
-    return 0;
+    return false;
 
 F32_05:                                 /* read it */
     read = FileRead(opened.value, md.MenuBuf, LenMenu - 1);
@@ -555,7 +560,7 @@ F32_10:
     next = text[1];
     if (c <= ' ' || c == 0xFF || c == 0x7F)
         goto F32_15;
-    c = UpCase(next << 8 | c);
+    c = UpCase((u16)(next << 8 | c));
     next = c >> 8;
     c &= 0xFF;
     if (next == ':')
@@ -564,7 +569,7 @@ F32_10:
         goto F32_15;
     if (next < '1' || next > '9')
         goto F32_15;
-    to = next + (0x3B - '1');           /* F1 to F9 */
+    scan = next + (0x3B - '1');         /* F1 to F9 */
     if (text[2] == ':')
         goto F32_12;
     if (next != '1')
@@ -573,12 +578,12 @@ F32_10:
         goto F32_15;
     if (text[2] > '2')
         goto F32_15;
-    to = 0x44;                          /* F10 */
+    scan = 0x44;                        /* F10 */
     if (text[2] == '0')
         goto F32_11;
     if (text[2] < '0')
         goto F32_15;
-    to = (u8)(text[2] + (0x85 - '1'));  /* F11 and F12 */
+    scan = (u8)(text[2] + (0x85 - '1'));  /* F11 and F12 */
 F32_11:
     length++;
 F32_12:
@@ -586,10 +591,10 @@ F32_12:
     c = 0;
     goto F32_14;
 F32_13:
-    to = 0;
+    scan = 0;
 F32_14:
     length += 2;
-    *key = to << 8 | c;
+    *key = (u16)(scan << 8 | c);
     text += length;
     while (*text == ' ' || *text == '\t')
         text++;
@@ -630,25 +635,25 @@ F32_18:                                 /* the box */
         widest = 63;
     if (widest < 11)
         widest = 11;
-    size = ((lines & 0xFF) << 8 | widest) + 0x50E;
+    size = (u16)(((lines & 0xFF) << 8 | widest) + 0x50E);
     begin = SftEGA(0x0C28);
     limit = (u8)((begin >> 8) - 7);
     begin -= (u8)(((size >> 8) + 1 & 0xFF) >> 1) << 8
         | (u8)((size - 1 & 0xFF) >> 1);
     if (begin >> 8 > limit)
-        begin = limit << 8 | begin & 0xFF;
+        begin = (u16)(limit << 8 | begin & 0xFF);
     SavWin(begin, size, md.WinBuf);
-    c = Color(Hist_C) << 8;
-    MinBox(begin, size, c);
-    MvsBw(BasAdr((begin + 0x100 & 0xFF00) | 34), User_S, 11, c);
+    color = (u16)(Color(Hist_C) << 8);
+    MinBox(begin, size, color);
+    MvsBw(BasAdr((begin + 0x100 & 0xFF00) | 34), User_S, 11, color);
 
     /* Its lines. */
     lines = (u8)((size >> 8) - 5);
-    to = begin + 0x205;
+    place = begin + 0x205;
     text = md.MenuBuf;
 F32_22:
     text = FndItem(text).at;
-    screen = BasAdr(to);
+    screen = BasAdr(place);
     if (*key != 0) {
         i = 0;
         c = *text++;
@@ -681,7 +686,7 @@ F32_26:
     goto F32_26;
 F32_28:
     key++;
-    to += 0x100;
+    place += 0x100;
     if (--lines != 0)
         goto F32_22;
 F32_29:
@@ -743,23 +748,23 @@ F32_33:
 F32_36:                                 /* Up */
     if (row == 0)
         goto F32_39;
-    to = row - 1;
+    target = row - 1;
     goto F32_40;
 F32_37:                                 /* Down */
     if (row >= (u8)((size >> 8) - 6))
         goto F32_38;
-    to = row + 1;
+    target = row + 1;
     goto F32_40;
 F32_38:                                 /* Home, PgUp */
-    to = 0;
+    target = 0;
     goto F32_40;
 F32_39:                                 /* End, PgDn */
-    to = (u8)((size >> 8) - 6);
+    target = (u8)((size >> 8) - 6);
 F32_40:
-    if (to == row)
+    if (target == row)
         goto F32_31;
     F32_60(Hist_C, begin, row, keys, size);
-    row = to;
+    row = target;
     goto F32_30;
 
 F32_45:                                 /* the mouse */
@@ -767,7 +772,7 @@ F32_45:                                 /* the mouse */
     if (answer >> 8 < 1)
         goto F32_31;
     if (answer >> 8 == 1) {
-        to = answer & 0xFF;
+        target = answer & 0xFF;
         goto F32_40;
     }
     if (answer >> 8 != 0x1C)
@@ -798,7 +803,7 @@ F32_55:                                 /* Esc, and the box goes */
     Window(begin, size);
     if (answer != 0) {
         md.MenuFl = 0;
-        return 0;
+        return false;
     }
     found = F34_30(text);
     command = found.at;

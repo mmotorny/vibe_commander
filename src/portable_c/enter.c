@@ -243,7 +243,7 @@ struct Onward F21_10(struct WCBdef *panel)
     cursor = 0;
     md.DosBuf[0] = 0;
     for (i = 0; (c = file->NameF[i]) != 0; i++) {
-        edited = EdLin(c, md.DosBuf, (u16)cursor, LenCmd - 1);
+        edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
         cursor = edited.cursor;
         if (edited.changed == 0)
             break;
@@ -396,11 +396,11 @@ static void F27_07(const u8 *text, i32 cursor)
         c = *from;
         if (c == 0) {
             if (text == md.TmpBuf)
-                cursor = EdLin(' ', md.DosBuf, (u16)cursor, LenCmd - 1).cursor;
+                cursor = EdLin(' ', md.DosBuf, cursor, LenCmd - 1).cursor;
             break;
         }
         from++;
-        edited = EdLin(c, md.DosBuf, (u16)cursor, LenCmd - 1);
+        edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
         cursor = edited.cursor;
         if (edited.changed == 0)
             break;

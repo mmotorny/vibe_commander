@@ -941,7 +941,7 @@ V00_40:                                 /* a key */
         if (VI->ViWrap != 0)
             bar = 5;
     }
-    key = Input((u16)bar);
+    key = Input(bar);
     ClrKbd();
     /* The mouse, or a key without a scan code: Case takes none. */
     if (key >> 8 == 0xFC || key >> 8 == 0)

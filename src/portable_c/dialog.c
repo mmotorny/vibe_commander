@@ -539,7 +539,7 @@ static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
            as the field has them. */
         InSt10(place, text, length, (u16)(color << 8));
         Cursor((u16)(place + cursor));
-        key = Input((u16)bar);
+        key = Input(bar);
         if (key >> 8 == KEY_MOUSE) {
             for (;;) {                  /* InSt05 */
                 pointer = GetMous(0);
@@ -601,7 +601,7 @@ static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
                 text[0] = 0;
         }
 InSt04:
-        cursor = EdLin(key, text, (u16)cursor, (u16)length).cursor;
+        cursor = EdLin(key, text, cursor, length).cursor;
     }
 InSt08:
     typed.key = key;
@@ -631,7 +631,7 @@ Slct01:
         while (GetMous(0).buttons != 0)
             ;
 Slct03:
-    key = Input((u16)bar);
+    key = Input(bar);
     if (key >> 8 == KEY_MOUSE) {
         for (;;) {                      /* Slct04 */
             pointer = GetMous(0);
@@ -727,7 +727,7 @@ static struct Ticked FlipFl(u16 place, i32 bar, u16 value)
     value &= 0xFF;
     Cursor(place);
     for (;;) {
-        key = Input((u16)bar);          /* a byte, as the field has it */
+        key = Input(bar);               /* a byte, as the field has it */
         if (key != 0x3920) {
             if (key >> 8 != KEY_MOUSE)
                 break;
