@@ -9255,7 +9255,7 @@ nothing that 15 MB can wrap:
 | The editor's count of free bytes, which shows 0 for a megabyte or more in a text, and has seven cells; the 20 bits of a place in its text | A text beyond a megabyte | F5 takes `AddressOf` out, and with it the 20 bits. N6 the test of the count, and what is shown in the cells by the answer to question 8 | Not reached under the cap |
 | The editor's line in text, 16 bits | More than 65,535 lines: within reach in the original with lines of fewer than six bytes | N6, by the answer to question 5 | Not guarded by the room |
 | The viewer's window on a file | Nothing: the viewer takes 0FFEh paragraphs at the most itself, and that stays its number. N3 writes it in bytes | N3 | None needed |
-| A panel's offsets | Nothing: its block is 1000h paragraphs whatever the machine has | Not widened in the clusters: question 3, and P if it is lifted | None needed |
+| A panel's offsets | Nothing: its block is 1000h paragraphs whatever the machine has | Not widened in the clusters: P, question 3 having lifted the limit | None needed |
 | What `Init11` answers with for `AlocEr`, paragraphs in 16 bits that the BIOS is then handed as a page | Cut | F9 answers 0FFFFh for more, with a row in entry 6 | The same |
 | What the functions of `sys.h` are asked for, paragraphs in 16 bits | No block of more than a megabyte could be asked for | F9: bytes, an `i32` | The same |
 
@@ -9364,7 +9364,7 @@ thought and long in lines.
 | N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; every cut that clang names written as a cast, with a comment where the program counts on it; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's warnings of a conversion silent, which the test of the record asks; the test of the record; `portable_c-cut` | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
 | S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
 | M, the main data's numbers | Each field of the main data or of a panel that the record has as to be widened: a variable beside the structure, its word left unused, and every line that names it | Those lines, in whatever file | Every cluster; alone | The scenarios; the images, the main data equal but for those words | |
-| P, a panel as long as its directory. Only if question 3 is answered so | "The questions for the user", 3: a panel's block longer than 64K, its four offsets beside it in 32 bits, `ENTRY` without its cut, and a scenario that fills what the original can hold | `files.c`, `read.c`, `place.c`, `panel.c`, `enter.c`, `start.c`, and the lines of other files that keep an offset in a panel; `harness/scenarios.py`, `DEVIATIONS.md` | M; alone | The scenarios, with the new one held to the original's golden and its patch; the images | |
+| P, a panel as long as its directory. Wanted: question 3 is answered so, 14 October 2026 | "The questions for the user", 3: a panel's block longer than 64K, its four offsets beside it in 32 bits, `ENTRY` without its cut, and a scenario that fills what the original can hold | `files.c`, `read.c`, `place.c`, `panel.c`, `enter.c`, `start.c`, and the lines of other files that keep an offset in a panel; `harness/scenarios.py`, `DEVIATIONS.md` | M; alone | The scenarios, with the new one held to the original's golden and its patch; the images | |
 
 **The clusters.** Each is the work of one fresh agent that hands back
 after some hundred tool calls. The two figures are the lines of the
@@ -9443,7 +9443,7 @@ The order:
     F7 landed                    N11†  N12  N13  N14  N15    question 3 asked
     F8 landed                    N16  N17a  N17b  N18  N19a  N20  N21
     F2 to F8 and the five †      F9 > F10                N19b behind F9
-    every cluster landed         M > P, if question 3 says so
+    every cluster landed         M > P, which question 3 asked for
 
 What a piece goes by:
 
@@ -9797,7 +9797,10 @@ recommendation first.
      that the program does tomorrow what it did when it was read. That
      it was right then, only the reading says, once.
 
-3. **How many files a panel holds.**
+3. **How many files a panel holds.** **Answered, 14 October 2026**
+   (`CLAUDE.md`, "The portable C"): **lifted**, by the piece P at the
+   end of step 2, which declares it. A panel holds as many entries of a
+   directory as the memory allows; N11 left the offsets 16 bits for P.
    - *When*: N11, which has `files.c`, `read.c` and `place.c`, before
      it sorts the offsets in a panel: the answer is the reason that
      the record gives for them.
@@ -13603,6 +13606,8 @@ piece P at the end of step 2, or keep 2,703 as a number of the
 program's own. For a dialog: *"A panel holds 2,703 entries of a
 directory, as the original does (it beeps and shows those). Lift it in
 a piece of its own at the end of step 2 (recommended), or keep it?"*
+The user answered on 14 October 2026: lift it, by the piece P, declared
+then.
 Either way the offsets in a panel stay 16 bits, with the word `address`
 and the sentence "16 bits while a panel is 64K. Widened only if
 question 3 of the plan says so, by the piece P", as the fields of
