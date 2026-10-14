@@ -3000,13 +3000,27 @@ in "The portable C".
     number of 32: of `u16 line = (u16)(signed char)c;` it hands
     `line`, to a parameter of 32 bits or into `line + first` and `line
     < first`, as the byte with its sign in all 32 bits, FFFFFFFEh for
-    FEh where C says FFFEh. `-od` and clang do what C says. The tree
-    writes the original's `CBW` so on 35 lines, and each is right
-    only while its byte is below 80h or what is made of it is cut to
-    16 bits again before it is looked at. Before a parameter or a
-    variable that such a number gets to is widened, look at whether
-    the byte can be 80h or more. A toy of a few lines and `wdis` show
-    what the compiler made of one.
+    FEh where C says FFFEh. `-od` and clang do what C says. The
+    original's `CBW` is written `(u16)(short)(signed char)c` for that,
+    with the `short`, which the compiler keeps, on every line that
+    has it: `vc.h` says so at "A byte with a sign made a word", and
+    `TODO.md`, "N0c", has which forms are lost, in which uses, and
+    that every other cast that narrows is kept. The test
+    `portable_c-cut` fails for the other form anywhere in the tree,
+    and holds the compiler to the instructions of
+    `harness/cutcheck.c`: before a cast is relied on in a use that
+    the file has not, a function is added there, and its
+    instructions read. Where the test fails for a function called
+    Lost, the compiler has changed and the fault with it: pin it
+    down again before anything is rewritten.
+  - A fault of the compiler is pinned down fastest by running its
+    code on this computer: the functions compiled with the build's
+    options, a driver compiled with `-bt=linux`, the two linked by
+    `wlink system linux` with the C library of the same download, and
+    what the program prints held against gcc's of the same source. A
+    matrix of forms by uses is a script's work then, 1,900 functions
+    in a minute. A function may be declared to the driver with wider
+    parameters than it has, to hand it rubbish above its arguments.
   - The objects of two builds in two directories differ in length by
     the paths that are in them: hold listings against each other, or
     the places of the functions in the two maps, not the lengths.

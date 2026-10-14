@@ -575,6 +575,21 @@ add_test(NAME portable_c-words
 add_test(NAME portable_c-width
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/width.py)
 set_tests_properties(portable_c-width PROPERTIES SKIP_RETURN_CODE 77)
+# A cut that Open Watcom's compiler loses, and those that it keeps. A byte
+# with a sign made a number of 16 bits without one is extended with its
+# sign to all 32 bits wherever it goes on into 32 bits, unless a short
+# stands between: the test reads the tree through clang and fails for the
+# form that is lost, anywhere, and it compiles harness/cutcheck.c with
+# the compiler and the options that the build compiles the tree with and
+# holds every function of it to the instructions written there, the
+# fault's and those of every cast that narrows. See harness/cut.py. It
+# runs no machine; without clang the tree is not read, and the test
+# counts as skipped if the compiler's half has passed.
+add_test(NAME portable_c-cut
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/cut.py
+            --compiled ${CMAKE_BINARY_DIR}/portable_c/compiled.txt
+            --out ${CMAKE_BINARY_DIR}/cutcheck)
+set_tests_properties(portable_c-cut PROPERTIES SKIP_RETURN_CODE 77)
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see

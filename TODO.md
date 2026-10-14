@@ -11132,7 +11132,8 @@ the mouse is on a line. But the tree has such a cast on 35 lines, and each is
 right in the program of 32 bits only while its byte is below 80h or
 its result is cut to 16 bits again before it is looked at. That is
 not of this piece and was not gone through: it is for the session.
-`CLAUDE.md` has the note.
+It has been gone through since, and every such line is written
+otherwise: "N0c", below.
 
 **The toy** that "The rule for a number" speaks of is a file of
 constant expressions, each the line of the tree with its variables
@@ -11198,6 +11199,137 @@ widens, had clang name 28 places in `edit.c`, 9 in `view.c`, 7 in
 `copy.c`, 2 in `info.c`, 1 in `dialog.c` and none in `find.c` and
 `panel.c`. So N3, N4, N6 to N8 and N9 are slower by that much, a few
 tool calls each, and the others by nothing that was measured.
+
+### N0c, a cut that the compiler loses: done, and which cast is safe to write
+
+**The fault**, pinned down. Open Watcom's code generator extends a
+number with a sign that is converted to a wider type without a sign,
+and from there to a still wider type, with its sign both times; C says
+that the second time fills with zeros. It takes three sizes. A program
+of 32 bits that has no number of 64 has one such chain, a byte with a
+sign made a number of 16 bits without one that goes on into 32 bits,
+the original's `CBW`:
+
+    u16 line = (u16)(signed char)byte;      /* FFFEh for FEh, says C */
+    return line + first;                    /* movsx eax,al; add eax,edx */
+
+One size up it is the same, `(u64)(u32)word` for a short: `cwde` and
+`cdq`.
+
+- Which forms. The conversion itself, with the cast written or not
+  (`u16 line = byte;` for a `signed char byte`), wherever the byte is,
+  in a register, in memory, in a field, in what a function answered;
+  and through steps that change no number, `(u16)(int)(signed char)x`,
+  `(u16)(u32)(signed char)x`, `+ 0`, a choice of two such. Through a
+  variable of 16 bits as well as within one expression.
+- Which uses. Every use in 32 bits: handed to a parameter of 32 bits,
+  returned as 32 bits, kept in a variable of 32 bits, added to a number
+  of 32 or of 16 bits, compared with one of 32 bits, multiplied,
+  shifted, divided, made an index, added to a pointer. A division or a
+  shift to the right is wrong also where its result is cut again: it
+  is a division of numbers with a sign. No use in 16 bits: kept in a
+  field of 16 bits, compared with a number of 16 bits or with a
+  constant, handed to a parameter of 16 bits, which a function
+  compiled by this compiler reads no more of than 16 bits.
+- Which options. All but `-od`: `-os`, which the build has, `-ot`,
+  `-ox`, `-oh`, `-oa`, none at all, another processor, the stack
+  convention. No option of the optimiser turns just this off. The
+  debugging build, `-od`, is right, and clang.
+- Which compilers. `wcc386`, version "2.0 beta Oct 1 2026", of the
+  pinned download; its `wpp386`, which has another front end and the
+  same code generator; and its `wcc` for 16 bits, for a byte made a
+  word that goes on into a long, `cbw` and `cwd`.
+
+**Which cast is safe to write, and which is not.** Not safe: a
+`signed char` made a `u16`, by a cast or without one, in any spelling
+that has no `short` in it. Safe, and the form of the tree:
+
+    (u16)(short)(signed char)byte           /* cbw; movzx eax,ax */
+
+Safe as well: arithmetic on the byte before the cut, `(u16)((signed
+char)byte - 1)`, which is no conversion of the byte; a mask, `& 0xFFFF`.
+And safe, in every use that was tried: every other cast that narrows.
+A number of 32 bits, with a sign or without, cast to `u16` or to `u8`;
+a number of 16 bits, with a sign or without, cast to `u8`; a short
+cast to `u16`; a difference of two numbers cast to either. Each is
+`movzx` from the register of 16 or 8 bits, or arithmetic in that
+register, before the number is used in 32 bits. A byte made 32 bits
+with its sign, `(i32)(signed char)byte`, is `movsx`, which is what is
+meant there. A number of 64 bits is not safe until the finder knows
+the fault one size up: the test fails for one.
+
+How it was found out: a matrix of 60 forms by 33 uses, some 1,900
+functions, compiled with the build's options, linked as a program for
+Linux by the same download's linker and library, and run on this
+computer, each function with numbers that have their top bit and that
+have not, and with rubbish above every argument, against what gcc
+makes of the same source. It was not kept; `harness/cutcheck.c` has
+what the test holds.
+
+**The tree.** 33 lines had the form, in 13 files, one of them a macro
+of `find.c`, `SIGNED`, written by way of an int. Each was read in the
+build's listing:
+
+- Right as compiled, 26: the number is used in 16 bits only, or only
+  the low byte of it shifted down is read, as where `place.c` holds a
+  count of rows against the mini status.
+- Wrong as compiled, and never reached with a byte that has its top
+  bit, 7. A division with a sign in the place of one without: the
+  third of the window's rows by which the mouse scrolls, in `help.c`
+  (two lines), `sthelp.c` and `view.c`, whose byte is the rows of the
+  screen less 12 or less 2, and `column / 13 * 13` of `Func21` in
+  `main.c`, whose column is 0 to 37 by the tests above it. And the
+  line under the mouse handed to `DoublMo` as FFFFFFFEh, in
+  `usermenu.c` and `treebox.c`, which would never have equalled
+  `MousPos` of 16 bits, so that no second click would have counted:
+  the line is 0 or more, by `InWind` just above each.
+- Wrong and reachable: none. So no scenario was written, and the
+  program does what it did: the image of every scenario says so.
+
+All 33 are written `(u16)(short)(signed char)` now. The seven are
+right in the listings, `cbw` or `movsx` to 16 bits and `movzx` behind
+it, and no listing of the tree has a byte extended with its sign to 32
+bits but where `menu.c` means it, the index of `LIST`.
+
+**The C translation** is built by the compiler that has the fault for
+16 bits, and has the form on 31 lines and in the same macro. None is
+wrong as compiled: an int has 16 bits there, the fault shows only
+where the word goes on into a long, which the compiler does by `cwd`
+in every use that was tried, and no listing of `build/c/` has a `cwd`
+at all. Nothing was changed there.
+
+**The guard**, the test `portable_c-cut`, `harness/cut.py` with
+`harness/cutcheck.c`, both halves, since either alone leaves a way
+open:
+
+- It reads the tree through clang and fails for a `signed char` made a
+  `u16` with no `short` between, wherever it is and however it is
+  used: a place that is right today because its number stays in 16
+  bits is wrong the day a variable behind it is widened, with no line
+  of it changing. And for a number of 64 bits.
+- It compiles `harness/cutcheck.c` with the build's compiler and the
+  options of `build/portable_c/compiled.txt` and holds 54 functions to
+  the instructions written in front of each. Ten have the fault and
+  are held to the wrong instructions, so that a compiler which is
+  mended, or which does it otherwise, is noticed. The others are held
+  to the right ones: the tree's form in every use, and every cast that
+  narrows, each handed to a parameter of 32 bits, added, compared and
+  made an index. That half is what the tree leans on once every
+  narrowing is a cast: a compiler that loses another cut fails it.
+
+What a later piece should know:
+
+- A cast that the tree does not have yet, in a use that it does not
+  have yet, wants a function in `harness/cutcheck.c` before it is
+  relied on: write it, run the test, read the instructions that the
+  test says the compiler makes, and write them in front of it if they
+  are right.
+- The test's own finder and `harness/width.py` do not know of each
+  other: a cut that the width's record counts as a `cast` is the same
+  cut with a `(short)` in it.
+- A listing of the build can be searched for the fault's mark, a byte
+  extended with its sign into a register of 32 bits: `movsx e..,` with
+  a byte behind the comma. After this piece only `menu.c` has it.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

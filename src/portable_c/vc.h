@@ -65,7 +65,9 @@ typedef int            i32;
    that a program without numbers of 64 bits has. With a conversion to
    the type of 16 bits that has a sign between the two it is `cbw` and
    `movzx eax,ax`, which is right. Every other cast that narrows, of 32
-   or 16 bits to a u16 or a u8, it keeps. */
+   or 16 bits to a u16 or a u8, it keeps. The test `portable_c-cut`
+   fails for the second form anywhere in the tree, and holds the
+   compiler to both: harness/cut.py. */
 
 /* True or false and nothing else: bool, with true and false, as C has
    them since 1999, from the compiler's own header, which is no part of
