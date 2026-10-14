@@ -2528,7 +2528,7 @@ followed, kept for what each piece met, and it is not brought up: it
 speaks of two builds, of `build/portable_c32/`, of `dos.c` beside
 `dos32.c`, of `resident.c` and of a record `harness/pass32.txt`, none of
 which is there any more. "W and Z1, the switch and the end of the 16-bit
-build", near its end, says what became of each, and has what is left of
+build", near its end, says what became of each, and what was done to
 the documents. Every piece has a section, "done, and what a later piece
 should know", under its name in the table of "The pieces": P1 to P4 for
 the source, S1 to S3 and D1, D2 and E for the system's functions, B1
@@ -2539,6 +2539,9 @@ is decided, in "Open, for the user", and the next step of the road has
 a plan of its own, "The portable C in a flat memory: the plan".
 
 ### In short
+
+As it was planned: the two builds were one from the switch on, and the
+16-bit one is gone. See the top of this plan.
 
 - The same source is built twice, by `wcc` and by `wcc386`, from the
   first piece to the last. Nothing is cut over.
@@ -2608,6 +2611,9 @@ is decided: nothing of this table is open any more.
 | 10 | What becomes of a program that a command has left in the memory, with interrupts taken, when the program of 32 bits is left. Its extender puts every interrupt of real mode back as it was when the program started, and writes a line of warning for each: such a program keeps its memory and is cut off, where the original releases it and the program of 16 bits leaves it at work (entry 7 of `DEVIATIONS.md`). And Ctrl-Break it loses while the program still runs. `stay-left` shows it | Found by W, 2 of the list of what differs. The user's word of 13 October 2026 was first "mend it", on being told that it was one bit of the extender's settings; it was not, and told what the mend took and that it still left such a program without INT 21h, the user had it dropped the same day: "L, a program that has stayed in the memory" below has the mend in words and what was read of the extender. It was open then: declared as it is, or another mend, with `stay-left` failing and off the record. **Decided by the user, the same day**: declared as it is, with no change of the program (`CLAUDE.md`, "The portable C"). **Done**: a point of entry 7 of `src/portable_c/DEVIATIONS.md`, "Behind the program of 32 bits such a program keeps its memory and is cut off from its interrupts", with the row of `stay-left` there; and a patch of this build's own, `harness/goldens/portable_c32/stay-left.patch`, three screens of that and the rows that the 16-bit program's patch has for 10 and 14. `stay-left` is on the record, which is every scenario that this program is taken through, 155 of 155 |
 
 ### The strategy
+
+As it was planned, and as it was followed until the switch; see the top
+of this plan. Of the two programs of one source the 32-bit one is left.
 
 | Way | For | Against |
 |---|---|---|
@@ -2880,6 +2886,10 @@ build is gone, and would do harm mixed into step 1:
   build needs them to its last day.
 
 ### The build
+
+As it was planned, for a second build beside the 16-bit one; see the
+top of this plan. The build that there is is `add_portable_c` of
+`CMakeLists.txt`, once for the program and once for `debug/`.
 
 - `wcc386 -3r -mf -os -s -zl -zls -wx -we`: the flat model, small code
   as today, no check of the stack and no library. `vc.h` includes
@@ -4962,7 +4972,9 @@ For D2:
   last corner says that more was written than fits, and then a page
   wants dividing.
 - A step of the script is what turns a page, and a page that is added
-  wants a step in `STEPS` of `both.py`.
+  wants a step in `STEPS` of `both.py`. (`both.py` went with the
+  16-bit build: `asked.py` beside it runs the toy with `dos32.c`, has
+  `STEPS`, and holds what the toy writes against nothing.)
 
 For B1, B2 and the harness:
 
@@ -6087,7 +6099,9 @@ way, and made: the section behind this one.)
 - `harness/trial32/both.py` and `sys.c` are the place to try a
   function of `dos32.c` by itself, in ten seconds; a page wants a step
   in `STEPS`. `build/portable_c/dos.obj` has to be built for the 16-bit
-  half.
+  half. (Since the 16-bit build went there is no such half: the script
+  is `asked.py`, which runs the toy with `dos32.c` and prints what it
+  writes, for a reader to hold against what it printed before.)
 
 ### C1, the editor: nine of the ten pass, and one is declared and not run
 
@@ -6951,7 +6965,7 @@ to stand side by side for a while behind it.
 - A patch that two builds are held to says in its reason what is so of
   each: `ended` did not, and nothing fails for a reason.
 
-### W and Z1, the switch and the end of the 16-bit build: done, and what is left of the piece
+### W and Z1, the switch and the end of the 16-bit build: done
 
 On the user's word of 13 October 2026 the switch and the end of the
 16-bit build are one piece (`CLAUDE.md`, "The portable C", step 1 of
@@ -7056,7 +7070,8 @@ that place is `sys.h`, with `dos.c` behind it". The session was told.
   that nothing reads: `build/portable_c32/`, and `arith.obj`, `dos.obj`
   and their listings in `build/portable_c/`.
 
-**What is left of the piece** is its fifth stage, the documents. The
+**Nothing is left of the piece.** Its fifth stage, the documents, was
+the last, and is done: see there. The
 first two stages are on `main` at `7e73258`, and the third and the
 fourth, Z2, in the three commits that follow "Write down how step 2 of
 the road is divided": "Take the words of the 16-bit compiler out of the
@@ -7223,14 +7238,82 @@ build/portable_c` then.
      was not looked at ("The program of 32 bits: what differs from the
      original, for the user", its last lines).
 
-   **Left**, each as the list below has it, which is of before and
-   whose line numbers no longer hold:
+   **The rest of it, done** in the three commits from "Say in the
+   notes what the end of the 16-bit build changed" on. Documents and
+   comments only: `VC.EXE` is the bytes that it was,
+   `9887141a...567d9452`, and the tests that start no machine pass.
    - This plan, beyond its top: "In short", the strategy and "The
-     build" still say that the same source is built twice.
-   - `CLAUDE.md`, the notes: every place of the last point below, and
-     `resident.c` where a note means the portable C's file.
-   - The top of `harness/scenarios.py` and the tops of the harness's
-     scripts, where they describe two builds: not looked at.
+     build" each begin with a line that says they are as they were
+     planned and points to the top. Nothing of them is rewritten. The
+     two places that told a reader to use `both.py`, at the ends of
+     D1's and D2's sections, say what there is in its place. "What a
+     trial on the bench showed" names `both.py` nowhere and is as it
+     was.
+   - `CLAUDE.md`, the notes. The note that said how the others are
+     read stands first in "Notes on the portable C" now, with what it
+     lacked: the files that went or were renamed, the compiler and its
+     model, the words that are gone, and what a check by the bytes of
+     `VC.EXE` still is and no longer is. "Moving a file to the system's
+     functions" has such a paragraph of its own behind its first. With
+     those two a note of history is left as it was written, `dos.c`,
+     `resident.c`, far pointers, the same bytes and all. Mended in
+     place is what would send a reader wrong all the same, some thirty
+     places: what `add_portable_c` takes; the command that compiles
+     one file, which was `wcc`'s; the copy of a build, which was to be
+     put through `arithcheck.py`; the cast of `portable_c-int16`, which
+     is code now and no longer "the same bytes"; `OWN_OF_FLAT`, which
+     is `OWN_OF`; the notes on the layout's, the data's and the
+     scenarios' tests of the program of 32 bits, which named
+     `build/portable_c32`, the tests `portable_c32-...` and the record;
+     `notice.py --build`; in the table of the calls the five rows that
+     named something of `dos.c`, `MemOwn`, `ProgramRun`, the PSP at
+     0Ah, 51h and the vectors; where a new function is written; and
+     `both.py`. The table was held against `sys.h` by a script: every
+     function that it names as what a call is, is declared there, but
+     for `ShellRun`, `ScreenPrintAll` and `ScreenSmallFont`, which it
+     says went with their commands; and every function of `dos32.c`
+     that is not static is declared in `sys.h`, but `Start`.
+   - The harness and the tools. The tops had been brought up by the
+     pieces that changed the scripts; every line of `harness/`,
+     `harness/trial32/` and `tools/` that names the tree `portable_c32`,
+     the record, 16 bits, `dos.c`, `resident.c`, `arith.c`, `both.py`,
+     `__far` or `STACK` was read, 157 of them, and what is of the C
+     translation or of the original stays. Mended: a comment of
+     `harness/ported.py` that had the entry of the critical error in
+     `dos.c`, one of `harness/trial32/ended.asm` that named the 16-bit
+     file, and the top of `harness/scenarios.py`, which had where the
+     16-bit portable C shows its first screen.
+   - Not done, being code and no comment: `harness/trial32/casts.py`
+     sorts its places by names that are gone, `dos.c`, `DOS_AT` and
+     `(void __far *)Stack`. It runs, and has one class left, the 39
+     places of `dos32.c`.
+   - Not the notes' and so not touched: the rule of `CLAUDE.md` that
+     says "with `dos.c` behind it", and the rule of "Scenarios" that a
+     C tree takes up to a sixth more instructions than the original,
+     for which the next point has what was counted.
+   - **The machine's clock in the portable C, counted for that rule.**
+     The top of `harness/scenarios.py` has the figures, at the end of
+     what it says of the time of day: at its last step a scenario of
+     the portable C stands at 1.13 times the original's clock in the
+     middle one, beyond a sixth more in 38 of 155, and at twice in
+     `view-search` and `find`. Those two are worth a look for their
+     own sake: the step that searches for a text takes 2.6 seconds of
+     the machine's clock in the original and 8.7 in the portable C in
+     the viewer, 3.0 and 11.1 in the file search, and the C
+     translation is at 1.18 and 1.16 of the original at the end of the
+     same two scenarios. No scenario of the portable C shows a time of
+     its run past 45 seconds, and none makes a file past the first
+     minute. How it was counted, by a script that is not kept:
+     `scenarios.run` with `until`, which is called with every screen
+     as the driver has written it and asks `Machine.executed()` then,
+     the machine having been noted in a wrapper of
+     `Machine.wait_for_end` that also has QEMU's process waited for a
+     millisecond at a time and not ten; a step more at the end of
+     every scenario, `Wait*40`, since the machine ends behind the last
+     screen and cannot be asked then; and for the files, the stamps of
+     `Run.disks` between noon and ten past. A scenario comes to a step
+     at the same count whenever it is run: `menu` twice gave 11.66 and
+     11.67 seconds, the difference being how soon the host asked.
 
    What the list said before any of it was done:
    - **R1 goes with this stage: `resident.c` of the portable C becomes

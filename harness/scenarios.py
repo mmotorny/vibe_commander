@@ -1464,7 +1464,11 @@ clock on or by listing a file it has made, has to be done with that
 before the machine's first minute is over. The original shows its first
 screen some five seconds past noon and the translation half a second
 later: a command typed there runs at 5.3 seconds past in the original,
-5.7 in the C translation and 5.8 in the portable C. That is 4.7 seconds
+5.7 in the C translation and 5.8 in the portable C while that was a
+program of 16 bits. As a program of 32 bits, which its extender loads
+first, the portable C shows its first screen 5.6 seconds past noon,
+where the original shows it at 5.0 and the C translation at 5.3. That
+is 4.7 seconds
 sooner than while the bench had the Info panel: the first time that panel
 is drawn, where DOS is asked what is free on the disk, takes 4.7 seconds
 of the machine's time, and a scenario that switches it on, Ctrl+l, has
@@ -1472,6 +1476,23 @@ them then; switched off and on again it takes none. On that bench
 `copy`, of 68 steps, ended 26.9 seconds past noon in the original and
 28.1 in the translation, and `delete`, of 63, 25.8 and 28.6: the
 translation has taken up to a sixth longer.
+
+That was of two scenarios and of programs of 16 bits. Counted on 13
+October 2026 for the portable C as it is, a program of 32 bits, in each
+of its 155 scenarios, by what QEMU says the machine has executed when
+the driver has written the last screen: its clock stands there at 1.13
+times the original's in the middle one of them, at more than seven
+sixths of it in 38, at 1.3 to 1.4 times in scenarios of the editor and
+of the tree (`mouse-edit`, `editor-buffer`, `tree-box`, `editor-full`),
+and at twice in `view-search` and `find`, where the search for a text
+takes three and a half times the instructions. The C translation,
+counted in ten of them, is beyond a sixth as well: 1.58 in `enter`,
+1.47 in `editor-full`. Five scenarios go on past 45 seconds in the
+portable C, `mouse-edit`, `editor-full`, `enter-many`, `blank-timed`
+and `copy-full`, and none of them shows a time of day of its run
+there. The latest file that any scenario makes is `mouse-edit`'s, 54
+seconds past noon where the original makes it at 40, and its time is
+on no screen; the next is `move`'s, at 34.
 """
 import re
 from dataclasses import dataclass, field, replace
