@@ -177,6 +177,14 @@ info.c, PutInf: compare
     entry at or behind EndBuf, which is FFC0h at the most (ReDr00), so
     it stays below 64K.
 
+keys.c, F00_50: widen
+    | moved = was.first - first;
+    was.first and first are offsets of entries in one list, a panel's
+    block or the tree's list, each below 64K and the two at most the
+    list's length apart: the difference is how far the first entry shown
+    has moved, back or on, and is held only against 0 and a step either
+    way, -step where the original had it in 16 bits.
+
 main.c, F39_01: back
     | return Command(Menu_T[table - 1][r->bx >> 1], panel, r);
     table is not 0: the function has returned for that, above.

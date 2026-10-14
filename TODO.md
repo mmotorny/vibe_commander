@@ -9390,7 +9390,7 @@ for.
 | N14 † | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | **Done**, with the answer to question 4 carried out: "N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know" below |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
 | N16 | `main.c` | 1,601; 117 | F8 | |
-| N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | |
+| N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | **Done**: "N17a, `keys.c`: done, and what a later cluster should know" below |
 | N17b | `commands.c` | 604 lines; in the record's table | F8 | **Done**: "N17b, `commands.c`: done, and what a later cluster should know" below |
 | N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | **Done**: "N18, `menu.c`, `help.c`: done, and what a later cluster should know" below. The help's lines widened with the original's cuts written where a help file that is not true to its text takes them past 16 bits |
 | N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | **Done**: "N19a, `bars.c`, `window.c`, `system.c`, `setup.c`" below |
@@ -14972,6 +14972,83 @@ changed, 36 in what may differ". The README's figures moved with the
 code, `tools/figures.py --write`.
 
 It took some 60 tool calls: reading the brief, the plan and the sections 15; the files with the finder's lists beside them 10, the finder being slow, a minute or more for each call, since it has clang read the tree; the types and the casts by scripts 10; the record's reasons by one script 5; the tests, the images and the documents the rest to hand back.
+
+### N17a, `keys.c`: done, and what a later cluster should know
+
+**What there is.** `keys.c` sorted by "The rule for a number", with the
+steps of "N0d" in their order, and the two fields of `struct Left` of
+`vc.h`, which only this file makes. clang's warnings of a conversion
+are silent for the file. The whole suite passes, no golden and no
+patch changed, and the image of each of the 155 scenarios is that of
+the build before (below). No question for the user: nothing that a
+user sees moved.
+
+**The numbers.** Of the 65 of 8 or 16 bits, and no `u32`:
+
+| | Count | Which |
+|---|---|---|
+| Widened, to `i32` | 37 | The numbers of entries that the keys of the cursor reckon with, `cursor`, `first`, `last`, `page`, `limit` and `column` of `F00_60`, `F00_05`, `F01_05`, `F00_70` and `F02_00` to `F05_00`, and `F03_30` and `F04_30` with what they return; the place of the loop and the item that `To` and `ToMenu` take; `step`, `moved` and `how` of `F00_50`; the kind of panel of `F17_01` and `F18_01`; `length` and `i` of `F20_02` |
+| Made `bool` | 2 | `found` of `F10_01`, `changed` of `F11_00` |
+| Kept by a word | 24 | `place` 9, a row and a column or the size of a window; `address` 7, the five places in a panel's block and the two entries that `F00_50` takes as `struct Shown` has them; `text` 3; `bits` 3, the mouse's buttons; `attributes` 1; `setup` 1, `was` of `F11_00` |
+| Kept by a sentence | 2 | `bx` and `dx` of `Leaves`, and the two fields of `struct Left` beside them: BX and DX as the original leaves them for the loop, a place, an entry or the place of one in the main data |
+| `sign` | 0 | Nothing of the file is shifted right or divided |
+
+`was` of `F11_00` held `Ctrl_O`, a byte of the setup file, in a `u16`
+and gave it to `Visible` through a `(u8)`: it is a `u8` now, by its
+word, and the cast is gone. It is not a `bool`, since what it copies
+is copied as it is: a setup file with another byte than 0 or 1 there
+would have `Visible` that byte, as in the original.
+
+**The casts.** clang named 29 places before anything changed. 27 went
+by the type: the fields of `struct Place` are `i32` since N11, and every
+variable of the keys of the cursor that took one was a `u16`. 2 by a
+cast, each a row shifted into the high byte of a place, `(u16)((u8)(md.Lines
+- 1) << 8)` of `F16_00` and `(u16)(md.Lines << 8 | 80)` of `F20_02`,
+with no comment, as the other files write it. One cast went, `(u16)-step`
+of `F00_50`, since `moved` is an `i32` held against `-step`, and the
+`(u8)` of `was`. The casts of 16 bits in `F02_00` to `F05_00`,
+`(u16)(cursor - first)` and its like, stay as they are written: they
+say the original's comparison of 16 bits, clang does not name them,
+and none cuts anything, a cursor being among the entries shown.
+
+**`harness/int16.py`.** The file had no place. One is new, `moved =
+was.first - first` of `F00_50`, of the kind `widen`, with its reason:
+two offsets in one list, below 64K, whose difference is held only
+against 0 and a step either way.
+
+**Across clusters.** `F00_60`, `F00_05` and `F01_05` take the numbers of
+entries as `i32`, three prototypes of `vc.h`; `Command` of `main.c`
+(N16) hands them `si`, `di` and `dx` of `struct Regs`, `u16`, unchanged:
+a `u16` goes into an `i32` with no cast and no word of clang's.
+`F00_50` takes offsets as before, so `cmdline.c` is not touched.
+`SetCur` is handed `true` and `false` where it was handed 1 and 0.
+
+**The program.** `VC.EXE` is another, by the types: 288,303 bytes, 12
+fewer, `300da2ce...` where the build of `main` that the cluster began
+on, `bed8f6f`, is `25a4cdc7...`. The casts, and `true` and `false` for
+the booleans, left it the same bytes. The image of every scenario,
+`python3 harness/dataimage.py compare`, against that build: "156
+scenarios, 156 with nothing that differs; 0 differences, 0 more in
+what was declared as changed, 0 in what may differ".
+
+What a later cluster should know:
+
+- A variable that copies a byte of the setup into another, as `was`
+  does `Ctrl_O` into `Visible`, takes the byte's type with the word
+  `setup`, and not `bool`: a `bool` would make 1 of any byte that is not
+  0, where the original copies it.
+- `To` and `ToMenu` take the place and the item as `i32`, and cut them
+  into the bytes of `struct Onward` with `(u8)`, as `enter.c` and
+  `view.c` have their `To`; the structure is N16's.
+- A line of `TODO.md` that a rebase left, `||||||| parent of ...` in
+  front of the section of N14, is gone: look for conflict markers in
+  the documents after a rebase, `grep -n '^|||||||\|^<<<<<<<\|^>>>>>>>'`.
+
+It took some 90 tool calls to hand back: reading the brief, the
+plan and the sections 15; the file and the finder's lists 5; the types,
+the casts and the record by scripts 12; the tests, the images and the
+documents the rest, while the images of the base were saved on a
+machine that other clusters were testing on.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

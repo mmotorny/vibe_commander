@@ -1022,13 +1022,13 @@ struct Left {
                                            holds */
 };
 struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first);
-struct Onward F00_60(struct WCBdef *panel, u16 cursor, u16 first, u16 buttons,
+struct Onward F00_60(struct WCBdef *panel, i32 cursor, i32 first, u16 buttons,
                      struct Regs *r);
 struct Onward F00_00(struct WCBdef *panel, struct Regs *r);
-struct Onward F00_05(struct WCBdef *panel, u16 cursor, u16 first, u16 buttons,
+struct Onward F00_05(struct WCBdef *panel, i32 cursor, i32 first, u16 buttons,
                      struct Regs *r);
 struct Onward F01_00(struct WCBdef *panel, struct Regs *r);
-struct Onward F01_05(struct WCBdef *panel, u16 cursor, u16 first, u16 last,
+struct Onward F01_05(struct WCBdef *panel, i32 cursor, i32 first, i32 last,
                      u16 buttons, struct Regs *r);
 struct Onward F02_00(struct WCBdef *panel, struct Regs *r);
 struct Onward F03_00(struct WCBdef *panel, struct Regs *r);

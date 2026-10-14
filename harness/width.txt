@@ -84,7 +84,7 @@ N13             30          0     0              0      30     0     1     9    
 N14             62          0     0              0      62     0     0     6    38  cmdline.c enter.c exec.c
 N15            107        107     3              3       0     0     0     0     1  input.c usermenu.c
 N16             95         95     0              0       0     0     3     0     1  main.c
-N17a            65         65     0              0       0     0     0     0     0  keys.c
+N17a            26          0     0              0      24     2     0     2    37  keys.c
 N17b            28          0     0              0      28     0     0     5    41  commands.c
 N18             70          0     1              0      50     1     0     5    40  menu.c help.c
 N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
@@ -92,11 +92,11 @@ N19b            40         40     0              0       0     0     0     0    
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        279         95    12              1     153     3     0     0     0  vc.h sys.h tables.h
-all           2237        624   115              7     963    52    48   116   692
+headers        279         93    12              1     153     5     0     0     0  vc.h sys.h tables.h
+all           2198        557   115              7     987    56    48   118   729
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               222         38    11              0     153     3     0     0     0
+vc.h               222         36    11              0     153     5     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              19          0     0              0      19     0     2     0    21
@@ -119,7 +119,7 @@ format.c            29          0     2              0      31     0     4     2
 help.c              39          0     1              0      25     1     0     3    17
 info.c              12          0     2              0      13     1     0     0     5
 input.c             58         58     3              3       0     0     0     0     0
-keys.c              65         65     0              0       0     0     0     0     0
+keys.c              26          0     0              0      24     2     0     2    37
 line.c               5          0     0              0       5     0     1     0    10
 main.c              95         95     0              0       0     0     3     0     1
 mask.c               4          0     0              0       4     0     0     1     3
@@ -656,7 +656,17 @@ vc.h, struct Onward: not sorted, 2 numbers
 
 vc.h, struct Regs: not sorted, 7 numbers
 
-vc.h, struct Left: not sorted, 2 numbers
+vc.h, struct Left: field bx, u16
+    BX as the original has it where a key of the cursor goes back to
+    the main loop: a place or a size of the screen, or an entry as
+    struct Shown has it, or the place of one in the main data, which
+    Rename reads as a count (F00_50 of keys.c says which).
+
+vc.h, struct Left: field dx, u16
+    DX as the original has it where a key of the cursor goes back to
+    the main loop: a place or a size of the screen, or an entry as
+    struct Shown has it, or the place of one in the main data, which
+    Rename reads as a count (F00_50 of keys.c says which).
 
 vc.h, struct Open: not sorted, 1 number
 
@@ -2808,7 +2818,95 @@ info.c, PutInf: variable two, u16
 
 input.c: not sorted, 58 numbers, 3 u32
 
-keys.c: not sorted, 65 numbers
+keys.c, (): variable Sel_S, u8[]
+    text
+
+keys.c, (): variable Unsl_S, u8[]
+    text
+
+keys.c, (): variable Inv_S, u8[]
+    text
+
+keys.c, Leaves: parameter bx, u16
+    BX as the original leaves it for the main loop, which struct Left
+    keeps: a place or a size of the screen, or an entry as struct Shown
+    has it, or the place of one in the main data, which Rename reads as
+    a count (F00_50 says which).
+
+keys.c, Leaves: parameter dx, u16
+    DX as the original leaves it for the main loop, which struct Left
+    keeps: a place or a size of the screen, or an entry as struct Shown
+    has it, or the place of one in the main data, which Rename reads as
+    a count (F00_50 says which).
+
+keys.c, F00_50: parameter cursor, u16
+    address: an entry as struct Shown has it, which ChgAdr takes.
+
+keys.c, F00_50: parameter first, u16
+    address: as cursor.
+
+keys.c, F00_50: variable begin, u16
+    place
+
+keys.c, F00_50: variable bottom, u16
+    place
+
+keys.c, F00_50: variable corner, u16
+    place
+
+keys.c, F00_60: parameter buttons, u16
+    bits: the mouse's buttons, as its driver answers them.
+
+keys.c, F00_60: variable address, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+keys.c, F00_60: variable attributes, u8
+    attributes
+
+keys.c, F00_05: parameter buttons, u16
+    bits: as F00_60 takes them.
+
+keys.c, F01_05: parameter buttons, u16
+    bits: as F00_60 takes them.
+
+keys.c, F08_00: variable address, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+keys.c, F10_01: variable address, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+keys.c, F78_00: variable address, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+keys.c, F11_00: variable begin, u16
+    place
+
+keys.c, F11_00: variable size, u16
+    place
+
+keys.c, F11_00: variable was, u8
+    setup: Ctrl_O, a byte of the setup file, which goes into Visible
+    as it is, whatever byte it is.
+
+keys.c, F16_00: variable last, u16
+    place
+
+keys.c, F16_00: variable begin, u16
+    place
+
+keys.c, F16_00: variable size, u16
+    place
+
+keys.c, F17_01: variable address, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+keys.c, F20_02: variable whole, u16
+    place
 
 keys_t.c: as a whole, 20 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
