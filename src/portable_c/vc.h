@@ -1149,7 +1149,7 @@ enum {                                  /* how the editor was left: */
 };
 struct EditEnd {
     u8  how;                            /* an EDIT_ above */
-    u8  written;                        /* with EDIT_DONE not 0 if a file
+    bool written;                       /* with EDIT_DONE whether a file
                                            was written: what V13_01
                                            takes */
 };

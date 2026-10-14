@@ -2473,7 +2473,7 @@ static struct EditEnd Ends(i32 how, bool written)
     struct EditEnd end;
 
     end.how = (u8)how;
-    end.written = (u8)written;
+    end.written = written;
     return end;
 }
 

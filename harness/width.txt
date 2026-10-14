@@ -91,11 +91,11 @@ N19b            22          0     0              0      21     1     2     1    
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
 as a whole     567          0    58              0       0     0     0     0    13  the tables, dos32.c stack.c
-headers        270         56    12              1     174     5     0     0     0  vc.h sys.h tables.h
-all           1929         56   112              1    1218    65    54   172   949
+headers        269         56    12              1     173     5     0     0     0  vc.h sys.h tables.h
+all           1928         56   112              1    1217    65    54   172   949
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               214          0    11              0     174     5     0     0     0
+vc.h               213          0    11              0     173     5     0     0     0
 sys.h               36         36     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              19          0     0              0      19     0     2     0    21
@@ -694,9 +694,6 @@ vc.h, struct Open: field handle, u16
 
 vc.h, struct EditEnd: field how, u8
     small: an EDIT_ of vc.h, which are fewer than 256.
-
-vc.h, struct EditEnd: field written, u8
-    flag: whether a file was written, which V13_01 takes as a bool.
 
 vc.h, struct Cleared: field place, u16
     place
