@@ -2146,3 +2146,37 @@ would have to be typed into by their codes; nothing of the original's
 writes one. `tree`, `tree-box`, `tree-choose`, `tree-deep`, `copy-tree`
 and `mouse-tree`, which read a tree from the disk and from its file, are
 held to the original's goldens as they are.
+
+### 22. The Info panel goes by whether reading the label failed
+
+**What the original does.** `RdInfo` of `VCSUB3.INC` reads what the Info
+panel shows of the current drive, the label last, by `GetVol`, and takes
+the panel for one that could not be read where `GetVol` answers with the
+carry flag set and 53h in AX, the error of a drive that is not ready.
+But `GetVol` sets the flag for every local drive, also where it has
+found a label, and AX then holds what DOS left in AH at the call that
+found it, 4Eh, with the eleventh character of the label in AL, as
+`Convert` has made it a capital. So a label of eleven characters whose
+last is an S, `GAMES_DISKS` say, on a DOS that leaves 0 in AH there, is
+taken for a drive that is not ready. The panel still shows all that was
+read, the label too; what differs is that it stays marked as changed,
+so that it is read from the disk again every time the panels are drawn,
+where it is otherwise read only when something has changed. That is
+known by reading the assembly, and was not tried: what DOS leaves in AH
+when a search succeeds is not said of the call, and the bench was not
+asked.
+
+**What the portable C does.** The panel counts as not read only where
+looking for the label failed with that error. `GetVol` of `read.c`
+answers whether it failed apart from the error, and `RdInfo` goes by
+that; `GetVol` gives no error for a label that it has found.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed.
+
+**Which scenarios show it.** None. Every disk of the bench has a label,
+`VOLKOV`, `PROGRAM` and `WORK`, which the bench makes and a scenario does
+not change, and none of them is eleven characters long. The program's
+own way to a label, Ctrl+F4, makes none on FreeDOS, which keeps the
+label that the disk has and reports no error (`label`). The scenarios
+that show the Info panel are held to the original's goldens as they are.

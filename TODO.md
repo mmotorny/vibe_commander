@@ -16801,7 +16801,10 @@ than it is would pass.
   set and in AX what DOS left in AH and the eleventh character of the
   label; `RdInfo` takes 53h there for a drive that is not ready. A
   label of eleven characters that ends in S would do that, if DOS
-  leaves 0 in AH. Ported like that; not tried.
+  leaves 0 in AH. Ported like that in the C translation; not tried.
+  **Dealt with in the portable C**, on the user's word of 14 October
+  2026: it goes by whether the label could not be read
+  (`src/portable_c/DEVIATIONS.md`, 22).
 - Every instruction of the commands that start the viewer or the editor
   has run in a scenario, those that tell a program run as the viewer of
   the mouse too, since the bench has one; what they tell it shows on no

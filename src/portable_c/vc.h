@@ -611,12 +611,13 @@ bool ReDir(struct WCBdef *panel, bool keep);
 /* Get the label of the current drive, a text of at most 11 characters,
    to `volume` in the main data. See read.c. */
 struct Label {                          /* what GetVol returns: */
-    u16 answer;                         /* AX as DOS left it: its error
-                                           where it could not say what the
-                                           drive is or found no label; with
-                                           a label, what it left in AH and
-                                           the last of 11 characters. 0
-                                           for a drive of a network */
+    bool failed;                        /* DOS could not say what the
+                                           drive is, or found no label */
+    u16 answer;                         /* its error then, and 0 for a
+                                           label or a drive of a network:
+                                           the original has AX here, and
+                                           for a label what DOS left in AH
+                                           and the last of 11 characters */
     bool local;                         /* false for a drive of a
                                            network; true for any other,
                                            with a label or without, and

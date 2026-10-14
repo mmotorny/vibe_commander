@@ -356,10 +356,13 @@ static void ReDr50(struct WCBdef *panel, struct OldList *old)
    read, or there is no such file. InfoLen is the length of what was read
    of it, or 0FFFFh for none.
 
-   Ported as it is: a label is looked for and found with the carry flag
-   set, and what is in AX then counts as the error of a drive that is not
-   ready if it is 53h: what DOS left in AH, and the eleventh character of
-   the label. */
+   The panel counts as not read where looking for the label failed for
+   a drive that is not ready. The original goes by the carry flag and AX
+   of GetVol, and that flag is set for a label that it has found too,
+   with AX what DOS left in AH and the eleventh character of the label:
+   a label of eleven characters that ends in S, on a DOS that leaves 0
+   in AH there, is 53h, and the panel was taken as not read. Here it
+   goes by whether the label could not be read (DEVIATIONS.md, 22). */
 static void RdInfo(struct WCBdef *panel)
 {
     struct Space space;
@@ -398,7 +401,7 @@ static void RdInfo(struct WCBdef *panel)
         md.InfoLen = read.value;
     }
     label = GetVol(md.Volume);
-    if (label.local && label.answer == ERR_NOT_READY)
+    if (label.failed && label.answer == ERR_NOT_READY)
         return;
     panel->ChgFlg = 0;
 }
@@ -425,12 +428,13 @@ bool ReDir(struct WCBdef *panel, bool keep)
     return panel->ChgFlg != 0;          /* ReDr70 */
 }
 
-/* What GetVol returns: what DOS answered, and whether the drive is a
-   local one. */
-static struct Label Labelled(u16 answer, bool local)
+/* What GetVol returns: whether the label could not be read and DOS's
+   error then, and whether the drive is a local one. */
+static struct Label Labelled(bool failed, u16 answer, bool local)
 {
     struct Label label;
 
+    label.failed = failed;
     label.answer = answer;
     label.local = local;
     return label;
@@ -444,11 +448,13 @@ static struct Label Labelled(u16 answer, bool local)
    empty text if there is none.
 
    Returns whether the drive is a local one, where the original has the
-   carry flag, and what it has in AX. The flag is clear for a drive of a
-   network, and set for any other, with a label or without. AX is the
-   error of DOS where it could not say what the drive is or found no
-   label; for a label it is what DOS left in AH with the last of the 11
-   characters, a space unless the label is that long. */
+   carry flag, clear for a drive of a network and set for any other,
+   with a label or without; and whether DOS could not say what the drive
+   is or found no label, with its error. The original has that error in
+   AX, and for a label that it has found it has what DOS left in AH with
+   the last of the 11 characters there, a space unless the label is that
+   long, which RdInfo took for an error (DEVIATIONS.md, 22): that is not
+   kept. */
 struct Label GetVol(u8 *volume)
 {
     struct Answer asked;
@@ -460,7 +466,7 @@ struct Label GetVol(u8 *volume)
     *(u16 *)md.TmpErr = 'A';
     asked = FileTrueName(md.TmpErr, md.TmpErr + 100);
     if (asked.failed)
-        return Labelled(asked.value, true);
+        return Labelled(true, asked.value, true);
     scan = md.TmpErr + 100;
     if (*(u16 *)scan == 0x5C5C) {               /* \\server\name\... */
         scan += 2;
@@ -474,13 +480,13 @@ struct Label GetVol(u8 *volume)
             *volume++ = c;
         }
         *volume = 0;
-        return Labelled(0, false);
+        return Labelled(false, 0, false);
     }
     SetDTA();
     asked = FindFirst(Mask_S, 8);
     if (asked.failed) {
         *volume = 0;
-        return Labelled(asked.value, true);
+        return Labelled(true, asked.value, true);
     }
     Convert(md.DTA.FilName, volume);
     end = volume;
@@ -490,7 +496,7 @@ struct Label GetVol(u8 *volume)
             end = volume + i + 1;
     }
     *end = 0;
-    return Labelled((asked.value & 0xFF00) | c, true);
+    return Labelled(false, 0, true);
 }
 
 /* Work out the sizes of the directories in a panel's list, of all files
