@@ -9327,7 +9327,7 @@ thought and long in lines.
 | F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
-| F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
+| F7, the tree, the history, the commands. **Done** but for the commands of a line, which wait for F4: "F7, the tree, the history, the commands" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
 | F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
@@ -11054,6 +11054,173 @@ counted wrongly; the comments 6; the records, the tally and the tests
   while a test runs on `build/portable_c`.
 - Any change of the code moves `DTA+41`, and with it the six bytes of
   `copy` and `copy-dirs`: F2's section, "The image".
+
+### F7, the tree, the history, the commands: done but for the commands of a line, and what a later piece should know
+
+The five words of the main data that kept a place of it are pointers
+beside it, the tree's list is a pointer, and what F2 and F3a left to
+this piece is done. The lines of a menu file and of an extension file,
+which are places of `MenuBuf` in `u16` from `FndItem` to `Run_00`, are
+left: they run through `view.c`, which F4 has. The whole suite passes,
+14 tests, with all 155 scenarios and no golden and no patch changed, at
+the first run.
+
+**What it is now.**
+
+- Beside the main data, in `main.c`: `TreeCursor`, `TreeFirst` and
+  `TreeCurrent`, each a `struct DIRENT *`, `HistoryPlace`, a `const u8
+  *`, and `NextCommand`, a `u8 *`. They are `TreAdr`, `TreFrst`,
+  `TreCrnt`, `HstAdr` and `BatAdr` of the original; the five words are
+  in `struct MainDat` with "Not set or read here". `TreeCurrent` is 0
+  where the word was 0, for none.
+- `TRELIST` is the pointer to the list's first entry, where it was that
+  entry's place: `TRELIST + n`, `entry - TRELIST`, `entry >= TreeFirst`.
+- Where one routine moves a cursor through a panel's files or through
+  the tree alike, an entry of the tree is an offset in the tree's list,
+  in bytes and in 16 bits, as a file is an offset in its panel:
+  `TREE_OFFSET(entry)` and `TREE_ENTRY(offset)` of `vc.h`, which stay.
+  That is `struct Shown` with `ChgAdr` and `NumAdr` of `place.c`,
+  `F00_50` of `keys.c`, the speed search, and the tree's box,
+  `ChTree`. The original has the entry's place of the main data there.
+  The two differ by where the list begins, in every such number alike.
+- `Search(const u8 *list, at, begin, end, step, key)` of `input.c`
+  takes what the names are in, a panel or the tree's list, and offsets
+  in that: `F77_10` of `cmdline.c` hands it `(const u8 *)panel` or
+  `(const u8 *)TRELIST`, and `ChTree` the second.
+- `PutTree` goes by its `panel` where it kept the panel's segment in
+  the word at `MenuBuf+48`, `OWNER`, for itself: nothing else read the
+  word, and it is not written any more.
+- `NearFl` of `files.c` has the old list at `Room` and the entry's
+  offset as `(u16)(name - Room)`; `F24_01` of `enter.c` takes the path
+  as a pointer; the Info's text is held against `md.InfBuf +
+  md.InfoLen`.
+
+**What was read by hand**, and what each kind became:
+
+| Kind | Places | What it became |
+|---|---|---|
+| A word of the five set or read as a place | 67, in 12 files | The pointer. `MD_PLACE(entry) >= md.TreFrst` is `entry >= TreeFirst`, two pointers of one list held against each other; `*MD_POINTER(md.TreAdr + i)` in `copy.c` is `((const u8 *)TreeCursor)[i]` |
+| 16-bit arithmetic on a place that could wrap: `TrCr20` of `tree.c` | 1 | `first = md.TreAdr - above`, with `md.TreAdr < above \|\| first < TRELIST` for the root. The first test is for the subtraction wrapping below 0, which it cannot: `above` is 1,008 at most and the list is further into the main data than that. So it is `TreeCursor < TRELIST + above`, in entries, with `above` an `i32`, and the comment says so |
+| The same in the history: `F26_00` of `enter.c` | 1 | `u16 entry = md.HstAdr - 1`, held against the place of `HstBuf` and stepped back for up to 256 bytes: a `const u8 *` stepped the same way. Nothing wrapped: the history is not at the start of the main data. The pointer may stand a byte in front of `HstBuf`, in the field before it, as the place did |
+| The tree's box, `ChTree` of `treebox.c`: `cursor`, `first`, `was`, `shown`, `moved`, `n`, numbers of entries from the keys and addresses otherwise | 14 lines | Offsets in the list, in 16 bits, and the arithmetic as it was: it counts on wrapping. `moved` is held against `(u16)-(int)sizeof(struct DIRENT)`, `was -= moved`, and `ChTr50(begin, was - shown)` is handed an offset of -16 where the line that had the cursor has left the box at its top, which its shift and its cut to a byte make the row above. All of it is differences and comparisons within the list, the same numbers as before. The two lines that set the screen "elsewhere" are `TreeCursor += 2` and `TreeFirst += 2` |
+| A place that leaks into a register: `F00_50` of `keys.c` | 1 | Where the cursor of a tree has not moved, the original leaves `TreFrst` and `TreAdr` in BX and DX, and Rename with Shift, or without a panel of files, goes by whether the two are 0 (`F35_50` of `copy.c`). The addresses never are; the offsets are both 0 at the root. So that return is `Leaves(MD_PLACE(TreeFirst), MD_PLACE(TreeCursor))`, with its reason. This was found by reading; whether a scenario has those keys one behind the other on a tree at its root was not looked for |
+| A place that is the original's address, handed to the BIOS or to a routine as a number | 3 | Left as `MD_PLACE` and `MD_POINTER`: `WAS(MD_PLACE(NextCommand))` and `EPB_WAS` in `exec.c`, a page and a colour for the BIOS, and `DelTr0(MD_POINTER(path))` in `ChTree`, where `path` is E45Ah or E45Eh, the original's SI |
+| `MD_PLACE` of a pointer that is then held against another or measured | 5 | The pointers: `text <= HistoryPlace` in `cmdline.c`, the two of `info.c`, and `(u16)(MvzLine(...) - md.MenuBuf)` in `Search` |
+| `NEAR` | 3 | Gone, in `panel.c`, `treebox.c` and `input.c`: each was a `u8 *` already |
+
+Of `info.c`: `(u16)(MD_PLACE(md.InfBuf) + md.InfoLen)` would wrap for
+an `InfoLen` of FFFFh, which is what the word holds while no `dirinfo`
+is read. `PutInf` returns for that value above the loop, so the sum is
+never made with it, and with a length that was read it is within the
+buffer.
+
+**A number that the piece added.** One: `above` of `TrCr20`, an `i32`,
+a count of entries. And four casts of a difference of two pointers to
+16 bits, each into what is 16 bits already and is not this piece's to
+widen: `n -= (u16)(TreeFirst - TRELIST)` in `PutTree`, `TREE_NUMBER`
+of `place.c` and `NUMBER` of `treebox.c`, `(u16)(name - list)` in
+`NearFl`, and the length in `Search`; `TREE_OFFSET` is a fifth, by its
+purpose.
+
+**Lines in files of other pieces**, each as small as it could be:
+`keys.c`, two lines that read the tree's cursor and the leak above;
+`copy.c`, two lines that name `TreAdr`; `main.c`, the five variables,
+`Init92` and the call of `F24_01`; `start.c`, the line that sets the
+history's place. Of `vc.h`: the five declarations with their comment,
+`TRELIST` and the two words, the comments of the five fields and of
+`struct Shown`, and the prototypes of `Search` and `F24_01`.
+
+**The image.** `compare` of the build of `ec7cf55`, which the piece
+stands on, saved anew before the piece was built on it, with the
+piece's build: "155 scenarios, 0 with nothing that differs; 1
+differences, 0 more in what was declared as changed, 627 in what may
+differ", and "465 pointers that name the same in both". The five words
+are held by what they name, each by its `variable=` in `ADDRESSES`,
+in every scenario: a place before and a pointer after, or nothing in
+both.
+
+The one difference is the one thing that the piece writes otherwise:
+`MenuBuf+48`, two bytes, in `mouse-dialog`, 71h 1Fh before, the left
+panel's segment as `PutTree` left it, and 53h 55h after, two letters
+of whatever the buffer held last. Declared, `--changed MenuBuf`: "0
+differences, 1 more in what was declared as changed". In every other
+scenario something has written over the word behind the last tree.
+The original has a segment of DOS's there and the build before a
+paragraph of the megabyte, two numbers that were never alike, and no
+screen has told them apart.
+
+What may differ: `dos32.OwnFirst` and three words of
+`dos32.OwnBlocks` in every scenario, the paragraphs that the blocks
+begin in, one further on for the 20 bytes of the five pointers in
+front of the 640 KB, as F2's four moved them; and `Rand1` and `Rand2`
+in three scenarios, which follow the time. `DTA+41` did not move this
+time, nor the six bytes of `copy` and `copy-dirs`, nor `dos32.Below`.
+No panel differs, nothing of the room, no pattern round a block. No
+variant was built: nothing of a layout changed but those 20 bytes.
+
+The tool: `ADDRESSES` of `harness/dataimage.py` has the five words,
+each with its variable, and a third kind, `PLACE`, bytes from where
+the main data begins. A place of 0 and a pointer of 0 are both
+"nothing": the word was never set, or says that there is none.
+`check` catches each of its nine bytes in the piece's images.
+
+**The records.** The words that were F7's are at nothing: `md.TreAdr`
+27, `md.TreFrst` 23, `md.TreCrnt` 3, `md.HstAdr` 7, `md.BatAdr` 7. Of
+the rest in the piece's fourteen files, before and after: `MD_PLACE`
+39 and 21, `MD_POINTER` 27 and 9, `NEAR` 6 and 3, `SEG_OF` 4 and 0,
+`MAIN_SEG` 2 and 0, `u16 segment` 2 and 0, `OFFSET_IN_SEG` 1 and 0,
+`AT` 1 and 0; `TREE_OFFSET`, 17 places with the two of `keys.c`, and
+`TREE_ENTRY`, 5, are new and stay. Left to go, by the record's last
+line: F5 45, F6 32, F7 0, F8 165, F9 13, F10 51, where it was F6 35,
+F7 67, F8 207 and F10 59. The record of the widths
+has six numbers fewer, 12 cuts fewer and one `i32` more. The host
+check's record and that of `portable_c-int16` did not move.
+
+**What is left of the words in the piece's files**, and whose it is:
+
+| Where | What | Whose |
+|---|---|---|
+| `usermenu.c` 14, `extfile.c` 4, `enter.c` 1 | The commands of a line: `struct Entry` with `at`, what `FndItem` and `FindExt` answer, `Run_00(u16 text, u16 view)`, and `F34_30(u16 text)` with `struct Next` and `F34_40`, which are in `view.c`: places of `MenuBuf` in 16 bits, with 0 for none | A piece of its own behind F4, small: five functions and two structures, a pointer into `MenuBuf` each, and the callers in `view.c`, `enter.c` and `usermenu.c`. It was not begun, so that nothing of it stands half done beside F4 |
+| `cmdline.c` 5, `treebox.c` 4, `drive.c` 2, `usermenu.c` 2 | `MD_PLACE(md.WinBuf)` and its like, handed to `SavWin` and `ResWin` of `window.c` and to `InSt10` of `dialog.c`, which take the buffer as a place | F8, with the two routines of `window.c`; `InSt10` with whoever has `dialog.c` |
+| `exec.c` 2, `treebox.c` 1 | The original's addresses, above | Stay, each with its reason |
+
+**What the clusters should know.**
+
+- N11. `struct Shown`, `ChgAdr` and `NumAdr` of `place.c` carry an
+  offset of 16 bits for either list. A panel's is 16 bits by the
+  panel's layout, question 3; the tree's shares the type and has no
+  limit of its own but the list's length, 768 entries. `TREE_NUMBER`
+  cuts a difference of two pointers for `PLACE`'s `u16` variables: the
+  cast goes when they are widened. In `NearFl`, `start` and `at` are
+  offsets in the old list, which was a panel's.
+- N12. `panel.c` reads `TreeCursor->DirLevel` and holds `TreeCursor`
+  against `TreeCurrent`, which may be 0. Nothing of `info.c` is a
+  place any more.
+- N13. `ChTree`'s six variables above are the ones that count on
+  wrapping at 16 bits: kept, with that for the reason, or rewritten as
+  numbers of entries with a sign, and then `ChTr50` with them, which
+  shifts an offset and cuts it to a byte. `above` of `TrCr20` is
+  sorted. `n -= (u16)(TreeFirst - TRELIST)` in `PutTree` loses its
+  cast when `n` is widened. `TreeCursor` and `TreeFirst` stand two
+  entries further on than they are for a moment in `ChTree`, which is
+  behind the end of the list where the tree is full: nothing reads
+  there, and the pointers are still within `TreeBuf` or just behind it.
+- N14. `F77_10` of `cmdline.c` has `at`, `first`, `begin`, `end` and
+  `step` as `Search` takes them. `bx` of `Exec02` is the original's
+  address of the command, 16 bits by what the BIOS is handed. In
+  `F26_00` of `enter.c` only `count` is a number.
+- N15. `Search` steps `at` by `step` and wraps it to `begin` at `end`,
+  in offsets of 16 bits: a panel's by its layout, the tree's with
+  them. `length` there is at most 13.
+- N17a, of `keys.c`: `first` and `cursor` of `F00_50` are such offsets
+  too, and its one return with `MD_PLACE` is the leak above.
+
+**How long it took**, in tool calls, some 95: reading the brief,
+the plan and five sections 14; reading the code 14; the change, to a
+build without warnings at the first try, 12; the tools and the records
+8; the rebase onto F3b, which landed while the piece was at work, with
+the base built and saved anew, 8; the suite, the images and the
+documents the rest. Waiting for origin to have F3b cost seven pulls.
 
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 

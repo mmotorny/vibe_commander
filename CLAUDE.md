@@ -2663,6 +2663,30 @@ in "The portable C".
     `Dialog` is the text that ^I stands for, or the size of a box that
     is on the screen already. A number carries both and a pointer does
     not: read what a parameter is assigned to before it is retyped.
+- A place of the main data that a word of it kept is a pointer beside
+  it, since the piece F7: the tree's cursor, its first line and the
+  current directory in it, where the history is, the command to run
+  next (`TODO.md`, "F7, the tree, the history, the commands"). What
+  making them so met:
+  - A number that is a place may be read as a number somewhere, and a
+    pointer in its stead is then another thing there. The cursor's keys
+    leave the tree's two addresses in BX and DX, which go round the
+    main loop to Rename, and that goes by whether the two are 0: an
+    address never is, and an offset in the list is at the root. Before
+    a place becomes anything else, read every return of the routines
+    that hand it on, to where the number ends: such a place keeps
+    `MD_PLACE`, with its reason. So do the addresses that the original
+    hands the BIOS with a register unset, `WAS` of `exec.c`.
+  - Where one routine goes through a panel's files or the tree alike,
+    by numbers of 16 bits, the tree's entry is an offset in the tree's
+    list as the file's is one in the panel, `TREE_OFFSET` of `vc.h`:
+    the arithmetic is differences and comparisons, and stays what it
+    was. Arithmetic that only one list has is written in pointers, and
+    there a test that was for wrapping at 16 bits is read and said, as
+    in `TrCr20` of `tree.c`.
+  - A place of 0 that meant none is a pointer of 0, and a word that
+    was 0 because nothing had set it is one too: the image's tool
+    takes both for nothing (`PLACE` of `harness/dataimage.py`).
 - A word of a table that names something, a line of a box, the box
   and the buttons of a dialog, is a pointer in `tables.h`, as long as
   a pointer is, and code never reads through it: it asks `NAMED` of
