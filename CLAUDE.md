@@ -1330,17 +1330,79 @@ What the work on `src/portable_c/` has written down for whoever goes on
 with it. Like the notes above they are notes, not rules; the rules are
 in "The portable C".
 
+- Since the 16-bit build went, on 13 October 2026, the portable C is
+  the program of 32 bits and that alone (`TODO.md`, "W and Z1, the
+  switch and the end of the 16-bit build"). The notes below were
+  written as the work went, most of them while the tree was a program
+  of 16 bits or was built both ways, and they are kept as they were
+  written, for what the work met. What a note says of two builds, or of
+  the tree as a program of 16 bits, is of before, and is read so:
+  - `dos.c`, of the portable C, is the file that is gone, and what it
+    held is `dos32.c`'s: the one file of the system's functions, which
+    keeps its name, since the C translation has a `dos.c` and the
+    tables of the harness that are one for both trees tell the two
+    files apart by their names (`SYSTEM_FILE` of `harness/reads.py`).
+    `resident.c` is `exec.c`, which the harness knows under the C
+    translation's name (`FILES` of `harness/reads.py` and of
+    `harness/ported.py`). `arith.c` is gone with the test
+    `portable_c-arith`: `harness/arithcheck.py` is of the C
+    translation.
+  - The compiler is `wcc386`, in the flat model: one segment of code
+    and one of data, a pointer an offset of 32 bits, every function
+    near, and the arguments in EAX, EDX, EBX and ECX. What a note says
+    of the medium model, of far functions and far pointers, of the two
+    code segments with their limit, of a relocation that a call costs
+    and of what the compiler did with a function's registers is of
+    `wcc`, the 16-bit one. The words `__far`, `STACK`, `FAR`, `CODE`
+    and `TEXT_FAR` are gone from the source, and `#ifdef __I86__` with
+    them: each word of the addresses in `vc.h` has one body, the flat
+    one, which the notes call the second.
+  - `build/portable_c/VC.EXE` is the program that was
+    `build/portable_c32/VC.EXE`, with `debug/` in it, and the tree
+    `portable_c` of the harness is that program. There is no tree
+    `portable_c32`, no `SOURCE` in `harness/deviations.py`, no
+    directory of patches but `harness/goldens/portable_c/`, and no
+    record: `harness/pass32.txt` and `ported.py --record` are gone, and
+    the test `portable_c-scenarios` holds the program to every scenario
+    that it is taken through. The tests of the layout and of the data
+    are `portable_c-layout`, `portable_c-debug-layout` and
+    `portable_c-data`; `harness/notice.py` has no `--build`; and
+    `harness/trial32/both.py` is gone, `asked.py` there running the
+    toy with `dos32.c` alone.
+  - Where a note has "the same bytes of `build/portable_c/VC.EXE`" for
+    a check, the file meant was the 16-bit one. The check itself holds
+    of the program that there is, by `sha256sum` before and after, for
+    a change that is to be no code. What is no longer to be had is the
+    16-bit file as the witness of a change that is code in 32 bits: a
+    cast that was "no code on DOS", a word of the addresses written
+    where a cast stood. The scenarios judge those now.
+  - The build compiles a file again when the compiler's command has
+    changed, by a file that the configuration writes into the build's
+    directory, `compiled.txt`, and every object follows: without it an
+    object that another compiler had left under the same name was
+    linked as it was. A custom command of the build does not notice
+    by itself that it has changed.
+  - A piece that takes a name of the harness away, a tree, a
+    directory, a test, looks for it in `harness/trial32/` too, whose
+    scripts and toys have the commands that run them in their
+    comments.
+
 - The C translation is built by `add_c_tree` of `CMakeLists.txt`,
   which takes the tree's name, its model and the files of its second
   code segment: the notes above say `port_c_second` and `c_second` for
   that list, which is the end of the call now. The portable C is built
-  by `add_portable_c`, which takes that list too.
+  by `add_portable_c`, which takes a target, the directory of the build
+  and the compiler's options that are that build's own, once for the
+  program and once for the one of `debug/`: it has one code segment and
+  no such list.
   The harness takes the tree where it had `src/c` written in:
   `datacheck.py` and `reads.py` go by the name of the build's directory,
   `notice.py` by the file it is given, `play.py` has `--tree`. The
   tables of `datacheck.py` and `reads.py` are one for both trees: an
   entry that only one tree wants will need them told apart.
-- The portable C is compiled in the medium model, `-mm`: a function is
+- The portable C was compiled in the medium model, `-mm`, while it was
+  a program of 16 bits, and the notes from here to the one on the
+  figures are of that compiler where they speak of one: a function is
   far unless it is static, by the compiler's rule and with no
   `#pragma aux`, and a pointer to a function is four bytes. A static
   function is called near, as before. The compiler calls `__U4M` and
@@ -1630,12 +1692,15 @@ in "The portable C".
     is given back, and has it as the start of the largest if it lies in
     front of it.
   - What the tests know of a program's file they get from
-    `harness/coverage.py`: `made_by_mkexe` tells the C translation's
+    `harness/coverage.py`: `made_by_mkexe` told the C translation's
     file from one that the linker wrote, by its header, and `origin` is
     what to add to an address of the linker's map for the place in the
     file. The limits that `tools/mkexe.c` holds the C translation's
-    build to, for QEMU, `check_layout` of `harness/ported.py` holds the
-    portable C to, at the start of the scenarios' test.
+    build to, for QEMU, `check_layout` of `harness/ported.py` held the
+    16-bit portable C to, at the start of the scenarios' test. The
+    file of the program that there is, a flat one, is read by
+    `harness/le.py`, `le.linear` tells it from one of 16 bits, and
+    `check_layout` asks `harness/layoutcheck.py` of it.
 
 - What retyping the first 22 of those functions met, each of which
   the compiler took without a word:
@@ -1767,11 +1832,18 @@ in "The portable C".
     copy of the file next to copies of the two headers, the compiler
     being in `build/_deps/open_watcom-src`, which `WATCOM` is set to:
     `binl64/wcc -q -0 -mm -os -s -zu -zl -zls -wx -we -fo=x.obj` and
-    the copy. Try the copy as it is first: it has to be taken.
+    the copy. Try the copy as it is first: it has to be taken. That
+    was the command of the 16-bit build. For the program as it is, the
+    copy wants `tables.h` beside it as well where the file has tables,
+    and the command is `binl64/wcc386 -q -3r -mf -s -zl -zls -wx -we
+    -os -i=$WATCOM/h -fr -fo=x.obj` and the copy;
+    `build/portable_c/compiled.txt` has the command that the build
+    uses.
 - A build can be tested while the tree goes on changing: copy
   `build/portable_c/VC.EXE`, `VC.MAP` and the object files elsewhere
   in `build/`, and run `harness/datacheck.py` (at once: it reads the
-  source), `harness/arithcheck.py` and `harness/ported.py` on the copy.
+  source), `harness/layoutcheck.py` and `harness/ported.py` on the copy,
+  each as its test in `CMakeLists.txt` runs it.
   The commit has to be made when the copy is. The copy is in a
   directory called `portable_c`, `build/copy/portable_c`: the harness
   knows the tree by that name, and holds a build of any other name to
@@ -1844,7 +1916,9 @@ in "The portable C".
   before, `build/portable_c/*.lst`, and if `resident.lst` alone
   differs, in the order of two variables of `_BSS` and nothing else,
   it is this, and the program is as right as it was. `HOLDS` of `vc.h`
-  is a tag for that reason.
+  is a tag for that reason. (The two variables went with the watch on
+  DOS, and the compiler was `wcc`: of `wcc386` this has not been seen,
+  nor looked for.)
 - The test `portable_c-host` has gcc read the tree for a machine of 64
   bits and holds every file to its counts in `harness/hostcheck.txt`,
   by kind: the top of `harness/hostcheck.py` says what is counted, and
@@ -1869,8 +1943,8 @@ in "The portable C".
     has 436 in the same source, and nothing for the address of a
     function kept as that of data, so the test does not ask it.
   - A cast that a macro makes is counted where the macro is used, so a
-    file is not clean while it uses `DOS_AT` of `vc.h` or a macro of
-    its own that casts. A macro that is made right makes every file
+    file is not clean while it uses a macro that casts, as `DOS_AT` of
+    `vc.h` was, or one of its own. A macro that is made right makes every file
     right that uses it, and `--macros` says which macros there are and
     how many places each makes. The words of the addresses in `vc.h`
     are made so: gcc reads their second bodies, which cast nothing.
@@ -1882,14 +1956,19 @@ in "The portable C".
   may have otherwise is looked at before it is back in 16 bits: the
   top of `harness/int16.py` says how it knows, and what it cannot
   see. `harness/int16.txt` has every such place with the reason why
-  it is the same in both builds. Using it and keeping it up:
+  it is the same in both builds. The two builds are, since the program
+  of 16 bits went, the code as it was written and judged, with an int
+  of 16 bits, and the code as it is compiled now. Using it and keeping
+  it up:
   - It fails for a line that is new or changed and is such a place:
     "not in the record". Read the place, `--show FILE` for the lines.
     Where the number can leave 16 bits or go below 0, or stays within
     only by something that is not to be seen at the place, write the
     cast that says what DOS does, `(u16)(a - b) < c`, and the place is
-    gone: that is no code on DOS, so `VC.EXE` is the same bytes, which
-    is held against the file of before. Where it cannot, run
+    gone. That was no code on DOS, so the 16-bit `VC.EXE` was the same
+    bytes, which was held against the file of before; in the program
+    that there is the cast is code, and the scenarios judge it. Where
+    it cannot, run
     `--record` and write the reason into `harness/int16.txt` by hand,
     under the place's line, in the words of the others: what at the
     place or just above it keeps the number in.
@@ -1980,8 +2059,8 @@ in "The portable C".
   definition too, and a segment under another name than `panel` or
   `segment` is not found.
 - The figures of the portable C that change with every step, the
-  length of its file and what follows from that, what it keeps of the
-  memory, where its code segments end, and the counts of what only
+  length of its file and what follows from that, what it has of the
+  memory, how far its tables may grow, and the counts of what only
   Open Watcom takes, are in one place: the table of the README under
   "The figures", which `python3 tools/figures.py --write` writes of the
   build and the source, between two marks. Run it when a piece of work
@@ -2147,9 +2226,9 @@ in "The portable C".
     fit, and the screens are held against the original with the whole
     declaration made.
   - A function of `sys.h` that goes is in more places than those which
-    the notes on the system's functions list: the toy that holds the
-    two files of the system together, `harness/trial32/sys.c`; a table
-    of `dos32.c` alone in `OWN_OF_FLAT` of `harness/datacheck.py` and
+    the notes on the system's functions list: the toy that asks every
+    function of `sys.h`, `harness/trial32/sys.c`; a table
+    of `dos32.c` alone in `OWN_OF` of `harness/datacheck.py` and
     in `REVIEWED` of `harness/reads.py`; the count at the top of
     `dos32.c` of those that are made in real mode; the count of the
     functions in the README, in its text and in its table by group;
@@ -2411,7 +2490,8 @@ in "The portable C".
 - The words of the addresses, `AT`, `OFFSET`, `PANEL`, `MAIN_SEG`,
   `NEAR`, `SEG_OF`, `OFFSET_IN_SEG`, `MD_PLACE`, `MD_POINTER`, are in
   `vc.h` once, each with a body for DOS in 16 bits and one for a flat
-  memory, and no file defines one for itself: `TODO.md`, "The portable
+  memory while there were two builds, and with the flat one alone
+  since, and no file defines one for itself: `TODO.md`, "The portable
   C in 32 bits: the plan", has what each takes and gives, with a line
   as it was and as it becomes for every kind of place. What putting
   them there met:
@@ -2499,9 +2579,10 @@ in "The portable C".
     without their addresses, say which routines.
 
 - The program of 32 bits is linked by the build since the piece B2
-  (`TODO.md`, "B2, the program"), `build/portable_c32/VC.EXE` and
-  `debug/VC.EXE` there, and the test `portable_c32-layout` holds where
-  the linker has put things. What linking it met:
+  (`TODO.md`, "B2, the program"), `build/portable_c/VC.EXE` and
+  `debug/VC.EXE` there, and the tests `portable_c-layout` and
+  `portable_c-debug-layout` hold where the linker has put things. What
+  linking it met:
   - The order of the segments is the linker's command's, by classes,
     and a class is linked whole: the constants and what has a value
     are both `DATA`, `CONST2` and `_DATA`, and nothing can be put
@@ -2521,7 +2602,7 @@ in "The portable C".
   - The name of the file is in the file: two links of the same
     objects under two names differ in one byte. Under one name they
     are the same bytes, so the program of 32 bits can be held against
-    itself as the one of 16 is.
+    itself as the one of 16 was.
   - `wcc386 -os` gives a function no instructions of its own where
     the function behind it in the file has the same: one that does
     nothing, or that is the same call. The map has several names at
@@ -2535,14 +2616,15 @@ in "The portable C".
     directive nothing of that is in the program.
   - A check that is to fail for a wrong link is tried with wrong
     links, by hand, from `build/`: the objects of
-    `build/portable_c32/` with another `order`, or with a toy object
+    `build/portable_c/` with another `order`, or with a toy object
     of constants or of memory without a value among them. The table
     in the plan has which link broke what.
 
-- The tables of the program of 32 bits are held by a test of their
-  own, `portable_c32-data`: `harness/datacheck.py` with
-  `build/portable_c32` and `--source src/portable_c` (`TODO.md`, "H4,
-  the test of the data"). What "Moving the data of a file to C" says
+- The tables of the program of 32 bits are held by `portable_c-data`,
+  which was a test of their own, `portable_c32-data`, beside that of
+  the 16-bit program: `harness/datacheck.py` with `build/portable_c`
+  and `--source src/portable_c` (`TODO.md`, "H4, the test of the
+  data"). What "Moving the data of a file to C" says
   of `c-data` holds for it, its messages and its tables, with this
   besides:
   - A word of a table that names something is a pointer of four bytes
@@ -2566,10 +2648,11 @@ in "The portable C".
     the address of X, ..., where the original has a number and names
     nothing". The first of the two passes in no program; the second
     is a mistake that only this test names for what it is.
-  - A change to a file of tables is held by both tests. Read
-    `portable_c-data` first: it says the same in fewer words.
+  - A change to a file of tables was held by both tests while there
+    were two, and the 16-bit one said the same in fewer words. There
+    is the one now.
   - Data that only this program has is that of `dos32.c`. A constant
-    of that file wants a line in `OWN_OF_FLAT` there, and one in
+    of that file wants a line in `OWN_OF` there, and one in
     `REVIEWED` of `reads.py` for where code reads it; `reads.py` leaves
     out the file of the system's functions that a program is not built
     of, `SYSTEM_FILE`. A variable of that file wants nothing, with a
@@ -2584,27 +2667,21 @@ in "The portable C".
     structure of its own, and a second declaration is "Type does not
     agree with previous definition". Buttons can, being arrays.
 
-- The program of 32 bits goes through the scenarios by a test of its
-  own, `portable_c32-scenarios`, since the piece H3 (`TODO.md`, "Piece
-  H3, the scenarios' test", which has the commands). What that met:
-  - It is held to a record, `harness/pass32.txt`, and not to passing
-    everything: the test fails for a scenario of the record that fails
-    and for one that passes and is not on it. A fix that makes a
-    scenario pass is committed with the record written anew, `python3
-    harness/ported.py --record build/portable_c32/VC.EXE`, or the test
-    fails for the fix.
-  - To the harness that build is a tree, `portable_c32`, with the
-    source of another: `SOURCE` of `harness/deviations.py`. What is
-    declared for the portable C holds for it without being said again,
-    its patches too. Where a table of the harness goes by a tree's
-    name and means its source, it asks `deviations.source(tree)`.
-  - What is declared for that build alone is said in its entry of
-    `TREES`, `TREES["portable_c"].also(...)`, and in the portable C's
-    `DEVIATIONS.md`, in an entry that says which build it is of:
-    `editor-big` is not run for it, entry 13. A scenario that is not
-    run for the build has to be named by an entry there and be one
-    that the portable C is taken through, or the test fails. Nothing
-    holds that the build still does otherwise in it.
+- The program of 32 bits went through the scenarios by a test of its
+  own, `portable_c32-scenarios`, from the piece H3 (`TODO.md`, "Piece
+  H3, the scenarios' test") until it became the portable C, and goes
+  through them by `portable_c-scenarios` since. What that met:
+  - While it failed scenarios it was held to a record,
+    `harness/pass32.txt`, and not to passing everything, and was a tree
+    of its own to the harness, `portable_c32`, with the source of
+    another and with what was declared for it alone in an entry of its
+    own. All of that went with the switch: the program is held to
+    every scenario that the portable C is taken through, a fix wants
+    no record written, and what was declared for that build alone is
+    declared for the portable C, `editor-big`, which is not run, entry
+    13 of `DEVIATIONS.md`. A scenario that is not run has to be named
+    by an entry there, or the test fails. Nothing holds that the
+    program still does otherwise in it.
   - That program has 640 KB of its own where the program of 16 bits
     has what DOS leaves it, and a scenario that takes the original to
     the end of its memory may pass without taking this program there:
@@ -2614,7 +2691,9 @@ in "The portable C".
     room: untested in the program of 32 bits"). Before a scenario that
     passes is taken for a test of a limit of memory, look at what the
     program shows as free in it, `harness/show.py --program`.
-  - A scenario of that test is ended at its first screen that differs.
+  - A scenario of that test was ended at its first screen that
+    differs, while the record was; `harness/compare.py` does so with
+    `--first`.
     What the keys of a scenario do in a program that has left, or that
     stands in another box than the scenario takes it to, is not worth
     reading, and such a program waits for keys that do not come: DOS's
@@ -2676,18 +2755,16 @@ in "The portable C".
     went up. Scenarios that fail alike by the look of their first
     screen are not thereby of one cause, nor those that fail
     otherwise of several: mend the first and run them all, `python3
-    harness/compare.py build/portable_c32/VC.EXE NAME --first`, a few
+    harness/compare.py build/portable_c/VC.EXE NAME --first`, a few
     seconds each and as many side by side as there are.
   - To see what a mend changed in the memory, keep the program of
     before beside the build in a directory named as its tree is,
-    `build/NAME/portable_c32/VC.EXE` with its `VC.MAP`: the harness
+    `build/NAME/portable_c/VC.EXE` with its `VC.MAP`: the harness
     takes it for the same tree, and `harness/show.py --program` shows
     the two side by side. The editor's F4 is a view of the memory at
     `ViewSeg` in hex.
-  - Which functions of the batches ran is asked of that program while
-    its record holds, of what ran in the scenarios that pass; a
-    scenario that is off the record is not counted, being ended at its
-    first screen that differs. A function that the program has under
+  - Which functions of the batches ran is asked of that program, as
+    of the C translation. A function that the program has under
     another name may be static in its file, as the entry of the
     critical error is, `DeviceEntry` of `dos32.c` for `FatErr`:
     `RENAMED` of `harness/ported.py`, which finds a static name in the
@@ -2705,59 +2782,36 @@ in "The portable C".
     32 bits. Under the extender, DS of real mode holds what AX holds
     at a call that takes no address, and is not on the program's data
     at any.
-  - `harness/notice.py --build portable_c32` tries a change on the
-    program of 32 bits, through the scenarios of its record.
-
-- The portable C is the program of 32 bits, and that alone, since the
-  switch (`TODO.md`, "W and Z1, the switch and the end of the 16-bit
-  build"). What the notes above and below say of two builds is of
-  before, and is read so:
-  - `build/portable_c/VC.EXE` is the program that was
-    `build/portable_c32/VC.EXE`, with `debug/` in it, and the tree
-    `portable_c` of the harness is that program. There is no tree
-    `portable_c32`, no `SOURCE` in `harness/deviations.py`, no
-    directory of patches but `harness/goldens/portable_c/`, and no
-    record: `harness/pass32.txt` and `ported.py --record` are gone, and
-    the test `portable_c-scenarios` holds the program to every scenario
-    that it is taken through. The tests of the layout and of the data
-    are `portable_c-layout`, `portable_c-debug-layout` and
-    `portable_c-data`; `harness/notice.py` has no `--build`.
-  - The 16-bit build is gone, with `dos.c` and `arith.c` of
-    `src/portable_c`, the test `portable_c-arith`, the medium model,
-    the two code segments with their limit, and
-    `harness/trial32/both.py`. Where a note has "the same bytes of
-    `build/portable_c/VC.EXE`" for a check, the file meant was the
-    16-bit one; the check itself holds of the program that there is,
-    by `sha256sum` before and after.
-  - The file of the system's functions is `dos32.c`, which keeps its
-    name: the C translation has a `dos.c`, and the tables of the
-    harness that are one for both trees tell the two files apart by
-    their names (`SYSTEM_FILE` of `harness/reads.py`).
-  - The build compiles a file again when the compiler's command has
-    changed, by a file that the configuration writes into the build's
-    directory, `compiled.txt`, and every object follows: without it an
-    object that another compiler had left under the same name was
-    linked as it was. A custom command of the build does not notice
-    by itself that it has changed.
-  - A piece that takes a name of the harness away, a tree, a
-    directory, a test, looks for it in `harness/trial32/` too, whose
-    scripts and toys have the commands that run them in their
-    comments.
+  - `harness/notice.py` tries a change on the program, through its
+    scenarios, as on the C translation: the file that it is given says
+    which tree.
 
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through
 `src/portable_c/sys.h`, functions named for what is asked, with
-`dos.c` as their one file for DOS: read the top of `sys.h` before
+`dos32.c` as their one file for DOS: read the top of `sys.h` before
 anything else. Every file has gone over. None fills a `struct DosRegs`
 or a `struct BiosRegs` and hands it to an interrupt, as each did and as
 the C translation does: `Intr21`, `Int21d`, `Int10` and their like are
-gone from the tree, the two structures are `dos.c`'s own, and `python3
+gone from the tree, the two structures are `dos32.c`'s own, and `python3
 tools/calls.py` counts no such call. These notes are what the move met.
 They are kept for whoever writes a call of the system anew, brings code
 over from the C translation, or adds a function to the interface: the
 steps and the table say how one call goes over, and the last notes how
 a function is added.
+
+Since the 16-bit build went, on 13 October 2026: `dos.c` in the notes
+below is the file that the calls moved into, which went with that
+build, and what it held is `dos32.c`'s, written for a flat memory
+under the extender (`TODO.md`, the pieces D1 and D2 of the plan for the
+32 bits; what D2 met is further down); `resident.c` is `exec.c`. What a note says of `sys.h`, of what a call hands back and
+of the traps holds as it stands. What it says a function of `dos.c`
+does, with registers, segments, a stack or `_asm`, is of that file and
+is history. The table was held against `sys.h` by a script when that
+build went: every function that it names as what a call is, is
+declared there, but for those that it says went with a command, and
+the rows that named something of `dos.c` say what `dos32.c` has.
 
 For one function, in this order:
 
@@ -2805,19 +2859,19 @@ is called both ways the bare function says so in its name.
 | 440Eh, 440Fh | bare | `DriveLetter(drive)`, `DriveSetLetter(drive)` |
 | 47h | asked, bare | `DirCurrent(drive, to)`, `DirCurrentBare` |
 | 48h, 49h, 4Ah | bare | `MemTake(paragraphs)`, `MemGive(block)`, `MemResize(block, paragraphs)` |
-| 4Ah, of the program's own block | bare | `MemOwn()`: the block that DOS loaded the program into made as long as the program is. Which block that is and how long the program is, `dos.c` knows |
+| 4Ah, of the program's own block | bare | `MemOwn()`: the block that DOS loaded the program into made as long as the program is. Which block that is and how long the program is, `dos.c` knew; in `dos32.c` there is nothing to make shorter, the program's memory being the extender's, and it answers that nothing failed |
 | 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
-| 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is `dos.c`'s to make |
+| 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is the system's file's to make, `Run` of `dos32.c` |
 | INT 2Eh, COMMAND.COM's own | | Was `ShellRun(command)`, which came back, the stack kept and put back around the interrupt in `dos.c`: it went with Quick execute commands (`src/portable_c/DEVIATIONS.md`, 14) |
 | 4Ch | bare | `ProgramEnd(code)` |
 | INT 20h, entered at the start of the PSP | | `ProgramEndOld()`, for a DOS before 3 |
-| The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake()` and `ProgramEndedGive()`: the PSP names `Exit01` of `dos.c` between the two, which has DOS told what the program has said beforehand, `ProgramEndedBreakCheck(on)`, when DOS has ended the program. It called a function of the program's, `told`, until the program of 32 bits had to do the same |
-| 51h | bare | No function of `sys.h`: the entry of the program, `Alloc0` of `dos.c`, asks where the PSP is, as the first thing that DOS is asked, by `ProgramPrefix`, static there. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
+| The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake()` and `ProgramEndedGive()`: the PSP names a routine of the system's file between the two, `Exit01` of `dos.c` then and the routine of real mode `Ended_T` of `dos32.c` now, which has DOS told what the program has said beforehand, `ProgramEndedBreakCheck(on)`, when DOS has ended the program. It called a function of the program's, `told`, until the program of 32 bits had to do the same |
+| 51h | bare | No function of `sys.h`, and no call any more: the entry of the 16-bit program, `Alloc0` of `dos.c`, asked where the PSP is, as the first thing that DOS was asked, by `ProgramPrefix`, static there; `Start` of `dos32.c` has it from the extender, by the selector that the program is entered with. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
 | 60h | asked | `FileTrueName(name, to)` |
-| 25h, 35h | bare | The seven by which the program takes what DOS and the BIOS enter of it: `DeviceErrorNote()`, `DeviceErrorTake(ask)` and `DeviceErrorGive()` for INT 24h, `CtrlBreakNote()`, `CtrlBreakTake()` and `CtrlBreakGive()` for INT 1Bh, `CtrlCTake()` for INT 23h. `SetVector(number, to)` and `Vector(number)` are static in `dos.c` behind them; `PutVector(number, to)` beside them wrote the machine's table without DOS, for INT 21h, and went with that |
+| 25h, 35h | bare | The seven by which the program takes what DOS and the BIOS enter of it: `DeviceErrorNote()`, `DeviceErrorTake(ask)` and `DeviceErrorGive()` for INT 24h, `CtrlBreakNote()`, `CtrlBreakTake()` and `CtrlBreakGive()` for INT 1Bh, `CtrlCTake()` for INT 23h. `SetVector(number, to)` and `Vector(number)` were static in `dos.c` behind them; `PutVector(number, to)` beside them wrote the machine's table without DOS, for INT 21h, and went with that. In `dos32.c` the extender is asked, not DOS: `Note`, `Go` and `Give`, static there |
 
 The BIOS for the screen, `Int10`, by AH: 0Fh is `ScreenState()`, 0
 `ScreenSetMode(mode)`, 1 `CursorShape(shape)`, 2 `CursorTo(page,
@@ -3157,12 +3211,16 @@ function is added:
 - A function that the interface lacks is declared in `sys.h`, in the
   group of its kind, with a comment that says what is asked, what it
   answers and what it answers when it fails, in DOS's values and with
-  no register in it; and written in `dos.c`, where the comment at the
-  head of its group says the service. If it takes a name, it goes into
-  `NAMED` of `harness/reads.py`. The README counts the functions by
-  group, under "The system in one place", and the table above gets its
-  row. What is of DOS alone and no part of the interface, where an
-  interrupt goes, is in the last part of `dos.c` and declared in `vc.h`.
+  no register in it; and written in `dos32.c`, as it was in `dos.c`,
+  where the comment at the head of its group says the service. If it
+  takes a name, it goes into `NAMED` of `harness/reads.py`. The README
+  counts the functions by group, under "The system in one place", and
+  the table above gets its row. What is of DOS alone and no part of
+  the interface, where an interrupt goes, was in the last part of
+  `dos.c` and declared in `vc.h`; of `dos32.c` nothing is declared
+  there, and `vc.h` declares for it what it calls, `Main`. A function
+  of `sys.h` is in more places besides, which the note on one that
+  goes has, in "Notes on the portable C".
 - A register that a service does take may be set by nothing in the
   original: BL of the BIOS's 1112h in `F69_00` is 0 from a line of the
   screen buffer cleared at the start of the command. Step 2 finds the
@@ -3189,12 +3247,13 @@ function is added:
   original's.
 - No file declares the names of the old way, so a call of one does not
   compile. What `tools/calls.py` still watches in the portable C is its
-  last kind, a fixed address of the machine written outside `dos.c`,
+  last kind, a fixed address of the machine written outside `dos32.c`,
   and not where the segment comes from a variable, as it has to for
   the table of interrupts: `PutVector` of `dos.c` was where that was,
   and nothing writes that table now.
-- The whole suite takes three minutes with `ctest --test-dir build
-  -j8`: the tests that read the source are done within the first ten
+- The whole suite takes four to eight minutes with `ctest --test-dir
+  build -j8`, where it took three while the portable C was a program of
+  16 bits: the tests that read the source are done within the first ten
   seconds, and from then on the source may be edited while the
   scenarios of both C trees run. The build may not change until they
   are done.
@@ -3233,8 +3292,10 @@ the header (`TODO.md`, the piece S1 of the plan for the 32 bits):
   the rest; and what is of DOS alone and outside `sys.h` is in no
   `dos32.c`, so the build, which links the tree for 32 bits too,
   stops at each such name as one that the linker does not find.
-  `python3 harness/trial32/both.py` takes seconds and says whether the
-  two files still answer alike.
+  `python3 harness/trial32/both.py` took seconds and said whether the
+  two files still answered alike; since `dos.c` went,
+  `harness/trial32/asked.py` runs the toy with `dos32.c`, and nothing
+  judges what it writes.
 
 What the critical error, Ctrl-Break and Ctrl-C met, when where they
 arrive went into `dos.c` (`TODO.md`, the piece S2 of the plan for the
@@ -3323,8 +3384,8 @@ the 32 bits):
   them is the bench: `harness/trial32/ended.asm` run against the
   program, which prints the registers that it gets back and whether
   DOS looks for Ctrl-C again, the scenario `ended`, and the toy of
-  `both.py`, which ends with its end left taken so that DOS goes on in
-  the routine of either build.
+  `both.py`, `asked.py` since, which ends with its end left taken so
+  that DOS goes on in the routine.
 - `_asm` in a function that is static and naked: the function is near,
   `ret` is a near return, and the call of it is near. `seg` of a
   variable of the program's data is the segment of its group, `DGROUP`,
@@ -3354,11 +3415,12 @@ the 32 bits):
   in one place", "What rests on Open Watcom" and "Inline assembly",
   which say where each thing of the compiler's is, by file.
 - The toy of `harness/trial32/sys.c` is entered where the program is,
-  at `Alloc0_` of `dos.obj` in 16 bits and at `Start_` of `dos32.c` in
-  32, and defines `Main`, the one name of the program that `dos.c`
-  calls. The build links the objects for 32 bits and nothing else,
-  `build/portable_c32/VC.EXE`: a name of DOS that the tree asks for
-  outside `sys.h` shows there as one that the linker does not find.
+  at `Start_` of `dos32.c`, as it was at `Alloc0_` of `dos.obj` in 16
+  bits, and defines `Main`, the one name of the program that the file
+  of the system's functions calls. The build links the objects for 32
+  bits and nothing else, `build/portable_c/VC.EXE`: a name of DOS that
+  the tree asks for outside `sys.h` shows there as one that the linker
+  does not find.
 - The stack figures of the scenarios follow the layout of the file in
   two or three scenarios, `command`, `mouse-select` and `mouse-find`,
   by 2 to 16 bytes, at every change of the code: hold a change to the
