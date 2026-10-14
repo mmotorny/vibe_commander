@@ -173,7 +173,7 @@ u16 Fantom(u16 drive)
         return 0;
     if (DriveSetLetter(goes_by).failed)
         return 0;
-    *(u16 *)(md.TmpErr + 1) = (u16)(signed char)drive & 0xFF00
+    *(u16 *)(md.TmpErr + 1) = (u16)(short)(signed char)drive & 0xFF00
                               | (u8)(drive + 'A' - 1);
     page = md.HlpPage;
     answer = Dialog(OFFSET(Fant_B), 0, 0, 0, &md);

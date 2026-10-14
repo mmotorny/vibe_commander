@@ -47,6 +47,26 @@ typedef unsigned int   u32;
    which a pointer does not. */
 typedef int            i32;
 
+/* A byte with a sign made a word. Where the original has `CBW`, a byte
+   taken with its sign for a number of 16 bits that then counts without
+   one, the code writes
+
+       (u16)(short)(signed char)byte
+
+   with the `(short)`, and never `(u16)(signed char)byte`. C says the
+   same of both: FFFEh for the byte FEh. Open Watcom, with every option
+   but -od, loses the second form's cut wherever the number goes on into
+   32 bits, handed to a parameter of 32 bits, kept in a variable of 32
+   bits, added to, compared, divided, shifted or made an index: it
+   extends the byte with its sign to all 32 bits, `movsx eax,al`,
+   FFFFFFFEh. It does so for any number with a sign that is converted to
+   a wider type without one and from there to a still wider type, with
+   the cast written or not; the byte made a word is the one such case
+   that a program without numbers of 64 bits has. With a conversion to
+   the type of 16 bits that has a sign between the two it is `cbw` and
+   `movzx eax,ax`, which is right. Every other cast that narrows, of 32
+   or 16 bits to a u16 or a u8, it keeps. */
+
 /* True or false and nothing else: bool, with true and false, as C has
    them since 1999, from the compiler's own header, which is no part of
    a library. A number made one is 1 unless it is 0, and one byte in a

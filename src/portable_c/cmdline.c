@@ -378,7 +378,8 @@ F68_20:                                 /* the box goes */
     Window(begin, size);
     if (key >> 8 != 0x1C)
         return 0;
-    count = (u16)(signed char)(u8)((begin >> 8) + (size >> 8) - 4 - row);
+    count = (u16)(short)(signed char)(u8)((begin >> 8) + (size >> 8) - 4
+                                          - row);
     text = md.HstBuf;
     for (; count != 0; count--) {
         length = 0;

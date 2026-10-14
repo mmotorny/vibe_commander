@@ -144,7 +144,7 @@ static const u8 SubDir[7] = "SUB-DIR";
    assembly takes the number for a signed byte where it compares with it,
    and for an unsigned one where it counts. */
 #define ROWS(size) ((u16)(((size) >> 8) - 8 & 0xFF))
-#define SIGNED(byte) ((u16)(int)(signed char)(byte))
+#define SIGNED(byte) ((u16)(short)(signed char)(byte))
 
 /* What a key or the mouse asks of FndMove. */
 enum {

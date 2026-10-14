@@ -586,7 +586,7 @@ Func40:                                 /* Move the cursor */
     }
     if (column == 0)                    /* Func42 */
         return Nothing(FUNC07);
-    r->ax = (u16)(signed char)rows + r->di;
+    r->ax = (u16)(short)(signed char)rows + r->di;
     r->si = r->ax;
     if (r->si > r->dx) {
         r->si = r->dx;
@@ -603,7 +603,7 @@ Func40:                                 /* Move the cursor */
     r->ax = r->ax & 0xFF00 | kind;
     if (kind == 0) {
         column = (u8)(r->cx - (r->bx & 0xFF));
-        column = (u16)(signed char)column / 13 * 13;
+        column = (u16)(short)(signed char)column / 13 * 13;
         r->ax = column;
         r->cx = 13;
         r->bx = r->bx & 0xFF00 | (u8)(r->bx + column);
@@ -1333,7 +1333,7 @@ u16 ErrRdy(u16 letter)
     u16 *cell;
     u16 drive, key, c, buttons, place, look, shown, last;
 
-    *(u16 *)(md.TmpErr + 1) = (u16)(signed char)letter;
+    *(u16 *)(md.TmpErr + 1) = (u16)(short)(signed char)letter;
     drive = letter & 0xFF;
     PutKey(2);
     DialBox(0x528, OFFSET(NoRd_P), 0, &md, &where);

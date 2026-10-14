@@ -431,7 +431,7 @@ failed:
         goto stop;
     /* What DOS left in AL: 0 for deleted, 0FFh for not. One more, and
        that with its sign. */
-    answer = (u16)(signed char)(u8)(answer + 1);
+    answer = (u16)(short)(signed char)(u8)(answer + 1);
     goto close;
 stop:
     answer = STOP;

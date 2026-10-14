@@ -395,15 +395,15 @@ Help20:                                 /* a key */
     case 0x47: goto Help35;             /* Home */
     case 0x4F:                          /* End */
         first = entry->HlpLins;
-        count = (u16)(signed char)(md.Lines - 11);
+        count = (u16)(short)(signed char)(md.Lines - 11);
         goto Help34;
     case 0x49:                          /* PgUp */
         if (first == 0)
             goto Help10;
-        count = (u16)(signed char)(md.Lines - 13);
+        count = (u16)(short)(signed char)(md.Lines - 13);
         goto Help34;
     case 0x51:                          /* PgDn */
-        count = (u16)(signed char)(md.Lines - 12);
+        count = (u16)(short)(signed char)(md.Lines - 12);
         last = entry->HlpLins - 1;
         if (last < count)
             goto Help10;
@@ -453,7 +453,7 @@ Help22:
        third or below it: down. */
     md.WinMous |= 1;
     first = entry->HlpFrst;
-    third = (u8)((u16)(signed char)((size >> 8) - 9) / 3);
+    third = (u8)((u16)(short)(signed char)((size >> 8) - 9) / 3);
     if ((u8)(mouse >> 8) < (u8)((BEGIN >> 8) + 4 + third))
         goto Help30;
     if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
@@ -466,7 +466,8 @@ Help30:                                 /* Up */
     goto Help10;
 
 Help32:                                 /* Down */
-    if ((u16)((u16)(signed char)(md.Lines - 11) + first) < entry->HlpLins)
+    if ((u16)((u16)(short)(signed char)(md.Lines - 11) + first)
+        < entry->HlpLins)
         first++;
     goto Help10;
 

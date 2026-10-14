@@ -878,7 +878,7 @@ V00_30:                                 /* the mouse */
     if (md.WinMous == 0 && InWind(mouse, begin, size))
         goto V00_30;
     md.WinMous = 1;
-    third = (u8)((u16)(signed char)(size >> 8) / 3);
+    third = (u8)((u16)(short)(signed char)(size >> 8) / 3);
     if ((u8)(mouse >> 8) < (u8)((begin >> 8) + third))
         goto V05_00;
     if ((u8)(mouse >> 8) >= (u8)((begin >> 8) + (size >> 8) - third))
@@ -1062,7 +1062,7 @@ V06_00:                                 /* Down */
     begin = VI->ViBase;
     T71_00(0x600, begin, 2 * 80);
     V31_00(begin + ((VI->ViSize >> 8) - 1 << 8));
-    number = (u16)(signed char)(VI->ViSize >> 8) - 1;
+    number = (u16)(short)(signed char)(VI->ViSize >> 8) - 1;
     count = number;
     FIRST();
     do {

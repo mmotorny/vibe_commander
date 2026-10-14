@@ -179,7 +179,7 @@ F32_76:
     return (u8)last;
 
 F32_77:
-    line = (u16)(signed char)((u8)((u16)(mouse - begin) >> 8) - 2);
+    line = (u16)(short)(signed char)((u8)((u16)(mouse - begin) >> 8) - 2);
     answer = DoublMo((begin + 0x204 & 0xFF) | (u8)(((begin + 0x204) >> 8)
                                                    + line) << 8,
                      0x100 | (u8)(size - 10), line);

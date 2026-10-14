@@ -146,7 +146,7 @@ static const u8 Empty_S[] = "";
 
 /* The lines of text that the window shows, as the assembly makes a word
    of them. */
-#define SHOWN() ((u16)(signed char)(md.Lines - 12))
+#define SHOWN() ((u16)(short)(signed char)(md.Lines - 12))
 
 /* Take the mark off `count` bytes that were read from the file. A count
    of 0 is one of 65536. Not static: the help of the setup, sthelp.c,
@@ -323,7 +323,7 @@ Help06:                                 /* the title and the buttons */
 Help10:                                 /* the cursor within the window */
     if (cursor < first)
         first = cursor;
-    count = (u16)(signed char)((size >> 8) - 9);
+    count = (u16)(short)(signed char)((size >> 8) - 9);
     if (cursor >= (u16)(count + first))
         first = cursor - count + 1;
     was = hd.HlpCur;
@@ -458,7 +458,7 @@ Help31:
         }
         third = 0;
         if (hd.HlpMode != 0)
-            third = (u8)((u16)(signed char)((size >> 8) - 9) / 3);
+            third = (u8)((u16)(short)(signed char)((size >> 8) - 9) / 3);
     } else {
         md.WinMous |= 1;
         if (hd.HlpMode == 0) {          /* a line of the index */
@@ -480,7 +480,7 @@ Help31:
             TypMous(0);
             goto Help60;
         }
-        third = (u8)((u16)(signed char)((size >> 8) - 9) / 3);
+        third = (u8)((u16)(short)(signed char)((size >> 8) - 9) / 3);
     }
     /* Held above the text, or in its first third on a page: up; below it
        or in the last third: down. */
@@ -576,7 +576,7 @@ static void HelpFil(void)
     if (RdEntry())                      /* the index */
         goto Help01;
     if (md.HlpPage != 0 && hd.HlpMode == 0) {
-        Help70((u16)(signed char)md.HlpPage - 1);
+        Help70((u16)(short)(signed char)md.HlpPage - 1);
         if (RdEntry())
             goto Help01;
     }

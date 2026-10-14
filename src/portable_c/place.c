@@ -64,7 +64,7 @@ u16 SizDX(void)
 /* How many lines of a panel show files. */
 u16 LnsAX(void)
 {
-    u16 rows = (u16)(signed char)ROWS();
+    u16 rows = (u16)(short)(signed char)ROWS();
 
     return LINES(rows);
 }
@@ -94,13 +94,13 @@ u16 FilePan(struct WCBdef *panel)
             cursor = FILE_NUMBER((wcb)->CurAdr); \
             first = FILE_NUMBER((wcb)->First); \
             last = FILE_NUMBER((wcb)->EndBuf); \
-            lines = (u16)(signed char)ROWS(); \
+            lines = (u16)(short)(signed char)ROWS(); \
             lines = LINES(lines); \
         } else { \
             cursor = TREE_NUMBER(md.TreAdr); \
             first = TREE_NUMBER(md.TreFrst); \
             last = ((struct DIRTREE *)md.TreeBuf)->TreeLen; \
-            lines = (u16)(signed char)(u8)(ROWS() - 4); \
+            lines = (u16)(short)(signed char)(u8)(ROWS() - 4); \
         } \
         if (last != 0) \
             last--; \

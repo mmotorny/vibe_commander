@@ -201,7 +201,7 @@ RdTr11:                                 /* one more: with five, a box that
     count = ++TREE->TreeLen;
     if (count >= 5) {
         if (count == 5) {
-            *(u16 *)md.MenuBuf = (u16)(signed char)md.DosPth[0];
+            *(u16 *)md.MenuBuf = (u16)(short)(signed char)md.DosPth[0];
             OncZoom(0x728, OFFSET(Tree_P), 0, &box);
         }
         Number(md.MenuBuf, 0, count, NUM_SEPARATED);
@@ -438,7 +438,7 @@ ChTr59:                                 /* the box, and the tree read */
     md.CrnPath[0] = 0;
     ReadTre();
     TrCr20((size >> 8) - 8);
-    lines = (u16)(signed char)((size >> 8) - 8);
+    lines = (u16)(short)(signed char)((size >> 8) - 8);
     n = TREE->TreeLen - lines;
     if (TREE->TreeLen < lines)
         n = 0;
@@ -505,7 +505,7 @@ ChTr12:                                 /* the cursor within the lines */
                                            moved too */
         Scroll(scroll >> 8 == 7, Color(ChTr_P[0]), place,
                n + place - 0x101);
-        ChTr50(begin, (u16)(signed char)scroll << 4);
+        ChTr50(begin, (u16)(short)(signed char)scroll << 4);
     }
     ChTr50(begin, was - shown);         /* the line that had the cursor */
     ChTr50(begin, md.TreAdr - md.TreFrst);      /* and the one that has */
@@ -536,13 +536,13 @@ ChTr20:                                 /* the speed search, and a key */
             case 0x50: goto ChTr37;
             case 0x49:                  /* PgUp */
                 paged = PgUp(cursor, first,
-                             (u16)(signed char)((size >> 8) - 8));
+                             (u16)(short)(signed char)((size >> 8) - 8));
                 cursor = paged.cursor;
                 first = paged.first;
                 goto ChTr10;
             case 0x51:                  /* PgDn */
                 paged = PgDn(cursor, first,
-                             (u16)(signed char)((size >> 8) - 8),
+                             (u16)(short)(signed char)((size >> 8) - 8),
                              TREE->TreeLen);
                 cursor = paged.cursor;
                 first = paged.first;
@@ -643,7 +643,7 @@ ChTr61:
         goto ChTr35;
     if ((u8)(held >> 8) < (u8)((begin >> 8) + (size >> 8) - 6))
         goto ChTr61;
-    cursor += (u16)(signed char)((size >> 8) - 9);
+    cursor += (u16)(short)(signed char)((size >> 8) - 9);
     goto ChTr37;
 
 ChTr65:                                 /* let go */
@@ -663,7 +663,7 @@ ChTr65:                                 /* let go */
 
 ChTr67:                                 /* on a line */
     md.WinMous = 1;
-    n = (u16)(signed char)((u8)((u16)(held - begin) >> 8) - 2);
+    n = (u16)(short)(signed char)((u8)((u16)(held - begin) >> 8) - 2);
     key = DoublMo(begin + 0x204 + (n << 8), 0x100 | (u8)(size - 10), n);
     if (key == 2) {                     /* the cursor goes there */
         n += first;
