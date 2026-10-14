@@ -26,7 +26,7 @@ enter.c       ENTRY 14, DSKBUF 11, MAIN_AS_PANEL 1
 exec.c        MD_PLACE 2
 extfile.c     none
 files.c       ENTRY 7, DSKBUF 7
-find.c        RoomParas 2, DSKBUF 3
+find.c        DSKBUF 3
 find_t.c      MD_AT 2, NUMBER 2
 format.c      none
 help.c        none

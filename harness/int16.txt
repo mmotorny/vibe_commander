@@ -147,10 +147,6 @@ files.c, TstExe: index
     | if (name[0] == Ext_S[i] && name[1] == Ext_S[i + 1]
     i is below the length of Ext_S, by the loop that the line is in.
 
-find.c, FindFil: index
-    | *to++ = Mask_S[suffix + i];
-    suffix is 1 or 4, by the lines above, and i is below 4.
-
 help.c, Help05: divide, 2 times
     | third = ((size >> 8) - 9) / 3;
     size has the rows of the screen less 3, at the top of the function,

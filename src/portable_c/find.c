@@ -23,16 +23,19 @@
 #define LenFnf (LenStr + 1)             /* the length of a line */
 
 /* What the search keeps: FndData, which lies in TmpBuf from its byte 100
-   on. The path that is searched is at the start of TmpBuf. */
+   on. The path that is searched is at the start of TmpBuf, and what the
+   viewer keeps, ViewDat, from its byte 200 on, of which the search reads
+   ViTxHex. The lines and the files are counted in 32 bits, where the
+   original has 16: the list is as long as the room has room for. */
 #pragma pack(push, 1)
 struct FndData {
-    u16 FndCur;                         /* Current line */
-    u16 FndFrst;                        /* First output line */
-    u16 FndNumb;                        /* Total number of lines */
-    u16 FndSize;                        /* Max. number of files */
+    i32 FndCur;                         /* Current line */
+    i32 FndFrst;                        /* First output line */
+    i32 FndNumb;                        /* Total number of lines */
+    i32 FndSize;                        /* Max. number of files */
     u16 FndBg;                          /* Base of the window */
     u16 FndSz;                          /* Size of the window */
-    u16 FndFls;                         /* Number of found files */
+    i32 FndFls;                         /* Number of found files */
     u8  FndMode;                        /* 0-auto scroll; 1-allow move cursor */
     u8  FndDir;                         /* Not first file in subdirectory */
     u8  FndMenu;                        /* Menu item */
@@ -40,7 +43,8 @@ struct FndData {
 };
 #pragma pack(pop)
 
-LAID_OUT(FndData, 18);
+LAID_OUT(FndData, 28);
+HOLDS(FndData_ends_before_ViewDat, 100 + sizeof(struct FndData) <= 200);
 
 #define FND ((struct FndData *)(md.TmpBuf + 100))
 
@@ -61,7 +65,7 @@ LAID_OUT(FndData, 18);
 
 u16 FindFil(u16 attributes);
 static u16 FndMove(u16 key, u16 mode, u16 place, u16 size);
-static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
+static void FndCurs(u16 color, i32 line, i32 first, u16 place, u16 size);
 
 /* FindFil is what FncAddr names for the search. F67_00, the command, is
    declared in vc.h: it returns where the program goes on, one of the TO_
@@ -156,7 +160,7 @@ enum {
    an offset below 16 of that, FndAdr, an address of 20 bits; where it
    goes by the segment alone, InParagraph says how far that is in front
    of the line. */
-static u8 *Line(u16 number)
+static u8 *Line(i32 number)
 {
     return Room + (i32)number * LenFnf;
 }
@@ -170,28 +174,28 @@ static i32 InParagraph(const u8 *line)
 
 /* Write a line of the list to the screen buffer, in the colour of the
    box: 64 cells from `place`. */
-static void FndLine(u16 number, u16 place)
+static void FndLine(i32 number, u16 place)
 {
     const u8 *line = Line(number);
     u16 *screen = BasAdr(place);
-    u16 color = Color(Conf_C) << 8;
-    u16 i;
+    u16 color = (u16)(Color(Conf_C) << 8);
+    i32 i;
 
     for (i = 0; i < LenFnf - 1; i++)
         *screen++ = color | line[i];
 }
 
 /* Show a line of the list in a colour, by its number: that of the box, or
-   that of the cursor. `first` is the line at the top of the list, and the
-   colour is in the high byte of `color`. */
-static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size)
+   that of the cursor. `first` is the line at the top of the list, and
+   `color` is the number of the colour. */
+static void FndCurs(u16 color, i32 line, i32 first, u16 place, u16 size)
 {
-    u16 width = (size - 12) & 0xFF;
+    i32 width = (size - 12) & 0xFF;
 
     place = (u16)(place + ((line - first) << 8)) + 0x205;
     FndLine(line, place);
-    MvsColr(BasAdr(place), width, Color(color >> 8));
-    Window(place, 0x100 | width);
+    MvsColr(BasAdr(place), (u16)width, Color(color));
+    Window(place, (u16)(0x100 | width));
 }
 
 /* Show below the list what is being searched: the path at TmpBuf, in
@@ -200,7 +204,8 @@ static void FndStat(void)
 {
     const u8 *text = md.TmpErr;
     u8 *screen;
-    u16 place, i;
+    u16 place;
+    i32 i;
     u8 c;
 
     for (i = 0; i < LenPath + 13; i++)
@@ -228,10 +233,11 @@ static void FndStat(void)
    it has been in the list, and the left button let go outside the box
    is Esc. In the list the cursor goes to the line under the mouse, at
    `*line`, and a second click on that line is Enter. */
-static u16 FnMv00(u16 at, u16 place, u16 size, u16 *line)
+static i32 FnMv00(u16 at, u16 place, u16 size, i32 *line)
 {
     struct Mouse mouse;
-    u16 buttons, was, last, target, clicks;
+    u16 buttons, was;
+    i32 last, target, clicks;
 
     mouse = GetMous(at);
     for (;;) {
@@ -297,7 +303,7 @@ static u16 FnMv00(u16 at, u16 place, u16 size, u16 *line)
 /* What a key asks of FndMove: Find_T in the assembly, a table for Case.
    A key without a scan code is none of these, and Enter and Esc are
    known by their characters. */
-static u16 Find_T(u16 key)
+static i32 Find_T(u16 key)
 {
     if ((key >> 8) == 0)
         return ASK_NOTHING;
@@ -326,11 +332,10 @@ static u16 Find_T(u16 key)
    for a second click on a line. */
 static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
 {
-    u16 line = FND->FndCur;
-    u16 first = FND->FndFrst;
-    i32 rows;
-    u16 ask, old, wasLine, wasFirst, moved, count, at, number;
-    u16 scroll, color;
+    i32 line = FND->FndCur;
+    i32 first = FND->FndFrst;
+    i32 rows, ask, wasLine, wasFirst, moved, count, number;
+    u16 old, at, scroll, color;
     struct Paged paged;
 
     if ((key >> 8) == KEY_MOUSE)
@@ -379,7 +384,7 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
     FND->FndMode |= (u8)mode;
     if (line < first)
         first = line;
-    if (line >= (u16)(rows + first))
+    if (line >= rows + first)
         first = line - rows + 1;
     wasLine = FND->FndCur;
     wasFirst = FND->FndFrst;
@@ -396,7 +401,7 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
         }
     }
     /* FnMv24: the line that had the cursor, where it was. */
-    FndCurs(Conf_C << 8, wasLine, wasFirst, place, size);
+    FndCurs(Conf_C, wasLine, wasFirst, place, size);
     if (moved != 0) {
         count = ROWS(size);
         at = place + 0x205;
@@ -410,16 +415,16 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
            that came in is put there from the buffer. */
         at = place + 0x205;
         rows = ROWS(size);
-        if (moved == 1 || moved == 0xFFFF) {
+        if (moved == 1 || moved == -1) {
             scroll = 0x600 | (rows - 1) & 0xFF;
             if (moved != 1)
                 scroll = 0x700;
             Scroll(scroll >> 8 == 7, Color(Conf_C), at,
-                   (((rows - 1) & 0xFF) << 8 | 63) + at);
+                   (u16)((((rows - 1) & 0xFF) << 8 | 63) + at));
             at += (scroll & 0xFF) << 8;
             rows = 1;
         }
-        Window(at, rows << 8 | 64);
+        Window(at, (u16)(rows << 8 | 64));    /* the rows of a box */
     }
 cursor:
     /* FnMv28 */
@@ -428,22 +433,23 @@ cursor:
     color = Conf_C;
     if (FND->FndMode & MODE_CURSOR)
         color = CnfRe_C;
-    FndCurs(color << 8, FND->FndCur, FND->FndFrst, place, size);
+    FndCurs(color, FND->FndCur, FND->FndFrst, place, size);
     return 0;
 }
 
 /* Add the line at TmpErr to the list and show it: at the end of the
    list, which the cursor follows, or, once a key has moved the cursor,
-   where the line falls in what the box shows. Returns 1 if the memory
+   where the line falls in what the box shows. Returns true if the memory
    has no room for the line. */
-static u16 FndStuf(void)
+static bool FndStuf(void)
 {
-    u16 number = FND->FndNumb;
-    u16 place, size, line, first, shown, color, i;
+    i32 number = FND->FndNumb;
+    u16 place, size, color;
+    i32 line, first, shown, i;
     u8 *to;
 
     if (FND->FndSize < number)
-        return 1;
+        return true;
     FND->FndNumb++;
     to = Line(number);
     for (i = 0; i < LenFnf; i++)
@@ -452,7 +458,7 @@ static u16 FndStuf(void)
     size = FND->FndSz;
     if (!(FND->FndMode & MODE_CURSOR)) {
         FndMove(0x4F00, 0, place, size);
-        return 0;
+        return false;
     }
     line = FND->FndNumb - 1;
     first = FND->FndFrst;
@@ -461,13 +467,13 @@ static u16 FndStuf(void)
         color = Conf_C;
         if (line == 0)
             color = CnfRe_C;
-        FndCurs(color << 8, line, first, place, size);
+        FndCurs(color, line, first, place, size);
     }
-    return 0;
+    return false;
 }
 
 /* Between two files, or two parts of one: take the keys and the mouse
-   that have come in. Returns 1 for the search to go on, and 0 to stop
+   that have come in. Returns true for the search to go on, and false to stop
    it: for Esc, Ctrl-C and Ctrl-Break, and for an answer to the menu,
    which is then in FndMenu, with MODE_ANSWER set.
 
@@ -477,11 +483,13 @@ static u16 FndStuf(void)
    back for the next key. So FndMove is called with what MnMn40 leaves in
    AX, two bytes of a colour, and does nothing, unless the colour is that
    of Enter or of Esc: 0Dh or 1Bh. */
-static u16 FndBack(void)
+static bool FndBack(void)
 {
     struct Taken taken;
     struct Mouse pointer;
-    u16 key, mode, place, size, menu, item, go;
+    u16 key, mode, place, size, menu, answer;
+    i32 item;
+    bool go;
 
     for (;;) {
         /* The place of the mouse, if there is one, gets to FndMove as
@@ -493,12 +501,12 @@ static u16 FndBack(void)
             key = KEY_MOUSE << 8 | key & 0xFF;
         } else {
             if (KeyWaiting().none) {
-                go = 1;
+                go = true;
                 break;
             }
             key = KeyRead();
             if (key == 0 || key == 0x2E03 || key == 0x011B) {
-                go = 0;
+                go = false;
                 break;
             }
             if (key == 0x3B00) {
@@ -513,18 +521,18 @@ static u16 FndBack(void)
             taken = MnMn10(key, menu, FND->FndMenu, 0x11F, Find5_D);
             key = taken.key;
             item = taken.button;
-            mode = item;
+            mode = (u16)item;           /* a button of three */
             FND->FndMenu = (u8)item;
             if (taken.taken)
-                key = MnMn40(Conf_C << 8 | CnfRe_C, menu, item, 0x11F,
+                key = MnMn40(Conf_C << 8 | CnfRe_C, menu, (u16)item, 0x11F,
                              Find5_D);
         }
-        key = FndMove(key, mode & 0xFF00 | MODE_CURSOR, place, size);
-        if ((key >> 8) == 0)
+        answer = FndMove(key, mode & 0xFF00 | MODE_CURSOR, place, size);
+        if ((answer >> 8) == 0)
             continue;
         FND->FndMode |= MODE_ANSWER;
-        FND->FndMenu = (u8)key;
-        go = 0;
+        FND->FndMenu = (u8)answer;
+        go = false;
         break;
     }
     md.WinMous = 0;
@@ -544,7 +552,9 @@ u16 FindFil(u16 attributes)
     struct TimeText time;
     const u8 *from;
     u8 *end, *to, *name, *part;
-    u16 length, suffix, handle, room, chunk, count, found, i;
+    u16 handle;
+    i32 length, suffix, room, chunk, count, i;
+    bool found;
     struct Answer entry, opened, read;
     u8 c, kind;
 
@@ -617,14 +627,17 @@ next:
             goto next;
         }
         handle = opened.value;
-        room = RoomParas();
+        /* A part is as long as the room or 8000h and 80 bytes, the
+           shorter. That is of the whole room, as the original has it,
+           not of what is left of it behind the list: with the list
+           within that many bytes of the room's end, a part is read
+           behind the end. A bug of the original, which stays until the
+           user has decided its fix (TODO.md, "N5"). */
+        room = RoomBytes();
         chunk = 0x8000 + 80;
-        if (!(room & 0xF000)) {
-            room <<= 4;
-            if (room < chunk)
-                chunk = room;
-        }
-        found = 0;
+        if (room < chunk)
+            chunk = room;
+        found = false;
         if (chunk < 4000)
             goto stopped;
         /* Where a part is read to: the paragraph that the line behind
@@ -637,12 +650,12 @@ next:
             /* FnFl46 */
             if (!FndBack())
                 goto stopped;
-            read = FileRead(handle, part, chunk);
+            read = FileRead(handle, part, (u16)chunk);   /* 8050h at most */
             if (read.failed)
                 goto stopped;
             count = read.value;
-            if (V82_00(part, 0, count).found != 0x100) {
-                found = 1;
+            if (V82_00(part, 0, (u16)count).found != 0x100) {
+                found = true;
                 break;
             }
             if (count < chunk)
@@ -660,7 +673,7 @@ next:
     if (!(FND->FndDir & DIR_LISTED)) {
         FND->FndDir |= DIR_LISTED;
         if (FND->FndNumb != 0) {
-            if ((u16)(FND->FndNumb + 2) >= FND->FndSize)
+            if (FND->FndNumb + 2 >= FND->FndSize)
                 return 0x100;
             for (i = 0; i < LenFnf; i++)
                 md.TmpErr[i] = 0;
@@ -745,7 +758,7 @@ static const u8 Find6_S[] =
 /* What the search returns, struct Searched of vc.h: the place where the
    program goes on, a TO_ there; or that the current directory is another,
    TO_F24_02, with the panel that is to show it. */
-static struct Searched To(u16 place)
+static struct Searched To(i32 place)
 {
     struct Searched searched;
 
@@ -799,10 +812,12 @@ struct Searched F67_00(void)
     u8 *end;
     u16 *screen;
     u16 place = 0x203;
-    u16 size = (u16)(u8)(md.Lines - 3) << 8 | 76;
-    u16 color, row, count, answer, first, drive, cell, i, number;
+    u16 size = (u16)((u8)(md.Lines - 3) << 8 | 76);
+    u16 color, row, answer, first, drive, cell;
+    i32 count, unit, i, number;
+    u8 letter;
     struct WCBdef *panel;
-    u16 key, mode, room;
+    u16 key, mode;
     struct Buttons chosen;
     struct Answer fixed;
     struct Device remote;
@@ -811,7 +826,7 @@ struct Searched F67_00(void)
     HidCur();
     PutMnu(3);
     SavWin(place, size, md.WinBuf);
-    MinBox(place, size, Color(Conf_C) << 8);
+    MinBox(place, size, (u16)(Color(Conf_C) << 8));
     /* No line of the box has ^I: the include line is any text. */
     line.colors = FindColors;
     line.include = Find0_S;
@@ -821,7 +836,7 @@ struct Searched F67_00(void)
 
 again:
     /* F67_01: the box empty, with the two questions */
-    color = Color(Conf_C) << 8;
+    color = (u16)(Color(Conf_C) << 8);
     row = place + 0x200;
     for (count = (u8)((size >> 8) - 5); count != 0; count--)
         row = StdLine(row, color | SPACE, BOTH_SIDES, size);
@@ -843,7 +858,7 @@ again:
         goto close;
 
     /* F67_03: what is searched, and the menu, in their place */
-    color = Color(Conf_C) << 8;
+    color = (u16)(Color(Conf_C) << 8);
     row = place + (size & 0xFF00) - 0x800;
     row = StdLine(row, color | SPACE, BOTH_SIDES, size);
     row = StdLine(row, color | SPACE, BOTH_SIDES, size);
@@ -873,8 +888,7 @@ again:
     ((u16 *)&md.MousTim)[1] = 0xFFFF;
     ViTxHex = 0;
     /* As many lines as the memory behind the program has room for. */
-    room = RoomParas();
-    FND->FndSize = (u16)(((u32)room << 4) / LenFnf) - 1;
+    FND->FndSize = RoomBytes() / LenFnf - 1;
     FND->FndDrv = 'A';
 
     for (;;) {
@@ -896,16 +910,16 @@ again:
         if (first == ALL_DRIVES) {
             for (;;) {
                 /* F67_10: the next drive that is searched */
-                drive = FND->FndDrv;
-                md.TmpErr[0] = (u8)drive;
+                letter = FND->FndDrv;
+                md.TmpErr[0] = letter;
                 FND->FndDrv++;
-                drive = (u8)(drive - 'A');
-                if (!DriveCd(drive)) {
+                unit = letter - 'A';
+                if (!DriveCd((u16)unit)) {
                     /* F67_11: no CD-ROM */
-                    remote = DriveRemote(drive + 1);
+                    remote = DriveRemote((u16)(unit + 1));
                     if (!remote.failed && (remote.kind & 0x1000))
                         break;
-                    fixed = DriveFixed(drive + 1);
+                    fixed = DriveFixed((u16)(unit + 1));
                     if (!fixed.failed && (u8)fixed.value == 1)
                         break;
                 }
@@ -958,7 +972,8 @@ searched:
 
 found:
     /* F67_19: "N files found", and the menu of a search that is over */
-    end = Number(md.TmpBuf, 0, FND->FndFls, NUM_SEPARATED);
+    end = Number(md.TmpBuf, (u16)(FND->FndFls >> 16), (u16)FND->FndFls,
+                 NUM_SEPARATED);
     end = MvzLine(end, FnFl6_S, 15);
     if (FND->FndFls == 1)
         end--;
@@ -972,17 +987,17 @@ found:
     cell = *screen & 0xFF00;            /* in the colour that is there */
     for (i = 0; i < count; i++)
         screen[i] = cell;
-    line.value = count;
+    line.value = (u16)count;
     line.screen = screen;
     line.line = md.TmpBuf;
     NgLine(&line);
-    Window(row, 0x100 | count);
+    Window(row, (u16)(0x100 | count));
     line.value = MOVED(place, (size >> 8) - 4, 0) & 0xFF00 | 40;
     line.line = Find6_S;
     CntLine(&line);
     FND->FndMenu = 1;
     if (FND->FndCur != 0)
-        FndCurs(CnfRe_C << 8, FND->FndCur, FND->FndFrst, place, size);
+        FndCurs(CnfRe_C, FND->FndCur, FND->FndFrst, place, size);
     do {
         /* F67_21: a key for the menu, and then for the list. With a
            button of the mouse down, the list alone. */
@@ -1023,7 +1038,7 @@ close:
     if (FND->FndNumb == 0)
         return To(TO_FUNC04);
     /* The line of the directory: the first above that begins with no
-       space. */
+       space. Line 0 is a directory's, so the number is never below 0. */
     number = FND->FndCur;
     do
         from = Line(number--);

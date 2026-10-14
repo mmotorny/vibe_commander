@@ -490,10 +490,11 @@ extern struct WCBdef *RightPanel;
    a command and taken again, and may then be elsewhere and of another
    length: nothing keeps a pointer into it across GiveMem, TakeMem or
    Aexec0 of view.c. RoomParas, of start.c, says how long it is, in
-   paragraphs. */
+   paragraphs, and RoomBytes in bytes. */
 extern u8 *Room;
 extern u8 *RoomEnd;
 u16 RoomParas(void);
+i32 RoomBytes(void);
 
 /* Places of the main data that the program keeps, of main.c: each is a
    word of the main data in the original, the place as a number, and a
@@ -1216,7 +1217,7 @@ struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
    1 for the main one; the box of the drives, drive.c; and the menu bar,
    menu.c. See each there. */
 struct Searched {                       /* what the file search returns: */
-    u16 place;                          /* where the program goes on: a
+    i32 place;                          /* where the program goes on: a
                                            TO_ */
     struct WCBdef *panel;               /* with TO_F24_02 the panel that is
                                            to show the directory which DOS

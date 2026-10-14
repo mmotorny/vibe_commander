@@ -392,6 +392,13 @@ u16 RoomParas(void)
     return (u16)((RoomEnd - Room) >> 4);
 }
 
+/* How long the room is, in bytes: what the five clusters that count the
+   room take in place of RoomParas, which goes when nothing calls it. */
+i32 RoomBytes(void)
+{
+    return (i32)(RoomEnd - Room);
+}
+
 /* Ask for the memory of the two panels and for the room, and make the
    panels of what Init00 has left of them at IMAGE, without files. Each
    panel has a block of its own, as long as a panel can get, which it
