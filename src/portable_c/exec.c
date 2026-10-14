@@ -103,10 +103,10 @@ static void OutStr0(const u8 *text, u16 bx)
 }
 
 /* Say that the file `name` is missing, after `text`, and wait for Enter
-   or Esc: 1 for Esc, to give up. The assembly has the address of
+   or Esc: true for Esc, to give up. The assembly has the address of
    ComnIni.EPB in BX where it calls, which DOS was to run the file
    with. */
-static u16 NotFind(const u8 *text, const u8 *name)
+static bool NotFind(const u8 *text, const u8 *name)
 {
     OutStr0(text, EPB_WAS);
     OutStr(name, EPB_WAS);
@@ -115,9 +115,9 @@ static u16 NotFind(const u8 *text, const u8 *name)
         u8 key = (u8)KeyRead();
 
         if (key == 0x0D)
-            return 0;
+            return false;
         if (key == 0x1B)
-            return 1;
+            return true;
     }
 }
 
@@ -211,8 +211,8 @@ static void Exec02(void)
     struct Answer ran;
     const u8 *name;
     u8 *command, *before, *end, *to;
-    u16 count, bx;
-    u8 drive;
+    i32 count, drive;
+    u16 bx;
 
     for (;;) {
         SetBreakCheck(md.BreakFl);
@@ -260,12 +260,12 @@ static void Exec02(void)
         to = PromptLine;
         *to++ = 0x0D;
         *to++ = 0x0A;
-        drive = (u8)DriveCurrent();
-        *to++ = drive + 'A';
+        drive = DriveCurrent();
+        *to++ = (u8)(drive + 'A');
         if (md.Prompt != 0) {
             *to++ = ':';
             *to++ = '\\';
-            DirCurrentBare(drive + 1, to);
+            DirCurrentBare((u16)(drive + 1), to);
             while (*to != 0)
                 to++;
         }

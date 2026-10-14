@@ -1241,10 +1241,10 @@ struct Picked {                         /* what the menu bar returns: */
 };
 struct Searched F67_00(void);
 void F73_00(u16 key);
-u16 F74_00(void);
-u16 F80_00(struct WCBdef *panel);
+bool F74_00(void);
+bool F80_00(struct WCBdef *panel);
 void F82_01(struct WCBdef *panel, u16 key);
-u16 F68_00(void);
+bool F68_00(void);
 struct SpeedKey F77_00(u16 key, struct WCBdef *panel);
 u16 F32_00(u16 main);
 bool F62_01(struct WCBdef *panel, i32 item);

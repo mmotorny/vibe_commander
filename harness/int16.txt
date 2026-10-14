@@ -21,6 +21,12 @@ cmdline.c, F68_00: widen
     Up, Down and the mouse keep from two rows below its top to four above
     its bottom: 0 or more, and below its rows.
 
+cmdline.c, F68_00: widen
+    | row = (u8)((begin >> 8) + (size >> 8) - 3 - at);
+    at counts the lines of the list that the loop just above has drawn,
+    from the history's place on, which are no more than the box has
+    rows for: the row of a line of the list, 0 or more and below 256.
+
 copy.c, C00_01: widen
     | count = end - CpDest;
     end is behind the zero byte of CpDest, looked for in LenName bytes
@@ -130,14 +136,6 @@ edit.c, T72_00: widen
     Written for an int of 32 bits and meant so: the place of a byte
     of the text, an address less the address of the text, which is
     not below 0 and is shown as eight digits of hex.
-
-enter.c, F21_25: back
-    | md.HstBuf[i] = md.HstBuf[i - length];
-    The loop goes on while i is length or more.
-
-enter.c, F27_00: back
-    | c = md.DosBuf[cursor - 1];
-    The line above asks that cursor is not 0.
 
 find.c, FindFil: widen
     | left = (i32)(RoomEnd - part);

@@ -9387,7 +9387,7 @@ for.
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | **Done**: "N12, `panel.c`, `info.c`, `drive.c`" below. Two questions of the Info panel, a cluster of 64K and a file just under 65,536 clusters, answered: fix both, the second by N12, entry 19 of `DEVIATIONS.md`, the first by M |
 | N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | |
-| N14 | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | Carries out the answer to question 4 |
+| N14 † | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | **Done**, with the answer to question 4 carried out: "N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know" below |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
 | N16 | `main.c` | 1,601; 117 | F8 | |
 | N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | |
@@ -14242,6 +14242,107 @@ and the sections 15, the three files and the finder's lists 10, the
 types and the record by scripts 15, the tests 10, and some 20 to find
 what the six differences of the image are, by building the tree three
 times with parts of it as they were, which the note above saves.
+||||||| parent of 9f0b41a (Sort the numbers of cmdline.c, enter.c and exec.c)
+
+### N14, `cmdline.c`, `enter.c`, `exec.c`: done, and what a later cluster should know
+
+**Question 4, carried out.** The cut of each panel to 256 entries while
+a command runs is gone, on the user's word of 13 October 2026: entry 18
+of `src/portable_c/DEVIATIONS.md`, in a commit of its own before the
+widths. `F21_40` of `enter.c` is gone, and its two calls in `F21_31`
+and the two in `StSetup` of `stmain.c`, N21's file, where only the
+calls and a sentence of a comment changed: the setup is entered as a
+command is run, and cut alike, which the session confirmed.
+`enter-many` shows nothing of it, since nothing is selected when its
+command runs, and the cursor on the last file is found again by name
+either way. A scenario of its own shows it, `enter-many-selected`: the
+directory of `enter-many`, then all 288 files selected with the cursor
+on the last, a command, Home and End. Its golden is derived from the
+original, both C trees pass it, and the original then has 253 selected,
+the portable C 288, which its patch holds on three screens. `enter-many`
+stays as it was, and no other scenario changed. Look first whether a
+scenario can show a deviation at all: this one could not.
+
+**What there is.** The three files sorted by "The rule for a number",
+and `struct SpeedKey` of `vc.h`, which `F77_00` answers in; clang's
+warnings of a conversion silent for all three. The whole suite passes,
+no golden of the original changed, one is new, and
+the image of each scenario is that of the build before (below).
+
+**The numbers.** Of the 101 of 8 or 16 bits that were left behind the
+removal, none a `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 35 | The counts and the indexes; the columns of the command line, which `EdLin` answers; the row of the cursor in the history's box and the row it goes to, its rows and widths; the drive of `Exec02`; what the program goes on at, `place` of `To`; the kind of a panel in `F24_02`; the key bar that the speed search puts back |
+| Made `bool` | 6 | What `NotFind`, `F74_00`, `F80_00` and `F68_00` answer; `find` of `F24_02`; `any` of `F80_00`, which was what was selected, files or directories, and is now whether any is |
+| Kept by a word | 60 | `text` 12, `character` 13, `address` 10 (the offsets in a panel's block of question 3, and the six of `F77_10` as `Search` of `input.c` takes them), `place` 8, `key` 7, `system` 5 (`bx` of four functions, what the original has in BX and the BIOS takes for a page; the code that `Exit00` ends with), `colour` 2, `cell` 2, `bits` 1 (what `F32_70` answers) |
+| Kept by a sentence | 0 | |
+
+Four numbers are new, each where a variable held two things in turn:
+`entry` of `F80_00`, an offset in the panel where `i` went through the
+list before it counted a name's characters (`address`); `next` of
+`F68_00`, the row that a letter looks at, where `i` had been an index
+of the screen (`i32`); `column` of `F68_00`, what `F68_25` answers,
+where `c` had been a character (`i32`); and `place` of `F77_00`, where
+the cursor of the speed search is, where `i` had been an index of
+`AltSr_T` (`place`). `struct SpeedKey`'s two are `key` and `place`.
+
+No place of the kind `sign`.
+
+**The casts.** clang named 11 places before anything changed: one went
+by a type, `any`, now a comparison; ten are casts, each a place or a
+cell made of a row and a column or of a colour, as in the files before.
+The widening made 14 more: the column handed to `EdLin` of `input.c`,
+eight, until N15 widens its parameter; the width handed to `MvsColr`
+and to `Window` in `F68_30`; the drive of `Exec02` made a letter and
+handed to `DirCurrentBare`; and two loops to `(i32)sizeof AltSr_T`. So
+24 casts, of which two have a comment: the tree's end in `F77_10`,
+`TreeLen << 4`, which fits by the room that the tree has, and the room
+for a name in `F80_00`, `(u16)(LenCmd - used)`, which the original
+lets wrap for a line longer than `EdLin` makes, and which stays as it
+was written. `(u8)DriveCurrent()` lost its cast: `DriveCurrent`
+answers the low byte already.
+
+**Across clusters.**
+
+- `F74_00`, `F80_00` and `F68_00` answer a `bool`: `vc.h` says so, and
+  `main.c` asks each as before, `answer = F74_00()` into its `u16`.
+- `EdLin` of `input.c` is handed `(u16)cursor` and `(u16)column`
+  eight times in these files: N15 takes the casts out when it widens
+  the parameter.
+- `F77_10` keeps its six offsets as `Search` takes them; `F00_50` of
+  `keys.c` is handed `found` and `first` as they are.
+- `Run_00` of `usermenu.c` is still handed 0 for `view` by `F21_10`.
+
+**`harness/int16.py`.** Two places went, `back`, each an index of
+`i32` now; one is new, `row` of `F68_00`, a difference made a byte as
+the original's CL is, with its reason.
+
+**The program.** The image of every scenario, `python3
+harness/dataimage.py compare`, against a build of `main` as it landed,
+behind N12: "156 scenarios, 153 with nothing that differs; 871
+differences, 0 more in what was declared as changed, 2 in what may
+differ". Of those, 808 are `enter-many-selected`, the deviation: what
+is selected, and the line that counts it. 63 are `enter-many`, behind
+the panels: the old list by which a panel read again keeps its cursor
+and what was selected is the whole list of 289 entries now where it
+was 256, so the room behind them holds other bytes, which nothing
+shows. Before the rebase, against the build that the work began on, 6
+bytes more differed in `copy` and `copy-dirs`, 80h and 7Fh behind a
+device's name in `TmpBuf` and `TmpErr`: N12 showed that such a byte
+follows the length of the program's file, and against the build of
+`main` it is gone. `VC.EXE` is another by the types, and the same
+bytes behind the casts but for the one in `F80_00`, which keeps the
+original's cut.
+
+It took some 95 tool calls to hand back: reading the brief, the plan
+and the sections 20; the removal of the cut, with the scenario, its
+golden, its patch and the entry, 25; the files read with the finder's
+lists beside them 10; the types and the casts by scripts 10; the
+record's reasons by one script 5; the tests and the documents the
+rest, the images and the suite once each on a machine that four
+other clusters were testing on.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

@@ -55,7 +55,7 @@ static struct Onward F23_02(struct WCBdef *panel, u16 address);
 
 /* What a command returns, struct Onward of vc.h: the place where the
    program goes on, a NEXT_ there. None of these places takes a panel. */
-static struct Onward To(u16 place)
+static struct Onward To(i32 place)
 {
     struct Onward next;
 
@@ -98,7 +98,7 @@ struct Onward F21_31(void)
     Quit();
     if (!(md.LoadFl & 0x80))
         PutPrm(MAIN_AS_PANEL);          /* Quit leaves DS on the main data */
-    Window(0, (u16)md.Lines << 8 | 80);
+    Window(0, (u16)(md.Lines << 8 | 80));
     Cursor1();
     CurMous(0);
 
@@ -113,9 +113,9 @@ struct Onward F21_31(void)
 }
 
 /* Have what the command line holds run, DosBuf, which may be several
-   commands, each with its zero byte: F21_30. LoadRes keeps the byte of the setup that
-   LoadFl is while the command runs, without the bit that says not to
-   show the command.
+   commands, each with its zero byte: F21_30. LoadRes keeps the byte of
+   the setup that LoadFl is while the command runs, without the bit that
+   says not to show the command.
 
    The original looks at Shift here: held down, the program is for this
    once kept in the memory whole if the setup has it otherwise, and the
@@ -140,8 +140,8 @@ struct Onward F21_25(void)
     u8 *line = md.DosBuf;
     u8 *history = md.HstBuf + 1;
     u8 *entry;
-    u16 length = 0;
-    u16 i, count;
+    i32 length = 0;
+    i32 i, count;
     u8 c;
 
     do {
@@ -194,7 +194,8 @@ struct Onward F21_10(struct WCBdef *panel)
     const u8 *from;
     u8 *command;
     struct Edited edited;
-    u16 address, cursor, i;
+    u16 address;
+    i32 cursor, i;
     u8 c;
 
     if (panel->WinTyp == 1) {
@@ -242,7 +243,7 @@ struct Onward F21_10(struct WCBdef *panel)
     cursor = 0;
     md.DosBuf[0] = 0;
     for (i = 0; (c = file->NameF[i]) != 0; i++) {
-        edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
+        edited = EdLin(c, md.DosBuf, (u16)cursor, LenCmd - 1);
         cursor = edited.cursor;
         if (edited.changed == 0)
             break;
@@ -272,21 +273,22 @@ struct Onward F21_00(struct WCBdef *panel)
 void F24_02(struct WCBdef *panel)
 {
     struct WCBdef *wcb = panel;
-    u16 kind, find = 0;
+    i32 kind;
+    bool find = false;
 
     SetPth();
     kind = wcb->WinTyp;
     if (kind != 1)
         wcb->ChgFlg = 1;
     else if (wcb->ChgFlg == 0)
-        find = 1;
+        find = true;
     wcb = InvWCB(panel);
     if ((kind | wcb->WinTyp) == 0)
         return;
     if (wcb->WinTyp != 1)
         wcb->ChgFlg = 1;
     else if (wcb->ChgFlg == 0)
-        find = 1;
+        find = true;
     if (find)
         TrCr10();
 }
@@ -300,7 +302,7 @@ static struct Onward F23_02(struct WCBdef *panel, u16 address)
 {
     struct FILENT *file = ENTRY(panel, address);
     u8 *name;
-    u16 i;
+    i32 i;
 
     HidCur();
     if (Fantom((u8)(panel->WinPath[0] - ('A' - 1))))
@@ -384,7 +386,7 @@ struct Onward F24_00(struct WCBdef *panel)
    as the line takes it: F27_07. The name of a file, which is at TmpBuf,
    gets a space behind it. The original goes on from here at Func05, as
    every command does that comes here. */
-static void F27_07(const u8 *text, u16 cursor)
+static void F27_07(const u8 *text, i32 cursor)
 {
     const u8 *from = text;
     struct Edited edited;
@@ -394,11 +396,11 @@ static void F27_07(const u8 *text, u16 cursor)
         c = *from;
         if (c == 0) {
             if (text == md.TmpBuf)
-                cursor = EdLin(' ', md.DosBuf, cursor, LenCmd - 1).cursor;
+                cursor = EdLin(' ', md.DosBuf, (u16)cursor, LenCmd - 1).cursor;
             break;
         }
         from++;
-        edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
+        edited = EdLin(c, md.DosBuf, (u16)cursor, LenCmd - 1);
         cursor = edited.cursor;
         if (edited.changed == 0)
             break;
@@ -423,7 +425,7 @@ static void F27_06(const u8 *entry)
 struct Onward F25_00(void)
 {
     const u8 *entry = HistoryPlace;
-    u16 count = 256;
+    i32 count = 256;
     u8 c;
 
     do
@@ -440,7 +442,7 @@ struct Onward F25_00(void)
 struct Onward F26_00(void)
 {
     const u8 *entry = HistoryPlace - 1;
-    u16 count = 256;
+    i32 count = 256;
     u8 c;
 
     if (entry >= md.HstBuf) {
@@ -470,8 +472,8 @@ struct Onward F27_00(struct WCBdef *panel)
 {
     const struct FILENT *file;
     const u8 *line, *entry, *found;
-    u16 cursor = md.DosCol;
-    u16 count, i;
+    i32 cursor = md.DosCol;
+    i32 count, i;
     u8 c, other;
 
     if (md.DosBuf[0] == 0)
