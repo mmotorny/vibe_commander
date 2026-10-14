@@ -278,7 +278,11 @@ These held while `src/c/` was made, and they say what it is.
   goes past the room's end when the list is long, a bug of the
   original, fixed and declared; and a panel holds as many entries of a
   directory as the memory allows, where the original stops at 2,703,
-  lifted by a piece of its own at the end of step 2 and declared.
+  lifted by a piece of its own at the end of step 2 and declared. And
+  a copy from a device that answers a piece in several reads counts
+  the room down by every read, where the original counts it down by
+  the last one only and reads past the room's end: a bug of the
+  original, fixed and declared.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
