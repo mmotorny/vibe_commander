@@ -9384,7 +9384,7 @@ for.
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
 | N9 † | `copy.c` | 1,571; 147 | F6 | The buffer in bytes |
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | |
-| N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | The old list's room in `ReDr00`. Meets question 3 |
+| N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | |
 | N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | |
 | N14 | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | Carries out the answer to question 4 |
@@ -9801,8 +9801,9 @@ recommendation first.
    - *When*: N11, which has `files.c`, `read.c` and `place.c`, before
      it sorts the offsets in a panel: the answer is the reason that
      the record gives for them.
-   - *The original*: reads a directory until 64K are full, 2,704
-     files, beeps, and shows those.
+   - *The original*: reads a directory until 64K are full, 2,703
+     entries with "..", beeps if there is a 2,704th, and shows those
+     (N11 read it: "N11, `files.c`, `read.c`, `place.c`").
    - *Recommended*: lifted, in a piece of its own at the end of the
      step, P: a panel's block as long as holds the 65,535 entries that
      a directory of DOS can have, some 1.6 MB, or as the memory goes;
@@ -13574,6 +13575,127 @@ It took some 75 tool calls, of which some 25 were the brief, the plan
 and the sections, 10 the file and its listings, 15 the edits and the
 records, and the rest the suite, the image and the documents; the
 scenarios and the images ran once.
+
+### N11, `files.c`, `read.c`, `place.c`: done, and what a later cluster should know
+
+**What there is.** The three files sorted by "The rule for a number",
+with the steps of "N0d" in their order, and the four structures of
+`vc.h` that their functions answer in: `struct Place` of `AdrNum`,
+`struct Selected` of `TotSel`, `struct Shown` of `ChgAdr`, `struct
+Label` of `GetVol`. clang's warnings of a conversion are silent for the
+three files. The whole suite passes, fourteen tests, no golden and no
+patch changed, and the image of each of the 155 scenarios is that of
+the build before (below).
+
+**The question for the user, 3, prepared** ("The questions for the
+user", 3). How many files a panel holds. What the original does, read
+in `ReDr00` of `VCSUB3.INC`: the list ends where the next entry would
+pass a paragraph short of 64K less two entries, FFC0h, counted from
+`DskBuf`, 262h, with 24 bytes an entry: so it keeps 2,703 entries, ".."
+among them where the directory is not a root, and beeps when DOS has a
+2,704th to give; with exactly 2,703 it does not beep. (The plan had
+2,704 for the count; it is the file that makes the beep.) A root of FAT12
+or FAT16 holds 512 entries on a hard disk, so only a subdirectory, or a
+root of FAT32, gets there. It was not tried on the bench: a directory of
+2,704 files is no few steps of a scenario. The ways and the
+recommendation are those of question 3, unchanged: lift it, in the
+piece P at the end of step 2, or keep 2,703 as a number of the
+program's own. For a dialog: *"A panel holds 2,703 entries of a
+directory, as the original does (it beeps and shows those). Lift it in
+a piece of its own at the end of step 2 (recommended), or keep it?"*
+Either way the offsets in a panel stay 16 bits, with the word `address`
+and the sentence "16 bits while a panel is 64K. Widened only if
+question 3 of the plan says so, by the piece P", as the fields of
+`WCBdef` have it; and the limit, `limit` of `ReDr00`, says that it is a
+number of the program's own which question 3 may move.
+
+**The numbers.** Of the 90 of 8 or 16 bits and the one `u32` of the
+three files, and the 10 of the four structures of `vc.h`:
+
+| | The files | `vc.h` | Which |
+|---|---|---|---|
+| Widened, to `i32` | 34 | 6 | The counts and indexes of the loops; the numbers of entries of `AdrNum`, `CorPar` and `NumAdr`, with `struct Place`, and what `LnsAX` answers; the sort's type and gap; the old list's length, `end` of `NearFl` and of `struct OldList`; the room, the count, the number of an entry, the retries and the drive of `ReDr00`, the drive of `RdInfo`; what `TotSel` counts, with `struct Selected` |
+| Made `bool` | 9 | 1 | What `FilePan`, `TstExe`, `CmpPar` and `ReDir` answer; `keep` of `ReDir`, of `ReDr00` and of `struct OldList`; `forward` of `NearFl`; `local` of `Labelled` and of `struct Label` |
+| Kept by a word | 46 | 3 | `address` 23 and 2 in `vc.h` (`struct Shown`): a place in a panel's block, or an offset in the old list, which was a panel's; `text` 6; `character` 6; `attributes` 5; `system` 2 and 1 in `vc.h`, DOS's answer; `place` 2; `handle` 1; `size` 1, the `u32` of `DiSi10` |
+| Kept by a sentence | 2 | | `count` of `Sort`, which counts down as the original's `LOOP` does and wraps for a full stop behind the ninth character, which DOS has in no name; what `DiSi10` answers, of the type `FncFn` |
+| `sign` | 2 | | `gap / SIZE_FILENT >> 1` of `Sort` and `size / SIZE_FILENT` of `ReDr00`: neither is below 0 |
+
+**The room.** `ReDr00` takes the room in bytes, `RoomBytes()` of
+`start.c`, an `i32`, where it took `RoomParas()`: N5's, which landed
+first; this cluster had written one of its own and took N5's at the
+rebase. The cap stays where the original has it, a
+paragraph short of 64K, `0xFFF0` where it was `0xFFF` paragraphs, with
+its comment: it is more than a panel's list, so nothing is cut by it
+while a panel is 64K. How nothing writes behind the room's end with
+`size` wide: the old list is copied as `count` bytes, which is at most
+`size`, which is at most what `RoomBytes` answers.
+
+**The casts.** clang named 9 places before anything changed. One went by
+a type, `gap` of `Sort` an `i32`. The other eight were of the macros of
+`place.c`, `DSKBUF` being a `size_t`: `FILE_ADDRESS` is cut to 16 bits
+in the macro now, `(u16)(... + (i32)DSKBUF)`, which its comment says;
+`SizDX` and the tree's offset in `NumAdr` have a `(u16)`. The widening
+made 11 more, every one a `(u16)`: the drive handed to `Fantom`,
+`DirCurrent` and `DriveSpace`, five times, until `sys.h` and
+`system.c` are sorted; the room kept as an offset of the old list,
+twice, which fits by the line above; the number of an entry kept in
+`NumbF`, which fits by the list's limit, with a comment; the count of
+`Sort`, with `wraps` in the comment above it; and the place that the
+sort exchanges, `swapped`. So 14 casts that narrow, one comment that
+says `wraps`. And six `(i32)` of a `size_t`, `DSKBUF`, `sizeof` and
+`SIZE_FILENT` in both files, where an `i32` meets them: without them
+clang names a sign changed. `TREE_NUMBER` lost its cast, as F7 said it
+would, the difference of two pointers being an `i32` already.
+`portable_c-cut` needed no function more.
+
+**`harness/int16.py`.** Five places went, the indexes of `TstExe` and
+`Sort`, whose numbers are `i32` now. Three are new, of the kind
+`widen`, each with its reason: `PLACE` in `AdrNum` and `CorPar`, the
+lines of a panel being 10 or more, and `limit` of `ReDr00`, a constant.
+
+**The harness.** `harness/reads.py` knew a loop to a count by `i <
+sizeof Name`, and an index that is an `i32` wants `i < (i32)sizeof
+Name`, which `TstExe` has: this cluster taught `_count` that cast, and
+so did N3, which landed first, and N3's is kept. `harness/words.txt`
+has `RoomParas` once fewer, in `read.c`.
+
+**Across clusters.** Every line in another's file is a declaration:
+`NumAdr` in `keys.c` takes an `i32`, `TstExe` in `enter.c` answers a
+`bool`. What the others call:
+
+- `LnsAX` answers an `i32`: `dirfunc.c` (N10, at work beside this one)
+  and `panel.c` keep it in a `u16`, which clang names when their
+  clusters sort them.
+- `struct Place` and `struct Selected` are `i32`: `keys.c`, `panel.c`,
+  `main.c`, and `copy.c` (N9), `cmdline.c`, `dirfunc.c` (N10) and
+  `usermenu.c`, read them, every one into a variable or an expression;
+  nothing writes them but `AdrNum` and `TotSel`. An `int` was what the
+  `u16` became in every expression already, so no line reads another
+  number.
+- `FilePan`, `ReDir` and `TstExe` answer a `bool`, `ReDir` takes one:
+  every caller asks whether it is 0, and `main.c` hands it 0 or 1.
+  `ReDir`'s `keep &= 0xFF` went, the caller handing 0 or 1.
+- `GetVol(...).local` is a `bool`; `dirfunc.c` asks it `== 0`, which
+  is the same.
+- `NearFl` takes the old list's length as an `i32`; `struct Shown`,
+  `ChgAdr`, `NumAdr`'s answer and `FnFile`'s stay 16 bits, `address`,
+  for question 3.
+
+What a later cluster should know:
+
+- `CorPar` counted on nothing wrapping: `last -= first` is not below 0
+  because the cursor is on an entry of the list, which every routine
+  that sets `CurAdr` or the tree's cursor keeps (`ReDr00`, `ReDr50`,
+  `SetMask`'s callers, `F21_40`, `F47_06`). Its comment says so. A
+  later piece that lets the cursor stand behind the last entry has
+  `CorPar` show the panel otherwise than it did.
+- A macro that casts is read where it is used, so `FILE_ADDRESS` has
+  its cut and its `(i32)DSKBUF` inside: one cast for three places.
+
+It took some 85 tool calls to hand back, the reading of the brief, the
+plan and the three files some 30 of them, and some 35 more to land
+behind N5 and N3, with the question's answer; the scenarios and the
+images ran once before the rebase and once behind it.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 
