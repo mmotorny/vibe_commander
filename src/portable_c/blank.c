@@ -40,9 +40,6 @@
 #define NO_CURSOR 0x2000                /* a shape of the cursor that does
                                            not show */
 
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
-
 /* Tell DOS that the program has nothing to do at the moment. The
    original tells Windows too, and DESQview: see DEVIATIONS.md. */
 void LeaveTm(void)
@@ -101,7 +98,7 @@ void Blank(void)
     cursor = CursorWhere(ScreenState().page);
     CursorShape(NO_CURSOR);
     /* The screen empty, as a window scrolled by all its rows. */
-    ScreenScroll(0, 0, Color(Sky1_C), 0, (u16)(u8)(md.Lines - 1) << 8 | 79);
+    ScreenScroll(0, 0, Color(Sky1_C), 0, (u16)((u8)(md.Lines - 1) << 8 | 79));
     for (i = 0; i < NmbStrs; i++) {
         md.Stars[i].StarMod = 0;
         md.Stars[i].StarPos = 0;
@@ -111,7 +108,7 @@ void Blank(void)
 
     for (;;) {
         /* Blnk01: a star comes out. */
-        place = Below(md.Lines) << 8;
+        place = (u16)(Below(md.Lines) << 8);
         place |= Below(80);
         clock = Rnd() >> 3 & 0xFF;
         if (clock < 100)
@@ -132,7 +129,7 @@ void Blank(void)
         }
         if (vacant == NmbStrs)
             goto older;
-        md.Stars[vacant].StarMod = kind << 8 | clock;
+        md.Stars[vacant].StarMod = (u16)(kind << 8 | clock);
         md.Stars[vacant].StarPos = place;
         Star(place, md.StarTab[0], Sky1_C);
 
@@ -193,7 +190,7 @@ void Blank(void)
                 mouse = pointer.place;
             if (pointer.place != mouse)            /* Blnk11 */
                 goto wake;
-            now = LOW(Timer());
+            now = (u16)Timer();         /* its low word: has it ticked */
             if (now != ticks)
                 break;
             LeaveTm();                          /* Blnk12 */

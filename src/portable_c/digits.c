@@ -59,12 +59,15 @@ const u8 *TxtNum(const u8 *text, u16 *number)
     i32 digit;
 
     for (;;) {
+        /* It wraps: a character below '0' is a number above 9. */
         digit = (u16)(*text - '0');
         if (digit > 9)
             break;
         text++;
         /* Ten times more than 6553 does not fit, nor does 65530 and a
-           digit above 5; and once at 0FFFFh it stays there. */
+           digit above 5; and once at 0FFFFh it stays there. The sum
+           wraps in 16 bits, as the original finds by its carry that it
+           does not fit. */
         if (value > 6553) {
             value = 0xFFFF;
         } else {
@@ -72,6 +75,6 @@ const u8 *TxtNum(const u8 *text, u16 *number)
             value = (u16)(value + digit) < value ? 0xFFFF : value + digit;
         }
     }
-    *number = value;
+    *number = (u16)value;
     return text;
 }

@@ -6,11 +6,14 @@ be as wide as what it counts, and signed unless there is a reason for
 it not to be: a number of 8 or 16 bits becomes an i32 or a boolean, or
 stays as it is with its reason written down, and a u32 becomes an i32
 or stays with its reason (TODO.md, "The portable C in a flat memory:
-the plan", "The rule for a number"). This finds the numbers and where
-each is cut, and the test `portable_c-width` of the build holds the
-tree to a record of them, harness/width.txt, so that a number that is
-added later is sorted too, and so that a commit which widens shows in
-the record what it widened.
+the plan", "The rule for a number"). And where a number then meets one
+of another sign or is put into fewer bits, the code says so with a
+cast, which the compiler's warnings hold and no list beside the code
+(CLAUDE.md, "The portable C"). This finds the numbers, and the test
+`portable_c-width` of the build holds the tree to a record of them,
+harness/width.txt, so that a number that is added later is sorted too,
+and so that a commit which widens shows in the record what it widened;
+and it holds every file that is sorted to clang's warnings.
 
 What is found. clang reads every file as harness/int16.py has it read,
 and this walks what it understood with the finder of that tool, which
@@ -25,52 +28,127 @@ where the
 function is written, not where a header declares it. The structures of
 the headers are found too, once, under the header's name.
 
-A cut is where a number that may not fit is put into fewer bits, by
-the types alone, a variable being taken to hold any number of its type
-as int16.py takes it:
+A cut is where a number that may not fit is put into fewer bits with
+no cast, by the types alone, a variable being taken to hold any number
+of its type as int16.py takes it:
 
-    cast      by a cast that is written, `(u16)(a + b)`
-    store     kept in a variable or a field of 8 or 16 bits
+    store     kept in a variable or a field of 8 or 16 bits, `=` and
+              `|=`, `<<=` and their like
     step      a variable of 8 or 16 bits stepped, `++`, `--`, `+=`,
               `-=`: all of them, but the variable that a loop counts with
     handed    handed to a parameter of 8 or 16 bits
     returned  returned as 8 or 16 bits
-    sign      no cut, and held like one: a number of 32 bits with a sign,
-              an i32, which may be below 0 by its type, is shifted to the
-              right or divided, or a remainder is taken of it or by it.
-              That is what it was without a sign only for a number that
-              is not below 0, and the reason says why it is not
 
-A cut is where a wider variable would keep another number, so the cuts
-of a number are what is read before it is widened: `--show`. A
-parameter that is widened no longer cuts what it is handed, and a
-return that is widened is cut where a caller keeps it in 16 bits: both
-show as cuts that go or come in the files of the callers, which the
-record counts.
+The cuts are printed for whoever asks, `--show`, and are neither
+recorded nor counted, and no test holds them: they are what a cluster
+reads before it widens a number, since a wider variable keeps another
+number exactly there. A parameter that is widened no longer cuts what
+it is handed, and a return that is widened is cut where a caller keeps
+it in 16 bits. A cut that is written, `(u16)(a + b)`, is none. What of
+them a file that is sorted may not have is clang's to say and not this
+finder's: see "The casts", below.
+
+And one kind of place is no cut and has an entry in the record with its
+reason, since no cast says it and no warning names it:
+
+    sign      a number of 32 bits with a sign, an i32, which may be
+              below 0 by its type, is shifted to the right or divided,
+              or a remainder is taken of it or by it. That is what it
+              was without a sign only for a number that is not below 0,
+              and the reason says why it is not
 
 The record. A file, or a function or a structure of one, is in it in
 one of four ways.
 
-  - `not sorted`, with how many numbers and cuts it has: nobody has
-    read it for the rule yet.
+  - `not sorted`, with how many numbers it has: nobody has read it for
+    the rule yet.
   - Sorted: every number that it still has without a sign, of 8, 16
-    or 32 bits, and every cut that is left, is an entry with its
-    reason, written by whoever read it. A number that was made an i32
-    or a boolean is no entry: the table at the top of the record
-    counts those, by file.
+    or 32 bits, and every place of a sign, is an entry with its reason,
+    written by whoever read it. A number that was made an i32 or a
+    boolean is no entry: the table at the top of the record counts
+    those, by file. A cut is no entry either.
   - `laid out`, a structure whose layout is not the program's to
     change, with whose it is, once for all its fields.
   - `as a whole`, a file that no cluster of step 2 reads: WHOLE below
     says why.
 
 The test fails where the tree is not as the record has it: a count that
-has moved, fewer as well as more; a number or a cut of something sorted
-that the record has not; one of the record that is gone; an entry
-without a reason. And it fails for what clang says of a file that is
-sorted under five warnings, WARNINGS below: a number with a sign held
-against a u32 or made one without a word, which the finder does not
-look for, and the three that name a boolean made of something that is
-none.
+has moved, fewer as well as more; a number or a place of a sign of
+something sorted that the record has not; one of the record that is
+gone; an entry without a reason.
+
+The casts. A file that is sorted is held to clang's warnings, WARNINGS
+below, each switched on and none switched off for a line: the test
+fails for whatever clang says, and for a line of the tree that switches
+a warning off, `#pragma clang diagnostic` and its like. A place that is
+named gets the type that holds its number, which is tried first, or a
+cast, with a comment where the program counts on what the cast cuts
+off; which cast the compiler keeps is the matter of harness/cut.py.
+What clang names is what is held, and nothing beyond it, on the user's
+word of 13 October 2026: no rule of the project's own on top of the
+compiler's. What the warnings are:
+
+  -Wconversion, all of it. Its parts that can speak of this tree:
+      -Wimplicit-int-conversion    a number put into fewer bits, by
+                                   `=`, at a call, by `return`, in a
+                                   declaration; with it
+                                   -Wimplicit-int-conversion-on-negation,
+                                   `byte = -byte`, and
+                                   -Wshorten-64-to-32, which has nothing
+                                   to say while the tree is read for a
+                                   machine of 32 bits and has no number
+                                   of 64 (harness/cut.py fails for one)
+      -Wsign-conversion            a number made one of the other sign
+                                   with no cast, an i32 handed to a
+                                   function that takes a u32
+      -Wconstant-conversion,       a constant that does not fit where
+      -Wbitfield-constant-         it is put
+       conversion
+      -Wenum-conversion            a value of one enumeration taken for
+                                   one of another
+      -Wbool-conversion,           a pointer or a constant taken for
+      -Wnull-conversion,           true or false or for no pointer;
+      -Wint-conversion             a number for a pointer
+    The others are of floating types, of C++ or of Objective-C, and say
+    nothing of C without a floating number; all of the group is held so
+    that nothing has to be said of a part that is left out.
+  -Wsign-compare                   a number with a sign held against one
+                                   of 32 bits without, where C makes
+                                   the first a huge number if it is
+                                   below 0
+  -Wtautological-constant-         of the booleans: a comparison that a
+   out-of-range-compare,           type decides, and a number where
+  -Wint-in-bool-context            true or false is asked
+
+What clang does not name, with any warning that it has. Its warning of
+a conversion takes arithmetic on numbers of 8 or 16 bits to stay within
+them, on purpose, so `word = word + 1` and `byte = a - b` are silent
+where `word = number` is not; and it says nothing of a step, `++`,
+`--`, `+=`, `|=`. Such a place, on a variable that stays 8 or 16 bits
+for a reason, stays as it is written: it wraps in its own width, which
+is what C says and what a reader expects, and it gets no cast for the
+finder's sake. The finder's cuts have them, to be read when a cluster
+decides what is widened, which is how most of them go: a step of a
+count that becomes an i32 is no cut. They are three quarters of the
+cuts of the tree as it was before the clusters, 902 of 1,074. gcc's
+-Wconversion names `word += number` and not `++`, nor a step by a
+number that is written, nor `word = word + 1`.
+
+Where clang and Open Watcom read a line otherwise. clang reads the tree
+for a machine of 32 bits with a char that has no sign, as wcc386 has
+it: an int, a long and a pointer are 32 bits for both, and the
+promotions are C's for both, so a line converts the same numbers. Two
+things differ. An enumeration is an int for clang and as few bytes as
+its values need for wcc386, one for three values: a number kept in a
+variable of an enumeration would be cut by wcc386 and named by nobody,
+and a variable of one put into a u8 would be named by clang where
+wcc386 converts nothing. The tree has no variable, parameter or field
+of an enumeration, only their constants, which are an int for both. And
+what wcc386 does wrongly with a cast that is written, a byte with a
+sign made a u16, clang knows nothing of: harness/cut.py holds that.
+When the tree is read for a machine of 64 bits, step 6, a difference of
+two pointers and a size are 64 bits, and -Wshorten-64-to-32 will name
+each that is kept in an i32.
 
     python3 harness/width.py                 the table, and the test
     python3 harness/width.py --show FILE     the numbers and the cuts of
@@ -89,7 +167,9 @@ something sorted without a reason: that is then written under the
 entry, in harness/width.txt, by whoever has read the place. A
 structure is made `laid out` by hand there: the line `FILE, struct
 NAME: laid out, 1 numbers` with the reason under it, in the place of
-its entries or of its line `not sorted`.
+its entries or of its line `not sorted`. `--warned FILE` prints what
+clang says of a file under the warnings, sorted or not: what a cluster
+has to mend before the file is sorted.
 
 What a reason is. For a number that is as wide as it is, or without a
 sign, by what it is, a character, a colour, a cell of the screen, a row
@@ -100,11 +180,10 @@ table counts those in a column of their own, `by word`, and a single
 word that is not of the list fails the test. The code has no type for
 such a thing: a name for what a number merely means is not made, since
 C holds it apart from nothing (CLAUDE.md, "The portable C"), so the
-word is in the record and nowhere else. For any other number that stays it is a sentence. For a
-cut it is always a sentence, also for a cut into a number that has a
-word: what at the place or just above it keeps the number within, as
-harness/int16.txt has it, or `wraps:` and where the program counts on
-that.
+word is in the record and nowhere else. For any other number that
+stays it is a sentence. For a place of a sign it is always a sentence:
+what at the place or just above it keeps the number from being below
+0, as harness/int16.txt has it.
 
 What it cannot see is what int16.py cannot see, and this besides: a
 number that is only ever 0 or 1 is not named as one. Whether a number
@@ -137,7 +216,10 @@ RECORD = Path(__file__).resolve().parent / "width.txt"
 CHECK = Path(__file__).resolve().parent / "widthcheck.c"
 SKIPPED = 77
 
-CUTS = ["cast", "store", "step", "handed", "returned", "sign"]
+# Where a number is put into fewer bits with no cast, by its kind; and
+# the one kind of place that has an entry in the record, with its reason.
+CUTS = ["store", "step", "handed", "returned"]
+SIGN = "sign"
 HEADERS = ("vc.h", "sys.h", "tables.h")
 
 # The clusters of step 2, as TODO.md has them, each with its files. A
@@ -176,16 +258,13 @@ WHOLE = {
     "stack.c": "the stack, an array of bytes",
 }
 
-# What clang is asked of every file that is sorted, each of which names
-# a place that the finder does not: a number with a sign held against
-# one of 32 bits without, where C makes the first a huge number if it is
-# below 0; one made the other without a cast, as an i32 handed to a
-# function that takes a u32; and of the booleans, a comparison that a
-# type decides, a constant that does not fit, a number where true or
-# false is asked.
-WARNINGS = ["-Wsign-compare", "-Wsign-conversion",
+# What clang is asked of every file that is sorted: the top of this file
+# says what each names. -Wconversion has -Wsign-conversion,
+# -Wimplicit-int-conversion and -Wconstant-conversion in it. Nothing is
+# taken out of the group and nothing is switched off behind it.
+WARNINGS = ["-Wconversion", "-Wsign-compare",
             "-Wtautological-constant-out-of-range-compare",
-            "-Wconstant-conversion", "-Wint-in-bool-context"]
+            "-Wint-in-bool-context"]
 
 # The types that a number is widened to, by the name that vc.h has for
 # each, and the column of the table that counts it. A u32 is none of
@@ -288,6 +367,7 @@ class Widths(int16.Finder):
         self.numbers = {}       # (file, scope, what, name, type): lines
         self.wider = {}         # a column of the table: how many
         self.cuts = {}          # (line, kind, scope): what is called
+        self.signs = set()      # (line, scope)
         self.quiet = set()      # the steps of the loops that count
         self.first = {}         # (file, scope): its first line
 
@@ -358,17 +438,17 @@ class Widths(int16.Finder):
             return
         if used[0] != "<stdin>":
             return
-        self.cuts.setdefault((used[1], kind, self.function),
-                             node.get("_callee", ""))
+        if kind == SIGN:
+            self.signs.add((used[1], self.function))
+        else:
+            self.cuts.setdefault((used[1], kind, self.function),
+                                 node.get("_callee", ""))
 
     def convert(self, value, types, node):
-        if types[1][1] in (8, 16) and not int16.within(
-                value.low, value.high, types[1]):
-            kind = "store"
-            if node.get("kind") == "CStyleCastExpr":
-                kind = "cast"
-            elif node.get("opcode") in ("+=", "-="):
-                kind = "step"
+        if (types[1][1] in (8, 16) and not int16.within(
+                value.low, value.high, types[1])
+                and node.get("kind") != "CStyleCastExpr"):
+            kind = "step" if node.get("opcode") in ("+=", "-=") else "store"
             self.cut(node, node.get("_cut") or kind)
         return super().convert(value, types, node)
 
@@ -379,7 +459,7 @@ class Widths(int16.Finder):
         if op in (">>", "/", "%"):
             for value in (a,) if op == ">>" else (a, b):
                 if (value.t16 == value.t32 == int16.S32 and value.low < 0):
-                    self.cut(node, "sign")
+                    self.cut(node, SIGN)
         return super().arithmetic(op, a, b, node)
 
     def value(self, node):
@@ -447,8 +527,9 @@ def read(command, source, name, text=None):
     return finder
 
 
-def warned(command, source, name):
-    """What clang says of a file under WARNINGS, as lines."""
+def warned(command, source, name, whole=False):
+    """What clang says of a file under WARNINGS, as lines: those that
+    name a place, or all that it prints of each."""
     text = (source / name).read_text(encoding="latin-1")
     _, text, _ = hostcheck.own(name, text)
     options = [option for option in int16.OPTIONS
@@ -459,7 +540,20 @@ def warned(command, source, name):
         input=text.encode("latin-1"), capture_output=True)
     return [line.replace("<stdin>", name)
             for line in result.stderr.decode("latin-1").splitlines()
-            if ": warning: " in line]
+            if whole or ": warning: " in line]
+
+
+def switched_off(source):
+    """The lines of the tree that switch a warning off for clang or gcc,
+    or have a header taken for the system's: as lines to print."""
+    found = []
+    for path in sorted(source.glob("*.[ch]")):
+        for number, line in enumerate(
+                path.read_text(encoding="latin-1").split("\n"), 1):
+            if re.match(r"\s*#\s*pragma\s+(clang|GCC)\s+"
+                        r"(diagnostic|system_header)", line):
+                found.append(f"{path.name}:{number}: {line.strip()}")
+    return found
 
 
 class Tree:
@@ -472,6 +566,7 @@ class Tree:
                 lambda name: read(command, source, name), self.names))
         self.numbers = {}       # (file, scope, what, name, type): lines
         self.cuts = {}          # (file, scope, kind, text): lines
+        self.signs = {}         # (file, scope, "sign", text): lines
         self.called = {}        # (file, line): what is called there
         self.wider = {}         # file: {column: how many}
         self.first = {}         # (file, scope): its first line
@@ -488,24 +583,35 @@ class Tree:
                 self.first.setdefault((name, scope), line)
                 if callee:
                     self.called[(name, line)] = callee
+            for line, scope in sorted(finder.signs):
+                text = " ".join(lines[line - 1].split())
+                self.signs.setdefault((name, scope, SIGN, text),
+                                      []).append(line)
+                self.first.setdefault((name, scope), line)
         self.files = [name for name in HEADERS
                       if any(key[0] == name for key in self.numbers)]
         self.files += self.names
 
-    def scopes(self, file):
-        found = {key[:2] for key in list(self.numbers) + list(self.cuts)
-                 if key[0] == file}
+    def scopes(self, file, cuts=False):
+        """The scopes of a file that have a number or a place of a sign,
+        which is what the record has; with those that have only a cut,
+        for whoever asks to see the cuts."""
+        tables = (self.numbers, self.signs) + ((self.cuts,) if cuts else ())
+        found = {key[:2] for table in tables
+                 for key in table if key[0] == file}
         return sorted(found, key=lambda key: (self.first.get(key, 0), key))
 
     def count(self, file, scope=None):
-        """(numbers of 8 or 16 bits, cuts, numbers that are a u32) of a
-        file, or of one scope of it."""
+        """(numbers of 8 or 16 bits, numbers that are a u32, places of
+        a sign) of a file, or of one scope of it. The cuts are not
+        counted: they are printed for whoever asks, and held by
+        nothing."""
         def of(table, wanted=None):
             return sum(len(lines) for key, lines in table.items()
                        if key[0] == file and scope in (None, key[1])
                        and (wanted is None or wanted == unsigned(key[4])))
-        return (of(self.numbers, False), of(self.cuts),
-                of(self.numbers, True))
+        return (of(self.numbers, False), of(self.numbers, True),
+                of(self.signs))
 
 
 def whole(file):
@@ -549,13 +655,12 @@ class Record:
                 self.scopes.add((file, scope))
             elif what.startswith("laid out, "):
                 self.laid[(file, scope)] = reason
-            elif what.split(",")[0] in CUTS:
+            elif what.split(",")[0] == SIGN:
                 if len(rows) < 2 or not rows[1].startswith("    | "):
-                    sys.exit(f"width: the record has a cut without its "
-                             f"line:\n{entry}")
+                    sys.exit(f"width: the record has a place of a sign "
+                             f"without its line:\n{entry}")
                 reason = "\n".join(row.strip() for row in rows[2:]).strip()
-                self.reasons[(file, scope, what.split(",")[0],
-                              rows[1][6:])] = reason
+                self.reasons[(file, scope, SIGN, rows[1][6:])] = reason
             else:
                 found = re.fullmatch(
                     r"(returns|parameter|variable|field)(?: (\w+))?, "
@@ -573,29 +678,35 @@ class Record:
                     or (file, scope) in self.scopes
                     or (file, scope) in self.laid)
 
+    def done(self, tree):
+        """The files of code that have something sorted."""
+        return [file for file in tree.names if not whole(file)
+                and file in self.known and file not in self.files]
+
 
 def plural(number, what):
     return f"{number} {what}{'' if number == 1 else 's'}"
 
 
-def counted(numbers, cuts, wide):
+def counted(numbers, wide, signs=0):
     """The counts of something that has no entries, as the record says
     them."""
     return (plural(numbers, "number") + (f", {wide} u32" if wide else "")
-            + ("" if cuts is None else f", {plural(cuts, 'cut')}"))
+            + (f", {signs} of a sign" if signs else ""))
 
 
 def table(tree, record):
     """The counts, by cluster and by file."""
     def row(files):
-        numbers = wide = kept = words = unsorted = unsorted32 = cuts = 0
+        numbers = wide = kept = words = unsorted = unsorted32 = 0
+        signs = 0
         wider = {}
         for file in files:
             for column, count in tree.wider.get(file, {}).items():
                 wider[column] = wider.get(column, 0) + count
             for scope in tree.scopes(file):
-                n, c, w = tree.count(file, scope[1])
-                numbers, cuts, wide = numbers + n, cuts + c, wide + w
+                n, w, s = tree.count(file, scope[1])
+                numbers, wide, signs = numbers + n, wide + w, signs + s
                 if record.sorted_(file, scope[1]):
                     said = sum(len(at) for entry, at in tree.numbers.items()
                                if entry[:2] == scope
@@ -606,12 +717,12 @@ def table(tree, record):
                     unsorted += n
                     unsorted32 += w
         return (f"{numbers:>8}{unsorted:>11}{wide:>6}{unsorted32:>15}"
-                f"{words:>8}{kept:>6}{cuts:>6}"
+                f"{words:>8}{kept:>6}{signs:>6}"
                 f"{wider.get('bool', 0):>6}{wider.get('i32', 0):>6}")
 
     head = (f"{'8 or 16':>8}{'not sorted':>11}{'u32':>6}"
             f"{'u32 not sorted':>15}{'by word':>8}{'kept':>6}"
-            f"{'cuts':>6}{'bool':>6}{'i32':>6}")
+            f"{'sign':>6}{'bool':>6}{'i32':>6}")
     lines = [f"{'cluster':<10}{head}  its files"]
     named = set()
     for name, files in CLUSTERS:
@@ -640,9 +751,13 @@ def written(tree, record, said):
     found = re.search(r"(\d+)\.\d+", said)
     lines = [
         "The numbers without a sign of the portable C, src/portable_c/, of",
-        "8, 16 and 32 bits, and where a number is cut to 8 or 16: of what",
-        "has been sorted by the rule of step 2, every one that is left with",
-        "why it is as wide as it is and has no sign; of the rest, how many.",
+        "8, 16 and 32 bits: of what has been sorted by the rule of step 2,",
+        "every one that is left with why it is as wide as it is and has no",
+        "sign, and every place where a number with a sign is shifted to the",
+        "right or divided, with why it is not below 0 there; of the rest,",
+        "how many. That a number is put into fewer bits, or meets one of",
+        "another sign, is not here: where clang names such a place, the",
+        "code says it with a cast, and nothing else is held of it.",
         "harness/width.py found them, with",
         f"clang {found.group(1) if found else '?'}, and says what the "
         "columns and the kinds are; the reason",
@@ -655,10 +770,10 @@ def written(tree, record, said):
         "numbers that are a u32; of the numbers of any of those widths that",
         "are sorted, how many are what they are by a word of the list below",
         "and how many are kept with a reason of their own, the rest being",
-        "of a structure that is laid out or of a file as a whole; the cuts;",
-        "and how many numbers are declared as bool and as i32, which is",
-        "what a number becomes that is widened. A cluster takes the two",
-        "`not sorted` of its row to nothing.", "",
+        "of a structure that is laid out or of a file as a whole; the",
+        "places of a sign; and how many numbers are declared as bool and as",
+        "i32, which is what a number becomes that is widened. A cluster",
+        "takes the two `not sorted` of its row to nothing.", "",
         "The words, for a number that has its width, or no sign, by what it",
         "is. Such a number has its word for a reason, alone or with what is",
         "not plain behind a colon. The code has no name for any of them.",
@@ -682,15 +797,15 @@ def written(tree, record, said):
             continue
         for key in tree.scopes(file):
             scope = key[1]
-            numbers, cuts, wide = tree.count(file, scope)
-            counts = counted(numbers, cuts, wide)
+            numbers, wide, signs = tree.count(file, scope)
             where = f"{file}, {scope or '()'}"
             if key in record.scopes:
-                lines += ["", f"{where}: not sorted, {counts}"]
+                lines += ["", f"{where}: not sorted, "
+                              f"{counted(numbers, wide, signs)}"]
                 continue
             if key in record.laid:
                 lines += ["", f"{where}: laid out, "
-                              f"{counted(numbers, None, wide)}"]
+                              f"{counted(numbers, wide)}"]
                 lines += [f"    {row}" for row in
                           record.laid[key].split("\n") if row]
                 if not record.laid[key]:
@@ -702,10 +817,9 @@ def written(tree, record, said):
                     _, _, what, name, type_ = entry
                     head = f"{what}{' ' + name if name else ''}, {type_}"
                     entries.append((min(at), head, len(at), None, entry))
-            for entry, at in tree.cuts.items():
+            for entry, at in tree.signs.items():
                 if entry[:2] == key:
-                    entries.append((min(at), entry[2], len(at), entry[3],
-                                    entry))
+                    entries.append((min(at), SIGN, len(at), entry[3], entry))
             for _, head, times, text, entry in sorted(
                     entries, key=lambda entry: (entry[3] is not None,
                                                 entry[0], entry[1])):
@@ -719,7 +833,8 @@ def written(tree, record, said):
                         text is not None or reason not in WORDS):
                     # One word: of the list, and for a number.
                     bare.append(f"{where}: {head}: `{reason}` is no "
-                                + ("reason for a cut" if text is not None
+                                + ("reason for a place of a sign"
+                                   if text is not None
                                    else "word of the list"))
                 if not reason:
                     bare.append(f"{where}: {head}"
@@ -735,7 +850,7 @@ def show(tree, asked):
                 if kind == "handed" and tree.called.get((name, line)) == file:
                     print(f"{name}:{line}: {where or '()'}: {text}")
         return
-    for key in tree.scopes(file):
+    for key in tree.scopes(file, True):
         if scope and key[1] != scope:
             continue
         print(f"{file}, {key[1] or '()'}")
@@ -743,7 +858,8 @@ def show(tree, asked):
             if entry[:2] == key:
                 print(f"  {','.join(map(str, at)):>6}  {entry[2]} "
                       f"{entry[3]}, {entry[4]}")
-        for entry, at in sorted(tree.cuts.items(), key=lambda x: x[1]):
+        places = list(tree.cuts.items()) + list(tree.signs.items())
+        for entry, at in sorted(places, key=lambda x: x[1]):
             if entry[:2] == key:
                 for line in at:
                     callee = tree.called.get((file, line), "")
@@ -765,7 +881,9 @@ def check(command):
             got = sorted(key[2] for key, at in finder.numbers.items()
                          for line in at if line == number)
         else:
-            got = sorted(kind for at, kind, _ in finder.cuts if at == number)
+            got = sorted([kind for at, kind, _ in finder.cuts
+                          if at == number]
+                         + [SIGN for at, _ in finder.signs if at == number])
         if got != wanted:
             wrong.append(f"{CHECK.name}:{number}: finds "
                          f"{', '.join(got) or 'nothing'}, where "
@@ -783,7 +901,11 @@ def main():
     parser.add_argument("--show", metavar="FILE[:SCOPE]|FUNCTION",
                         help="list the numbers and the cuts of a file or "
                              "of a scope, or what is cut in being handed "
-                             "to a function")
+                             "to a function: printed, and held by nothing")
+    parser.add_argument("--warned", metavar="FILE", action="append",
+                        default=[],
+                        help="what clang says of a file under the "
+                             "warnings, sorted or not")
     parser.add_argument("--sort", metavar="FILE[:SCOPE]", action="append",
                         default=[],
                         help="make entries of a file, or of one scope of "
@@ -805,6 +927,10 @@ def main():
         print("\n".join(wrong))
         sys.exit(1)
 
+    if arguments.warned:
+        for name in arguments.warned:
+            print("\n".join(warned(command, arguments.source, name, True)))
+        return
     tree = Tree(command, arguments.source)
     if arguments.show:
         show(tree, arguments.show)
@@ -833,7 +959,9 @@ def main():
             print(f"{len(bare)} entries want a reason.")
         return
 
+    failed = False
     if now != before:
+        failed = True
         print("\nNot as harness/width.txt has it, which is the lines with "
               "a minus:")
         print("\n".join(list(difflib.unified_diff(
@@ -841,27 +969,36 @@ def main():
             "the tree", n=1, lineterm=""))[2:80]))
         print("\nA count that has moved wants the record written anew, "
               "`python3\nharness/width.py --record`: read what moved. A "
-              "number or a cut that is new in\nsomething sorted wants its "
-              "reason under it then, or to be widened: `--show\nFILE` has "
-              "the lines, and the top of harness/width.py what a reason is.")
-        sys.exit(1)
-    if bare:
+              "number or a place of a sign that\nis new in something "
+              "sorted wants its reason under it then, or the number to "
+              "be\nwidened: `--show FILE` has the lines, and the top of "
+              "harness/width.py what a\nreason is.")
+    elif bare:
+        failed = True
         print("\nThe record has no reason for:")
         print("\n".join(bare))
-        sys.exit(1)
-    done = [file for file in tree.names if not whole(file)
-            and file in record.known and file not in record.files]
     with ThreadPoolExecutor() as pool:
         said = [line for lines in pool.map(
-            lambda name: warned(command, arguments.source, name), done)
-            for line in lines]
+            lambda name: warned(command, arguments.source, name),
+            record.done(tree)) for line in lines]
+    hidden = switched_off(arguments.source)
+    if hidden:
+        failed = True
+        print("\nA warning is switched off in the source, which is not "
+              "done:")
+        print("\n".join(hidden))
     if said:
+        failed = True
         print(f"\nclang says of what is sorted, under {' '.join(WARNINGS)}:")
         print("\n".join(said))
-        print("\nA number with a sign that meets one of 32 bits without "
-              "wants the type that it\nis, or the cast that says it is not "
-              "below 0 there; a boolean that is none wants\nto be a "
-              "number.")
+        print("\nA number that is put into fewer bits, or that meets one "
+              "of another sign, wants\nthe type that holds it, which is "
+              "tried first, or else a cast at the place: one\nthat the "
+              "compiler keeps (TODO.md, \"N0c\"), with a comment where the "
+              "program counts\non what is cut off. A boolean that is none "
+              "wants to be a number. No warning is\nswitched off for a "
+              "line, and nothing is asked beyond what clang names.")
+    if failed:
         sys.exit(1)
 
 

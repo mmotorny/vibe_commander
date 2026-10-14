@@ -34,7 +34,7 @@ void IniMous(void)
     }
     TypMous(0);
     if (md.Lines != 25)
-        MouseRows(0, ((u16)md.Lines << 3) - 1);
+        MouseRows(0, (u16)((md.Lines << 3) - 1));
     if ((md.MouseX & md.MouseY) != 0xFFFF)
         MouseTo(md.MouseX, md.MouseY);
     CurMous(1);
@@ -87,7 +87,9 @@ struct Mouse GetMous(u16 place)
 
     if (md.Mouse != 0) {
         at = MouseWhere();
-        place = (at.y >> 3) << 8 | (at.x >> 3) & 0xFF;
+        /* The mouse is kept to the rows of the screen, so the row is a
+           byte, as the original has it in a register of 8 bits. */
+        place = (u16)((at.y >> 3) << 8 | (at.x >> 3) & 0xFF);
         buttons = at.buttons;
         if (md.LftMous != 0)
             buttons = buttons & 4 | buttons >> 1 & 1 | buttons << 1 & 2;
@@ -124,6 +126,8 @@ i32 DoublMo(u16 begin, u16 size, i32 cursor)
     time = TimeOfDay();
     hours = time.clock;
     seconds = time.seconds;
+    /* MousTim has the two words of the time, as they are here: its
+       high word and its low one are each taken by a cast. */
     if ((u16)(md.MousTim >> 16) != 0xFFFF && cursor == md.MousPos
         && (hours < (u16)(md.MousTim >> 16)
             || hours == (u16)(md.MousTim >> 16)
@@ -136,7 +140,7 @@ i32 DoublMo(u16 begin, u16 size, i32 cursor)
             click = GetMous(hours);
             pointer = InWind(click.place, begin, size) ? 0 : TICK;
             if (pointer != hours >> 8) {
-                hours = hours & 0xFF | pointer << 8;
+                hours = (u16)(hours & 0xFF | pointer << 8);
                 TypMous(pointer);
             }
         } while (click.buttons & 7);
@@ -152,7 +156,9 @@ i32 DoublMo(u16 begin, u16 size, i32 cursor)
         }
     }
     md.MousTim = (u32)hours << 16 | seconds;
-    md.MousPos = cursor;
+    /* A line of a list, which every caller has in 16 bits, as the field
+       has it. */
+    md.MousPos = (u16)cursor;
     return 2;
 }
 
@@ -170,6 +176,8 @@ bool InWind(u16 where, u16 begin, u16 size)
     if (column < (begin & 0xFF))
         return true;
     column -= begin & 0xFF;
+    /* Each wraps: 0 less one is 255 in the original's register of 8
+       bits, which is how a window of none has 256. */
     if ((u8)((size >> 8) - 1) < row)
         return true;
     return (u8)(size - 1) < column;

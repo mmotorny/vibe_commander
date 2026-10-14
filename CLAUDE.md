@@ -3000,21 +3000,48 @@ in "The portable C".
   `portable_c-width`, since the piece N0 of step 2 (`TODO.md`, "N0, the
   finder, the record, the types", which has what a cluster does, in
   order). `harness/width.py` finds every such number that a file
-  declares and every cut, where a number that may not fit by the types
-  is put into so few bits; `harness/width.txt` has them, with a reason
-  for each in what has been sorted and the counts of the rest. Using it
-  and keeping it up:
+  declares, and `harness/width.txt` has them, with a reason for each in
+  what has been sorted and the counts of the rest. A cut, where a
+  number that may not fit by the types is put into so few bits, is no
+  entry there since the piece N0d (`TODO.md`, "N0d, a cut is said by a
+  cast"), and is not counted: where clang names it, in a file that is
+  sorted, it is a cast in the code, which the test holds by clang's
+  warnings; where clang names nothing it stays as it is written, on
+  the user's word of 13 October 2026, and the finder prints it for
+  whoever asks. Using it and keeping it up:
   - It fails for a count that has moved, fewer as well as more, in a
     file that is not sorted, and prints the lines of the record that
     differ: `python3 harness/width.py --record`, and read what moved.
-    A number or a cut that is new in something sorted is written
-    without a reason, and the test fails until the reason is under it
-    in the record, or the number is widened.
-  - A function that is widened moves the counts of other files: one
+    A number that is new in something sorted, or a place of the kind
+    `sign`, is written without a reason, and the test fails until the
+    reason is under it in the record, or the number is widened.
+  - It fails for a file that is sorted where clang says something
+    under `-Wconversion`, `-Wsign-compare` and the two of the
+    booleans. Each place gets the type that holds its number, first,
+    or a cast. Nothing is asked beyond what clang names: it leaves out
+    on purpose arithmetic on numbers of 8 or 16 bits that is kept in
+    as many, `word = word + 1`, `byte = a - b`, and every step, `++`,
+    `+=`, `|=`, and such a place on a variable that stays narrow for a
+    reason stays as it is written, with no cast. `python3
+    harness/width.py --warned FILE` prints what clang says of a file
+    that is not sorted yet, and `--show FILE` the finder's cuts, which
+    are read when it is decided what is widened and held by nothing.
+  - A cast that is written is the same instructions as the cut that
+    was not, for every form that the first five files have: `VC.EXE`
+    was the same bytes with 12 of them written. So the check of a
+    cluster's casts is the listings of its files against those of the
+    build before, by `wdis`: what differs there is of a type that
+    changed, not of a cast.
+  - A cast in a macro is a cast, and clang reads it where the macro is
+    used; but the place does not say it then. `blank.c` had `LOW` for
+    `(u16)`, used once, and has the cast.
+  - A function that is widened moves the cuts of other files: one
     that returns 32 bits where it returned 16 is a cut more in every
     file that keeps its answer in 16 bits, and one that takes 32 bits
     is a cut fewer where a caller counted on it to cut. Those are for
-    the cluster of that file, and are committed as counts.
+    the cluster of that file. The record does not count them, since
+    N0d; in a file that is sorted clang names such a caller, and the
+    test fails until it has its cast.
   - Before a parameter is widened, `--show NAME` lists the calls of the
     tree that hand the function more than it takes. Afterwards nothing
     lists them.
@@ -3029,10 +3056,13 @@ in "The portable C".
     is only ever 0 or 1. Each is read, at every line that names the
     variable.
   - A number that the program counts on wrapping at one place is
-    widened, and the cut is written there with `wraps:` in front of its
-    reason: `more = (u16)((second << 8 | second & 0x7F) - 1);` in
-    `LnStr` of `line.c`, where `more` was a `u16` and the line had no
-    cast.
+    widened, and the cut is written there, with the word `wraps` in a
+    comment at the place that says what is counted on:
+    `more = (u16)((second << 8 | second & 0x7F) - 1);` in `LnStr` of
+    `line.c`, where `more` was a `u16` and the line had no cast. A
+    cast without such a comment says that the number fits, by the
+    lines just above; where it fits by something further off, a
+    comment says by what.
   - A character, a colour, a cell of the screen, a place of a row and
     a column, and what the system answers in stay as wide as the
     translation has them, 16 bits as a rule: half of the numbers of the
@@ -3040,16 +3070,15 @@ in "The portable C".
     list, `WORDS` of `harness/width.py`, which the record prints at its
     top with what each word says; what is not plain goes behind a
     colon, and the table counts them in the column `by word`. The code
-    has no type for any of them, by the rule of "The portable C". A cut
-    into such a number wants a sentence like any other cut, and a
+    has no type for any of them, by the rule of "The portable C". A
     single word that is not of the list fails the test. A word is added
     to the list for a thing that recurs and has none.
   - A reason is written into `harness/width.txt` by hand, or for many
     at once by a script of a dozen lines that is kept in `build/`: the
     entries are divided by empty lines, the first line of one is its
-    key, a cut has its line behind `    | `, and what follows is the
-    reason. `--record` puts the file into its form again and keeps
-    them.
+    key, a place of a sign has its line behind `    | `, and what
+    follows is the reason. `--record` puts the file into its form
+    again and keeps them.
   - `harness/int16.py` knows `bool` and `i32`. Its test stays, and a
     widening moves its places too: one that makes 32 bits of a
     difference of two numbers of 16 is a new place, `widen`, with its

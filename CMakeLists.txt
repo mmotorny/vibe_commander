@@ -567,9 +567,11 @@ add_test(NAME portable_c-words
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/words.py)
 # The numbers of 8 and 16 bits of the portable C, which step 2 of the
 # road widens, makes booleans or keeps with a reason: every one that a
-# file declares and every place where a number is cut to so few, held
-# to a record that has the reason of each in what has been sorted and
-# the counts of the rest. See harness/width.py. It asks clang, as the
+# file declares, held to a record that has the reason of each in what
+# has been sorted and the counts of the rest; and every file that is
+# sorted held to clang's warnings of a conversion, so that a number
+# which meets one of another sign or is put into fewer bits has a cast
+# there. See harness/width.py. It asks clang, as the
 # test of the int does, builds nothing and runs no machine, and is
 # skipped where there is no clang.
 add_test(NAME portable_c-width

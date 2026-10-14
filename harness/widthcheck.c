@@ -35,12 +35,12 @@ u16 Check(u16 a, u8 b, u32 c)           /* number: parameter, parameter, paramet
 
     kept = b;
     kept = a + b;                       /* cuts: store */
-    kept = (u16)(a + b);                /* cuts: cast */
+    kept = (u16)(a + b);
     kept = a & 0xFF;
     kept = c;                           /* cuts: store */
     kept = c >> 16;
-    kept = (u16)c;                      /* cuts: cast */
-    kept = (u8)a;                       /* cuts: cast */
+    kept = (u16)c;
+    kept = (u8)a;
     kept = (u16)b;
     kept = flag;
     kept = a == 3;
@@ -60,7 +60,7 @@ u16 Check(u16 a, u8 b, u32 c)           /* number: parameter, parameter, paramet
     for (count = 0; count < 13; count++)
         kept = count >> 1;
     kept = count;                       /* cuts: store */
-    kept = (u16)count;                  /* cuts: cast */
+    kept = (u16)count;
     kept++;                             /* cuts: step */
     --kept;                             /* cuts: step */
     kept += 2;                          /* cuts: step */

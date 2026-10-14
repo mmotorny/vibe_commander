@@ -82,7 +82,9 @@ i32 LnStr(const struct LineArgs *args)
             }
         } else if (first == 0xFF) {
             /* The count less one, and one more unless a character follows
-               it, which is then counted like any other. */
+               it, which is then counted like any other. It wraps: a
+               count of 0 less one is 0FFFFh, of which the low byte and
+               the highest bit are read. */
             more = (u16)((second << 8 | second & 0x7F) - 1);
             more = (more & 0xFF) + (more & 0x8000 ? 0 : 1);
         } else {
@@ -106,8 +108,9 @@ void NgLine(struct LineArgs *args)
     u16 *screen = args->screen;
     i32 room = args->value & 0xFF;
     i32 style = 0;                      /* which of the colours is on */
-    u16 color = Color(args->colors[0]) << 8;
+    u16 color = (u16)(Color(args->colors[0]) << 8);
     u16 c;
+    u16 code;                           /* a character by its number */
     i32 count, high;
 
 #define PUT(character) \
@@ -146,25 +149,25 @@ void NgLine(struct LineArgs *args)
                     if (count == style)
                         count = 0;
                     style = count;
-                    color = Color(args->colors[style]) << 8;
+                    color = (u16)(Color(args->colors[style]) << 8);
                     continue;
                 }
                 if (c != 'A' && c != 'C')
                     continue;
                 high = TstHex(*line++);
-                count = *line++;
+                code = *line++;
                 if (high > 0xFF)
                     continue;
-                count = TstHex(count);
+                count = TstHex(code);
                 if (count > 0xFF)
                     continue;
-                count = (high << 4 | count) & 0xFF;
+                code = (high << 4 | count) & 0xFF;
                 if (c == 'A') {
-                    color = count << 8;
+                    color = (u16)(code << 8);
                     style = 0;
                     continue;
                 }
-                c = count;
+                c = code;
             }
         }
         PUT(c);
@@ -183,7 +186,9 @@ void CntLine(struct LineArgs *args)
     i32 length = LnStr(args);
 
     line.screen = BasAdr(args->value) - (length + 1 >> 1);
-    line.value = length;
+    /* NgLine reads the low byte of it and no more, the cells that it
+       may write in. */
+    line.value = (u16)length;
     NgLine(&line);
     args->line = line.line;
 }
