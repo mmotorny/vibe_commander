@@ -337,7 +337,10 @@ def _count(text, name, sizes):
         return int(text)
     if text in _NUMBER:
         return _NUMBER[text]
-    match = re.fullmatch(r"sizeof\s*\(?\s*(\w+)\s*\)?", text)
+    # A sizeof may be made a number with a sign first, for a loop whose
+    # index is one: `i < (i32)sizeof Name`.
+    match = re.fullmatch(r"(?:\(\s*\w+\s*\)\s*)?sizeof\s*\(?\s*(\w+)\s*\)?",
+                         text)
     if match and match[1] in sizes:
         return sizes[match[1]]
     return None
