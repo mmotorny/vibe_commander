@@ -7291,29 +7291,11 @@ build/portable_c` then.
      says "with `dos.c` behind it", and the rule of "Scenarios" that a
      C tree takes up to a sixth more instructions than the original,
      for which the next point has what was counted.
-   - **The machine's clock in the portable C, counted for that rule.**
-     The top of `harness/scenarios.py` has the figures, at the end of
-     what it says of the time of day: at its last step a scenario of
-     the portable C stands at 1.13 times the original's clock in the
-     middle one, beyond a sixth more in 38 of 155, and at twice in
-     `view-search` and `find`. Those two are worth a look for their
-     own sake: the step that searches for a text takes 2.6 seconds of
-     the machine's clock in the original and 8.7 in the portable C in
-     the viewer, 3.0 and 11.1 in the file search, and the C
-     translation is at 1.18 and 1.16 of the original at the end of the
-     same two scenarios. No scenario of the portable C shows a time of
-     its run past 45 seconds, and none makes a file past the first
-     minute. How it was counted, by a script that is not kept:
-     `scenarios.run` with `until`, which is called with every screen
-     as the driver has written it and asks `Machine.executed()` then,
-     the machine having been noted in a wrapper of
-     `Machine.wait_for_end` that also has QEMU's process waited for a
-     millisecond at a time and not ten; a step more at the end of
-     every scenario, `Wait*40`, since the machine ends behind the last
-     screen and cannot be asked then; and for the files, the stamps of
-     `Run.disks` between noon and ten past. A scenario comes to a step
-     at the same count whenever it is run: `menu` twice gave 11.66 and
-     11.67 seconds, the difference being how soon the host asked.
+   - **The machine's clock in the portable C, counted for that rule**,
+     which the session has changed by it since: the section behind
+     this one, "The machine's clock of the portable C against the
+     original's", has the table, what was found of a search for a
+     text, and how it was counted.
 
    What the list said before any of it was done:
    - **R1 goes with this stage: `resident.c` of the portable C becomes
@@ -7420,6 +7402,94 @@ build/portable_c` then.
      The note at 2650 says how all of them are read meanwhile, and
      goes when they are right. The rule above the notes that says
      "with `dos.c` behind it" is the session's to change.
+
+### The machine's clock of the portable C against the original's: counted
+
+For the rule of `CLAUDE.md`, "Scenarios", that a scenario which shows
+the time of day does so within the first minute of its machine: the
+machine's clock is counted in the instructions that it executes, and a
+C tree takes more of them than the original to get to the same step.
+The rule had "up to a sixth more", from `copy` and `delete` on the
+programs of 16 bits. Counted on 13 October 2026, with the fifth stage
+of the switch, for the portable C as it is, a program of 32 bits under
+its extender, in each of the 155 scenarios that it is taken through:
+what QEMU says the machine has executed when the driver has written
+the last screen, 3,906,250 instructions to a second, from noon, so the
+five seconds in which the machine starts are in both figures. The top
+of `harness/scenarios.py` says the same in fewer words.
+
+| At its last step, the portable C's clock against the original's | Scenarios |
+|---|---|
+| Less than the original's | 5: `setup-menu`, `setup-mouse` and `setup-missing`, whose original is two programs, of which the second is started; `mouse-drag-lists`, which the tree is taken through with steps left out; and `diskette-command`, 0.82, which was not looked into |
+| Up to a tenth more | 42 |
+| A tenth to a third more | 102 |
+| 1.34 to 1.37 times | 4: `mouse-edit`, `editor-buffer`, `tree-box`, `editor-full` |
+| Twice | 2: `view-search`, 2.05, and `find`, 2.01 |
+
+The middle one of the 155 is at 1.13 times. Of scenarios of each
+kind, in seconds past noon at the last step, with the C translation
+where it was counted, which was in ten:
+
+| Scenario | The original | The C translation | The portable C | The portable C against the original |
+|---|---|---|---|---|
+| `view-search` | 13.01 | 15.41 | 26.62 | 2.05 |
+| `find` | 10.20 | 11.80 | 20.48 | 2.01 |
+| `mouse-edit` | 40.83 | 52.92 | 55.78 | 1.37 |
+| `editor-buffer` | 8.19 | | 11.17 | 1.36 |
+| `tree-box` | 12.00 | 16.04 | 16.17 | 1.35 |
+| `editor-full` | 49.38 | 72.32 | 66.04 | 1.34 |
+| `enter` | 18.31 | 28.93 | 23.43 | 1.28 |
+| `copy-full` | 195.02 | 198.91 | 228.99 | 1.17 |
+| `stamps`, which shows times | 6.55 | | 7.59 | 1.16 |
+| `delete` | 21.06 | 23.80 | 24.38 | 1.16 |
+| `clock`, which shows the clock | 5.02 | | 5.74 | 1.14 |
+| `menu` | 11.67 | 12.78 | 13.02 | 1.12 |
+| `editor` | 5.32 | | 5.92 | 1.11 |
+| `copy` | 22.18 | 23.57 | 24.10 | 1.09 |
+| `setup-colors` | 7.55 | | 8.00 | 1.06 |
+| `setup-clock` | 8.27 | | 8.71 | 1.05 |
+| `blank-timed` | 86.77 | | 87.48 | 1.01 |
+
+- The first screen is 4.97 seconds past noon in the original, 5.31 in
+  the C translation and 5.59 in the portable C, on the bench of the
+  United States; on the Russian one the original and the portable C
+  are each 0.4 seconds later.
+- The C translation is beyond a sixth more as well, in four of the
+  ten: 1.58 in `enter`, 1.47 in `editor-full`, 1.34 in `tree-box`, 1.30
+  in `mouse-edit`. The sixth was of the two scenarios that it was
+  taken from.
+- **A search for a text takes three and a half times the machine's
+  clock in the portable C, and that is all of the two scenarios at
+  twice.** The step that searches takes 2.60 seconds in the original
+  and 8.70 in the portable C in the viewer (`view-search`, the Enter
+  of its step 14; the Enter of step 18 is 2.35 and 8.14), and 3.01
+  and 11.07 in the file search (`find`, the Enter of its step 19). The
+  C translation does not show it: it ends the two scenarios at 1.18
+  and 1.16 times the original. Why was not looked into. The piece F4
+  of the plan for a flat memory, which makes the viewer's text and
+  the list of the search pointers, counts those steps before and
+  after: its row there says so.
+- No scenario of the portable C shows a time of day of its run past
+  45 seconds. Five go on past that, `mouse-edit`, `editor-full`,
+  `enter-many`, `blank-timed` and `copy-full`, and none of them has
+  the clock on or shows the time of a file that it has made, by their
+  goldens. And none makes a file past the first minute, by the stamps
+  that all 155 leave on their disks: the latest is `DIRINFO` of
+  `mouse-edit`, 54 seconds past noon where the original makes it at
+  40, whose time is on no screen, the cursor being on `..`; the next
+  is of `move`, at 34.
+- How it was counted, by scripts that are not kept: `scenarios.run`
+  with `until`, which is called with every screen as the driver has
+  written it and asks `Machine.executed()` then, the machine having
+  been noted in a wrapper of `Machine.wait_for_end` that also has
+  QEMU's process waited for a millisecond at a time and not ten; a
+  step more at the end of every scenario, `Wait*40`, since the machine
+  ends behind the last screen and cannot be asked then; and for the
+  files, the stamps of `Run.disks` between noon and ten past. A
+  scenario comes to a step at the same count whenever it is run:
+  `menu` twice gave 11.66 and 11.67 seconds, the difference being how
+  soon the host asked. All 155 in both programs, three side by side,
+  took some ten minutes.
 
 ### T, the time of a wait: done, and what a later piece should know
 
@@ -9127,7 +9197,7 @@ thought and long in lines.
 | F1, three blocks where there was one. The proof | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, which answers in paragraphs of 16 bits as the seven places did and needs no cap, since inside the 640 KB it cannot pass A000h; 16 bytes of a pattern in front of each block and behind the last, written when a block is taken, which the image's tool holds at the end of every scenario ("What could go wrong", 15); `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the hand-out of the 640 KB in the system's file and the image's tool, for the 16 bytes; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
 | F2, a panel is a pointer. A sweep | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
 | F3, what a dialog is handed. A sweep | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
-| F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images | Where the viewer counts on an offset wrapping at the top of its segment |
+| F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |

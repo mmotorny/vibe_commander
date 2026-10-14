@@ -1481,11 +1481,14 @@ That was of two scenarios and of programs of 16 bits. Counted on 13
 October 2026 for the portable C as it is, a program of 32 bits, in each
 of its 155 scenarios, by what QEMU says the machine has executed when
 the driver has written the last screen: its clock stands there at 1.13
-times the original's in the middle one of them, at more than seven
-sixths of it in 38, at 1.3 to 1.4 times in scenarios of the editor and
-of the tree (`mouse-edit`, `editor-buffer`, `tree-box`, `editor-full`),
-and at twice in `view-search` and `find`, where the search for a text
-takes three and a half times the instructions. The C translation,
+times the original's in the middle one of them, at a tenth to a third
+more in 102, at less than a tenth more in 47, at 1.34 to 1.37 times in
+four, of the editor and of the tree (`mouse-edit`, `editor-buffer`,
+`tree-box`, `editor-full`), and at twice in `view-search` and `find`,
+where the step that searches for a text takes three and a half times
+the instructions: 8.70 seconds against 2.60 in the viewer, 11.07
+against 3.01 in the file search. TODO.md has the table, "The machine's
+clock of the portable C against the original's". The C translation,
 counted in ten of them, is beyond a sixth as well: 1.58 in `enter`,
 1.47 in `editor-full`. Five scenarios go on past 45 seconds in the
 portable C, `mouse-edit`, `editor-full`, `enter-many`, `blank-timed`
