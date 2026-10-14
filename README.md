@@ -667,11 +667,11 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 306,135 bytes, of which the extender's stub is 27,536 |
+| `VC.EXE` | 306,151 bytes, of which the extender's stub is 27,536 |
 | as a multiple of the original's 65,090 bytes | 4.70 |
-| more than the C translation's 133,056 bytes | 173,079 bytes |
-| Its code, and what the file has of its data | 131,362 and 104,463 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 891,837 bytes |
+| more than the C translation's 133,056 bytes | 173,095 bytes |
+| Its code, and what the file has of its data | 131,340 and 104,463 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 891,815 bytes |
 | The addresses in it that the extender sets when it loads it | 5,125 |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |

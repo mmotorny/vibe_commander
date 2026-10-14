@@ -112,7 +112,7 @@ struct Mouse GetMous(u16 place)
    seconds and the minutes. The second click is in time until the clock
    has gone beyond that, which for the last 40 hundredths of a second is
    when the next second ends. */
-u32 DoublMo(u16 begin, u16 size, u32 cursor)
+i32 DoublMo(u16 begin, u16 size, i32 cursor)
 {
     struct Time time;
     struct Mouse click;
@@ -162,7 +162,7 @@ u32 DoublMo(u16 begin, u16 size, u32 cursor)
    columns has 256 of them. */
 bool InWind(u16 where, u16 begin, u16 size)
 {
-    u32 row = where >> 8, column = where & 0xFF;
+    i32 row = where >> 8, column = where & 0xFF;
 
     if (row < begin >> 8)
         return true;

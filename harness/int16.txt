@@ -33,14 +33,6 @@ dialog.c, MnMn11: shift
     | key = item - table >> 1;
     item steps up from table, two at a time, in the loop above.
 
-digits.c, TstHex: widen
-    | return digit - '0';
-    The line above has asked that digit is '0' or more.
-
-digits.c, TstHex: widen
-    | return digit - ('A' - 10);
-    The line above has asked that digit is 'A' or more.
-
 dirfunc.c, DirFunc: index
     | end[count] = Mask_S[skip + count];
     skip is 0 or 1, by the lines above, and count is below 5.
