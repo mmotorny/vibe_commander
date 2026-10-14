@@ -1131,7 +1131,7 @@ struct Sought {
     i32 end;                            /* where the search ended: behind
                                            what was found */
 };
-struct Cleared T70_00(u16 line);
+struct Cleared T70_00(i32 line);
 struct Sought V82_00(const u8 *text, i32 at, i32 count);
 
 /* The commands of the menus, commands.c: `panel` is the current panel,

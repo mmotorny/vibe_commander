@@ -102,12 +102,6 @@ edit.c, T00_00: widen
     The length of a name, with its zero: MvzLine copies 13 bytes at the
     most to TmpBuf, and `end` is behind them, a byte further on.
 
-edit.c, T00_20: minus
-    | (u16)-160);
-    The step of T71_00, which adds it to a place of the main data, a
-    number, and makes the pointer of the sum: MD_POINTER(MD_PLACE(to) +
-    step). The sum wraps round there in both builds.
-
 edit.c, T01_10: widen
     | EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst + 0x10);
     wraps: written so. The low word of the place alone is stepped by a
@@ -117,12 +111,6 @@ edit.c, T01_10: widen
     | EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst - 0x10);
     wraps: written so. The low word of the place alone is stepped by a
     line of hex and back, as the assembly steps it, and the cast is that.
-
-edit.c, T02_03: minus
-    | (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)), (u16)-160);
-    The step of T71_00, which adds it to a place of the main data, a
-    number, and makes the pointer of the sum: MD_POINTER(MD_PLACE(to) +
-    step). The sum wraps round there in both builds.
 
 edit.c, T25_00: widen
     | EdUndo = size + 2;
@@ -147,6 +135,16 @@ edit.c, T72_00: widen
     | offset = from - Room;
     The place of a byte of the text, an address less the address of the
     text, which is not below 0 and is shown as eight digits of hex.
+
+edit.c, T80_14: widen
+    | count = file - md.TmpBuf;
+    The length of the path in front of the name: CutPath answers a
+    place in the path that TmpBuf holds, at its start or behind it.
+
+edit.c, T80_14: widen
+    | for (count = md.TmpBuf + LenPath + 13 - to; count; count--)
+    What is left of TmpBuf's first LenPath + 13 bytes: the line above
+    returns where `to` is at their end or behind it.
 
 find.c, FindFil: widen
     | left = (i32)(RoomEnd - part);
@@ -363,12 +361,6 @@ view.c, F34_40: compare
     How far end is behind text, two pointers into MenuBuf: end is where
     the loop above has taken at from text on, a character at the least,
     and MenuBuf is 4,000 bytes.
-
-view.c, V00_10: minus
-    | T71_00(0x700, (u16)(begin + ((VI->ViSize >> 8) - 1 << 8)), (u16)-(2 * 80));
-    The step of T71_00 of edit.c, which adds it to a place of the main
-    data, a number, and makes the pointer of the sum. The sum wraps
-    round there in both builds.
 
 view.c, V00_10: widen, 2 times
     | count = (VI->ViSize >> 8) - 1;

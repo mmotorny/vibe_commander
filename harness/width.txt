@@ -75,7 +75,7 @@ N1              81          0     2              0      77     6     5     4    
 N2              79          0     0              0      68    11     0     3    29  dialog.c
 N3, N4          56          0    13              0      67     2     7    22    88  view.c
 N5              76          0     0              0      70     6     3     4    44  find.c
-N6 to N8       164        140     4              0      28     0    12    14    66  edit.c
+N6 to N8       121         64     4              0      61     0    12    22   102  edit.c
 N9              41          0     6              0      39     8     2     7    37  copy.c
 N10             55          0     0              0      49     6     3     9    37  dirfunc.c
 N11             47          0     1              0      46     2     2     9    34  files.c read.c place.c
@@ -93,7 +93,7 @@ N20             61          0     0              0      58     3     0     3    
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
 headers        271         69    12              1     162     5     0     0     0  vc.h sys.h tables.h
-all           2061        249   115              1    1138    65    51   149   838
+all           2018        173   115              1    1171    65    51   157   874
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               214         12    11              0     162     5     0     0     0
@@ -109,7 +109,7 @@ dialog.c            79          0     0              0      68    11     0     3
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           55          0     0              0      49     6     3     9    37
 drive.c             16          0     0              0      16     0     2     2    10
-edit.c             164        140     4              0      28     0    12    14    66
+edit.c             121         64     4              0      61     0    12    22   102
 enter.c             12          0     0              0      12     0     0     1    14
 exec.c              13          0     0              0      13     0     0     1     2
 extfile.c            4          0     0              0       4     0     0     2     1
@@ -2006,63 +2006,135 @@ edit.c, struct EdData: field EdFirst, u32
 edit.c, struct EdData: field EdShape, u16
     system: the shape of the cursor as the BIOS answers it, put back when the editor is left.
 
-edit.c, struct Reached: not sorted, 2 numbers
+edit.c, struct Drawn: field begin, u16
+    place: the line's row and column, as Window takes them.
 
-edit.c, struct Drawn: not sorted, 2 numbers
+edit.c, struct Drawn: field size, u16
+    place: one row and the window's columns, as Window takes them.
 
-edit.c, (): not sorted, 14 numbers
+edit.c, (): variable EdFl_S, u8[]
+    text: of the tables, edit_t.c
 
-edit.c, Column: not sorted, 4 numbers
+edit.c, (): variable ViFl_S, u8[]
+    text: of the tables, view_t.c
 
-edit.c, T57_01: not sorted, 1 number
+edit.c, (): variable Menu_F, u8[]
+    text: of the tables
 
-edit.c, T57_02: not sorted, 1 number
+edit.c, (): variable Ext_F, u8[]
+    text: of the tables
 
-edit.c, T50_00: not sorted, 2 numbers
+edit.c, (): variable ViewE_F, u8[]
+    text: of the tables, edit_t.c
 
-edit.c, T51_30: not sorted, 1 number
+edit.c, (): variable EditE_F, u8[]
+    text: of the tables, edit_t.c
 
-edit.c, T51_00: not sorted, 4 numbers, 1 of a sign
+edit.c, (): variable Line_S, u8[]
+    text: of the tables, edit_t.c
+
+edit.c, (): variable Col_S, u8[]
+    text: of the tables, edit_t.c
+
+edit.c, (): variable FrBuf_S, u8[]
+    text: of the tables, edit_t.c
+
+edit.c, (): variable EdtH_P, u8[]
+    colour: the help's table of colours, of the tables, edit_t.c
+
+edit.c, (): variable EdtH_S, u8[]
+    text: of the tables, edit_t.c
+
+edit.c, (): variable EdtH1_S, u8[]
+    text: of the tables, edit_t.c
+
+edit.c, (): variable EdtH2_S, u8[]
+    text: of the tables, edit_t.c
+
+edit.c, (): variable MainExt_F, u8[7]
+    text
+
+edit.c, T51_00: sign
+    | if (end >> 16 == EdOffst >> 16
+    end and EdOffst are places in the text, which are not below 0.
 
 edit.c, T53_10: variable word, u16
     text: two bytes of the text, held against CR LF.
 
-edit.c, T53_00: not sorted, 1 number
+edit.c, T54_00: variable pair, u16
+    text: the two characters that end a line, as a word, turned round at
+    every step.
 
-edit.c, T54_00: not sorted, 4 numbers
+edit.c, T54_00: variable word, u16
+    text: two bytes of the text, held against CR LF.
 
-edit.c, T55_10: not sorted, 2 numbers
+edit.c, T70_00: variable place, u16
+    place
 
-edit.c, T55_00: not sorted, 2 numbers
+edit.c, T70_00: variable blank, u16
+    cell
 
-edit.c, T56_00: not sorted, 2 numbers
+edit.c, T71_00: parameter function, u16
+    bits: what the BIOS is asked to do with the screen in the high byte,
+    the line in the low one.
 
-edit.c, T70_00: not sorted, 4 numbers
+edit.c, T71_00: parameter place, u16
+    place
 
-edit.c, T71_00: not sorted, 6 numbers, 1 of a sign
+edit.c, T71_00: sign
+    | i32 stride = step / 2;
+    step is 160 or -160 at every call, below 0 being what it is for:
+    even, so the halving is exact either way.
 
-edit.c, T72_00: not sorted, 5 numbers, 2 of a sign
+edit.c, T72_00: variable c, u16
+    text: a character of the text, or the two before the end read as a
+    word to be held against CR LF.
 
-edit.c, T73_10: not sorted, 2 numbers
+edit.c, T72_00: sign
+    | cell = HexByt(cell, (u16)(offset >> 24));
+    offset is a place in the text, from - Room, of a line of it: not
+    below 0.
 
-edit.c, T74_00: not sorted, 2 numbers
+edit.c, T72_00: sign
+    | cell = HexByt(cell, (u16)(offset >> 16));
+    offset is a place in the text, from - Room, of a line of it: not
+    below 0.
+
+edit.c, T73_10: variable place, u16
+    place
+
+edit.c, T74_00: variable blank, u16
+    cell
 
 edit.c, T75_00: parameter color, u16
     cell: the colour in the high byte.
 
-edit.c, T76_00: not sorted, 2 numbers
+edit.c, T76_00: parameter place, u16
+    place
 
-edit.c, Done: not sorted, 1 number
+edit.c, Done: parameter value, u16
+    system: what struct Answer of vc.h holds, the attributes that DOS
+    answers or 0.
 
-edit.c, Failed: not sorted, 1 number
+edit.c, Failed: parameter error, u16
+    system: DOS's number of an error, as struct Answer has it.
 
-edit.c, T80_Name: not sorted, 1 number
+edit.c, T80_02: parameter attributes, u16
+    attributes: 0FFFFh for a device, whose are not set again.
 
-edit.c, T80_02: not sorted, 5 numbers
+edit.c, T80_02: variable error, u16
+    system: DOS's number of an error, or the editor's for a disk that is
+    full, as struct Answer has it.
 
-edit.c, T80_14: not sorted, 3 numbers
+edit.c, T80_02: variable handle, u16
+    handle
 
-edit.c, T80_00: not sorted, 2 numbers
+edit.c, T80_14: variable c, u16
+    character
+
+edit.c, T80_14: variable letter, u16
+    character: the drive's letter, in the low byte of the first two
+    characters of the name read as a word.
 
 edit.c, T14_12: not sorted, 1 number
 

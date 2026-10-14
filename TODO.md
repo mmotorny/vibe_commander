@@ -15354,6 +15354,79 @@ and the casts by three scripts 6; the record's reasons by one script 4;
 the tests, the images, the suite and the documents the rest, on a
 machine that five other clusters were testing on.
 
+### N7, `edit.c`, the lines, the text, the screen and saving: done, and what a later cluster should know
+
+**What there is.** The first half of `edit.c` sorted by "The rule for a
+number", by the steps of "N0d": from the top to `T80_00`, with `T60_10`,
+`T60_20`, `struct Reached`, `struct Drawn` and the texts, as N6's
+section cuts the file. clang's warnings stay silent for all of
+`edit.c` and `view.c`. N8's half, the keys from `T14_12` on, is as it
+was but for five lines at the border, below.
+
+**The numbers**, the 76 that N6 counted and one that is new:
+
+| | Count | Which |
+|---|---|---|
+| Widened, to `i32` | 35 | `column` and `left` of `struct Reached`; the counts and the columns of `Column`, its limit and that of `T57_01`, what `T57_02` answers; `count` and `size` of `T50_00`; `size`, `more`, `grown`, `count` of `T51_00`; the cursor that `T55_10` and `T55_00` take and `T55_00` answers; `cursor` and `last` of `T56_00`; the row of the window that `T70_00`, `T72_00` and `T73_10` have, the counts of `T70_00`, `T71_00`, `T72_00`, `T74_00`, `T76_00`, `T80_Name`, `T80_02`, `T80_14`; `cells` and `column` of `T71_00`; `column` and `place` of `T72_00`; the step of `T71_00`, 160 or -160 |
+| New, an `i32` | 1 | `i` of `T80_14`: `c` was a character of the path and then the index of three loops, and is the character alone |
+| Made `bool` | 8 | What `T53_00`, `T54_00`, `T55_10` and `T80_00` answer; `found` of `T54_00`; `down` of `T51_30`; `failed` of `T80_02` and of `T80_00` |
+| Kept by a word | 33 | `text` 17 (the fourteen tables and `MainExt_F` less `EdtH_P`, two words of CR LF in `T54_00`, `c` of `T72_00`), `place` 7 (`struct Drawn`, `T70_00`, `T71_00`, `T73_10`, `T76_00`), `cell` 2, `colour` 1 (`EdtH_P`), `bits` 1 (`function` of `T71_00`), `system` 3 (`Done`, `Failed`, `error` of `T80_02`), `attributes` 1, `handle` 1, `character` 2 (`c` and `letter` of `T80_14`) |
+| Kept by a sentence | 0 | |
+| Places of a sign | 4 | `T51_00`'s `>> 16` (N6's), `step / 2` of `T71_00`, which is below 0 on purpose and even, `offset >> 24` and `>> 16` of `T72_00` |
+
+**The casts.** clang named 4 places after the widening, none before,
+and each went by a cast: `(u16)count` handed to `FileWrite`, which
+takes 16 bits, `(i32)sizeof MainExt_F`, and two in N8's half where it
+keeps what my functions answer in a `u16` (below). None wants a
+comment. Some twenty `(u16)` and `(u8)` went with the types; of those
+that stay in this half, `(u16)(end - EdOffst) < EdSizLn` of `T51_00`
+is N6's test by 64K, and the two of `T73_10`'s first test, `(u16)(EdSizLn
+- EdCursr) < (u16)(...)`, were left as the original's comparison of 16
+bits, since nothing at the place says that the cursor is not behind the
+end of the buffer. `(u8)place` of `T72_00` went with a comment: the
+place passes the window's width by less than 8, below 256. The clamp
+to 0FFFFh in `T56_00` went with one too: the last character is less.
+`harness/int16.txt`: the two `minus` of `(u16)-160` gone, two new
+`widen` of `T80_14`, each with why it fits in `TmpBuf`.
+
+**At the border, in other files and in N8's half.** `T71_00` takes its
+step as an `i32`, so its callers hand `-160` where they handed
+`(u16)-160`: two lines of N8's (`T02_03`, `T00_20`) and one of
+`view.c` (`V00_10`), with the line by which `view.c` declares it.
+`T70_00` takes its row as an `i32`, in `vc.h` too: the `(u16)` of its
+callers in `view.c` and in `T21_00` are harmless and N8's or nobody's
+to take out. `left = (u16)T57_00().left` of `T14_00` and `column =
+(u16)T57_02()` of `T00_20` are new: they go when N8 widens the two.
+`(u16)EdCursr` handed to `T55_00` in `T00_83` is harmless, for N8.
+`T53_00` and `T54_00` answering a `bool` change nothing at their
+callers, which ask whether it is 0.
+
+**The lines beyond 65,535, decided on 14 October 2026 and left to the
+piece that carries it out.** The counts of lines of this half were
+`i32` already, N6's: `EdLine`, `EdLin0`, `struct Where`. What keeps the
+original's limit here is behaviour, and was left as it is so that the
+fix, its scenario and its entry of `DEVIATIONS.md` land together:
+`where->line == 0xFFFF` in `T53_00`, which refuses the next line from
+the 65,536th on, in text and in hex, and the cut of `T75_00`,
+`(u16)(number + 1)`, with the five cells that it writes and its
+comment `wraps`. The piece wants besides: in N8's half `T00_20` and
+`T20_06`, which have the lines in `u16` and take `(u16)EdLine` and
+`(u16)EdLin0` (N8 widens those, or leaves them to it); and in
+`T75_00` room for six digits, which the free bytes leave when they go,
+cells 62 to 68: `Line` in cells 46 to 51 is question 8's
+recommendation, not decided.
+
+**The program.** The whole suite passes, fourteen tests, 156
+scenarios, no golden and no patch changed. `VC.EXE` is another by the
+types (`67d57477...` before, `ee67ef91...` after, on the head
+`92ff60c` that the work began on). The image of every scenario,
+`python3 harness/dataimage.py compare` against a build of that head:
+"156 scenarios, 155 with nothing that differs; 0 differences, 0 more
+in what was declared as changed, 1 in what may differ", and "497
+pointers that name the same in both".
+
+It took some 75 tool calls to hand back.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

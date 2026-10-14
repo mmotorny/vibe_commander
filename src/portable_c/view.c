@@ -146,7 +146,7 @@ void PutFls(struct WCBdef *panel);
 void PutTre(struct WCBdef *panel);                      /* tree.c */
 u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
            u16 color);                                  /* screen.c */
-void T71_00(u16 function, u16 place, u16 step);         /* edit.c */
+void T71_00(u16 function, u16 place, i32 step);         /* edit.c */
 
 /* Boxes, dialogs and texts of view_t.c, which DialBox and Dialog take
    a pointer to: a box and a dialog are declared here as what each
@@ -1070,7 +1070,7 @@ V05_02:                                 /* the window a line down, and the
     ViPoint = line.entry;
     V25_00();
     begin = VI->ViBase;
-    T71_00(0x700, (u16)(begin + ((VI->ViSize >> 8) - 1 << 8)), (u16)-(2 * 80));
+    T71_00(0x700, (u16)(begin + ((VI->ViSize >> 8) - 1 << 8)), -(2 * 80));
     V31_00(begin);
     FIRST();
     at = line.at;

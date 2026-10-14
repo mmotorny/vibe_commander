@@ -117,11 +117,11 @@ struct Ending {
 /* What Column, T57_00 and T57_01 return: how far characters of the line
    buffer go, counted up to a column that is the limit. */
 struct Reached {
-    u16 column;                         /* the column that they end in; if
+    i32 column;                         /* the column that they end in; if
                                            they reach the limit, the one
                                            that the character begins in
                                            which reaches it */
-    u16 left;                           /* how many of them were not
+    i32 left;                           /* how many of them were not
                                            counted, because the limit was
                                            reached: that character and
                                            those behind it */
@@ -163,24 +163,24 @@ static i32 EdLin0;                      /* First line displayed on the screen */
 
 void T50_00(void);
 void T51_00(void);
-u16 T53_00(struct Where *where);
+bool T53_00(struct Where *where);
 struct Ending T53_10(i32 place);
-u16 T54_00(struct Where *where);
-u16 T55_00(u16 cursor);
+bool T54_00(struct Where *where);
+i32 T55_00(i32 cursor);
 void T56_00(i32 place, i32 line, i32 target);
 struct Reached T57_00(void);
-struct Reached T57_01(u16 limit);
-u16 T57_02(void);
+struct Reached T57_01(i32 limit);
+i32 T57_02(void);
 i32 T63_01(i32 place);
 bool T64_00(const u8 *name, const u8 *text, i32 count);
-void T71_00(u16 function, u16 place, u16 step);
-void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base);
+void T71_00(u16 function, u16 place, i32 step);
+void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base);
 void T73_00(void);
 struct Drawn T73_10(void);
 void T74_00(void);
 void T75_00(i32 number, u16 *screen, u16 color);
 void T76_00(u16 place, const u8 *text, const u8 *colors);
-u16 T80_00(void);
+bool T80_00(void);
 
 /* T00_00, the editor itself, is declared in vc.h. Of the others the
    viewer calls T70_00 and T71_00. */
@@ -271,12 +271,12 @@ static const u8 MainExt_F[] = "VC.EXT";
 /* The column that `count` characters of the line buffer end in, with
    tabs to every eighth, and how many of them were not counted, because
    the column `limit` was reached: none, if it was not. */
-static struct Reached Column(u16 count, u16 limit)
+static struct Reached Column(i32 count, i32 limit)
 {
     struct Reached reached;
     const u8 *text = EditBuf;
-    u16 column = 0;
-    u16 before;
+    i32 column = 0;
+    i32 before;
 
     reached.column = 0;
     reached.left = 0;
@@ -303,21 +303,23 @@ static struct Reached Column(u16 count, u16 limit)
    `limit`. */
 struct Reached T57_00(void)
 {
-    return Column((u16)EdSizLn, LenEdit - 100);
+    return Column(EdSizLn, LenEdit - 100);
 }
 
-struct Reached T57_01(u16 limit)
+struct Reached T57_01(i32 limit)
 {
-    return Column((u16)EdSizLn, limit);
+    return Column(EdSizLn, limit);
 }
 
 /* The column of the cursor, counted from 0: in hex mode the number of the
    byte in its line. */
-u16 T57_02(void)
+i32 T57_02(void)
 {
     if (ed.EdTxHex != 0)
-        return (u16)EdCursr;
-    return Column((u16)EdCursr, 0xFFFF).column;
+        return EdCursr;
+    /* No limit: the assembly's is 0FFFFh, which the line buffer's 3900
+       characters at eight columns each do not reach. */
+    return Column(EdCursr, 0xFFFF).column;
 }
 
 /* Where an offset is in the text: 0 before its end, 1 at the end and 2
@@ -345,8 +347,7 @@ void T50_00(void)
 {
     struct Ending end;
     const u8 *text;
-    i32 length;
-    u16 count, size;
+    i32 length, count, size;
 
     if (ed.EdTxHex != 0)
         return;
@@ -367,7 +368,7 @@ void T50_00(void)
             size = LenEdit - 100;
             ed.EdWhole = 0;
         } else {
-            size = (u16)length;
+            size = length;
         }
     }
     EdEndBf = EdOffst + size;
@@ -379,7 +380,7 @@ void T50_00(void)
    bytes given, or downwards. The assembly does it a piece of 0FF00h
    bytes at a time, each from a segment that much further on or back, a
    byte after the other in the same direction all through. */
-static void T51_30(const u8 *source, u8 *target, i32 count, u16 down)
+static void T51_30(const u8 *source, u8 *target, i32 count, bool down)
 {
     if (down) {
         for (; count; count--)
@@ -410,21 +411,21 @@ void T51_00(void)
     i32 old, less, end, tail;
     const u8 *buffer;
     u8 *text;
-    u16 size, more, grown, count;
+    i32 size, more, grown, count;
 
     if (ed.EdTxHex != 0 || ed.EdUpdat == 0)
         return;
     ed.EdUpdat = 0;
     ed.EdChng = 1;
     old = EdEndBf - EdOffst;
-    size = (u16)EdSizLn;
+    size = EdSizLn;
     if (old > size) {
         less = old - size;
         T51_30(Room + EdEndBf, Room + EdOffst + size,
-               ed.EdLen - EdEndBf, 0);
+               ed.EdLen - EdEndBf, false);
         ed.EdLen -= less;
     } else if (old < size) {
-        more = size - (u16)old;
+        more = size - old;
         grown = more;
         end = ed.EdLen + more;
         if (end >= EdSpace) {
@@ -438,17 +439,17 @@ void T51_00(void)
             if (end >> 16 == EdOffst >> 16
                 && (u16)(end - EdOffst) < EdSizLn)
                 EdSizLn = end - EdOffst;
-            grown = (u16)(end - ed.EdLen);
+            grown = end - ed.EdLen;
         }
         /* From the last byte to read to the last to write, downwards. */
         tail = end - more;
         if (tail >= EdEndBf)
-            T51_30(Room + tail - 1, Room + end - 1, tail - EdEndBf, 1);
+            T51_30(Room + tail - 1, Room + end - 1, tail - EdEndBf, true);
         ed.EdLen += grown;
     }
     text = Room + EdOffst;
     buffer = EditBuf;
-    for (count = (u16)EdSizLn; count; count--)
+    for (count = EdSizLn; count; count--)
         *text++ = *buffer++;
 }
 
@@ -511,36 +512,41 @@ struct Ending T53_10(i32 place)
     return EndsAt(place);
 }
 
-/* Go to the next line of the text. Returns 0, with `where` on it, or 1
-   and `where` as it was if there is none: at the end of the text, and
-   after a line that the text ends in without the two characters. In hex
-   mode the next line is the next 16 bytes, if the text has that many. */
-u16 T53_00(struct Where *where)
+/* Go to the next line of the text. Returns false, with `where` on it,
+   or true and `where` as it was if there is none: at the end of the
+   text, and after a line that the text ends in without the two
+   characters. In hex mode the next line is the next 16 bytes, if the
+   text has that many.
+
+   The assembly counts the lines in 16 bits and has no next line from
+   the line 0FFFFh on, in text and in hex: a limit of the original, kept
+   until its fix is carried out (TODO.md, question 5). */
+bool T53_00(struct Where *where)
 {
     i32 place = where->place;
     struct Ending end;
 
     if (where->line == 0xFFFF)
-        return 1;
+        return true;
     if (T63_01(place))
-        return 1;
+        return true;
     end = T53_10(place);
     if (ed.EdTxHex != 0) {
         if (end.at & 0x0F)
-            return 1;
+            return true;
     } else {
         if (end.at - place <= 1)
-            return 1;
+            return true;
         if (!ENDS_LINE(*(const u16 *)(Room + end.at - 2)))
-            return 1;
+            return true;
     }
     where->place = end.at;
     where->line++;
-    return 0;
+    return false;
 }
 
-/* Go to the line before. Returns 0, with `where` on it, or 1 and `where`
-   as it was if there is none: in the first line. In hex mode the line
+/* Go to the line before. Returns false, with `where` on it, or true and
+   `where` as it was if there is none: in the first line. In hex mode the line
    before is 16 bytes back, and there is none for a line in the first 16
    bytes whatever its number.
 
@@ -551,25 +557,26 @@ u16 T53_00(struct Where *where)
    stopped the lines are taken forwards again until the next one would be
    this line. The assembly looks through at most 32K at a time, and then
    takes a segment that is lower. */
-u16 T54_00(struct Where *where)
+bool T54_00(struct Where *where)
 {
     struct Where line;
     i32 place = where->place;
     i32 from, next;
     i32 at;
-    u16 found = 0, pair, word;
+    bool found = false;
+    u16 pair, word;
 
     if (where->line == 0)
-        return 1;
+        return true;
     if (ed.EdTxHex != 0) {
         if (place < 16)
-            return 1;
+            return true;
         where->place = place - 16;
         where->line--;
-        return 0;
+        return false;
     }
     if (place == 0)
-        return 1;
+        return true;
     /* Two bytes behind the word that is looked at: with a sign, since
        from the second byte of the text that is the byte before the
        text. */
@@ -583,7 +590,7 @@ u16 T54_00(struct Where *where)
         word = *(const u16 *)(Room + at - 2);
         if (!found) {
             if (ENDS_LINE(word)) {
-                found = 1;
+                found = true;
                 pair = word;
             }
         } else {
@@ -607,13 +614,13 @@ u16 T54_00(struct Where *where)
     }
     where->place = from;
     where->line--;
-    return 0;
+    return false;
 }
 
 /* Whether the line buffer has a character at `cursor`. If it has not,
    and does not hold the whole line, it is first put back into the text
    and filled again. */
-static u16 T55_10(u16 cursor)
+static bool T55_10(i32 cursor)
 {
     if (cursor >= EdSizLn && ed.EdWhole == 0) {
         T51_00();
@@ -627,7 +634,7 @@ static u16 T55_10(u16 cursor)
    such, and behind those that do not, up to the next one that does or to
    the end of what the buffer has. The first character itself is not
    looked at. */
-u16 T55_00(u16 cursor)
+i32 T55_00(i32 cursor)
 {
     for (;;) {
         if (!T55_10(cursor))
@@ -655,7 +662,7 @@ u16 T55_00(u16 cursor)
 void T56_00(i32 place, i32 line, i32 target)
 {
     struct Where where;
-    u16 cursor, last;
+    i32 cursor, last;
 
     where.place = place;
     where.line = line;
@@ -669,9 +676,10 @@ void T56_00(i32 place, i32 line, i32 target)
             break;
     }
     T50_00();
-    target -= EdOffst;
-    cursor = target > 0xFFFF ? 0xFFFF : (u16)target;
-    last = (u16)(EdSizLn - T57_00().left);
+    /* The assembly takes 0FFFFh for a byte 64K or more into the line,
+       which is beyond the last character too. */
+    cursor = target - EdOffst;
+    last = EdSizLn - T57_00().left;
     if (cursor > last)
         cursor = last;
     EdCursr = cursor;
@@ -689,14 +697,16 @@ bool T64_00(const u8 *name, const u8 *text, i32 count)
 /* Clear a line of the window in the screen buffer; only the low byte of
    `line` counts. Returns where the line is in the buffer, and its row
    and column on the screen. */
-struct Cleared T70_00(u16 line)
+struct Cleared T70_00(i32 line)
 {
     struct Cleared cleared;
+    /* Of the row the low byte alone counts: the rest is shifted out of
+       the place's 16 bits. */
     u16 place = (u16)(ed.EdBase + (line << 8));
     u16 *screen = BasAdr(place);
     u16 *cell = screen;
     u16 blank = (u16)(Color(Back_C) << 8 | ' ');
-    u16 count;
+    i32 count;
 
     for (count = ed.EdSizeX; count; count--)
         *cell++ = blank;
@@ -714,17 +724,17 @@ struct Cleared T70_00(u16 line)
    high byte of `function` is what the BIOS is asked to do with the screen,
    6 to scroll up and 7 to scroll down; the line that comes free is blank
    there. Nothing is done if `line` is the last line. */
-void T71_00(u16 function, u16 place, u16 step)
+void T71_00(u16 function, u16 place, i32 step)
 {
     u16 *to = BasAdr(place);
-    /* The step is a number of 16 bits that the assembly adds to an
-       offset, where one of FF60h goes 160 back: added to a pointer as it
-       is, it would go that far on. Taken with its sign it is so many
-       bytes on or back, two to a cell. */
-    i32 stride = (i32)(short)step / 2;
+    /* So many bytes on or back, two to a cell: the assembly adds the
+       step to an offset, as a number of 16 bits, FF60h for 160 back. */
+    i32 stride = step / 2;
     u16 *from = to + stride;
-    u16 count = (u8)(ed.EdSizeY - function) - 1;
-    u16 cells, column;
+    /* The lines below `line` but the last: `line` is never below the
+       last, so this is not below 0. */
+    i32 count = (u8)(ed.EdSizeY - function) - 1;
+    i32 cells, column;
 
     if (count == 0)
         return;
@@ -766,13 +776,13 @@ void T71_00(u16 function, u16 place, u16 step)
    is written, but where it stands less than two bytes into its
    segment; and the two bytes before a line that is in the buffer are
    always looked at. */
-void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base)
+void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base)
 {
     u16 *screen = T70_00(line).screen;
     u16 *cell;
     u8 *ascii;
-    i32 offset;
-    u16 column, place, c, count;
+    i32 offset, column, place, count;
+    u16 c;
 
     if (ed.EdTxHex == 0) {
         column = 0;
@@ -791,7 +801,11 @@ void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base)
             if (place < EdCol0)
                 continue;
             place -= EdCol0;
-            if ((u8)place >= ed.EdSizeX) {
+            /* Nothing is left out in front of the window or more than
+               seven columns of a tab: the window's width is passed here
+               by less than 8, below 256, where the assembly holds the
+               low byte against it. */
+            if (place >= ed.EdSizeX) {
                 screen[(u16)(ed.EdSizeX - 1)] = (u16)(Color(Arrow_C) << 8 | 0x1A);
                 break;
             }
@@ -833,7 +847,7 @@ void T72_00(u16 line, const u8 *from, const u8 *end, const u8 *base)
 struct Drawn T73_10(void)
 {
     struct Drawn drawn;
-    u16 line = (u16)(EdLine - EdLin0);  /* a row of the window */
+    i32 line = EdLine - EdLin0;         /* a row of the window */
     u16 place = (u16)(ed.EdBase + (line << 8));
     const u8 *from;
     const u8 *end;
@@ -876,7 +890,8 @@ void T74_00(void)
 {
     u8 *name = md.TmpBuf;
     u16 *screen = md.ScrBuf + 6;
-    u16 blank, count;
+    u16 blank;
+    i32 count;
 
     for (count = 0; count < LenStr + 1; count++)
         name[count] = md.ViewFil[count];
@@ -909,7 +924,7 @@ void T75_00(i32 number, u16 *screen, u16 color)
 void T76_00(u16 place, const u8 *text, const u8 *colors)
 {
     struct LineArgs line;
-    u16 count;
+    i32 count;
 
     line.value = 0xFF;                  /* no limit to the width */
     line.line = text;
@@ -960,7 +975,7 @@ static struct Answer T80_01(void)
 static void T80_Name(void)
 {
     u8 *name = md.TmpBuf + 130;
-    u16 count;
+    i32 count;
 
     for (count = 0; count < LenStr + 1; count++)
         name[count] = md.ViewFil[count];
@@ -985,8 +1000,9 @@ static struct Answer T80_02(u16 attributes)
     struct Answer answer;
     struct Device device;
     const u8 *piece;
-    i32 left;
-    u16 handle, count, error, failed;
+    i32 left, count;
+    u16 handle, error;
+    bool failed;
 
     if (attributes & 1) {
         answer = FileSetAttributes(md.ViewFil, attributes & 0xFFFE);
@@ -1013,8 +1029,8 @@ static struct Answer T80_02(u16 attributes)
         do {
             count = PIECE;
             if (left < count)
-                count = (u16)left;
-            answer = FileWrite(handle, piece, count);
+                count = left;
+            answer = FileWrite(handle, piece, (u16)count);
             failed = answer.failed;
             error = answer.value;
             if (failed)
@@ -1068,7 +1084,8 @@ static void T80_14(void)
     const u8 *file;
     const u8 *text;
     u8 *to;
-    u16 letter, count, c;
+    u16 letter, c;
+    i32 count, i;
 
     letter = *(const u16 *)name;
     if (letter >> 8 == ':')
@@ -1091,29 +1108,29 @@ static void T80_14(void)
     }
     if (md.TmpBuf + LenPath + 13 <= to)
         return;
-    for (count = (u16)(md.TmpBuf + LenPath + 13 - to); count; count--)
+    for (count = md.TmpBuf + LenPath + 13 - to; count; count--)
         *to++ = *name++;
     PathLin(md.TmpBuf);
     file = CutPath(md.TmpBuf);
-    count = (u16)(file - md.TmpBuf);
-    for (c = 0; c < count; c++)
-        if (md.TmpBuf[c] != md.NcPath[c])
+    count = file - md.TmpBuf;
+    for (i = 0; i < count; i++)
+        if (md.TmpBuf[i] != md.NcPath[i])
             return;
     if (md.NcPath[count] != 0)
         return;
-    for (c = 0; c < sizeof MainExt_F; c++)
-        if (file[c] != MainExt_F[c])
+    for (i = 0; i < (i32)sizeof MainExt_F; i++)
+        if (file[i] != MainExt_F[i])
             return;
     count = LenExt - 1;
     if (count > ed.EdLen)
-        count = (u16)ed.EdLen;
+        count = ed.EdLen;
     text = Room;
-    for (c = 0; c < count; c++)
-        md.ExtMain[c] = text[c];
+    for (i = 0; i < count; i++)
+        md.ExtMain[i] = text[i];
     md.ExtMain[count] = 0x1A;
 }
 
-/* Save the text as the file ViewFil. Returns 0 if it is saved.
+/* Save the text as the file ViewFil. Returns false if it is saved.
 
    With a box on the screen that says so: the line buffer goes back into
    the text, the user is asked whether to overwrite a file that is
@@ -1124,11 +1141,11 @@ static void T80_14(void)
 
    Ported as it is: what follows the saving of the file, T80_14, is done
    whether it was saved or not. */
-u16 T80_00(void)
+bool T80_00(void)
 {
     struct Box box;
     struct Answer answer;
-    u16 failed = 1;
+    bool failed = true;
 
     T51_00();
     T50_00();
@@ -1146,7 +1163,7 @@ u16 T80_00(void)
         }
         answer = T80_02(answer.value);
         if (!answer.failed) {
-            failed = 0;
+            failed = false;
             goto done;
         }
     }
@@ -1228,7 +1245,7 @@ static void T14_00(void)
         T14_11();
         return;
     }
-    left = T57_00().left;
+    left = (u16)T57_00().left;
     if (left == 0 && EdSizLn != 0 && ed.EdWhole == 0) {
         T51_00();
         T14_11();
@@ -1397,7 +1414,7 @@ static void T02_03(void)
     row = (u16)(EdLine - EdLin0 + 2);
     if ((u8)row < ed.EdSizeY)
         T71_00(0x700 | (u8)(row - 1),
-               (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)), (u16)-160);
+               (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)), -160);
     T06_14();
 }
 
@@ -2198,7 +2215,7 @@ static void T00_20(void)
     u16 delta, row, count, size, state, color, i;
     u16 *saved;
 
-    column = T57_02();
+    column = (u16)T57_02();
     EdCol = column;
     if (ed.EdUpDwn == 0) {
         EdCol1 = column;
@@ -2280,7 +2297,7 @@ top:
             } else if (delta == 0xFFFF) {       /* T00_34 */
                 T71_00(0x700,
                        (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)),
-                       (u16)-160);
+                       -160);
                 ed.EdCurLn = 0;
             } else if (delta != 0) {
                 goto whole;
