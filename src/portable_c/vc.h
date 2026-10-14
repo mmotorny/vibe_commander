@@ -1114,7 +1114,7 @@ struct Onward F34_10(struct WCBdef *panel);
 i32 V00_02(i32 menu, bool edit, bool whole, struct Open *open);
 void V00_10(u16 handle);
 void V13_00(void);
-void V13_01(u16 changed);
+void V13_01(bool changed);
 struct EditEnd T00_00(u16 handle, u16 begin, u16 size);
 /* Two that the viewer and the editor share, and the file search the
    second: T70_00 of edit.c clears a line of the window in the screen
@@ -1130,11 +1130,11 @@ struct Sought {
     u16 found;                          /* 1 if the text was found, capitals
                                            and small letters alike, 0 if
                                            the bytes were, 100h if neither */
-    u16 end;                            /* where the search ended: behind
+    i32 end;                            /* where the search ended: behind
                                            what was found */
 };
 struct Cleared T70_00(u16 line);
-struct Sought V82_00(const u8 *text, u16 at, u16 count);
+struct Sought V82_00(const u8 *text, i32 at, i32 count);
 
 /* The commands of the menus, commands.c: `panel` is the current panel,
    or the panel of the Left or the Right menu, and `item` what the
@@ -1263,20 +1263,20 @@ struct Onward F21_30(void);
    for `view` and else a menu, whose path it has put at TmpBuf then. See
    view.c. */
 struct Next {                           /* what F34_30 found: */
-    u16 none;                           /* 1 if there is no command */
+    bool none;                          /* whether there is no command */
     u8 *at;                             /* where the command begins: or,
                                            with none, the line that is no
                                            command, or the place behind
                                            the end of the file */
 };
 struct Named {                          /* what F34_40 found: */
-    u16 file;                           /* 1 if the command is only the
-                                           name of a file */
+    bool file;                          /* whether the command is only
+                                           the name of a file */
     u8 *at;                             /* if it is not, the place before
                                            the command */
 };
 struct Next F34_30(const u8 *text);
-struct Named F34_40(u8 *text, u16 view);
+struct Named F34_40(u8 *text, bool view);
 /* Have both panels read again: where a command ends that has changed
    what is on the disk. Returns true. See dirfunc.c. */
 bool FncEx1(void);

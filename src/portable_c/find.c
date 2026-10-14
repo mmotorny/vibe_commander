@@ -656,7 +656,7 @@ next:
             if (read.failed)
                 goto stopped;
             count = read.value;
-            if (V82_00(part, 0, (u16)count).found != 0x100) {
+            if (V82_00(part, 0, count).found != 0x100) {
                 found = true;
                 break;
             }

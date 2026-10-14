@@ -108,9 +108,9 @@ bool NextLin(const u8 *text, struct Line *line);
 bool PrevLin(const u8 *text, struct Line *line);
 i32 V20_00(const u8 *text);
 void V25_00(void);
-u16 V30_00(const u8 *text);
+bool V30_00(const u8 *text);
 void V31_00(u16 place);
-void V32_00(const u8 *text, u16 number, u16 at, u16 end);
+void V32_00(const u8 *text, i32 number, i32 at, i32 end);
 bool V40_00(void);
 void V50_00(u8 *text);
 void V51_00(u8 *text);
@@ -420,16 +420,19 @@ i32 V20_00(const u8 *text)
 void V25_00(void)
 {
     u16 *screen;
-    u16 cell, count, percent, high;
+    u16 cell;
+    i32 column, count, percent, high;
     u32 position, length, low;
 
     VI->Vi100pc = 0;
     if (VI->ViStatus == 0)
         return;
-    count = 0;
+    column = 0;
     if (VI->ViTxHex == 0)
-        count = (u16)ViCol;
-    Number(md.TmpBuf, 0, count, NUM_SEPARATED);
+        column = ViCol;
+    /* ViCol is below 64K: the keys keep it below 0FFAFh, and the search
+       counts it in 16 bits (V00_10). */
+    Number(md.TmpBuf, 0, (u16)column, NUM_SEPARATED);
     screen = md.ScrBuf + 44;
     cell = *screen & 0xFF00 | ' ';
     for (count = 7; count; count--)
@@ -450,7 +453,8 @@ void V25_00(void)
     length = VI->ViLen;
     percent = 0;
     if (length != 0) {
-        percent = 0xFFFF;
+        percent = -1;                   /* the assembly's 0FFFFh, which
+                                           the first step makes 0 */
         for (;;) {
             percent++;
             if (low < length) {
@@ -463,24 +467,26 @@ void V25_00(void)
             }
         }
     }
-    Number(md.TmpBuf, 0, percent, NUM_SEPARATED | NUM_PADDED);
+    /* 100 at the most: the place is within the file. */
+    Number(md.TmpBuf, 0, (u16)percent, NUM_SEPARATED | NUM_PADDED);
     MovDz0(BasAdr(75), md.TmpBuf + 10);
     Window(0, 0x150);
 }
 
 /* Write the screen: the window cleared, and a line of the text in each
-   of its rows, from the line that ViFirst is in. Returns 1 if the part in
-   the memory ends before the window is full, and else 0. */
-u16 V30_00(const u8 *text)
+   of its rows, from the line that ViFirst is in. Returns whether the part
+   in the memory ends before the window is full. */
+bool V30_00(const u8 *text)
 {
     struct Line line;
-    u16 number, count, at, end, result;
+    i32 number, count, at, end;
+    bool result;
     u8 last;
 
     number = 0;
     count = VI->ViSize >> 8;
     do {
-        T70_00(number);
+        T70_00((u16)number);
         number++;
     } while (--count);
     number = 0;
@@ -488,26 +494,26 @@ u16 V30_00(const u8 *text)
     line.at = V20_00(text);
     line.entry = ViPoint;
     for (;;) {
-        at = (u16)line.at;
+        at = line.at;
         if (NextLin(text, &line))
             break;
-        V32_00(text, number, at, (u16)line.at);
+        V32_00(text, number, at, line.at);
         number++;
         if (--count == 0) {
-            result = 0;
+            result = false;
             goto show;
         }
     }
     /* The last line there is: without the first byte of a pair that ends
        it, where the second may be in the part still to be read. */
-    end = (u16)ViLoaded;
+    end = ViLoaded;
     if (V40_00() && at < end) {
         last = text[end - 1];
         if (last == 0x0D || last == 0x0A)
             end--;
     }
     V32_00(text, number, at, end);
-    result = 1;
+    result = true;
 show:
     Window(VI->ViBase, VI->ViSize);
     return result;
@@ -518,7 +524,7 @@ show:
 void V31_00(u16 place)
 {
     u16 *screen = BasAdr(place);
-    u16 count = VI->ViSize & 0xFF;
+    i32 count = VI->ViSize & 0xFF;
     u16 cell = (u16)(Color(Back_C) << 8 | ' ');
 
     for (; count; count--)
@@ -540,18 +546,19 @@ void V31_00(u16 place)
    being 0FFE0h bytes at the most; and the editor, which has the shape of
    the cursor in the same word, EdShape, sets that when it opens a
    file. */
-void V32_00(const u8 *text, u16 number, u16 at, u16 end)
+void V32_00(const u8 *text, i32 number, i32 at, i32 end)
 {
     u8 *screen = (u8 *)BasAdr((u16)(VI->ViBase + (number << 8)));
     u8 *chars;
     u32 found, position;
-    u16 first, column, place, behind, word, color, count;
+    i32 first, column, place, behind, count;
+    u16 word, color;
     u8 c;
 
     first = 0xFFFF;
     found = VI->ViSearch + 1 - VI->ViOffset;
     if ((u16)(found >> 16) == 0) {
-        first = (u16)found;
+        first = (i32)found;
         ViTmp2 = first + ViSrLen - 1;
     }
     ViTmp1 = first;
@@ -567,7 +574,11 @@ void V32_00(const u8 *text, u16 number, u16 at, u16 end)
             c = text[at++];
             behind = at;
             place = column;
-            column++;
+            /* wraps: the original counts the columns of a line in 16
+               bits. A line passes 65,535 of them only with more than
+               8,191 tabs, where the search can put ViCol (V00_10), and
+               it is drawn there as the original draws it. */
+            column = (u16)(column + 1);
             if (c == 9) {
                 c = ' ';
                 if (column & 7)
@@ -592,7 +603,7 @@ void V32_00(const u8 *text, u16 number, u16 at, u16 end)
         return;
     }
 
-    position = VI->ViOffset + at;
+    position = VI->ViOffset + (u32)at;
     screen += 2;
     screen = (u8 *)HexByt((u16 *)screen, (u16)(position >> 24));
     screen = (u8 *)HexByt((u16 *)screen, (u16)(position >> 16));
@@ -801,7 +812,7 @@ static void Status(void)
 {
     u16 *screen;
     u16 cell = (u16)(Color(Menu_C) << 8 | ' ');
-    u16 count;
+    i32 count;
 
     for (count = 0; count != 80; count++)
         md.ScrBuf[count] = cell;
@@ -819,7 +830,7 @@ static void Status(void)
     count = 6;
     if (VI->ViLen == 1)
         count--;
-    MvsBw(screen, Byts_S, count, cell);
+    MvsBw(screen, Byts_S, (u16)count, cell);
     *(u8 *)(md.ScrBuf + 78) = '%';
 }
 
@@ -848,13 +859,14 @@ void V00_10(u16 handle)
     u32 rest, position;
     struct Sought sought;
     struct Mouse pointer;
-    u16 count, key, bar, step, column, at, end, begin, size;
-    i32 number;
-    u16 length, panel, behind, in_file, result, edge;
+    u16 key, begin, size;
+    i32 count, bar, step, column, at, end, number, length, behind, edge;
+    i32 result;
+    u16 found;
+    bool in_file, ended;
     u8 *starts;
     u16 mouse = 0;
-    i32 third;
-    u8 quarter;
+    i32 third, quarter;
 
     /* The room in whole paragraphs, and 0FFEh of them at the most, which
        is the viewer's own number. */
@@ -927,7 +939,7 @@ V00_40:                                 /* a key */
         if (VI->ViWrap != 0)
             bar = 5;
     }
-    key = Input(bar);
+    key = Input((u16)bar);
     ClrKbd();
     /* The mouse, or a key without a scan code: Case takes none. */
     if (key >> 8 == 0xFC || key >> 8 == 0)
@@ -1001,7 +1013,7 @@ V02_00:                                 /* ^Left */
 V02_01:
     if (VI->ViTxHex != 0)
         goto V00_30;
-    column = (u16)ViCol;
+    column = ViCol;
     if (column == 0)
         goto V00_30;
     if (column < step)
@@ -1022,7 +1034,7 @@ V04_00:                                 /* ^Right */
 V04_01:
     if (VI->ViTxHex != 0)
         goto V00_30;
-    column = (u16)ViCol;
+    column = ViCol;
     if (column >= 0xFFFF - 80)
         goto V00_30;
     column += step;
@@ -1059,10 +1071,10 @@ V05_02:                                 /* the window a line down, and the
     T71_00(0x700, (u16)(begin + ((VI->ViSize >> 8) - 1 << 8)), (u16)-(2 * 80));
     V31_00(begin);
     FIRST();
-    at = (u16)line.at;
-    end = (u16)ViLoaded;
+    at = line.at;
+    end = ViLoaded;
     if (!NEXT())
-        end = (u16)line.at;
+        end = line.at;
     V32_00(text, 0, at, end);
     Window(VI->ViBase, 0x100 | (u8)VI->ViSize);
     /* Whether the window is full: from the first line again, with the
@@ -1094,20 +1106,20 @@ V06_00:                                 /* Down */
     T71_00(0x600, begin, 2 * 80);
     V31_00((u16)(begin + ((VI->ViSize >> 8) - 1 << 8)));
     number = (VI->ViSize >> 8) - 1;
-    count = (u16)number;
+    count = number;
     FIRST();
     do {
         if (NEXT())
             goto V06_05;
     } while (--count);
-    at = (u16)line.at;
-    end = (u16)ViLoaded;
-    result = NEXT();
-    if (!result)
-        end = (u16)line.at;
-    V32_00(text, (u16)number, at, end);
+    at = line.at;
+    end = ViLoaded;
+    ended = NEXT();
+    if (!ended)
+        end = line.at;
+    V32_00(text, number, at, end);
     Window((u16)(VI->ViBase + (number << 8)), 0x100 | (u8)VI->ViSize);
-    if (!result)
+    if (!ended)
         goto V00_30;
 V06_05:
     V40_00();
@@ -1194,7 +1206,7 @@ V09_00:                                 /* Home */
     VI->ViOffset = 0;
     ViFirst = 0;
     ViCol = 0;
-    count = (u16)ViSpace;
+    count = ViSpace;
     if (HIGH(VI->ViLen) == 0 && count > LOW(VI->ViLen))
         count = LOW(VI->ViLen);
     ViLoaded = count;
@@ -1209,8 +1221,8 @@ V10_00:                                 /* End */
     if (HIGH(rest) != 0 || LOW(rest) > ViLoaded) {
         /* The end of the file is not in the memory: half a part of it,
            from an offset that is a multiple of 16. */
-        count = (u16)((ViSpace >> 1) - 0x10 + (LOW(VI->ViLen) & 0xF));
-        VI->ViOffset = VI->ViLen - count;
+        count = (ViSpace >> 1) - 0x10 + (LOW(VI->ViLen) & 0xF);
+        VI->ViOffset = VI->ViLen - (u32)count;
         ViLoaded = count;
         ViFirst = 0;
         Load(text, VI->ViOffset, 0, ViLoaded);
@@ -1248,25 +1260,25 @@ V15_00:                                 /* Continue search */
     V80_00(ViFl_S, &box);
     /* From the first line of the screen, or from the line behind it if
        something has been found before. */
-    at = (u16)ViFirst;
+    at = ViFirst;
     if (HIGH(VI->ViSearch) != 0xFFFF) {
         line.at = at;
         line.entry = ViPoint;
-        at = (u16)ViLoaded;
+        at = ViLoaded;
         if (!NEXT())
-            at = (u16)line.at;
+            at = line.at;
     }
-    VI->ViSearch = VI->ViOffset + at;
+    VI->ViSearch = VI->ViOffset + (u32)at;
     if (ViLoaded < at)
         goto V15_04;
     /* In what is in the memory. */
-    count = (u16)(ViLoaded - at);
+    count = ViLoaded - at;
     sought = V82_00(text, at, count);
     if (sought.found & 0x100)
         goto V15_06;
     behind = sought.end - at;
-    panel = sought.found;
-    in_file = 0;
+    found = sought.found;
+    in_file = false;
     goto V15_10;
 V15_04:                                 /* and on in the file, a piece of
                                            it at a time in MenuBuf */
@@ -1282,7 +1294,7 @@ V15_04:                                 /* and on in the file, a piece of
         count = LOW(rest);
     if (FileSeek(VI->ViHandle, 0, VI->ViSearch).place != VI->ViSearch)
         goto V15_07;
-    read = FileRead(VI->ViHandle, md.MenuBuf, count);
+    read = FileRead(VI->ViHandle, md.MenuBuf, (u16)count);
     count = read.value;
     if (read.failed) {
         result = 2;
@@ -1290,8 +1302,8 @@ V15_04:                                 /* and on in the file, a piece of
     }
     sought = V82_00(md.MenuBuf, 0, count);
     behind = sought.end;
-    panel = sought.found;
-    in_file = 1;
+    found = sought.found;
+    in_file = true;
     if (!(sought.found & 0x100))
         goto V15_10;
 V15_06:                                 /* not in these `count` bytes: on
@@ -1299,20 +1311,20 @@ V15_06:                                 /* not in these `count` bytes: on
     if (count < SRCH_LEN)
         goto V15_07;
     count = count - SRCH_LEN + 1;
-    VI->ViSearch += count;
+    VI->ViSearch += (u32)count;
     goto V15_04;
 V15_07:
     Dialog(&SrEr_B, ViFl_S, 0, 0, &md);
     result = 3;
     goto V15_22;
 V15_10:                                 /* found, as text or as bytes */
-    VI->ViSrPan = (u8)panel;
+    VI->ViSrPan = (u8)found;
     length = SRCH_LEN;
-    if ((u8)panel == 0)
+    if ((u8)found == 0)
         length = HexLen;
-    ViSrLen = (u8)length;
+    ViSrLen = length;
     behind -= length;
-    VI->ViSearch += behind;
+    VI->ViSearch += (u32)behind;
     if (in_file) {
         /* The part of the file that begins 2000 bytes before it, at a
            multiple of 16. */
@@ -1322,19 +1334,24 @@ V15_10:                                 /* found, as text or as bytes */
         position &= 0xFFFFFFF0;
         VI->ViOffset = position;
         rest = VI->ViLen - position;
-        count = (u16)ViSpace;
+        count = ViSpace;
         if (HIGH(rest) == 0 && count > LOW(rest))
             count = LOW(rest);
         ViLoaded = count;
         Load(text, VI->ViOffset, 0, ViLoaded);
         V60_00(text, 0, ViSpace);
     }
-    count = LOW(VI->ViSearch) - LOW(VI->ViOffset);
+    /* Where it was found in the part, which the part holds: the
+       assembly takes the low words alone. */
+    count = (i32)(VI->ViSearch - VI->ViOffset);
     ViFirst = count;
     if (VI->ViTxHex != 0)
         goto V15_21;
-    /* The column it is in, and the line moved so that it shows. */
-    at = (u16)V20_00(text);
+    /* The column it is in, and the line moved so that it shows. These
+       wrap as the original counts them, in 16 bits: a line of more than
+       8,191 tabs in front of what was found passes 65,535 columns, and
+       the screen then does not show it, as in the original. */
+    at = V20_00(text);
     if (count < at)
         goto V15_21;
     count -= at;
@@ -1342,11 +1359,11 @@ V15_10:                                 /* found, as text or as bytes */
     for (; count; count--) {
         if (text[at++] == 9)
             column |= 7;
-        column++;
+        column = (u16)(column + 1);     /* wraps */
     }
     if (column > ViCol) {
-        column += ViSrLen;
-        edge = (u16)(ViCol + (u8)VI->ViSize);
+        column = (u16)(column + ViSrLen); /* wraps */
+        edge = (u16)(ViCol + (u8)VI->ViSize); /* wraps */
         if (column < edge)
             goto V15_21;
         column = column - (u8)VI->ViSize + 1;
@@ -1373,7 +1390,7 @@ leave:
 void V13_00(void)
 {
     FileClose(VI->ViHandle);
-    V13_01(0);
+    V13_01(false);
 }
 
 /* What PutFls of the original does: a panel shows files, the tree or
@@ -1390,10 +1407,9 @@ static void Files(struct WCBdef *panel)
 
 /* Go back to the panels from the viewer or the editor: what DOS had on
    the screen, the clock and the key bar as they were, the panels that
-   are visible, the prompt, the menu bar and the key bar. `changed` is
-   not 0 in its low byte if a file has been written, so that the panels
-   are read again. */
-void V13_01(u16 changed)
+   are visible, the prompt, the menu bar and the key bar. `changed` says
+   whether a file has been written, so that the panels are read again. */
+void V13_01(bool changed)
 {
     struct WCBdef *panel;
 
@@ -1406,14 +1422,14 @@ void V13_01(u16 changed)
         PutPath(panel);
         Files(panel);
     }
-    panel->ChgFlg |= (u8)changed;
+    panel->ChgFlg |= changed;
     panel = RightPanel;
     if (panel->Visible != 0) {
         Panel(panel);
         PutPath(panel);
         Files(panel);
     }
-    panel->ChgFlg |= (u8)changed;
+    panel->ChgFlg |= changed;
     PutPrm(panel);
     PutMnu(0);
     PutKey(0xFF);
@@ -1440,7 +1456,7 @@ void V81_00(void)
 {
     const u8 *from;
     u8 *to;
-    u16 digit;
+    i32 digit;
     u8 c;
 
     to = (u8 *)MvzLine(md.HelpBuf, md.SrchStr, LenStr + 1);
@@ -1457,7 +1473,7 @@ void V81_00(void)
         while (c == ' ');
         if (c == 0)
             return;
-        digit = (u16)TstHex(c);
+        digit = TstHex(c);
         if (digit > 0xFF)
             break;
         *to = (u8)digit;
@@ -1465,7 +1481,7 @@ void V81_00(void)
         c = *from++;
         if (c == 0)
             return;
-        digit = (u16)TstHex(c);
+        digit = TstHex(c);
         if (digit <= 0xFF) {
             *to = (u8)((*to << 4) + digit);
             from++;
@@ -1485,7 +1501,7 @@ void V81_00(void)
    where the search ended, behind what was found, and 1 if the text was
    found, capitals and small letters alike, 0 if the bytes were, and 100h
    if neither. */
-static struct Sought Sought(u16 found, u16 end)
+static struct Sought Sought(u16 found, i32 end)
 {
     struct Sought sought;
 
@@ -1494,19 +1510,21 @@ static struct Sought Sought(u16 found, u16 end)
     return sought;
 }
 
-struct Sought V82_00(const u8 *text, u16 at, u16 count)
+struct Sought V82_00(const u8 *text, i32 at, i32 count)
 {
-    u16 more = SRCH_LEN - HexLen;       /* places at the end where only
+    i32 more = SRCH_LEN - HexLen;       /* places at the end where only
                                            the bytes have room */
-    u16 start, left, i;
+    i32 start, left, i;
 
     if (count >= SRCH_LEN) {
         count = count - SRCH_LEN + 1;
     } else {
-        count -= SRCH_LEN;
-        more += count;
-        if (more >= count)              /* fewer bytes than are looked for */
+        /* The assembly adds what the text lacks, less than nothing, to
+           `more` in 16 bits, and goes on where that carries: where the
+           bytes have room at all. */
+        if (more + count < SRCH_LEN)    /* fewer bytes than are looked for */
             goto none;
+        more += count - SRCH_LEN;
         more++;
         count = 0;
         goto bytes_only;
@@ -1600,7 +1618,7 @@ extern const u8 Run2_S[];               /* "Try rebooting." */
 
 /* What a command returns, struct Onward of vc.h: the place where the
    program goes on, a NEXT_ there. None of these places takes a panel. */
-static struct Onward To(u16 place)
+static struct Onward To(i32 place)
 {
     struct Onward next;
 
@@ -1610,10 +1628,10 @@ static struct Onward To(u16 place)
     return next;
 }
 
-/* On in the program's own viewer, or in its editor if `edit` is not 0. */
-static struct Onward Own(u16 edit)
+/* On in the program's own viewer, or in its editor if `edit`. */
+static struct Onward Own(bool edit)
 {
-    return To(edit != 0 ? NEXT_EDIT : NEXT_VIEW);
+    return To(edit ? NEXT_EDIT : NEXT_VIEW);
 }
 
 /* What a program that is run as the viewer or the editor finds behind
@@ -1630,7 +1648,7 @@ static const u8 ViewPar[9] = { 0, 'S', 'o', 'c', 'h', 'a', 0, 0x1F, 1 };
    Returns where the command begins; or that there is none, and where
    the line begins that is no command, or the place behind the character
    that ends the file. */
-static struct Next Next(u16 none, const u8 *at)
+static struct Next Next(bool none, const u8 *at)
 {
     struct Next next;
 
@@ -1653,14 +1671,14 @@ struct Next F34_30(const u8 *text)
             if ((u8)word == EOF_CHAR)
                 break;
             at--;
-            return Next(0, at);
+            return Next(false, at);
         }
         for (;;) {                      /* behind the end of a line */
             word = *(const u16 *)at;
             if ((u8)word == ' ' || (u8)word == '\t')
                 break;
             if (!IS_CRLF(word) && (u8)word != '\'')
-                return Next(1, at);
+                return Next(true, at);
             do {                        /* to the end of this one */
                 word = *(const u16 *)at;
                 at += 2;
@@ -1669,15 +1687,15 @@ struct Next F34_30(const u8 *text)
                 at--;
             } while ((u8)word != EOF_CHAR);
             if (!IS_CRLF(word))
-                return Next(1, at);
+                return Next(true, at);
         }
     }
-    return Next(1, at);
+    return Next(true, at);
 }
 
 /* Is the command at `text` in MenuBuf nothing but the name of a file,
    and the last of its line: F34_40. For a viewer or an editor, `view`
-   not 0, that is a name with an extension of three characters, and for a
+   true, that is a name with an extension of three characters, and for a
    menu one that ends in ".MNU". A drive in front of it has to be a
    letter, and a "!" makes it a command.
 
@@ -1687,7 +1705,7 @@ struct Next F34_30(const u8 *text)
    what is returned has the place before the command. The
    character behind the name is made a zero byte before the length of
    the name is found too great. */
-struct Named F34_40(u8 *text, u16 view)
+struct Named F34_40(u8 *text, bool view)
 {
     struct Named named;
     const u8 *suffix = Menu_F + 1;
@@ -1695,7 +1713,8 @@ struct Named F34_40(u8 *text, u16 view)
     u8 *to;
     u8 *at = text;
     u8 *end;
-    u16 word, count;
+    u16 word;
+    i32 count;
     u8 c;
 
     word = *(const u16 *)at;
@@ -1718,7 +1737,7 @@ struct Named F34_40(u8 *text, u16 view)
     end = at;
     at -= 4;
     count = 1;
-    if (view == 0)
+    if (!view)
         count = 4;
     do {
         c = (u8)UpCase(*at++);
@@ -1737,11 +1756,11 @@ struct Named F34_40(u8 *text, u16 view)
     from = text;
     for (count = LenPath + 13; count != 0; count--)
         *to++ = *from++;
-    named.file = 1;
+    named.file = true;
     named.at = text + LenPath + 13;
     return named;
 command:
-    named.file = 0;
+    named.file = false;
     named.at = text - 1;
     return named;
 }
@@ -1834,19 +1853,19 @@ static struct Onward F34_11(u16 how)
     struct Named named;
     struct Next next;
     struct Answer file, read, found;
-    u16 edit = how & 0xFF;
-    u16 own = how >> 8;
-    u16 count, i;
+    bool edit = (how & 0xFF) != 0;
+    bool own = how >> 8 != 0;
+    i32 count, i;
     u8 *command;
 
-    if ((edit != 0 ? md.AltEdit : md.AltView) == 0)
-        own = own == 0;
-    if (own != 0)
+    if ((edit ? md.AltEdit : md.AltView) == 0)
+        own = !own;
+    if (own)
         return Own(edit);
     HidCur();
     PutMnu(2);
     name = ViewE_F;
-    if (edit != 0)
+    if (edit)
         name = EditE_F;
     from = name;
     for (i = 0; i < 13; i++)
@@ -1880,7 +1899,7 @@ static struct Onward F34_11(u16 how)
     next = F34_30(command);
     if (next.none)
         return Own(edit);
-    named = F34_40(next.at, 1);
+    named = F34_40(next.at, true);
     if (named.file == 0) {
         *named.at = ' ';
         if (Run_00(named.at, 1))
@@ -1907,7 +1926,9 @@ static struct Onward F44_01(u16 how)
 
     if ((how & 0xFF) != 0)
         include = EdFl_S + 1;
-    md.HlpPage = (u8)(how + 18);
+    md.HlpPage = (u8)(how + 18);       /* the low byte: the viewer's page
+                                           or the editor's, with or
+                                           without Alt */
     if ((u8)Dialog(&ViFil_B, include, 0, 0, &md) != 0)
         return To(NEXT_FUNC04);
     if (md.ViewFil[0] == 0)
@@ -1923,7 +1944,7 @@ struct Onward F34_10(struct WCBdef *panel)
     const u8 *from = DrIn_F;
     u16 begin = BegBX(panel);
     u16 size = SizDX();
-    u16 i;
+    i32 i;
 
     for (i = 0; i < 13; i++)
         md.ViewFil[i] = from[i];
@@ -1944,7 +1965,7 @@ struct Onward F34_10(struct WCBdef *panel)
 static struct Onward F34_01(struct WCBdef *panel, u16 how)
 {
     const struct FILENT *file;
-    u16 i;
+    i32 i;
 
     if (panel->Visible == 0)
         return F44_01(how);

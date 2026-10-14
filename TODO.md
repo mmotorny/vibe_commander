@@ -9378,7 +9378,7 @@ for.
 | N1 | `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c` | 891; 133 | F3, N0 | **Done**: "N1, `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c`" below |
 | N2 | `dialog.c` | 1,126; 110 | F3 | **Done**: "N2, `dialog.c`: done, and what a later cluster should know" below |
 | N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | **Done**: "N3, `view.c`, its first part" below, with what `ViewDat` and `EdData` share and where the file is cut |
-| N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | |
+| N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | **Done**, with question 11 asked: "N4, `view.c`, its second part" below |
 | N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
@@ -9859,6 +9859,32 @@ recommendation first.
      ends the program.
    - *The test*: no scenario can get near it; the image of the room,
      with its pattern behind it, holds that nothing is written behind.
+
+11. **The viewer's column of a text that is found, beyond 65,535.**
+   - *When*: the cluster N4 met it and kept the original's cut. Nothing
+     waits for it.
+   - *The original*: the viewer counts the columns of a line in 16
+     bits, a tab going on to the next multiple of eight. Where F7 or
+     Shift-F7 finds a text, it counts the columns in front of it from
+     where the line begins, and moves the first column that is shown,
+     `ViCol`, so that the text is on the screen. A line with more than
+     8,191 tabs in front of the text, 8 KB of a part of 0FFE0h, has
+     more than 65,535 columns there: the count wraps round, `ViCol` is
+     set near the wrapped number, and the screen shows tabs of the line
+     where the text is not. Drawing a line, `V32_00` counts its columns
+     in 16 bits as well, which tells only where the search has put
+     `ViCol` within 80 columns of 65,535. By reading, not tried on the
+     bench. The Right key stops at column 0FFAFh, a limit of the
+     program's own, which stays either way.
+   - *The program of 32 bits*: the same, by the cuts written with
+     `wraps` in `V00_10` and `V32_00`.
+   - *Recommended*: the columns counted in 32 bits in both places, so
+     that the text found is on the screen; the status line has seven
+     cells for the column, room for such a number.
+   - *Or*: as the original, the cuts as they are written.
+   - *The test*: within the original's reach, but a scenario that types
+     8,192 tabs into the editor is long; whether a scenario can make
+     such a line with the program's own commands is to be seen.
 
 Everything else that a user would see otherwise by the memory is
 covered by answer 2, as its table has it row for row. Two rows there
@@ -13916,6 +13942,93 @@ the setup found no `VCSETUP` and waited out their time, and some
 scenarios had no image. Copy the build before, its directory whole,
 to `build/NAME/portable_c/` and save from there, as the notes of
 `CLAUDE.md` have it for a copy that is tested.
+
+### N4, `view.c`, its second part: done, and what a later cluster should know
+
+**What there is.** The scopes that N3 left `not sorted`, sorted by "The
+rule for a number" with the steps of "N0d": what draws, `V25_00`,
+`V30_00`, `V31_00`, `V32_00`, `Status`; the viewer's loop, `V00_10`;
+the ends, `V13_01`; the search, `V81_00`, `Sought`, `V82_00`; the
+commands, `To`, `Own`, `Next`, `F34_30`, `F34_40`, `F34_11`, `F44_01`,
+`F34_10`, `F34_01`. And three structures of `vc.h` that are these
+routines' answers: `struct Sought` of `V82_00`, `struct Next` of
+`F34_30`, `struct Named` of `F34_40`. Nothing of `view.c` is `not
+sorted` now, and clang's warnings are silent for it.
+
+**The numbers.** 88, two of them new: a variable that held two things
+in turn got a second one, `column` of `V25_00` beside its loop's
+`count`, and `ended` of `V00_10`, what `NEXT()` answered, beside
+`result`, the 0, 2 or 3 of the search.
+
+| | Numbers | Which |
+|---|---|---|
+| Widened, to `i32` | 44 | Every place of the text and count in the routines, `at`, `end`, `behind`, `start`, `first`, `count`, `left`, `more`, `i`, `length`, `step`, `number`, `third`, `quarter`, `edge`; the columns, `column` and `place`; `percent` and `high` of the per cent; the number of the key bar; what `TstHex` answers in `V81_00`; `V32_00`'s three parameters and `V82_00`'s two; `To`'s place; `end` of `struct Sought` |
+| Made `bool` | 12 | What `V30_00` answers and its `result`; `in_file` and `ended` of `V00_10`; `changed` of `V13_01`; `edit` of `Own` and of `F34_11`, and `own` there; `none` of `Next` and of `struct Next`; `view` of `F34_40` and `file` of `struct Named` |
+| Kept by a word | 30 | `place` 6, the window's place and size twice, the mouse's, `V31_00`'s row; `bits` 6, the `how` of three commands, `found` of `struct Sought` and the two that take it; `size` 5; `cell` 3; `character` 4; `text` 3, two bytes held against CR LF; `colour` 1; `key` 1; `handle` 1 |
+| Kept by a sentence | 2 | `low` of `V25_00`, the low 32 bits of a hundred times the place, which wrap with the carry counted beside them; `found` of `V32_00`, a difference of two places in the file that wraps where the text is in front of the part |
+| `sign` | 4 | `ViSpace >> 1` in `V00_10`, three lines of it: not below 0, as N3 wrote for `V50_00` |
+
+**The cuts that are written.** `V82_00` counted on a carry: with fewer
+bytes than the text, it added what was lacking, less than nothing, to
+`more` in 16 bits and went on where that carried. It says so now, `if
+(more + count < SRCH_LEN)`, which is the carry for every count that it
+is handed, and `more` is what the 16 bits held. `percent` began at
+0FFFFh for its first step to make 0, and begins at -1. And the
+columns of the search and of the drawing are cut where the original
+cuts them, with `wraps`: question 11 below.
+
+**The casts.** Written before clang was asked, by what each routine
+hands over; clang then named one more, the count of `FileRead`, which
+is S's `u16`. Of the 24 that N3 wrote at the border, every one went by
+the type, with three more of a byte (`ViSrLen`, which is an `i32`, and
+`changed`, a `bool` now) and the one of `find.c` at `V82_00`: 29 taken
+out. 16 written in `view.c`: 9 `(u16)` at a parameter of another file
+or of `sys.h` that is still 16 bits, `T70_00`, `Input`, `MvsBw`,
+`Number` twice, `FileRead`, and three cuts with `wraps`; 5 `(u32)`
+where a count or a place is added to a place in the file; 2 `(i32)`,
+a difference of two places in the file which the part holds. And 2 in
+`edit.c`, at its call of `V82_00`: `(i32)` where it had `(u16)`, and
+`(u32)` where it adds `sought.end` to a place in the file, which
+clang names there once that file is sorted.
+
+**`harness/int16.py`.** The three places of `V30_00` and `V32_00` are
+gone; four are new, each with its reason: the rows of the window less
+1 or 2 in `V00_10`, a column cut to its byte there, and `more` of
+`V82_00`.
+
+**The program.** `VC.EXE` is another, by the types: the listings of
+`view.c`, `edit.c` and `find.c`, and of `main.c` and `usermenu.c`,
+which hand a `bool` now. 56 bytes shorter. The image, `compare` of
+the build of `main` that the cluster began on, saved before anything
+was changed, with the cluster's: "155 scenarios, 43 with nothing that
+differs; 6 differences, 0 more in what was declared as changed, 136 in
+what may differ", and "493 pointers that name the same in both". The
+six are F2's, in `copy` and `copy-dirs`: the byte behind a name copied
+as 13 bytes into `TmpBuf` and `TmpErr`, 80h before and 7Fh after, which
+follows the layout, as N3 saw it.
+
+**What a later cluster should know.**
+
+- `struct Sought` has `end` an `i32` and `found` as it was, 1, 0 or
+  100h. `edit.c` adds `sought.end` to a place in the file with
+  `(u32)`: N6 or N7 meets that line.
+- `T70_00` is called with `(u16)number`; the cast goes when N6 widens
+  its parameter. `T71_00`'s casts are of places of the screen, which
+  stay.
+- `V13_01` takes a `bool`; `main.c` hands it `end.written`, the
+  editor's `u8`, 0 or 1. `F34_40` takes `view` as a `bool`;
+  `usermenu.c` hands it 0.
+- `harness/words.py` counts a `u16 panel` as a panel kept as a
+  number, whatever it holds: `V00_10`'s was what the search found, and
+  is `found`.
+- A cast that was written before the variable was widened, at the
+  border, went with the widening in every place: nothing of the 24
+  needed reading but the line.
+
+It took some 80 tool calls to hand back, of which 15 were reading the
+brief, the plan and the file, 10 the types by scripts, 5 the record's
+reasons, and the rest the tests, the images and this; the suite took
+18 minutes on a machine that four other clusters were testing on.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

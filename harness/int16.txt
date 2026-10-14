@@ -368,23 +368,30 @@ view.c, V00_10: minus
     data, a number, and makes the pointer of the sum. The sum wraps
     round there in both builds.
 
+view.c, V00_10: widen, 2 times
+    | count = (VI->ViSize >> 8) - 1;
+    ViSize has the rows of the viewer's window, 3 or more and below 50,
+    as for `number` below.
+
+view.c, V00_10: widen, 2 times
+    | count = (VI->ViSize >> 8) - 2;
+    ViSize has the rows of the viewer's window, 3 or more and below 50,
+    as for `number` below.
+
+view.c, V00_10: widen
+    | if ((u8)mouse >= (u8)(begin + size - quarter))
+    The sum is cut to its low byte, the column, which is the same of it
+    in 16 bits and in 32.
+
 view.c, V00_10: widen
     | number = (VI->ViSize >> 8) - 1;
     ViSize has the rows of the viewer's window, the screen's less 2 or a
     panel's less 12, 3 or more and below 50.
 
-view.c, V30_00: back
-    | last = text[end - 1];
-    The line above asks that at is below end: end is 1 at the least.
-
-view.c, V32_00: compare
-    | if (end >= at && end - at >= 2) {
-    The same line asks first that end is at or more.
-
-view.c, V32_00: index
-    | screen[place + 1] = (u8)Color(Cursr_C);
-    place is a column of the window, doubled: the lines above leave the
-    loop where its low byte reaches the width, and it is counted up from 0.
+view.c, V82_00: widen
+    | i32 more = SRCH_LEN - HexLen; /* places at the end where only
+    HexLen is how many bytes the hex digits of the text name, one for
+    one or two of its characters, so not more than SRCH_LEN (V81_00).
 
 window.c, ResUser: index
     | const u16 *from = md.UserScr + (row - md.ScrBuf);

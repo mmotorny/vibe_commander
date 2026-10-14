@@ -73,7 +73,7 @@ cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i
 N0              35          0     1              0      36     0     3     3    28  digits.c mask.c line.c mouse.c blank.c
 N1              81          0     2              0      77     6     5     4    45  string.c format.c box.c screen.c misc.c
 N2              79          0     0              0      68    11     0     3    29  dialog.c
-N3, N4         107         75    13              7      38     0     6    12    45  view.c
+N3, N4          56          0    13              0      67     2     6    22    88  view.c
 N5              76          0     0              0      70     6     3     4    44  find.c
 N6 to N8       194        194    41             41       0     0     5     0     6  edit.c
 N9              41          0     6              0      39     8     2     7    37  copy.c
@@ -92,11 +92,11 @@ N19b            41         41     0              0       0     0     0     0    
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        283        102    12              1     150     3     0     0     0  vc.h sys.h tables.h
-all           2624       1415   152             60     573    42    32    51   316
+headers        280         98    12              1     151     3     0     0     0  vc.h sys.h tables.h
+all           2570       1336   152             53     603    44    32    61   359
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               226         45    11              0     150     3     0     0     0
+vc.h               223         41    11              0     151     3     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              40         40     0              0       0     0     0     0     0
@@ -141,7 +141,7 @@ system.c            21         21     1              1       0     0     0     0
 tree.c              18         18     0              0       0     0     0     0     1
 treebox.c           38         38     0              0       0     0     0     0     2
 usermenu.c          49         49     0              0       0     0     0     0     1
-view.c             107         75    13              7      38     0     6    12    45
+view.c              56          0    13              0      67     2     6    22    88
 window.c            39         39     0              0       0     0     0     0     0
 
 ----
@@ -664,7 +664,8 @@ vc.h, struct EditEnd: not sorted, 2 numbers
 
 vc.h, struct Cleared: not sorted, 1 number
 
-vc.h, struct Sought: not sorted, 2 numbers
+vc.h, struct Sought: field found, u16
+    bits: two flags in the bytes as the assembly has them in AX: the low byte 1 for the text and 0 for the bytes, and 100h for neither, which the callers take apart by their bytes.
 
 vc.h, struct Checked: field answer, u16
     What Dialog answers, in two bytes, as every caller takes it
@@ -674,10 +675,6 @@ vc.h, struct Checked: field answer, u16
 vc.h, struct SpeedKey: not sorted, 2 numbers
 
 vc.h, struct Picked: not sorted, 4 numbers
-
-vc.h, struct Next: not sorted, 1 number
-
-vc.h, struct Named: not sorted, 1 number
 
 vc.h, struct Buttons: field key, u16
     key
@@ -2416,13 +2413,41 @@ view.c, PrevLin: variable word, u16
 view.c, V20_00: variable word, u16
     text: two bytes of the text, held against CR LF.
 
-view.c, V25_00: not sorted, 4 numbers, 3 u32
+view.c, V25_00: variable cell, u16
+    cell
 
-view.c, V30_00: not sorted, 7 numbers
+view.c, V25_00: variable length, u32
+    size: the length of the file.
 
-view.c, V31_00: not sorted, 3 numbers
+view.c, V25_00: variable low, u32
+    The low 32 bits of a hundred times a place in the file, which wrap round: the carry is counted beside it in `high`, as the assembly does in 48 bits.
 
-view.c, V32_00: not sorted, 11 numbers, 2 u32
+view.c, V25_00: variable position, u32
+    size: where in the file the screen begins.
+
+view.c, V30_00: variable last, u8
+    character
+
+view.c, V31_00: parameter place, u16
+    place
+
+view.c, V31_00: variable cell, u16
+    cell
+
+view.c, V32_00: variable found, u32
+    Where the text found last is, one behind it, from where the part begins: a difference of two places in the file, which wraps round where the text is in front of the part, and its high word then says that it is not in the part.
+
+view.c, V32_00: variable position, u32
+    size: a place in the file.
+
+view.c, V32_00: variable color, u16
+    colour
+
+view.c, V32_00: variable word, u16
+    text: two bytes of the text, held against CR LF.
+
+view.c, V32_00: variable c, u8
+    character
 
 view.c, Load: parameter position, u32
     size: a place in the file.
@@ -2446,38 +2471,80 @@ view.c, V55_00: parameter handle, u16
 view.c, V60_00: variable word, u16
     text: two bytes of the text, held against CR LF, the first of them against a tab.
 
-view.c, Status: not sorted, 2 numbers
+view.c, Status: variable cell, u16
+    cell
 
-view.c, V00_10: not sorted, 18 numbers, 2 u32, 4 of a sign
+view.c, V00_10: parameter handle, u16
+    handle
 
-view.c, V13_01: not sorted, 1 number
+view.c, V00_10: variable position, u32
+    size: where the part of the file begins that is read.
 
-view.c, V81_00: not sorted, 2 numbers
+view.c, V00_10: variable rest, u32
+    size: what the file has behind a place.
 
-view.c, Sought: not sorted, 2 numbers
+view.c, V00_10: variable begin, u16
+    place: ViBase, where the window is.
 
-view.c, V82_00: not sorted, 6 numbers
+view.c, V00_10: variable key, u16
+    key
 
-view.c, To: not sorted, 1 number
+view.c, V00_10: variable size, u16
+    place: ViSize, the rows and the columns of the window.
 
-view.c, Own: not sorted, 1 number
+view.c, V00_10: variable found, u16
+    bits: what V82_00 found, struct Sought's `found`.
 
-view.c, Next: not sorted, 1 number
+view.c, V00_10: variable mouse, u16
+    place: where the mouse is.
 
-view.c, F34_30: not sorted, 1 number
+view.c, V00_10: sign
+    | if (ViFirst < ViSpace >> 1)
+    ViSpace is the room in whole paragraphs, 0FFE0h at the most, and is set
+    before anything else of the viewer runs: not below 0.
 
-view.c, F34_40: not sorted, 4 numbers
+view.c, V00_10: sign, 2 times
+    | if (ViSpace >> 1 <= ViFirst)
+    ViSpace is the room in whole paragraphs, 0FFE0h at the most, and is set
+    before anything else of the viewer runs: not below 0.
+
+view.c, V00_10: sign
+    | count = (ViSpace >> 1) - 0x10 + (LOW(VI->ViLen) & 0xF);
+    ViSpace is the room in whole paragraphs, 0FFE0h at the most, and is set
+    before anything else of the viewer runs: not below 0.
+
+view.c, V81_00: variable c, u8
+    character
+
+view.c, Sought: parameter found, u16
+    bits: struct Sought's `found`.
+
+view.c, F34_30: variable word, u16
+    text: two bytes of MenuBuf, held against CR LF, the first of them against a character.
+
+view.c, F34_40: variable word, u16
+    text: two bytes of MenuBuf, held against CR LF, the second of them against a colon.
+
+view.c, F34_40: variable c, u8
+    character
 
 view.c, Aexec0: variable error, u16
     system: the error that DOS answers when it does not run the program.
 
-view.c, F34_11: not sorted, 5 numbers
+view.c, F34_11: parameter how, u16
+    bits: 1 in the low byte for the editor, and in the high one for Alt.
 
-view.c, F44_01: not sorted, 1 number
+view.c, F44_01: parameter how, u16
+    bits: 1 in the low byte for the editor, and in the high one for Alt.
 
-view.c, F34_10: not sorted, 3 numbers
+view.c, F34_10: variable begin, u16
+    place: where the window is.
 
-view.c, F34_01: not sorted, 2 numbers
+view.c, F34_10: variable size, u16
+    place: the rows and the columns of the window.
+
+view.c, F34_01: parameter how, u16
+    bits: 1 in the low byte for the editor, and in the high one for Alt.
 
 view_t.c: as a whole, 23 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

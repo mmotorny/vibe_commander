@@ -1851,7 +1851,7 @@ static void T32_00(void)
            and an offset from there, and answers with one: so the
            assembly had them, a segment and an offset of less than 16. */
         base = place & 0xFFFFFFF0UL;
-        sought = V82_00(Room + base, (u16)(place - base), count);
+        sought = V82_00(Room + base, (i32)(place - base), count);
         if (sought.found < 0x100)
             break;
         if (count < SrchLen)
@@ -1860,7 +1860,7 @@ static void T32_00(void)
     }
     if (TstBrk())                       /* T32_05 */
         goto done;
-    place = base + sought.end;
+    place = base + (u32)sought.end;
     if (ed.EdTxHex != 0) {
         ed.EdHexAs = (u8)sought.found;
         ed.EdHxCur = 0;
