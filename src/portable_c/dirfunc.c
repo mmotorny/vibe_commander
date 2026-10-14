@@ -188,7 +188,7 @@ u16 F38_10(u16 answer)
     if ((u8)answer != 0)
         return answer;
     /* None of its lines has ^I: no include line. */
-    answer = Dialog(OFFSET(DelCo_B), 0, 0, 0, MAIN_SEG);
+    answer = Dialog(OFFSET(DelCo_B), 0, 0, 0, &md);
     if ((u8)answer > 1)
         return answer;
     DEL_ALL = (u8)answer;
@@ -232,7 +232,7 @@ u16 F38_40(u16 attributes)
                 error &= 0xFF00;
                 if (had.attributes & 1) {
                     answer = (u8)Dialog(OFFSET(RdOnl_B), OFFSET(Del_S),
-                                        0, 0, MAIN_SEG);
+                                        0, 0, &md);
                     if (answer == 1)
                         goto not_done;
                     if (answer > 1)
@@ -269,8 +269,7 @@ u16 F38_40(u16 attributes)
         }
         /* F38_51: it is not empty */
         if (DEL_ALL == 0) {
-            answer = (u8)Dialog(OFFSET(NoEmp_B), OFFSET(Del_S), 0, 0,
-                                MAIN_SEG);
+            answer = (u8)Dialog(OFFSET(NoEmp_B), OFFSET(Del_S), 0, 0, &md);
             if (answer > 1)
                 goto not_done;
             if (answer == 1)
@@ -317,7 +316,7 @@ done:
 failed:
     /* F38_43 */
     if (error != ERR_NOT_READY
-        && (u8)Dialog(report, OFFSET(Del_S), 0, 0, MAIN_SEG) == 0) {
+        && (u8)Dialog(report, OFFSET(Del_S), 0, 0, &md) == 0) {
 not_done:
         answer = NOT_DONE;
         goto close;
@@ -508,7 +507,7 @@ failed:
         include = OFFSET(NoAtr_S);
         if (error <= ERR_NO_PATH)
             include = OFFSET(NoFnd_S);
-        if ((u8)Dialog(OFFSET(AtrEr_B), include, 0, 0, MAIN_SEG) == 0) {
+        if ((u8)Dialog(OFFSET(AtrEr_B), include, 0, 0, &md) == 0) {
             answer = NOT_DONE;
             goto close;
         }
@@ -672,7 +671,7 @@ struct Checked M30_60(u16 answer)
 
 refused:
     /* None of its lines has ^I: no include line. */
-    checked.answer = Dialog(OFFSET(NoDat_B), 0, 0, 0, MAIN_SEG);
+    checked.answer = Dialog(OFFSET(NoDat_B), 0, 0, 0, &md);
     checked.refused = 1;
     return checked;
 }
@@ -715,7 +714,7 @@ u16 DirFunc(void)
         if (count == 0) {
             if (md.FncAddr != FNC_DISI10)
                 /* None of its lines has ^I: no include line. */
-                Dialog(OFFSET(PthEr_B), 0, 0, 0, MAIN_SEG);
+                Dialog(OFFSET(PthEr_B), 0, 0, 0, &md);
             return 0;
         }
         if (*end++ == 0)
@@ -882,7 +881,7 @@ static u16 F47_01(u16 box)
     u16 i;
 
     md.TmpBuf[0] = 0;
-    if ((u8)Dialog(box, OFFSET(CrDir_S), 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(box, OFFSET(CrDir_S), 0, 0, &md) != 0)
         return TO_FUNC04;
     if (md.TmpBuf[0] == 0)
         return TO_FUNC04;
@@ -909,7 +908,7 @@ failed:
         /* F47_03 */
         for (i = 0; i < LenPath + 13; i++)
             md.TmpBuf[130 + i] = md.TmpBuf[i];
-        Dialog(OFFSET(MkErr_B), OFFSET(MkDir_S), 0, 0, MAIN_SEG);
+        Dialog(OFFSET(MkErr_B), OFFSET(MkDir_S), 0, 0, &md);
         return TO_FUNC04;
     }
     /* F47_05 */
@@ -976,7 +975,7 @@ u16 F38_00(struct WCBdef *panel)
             return TO_FNCEXT;
         for (i = 0; i < LenPath; i++)
             md.TmpBuf[i] = md.CrnPath[i];
-        if ((u8)Dialog(OFFSET(DelDi_B), OFFSET(Subdi_S), 0, 0, MAIN_SEG)
+        if ((u8)Dialog(OFFSET(DelDi_B), OFFSET(Subdi_S), 0, 0, &md)
             != 0)
             return TO_FUNC04;
         md.ZoomOne = 0;
@@ -1016,7 +1015,7 @@ u16 F38_00(struct WCBdef *panel)
             md.TmpBuf[i] = file->NameF[i];
     }
     /* F38_08 */
-    if ((u8)Dialog(box, include, 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(box, include, 0, 0, &md) != 0)
         return TO_FUNC04;
     return TO_FNCSEL;
 }
@@ -1033,7 +1032,7 @@ u16 F48_00(void)
     u16 i, answer, include;
 
     /* None of its lines has ^I: no include line. */
-    if ((u8)Dialog(OFFSET(DlMas_B), 0, 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(DlMas_B), 0, 0, 0, &md) != 0)
         return TO_FUNC04;
     for (i = 0; i < LenStr + 1; i++)
         md.TmpBuf[i] = md.ViewFil[i];
@@ -1059,7 +1058,7 @@ u16 F48_00(void)
     for (i = 0; i < LenPath + 13; i++)
         md.TmpBuf[100 + i] = from[i];
     /* No ^I here either. */
-    if ((u8)Dialog(OFFSET(DlWrn_B), 0, 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(DlWrn_B), 0, 0, 0, &md) != 0)
         return TO_FUNC04;
 delete:
     /* F48_04 */
@@ -1150,7 +1149,7 @@ u16 M30_00(struct WCBdef *panel)
             *end = 0;
             for (i = 0; i < 13; i++)
                 md.TmpBuf[100 + i] = file->NameF[i];
-            if ((u8)Dialog(OFFSET(StAt1_B), OFFSET(Attr8_S), 0, 0, MAIN_SEG)
+            if ((u8)Dialog(OFFSET(StAt1_B), OFFSET(Attr8_S), 0, 0, &md)
                 != 0)
                 return TO_FUNC04;
             bits = M30_82(md.TmpBuf);
@@ -1162,7 +1161,7 @@ u16 M30_00(struct WCBdef *panel)
     /* M30_01 */
     for (i = 0; i < 100; i++)
         md.TmpBuf[i] = 0;
-    if ((u8)Dialog(OFFSET(StAt2_B), OFFSET(Empty_S), 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(StAt2_B), OFFSET(Empty_S), 0, 0, &md) != 0)
         return TO_FUNC04;
     ATTR_SET = (u8)M30_82(md.TmpBuf);
     ATTR_KEEP = (u8)~M30_82(md.TmpBuf + 10);
@@ -1206,7 +1205,7 @@ u16 F54_00(void)
         end[1] = 0;
     }
     /* F54_01 */
-    if ((u8)Dialog(OFFSET(Label_B), 0, 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(Label_B), 0, 0, 0, &md) != 0)
         return TO_FUNC04;
     md.TmpBuf[20] = 0xFF;               /* an extended FCB, */
     md.TmpBuf[26] = 8;                  /* for a label, */
@@ -1217,7 +1216,7 @@ u16 F54_00(void)
     if (md.TmpBuf[1] == 0) {
         if (md.Volume[0] == 0)
             return TO_FUNC04;
-        if ((u8)Dialog(OFFSET(DelVo_B), 0, 0, 0, MAIN_SEG) != 0)
+        if ((u8)Dialog(OFFSET(DelVo_B), 0, 0, 0, &md) != 0)
             return TO_FUNC04;
         FcbDelete(md.TmpBuf + 20, 0);
         return TO_FNCEXT;
@@ -1235,7 +1234,7 @@ u16 F54_00(void)
     /* F54_04 */
     *(u16 *)(md.TmpBuf + 9) = *(u16 *)(md.TmpBuf + 10);
     *(u16 *)(md.TmpBuf + 11) = *(u16 *)(md.TmpBuf + 12);
-    Dialog(OFFSET(ErVol_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(ErVol_B), 0, 0, 0, &md);
     return TO_FNCEXT;
 }
 
@@ -1291,7 +1290,7 @@ static u16 FncMs1(u16 include)
             *(u16 *)(md.TmpBuf + 100) = 's';
             break;
         }
-    Dialog(OFFSET(NoFnc_B), include, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(NoFnc_B), include, 0, 0, &md);
     return TO_FNCEXT;
 }
 

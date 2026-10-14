@@ -176,7 +176,7 @@ u16 Fantom(u16 drive)
     *(u16 *)(md.TmpErr + 1) = (u16)(signed char)drive & 0xFF00
                               | (u8)(drive + 'A' - 1);
     page = md.HlpPage;
-    answer = Dialog(OFFSET(Fant_B), 0, 0, 0, MAIN_SEG);
+    answer = Dialog(OFFSET(Fant_B), 0, 0, 0, &md);
     md.HlpPage = page;
     if ((answer & 0xFF) != 0)
         return 1;

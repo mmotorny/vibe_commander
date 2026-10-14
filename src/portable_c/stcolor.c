@@ -345,7 +345,7 @@ static void StF07_53(void)
 {
     u16 at, i;
 
-    if ((u8)Dialog(OFFSET(StDfCol_B), 0, 0, 0, MAIN_SEG) != 0) {
+    if ((u8)Dialog(OFFSET(StDfCol_B), 0, 0, 0, &md) != 0) {
         md.HlpPage = 4;
         return;
     }

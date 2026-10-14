@@ -483,7 +483,7 @@ static struct Onward F10_01(struct WCBdef *panel, u16 include)
 
     if (!FilePan(panel))
         return To(NEXT_INPUT);
-    if ((u8)Dialog(OFFSET(Sel_B), include, 0, 0, MAIN_SEG) != 0
+    if ((u8)Dialog(OFFSET(Sel_B), include, 0, 0, &md) != 0
         || md.SelMas[0] == 0)
         return To(NEXT_FUNC04);
     Convert(md.SelMas, md.TmpBuf);
@@ -506,7 +506,7 @@ static struct Onward F10_01(struct WCBdef *panel, u16 include)
     }
     if (found)
         return To(NEXT_FUNC01);
-    Dialog(OFFSET(ErSel_B), include, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(ErSel_B), include, 0, 0, &md);
     return To(NEXT_FUNC04);
 }
 
@@ -627,7 +627,7 @@ struct Onward F16_00(void)
     if (md.KeyBar != 0) {
         md.KeyBar = 0;
         md.BarPrev = 0xFF;
-        ClsLine(last, MAIN_SEG);
+        ClsLine(last, &md);
         Window(last, 0x150);
         return To(NEXT_FUNC04);
     }

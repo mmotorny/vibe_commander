@@ -73,7 +73,7 @@ void StF02_00(void)
     u8 bar = md.KeyBar;
     u16 row;
 
-    Dialog(OFFSET(StConf_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(StConf_B), 0, 0, 0, &md);
     if (md.KeyBar != 0 || bar == 0)
         return;
     row = (u8)(md.Lines - 1);
@@ -103,7 +103,7 @@ void StF03_00(void)
         ;
     md.TmpBuf[2] = delay;
     md.TmpBuf[3] = delay;
-    if ((u8)Dialog(OFFSET(StScrn_B), 0, 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(StScrn_B), 0, 0, 0, &md) != 0)
         return;
     md.ColTyp = md.TmpBuf[0];
     md.BlDelay = StDelay_T[md.TmpBuf[2]];
@@ -135,7 +135,7 @@ void StF04_00(void)
     *text++ = (u8)digits;
     *text++ = (u8)(digits >> 8);
     *text = 0;
-    Dialog(OFFSET(StPanOp_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(StPanOp_B), 0, 0, 0, &md);
 }
 
 /* What StF04_10 returns when it has refused nothing: the answer for the
@@ -224,7 +224,7 @@ taken:
     return Accepted(0);
 
 refused:
-    checked.answer = Dialog(OFFSET(StNoTim_B), 0, 0, 0, MAIN_SEG);
+    checked.answer = Dialog(OFFSET(StNoTim_B), 0, 0, 0, &md);
     /* The box has no page of the help, and the dialog that goes on has
        its own again. */
     md.HlpPage = PAGE_PANELS;
@@ -328,5 +328,5 @@ void StF09_00(void)
         *line++ = '0';
         *line++ = '0';
     }
-    Dialog(OFFSET(StInfo_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(StInfo_B), 0, 0, 0, &md);
 }

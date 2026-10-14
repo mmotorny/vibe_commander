@@ -181,7 +181,7 @@ void OncZoom(u16 place, u16 box, u16 include, struct Box *where)
 
     if (md.ZoomOne != 0)
         md.ZoomWin = 0;
-    DialBox(place, box, include, MAIN_SEG, where);
+    DialBox(place, box, include, &md, where);
     Window(where->begin, where->size);
     md.ZoomWin = zoom;
     md.ZoomOne = 1;

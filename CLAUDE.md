@@ -2637,6 +2637,32 @@ in "The portable C".
     that byte is in `TmpBuf` and `TmpErr` after a copy, where the tool
     does not know it: a difference there that is the pair of bytes of
     `DTA+41` is this.
+- What a dialog's fields are in is a pointer, since the first half of
+  the piece F3 (`TODO.md`, "F3a, what a dialog's fields are in"):
+  `Dialog` and `DialBox` are handed `&md` or a panel, `data`, and read
+  a field at the offset that the table names; `ClsLine` is handed the
+  main data, and in one place a panel by `PANEL_AS_MAIN` of `vc.h`,
+  which is `MAIN_AS_PANEL` the other way round. What that met:
+  - A sweep can be all of one form: every one of the 72 calls had
+    `MAIN_SEG` or `SEG_OF(panel)` written out at the place of the
+    segment, and the compiler refused nothing. A script that reads a
+    call from its name to the bracket that closes it, over as many
+    lines as it has, and changes one argument by its place, is surer
+    there than a pattern for a line.
+  - A parameter that is a `void *` takes any pointer, and a 0 for a
+    pointer to nothing: the compiler holds only that no number is
+    handed over. What each call hands was tallied by the same reading
+    of a call, and that list is the check. Where one kind of thing is
+    meant, the parameter has its type, as `ClsLine`'s has, and what is
+    handed otherwise goes through a word that says so.
+  - `AT` cut the offset that it was handed to 16 bits. Where a pointer
+    and a number added to it take its place, look at the type of the
+    number: a `u16` is cut as it was, and wants no cast; anything
+    reckoned in an int wants its cut written.
+  - An argument may be two things by a flag of the table: `include` of
+    `Dialog` is the text that ^I stands for, or the size of a box that
+    is on the screen already. A number carries both and a pointer does
+    not: read what a parameter is assigned to before it is retyped.
 - A word of a table that names something, a line of a box, the box
   and the buttons of a dialog, is a pointer in `tables.h`, as long as
   a pointer is, and code never reads through it: it asks `NAMED` of

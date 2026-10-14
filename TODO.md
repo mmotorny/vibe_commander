@@ -9323,7 +9323,7 @@ thought and long in lines.
 | X, the extender's memory tried. **Done**: "X, the extender's memory on the bench" below | A toy on the bench, of `harness/trial32/memory.c`: what DPMI 0500h says is free of the 16 MB; the largest block taken, given back and taken again, and where it then is; a block made shorter and longer, 0503h, whether it moves and keeps what it held; a second copy of the toy while the first holds the largest block, and while it has given it back; what a command's `mem` prints either way; and by `harness/trial32/calls.asm`, that DOS is asked nothing by any of it | `harness/trial32/` | Nothing; beside F0 and F1 | It has run, and the table of what it found is in this plan | What F9 goes by: whether the room is all that the extender has or leaves some, and whether rows m and n of "What a user would see otherwise" stand |
 | F1, three blocks where there was one. The proof. **Done**: "F1, three blocks where there was one" below | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, which answers in paragraphs of 16 bits as the seven places did and needs no cap, since inside the 640 KB it cannot pass A000h; 16 bytes of a pattern in front of each block and behind the last, written when a block is taken, which the image's tool holds at the end of every scenario ("What could go wrong", 15); `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the hand-out of the 640 KB in the system's file and the image's tool, for the 16 bytes; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
 | F2, a panel is a pointer. A sweep. **Done**: "F2, a panel is a pointer" below | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
-| F3, what a dialog is handed. A sweep | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
+| F3, what a dialog is handed. A sweep, in two halves. **The first is done**, what the fields are in: "F3a, what a dialog's fields are in" below. The second is what a table is handed as | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
 | F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
@@ -10648,6 +10648,199 @@ tool's check 4; the documents and the rest.
   caller's frame a room for every call: look at the frames in the
   listings, `enter` at a function's first line, if one does.
 - Any change of the code moves `DTA+41`; see above.
+
+### F3a, what a dialog's fields are in: done, and what the second half should know
+
+The first half of F3, as F2 cut it. Where a routine was handed the
+segment that a dialog's fields, the texts that a box puts in or the
+colour of a line are in, it is handed a pointer to that thing, and
+reads at the offset that the table names. All 155 scenarios pass with
+no golden and no patch changed, at the first run of the swept build.
+
+**What it is now.**
+
+- `Dialog(box, include, begin, saved, void *data)` and `DialBox(place,
+  box, include, const void *data, where)`, with `DiBx30` behind the
+  second: `data` is `&md`, or a panel. A line to type into is read and
+  written at `(u8 *)data + field->mPoint`, a box to tick at `(u8 *)data
+  + NUMBER_OF(field->mCtrl)`, a text that a box puts in at `(const u8
+  *)data + entry->from`. The offsets in the tables are as they were,
+  `MD_AT`, `WCB_AT` and `NUMBER`, and no table changed. What a field
+  keeps in the main data whatever it is handed, the line chosen, a tick
+  while the dialog is up, the button, is read by `MD` as before.
+- "Of a panel: in the half of the screen that the panel has" is `data
+  != LeftPanel` in `Dialog`, two pointers held against each other by
+  `!=`.
+- `ClsLine(place, const struct MainDat *data)` reads `data->CrntCol`,
+  where it read the byte at `CrntCol`'s offset in a segment.
+- `PANEL_AS_MAIN(panel)` of `vc.h` is a panel where the main data is
+  asked for, `MAIN_AS_PANEL` the other way round, and it has one place:
+  `Run_00` of `usermenu.c` comes to `ClsLine` with DS left on the
+  current panel when the commands have no room for a name, and the
+  colour of the line is then the byte of the panel that is as far into
+  it as `CrntCol` is into the main data, AB8h, which is within
+  `struct WCBdef`. The word is named in
+  `WORDS` of `harness/int16.py` and of `harness/words.py`, where it
+  stays, as `MAIN_AS_PANEL` does: it rests on the two layouts, not on
+  the megabyte.
+- `MAIN_SEG` has four places left in the code, none of them a
+  dialog's: `V82_00(MAIN_SEG, ...)` in `view.c`, where a search looks
+  through `MenuBuf` and not through the viewer's text, which is F4's;
+  `T72_00(line, MAIN_SEG, ...)` in `edit.c`, a line of the editor that
+  is in the main data, F5's; and the list that the speed search goes
+  through, `Search(MAIN_SEG, ...)` in `treebox.c` and `segment =
+  MAIN_SEG` in `cmdline.c`, F7's, with `segment = SEG_OF(panel)` beside
+  the second, which F2 left to F7 already. Its definition goes with
+  F10, as the record has it.
+
+**How it was done.** A script of sixty lines, `build/f3a-sweep.py`, not
+kept: it reads each call of `Dialog`, `DialBox` and `ClsLine` from its
+name to the bracket that closes it, over as many lines as the call has,
+and takes the argument at the place of the segment where that is
+`MAIN_SEG` or `SEG_OF(panel)` and nothing else. Then the three
+functions by hand, and every file compiled by itself. The compiler
+refused nothing: every call had the one or the other written out.
+
+| | Places | What it became |
+|---|---|---|
+| By the script: `Dialog(..., MAIN_SEG)` | 55 in 15 files, the `Ask` of `copy.c` among them, which is a macro around one | `&md` |
+| By the script: `DialBox(..., MAIN_SEG, ...)` | 8 in 6 files | `&md` |
+| By the script: `ClsLine(..., MAIN_SEG)` | 4 in 3 files | `&md` |
+| By the script: `Dialog(..., SEG_OF(panel))` | 5, four in `commands.c` and one in `enter.c` | `panel` |
+| By hand: the three functions and `DiBx30` | 4 signatures, 3 prototypes of `vc.h`, 3 calls that hand `segment` on, and 5 reads through `AT(segment, ...)` in `dialog.c` | A pointer and a number added to it, as above |
+| By hand: the comparison in `Dialog` | 1 | `data != LeftPanel` |
+| By hand: `ClsLine` | 1 read | `data->CrntCol` |
+| By hand: `segment` of `Run_00` in `usermenu.c` | 4 lines: the variable, two assignments of `MAIN_SEG` and one of `SEG_OF(CurrentPanel)`, and the call | `const struct MainDat *data`, `&md` and `PANEL_AS_MAIN(CurrentPanel)` |
+| By a second script: a call's last line that held `&md)` or `panel)` alone | 6 | Joined to the line before, where the whole fits |
+| Comments | 9, in `dialog.c`, `bars.c`, `vc.h` and `commands.c` | Say `data` and what it is, where they said `segment` and `MAIN_SEG` |
+
+Of the five calls that hand a panel, one means it: the filter's
+dialog, `Filt_B`, whose line and two ticks are named by `WCB_AT`. The
+other four are the original with DS left on the panel, in `F30_00` of
+`enter.c`, and in `M49_00` and twice in `M75_00` of `commands.c`:
+`Quit_B`, `CmpDi_B`, `SvSt_B` and `SetEr_B` have buttons and nothing
+else, their boxes put no text in, and none has the menu of a panel, so
+nothing is read through what they are handed. They hand `panel`, as
+the original does and as their comments say; `PANEL_AS_MAIN` is not
+written there, since nothing of the main data is read in the panel.
+And the main data is handed to no dialog that names a field of a
+panel: `Filt_B` has one call.
+
+**What the compiler does not refuse**, and how it was looked at:
+
+- `void *` takes any pointer. A script of fifteen lines tallied what
+  each call hands, by the same reading of a call: `Dialog` 55 times
+  `&md` and 5 times `panel`, `DialBox` 8 times `&md` and once `data`,
+  from `Dialog`, `ClsLine` 4 times `&md` and once `data`, in `Run_00`.
+  `ClsLine` is typed, so a panel handed to it without the word is
+  refused.
+- A 0 is a pointer to nothing to the compiler, and `Dialog` has two
+  zeros in front of `data` at most of its calls. No call has a number
+  where `data` is: the tally has every one.
+- `AT(data, x)` would have made a segment of a pointer without a word:
+  the five `AT(segment, ...)` were each rewritten by hand, and
+  `dialog.c` has no `AT` left but those of the tables, `AT(code, ...)`,
+  13 of them, which are the second half's.
+
+**A number cut where it was cut.** `AT` cut the offset that it was
+handed to 16 bits. What is added to `data` now is a `u16` by its type
+at each of the six places, `mPoint` and `from` of `tables.h` and what
+`NUMBER_OF` answers, so nothing is cut that was not, and no cast was
+written. No number was added by the piece.
+
+**The image.** `compare` of the build before, saved before anything
+was changed, with the piece's build: "155 scenarios, 46 with nothing
+that differs; 6 differences, 0 more in what was declared as changed,
+132 in what may differ", and "464 pointers that name the same in
+both". Nothing was declared as changed, and nothing of the main data
+changed its home. The six are F2's six, in `copy` and `copy-dirs`, the
+byte behind a name that was copied as 13 bytes into `TmpBuf` and
+`TmpErr`: 91h before and 93h after, which is what `DTA+41` has in the
+108 scenarios where the tool knows it, the same pair. The other 24 of
+what may differ are `dos32.Below`, the stack pointer at the last call
+of DOS. No panel differs, nothing of the room, no pattern round a
+block.
+
+**The program.** Its code is 169 bytes shorter and its file 476 bytes
+longer, 306,611 where it was 306,135, for 71 addresses more that the
+extender sets, 5,196 where there were 5,125: `&md` is an address where
+`MAIN_SEG` was a number. The table of the README has what it is now.
+
+**The records.** The words that were this half's: `MAIN_SEG` 73 in 18
+files before and 4 in 4 after, its definition besides; `SEG_OF` 34 in 13
+and 27 in 9, the five of `Dialog`, that of the comparison and that of
+`Run_00`; `AT` 99 in 17 and 93 in 16, the five of `dialog.c` and that
+of `ClsLine`; `u16 segment` 44 in 9 and 37 in 7, the four signatures
+and the three prototypes; `MD_PLACE` 103 and 102, `ClsLine`'s; and
+`PANEL_AS_MAIN` new, one place, which stays. Left to go, by the
+record's last line: F3 277, which is the second half's whole, F5 45,
+F6 37, F7 67, F8 211, F9 13, F10 131, where it was F6 44, F8 212 and
+F10 213. The table of the words says of `MAIN_SEG` and of `u16
+segment` what is left of each and whose it is; no count moved from one
+piece to another. The record of the widths has five numbers fewer and
+no cut more or fewer: the three `segment` of `dialog.c`, `ClsLine`'s
+in `bars.c` and that of `Run_00` in `usermenu.c`, each a parameter or
+a variable that is a pointer now. The host check's record and that of
+`portable_c-int16` did not move.
+
+**As it landed.** Rebased onto `7ebaec0`, behind the five leaf files'
+numbers with a sign and the record of the widths in its new form,
+which was taken as it stood and written anew: the same five numbers
+gone and nothing else. The figures of "The program" above are of the
+build before the rebase; as it landed the file is 306,603 bytes where
+that of `7ebaec0` is 306,151, 452 more, its code 169 bytes shorter,
+and the addresses 5,196 for 5,125. The whole suite passes, 13 tests.
+The images of `7ebaec0`, built in a copy and saved anew, against the
+piece's: "155 scenarios, 46 with nothing that differs; 6 differences,
+0 more in what was declared as changed, 109 in what may differ", the
+same six, 91h and 93h, with `DTA+41` the same pair in 108 scenarios.
+
+**How long it took**, in tool calls, some 60: reading the plan and
+the three sections 9; the script, the three functions and a clean
+compile 12; the records 5; the images and the suite 10, most of them
+waiting, since the images of the build before took half an hour to
+save with other agents testing; the documents the rest. It is a third of F2 in lines and less in thought:
+the calls were all of one form.
+
+**The second half, from here.** What a table is handed as.
+
+- `include` of `Dialog` is two things. It is the text that ^I stands
+  for, an offset in the tables' segment or 0 for none; and for a
+  dialog whose box is on the screen already, `BOX_THERE`, it is the
+  size of that box, with `begin` and `saved` where the box is and what
+  it covers: `Dialog` has `u16 size = include;` at its top. Three
+  calls hand a size there, two in `edit.c`, `BigFi_B` and `NewFi_B`,
+  and one in `find.c`, `Find_B`. A pointer cannot be both: either
+  `Dialog` gets a parameter for the size, which is three calls changed
+  and 57 with one more zero, or those three go to a second function
+  that takes the box as it is on the screen.
+- `include` is not always a table's. In `FtErr1` of `main.c` it is
+  `OFFSET_IN_SEG(assembly, text)`, a text that is the device driver's
+  name or a line of the main data, made an offset in the tables'
+  segment: a pointer says it as it is.
+- Once `box` and `include` are pointers too, `Dialog` is handed three
+  pointers and two numbers, and the compiler takes a 0 for any of
+  them and any pointer for a `const void *`. A box is a structure of
+  its own type, as F2 said; what would hold the order is `include` as
+  `const u8 *`, which a box is refused for, and the box as `const
+  struct BOXHD *` with the cast in a word at the call, or the tally
+  above run again: it is fifteen lines and reads every call.
+- `first = box + sizeof(struct BOXHD)` and `FIELD(item)` in `Dialog`
+  step through the fields by an offset in the tables' segment, and
+  `MinMnu`, `MnMn10` and `MnMn40` are handed `control`, `colors` and
+  `table` so: those are reckoned with, not only handed on.
+- What a dialog's fields are in is done, so the second half changes no
+  `data` and no `&md`: of a call's five arguments the first two are
+  its own.
+- The four calls that hand a panel where nothing reads it, above, are
+  as the original has DS. Nothing asks that they stay so but the
+  comments at them.
+- `Search` of `input.c` and its two callers are F7's, `V82_00`'s
+  `MAIN_SEG` F4's and `T72_00`'s F5's, as above: each is the main data
+  where a text or a list is looked through, and `(u8 *)&md` when the
+  text is a `u8 *`.
+- Any change of the code moves `DTA+41` in the images: F2's section,
+  "The image".
 
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 

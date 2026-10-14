@@ -68,7 +68,7 @@ not plain behind a colon. The code has no name for any of them.
 cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  cuts  bool   i32  its files
 N0              34          0     1              0      35     0    32     3    28  digits.c mask.c line.c mouse.c blank.c
 N1             133        133     2              2       0     0    48     0     0  string.c format.c box.c screen.c misc.c
-N2             142        142     0              0       0     0    71     0     0  dialog.c
+N2             139        139     0              0       0     0    71     0     0  dialog.c
 N3, N4         189        189    13             13       0     0   211     0     0  view.c
 N5             123        123     1              1       0     0    78     0     0  find.c
 N6 to N8       248        248    37             37       0     0   278     0     0  edit.c
@@ -78,30 +78,30 @@ N11             91         91     1              1       0     0    61     0    
 N12             80         80     3              3       0     0   114     0     0  panel.c info.c drive.c
 N13             69         69     0              0       0     0   102     0     0  tree.c treebox.c extfile.c
 N14            111        111     0              0       0     0    95     0     0  cmdline.c enter.c exec.c
-N15            114        114     3              3       0     0   109     0     0  input.c usermenu.c
+N15            113        113     3              3       0     0   109     0     0  input.c usermenu.c
 N16            101        101     0              0       0     0    75     0     0  main.c
 N17a            68         68     0              0       0     0    45     0     0  keys.c
 N17b            86         86     0              0       0     0    13     0     0  commands.c
 N18            114        114     1              1       0     0   106     0     0  menu.c help.c
-N19a           112        112     1              1       0     0    44     0     0  bars.c window.c system.c setup.c
+N19a           111        111     1              1       0     0    44     0     0  bars.c window.c system.c setup.c
 N19b            42         42     0              0       0     0    17     0     0  start.c
 N20            120        120     0              0       0     0    89     0     0  stcolor.c stopts.c
 N21             88         88     3              3       0     0    59     0     0  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0    57     0     0  the tables, dos32.c stack.c
 headers        302        130    12              1     143     1     0     0     0  vc.h sys.h tables.h
-all           3187       2399   149             72     178     1  1827     3    28
+all           3182       2394   149             72     178     1  1827     3    28
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  cuts  bool   i32
 vc.h               245         73    11              0     143     1     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
-bars.c              41         41     0              0       0     0    22     0     0
+bars.c              40         40     0              0       0     0    22     0     0
 blank.c             12          0     0              0      12     0     8     0     7
 box.c               50         50     0              0       0     0    16     0     0
 cmdline.c           60         60     0              0       0     0    55     0     0
 commands.c          86         86     0              0       0     0    13     0     0
 copy.c             107        107     6              6       0     0    68     0     0
-dialog.c           142        142     0              0       0     0    71     0     0
+dialog.c           139        139     0              0       0     0    71     0     0
 digits.c             2          0     1              0       3     0     5     0     4
 dirfunc.c          131        131     0              0       0     0    55     0     0
 drive.c             27         27     0              0       0     0    39     0     0
@@ -136,7 +136,7 @@ string.c            14         14     0              0       0     0    10     0
 system.c            22         22     1              1       0     0     7     0     0
 tree.c              20         20     0              0       0     0    25     0     0
 treebox.c           41         41     0              0       0     0    74     0     0
-usermenu.c          55         55     0              0       0     0    72     0     0
+usermenu.c          54         54     0              0       0     0    72     0     0
 view.c             189        189    13             13       0     0   211     0     0
 window.c            41         41     0              0       0     0    13     0     0
 
@@ -685,7 +685,7 @@ sys.h: not sorted, 37 numbers, 1 u32, 0 cuts
 
 tables.h: not sorted, 20 numbers, 0 cuts
 
-bars.c: not sorted, 41 numbers, 22 cuts
+bars.c: not sorted, 40 numbers, 22 cuts
 
 bars_t.c: as a whole, 1 number, 0 cuts
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -782,7 +782,7 @@ copy.c: not sorted, 107 numbers, 6 u32, 68 cuts
 copy_t.c: as a whole, 38 numbers, 0 cuts
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-dialog.c: not sorted, 142 numbers, 71 cuts
+dialog.c: not sorted, 139 numbers, 71 cuts
 
 digits.c, HexByt: parameter byte, u32
     bits: eight of them are read, four at a time, by a shift and a
@@ -1072,7 +1072,7 @@ treebox.c: not sorted, 41 numbers, 74 cuts
 treebox_t.c: as a whole, 7 numbers, 0 cuts
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-usermenu.c: not sorted, 55 numbers, 72 cuts
+usermenu.c: not sorted, 54 numbers, 72 cuts
 
 view.c: not sorted, 189 numbers, 13 u32, 211 cuts
 

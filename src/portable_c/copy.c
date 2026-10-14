@@ -78,7 +78,7 @@ u16 F35_61(u16 answer, u16 place);
 /* A dialog whose box is not on the screen yet, and which sets what it
    sets in the main data: Dialog of vc.h. The low byte of what it returns
    is the number of the answer, 0 for the first, and 0FFh for Esc. */
-#define Ask(box, include) Dialog(box, include, 0, 0, MAIN_SEG)
+#define Ask(box, include) Dialog(box, include, 0, 0, &md)
 
 /* C routines of other files that vc.h does not have. FilDir writes
    "2 files", or what else the numbers of TotSel make, and returns the

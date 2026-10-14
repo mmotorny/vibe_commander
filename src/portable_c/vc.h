@@ -436,6 +436,15 @@ extern struct WCBdef *RightPanel;
    reads of a panel. */
 #define MAIN_AS_PANEL ((struct WCBdef *)&md)
 
+/* A panel where the main data is asked for: the other way round, and
+   one place. Run_00 of usermenu.c comes to ClsLine with DS left on the
+   current panel when the commands have no room for a name, and ClsLine
+   reads the colour that DOS writes in, CrntCol, through DS: the byte of
+   the panel that is as far into it as CrntCol is into the main data,
+   AB8h, which is within struct WCBdef. Nothing else of a panel is
+   read so, and nothing is written. */
+#define PANEL_AS_MAIN(panel) ((const struct MainDat *)(panel))
+
 /* The room, of main.c: the memory that whatever is at work has, the
    text of the viewer or the editor, the list of the file search, a
    copy's buffer, the old list while a directory is read. It is a block
@@ -1227,10 +1236,12 @@ void DeCode(u8 *at, u16 count);
 
 /* The boxes and the dialogs, which the assembly describes: `box`,
    `include`, `table`, `control` and `colors` are offsets in its code
-   segment, and `segment` is where what a box shows and a dialog sets is,
-   MAIN_SEG for the main data. See each in dialog.c. */
-void DialBox(u16 place, u16 box, u16 include, u16 segment, struct Box *where);
-u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment);
+   segment, and `data` is what a box shows of and a dialog sets in, at
+   the offsets that their tables name: &md for the main data, or a panel.
+   See each in dialog.c. */
+void DialBox(u16 place, u16 box, u16 include, const void *data,
+             struct Box *where);
+u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data);
 void InSt10(u16 place, u16 text, u16 length, u16 color);
 struct Buttons {                        /* what MinMnu returns: */
     u16 key;                            /* the key that is for the caller */
@@ -1250,8 +1261,8 @@ struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
 struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table);
 u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table);
 /* The key bar and the menu bar, the command line and its prompt: see
-   each in bars.c. `segment` is where ClsLine reads the colour, MAIN_SEG. */
-u16 *ClsLine(u16 place, u16 segment);
+   each in bars.c. `data` is where ClsLine reads the colour, &md. */
+u16 *ClsLine(u16 place, const struct MainDat *data);
 void PutKey(u16 bar);
 void PutKey0(u16 bar, u16 shift);
 void PutMnu(u16 item);

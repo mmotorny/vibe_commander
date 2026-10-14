@@ -1197,7 +1197,7 @@ u16 T80_00(void)
     T51_00();
     T50_00();
     /* None of its lines has ^I: no include line. */
-    DialBox(0x528, OFFSET(SavFi_P), 0, MAIN_SEG, &box);
+    DialBox(0x528, OFFSET(SavFi_P), 0, &md, &box);
     Window(box.begin, box.size);
     if (ChgDisk(md.ViewFil))
         goto done;
@@ -1205,8 +1205,7 @@ u16 T80_00(void)
     if (!answer.failed) {
         if (answer.value & 1) {
             T80_Name();
-            if ((u8)Dialog(OFFSET(Prot_B), OFFSET(EdFl_S), 0, 0,
-                           MAIN_SEG) != 0)
+            if ((u8)Dialog(OFFSET(Prot_B), OFFSET(EdFl_S), 0, 0, &md) != 0)
                 goto done;
         }
         answer = T80_02(answer.value);
@@ -1224,7 +1223,7 @@ u16 T80_00(void)
         goto done;
 report:
     /* None of its lines has ^I: no include line. */
-    Dialog(OFFSET(SavEr_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(SavEr_B), 0, 0, 0, &md);
 done:
     ResWin(box.begin, box.size, box.saved);
     Window(box.begin, box.size);
@@ -1975,7 +1974,7 @@ static void T32_00(void)
     }
     goto done;
 none:
-    Dialog(OFFSET(SrEr_B), OFFSET(EdFl_S), 0, 0, MAIN_SEG);    /* T32_03 */
+    Dialog(OFFSET(SrEr_B), OFFSET(EdFl_S), 0, 0, &md);    /* T32_03 */
 done:
     T50_00();                           /* T32_07 */
     ResWin(box.begin, box.size, box.saved);
@@ -2130,8 +2129,7 @@ delete:
             T30_00();
             return 0;
         case 0x41:                      /* F7: T31_00 */
-            if ((u8)Dialog(OFFSET(Srch_B), OFFSET(EdFl_S), 0, 0,
-                           MAIN_SEG) != 0)
+            if ((u8)Dialog(OFFSET(Srch_B), OFFSET(EdFl_S), 0, 0, &md) != 0)
                 return 0;
             T32_00();
             return 0;
@@ -2139,7 +2137,7 @@ delete:
             T32_00();
             return 0;
         case 0x55:                      /* Shift F2: T33_00 */
-            if ((u8)Dialog(OFFSET(SavAs_B), 0, 0, 0, MAIN_SEG) != 0)
+            if ((u8)Dialog(OFFSET(SavAs_B), 0, 0, 0, &md) != 0)
                 return 0;
             T34_00();
             return 0;
@@ -2150,7 +2148,7 @@ delete:
 quit:
             if (ed.EdChng == 0)
                 return 1;
-            c = (u8)Dialog(OFFSET(SavCn_B), 0, 0, 0, MAIN_SEG);
+            c = (u8)Dialog(OFFSET(SavCn_B), 0, 0, 0, &md);
             if (c == 1)
                 return 1;
             if (c > 1)
@@ -2564,7 +2562,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         /* T00_01. The assembly leaves in DX for the text that ^I stands
            for, and in BX and SI for a box that is on the screen, what the
            box before had there; so does this. */
-        if ((u8)Dialog(OFFSET(BigFi_B), size, begin, saved, MAIN_SEG) != 0)
+        if ((u8)Dialog(OFFSET(BigFi_B), size, begin, saved, &md) != 0)
             goto closed;
         place = (begin & 0xFF00) + 0x100 | 37;  /* T00_02 */
         MovDz0(BasAdr(place), AT(code, OFFSET(ViFl_S)));
@@ -2597,8 +2595,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     if (handle == 0xFFFF) {
         /* A new file. */
         if ((u8)(md.Lines - 2) <= ed.EdSizeY
-            && (u8)Dialog(OFFSET(NewFi_B), size, begin, file,
-                          MAIN_SEG) != 0)
+            && (u8)Dialog(OFFSET(NewFi_B), size, begin, file, &md) != 0)
             goto closed;
     } else {
         left = ed.EdLen;                /* T00_06 */

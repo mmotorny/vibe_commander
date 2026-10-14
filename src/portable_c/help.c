@@ -541,7 +541,7 @@ Help64:
         goto Help06;
 
 Help65:                                 /* it could not be read */
-    Dialog(OFFSET(HlpEr_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(HlpEr_B), 0, 0, 0, &md);
 
 Help66:                                 /* Esc */
     ResWin(BEGIN, size, MD_PLACE(md.ErrBuf1));
@@ -584,7 +584,7 @@ static void HelpFil(void)
     goto Help67;
 
 Help01:
-    Dialog(OFFSET(HlpEr_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(HlpEr_B), 0, 0, 0, &md);
 
 Help67:
     FileClose(hd.HlpHndl);

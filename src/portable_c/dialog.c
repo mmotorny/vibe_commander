@@ -18,8 +18,8 @@
  * line is the title, in the frame. A text to be put in is copied to
  * TmpErr, the first to its second byte and the second to its 102nd,
  * where the lines of the box have it as Var_S; its four bytes are where
- * it is, in the segment of whoever asks for the box, how it is to be
- * written and how long it may be.
+ * it is, as an offset in what whoever asks for the box hands over, the
+ * main data or a panel, how it is to be written and how long it may be.
  *
  * A dialog is a header, struct BOXHD of tables.h, and behind it its
  * fields, struct BOXMN, up to a byte 0. A field is a line to type into, a
@@ -37,11 +37,12 @@
 #include "tables.h"
 
 /* The kinds of a field. A line to type into has its text at mPoint in
-   the segment of whoever asks for the dialog, its length in the low byte
-   of mCtrl and INPUT_ flags in the high one. A group has, at mPoint in
+   what whoever asks for the dialog hands over, `data` of Dialog, which
+   is the main data or a panel; its length in the low byte of mCtrl and
+   INPUT_ flags in the high one. A group has, at mPoint in
    the main data, the line chosen and behind it the line of the cursor,
    and the number of its lines in the low byte of mCtrl. A box to tick has
-   its value at mCtrl in the caller's segment, and while the dialog is up
+   its value at mCtrl in the caller's `data`, and while the dialog is up
    at mPoint in the main data. Buttons have the one chosen at mPoint in
    the main data, and at mCtrl in the assembly their widths and columns,
    two bytes each, up to a width of 0. So mCtrl names something for
@@ -132,9 +133,9 @@ void NormStr(u8 *text);                                 /* string.c */
 
 /* Copy a text that a box puts into its lines to where the lines have it,
    and write it as the box asks: `entry` is its four bytes in the box. */
-static void DiBx30(const struct BOXTX *entry, u8 *to, u16 segment)
+static void DiBx30(const struct BOXTX *entry, u8 *to, const void *data)
 {
-    const u8 *from = AT(segment, entry->from);
+    const u8 *from = (const u8 *)data + entry->from;
     u8 *text = to;
     u16 count = LenPath + 13;
     u16 mode;
@@ -156,13 +157,15 @@ static void DiBx30(const struct BOXTX *entry, u8 *to, u16 segment)
 /* Put the box at `box` into the screen buffer, with the middle of its
    top at `place`, the row in the high byte, or lower on a screen of more
    than 25 lines. `include` is the text that ^I stands for in its lines,
-   an offset in the assembly too, and `segment` where the texts are that
-   it puts in. `where` gets where the box is and where what it covers is
-   kept. A box without a line has 65536.
+   an offset in the assembly too, and `data` what the texts are in that
+   it puts in, each at the offset that the box names. `where` gets where
+   the box is and where what it covers is kept. A box without a line has
+   65536.
 
    The lines of the box are words that name their texts, one behind the
    other behind the texts that it puts in: `line` is at one of them. */
-void DialBox(u16 place, u16 box, u16 include, u16 segment, struct Box *where)
+void DialBox(u16 place, u16 box, u16 include, const void *data,
+             struct Box *where)
 {
     u16 code = AsmSeg();
     const struct BOXTOP *head
@@ -179,9 +182,9 @@ void DialBox(u16 place, u16 box, u16 include, u16 segment, struct Box *where)
         place += (u16)((u8)(md.Lines - 25) >> 1) << 8;
     texts = head->texts & 3;
     if (texts != 0) {
-        DiBx30(put, md.TmpErr + 1, segment);
+        DiBx30(put, md.TmpErr + 1, data);
         if (texts != 1)
-            DiBx30(put + 1, md.TmpErr + 101, segment);
+            DiBx30(put + 1, md.TmpErr + 101, data);
     }
 
     /* As wide as its longest line. */
@@ -778,8 +781,9 @@ static u16 Dial85(u16 field, u16 code)
 }
 
 /* A dialog: show the box of the dialog at `box`, have its fields take
-   keys and the mouse, and take the box off the screen again. `segment`
-   is where the caller has what the fields set: the lines that are typed
+   keys and the mouse, and take the box off the screen again. `data` is
+   what the caller has what the fields set in, the main data or a panel,
+   and a field says at which offset of it: the lines that are typed
    and the values of the boxes to tick, which get there when the dialog
    is answered with Enter on the first button, or on a field that is no
    button. `include` is the text that ^I stands for in a line of the box.
@@ -806,7 +810,7 @@ static u16 Dial85(u16 field, u16 code)
    NormStr, and has 0 and 1 in the high byte where F10 and Alt-F10 are
    answers, the other way round: no dialog of the setup has such a box,
    such a line or those answers. */
-u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
+u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data)
 {
     u16 code = AsmSeg();
     const struct BOXHD *head = (const struct BOXHD *)AT(code, box);
@@ -836,7 +840,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     if (!(head->bFlags & BOX_THERE)) {
         begin = head->BoxBase;
         /* Of a panel: in the half of the screen that the panel has. */
-        if (key == 1 && segment != SEG_OF(LeftPanel)) {
+        if (key == 1 && data != LeftPanel) {
             key = 5;
             begin = ADD_LOW(begin, 40);
         }
@@ -847,7 +851,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     if (head->bFlags & BOX_ERROR)
         begin += (u16)md.SftErr << 8;
     if (!(head->bFlags & BOX_THERE)) {
-        DialBox(begin, NAMED(head->pDiBox), include, segment, &where);
+        DialBox(begin, NAMED(head->pDiBox), include, data, &where);
         begin = where.begin;
         size = where.size;
         saved = where.saved;
@@ -867,7 +871,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
             text[1] = 0;
             text[2] = 0;
             text += 3;
-            from = AT(segment, field->mPoint);
+            from = (const u8 *)data + field->mPoint;
             for (count = control & 0xFF; count != 0; count--)
                 *text++ = *from++;
             *text = 0;
@@ -876,7 +880,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
         } else if (type == FIELD_SELECT) {
             *((u8 *)screen + MD(field->mPoint) * (2 * 80)) = BULLET;
         } else if (type == FIELD_FLIP) {
-            value = *AT(segment, NUMBER_OF(field->mCtrl));
+            value = *((const u8 *)data + NUMBER_OF(field->mCtrl));
             MD(field->mPoint) = (u8)value;
             if (value != 0)
                 *(u8 *)screen = 'x';
@@ -1104,12 +1108,12 @@ Dial71:
             text = INPUT(control) + 3;
             if (control & INPUT_NORMAL)
                 NormStr(text);
-            to = AT(segment, field->mPoint);
+            to = (u8 *)data + field->mPoint;
             for (count = control & 0xFF; count != 0; count--)
                 *to++ = *text++;
             *to = 0;
         } else if (type == FIELD_FLIP)
-            *AT(segment, NUMBER_OF(field->mCtrl)) = MD(field->mPoint);
+            *((u8 *)data + NUMBER_OF(field->mCtrl)) = MD(field->mPoint);
     }
     goto Dial82;
 

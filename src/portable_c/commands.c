@@ -298,12 +298,12 @@ u16 M06_00(struct WCBdef *panel, u16 item)
     return MNU_FUNC04;
 }
 
-/* M16_01: the dialog of a panel's filter, whose fields are in the panel's
-   segment. The lines of its box have no ^I, so the text for that, which
+/* M16_01: the dialog of a panel's filter, whose fields are in the
+   panel. The lines of its box have no ^I, so the text for that, which
    the assembly leaves as DX happens to be, is not read. */
 u16 M16_01(struct WCBdef *panel)
 {
-    if ((u8)Dialog(OFFSET(Filt_B), 0, 0, 0, SEG_OF(panel)) != 0)
+    if ((u8)Dialog(OFFSET(Filt_B), 0, 0, 0, panel) != 0)
         return MNU_FUNC04;
     return M16_11(panel);
 }
@@ -356,7 +356,7 @@ u16 M42_00(struct WCBdef *panel)
     if (FilePan(panel)) {
         *(u16 *)md.TmpBuf = panel->WinPath[0];
         PutMnu(3);
-        DialBox(0x528, OFFSET(DiSiz_P), 0, MAIN_SEG, &where);
+        DialBox(0x528, OFFSET(DiSiz_P), 0, &md, &where);
         Window(where.begin, where.size);
         DirSize(panel);
         M16_20(panel);
@@ -429,7 +429,7 @@ u16 M49_00(struct WCBdef *panel)
     marked = M49_10(other, 0);
     marked = M49_10(panel, marked);
     if (marked == 0) {
-        Dialog(OFFSET(CmpDi_B), 0, 0, 0, SEG_OF(panel));
+        Dialog(OFFSET(CmpDi_B), 0, 0, 0, panel);
         return MNU_FUNC04;
     }
     return M60_02(panel);
@@ -452,7 +452,7 @@ u16 M60_00(void)
         ;
     md.TmpBuf[2] = delay;
     md.TmpBuf[3] = delay;
-    if ((u8)Dialog(OFFSET(Conf_B), OFFSET(Chk1_S), 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(Conf_B), OFFSET(Chk1_S), 0, 0, &md) != 0)
         return MNU_FUNC04;
     md.ColTyp = md.TmpBuf[0];
     md.BlDelay = Delay_T[md.TmpBuf[2]];
@@ -465,7 +465,7 @@ u16 M60_00(void)
    sets. */
 u16 M61_00(void)
 {
-    Dialog(OFFSET(Sets_B), OFFSET(Chk2_S), 0, 0, MAIN_SEG);
+    Dialog(OFFSET(Sets_B), OFFSET(Chk2_S), 0, 0, &md);
     return MNU_FUNC04;
 }
 
@@ -490,7 +490,7 @@ static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
     from = AT(code, title);
     for (i = 0; i < 80; i++)
         md.TmpBuf[i] = from[i];
-    answer = Dialog(OFFSET(MnLoc_B), include, 0, 0, MAIN_SEG) & 0xFF;
+    answer = Dialog(OFFSET(MnLoc_B), include, 0, 0, &md) & 0xFF;
     if (answer >= 2)
         return MNU_FUNC04;
     from = AT(code, name);
@@ -587,10 +587,10 @@ u16 M75_00(struct WCBdef *panel)
 {
     struct Answer saved;
 
-    if ((u8)Dialog(OFFSET(SvSt_B), 0, 0, 0, SEG_OF(panel)) == 0) {
+    if ((u8)Dialog(OFFSET(SvSt_B), 0, 0, 0, panel) == 0) {
         saved = SaveSet();
         if (saved.failed != 0 && saved.value != ERR_NOT_READY)
-            Dialog(OFFSET(SetEr_B), 0, 0, 0, SEG_OF(panel));
+            Dialog(OFFSET(SetEr_B), 0, 0, 0, panel);
     }
     return MNU_FUNC04;
 }

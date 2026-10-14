@@ -187,7 +187,7 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open)
     include = OFFSET(ViFl_S);
     if ((u8)edit != 0)
         include = OFFSET(EdFl_S);
-    DialBox(0x528, OFFSET(RdFil_P), include, MAIN_SEG, &open->box);
+    DialBox(0x528, OFFSET(RdFil_P), include, &md, &open->box);
     Window(open->box.begin, open->box.size);
     if (ChgDisk(md.ViewFil))
         goto none;
@@ -204,7 +204,7 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open)
             }
             include = OFFSET(EdFl_S);
         }
-        Dialog(OFFSET(FndEr_B), include, 0, 0, MAIN_SEG);
+        Dialog(OFFSET(FndEr_B), include, 0, 0, &md);
         goto none;
     }
 opened:
@@ -1208,7 +1208,7 @@ V12_00:                                 /* F2 - Wrap / Unwrap */
     goto V00_20;
 
 V14_00:                                 /* F7 - search */
-    if ((u8)Dialog(OFFSET(Srch_B), OFFSET(ViFl_S), 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(Srch_B), OFFSET(ViFl_S), 0, 0, &md) != 0)
         goto V00_30;
 V15_00:                                 /* Continue search */
     if (md.SrchStr[0] == 0)
@@ -1270,7 +1270,7 @@ V15_06:                                 /* not in these `count` bytes: on
     VI->ViSearch += count;
     goto V15_04;
 V15_07:
-    Dialog(OFFSET(SrEr_B), OFFSET(ViFl_S), 0, 0, MAIN_SEG);
+    Dialog(OFFSET(SrEr_B), OFFSET(ViFl_S), 0, 0, &md);
     result = 3;
     goto V15_22;
 V15_10:                                 /* found, as text or as bytes */
@@ -1395,7 +1395,7 @@ void V13_01(u16 changed)
    where the box is. */
 void V80_00(u16 include, struct Box *where)
 {
-    DialBox(0x528, OFFSET(SrFor_P), include, MAIN_SEG, where);
+    DialBox(0x528, OFFSET(SrFor_P), include, &md, where);
     Window(where->begin, where->size);
     V81_00();
 }
@@ -1739,7 +1739,7 @@ static void Aexec0(u16 edit)
     box = OFFSET(Viewr_P);
     if (edit != 0)
         box = OFFSET(Editr_P);
-    DialBox(0x528, box, MD_PLACE(md.TmpBuf), MAIN_SEG, &where);
+    DialBox(0x528, box, MD_PLACE(md.TmpBuf), &md, &where);
     Window(where.begin, where.size);
     *(u16 *)(md.TmpBuf + 95) = where.begin;
     *(u16 *)(md.TmpBuf + 97) = where.size;
@@ -1778,7 +1778,7 @@ static void Aexec0(u16 edit)
             for (i = 0; i < 80; i++)
                 md.TmpBuf[i] = from[i];
         }
-        Dialog(OFFSET(RunEr_B), include, 0, 0, MAIN_SEG);
+        Dialog(OFFSET(RunEr_B), include, 0, 0, &md);
     }
     ResWin(*(u16 *)(md.TmpBuf + 95), *(u16 *)(md.TmpBuf + 97),
            MD_PLACE(md.WinBuf));
@@ -1877,7 +1877,7 @@ static struct Onward F44_01(u16 how)
     if ((how & 0xFF) != 0)
         include = OFFSET(EdFl_S) + 1;
     md.HlpPage = (u8)(how + 18);
-    if ((u8)Dialog(OFFSET(ViFil_B), include, 0, 0, MAIN_SEG) != 0)
+    if ((u8)Dialog(OFFSET(ViFil_B), include, 0, 0, &md) != 0)
         return To(NEXT_FUNC04);
     if (md.ViewFil[0] == 0)
         return To(NEXT_FUNC04);

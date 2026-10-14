@@ -821,7 +821,7 @@ again:
     Window(place, size);
     /* The dialog has its box there already: its nine lines. */
     answer = Dialog(OFFSET(Find_B), 9 << 8 | size & 0xFF,
-                    place + (size & 0xFF00) - 0x900, 0, MAIN_SEG);
+                    place + (size & 0xFF00) - 0x900, 0, &md);
     if ((u8)answer != 0)
         goto close;
 

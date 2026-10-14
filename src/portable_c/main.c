@@ -1336,7 +1336,7 @@ u16 ErrRdy(u16 letter)
     *(u16 *)(md.TmpErr + 1) = (u16)(signed char)letter;
     drive = letter & 0xFF;
     PutKey(2);
-    DialBox(0x528, OFFSET(NoRd_P), 0, MAIN_SEG, &where);
+    DialBox(0x528, OFFSET(NoRd_P), 0, &md, &where);
     Window(where.begin, where.size);
     Cursor(where.begin + 0x42C);
     ClrKbd();
@@ -1404,7 +1404,7 @@ void Quit(void)
     u16 line = (u8)(md.Lines - 1);
 
     if (md.KeyBar != 0)
-        ClsLine(line << 8, MAIN_SEG);
+        ClsLine(line << 8, &md);
     ResUser(0, line << 8 | 80);
 }
 
@@ -1515,11 +1515,10 @@ FtErr5:
     *(u16 *)&md.AutoTim = 0xFFFF;
     if (how & 0x1000)
         answer = (u8)Dialog(OFFSET(FtEr1_B), OFFSET_IN_SEG(assembly, text),
-                            0, 0, MAIN_SEG)
+                            0, 0, &md)
                  == 0 ? DEVICE_RETRY : DEVICE_FAIL;
     else {
-        Dialog(OFFSET(FtEr2_B), OFFSET_IN_SEG(assembly, text), 0, 0,
-               MAIN_SEG);
+        Dialog(OFFSET(FtEr2_B), OFFSET_IN_SEG(assembly, text), 0, 0, &md);
         answer = DEVICE_FAIL;
     }
     md.Clock = clock;                   /* FtErr8 */
@@ -1557,7 +1556,7 @@ static void Exit(void)
 {
     RstVc1();
     Quit();
-    ClsLine((u16)md.DosLin << 8, MAIN_SEG);
+    ClsLine((u16)md.DosLin << 8, &md);
     Window(0, (u16)md.Lines << 8 | 80);
     CurMous(0);
     Cursor((u16)(u8)(md.DosLin - 1) << 8);

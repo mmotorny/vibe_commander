@@ -298,7 +298,8 @@ u16 Run_00(u16 text, u16 view)
     const u8 *name;
     const u8 *more;
     struct WCBdef *wcb;
-    u16 pair, c, left, to_dot, path, segment = MAIN_SEG;
+    const struct MainDat *data = &md;
+    u16 pair, c, left, to_dot, path;
 
     ListFlg = 0;
 Run_01:
@@ -428,7 +429,7 @@ Run_18:                                 /* the name of the file */
         wcb = CurrentPanel;
         /* The assembly leaves DS on the panel when the commands have no
            room for the name: see ClsLine below. */
-        segment = SEG_OF(CurrentPanel);
+        data = PANEL_AS_MAIN(CurrentPanel);
         if (wcb->Visible == 0)
             goto Run_23;
         if (wcb->WinTyp != 0)
@@ -450,7 +451,7 @@ Run_18:                                 /* the name of the file */
             break;
     }
 Run_23:
-    segment = MAIN_SEG;
+    data = &md;
     goto Run_05;
 
 Run_30:                                 /* that is all of them */
@@ -465,7 +466,7 @@ Run_30:                                 /* that is all of them */
     if (md.DosBuf[0] == 0)
         return 0;
     if (md.LoadFl & 0x80)
-        ClsLine((u16)md.DosLin << 8, segment);
+        ClsLine((u16)md.DosLin << 8, data);
     return 1;
 }
 
@@ -520,7 +521,7 @@ F32_02:
     if ((u8)opened.value > 3)
         goto F32_04;
 F32_03:
-    Dialog(OFFSET(UsrEr_B), include, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(UsrEr_B), include, 0, 0, &md);
 F32_04:
     return 0;
 

@@ -287,7 +287,7 @@ static void StMain40(u16 color, u16 item, u16 begin, u16 size)
    program has without a setup file. */
 static void StF08_00(void)
 {
-    if ((u8)Dialog(OFFSET(StDeflt_B), 0, 0, 0, MAIN_SEG) == 0)
+    if ((u8)Dialog(OFFSET(StDeflt_B), 0, 0, 0, &md) == 0)
         StDefault();
 }
 
@@ -320,7 +320,7 @@ static void StMain00(void)
 
 Main00:
     PutKey(0);
-    DialBox(0x528, OFFSET(StMain_P), 0, MAIN_SEG, &where);
+    DialBox(0x528, OFFSET(StMain_P), 0, &md, &where);
     Window(where.begin, where.size);
     item = sd.MnItem;
     last = (u8)((where.size >> 8) - 6); /* the item Exit */
@@ -455,7 +455,7 @@ static void StExit(void)
         if (sd.SrcIni[i] != ((u8 *)&md)[i])
             break;
     if (i != CmnIni
-        && (u8)Dialog(OFFSET(StSvSt_B), 0, 0, 0, MAIN_SEG) == 0)
+        && (u8)Dialog(OFFSET(StSvSt_B), 0, 0, 0, &md) == 0)
         save = 1;
     StUser(0, md.Lines);                /* Exit1: Restore screen */
     Window(0, (u16)md.Lines << 8 | 80);
@@ -537,7 +537,7 @@ void StSetup(void)
     F21_40(LeftPanel);
     F21_40(RightPanel);
     Quit();
-    ClsLine((u16)md.DosLin << 8, MAIN_SEG);
+    ClsLine((u16)md.DosLin << 8, &md);
     Window(0, (u16)md.Lines << 8 | 80);
     Cursor((u16)md.DosLin << 8);
     CurMous(0);
@@ -580,7 +580,7 @@ void StSetup(void)
             reason = OFFSET(StNoFnd_S);
         else
             reason = OFFSET(StNoIni_S);
-        answer = Dialog(OFFSET(StIniEr_B), reason, 0, 0, MAIN_SEG);
+        answer = Dialog(OFFSET(StIniEr_B), reason, 0, 0, &md);
         /* Err2, with Ok: nothing is stored in SrcIni. */
     }
     *name = 0;                          /* NcPath is the directory again */

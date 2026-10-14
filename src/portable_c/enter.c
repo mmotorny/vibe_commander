@@ -573,8 +573,7 @@ F27_05:
 struct Onward F30_00(struct WCBdef *panel)
 {
     if (md.QuitAck != 0
-        && (u8)Dialog(OFFSET(Quit_B), OFFSET(Name_S), 0, 0,
-                      SEG_OF(panel)) != 0)
+        && (u8)Dialog(OFFSET(Quit_B), OFFSET(Name_S), 0, 0, panel) != 0)
         return To(NEXT_FUNC04);
     return To(NEXT_EXIT);
 }

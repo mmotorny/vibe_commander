@@ -307,7 +307,7 @@ void StHelp(void)
         goto Help04;
 
 Help02:                                 /* there is none */
-    Dialog(OFFSET(StHlpEr_B), 0, 0, 0, MAIN_SEG);
+    Dialog(OFFSET(StHlpEr_B), 0, 0, 0, &md);
     goto Help41;
 
 Help04:                                 /* the window */

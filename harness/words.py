@@ -75,9 +75,10 @@ WORDS = [
                           "two pieces, up first"),
     _word("OFFSET_IN_SEG", "F10", "a pointer made an offset in a segment: "
                                  "the bridge, too"),
-    _word("MAIN_SEG", "F10", "the main data as a segment: F1 for the "
-                            "arithmetic on paragraphs, F3 for what a "
-                            "dialog is handed"),
+    _word("MAIN_SEG", "F10", "the main data as a segment: what a dialog "
+                            "is handed is &md since F3, and what is left "
+                            "is what a search looks through, the text of "
+                            "F4 and F5 and the list of F7"),
     _word("PANEL", "F2", "a segment made a panel"),
     _word("u16 panel", "F2", "a panel kept as a segment",
           text=r"u16\s+panel"),
@@ -105,9 +106,9 @@ WORDS = [
     _word("TABLES_BY", "F3", "the tables' segment"),
     _word("AsmSeg", "F3", "the same, as a function"),
     _word("NAMED", "F3", "what a word of a table names, as an offset"),
-    _word("u16 segment", "F6", "a segment kept in a number: F3 for what "
-                               "a dialog's fields are in, F4 to F6 for "
-                               "the texts, a list and a buffer",
+    _word("u16 segment", "F6", "a segment kept in a number: F4 to F6 "
+                               "for the texts, a list and a buffer, and "
+                               "F7 for the list of the speed search",
           text=r"u16\s+segment"),
     _word("AddressOf", "F5", "a place in the editor's text made a "
                              "segment and an offset", CALLED),
@@ -132,6 +133,9 @@ WORDS = [
                                  "for, as the original has DS left on it: "
                                  "it rests on the two layouts, not on the "
                                  "megabyte"),
+    _word("PANEL_AS_MAIN", None, "a panel where the main data is asked "
+                                 "for, the other way round: one place, "
+                                 "ClsLine for Run_00"),
     _word("MD_AT", None, "in a table: an offset in the main data"),
     _word("WCB_AT", None, "in a table: an offset in a panel"),
     _word("NUMBER", None, "in a table: a number where a name could be"),

@@ -151,13 +151,13 @@ static const u8 PtMnu_B[] = { Menu_C };
 
 /* Fill a row of the screen buffer with spaces in the colour that DOS
    writes in, and return the address of the row below: `place` has the row
-   in its high byte. The colour is read at CrntCol in the segment
-   `segment`, which is that of the main data, MAIN_SEG, for every caller
-   but one: Run_00 of usermenu.c. */
-u16 *ClsLine(u16 place, u16 segment)
+   in its high byte. The colour is CrntCol of `data`, which is the main
+   data for every caller but one: Run_00 of usermenu.c, which hands it a
+   panel by PANEL_AS_MAIN of vc.h. */
+u16 *ClsLine(u16 place, const struct MainDat *data)
 {
     u16 *screen = BasAdr(place & 0xFF00);
-    u16 cell = *AT(segment, MD_PLACE(&md.CrntCol)) << 8 | ' ';
+    u16 cell = data->CrntCol << 8 | ' ';
     u16 count;
 
     for (count = 80; count != 0; count--)
