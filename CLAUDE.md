@@ -156,30 +156,41 @@ These held while `src/c/` was made, and they say what it is.
      reasons did not hold, since most of what is widened never crosses
      to the system, and the memory from the extender makes the limits
      of 16 bits reachable on DOS.
-  3. The abstraction layer is designed: what the program asks of the
-     system it is on, and how. The user approves the design before
-     anything is built on it. `sys.h` is what there is until then, a
-     seam that keeps the registers in one file, and not that design. On the user's word of 13 October 2026 the
-     design begins while step 2 is still landing, interactively, a
-     group of functions at a time: a draft in
-     `src/portable_c/LAYER.md`, each decision put to the user and
-     written there with its date. The types that step 2 is still
-     changing may be settled last. The user has also decided, on 14
-     October 2026, that the program saves its preferences and its
-     session (the panels' directories, the command line and its
-     history) by itself, when they change and when it is put away,
-     on every platform, DOS included, with no command to save the
-     setup; when that is built, the comparison of the scenarios'
-     disks leaves the setup file out by one rule of the harness, but
-     in the scenarios that are about the setup itself.
-  4. The implementation for DOS moves under the layer.
+  3. The abstraction layer is DOS, on the user's word of 14 October
+     2026. The program goes on asking the system what it asks DOS and
+     the BIOS, as `sys.h` has it: functions named for DOS's services,
+     in DOS's terms and values (drive letters, names of 8.3, paths of
+     67 characters, the code page, the BIOS's key words, cells of the
+     screen, packed dates, DOS's numbers of errors). Every other system
+     emulates DOS behind those functions as well as it can, as DOSBox
+     does but at the level of the services and not of the processor or
+     the interrupts: a drive letter is a directory of the system's, by
+     a setting, as DOSBox's `mount`; a name longer than 8.3 has an
+     alias of DOS's form, `LONGNA~1`, that stays the same and leads back
+     to it; names are converted between UTF-8 and the code page where
+     they cross; the screen is a grid of cells drawn in a terminal; a
+     key is made a word of the BIOS; a command runs through `$SHELL
+     -c`. A design from the user's screens and what they are used for,
+     made anew for modern systems, is the right way for a redesign and
+     was set aside as more than is wanted now: the surveys of the
+     platforms and what was decided in that direction on 13 and 14
+     October 2026 are in `src/portable_c/LAYER.md` and
+     `src/portable_c/layer/`, kept for reference and superseded. That
+     the program saves its preferences and its session by itself, on
+     every platform, DOS included, decided on 14 October 2026 with the
+     rule of the harness for it, is of the program and not of the layer,
+     and stands until the user says otherwise.
+  4. The implementation for DOS is `dos32.c` behind `sys.h`, as it is.
   5. A second implementation is made that builds and is not meant to
      run: a stub.
-  6. The stub is built with clang on Linux, for 64 bits, and whatever of
-     the x86 or of DOS is still in the common code goes behind the
-     layer, as Chromium has it: files `_dos.c` and `_posix.c` beside
+  6. The implementation for Linux, of 64 bits, built with clang, a
+     program that runs in a terminal, emulating DOS as step 3 says;
+     whatever of the x86 is still in the common code goes behind
+     `sys.h`, as Chromium has it: files `_dos.c` and `_posix.c` beside
      common headers, and macros that each platform defines in its own
      way.
+  7. iOS, when Linux is done. Windows and macOS are not targets for now,
+     on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
   of 13 October 2026, since it no longer is what the original is. Its
   title and the first line of its banner are "Vibe Commander 0.1", the
