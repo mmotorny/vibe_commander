@@ -20,13 +20,13 @@ dirfunc.c     NEAR 25, MD_PLACE 1, ENTRY 7, DSKBUF 2
 dirfunc_t.c   MD_AT 75, NUMBER 9
 dos32.c       ARENA 1, AT 1
 drive.c       MD_PLACE 2, DSKBUF 2
-edit.c        AT 14, SEG_OF 13, MAIN_SEG 1, RoomParas 1, u16 segment 8, AddressOf 24, OFFSET_OF 21, NEAR 4, MD_PLACE 13, MD_POINTER 3
+edit.c        AT 15, SEG_OF 13, MAIN_SEG 1, RoomParas 1, u16 segment 8, AddressOf 24, OFFSET_OF 21, NEAR 4, MD_PLACE 13, MD_POINTER 3
 edit_t.c      MD_AT 15, NUMBER 1
 enter.c       MD_POINTER 1, ENTRY 14, DSKBUF 11, MAIN_AS_PANEL 1
 exec.c        MD_PLACE 2
 extfile.c     NEAR 1, MD_PLACE 2, MD_POINTER 1
 files.c       ENTRY 7, DSKBUF 7
-find.c        AT 2, SEG_OF 2, RoomParas 2, NEAR 5, MD_PLACE 3, DSKBUF 3
+find.c        RoomParas 2, MD_PLACE 3, DSKBUF 3
 find_t.c      MD_AT 2, NUMBER 2
 format.c      none
 help.c        NEAR 1, MD_PLACE 4
@@ -65,8 +65,8 @@ tables.h      none
 tree.c        TRELIST 8
 treebox.c     MD_PLACE 4, MD_POINTER 1, TRELIST 7, TREE_OFFSET 11, TREE_ENTRY 3, NUMBER 2
 treebox_t.c   MD_AT 3
-usermenu.c    NEAR 2, MD_PLACE 6, MD_POINTER 6, ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
-vc.h          ARENA 2, AT 1, RoomParas 1, u16 segment 1, TRELIST 2
-view.c        AT 1, SEG_OF 4, MAIN_SEG 1, RoomParas 1, ROOM_LEAST 1, u16 segment 21, NEAR 3, MD_PLACE 8, MD_POINTER 8, ENTRY 1
+usermenu.c    NEAR 2, MD_PLACE 7, MD_POINTER 6, ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
+vc.h          ARENA 2, AT 1, RoomParas 1, TRELIST 2
+view.c        SEG_OF 3, RoomParas 1, ROOM_LEAST 1, MD_PLACE 2, MD_POINTER 1, ENTRY 1
 view_t.c      MD_AT 21, NUMBER 2
 window.c      MD_POINTER 2

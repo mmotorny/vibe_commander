@@ -5,10 +5,11 @@
  *
  * Translated from VCVIEW.INC.
  *
- * The viewer has a segment of up to 0FFE0h bytes, ViSpace, for the file.
+ * The viewer has up to 0FFE0h bytes, ViSpace, for the file, where the
+ * room begins: a segment in the original.
  * A file that is larger is there a part at a time: ViOffset is where in
  * the file the part begins and ViLoaded how long it is. Where a line
- * begins on the screen is kept in a table at the top of the same segment,
+ * begins on the screen is kept in a table at the top of the same bytes,
  * a word for each line, growing down from ViSpace towards the text:
  * the first line, at the top, begins at 0, and ViEndTab is the address of
  * the last. A line ends behind CR LF or LF CR, or after 80 columns. Not
@@ -75,25 +76,25 @@ struct Line {
 };
 
 void V80_00(const u8 *include, struct Box *where);
-u16 NextLin(u16 segment, struct Line *line);
-u16 PrevLin(u16 segment, struct Line *line);
-u16 V20_00(u16 segment);
+u16 NextLin(const u8 *text, struct Line *line);
+u16 PrevLin(const u8 *text, struct Line *line);
+u16 V20_00(const u8 *text);
 void V25_00(void);
-u16 V30_00(u16 segment);
+u16 V30_00(const u8 *text);
 void V31_00(u16 place);
-void V32_00(u16 segment, u16 number, u16 at, u16 end);
+void V32_00(const u8 *text, u16 number, u16 at, u16 end);
 u16 V40_00(void);
-void V50_00(u16 segment);
-void V51_00(u16 segment);
-void V55_00(u16 segment, u16 to, u16 count, u16 handle);
-void V60_00(u16 segment, u16 at, u16 table);
+void V50_00(u8 *text);
+void V51_00(u8 *text);
+void V55_00(u8 *text, u16 to, u16 count, u16 handle);
+void V60_00(u8 *text, u16 at, u16 table);
 void V81_00(void);
 
 /* V00_02, V00_10, V13_00 and V13_01, which the main loop goes on in, are
    declared in vc.h, with struct Open, which V00_02 fills. The others are
    called by the keys of the viewer, which are looked at here: V80_00 and
-   V82_00 by the editor too, V82_00 by the file search. The segment of the
-   text is what the assembly has in DS. */
+   V82_00 by the editor too, V82_00 by the file search. The text that
+   each is handed is where the assembly has DS. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -145,11 +146,12 @@ static const u8 Byts_S[6] = " Bytes";
 #define ERR_NO_FILE   0x02
 #define ERR_NOT_READY 0x53
 
-/* The text in a segment, and a word of it or of the table of lines. The
-   place of the word is cut to 16 bits: the text begins where its segment
-   does, so a place that has wrapped round, two before 0, is the word
-   that it is on DOS, at the segment's end. */
-#define TEXT(segment) AT(segment, 0)
+/* A word of the text or of the table of lines, by its place. The place
+   is cut to 16 bits: the text begins where its segment does in the
+   original, so a place that has wrapped round, two before 0, is the word
+   that it is on DOS, at the segment's end, and not one in front of the
+   text. One place reads so: a line that begins at 1, which NextLin does
+   not ask about before it looks at the two bytes in front of it. */
 #define WORD_AT(text, at) (*(u16 *)((text) + (u16)(at)))
 
 /* Whether two bytes end a line: CR LF, or LF CR. */
@@ -235,9 +237,8 @@ none:
    leaves it there, or 1 if the part in the memory has no line behind
    this one: the place then stays and the entry is the first of the
    table. */
-u16 NextLin(u16 segment, struct Line *line)
+u16 NextLin(const u8 *text, struct Line *line)
 {
-    const u8 *text = TEXT(segment);
     u16 at = line->at;
     u16 entry = line->entry;
     u16 word;
@@ -281,9 +282,8 @@ none:
 
 /* Find where the line before the one at `line` begins. Returns as
    NextLin does. */
-u16 PrevLin(u16 segment, struct Line *line)
+u16 PrevLin(const u8 *text, struct Line *line)
 {
-    const u8 *text = TEXT(segment);
     u16 at = line->at;
     u16 entry = line->entry;
     u16 word;
@@ -349,9 +349,8 @@ none:
 /* Find the first line of the screen: where the line begins that ViFirst
    is in, which is returned, and its entry of the table, which goes to
    ViPoint. */
-u16 V20_00(u16 segment)
+u16 V20_00(const u8 *text)
 {
-    const u8 *text = TEXT(segment);
     u16 at = VI->ViFirst;
     u16 entry, word;
 
@@ -443,9 +442,8 @@ void V25_00(void)
 /* Write the screen: the window cleared, and a line of the text in each
    of its rows, from the line that ViFirst is in. Returns 1 if the part in
    the memory ends before the window is full, and else 0. */
-u16 V30_00(u16 segment)
+u16 V30_00(const u8 *text)
 {
-    const u8 *text = TEXT(segment);
     struct Line line;
     u16 number, count, at, end, result;
     u8 last;
@@ -458,13 +456,13 @@ u16 V30_00(u16 segment)
     } while (--count);
     number = 0;
     count = VI->ViSize >> 8;
-    line.at = V20_00(segment);
+    line.at = V20_00(text);
     line.entry = VI->ViPoint;
     for (;;) {
         at = line.at;
-        if (NextLin(segment, &line))
+        if (NextLin(text, &line))
             break;
-        V32_00(segment, number, at, line.at);
+        V32_00(text, number, at, line.at);
         number++;
         if (--count == 0) {
             result = 0;
@@ -479,7 +477,7 @@ u16 V30_00(u16 segment)
         if (last == 0x0D || last == 0x0A)
             end--;
     }
-    V32_00(segment, number, at, end);
+    V32_00(text, number, at, end);
     result = 1;
 show:
     Window(VI->ViBase, VI->ViSize);
@@ -513,9 +511,8 @@ void V31_00(u16 place)
    being 0FFE0h bytes at the most; and the editor, which has the shape of
    the cursor in the same word, EdShape, sets that when it opens a
    file. */
-void V32_00(u16 segment, u16 number, u16 at, u16 end)
+void V32_00(const u8 *text, u16 number, u16 at, u16 end)
 {
-    const u8 *text = TEXT(segment);
     u8 *screen = (u8 *)BasAdr(VI->ViBase + (number << 8));
     u8 *chars;
     u32 found, position;
@@ -618,18 +615,17 @@ u16 V40_00(void)
 
 /* Go to `position` in the file and, if DOS says it is there, read
    `count` bytes to `to` in the text. */
-static void Load(u16 segment, u32 position, u16 to, u16 count)
+static void Load(u8 *text, u32 position, u16 to, u16 count)
 {
     if (FileSeek(VI->ViHandle, 0, position).place == position)
-        V55_00(segment, to, count, VI->ViHandle);
+        V55_00(text, to, count, VI->ViHandle);
 }
 
 /* Read the next part: the second half of what is in the memory becomes
    the first, with the lines of the table that are in it, and the file is
    read on behind it, as far as the table leaves room. */
-void V50_00(u16 segment)
+void V50_00(u8 *text)
 {
-    u8 *text = TEXT(segment);
     u16 half = VI->ViSpace >> 1;
     u16 from, to, at, count, kept;
     u32 rest;
@@ -655,9 +651,9 @@ void V50_00(u16 segment)
     from = half;
     for (kept = 0; kept != count; kept++)
         text[kept] = text[from++];
-    Load(segment, VI->ViOffset + kept, kept, VI->ViEndTab - kept);
+    Load(text, VI->ViOffset + kept, kept, VI->ViEndTab - kept);
     to = VI->ViEndTab;
-    V60_00(segment, WORD_AT(text, to), to + 2);
+    V60_00(text, WORD_AT(text, to), to + 2);
 }
 
 /* Read the part before: what is in the memory moves up by half of the
@@ -665,9 +661,8 @@ void V50_00(u16 segment)
    the room that leaves, and the table of lines is made again: from the
    start, and from where the second line began before, so that the lines
    behind it are the same as they were. */
-void V51_00(u16 segment)
+void V51_00(u8 *text)
 {
-    u8 *text = TEXT(segment);
     u16 space = VI->ViSpace;
     u16 shift = space >> 1;
     u16 loaded, second, from, to, count;
@@ -688,8 +683,8 @@ void V51_00(u16 segment)
     to = space;
     for (count = from; count; count--)
         text[--to] = text[--from];
-    Load(segment, VI->ViOffset, 0, shift);
-    V60_00(segment, 0, space);
+    Load(text, VI->ViOffset, 0, shift);
+    V60_00(text, 0, space);
     to = space;
     for (;;) {
         if (to <= VI->ViEndTab)
@@ -701,28 +696,27 @@ void V51_00(u16 segment)
         if (second < from)
             break;
     }
-    V60_00(segment, second, to + 2);
+    V60_00(text, second, to + 2);
 }
 
 /* Read `count` bytes of the file `handle` to `to` in the text, which is
    filled with zeros first. */
-void V55_00(u16 segment, u16 to, u16 count, u16 handle)
+void V55_00(u8 *text, u16 to, u16 count, u16 handle)
 {
-    u8 *text = TEXT(segment) + to;
-    u8 *at = text;
+    u8 *part = text + to;
+    u8 *at = part;
     u16 left;
 
     for (left = count; left; left--)
         *at++ = 0;
-    FileRead(handle, text, count);
+    FileRead(handle, part, count);
 }
 
 /* Make the table of lines for the text from `at` on: `table` is the
    entry above the one that the line at `at` gets. Where the table meets
    the text, the part that is in the memory ends. */
-void V60_00(u16 segment, u16 at, u16 table)
+void V60_00(u8 *text, u16 at, u16 table)
 {
-    u8 *text = TEXT(segment);
     u16 loaded = VI->ViLoaded;
     u16 column, word;
 
@@ -797,9 +791,9 @@ static void Status(void)
 
 /* The first line of the screen, as V20_00 finds it, the line behind
    `line` and the one before it. */
-#define FIRST() (line.at = V20_00(segment), line.entry = VI->ViPoint)
-#define NEXT()  NextLin(segment, &line)
-#define PREV()  PrevLin(segment, &line)
+#define FIRST() (line.at = V20_00(text), line.entry = VI->ViPoint)
+#define NEXT()  NextLin(text, &line)
+#define PREV()  PrevLin(text, &line)
 
 /* The viewer: read the file `handle`, whose length is in ViLen, show it
    in the window ViBase and ViSize, with a status line if that is as wide
@@ -812,8 +806,8 @@ static void Status(void)
    between them Left or Right. */
 void V00_10(u16 handle)
 {
-    u16 segment = SEG_OF(Room);
-    const u8 *text = TEXT(segment);
+    u8 *text = Room;                    /* the room does not move while
+                                           the viewer has it */
     struct Line line;
     struct Box box;
     struct Answer read;
@@ -821,7 +815,8 @@ void V00_10(u16 handle)
     struct Sought sought;
     struct Mouse pointer;
     u16 count, key, bar, step, column, at, end, number, begin, size;
-    u16 starts, panel, length, behind, in_file, result, edge;
+    u16 length, panel, behind, in_file, result, edge;
+    u8 *starts;
     u16 mouse = 0;
     u8 third, quarter;
 
@@ -830,7 +825,7 @@ void V00_10(u16 handle)
         count = 0xFFE;
     count <<= 4;
     VI->ViSpace = count;
-    V55_00(segment, 0, count, handle);
+    V55_00(text, 0, count, handle);
     if (HIGH(VI->ViLen) == 0)
         count = LOW(VI->ViLen);
     VI->ViLoaded = count;
@@ -851,19 +846,19 @@ void V00_10(u16 handle)
     }
 
 V00_15:                                 /* the part in the memory is new */
-    V60_00(segment, 0, VI->ViSpace);
+    V60_00(text, 0, VI->ViSpace);
 V00_20:                                 /* write the screen */
     V25_00();
-    if (!V30_00(segment))
+    if (!V30_00(text))
         goto V00_30;
 V00_21:                                 /* the text ends on the screen */
     if (!V40_00())
         goto V00_30;
     if (VI->ViFirst < VI->ViSpace >> 1)
         goto V00_30;
-    V50_00(segment);
+    V50_00(text);
 V00_22:
-    V30_00(segment);
+    V30_00(text);
 
 V00_30:                                 /* the mouse */
     pointer = GetMous(mouse);
@@ -1012,7 +1007,7 @@ V05_00:                                 /* Up */
 V05_01:                                 /* the part before, if there is one */
     if (VI->ViOffset == 0)
         goto V05_02;
-    V51_00(segment);
+    V51_00(text);
     FIRST();
     PREV();
     VI->ViFirst = line.at;
@@ -1032,7 +1027,7 @@ V05_02:                                 /* the window a line down, and the
     end = VI->ViLoaded;
     if (!NEXT())
         end = line.at;
-    V32_00(segment, 0, at, end);
+    V32_00(text, 0, at, end);
     Window(VI->ViBase, 0x100 | (u8)VI->ViSize);
     /* Whether the window is full: from the first line again, with the
        entry of the table that the line behind it has left. */
@@ -1049,7 +1044,7 @@ V06_00:                                 /* Down */
         goto V00_30;
     FIRST();
     if (NEXT()) {
-        V50_00(segment);
+        V50_00(text);
         VI->ViFirst = 0;
         VI->ViPoint = VI->ViSpace - 2;
         V25_00();
@@ -1074,7 +1069,7 @@ V06_00:                                 /* Down */
     result = NEXT();
     if (!result)
         end = line.at;
-    V32_00(segment, number, at, end);
+    V32_00(text, number, at, end);
     Window(VI->ViBase + (number << 8), 0x100 | (u8)VI->ViSize);
     if (!result)
         goto V00_30;
@@ -1098,7 +1093,7 @@ V07_02:                                 /* the part before, if there is one */
         goto V07_04;
     if (VI->ViOffset == 0)
         goto V07_04;
-    V51_00(segment);
+    V51_00(text);
     FIRST();
     count = (u8)(md.Lines - 4);
     do {
@@ -1117,13 +1112,13 @@ V08_00:                                 /* PgDn */
     FIRST();
     /* Where the lines below begin goes to TmpBuf, a word for each: the
        last of them is the first line of the next screen. */
-    starts = MD_PLACE(md.TmpBuf) - 2;
+    starts = md.TmpBuf - 2;
     count = (VI->ViSize >> 8) - 2;
     do {
         if (NEXT())
             goto V08_06;
         starts += 2;
-        *(u16 *)MD_POINTER(starts) = line.at;
+        *(u16 *)starts = line.at;
     } while (--count);
     /* And a screen from there: where it is not full and the file ends,
        back by as many lines as it lacks. */
@@ -1136,17 +1131,18 @@ V08_00:                                 /* PgDn */
 V08_03:
     if (VI->ViOffset + VI->ViLoaded < VI->ViLen)
         goto V08_05;
+    /* The assembly leaves as well where taking them borrows, SUB DI,CX
+       and JC, which it cannot: DI is an address of the main data, 0CA7h
+       at the least, and the count that of a window's rows, doubled. */
     count += count;
-    if (starts < count)
-        goto V00_30;
     starts -= count;
-    if (starts < MD_PLACE(md.TmpBuf))
+    if (starts < md.TmpBuf)
         goto V00_30;
 V08_05:
-    VI->ViFirst = *(u16 *)MD_POINTER(starts);
+    VI->ViFirst = *(u16 *)starts;
     goto V00_20;
 V08_06:                                 /* the part ends: the next one */
-    V50_00(segment);
+    V50_00(text);
     VI->ViFirst = 0;
     VI->ViPoint = VI->ViSpace - 2;
     goto V00_20;
@@ -1167,7 +1163,7 @@ V09_00:                                 /* Home */
         count = LOW(VI->ViLen);
     VI->ViLoaded = count;
     FileSeek(VI->ViHandle, 0, 0);
-    V55_00(segment, 0, count, VI->ViHandle);
+    V55_00(text, 0, count, VI->ViHandle);
     goto V00_15;
 
 V10_00:                                 /* End */
@@ -1181,8 +1177,8 @@ V10_00:                                 /* End */
         VI->ViOffset = VI->ViLen - count;
         VI->ViLoaded = count;
         VI->ViFirst = 0;
-        Load(segment, VI->ViOffset, 0, VI->ViLoaded);
-        V60_00(segment, 0, VI->ViSpace);
+        Load(text, VI->ViOffset, 0, VI->ViLoaded);
+        V60_00(text, 0, VI->ViSpace);
     }
     line.entry = VI->ViEndTab;
     line.at = WORD_AT(text, line.entry);
@@ -1229,7 +1225,7 @@ V15_00:                                 /* Continue search */
         goto V15_04;
     /* In what is in the memory. */
     count = VI->ViLoaded - at;
-    sought = V82_00(segment, at, count);
+    sought = V82_00(text, at, count);
     if (sought.found & 0x100)
         goto V15_06;
     behind = sought.end - at;
@@ -1256,8 +1252,8 @@ V15_04:                                 /* and on in the file, a piece of
         result = 2;
         goto V15_22;
     }
-    sought = V82_00(MAIN_SEG, MD_PLACE(md.MenuBuf), count);
-    behind = sought.end - MD_PLACE(md.MenuBuf);
+    sought = V82_00(md.MenuBuf, 0, count);
+    behind = sought.end;
     panel = sought.found;
     in_file = 1;
     if (!(sought.found & 0x100))
@@ -1294,15 +1290,15 @@ V15_10:                                 /* found, as text or as bytes */
         if (HIGH(rest) == 0 && count > LOW(rest))
             count = LOW(rest);
         VI->ViLoaded = count;
-        Load(segment, VI->ViOffset, 0, VI->ViLoaded);
-        V60_00(segment, 0, VI->ViSpace);
+        Load(text, VI->ViOffset, 0, VI->ViLoaded);
+        V60_00(text, 0, VI->ViSpace);
     }
     count = LOW(VI->ViSearch) - LOW(VI->ViOffset);
     VI->ViFirst = count;
     if (VI->ViTxHex != 0)
         goto V15_21;
     /* The column it is in, and the line moved so that it shows. */
-    at = V20_00(segment);
+    at = V20_00(text);
     if (count < at)
         goto V15_21;
     count -= at;
@@ -1462,9 +1458,8 @@ static struct Sought Sought(u16 found, u16 end)
     return sought;
 }
 
-struct Sought V82_00(u16 segment, u16 at, u16 count)
+struct Sought V82_00(const u8 *text, u16 at, u16 count)
 {
-    const u8 *text = TEXT(segment);
     u16 more = SRCH_LEN - HexLen;       /* places at the end where only
                                            the bytes have room */
     u16 start, left, i;
@@ -1604,17 +1599,17 @@ static struct Next Next(u16 none, const u8 *at)
     struct Next next;
 
     next.none = none;
-    next.at = MD_PLACE(at);
+    next.at = (u8 *)at;                 /* in MenuBuf, which is written */
     return next;
 }
 
-struct Next F34_30(u16 text)
+struct Next F34_30(const u8 *text)
 {
-    const u8 *at = MD_POINTER(text);
+    const u8 *at = text;
     u16 word;
 
     for (;;) {
-        at = NEAR(FndLet(at));
+        at = FndLet(at);
         word = *(const u16 *)at;
         at += 2;
         if (!IS_CRLF(word)) {
@@ -1656,13 +1651,13 @@ struct Next F34_30(u16 text)
    what is returned has the place before the command. The
    character behind the name is made a zero byte before the length of
    the name is found too great. */
-struct Named F34_40(u16 text, u16 view)
+struct Named F34_40(u8 *text, u16 view)
 {
     struct Named named;
     const u8 *suffix = Menu_F + 1;
     const u8 *from;
     u8 *to;
-    u8 *at = MD_POINTER(text);
+    u8 *at = text;
     u8 *end;
     u16 word, count;
     u8 c;
@@ -1695,15 +1690,15 @@ struct Named F34_40(u16 text, u16 view)
         if (c != *suffix)
             goto command;
     } while (--count);
-    if (F34_30(MD_PLACE(end)).none == 0)
+    if (F34_30(end).none == 0)
         goto command;
     *end = 0;
-    if ((u16)(end - MD_POINTER(text)) >= LenPath + 12)
+    if (end - text >= LenPath + 12)
         goto command;
     to = md.TmpBuf;
-    if (MD_PLACE(NEAR(CutPath(MD_POINTER(text)))) == text)
+    if (CutPath(text) == text)
         to = (u8 *)CutPath(md.TmpBuf);
-    from = MD_POINTER(text);
+    from = text;
     for (count = LenPath + 13; count != 0; count--)
         *to++ = *from++;
     named.file = 1;
@@ -1733,7 +1728,7 @@ static void Aexec0(u16 edit)
     u8 *tail;
     u16 error, i;
 
-    tail = NEAR(MvzLine(md.TmpBuf + 101, md.ViewFil, LenStr + 1));
+    tail = MvzLine(md.TmpBuf + 101, md.ViewFil, LenStr + 1);
     md.TmpBuf[100] = (u8)((u16)(tail - (md.TmpBuf + 101)) + 45);
     box = &Viewr_P;
     if (edit != 0)
@@ -1844,14 +1839,13 @@ static struct Onward F34_11(u16 how)
     command = FindExt(CutPath(md.ViewFil));
     if (command == 0)
         return Own(edit);
-    next = F34_30(command);
+    next = F34_30(MD_POINTER(command));
     if (next.none)
         return Own(edit);
     named = F34_40(next.at, 1);
     if (named.file == 0) {
-        command = named.at;
-        *MD_POINTER(command) = ' ';
-        if (Run_00(command, 1))
+        *named.at = ' ';
+        if (Run_00(MD_PLACE(named.at), 1))
             return F21_30();
         return To(NEXT_FUNC04);
     }

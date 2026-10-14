@@ -7469,10 +7469,13 @@ where it was counted, which was in ten:
   of its step 14; the Enter of step 18 is 2.35 and 8.14), and 3.01
   and 11.07 in the file search (`find`, the Enter of its step 19). The
   C translation does not show it: it ends the two scenarios at 1.18
-  and 1.16 times the original. Why was not looked into. The piece F4
-  of the plan for a flat memory, which makes the viewer's text and
-  the list of the search pointers, counts those steps before and
-  after: its row there says so.
+  and 1.16 times the original. The piece F4 of the plan for a flat
+  memory counted those steps before and after and found why: the
+  capital of every byte is asked of DOS's routine in real mode,
+  through the extender, by `CaseMap` of `dos32.c`. Its section there,
+  "F4, the viewer and the file search", has the figures and the
+  trial that showed it. It stays so, on the user's word of 13 October
+  2026: remembering DOS's answers was offered and not taken.
 - No scenario of the portable C shows a time of day of its run past
   45 seconds. Five go on past that, `mouse-edit`, `editor-full`,
   `enter-many`, `blank-timed` and `copy-full`, and none of them has
@@ -9324,7 +9327,7 @@ thought and long in lines.
 | F1, three blocks where there was one. The proof. **Done**: "F1, three blocks where there was one" below | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, which answers in paragraphs of 16 bits as the seven places did and needs no cap, since inside the 640 KB it cannot pass A000h; 16 bytes of a pattern in front of each block and behind the last, written when a block is taken, which the image's tool holds at the end of every scenario ("What could go wrong", 15); `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the hand-out of the 640 KB in the system's file and the image's tool, for the 16 bytes; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
 | F2, a panel is a pointer. A sweep. **Done**: "F2, a panel is a pointer" below | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
 | F3, what a dialog is handed. A sweep, in two halves. **Done**, both: what the fields are in, "F3a, what a dialog's fields are in" below, and what a table is handed as, "F3b, what a table is handed as" behind it | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
-| F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
+| F4, the viewer and the file search. **Done**: "F4, the viewer and the file search" below | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands. **Done** but for the commands of a line, which wait for F4: "F7, the tree, the history, the commands" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
@@ -11054,6 +11057,283 @@ counted wrongly; the comments 6; the records, the tally and the tests
   while a test runs on `build/portable_c`.
 - Any change of the code moves `DTA+41`, and with it the six bytes of
   `copy` and `copy-dirs`: F2's section, "The image".
+
+### F4, the viewer and the file search: done, and what a later piece should know
+
+The text of the viewer and the list of the file search are pointers,
+and no segment is kept in a number in `view.c` or `find.c`. All 155
+scenarios pass with no golden and no patch changed, and the images are
+equal to those of the commit that the piece started from, with nothing
+declared. Two commits: a bug of the original that the switch to 32
+bits had fixed unasked, declared as fixed on the user's word, and the
+sweep.
+
+**What it is now.**
+
+- The viewer's routines take the text, `const u8 *text` or `u8 *text`
+  where they write, in place of `u16 segment`: `NextLin`, `PrevLin`,
+  `V20_00`, `V30_00`, `V32_00`, `V50_00`, `V51_00`, `V55_00`, `V60_00`,
+  `Load`. `V00_10` has `u8 *text = Room`. A place in the text, `at`,
+  `end`, `to`, `table`, an entry of the table of lines, and the fields
+  of `ViewDat` that hold one, stay numbers of 16 bits, added to the
+  text: N3 and N4 sort them.
+- `V82_00(const u8 *text, u16 at, u16 count)`, for all three that call
+  it. The viewer's search on in the file hands it `md.MenuBuf` and 0
+  where it handed the main data's segment and the place of `MenuBuf`,
+  and what comes back is how far behind `MenuBuf` the search ended.
+- `F34_30(const u8 *text)` and `F34_40(u8 *text, view)` take a pointer
+  into `MenuBuf`, and `struct Next` and `struct Named` have `u8 *at`.
+- PgDn's table of where the lines begin, `starts`, is a pointer into
+  `TmpBuf`.
+- `Line` of `find.c` is `Room + (i32)number * LenFnf`. Where the
+  original goes by the segment of a line alone, which it does where it
+  reads a file to be searched, `InParagraph` says how far into its
+  paragraph the line begins.
+- `NEAR` is out of both files: what `MvzLine` and `AddFile` return is a
+  `u8 *` already, and of `CutPath`, which returns a `const u8 *`, the
+  cast is written where it is written through.
+
+**The words' record**, of the two files, before and after:
+
+    find.c   AT 2, SEG_OF 2, RoomParas 2, NEAR 6, MD_PLACE 3
+             RoomParas 2, MD_PLACE 3
+    view.c   AT 1, SEG_OF 4, MAIN_SEG 1, RoomParas 1, ROOM_LEAST 1,
+             u16 segment 21, NEAR 3, MD_PLACE 8, MD_POINTER 8
+             SEG_OF 3, RoomParas 1, ROOM_LEAST 1, MD_PLACE 2, MD_POINTER 1
+
+What is left there is at the edge of another piece, each to go with
+that piece's function and not before:
+
+| Left | Where | Whose |
+|---|---|---|
+| `SEG_OF(Room)`, 3 | `Aexec0` of `view.c`, the three calls of `MemResize` | F9's, by its row: the lines that call the functions for the memory, which take a segment until then |
+| `RoomParas`, 3, and `ROOM_LEAST` | `V00_10`, `Aexec0`, `FindFil`, `F67_00` | N3 and N5 move theirs to bytes; F9 the one of `Aexec0` |
+| `MD_PLACE(md.WinBuf)`, 4 | `SavWin` and `ResWin` in `F67_00`, `ResWin` in `Aexec0` | F8's: `window.c` takes the buffer as a place |
+| `MD_POINTER(command)` and `MD_PLACE(named.at)` | `F34_11` of `view.c`: what `FindExt` answers and what `Run_00` takes | The small piece that F7 left behind it, of the commands of a line: see below |
+
+**Lines in files of other pieces**, each as small as it could be:
+
+- `edit.c`, F5's, one line: `V82_00(AT(address.segment, 0),
+  address.offset, count)` in `T32_00`, which is one `AT` more in the
+  record until F5 hands it the text.
+- `usermenu.c`, F7's, four lines of `F32_00`: `F34_30(text)` and
+  `F34_40(found.at, 0)`, with `command = MD_PLACE(found.at)` and
+  `MD_PLACE(named.at)` behind them, one `MD_PLACE` more there until
+  `command` is a pointer.
+- `vc.h`: the prototype of `V82_00` and its comment, the two of
+  `F34_30` and `F34_40`, and `at` of the two structures.
+
+**The commands of a line, with F7 landed.** F7 left the family that
+keeps a place of `MenuBuf` in 16 bits to a small piece behind this one
+("F7, the tree, the history, the commands", its table of what is
+left). This piece has made two of its five functions and their two
+structures pointers, since they are of `view.c`: `F34_30` and `F34_40`,
+`struct Next` and `struct Named`. What that piece still has: `struct
+Entry` with its `at`, `FndItem` and `Run_00` of `usermenu.c`, and
+`FindExt` of `extfile.c`, with the callers in `enter.c` and
+`usermenu.c`; and when those are pointers, the four bridges go that
+stand where the two halves meet, `MD_POINTER(command)` and
+`MD_PLACE(named.at)` in `F34_11` of `view.c`, and `MD_PLACE(found.at)`
+and `MD_PLACE(named.at)` in `F32_00` of `usermenu.c`. `F34_30` answers
+with a pointer also where it finds no command, the line that is none
+or the place behind the end of the file, and nothing there is 0 for
+none: `none` says it.
+
+**A bug of the original that the program of 32 bits had lost, and
+that is fixed now on the user's word.** Go to of the file search hands
+`ChgDisk` the address of the line under the cursor, and the original's
+`ChgDisk` reads at that offset in the main data, not in the list: two
+of its first 16 bytes, which are of the first palette, so the disk
+asked for is that of the current drive ("Known and not dealt with" has
+it). The call was `ChgDisk(NEAR(from))`, and `NEAR`, which dropped the
+segment in 16 bits, does nothing in a flat memory: since the switch
+`ChgDisk` read the line and asked for the disk of the drive that the
+line names. Nobody had decided that, and no scenario shows it. The
+piece handed it back, and the user decided on 13 October 2026
+(`CLAUDE.md`, "The portable C"): it is fixed. The call is
+`ChgDisk(from)` on purpose, with a comment that says what the original
+does, and the deviation is entry 15 of `src/portable_c/DEVIATIONS.md`,
+in a commit of its own that leaves the program the same bytes.
+
+**A scenario for it is to be written**, by a small piece: Go to on a
+line of the drive that shares the floppy drive with another, B: while
+the drive goes by A:, from a third drive. The original then has DOS
+ask for the disk at its own prompt, and the portable C shows its box,
+"Insert diskette for drive B:", which is the scenario's patch. Until
+then nothing holds the fix but the line.
+
+What it says for the pieces behind: **a `NEAR` that is taken out is
+read for whether the pointer was into the main data at all**. Where it
+was not, the cast changed what is read when the memory became flat:
+that is a bug of the original gone unasked, and it is handed back. The
+five others of `find.c` and the three of `view.c` are of `CutPath`,
+`AddFile`, `MvzLine` and `FndLet` on a text of the main data, and are
+right as they stand.
+
+**The places read by hand**, for a number of 16 bits that counted on
+wrapping where it meets the pointer:
+
+| Kind | Places | What it became |
+|---|---|---|
+| A word of the table of lines or of the text by its place, `WORD_AT(text, at)`, 29 | `NextLin`, `PrevLin`, `V20_00`, `V32_00`, `V50_00`, `V51_00`, `V60_00`, End | As it was: the macro cuts the place to 16 bits, and its comment says for which place that matters |
+| The two bytes in front of a line, `WORD_AT(text, at - 2)`, 5 of those | `NextLin`, `PrevLin` twice, `V20_00`, and `end - 2` in `V32_00` | `PrevLin` and `V20_00` ask first that `at` is not 0, and `V32_00` that the line has two bytes. `NextLin` does not ask, and need not for 0, the next line being behind the first. See below for 1 |
+| A byte of the text by a place that is stepped, `text[at++]`, `text[kept]`, `text[--to]`, `text[--from]`, `text[end - 1]`, 8 | `V30_00`, `V32_00`, `V50_00`, `V51_00`, the search's column in `V00_10`, `V82_00` | As it was. None wraps: each is held below `ViLoaded` or `ViSpace` by the loop that it is in, `end - 1` by `at < end` in front of it, and `--from` and `--to` of `V51_00` by a count that is `from` |
+| Where a part is read to, `TEXT(segment) + to` | `V55_00` | `text + to`, a number without a sign added |
+| A place of the main data counted in a number, `starts` of PgDn | `V00_10` | A pointer. The assembly leaves also where taking the count from the address borrows, `SUB DI,CX` and `JC`, which was `starts < count` and cannot be: the address is 0CA7h at the least and the count twice a window's rows. That test is gone, with a comment that says so; the one that holds `starts` against `TmpBuf` stays |
+| A place of `MenuBuf` handed on and taken apart, `(u16)(end - MD_POINTER(text))` | `F34_40` | `end - text`, a difference of two pointers with its sign, and its reason in `harness/int16.txt`: `end` is behind `text` |
+| What the search is handed for `MenuBuf` | `V15_04` of `V00_10` | The buffer and 0, where it was the main data and the buffer's place: the same bytes are looked through, and no place of them is near 64K either way |
+| A line of the list by 20 bits | `Line` of `find.c` | `Room` and 65 times the number, in 32 bits with a sign. The original's address wraps at a megabyte, at line 16,132; `FndSize` holds the list below what the room has, 8,064 lines on the bench |
+| A segment made of a line, and read at its offset 0 | `FindFil`, where a file is read to be searched | Written out: the paragraph that line `FndNumb + 1` begins in, up to 15 bytes in front of the line. The assembly reads at 0 of the segment that `FndAdr` made, and so did `SEG_OF(Line(...))` with `AT(segment, 0)`, by what `SEG_OF` does to a pointer and with no word of it |
+
+**Where the viewer counts on an offset wrapping at the top of its
+segment**, which the plan asks of this piece: nowhere on purpose, and
+in one place by what it does not ask. `NextLin` looks at the two bytes
+in front of the next line without asking where that begins, and a line
+that begins at 1 has them at FFFFh of the segment in the original. In
+a flat memory `WORD_AT` reads the same place, FFFFh behind where the
+text begins, which is in the room on the bench and 31 bytes behind
+what the viewer has of it, `ViSpace` being FFE0h at the most. A line
+begins at 1 only where `V51_00` makes the table again from where the
+second line began, which it moves up by `shift`, and `shift` is 1 only
+with a part that begins a byte into the file; the parts begin at
+multiples of 16 and of half the room. So it was not seen and is not
+expected. N4 has the read: with a room from the extender that is
+shorter than 64K it would be a read behind the block's end, of two
+bytes, which nothing shows.
+
+**The image.** `compare` of the build before, `ec7cf55`, saved before
+anything was changed, with the piece's build, after both commits: "155
+scenarios, 153 with nothing that differs; 0 differences, 0 more in
+what was declared as changed, 25 in what may differ", "465 pointers
+that name the same in both". The two that differ in what may are
+`blank-timed` and `mouse-find`. Nothing was declared, and `DTA+41` did
+not move this time. The room is equal byte for byte in every scenario,
+which is what holds `Line` and the place that a file is read to.
+
+Rebased onto `32827fb`, with F7 in, and held against a build of that
+commit made in a copy under `build/`: "155 scenarios, 39 with nothing
+that differs; 124 differences, 0 more in what was declared as changed,
+113 in what may differ". The 124 are of one kind, the kind of
+`DTA+41`: in the eight scenarios of the Russian bench that list files
+it is `DTA+42`, the byte behind a name of eleven characters as DOS's
+record of a search brings it up, C3h before and 00h after, and the
+same byte where a name was copied as 13 from there, `NameF+12` of the
+entries of both panels and `TmpErr`, `TmpBuf` and behind the panels;
+and the six of `copy` and `copy-dirs`. C3h and 83h are bytes of the
+program's code, which lay in that memory of DOS's when the extender
+loaded it, and the program's file is another with every change of the
+code. Against `ec7cf55` the two builds happened to leave the same
+bytes there.
+
+**The machine's clock of the step that searches.** Counted as "The
+machine's clock of the portable C against the original's" has it, in
+seconds of the machine for the one step:
+
+| The step | The original | Before the piece | After it | With the capitals remembered, a trial |
+|---|---|---|---|---|
+| `view-search`, the Enter of step 14 | 2.60 | 8.75 | 8.72 | 1.56 |
+| `view-search`, the Enter of step 18 | 2.35 | 8.13 | 8.10 | 1.19 |
+| `find`, the Enter of step 19 | 3.01 | 11.09 | 11.05 | 1.47 |
+
+It is not the reckoning of a segment and an offset: the piece takes
+that out of the loop and the figure moves by three hundredths, which
+is what the asking adds. **It is `CaseMap`.** `V82_00` asks `UpCase`
+for every byte that it looks at, `UpCase` asks `CaseMap` of the
+system's file for every byte that is no small letter of the 26, and
+`CaseMap` of `dos32.c` calls DOS's routine for capitals in real mode,
+through the extender, DPMI 0301h: into real mode and back for every
+byte of the text, some 320 instructions each, where the original and
+the C translation make a far call. The last column shows it: the
+piece's source of before F3b with eleven lines more in `CaseMap`,
+which keep what DOS answered for a letter and ask for each letter
+once. The step is then shorter than the original's. That was a trial
+in `build/` and is not in the tree.
+
+The mend is not of the addresses and is not made, and will not be:
+**the user has decided, on 13 October 2026, that the search stays as
+slow as it is** (`CLAUDE.md`, "The portable C"). Every byte's capital
+is asked of DOS through the extender as the original asks it, and
+remembering the answers was offered and not taken. Nothing changes in
+`dos32.c`. What was offered, for the record, two ways, both of which
+change what DOS is asked and when:
+
+- The system's file remembers what DOS's routine answered for a
+  letter, and forgets it when the country is asked for again, which
+  the program does when it starts and after every command, in
+  `IniData`. DOS's routine is then called
+  once for each letter that the program meets, 256 times at the most
+  between two commands, and the answers are DOS's own. It takes for
+  granted that the routine answers the same for the same letter until
+  the country is asked for again, which it does in every DOS that is
+  known, being a table.
+- `UpCase` asks only for a byte of 80h or more, which is what the
+  routine is documented for. That is common code doing otherwise than
+  the original for the bytes below, where a DOS could answer anything,
+  and it leaves a text of Russian as slow as it is.
+
+The first was the one recommended. With it `view-search` and `find`
+would end at some 1.15 times the original's clock where they end at
+twice.
+
+**What N3 to N5 should know.**
+
+- N3 and N4, `view.c`. A place in the text is a `u16` everywhere, 156
+  numbers of 8 or 16 bits by the record of the widths, and the text is
+  a pointer everywhere, so a place is widened by its type alone and
+  nothing of the addresses is in the way. What holds a place below
+  64K is `ViSpace`, which `V00_10` makes 0FFE0h at the most from
+  `RoomParas`: that stays the viewer's number, in bytes. `WORD_AT`
+  cuts its place to 16 bits and has to keep the cut, or get the test
+  that `NextLin` lacks, for as long as a place can be 1: see above.
+  `struct ViewDat` is 43 bytes in `TmpBuf` with the editor's over it
+  and a `LAID_OUT`: a field that is widened leaves it for a variable
+  beside, as the plan has it for the main data.
+- `V82_00` keeps `at` and `count` as numbers of 16 bits and returns the
+  end as one, for three callers that hand it at most 0FFE0h, 8000h and
+  80 more than 8000h bytes. Widened, it is one function for N4 with a
+  line of `edit.c` and one of `find.c`; a pointer to where the search
+  ended would do for all three and was not made here, since the
+  editor's caller is F5's while it takes its text apart.
+- `starts` of PgDn steps back below `TmpBuf` by its count and is held
+  against `TmpBuf` afterwards: two pointers of one block, which is
+  right, and two bytes in front of `TmpBuf` is still the main data.
+- N5, `find.c`. `Line` takes a `u16` and multiplies in 32 bits with a
+  sign: when `FndNumb`, `FndCur`, `FndFrst` and `FndSize` are widened,
+  the parameter is, and nothing else of the addresses changes. Go to
+  walks up from the cursor to the first line that begins with no
+  space, `Line(number--)`, and counts on line 0 being a directory's,
+  which it always is: below 0 the number wraps and the line is 4 MB
+  behind the room, where the original's 20 bits brought it back into
+  the megabyte. A number with a sign there reads in front of the room.
+- **A read behind the end of the room, found by reading and not
+  tried.** The place that a file is read to for a search is in the
+  list's own room, behind line `FndNumb + 1`, and the size of a part
+  is taken from the whole room, `RoomParas`, not from what is left
+  behind the list: 8000h and 80 bytes with any room of 64K or more.
+  The list may grow to within two lines of the room's end, `FndSize`.
+  So with some 7,560 lines found and a text looked for, a part of a
+  file is read to where the room ends and behind it. The original
+  does the same behind the end of its block, where the machine's
+  memory ends. No scenario gets near it, and inside the 640 KB the 16
+  bytes of the pattern behind the room would say so in the image. From
+  F9 on the extender ends the program for it ("What could go wrong",
+  14). What the program is to do there is the user's to say, when N5
+  gets to it: N5 meets it when it counts the room in bytes, and hands
+  it back with what the original was seen to do.
+- `InParagraph` is what is left of the 20 bits, in one place, where a
+  file is read to, and is the original's arithmetic on purpose: it
+  does not go when the numbers are sorted.
+- The words' tool counts `u16 panel` wherever it is written, also for
+  a variable that is no panel: `panel` of `V00_10` is which half of
+  the hex screen something was found in, and is declared behind
+  `length` for that.
+
+**How long it took**, in tool calls, some 100: reading the plan and
+the sections 20; waiting for F3b, with the two files read and the
+search's cause found meanwhile, 30; the trial of the edits as a script
+before F3b had landed, which then ran on the new tree as it was, 6;
+the bug put back 6; the sweep, its records and the suite 12; the
+image and the clock 5; the documents.
 
 ### F7, the tree, the history, the commands: done but for the commands of a line, and what a later piece should know
 

@@ -798,12 +798,12 @@ F32_55:                                 /* Esc, and the box goes */
         md.MenuFl = 0;
         return 0;
     }
-    found = F34_30(MD_PLACE(text));
-    command = found.at;
+    found = F34_30(text);
+    command = MD_PLACE(found.at);
     if (found.none)
         goto F32_57;
-    named = F34_40(command, 0);
-    command = named.at;
+    named = F34_40(found.at, 0);
+    command = MD_PLACE(named.at);
     /* BP, which was on the keys, is 0 from here on, and Run_00 takes it
        for whether a file is being viewed: so it is the place 0 of the
        main data, not a pointer to nothing, which has no place. */

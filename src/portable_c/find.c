@@ -152,14 +152,21 @@ enum {
     ASK_ENTER, ASK_ESC, ASK_LINE, ASK_CLICK
 };
 
-/* Where a line of the list is in the memory. The lines follow one
-   another from Room on, and the address is made so that a line never
-   crosses the end of a segment: of 20 bits, like the assembly's. */
+/* Where a line of the list is in the memory: the lines follow one
+   another from Room on, 65 bytes each. The assembly makes a segment and
+   an offset below 16 of that, FndAdr, an address of 20 bits; where it
+   goes by the segment alone, InParagraph says how far that is in front
+   of the line. */
 static u8 *Line(u16 number)
 {
-    u32 at = ((u32)number << 6) + number;       /* 65 bytes to a line */
+    return Room + (i32)number * LenFnf;
+}
 
-    return AT((u16)(at >> 4) + SEG_OF(Room), (u16)at & 0x0F);
+/* How far into its paragraph a place of the list is: the offset that
+   FndAdr of the assembly leaves in SI, beside the segment in DS. */
+static i32 InParagraph(const u8 *line)
+{
+    return (i32)((line - Room) & 0x0F);
 }
 
 /* Write a line of the list to the screen buffer, in the colour of the
@@ -536,8 +543,8 @@ u16 FindFil(u16 attributes)
     struct DateText date;
     struct TimeText time;
     const u8 *from;
-    u8 *end, *to, *name;
-    u16 length, suffix, handle, room, chunk, segment, count, found, i;
+    u8 *end, *to, *name, *part;
+    u16 length, suffix, handle, room, chunk, count, found, i;
     struct Answer entry, opened, read;
     u8 c, kind;
 
@@ -620,16 +627,21 @@ next:
         found = 0;
         if (chunk < 4000)
             goto stopped;
-        segment = SEG_OF(Line(FND->FndNumb + 1));
+        /* Where a part is read to: the paragraph that the line behind
+           the next one begins in. The assembly has DS there from FndAdr
+           and reads at 0 of it, not at the line: up to 15 bytes in front
+           of that, the end of the line that is still free. */
+        part = Line(FND->FndNumb + 1);
+        part -= InParagraph(part);
         for (;;) {
             /* FnFl46 */
             if (!FndBack())
                 goto stopped;
-            read = FileRead(handle, AT(segment, 0), chunk);
+            read = FileRead(handle, part, chunk);
             if (read.failed)
                 goto stopped;
             count = read.value;
-            if (V82_00(segment, 0, count).found != 0x100) {
+            if (V82_00(part, 0, count).found != 0x100) {
                 found = 1;
                 break;
             }
@@ -872,14 +884,14 @@ again:
         end = md.TmpErr + 2;
         *(u16 *)md.TmpErr = *(u16 *)md.FindStr;
         if (*(u16 *)md.FindStr == ALL_DRIVES
-            && NEAR(CutPath(rest)) == rest)
+            && CutPath(rest) == rest)
             *end++ = '\\';
         for (i = 0; i < LenPath + 13 - 2; i++)
             *end++ = *rest++;
         NormStr(md.TmpErr);
         if (md.TmpErr[0] == 0)
             goto close;
-        *(u16 *)NEAR(CutPath(md.TmpErr)) = 'A';
+        *(u16 *)CutPath(md.TmpErr) = 'A';
         first = *(u16 *)md.TmpErr;
         if (first == ALL_DRIVES) {
             for (;;) {
@@ -924,13 +936,13 @@ again:
                 if (*end++ == 0)
                     break;
             }
-            end = NEAR(AddFile(end - 1));
+            end = AddFile(end - 1);
         }
         /* F67_17 */
         for (; count != 0; count--)
             *end++ = *rest++;
         *end = 0;
-        *NEAR(CutPath(md.TmpBuf)) = 0;
+        *(u8 *)CutPath(md.TmpBuf) = 0;
         md.FncAddr = FNC_FINDFIL;
         answer = FindFil(ATTR_DIRECTORY);
         if ((answer >> 8) != 0 || first != ALL_DRIVES || FND->FndDrv > 'Z')
@@ -947,7 +959,7 @@ searched:
 found:
     /* F67_19: "N files found", and the menu of a search that is over */
     end = Number(md.TmpBuf, 0, FND->FndFls, NUM_SEPARATED);
-    end = NEAR(MvzLine(end, FnFl6_S, 15));
+    end = MvzLine(end, FnFl6_S, 15);
     if (FND->FndFls == 1)
         end--;
     for (i = 0; i < 15; i++)

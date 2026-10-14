@@ -1950,7 +1950,7 @@ static void T32_00(void)
         if (HIGH(left) == 0 && LOW(left) < count)
             count = LOW(left);
         address = AddressOf(place);     /* T32_02 */
-        sought = V82_00(address.segment, address.offset, count);
+        sought = V82_00(AT(address.segment, 0), address.offset, count);
         if (sought.found < 0x100)
             break;
         if (count < SrchLen)

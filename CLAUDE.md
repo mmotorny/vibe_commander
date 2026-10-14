@@ -2613,6 +2613,28 @@ in "The portable C".
     right one.
   - A cast with a step in it, `*(const u8 *)entry--`, is the same
     bytes with the step as a statement of its own behind it.
+  - `NEAR` did something in 16 bits, and what it did was not always
+    meant: it dropped the segment of a far pointer, and where the
+    pointer was not into the main data, the original read at that
+    offset in the main data. In a flat memory the cast does nothing
+    and the pointer is read where it points, which is the original's
+    bug gone with no word said and no scenario failing: `ChgDisk` in
+    Go to of the file search was one, for all of the 32 bits until the
+    piece F4 met it, and the user then decided that it stays fixed
+    (`src/portable_c/DEVIATIONS.md`, 15). Before a `NEAR` is taken
+    out, read whether its pointer is into the main data; where it is
+    not, that is a deviation to hand back.
+  - `SEG_OF` of a pointer with `AT(segment, 0)` behind it is the
+    paragraph that the pointer is in, not the pointer: up to 15 bytes
+    in front of it. Where the original goes by a segment so, the
+    pointer that takes its place has that taken from it, written out:
+    where the file search reads a file to, `FindFil` of `find.c`.
+  - The capital of a letter costs a call into real mode and back in
+    the program of 32 bits, some 320 instructions, `CaseMap` of
+    `dos32.c`: a loop that asks `UpCase` for every byte of a text
+    takes three and a half times the original's clock for that.
+    `TODO.md`, "F4, the viewer and the file search", has what was
+    counted; it stays so on the user's word.
 - A panel is a pointer, `struct WCBdef *`, since the piece F2
   (`TODO.md`, "F2, a panel is a pointer"), and `PANEL` of the words
   above is gone: the four panels are `CurrentPanel`, `OtherPanel`,

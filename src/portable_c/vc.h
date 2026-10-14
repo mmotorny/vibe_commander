@@ -1117,7 +1117,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size);
 /* Two that the viewer and the editor share, and the file search the
    second: T70_00 of edit.c clears a line of the window in the screen
    buffer, and V82_00 of view.c looks for the text of a search in `count`
-   bytes at `at` of the segment `segment`. */
+   bytes at `at` of the text `text`. */
 struct Cleared {
     u16 *screen;                        /* where the line is in the screen
                                            buffer */
@@ -1132,7 +1132,7 @@ struct Sought {
                                            what was found */
 };
 struct Cleared T70_00(u16 line);
-struct Sought V82_00(u16 segment, u16 at, u16 count);
+struct Sought V82_00(const u8 *text, u16 at, u16 count);
 
 /* The commands of the menus, commands.c: `panel` is the current panel,
    or the panel of the Left or the Right menu, and `item` what the
@@ -1262,7 +1262,7 @@ struct Onward F21_30(void);
    view.c. */
 struct Next {                           /* what F34_30 found: */
     u16 none;                           /* 1 if there is no command */
-    u16 at;                             /* where the command begins: or,
+    u8 *at;                             /* where the command begins: or,
                                            with none, the line that is no
                                            command, or the place behind
                                            the end of the file */
@@ -1270,11 +1270,11 @@ struct Next {                           /* what F34_30 found: */
 struct Named {                          /* what F34_40 found: */
     u16 file;                           /* 1 if the command is only the
                                            name of a file */
-    u16 at;                             /* if it is not, the place before
+    u8 *at;                             /* if it is not, the place before
                                            the command */
 };
-struct Next F34_30(u16 text);
-struct Named F34_40(u16 text, u16 view);
+struct Next F34_30(const u8 *text);
+struct Named F34_40(u8 *text, u16 view);
 /* Have both panels read again: where a command ends that has changed
    what is on the disk. Returns 1. See dirfunc.c. */
 u16 FncEx1(void);
