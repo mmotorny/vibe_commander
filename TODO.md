@@ -11158,6 +11158,25 @@ time, nor the six bytes of `copy` and `copy-dirs`, nor `dos32.Below`.
 No panel differs, nothing of the room, no pattern round a block. No
 variant was built: nothing of a layout changed but those 20 bytes.
 
+That the paragraph is those 20 bytes and nothing else was read in the
+linker's maps of the two builds, symbol for symbol of the data, by a
+script of a dozen lines. Of the 633 symbols that the build before has
+there, 623 are where they were: the stack, the tables, what has a
+value, the main data at A384h, and `_BSS` from where it begins, at
+19810h, up to the variables of `main.c`. The five pointers are the
+only symbols that are new, and none is gone. They stand among the six
+pointers that were there, from 19858h on, in an order that is the
+compiler's: `RightPanel` is 8 bytes further on, `Room` 12, and the
+eight symbols behind them 20 each, `RoomEnd`, `LeftPanel`,
+`OtherPanel`, `CurrentPanel`, `IniSave`, `list`, `StOpen` and `Own`,
+the 640 KB, which begin at 19A90h where they began at 19A7Ch. `_BSS`
+is 20 bytes longer, A029Fh for A028Bh, and no other segment of the
+data is of another length or at another place. The first block
+begins a paragraph behind the first paragraph at or behind `Own`:
+19A80h before, 19A90h after, one paragraph. The code is 486 bytes
+shorter, 1E560h for 1E746h, which ends in the same page, so the data
+is loaded where it was.
+
 The tool: `ADDRESSES` of `harness/dataimage.py` has the five words,
 each with its variable, and a third kind, `PLACE`, bytes from where
 the main data begins. A place of 0 and a pointer of 0 are both
