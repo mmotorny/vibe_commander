@@ -33,7 +33,8 @@
 ; The steps behind it are typed at DOS's prompt, to see what the machine
 ; still does. The program of the portable C is run the same way, as it
 ; stands at its first screen: --extra VC/T.EXE=build/portable_c/VC.EXE,
-; or build/portable_c/VC.EXE for the one of 16 bits, and no step for it.
+; and no step for it. (While the portable C was a program of 16 bits as
+; well, that one was run the same way.)
 ;
 ; The word behind the letters SKIP in the file is how many idle calls of
 ; the other program it lets by before it has DOS end that one: 0 as it
