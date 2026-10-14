@@ -271,6 +271,14 @@ These held while `src/c/` was made, and they say what it is.
   since every byte's capital is asked of DOS through the extender as
   the original asks it: remembering the answers was offered and not
   taken.
+- Two more limits of the original that step 2 came to, decided by the
+  user on 14 October 2026: the file search that looks for a text reads
+  a file in parts no longer than what is left of the room behind its
+  list, where the original reads parts as long as the whole room and
+  goes past the room's end when the list is long, a bug of the
+  original, fixed and declared; and a panel holds as many entries of a
+  directory as the memory allows, where the original stops at 2,703,
+  lifted by a piece of its own at the end of step 2 and declared.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
