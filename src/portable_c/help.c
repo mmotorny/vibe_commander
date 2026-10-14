@@ -288,7 +288,7 @@ static void Help05(void)
     struct Paged paged;
     struct Mouse pointer;
 
-    SavWin(BEGIN, size, MD_PLACE(md.ErrBuf1));
+    SavWin(BEGIN, size, md.ErrBuf1);
     color = Color(Help_C) << 8;
     MinBox(BEGIN, size, color);
     screen = BasAdr(BEGIN);
@@ -343,9 +343,10 @@ Help10:                                 /* the cursor within the window */
             place = BEGIN + AT_TEXT;
             count = (u8)((size >> 8) - 9);
             do {
-                /* Behind the text there are only empty lines. */
-                if ((u16)(MD_PLACE(NEAR(text)) - MD_PLACE(hd.HlpInfo))
-                        >= hd.HlpSize)
+                /* Behind the text there are only empty lines. How far
+                   into it the line is, is cut to 16 bits as in the
+                   original, where it was a difference of two offsets. */
+                if ((u16)(text - hd.HlpInfo) >= hd.HlpSize)
                     text--;
                 text = Help77(place, text);
                 place += 0x100;
@@ -545,7 +546,7 @@ Help65:                                 /* it could not be read */
     Dialog(&HlpEr_B, 0, 0, 0, &md);
 
 Help66:                                 /* Esc */
-    ResWin(BEGIN, size, MD_PLACE(md.ErrBuf1));
+    ResWin(BEGIN, size, md.ErrBuf1);
     Window(BEGIN, size);
 }
 

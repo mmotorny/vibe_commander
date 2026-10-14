@@ -313,7 +313,7 @@ RdTr22:                                 /* no more in this directory: on
 
 RdTr26:
     if (TREE->TreeLen >= 5) {
-        ResWin(box.begin, box.size, MD_PLACE(md.ErrBuf));
+        ResWin(box.begin, box.size, md.ErrBuf);
         Window(box.begin, box.size);
     }
     if (TREE->TreeErr != READ_FULL)
@@ -415,7 +415,7 @@ u16 ChTree(u16 column)
     struct Mouse pointer;
 
     HidCur();
-    SavWin(begin, size, MD_PLACE(md.WinBuf));
+    SavWin(begin, size, md.WinBuf);
     color = Color(ChTr_P[0]) << 8 | column & 0xFF;
     MinBox(begin, size, color);
     if (LeftPanel->WinTyp == 1)
@@ -524,7 +524,7 @@ ChTr19:                                 /* the path of the cursor */
 ChTr20:                                 /* the speed search, and a key */
     place = begin + (size & 0xFF00) - 0x400 + 19;
     if (md.WinMous == 0)
-        InSt10(place, MD_PLACE(md.MenuBuf + SPEED), 12, ChTr_P[1] << 8);
+        InSt10(place, md.MenuBuf + SPEED, 12, ChTr_P[1] << 8);
     Cursor(place + *(u16 *)(md.MenuBuf + SPEED - 2));
     cursor = NUMBER(TreeCursor);
     first = NUMBER(TreeFirst);
@@ -692,7 +692,7 @@ ChTr46:                                 /* Esc */
     HidCur();
     for (i = 0; i < LenPath; i++)
         md.CrnPath[i] = md.MenuBuf[KEPT + i];
-    ResWin(begin, size, MD_PLACE(md.WinBuf));
+    ResWin(begin, size, md.WinBuf);
     Window(begin, size);
     return (key & 0xFF) != 0x0D;
 }

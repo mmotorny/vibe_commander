@@ -1778,7 +1778,7 @@ static void Aexec0(u16 edit)
         Dialog(&RunEr_B, include, 0, 0, &md);
     }
     ResWin(*(u16 *)(md.TmpBuf + 95), *(u16 *)(md.TmpBuf + 97),
-           MD_PLACE(md.WinBuf));
+           md.WinBuf);
     Window(0, (u16)md.Lines << 8 | 80);
     CurShp(*(u16 *)(md.TmpBuf + 93));
     FncEx1();

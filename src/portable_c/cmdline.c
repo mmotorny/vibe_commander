@@ -261,7 +261,7 @@ F68_03:
     half = size + 0x100 - 1;
     begin = 0x0D28 - ((half >> 8) >> 1 << 8 | (half & 0xFF) >> 1);
     begin = SftEGA(begin);
-    SavWin(begin, size, MD_PLACE(md.WinBuf));
+    SavWin(begin, size, md.WinBuf);
     color = Color(Hist_C) << 8;
     MinBox(begin, size, color);
     MvsBw(BasAdr((begin + 0x100 & 0xFF00) | 35), Hist_S, 9, color);
@@ -375,7 +375,7 @@ F68_16:                                 /* Home */
     goto F68_12;
 
 F68_20:                                 /* the box goes */
-    ResWin(begin, size, MD_PLACE(md.WinBuf));
+    ResWin(begin, size, md.WinBuf);
     Window(begin, size);
     if (key >> 8 != 0x1C)
         return 0;
@@ -445,7 +445,7 @@ struct SpeedKey F77_00(u16 key, struct WCBdef *panel)
     size = SizDX();
     begin = (u8)((begin >> 8) + (size >> 8) - 1) << 8 | (u8)(begin + 8);
     size = 0x318;
-    SavWin(begin, size, MD_PLACE(md.WinBuf));
+    SavWin(begin, size, md.WinBuf);
     screen = BasAdr(begin);
     color = Color(AltSr_P[0]) << 8;
     BoxDubl(screen, color | 11, 1, 0, 0x16);
@@ -463,7 +463,7 @@ struct SpeedKey F77_00(u16 key, struct WCBdef *panel)
     goto F77_02;
 
 F77_01:                                 /* what has been typed, and a key */
-    InSt10(begin + 0x10A, MD_PLACE(md.MenuBuf + SPEED), 12,
+    InSt10(begin + 0x10A, md.MenuBuf + SPEED, 12,
            (u16)AltSr_P[1] << 8);
     i = *(u16 *)(md.MenuBuf + SPEED - 2) + begin + 0x10A;
     Cursor(i);
@@ -515,7 +515,7 @@ F77_11:
 
 F77_20:                                 /* the box goes */
     md.KeyBar = (u8)bar;
-    ResWin(begin, size, MD_PLACE(md.WinBuf));
+    ResWin(begin, size, md.WinBuf);
     Window(begin, size);
     Cursor1();
     ended.key = key;

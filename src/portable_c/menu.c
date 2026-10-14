@@ -504,7 +504,7 @@ struct Picked F39_00(u16 again, struct WCBdef *panel)
         menu = panel->Visible != 0 && md.Active != 0 ? 5 : 1;
     }
     HidCur();                           /* F39_01 */
-    SavWin(0, 0x150, MD_PLACE(md.ErrBuf));
+    SavWin(0, 0x150, md.ErrBuf);
     PutKey(1);
 
 F39_02:
@@ -554,7 +554,7 @@ F39_10:
                 to = 0xFF;
                 goto F39_41;
             }
-            ResWin(begin, size, MD_PLACE(md.WinBuf));    /* F39_13 */
+            ResWin(begin, size, md.WinBuf);    /* F39_13 */
             if (to == 0)
                 Window(begin, size);
         }
@@ -647,7 +647,7 @@ F39_26:                                 /* Right */
 F39_27:
     if (item == 0)
         goto F39_07;
-    ResWin(begin, size, MD_PLACE(md.WinBuf));
+    ResWin(begin, size, md.WinBuf);
     goto F39_50;
 F39_30:                                 /* Home, PgUp */
     if (item != 0)
@@ -696,13 +696,13 @@ F39_43:                                 /* Enter */
     if (item == 0)
         goto F39_50;
 F39_44:
-    ResWin(begin, size, MD_PLACE(md.WinBuf));
+    ResWin(begin, size, md.WinBuf);
     Window(begin, size);
     goto F39_85;
 F39_46:                                 /* Esc, Alt, F10 */
     if (item == 0)
         goto F39_85;
-    ResWin(begin, size, MD_PLACE(md.WinBuf));
+    ResWin(begin, size, md.WinBuf);
     Window(begin, size);
     item = 0;
     if (key != KEY_ALT)
@@ -716,7 +716,7 @@ F39_51:
     i = (menu - 1) & 0xFF;
     begin = MnuTab[i].begin;
     size = MnuTab[i].size;
-    SavWin(begin, size, MD_PLACE(md.WinBuf));
+    SavWin(begin, size, md.WinBuf);
     top = BasAdr(begin);
     F39_52(top, size, MnuTab[i].lines);
     F39_58(menu, panel, top, size);
@@ -731,7 +731,7 @@ F39_51:
     goto F39_42;
 
 F39_85:                                 /* Exit */
-    ResWin(0, 0x150, MD_PLACE(md.ErrBuf));
+    ResWin(0, 0x150, md.ErrBuf);
     Window(0, 0x150);
     table = 0;
     held = 0x50;

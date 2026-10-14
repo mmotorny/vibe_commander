@@ -804,13 +804,10 @@ static u16 Loop(u16 entry, struct Regs *r)
             }
             for (i = 0; i < INI_LEN; i++)       /* Func06 */
                 saved[i] = image[i];
-            /* What the registers hold behind the comparison, places as
-               numbers, which a command may go by: the second is of a
-               variable that stands behind the main data, IniSave, and
-               its number is how far behind, which is what the word
-               makes of a pointer that is no place of the main data. */
-            r->si = MD_PLACE(md.MenuBuf) + INI_LEN;
-            r->di = MD_PLACE(IniSave) + INI_LEN;
+            /* The assembly has SI and DI behind what it has compared
+               and copied, in MenuBuf and in IniSave: those are
+               pointers, `r->si` and `r->di` are not set to them, and
+               nothing reads SI or DI as this leaves them. */
             /* fall through */
         case FUNC07:
             Cursor1();
@@ -830,8 +827,9 @@ static u16 Loop(u16 entry, struct Regs *r)
                         break;
                     }
                 }
-                r->si = MD_PLACE(md.CrnPath) + i;
-                r->di = MD_PLACE(md.DosPth) + i;
+                /* The assembly has SI and DI here, in CrnPath and in
+                   DosPth, where the two paths differ: they are not set
+                   to those, as at Func06. */
                 if (!same && md.FlagCD != 0) {
                     moment = TimeOfDay();
                     time = moment.clock;
@@ -1160,7 +1158,9 @@ static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r)
         r->ax = ended.key;
         r->bx = ended.box;
         r->dx = 0x318;
-        r->si = MD_PLACE(md.WinBuf);
+        /* The assembly has SI on WinBuf, where the search kept what
+           its box covers: it is not set to that, and the command of the
+           key does not read SI. */
         r->cx = md.KeyBar;
         return FUNC12;
     case CMD_F80_00: return F80_00(panel) ? FUNC01 : FUNC05;

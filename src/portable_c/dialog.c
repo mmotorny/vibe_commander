@@ -200,7 +200,8 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
     begin = ADD_LOW(place, -((((size & 0xFF) - 1) & 0xFF) >> 1));
     where->begin = begin;
     where->size = size;
-    where->saved = head->saved;
+    /* The box names a buffer of the main data by its offset there. */
+    where->saved = (u16 *)((u8 *)&md + head->saved);
     SavWin(begin, size, where->saved);
     MinBox(begin, size, Color(head->colors[0]) << 8);
 
@@ -225,11 +226,11 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
 /* Show what a line that is typed into holds: `text`, in the main data, in
    `length` cells at `place`, in the colour whose number is in the high
    byte of `color`. A length of 0 is one of 65536, for a text that long. */
-void InSt10(u16 place, u16 text, u16 length, u16 color)
+void InSt10(u16 place, const u8 *text, u16 length, u16 color)
 {
     u16 *screen = BasAdr(place);
     u16 cell = Color(color >> 8) << 8;
-    const u8 *from = MD_POINTER(text);
+    const u8 *from = text;
     u16 count = length;
     u16 c;
 
@@ -528,7 +529,7 @@ static struct Typed InpStr(u16 place, u8 *text, u16 cursor, u16 length,
     struct Mouse pointer;
 
     for (;;) {                          /* InSt01 */
-        InSt10(place, MD_PLACE(text), length, color << 8);
+        InSt10(place, text, length, color << 8);
         Cursor(place + cursor);
         key = Input(bar);
         if (key >> 8 == KEY_MOUSE) {
@@ -864,7 +865,7 @@ u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
             for (count = control & 0xFF; count != 0; count--)
                 *text++ = *from++;
             *text = 0;
-            InSt10(place, MD_PLACE(INPUT(control) + 3), control & 0xFF,
+            InSt10(place, INPUT(control) + 3, control & 0xFF,
                    (u16)colors[1] << 8);
         } else if (type == FIELD_SELECT) {
             *((u8 *)screen + MD(field->mPoint) * (2 * 80)) = BULLET;

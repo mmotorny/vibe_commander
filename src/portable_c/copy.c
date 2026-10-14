@@ -1582,6 +1582,6 @@ u16 F35_61(u16 answer, u16 place)
         ;
     *(u16 *)(line - 3) = i;             /* the cursor behind the path */
     line[-1] = 1;                       /* and what is typed added to it */
-    InSt10(place, MD_PLACE(line), LenStr, BoxCu_C << 8);
+    InSt10(place, line, LenStr, BoxCu_C << 8);
     return 1;
 }

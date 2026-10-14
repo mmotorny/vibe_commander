@@ -636,7 +636,7 @@ F32_18:                                 /* the box */
         | (u8)((size - 1 & 0xFF) >> 1);
     if (begin >> 8 > limit)
         begin = limit << 8 | begin & 0xFF;
-    SavWin(begin, size, MD_PLACE(md.WinBuf));
+    SavWin(begin, size, md.WinBuf);
     c = Color(Hist_C) << 8;
     MinBox(begin, size, c);
     MvsBw(BasAdr((begin + 0x100 & 0xFF00) | 34), User_S, 11, c);
@@ -793,7 +793,7 @@ F32_53:
     answer = 0;
 
 F32_55:                                 /* Esc, and the box goes */
-    ResWin(begin, size, MD_PLACE(md.WinBuf));
+    ResWin(begin, size, md.WinBuf);
     Window(begin, size);
     if (answer != 0) {
         md.MenuFl = 0;

@@ -810,7 +810,7 @@ struct Searched F67_00(void)
 
     HidCur();
     PutMnu(3);
-    SavWin(place, size, MD_PLACE(md.WinBuf));
+    SavWin(place, size, md.WinBuf);
     MinBox(place, size, Color(Conf_C) << 8);
     /* No line of the box has ^I: the include line is any text. */
     line.colors = FindColors;
@@ -1012,13 +1012,13 @@ answered:
     if ((u8)answer != 1) {
 close:
         /* F67_25 */
-        ResWin(place, size, MD_PLACE(md.WinBuf));
+        ResWin(place, size, md.WinBuf);
         Window(place, size);
         return To(TO_FUNC04);
     }
 
     /* F67_30: Go to */
-    ResWin(place, size, MD_PLACE(md.WinBuf));
+    ResWin(place, size, md.WinBuf);
     Window(place, size);
     if (FND->FndNumb == 0)
         return To(TO_FUNC04);

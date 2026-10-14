@@ -179,12 +179,12 @@ struct Checked StF04_10(u16 answer)
 
     if ((u8)answer != 0)
         return Accepted(answer);
-    text = NEAR(FndLet(md.TmpErr + 3));
+    text = FndLet(md.TmpErr + 3);
     if (*text == 0)
         return Accepted(answer);
     if (*text != separator) {
         from = text;
-        text = NEAR(TxtNum(from, &number));
+        text = TxtNum(from, &number);
         if (text == from || number > 99)
             goto refused;
         seconds = (u8)number;
@@ -201,7 +201,7 @@ struct Checked StF04_10(u16 answer)
     for (from = text; *from == '0'; from++)
         zeros++;
     from = text;
-    text = NEAR(TxtNum(from, &number));
+    text = TxtNum(from, &number);
     if (text == from)
         goto refused;
     if (*FndLet(text) != 0)

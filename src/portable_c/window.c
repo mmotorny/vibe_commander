@@ -127,14 +127,14 @@ u16 SftEGA(u16 place)
     return place;
 }
 
-/* Keep what the screen buffer has in a window, at `buffer` in the main
-   data: `begin` is where the window begins, the row in the high byte,
+/* Keep what the screen buffer has in a window, at `buffer`, which is a
+   buffer of the main data: `begin` is where the window begins, the row in the high byte,
    and `size` its rows and columns likewise. A window of no rows has
    65536 of them. */
-void SavWin(u16 begin, u16 size, u16 buffer)
+void SavWin(u16 begin, u16 size, u16 *buffer)
 {
     const u16 *row = BasAdr(begin);
-    u16 *to = (u16 *)MD_POINTER(buffer);
+    u16 *to = buffer;
     u16 rows = size >> 8, columns = size & 0xFF, column;
 
     do {
@@ -146,10 +146,10 @@ void SavWin(u16 begin, u16 size, u16 buffer)
 
 /* Put back what SavWin kept, and have the next character typed taken as
    it is no longer. */
-void ResWin(u16 begin, u16 size, u16 buffer)
+void ResWin(u16 begin, u16 size, const u16 *buffer)
 {
     u16 *row = BasAdr(begin);
-    const u16 *from = (const u16 *)MD_POINTER(buffer);
+    const u16 *from = buffer;
     u16 rows = size >> 8, columns = size & 0xFF, column;
 
     do {

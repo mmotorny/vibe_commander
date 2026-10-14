@@ -9357,7 +9357,7 @@ thought and long in lines.
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
 | F6, a copy and what goes through files. **Done**: "F6, a copy and what goes through files" below | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands. **Done** but for the commands of a line, which wait for F4: "F7, the tree, the history, the commands" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
-| F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
+| F8, the rest. **Done**: "F8, the rest" below | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
 | F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
 | N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below, and "N0b, the rule turned to a sign" behind it | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and `i32`, the type with a sign; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
@@ -11515,7 +11515,7 @@ check's record and that of `portable_c-int16` did not move.
 | Where | What | Whose |
 |---|---|---|
 | `usermenu.c` 14, `extfile.c` 4, `enter.c` 1 | The commands of a line: `struct Entry` with `at`, what `FndItem` and `FindExt` answer, `Run_00(u16 text, u16 view)`, and `F34_30(u16 text)` with `struct Next` and `F34_40`, which are in `view.c`: places of `MenuBuf` in 16 bits, with 0 for none | A piece of its own behind F4, small: five functions and two structures, a pointer into `MenuBuf` each, and the callers in `view.c`, `enter.c` and `usermenu.c`. It was not begun, so that nothing of it stands half done beside F4 |
-| `cmdline.c` 5, `treebox.c` 4, `drive.c` 2, `usermenu.c` 2 | `MD_PLACE(md.WinBuf)` and its like, handed to `SavWin` and `ResWin` of `window.c` and to `InSt10` of `dialog.c`, which take the buffer as a place | F8, with the two routines of `window.c`; `InSt10` with whoever has `dialog.c` |
+| `cmdline.c` 5, `treebox.c` 4, `drive.c` 2, `usermenu.c` 2 | `MD_PLACE(md.WinBuf)` and its like, handed to `SavWin` and `ResWin` of `window.c` and to `InSt10` of `dialog.c`, which take the buffer as a place | F8, with the two routines of `window.c` and `InSt10`: done, "F8, the rest" below |
 | `exec.c` 2, `treebox.c` 1 | The original's addresses, above | Stay, each with its reason |
 
 **What the clusters should know.**
@@ -11853,6 +11853,128 @@ has three places more, each with its reason: `left` of `T26_00`, `end
 - `*(u16 *)&ed.EdOffst` in `T01_10` counts on the wrap, above.
 - `PIECE` is a count of 16 bits handed to `FileRead` and `FileWrite`
   with `count`, a `u16`.
+
+### F8, the rest: done, and what a later piece should know
+
+The words in the piece's fourteen files were fewer than the 165 that
+the record's last line gave F8: that line counts `NEAR`, `MD_PLACE` and
+`MD_POINTER` in every file, and most of them are in files that other
+pieces have, `edit.c`, `copy.c`, `dirfunc.c`, `view.c`, `find.c`, and
+the commands of a line. Of the fourteen, `help.c`, `keys.c`, `main.c`,
+`menu.c`, `stcolor.c`, `sthelp.c`, `stopts.c` and `window.c` had any,
+28 places on 25 lines; `commands.c`, `bars.c`, `system.c`, `setup.c`
+and `stmain.c` had none, and `start.c` has only what F9 is to change.
+With the callers of the routines that changed, the piece was one
+commit, and was not cut.
+
+**What changed.**
+
+- `SavWin` and `ResWin` of `window.c` take the buffer as a pointer,
+  `u16 *` and `const u16 *`, where they took its place in the main
+  data. `saved` of `struct Box` is a `u16 *` with them, which `DialBox`
+  of `dialog.c` makes of the offset that the box's table names
+  (`MD_AT`, which stays), `(u16 *)((u8 *)&md + head->saved)`, as the
+  file makes a field of `data`. Every caller that handed
+  `MD_PLACE(md.WinBuf)`, of `md.ErrBuf` or of `md.ErrBuf1` hands the
+  array: 30 lines in 11 files, 18 of them in other pieces' files, one
+  line each, `cmdline.c` 4, `treebox.c` 3, `find.c` 3, `drive.c` 2,
+  `usermenu.c` 2, `edit.c` 2, `view.c` 1. Those that hand `box.saved`
+  or `where.saved` are as they were.
+- `InSt10` of `dialog.c` takes the text as a `const u8 *`: its four
+  callers lost their `MD_PLACE`, two in `dialog.c` and one each in
+  `cmdline.c`, `treebox.c` and `copy.c`.
+- The registers of the main loop. `r->si` and `r->di` were set to
+  `MD_PLACE` of `md.MenuBuf` and of `IniSave` at `Func06`, of
+  `md.CrnPath` and `md.DosPth` at `Func07`, and `r->si` to `md.WinBuf`
+  behind the speed search: what the assembly has in SI and DI there.
+  Nothing reads them as those leave them: the three commands that take
+  SI and DI are the mouse's, which only `Func21` asks for, and it sets
+  both first; no other command reads either. So they are not set, with
+  a comment at each place that says what the assembly has there, as
+  F3b did for a menu's table. Four cuts of the record of the widths
+  went with them.
+- `help.c`: `(u16)(MD_PLACE(NEAR(text)) - MD_PLACE(hd.HlpInfo))`, how
+  far into the help's text a line is, is `(u16)(text - hd.HlpInfo)`: a
+  difference of two pointers, cut to 16 bits as the original's
+  difference of two offsets was, and held against `hd.HlpSize`, which
+  is 16 bits by its layout. The arithmetic is what it was; whether the
+  cut is needed is N18's, below.
+- `stopts.c`: three `NEAR` of what `FndLet` and `TxtNum` answer, which
+  are `const u8 *` already.
+
+**What stays, and why.**
+
+- `keys.c`, `MD_PLACE` twice on one line: the leak of `F00_50` into BX
+  and DX, `Leaves(MD_PLACE(TreeFirst), MD_PLACE(TreeCursor))` where the
+  cursor of a tree has not moved. They are the original's addresses,
+  the same numbers, in what the loop keeps as BX and DX, which Rename
+  reads as two counts (`F35_50` of `copy.c`): numbers by nature, as
+  `WAS(...)` of `exec.c` is. The comment there says so.
+- `start.c`: `AT` twice and `SEG_OF` and `u16 segment` once each, all
+  in the lines that take and give the blocks of memory: F9's.
+- `struct Onward`, eight bytes since F2, and the frame of `Command`,
+  396 bytes: a matter of the stack and not of the addresses, so N16's.
+- `dialog.c`, `MD` and `MDW`: `MD_POINTER` of a field's `mPoint`, an
+  offset that a table names, read in the main data. The file is not
+  this piece's but for `InSt10`, and an offset of a table stays one;
+  whoever next has the file may write the two as `(u8 *)&md + offset`,
+  as `DialBox` now makes `saved`.
+
+**The records**, as they stood when the piece landed on `0723c21`,
+behind F4, F5, F6 and N0d. The words: `MD_PLACE` 60 to 18,
+`MD_POINTER` 15 to 12, `NEAR` 7 to 3; by the last line F8 82 to 33, of
+which this piece's files have the two of `keys.c` above. What is left,
+by file: `usermenu.c` 13, `extfile.c` 4 and `enter.c` 1, of the
+commands of a line (F7's section); `copy.c` 5, `dirfunc.c` 1 and
+`view.c` 2, which their pieces' sections speak for; `exec.c` 2 and
+`treebox.c` 1, which stay with their reasons (F7's section); `dialog.c`
+2, above. The widths: 4 numbers fewer, `InSt10`'s text, the two
+buffers and `saved`. The host check's record and that of
+`portable_c-int16` did not move. (On `32827fb`, where the piece was
+made, F8's line went from 165 to 116, the rest being F4's, F5's and
+F6's to take.)
+
+**The image.** `compare` of a build of `0723c21`, saved before the
+rebase, with the piece's: "155 scenarios, 41 with nothing that
+differs; 6 differences, 0 more in what was declared as changed, 152 in
+what may differ", and "492 pointers that name the same in both".
+Nothing was declared. The 6 are the bytes of `copy` and `copy-dirs`,
+81h before and 7Fh after, which `DTA+41` has: F2's pair. On `32827fb`,
+before the rebase, the Russian bench showed 118 bytes besides, `DTA+42`
+and the same byte behind every name copied from it, C3h before and 0
+after, where `DTA+41` was B0h and 82h; F5 met the same, and the rule
+`NAME_TAIL` of `harness/dataimage.py`, which landed before this piece,
+takes them in as what DOS's memory held behind a short name.
+
+**What the clusters N16 to N21 should know.**
+
+- N16, `main.c`. `struct Regs` is the original's registers and stays
+  numbers. `si` and `di` are set only on the mouse's path, `Func21`,
+  and read only by the three commands that it asks for. `struct
+  Onward` and the 396 bytes of `Command`'s frame are this cluster's:
+  one variable of the structure that the fifty calls share takes them
+  back.
+- N17a, `keys.c`: `first` and `cursor` of `F00_50` are offsets of 16
+  bits in a panel or in the tree's list, and `struct Left` is BX and
+  DX, numbers by nature, the leak above among them.
+- N17b, `commands.c`: it had no word of the addresses.
+- N18, `menu.c` and `help.c`: the cut in `(u16)(text - hd.HlpInfo)` of
+  the help's lines is the original's. `text` only goes forward from
+  `hd.HlpInfo` but for the `text--` behind that test, which would put
+  it in front of the text if `hd.HlpSize` were 0 there; whether it can
+  be was not looked into, so the cut stays until it is.
+- N19a, `window.c`: `SavWin` and `ResWin` step a pointer, and a size
+  of no rows is 65536 rows, by `do ... while (--rows)` on a `u16`.
+- N19b, `start.c`: the four words above are F9's, and so are their
+  lines.
+- N20, `stcolor.c` and `stopts.c`, and N21, `stmain.c` and `sthelp.c`:
+  nothing of the addresses is left in them; `text` of `StF04_10` is a
+  `const u8 *` throughout.
+
+**How long it took**, in tool calls, some 45: reading the brief, the
+plan and the sections 12; reading the code 12; the change, built
+without a warning at the first try, 8; the records, the suite, the
+images and the documents the rest.
 
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 

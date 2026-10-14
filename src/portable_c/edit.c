@@ -2507,7 +2507,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
         }
         FileClose(handle);              /* T00_12 */
     }
-    ResWin(begin, size, MD_PLACE(md.WinBuf));    /* T00_13 */
+    ResWin(begin, size, md.WinBuf);    /* T00_13 */
     Window(begin, size);
     ed.EdStat = 0;
     if (ed.EdSizeX >= 79) {
@@ -2574,7 +2574,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     CurShp(ed.EdShape);                 /* T35_02 */
     return Ends(EDIT_DONE, ed.EdWrite);
 closed:
-    ResWin(begin, size, MD_PLACE(md.WinBuf));    /* T00_10 */
+    ResWin(begin, size, md.WinBuf);    /* T00_10 */
     Window(begin, size);
     return Ends(EDIT_CLOSE, 0);
 }

@@ -72,7 +72,7 @@ not plain behind a colon. The code has no name for any of them.
 cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32  its files
 N0              35          0     1              0      36     0     3     3    28  digits.c mask.c line.c mouse.c blank.c
 N1             130        130     2              2       0     0     0     0     0  string.c format.c box.c screen.c misc.c
-N2             112        112     0              0       0     0     0     0     0  dialog.c
+N2             111        111     0              0       0     0     0     0     0  dialog.c
 N3, N4         154        154    13             13       0     0     0     0     2  view.c
 N5             120        120     0              0       0     0     0     0     2  find.c
 N6 to N8       194        194    41             41       0     0     5     0     6  edit.c
@@ -87,16 +87,16 @@ N16             95         95     0              0       0     0     3     0    
 N17a            65         65     0              0       0     0     0     0     0  keys.c
 N17b            74         74     0              0       0     0     0     0     0  commands.c
 N18            112        112     1              1       0     0     0     0     2  menu.c help.c
-N19a           110        110     1              1       0     0     0     0     0  bars.c window.c system.c setup.c
+N19a           108        108     1              1       0     0     0     0     0  bars.c window.c system.c setup.c
 N19b            41         41     0              0       0     0     0     0     0  start.c
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
-headers        299        127    12              1     143     1     0     0     0  vc.h sys.h tables.h
-all           2945       2156   152             75     179     1    11     3    48
+headers        298        126    12              1     143     1     0     0     0  vc.h sys.h tables.h
+all           2941       2152   152             75     179     1    11     3    48
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               242         70    11              0     143     1     0     0     0
+vc.h               241         69    11              0     143     1     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              40         40     0              0       0     0     0     0     0
@@ -105,7 +105,7 @@ box.c               48         48     0              0       0     0     0     0
 cmdline.c           58         58     0              0       0     0     0     0     1
 commands.c          74         74     0              0       0     0     0     0     0
 copy.c              81         81     6              6       0     0     0     0     0
-dialog.c           112        112     0              0       0     0     0     0     0
+dialog.c           111        111     0              0       0     0     0     0     0
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           98         98     0              0       0     0     0     0     0
 drive.c             27         27     0              0       0     0     0     0     0
@@ -142,7 +142,7 @@ tree.c              18         18     0              0       0     0     0     0
 treebox.c           38         38     0              0       0     0     0     0     2
 usermenu.c          51         51     0              0       0     0     0     0     1
 view.c             154        154    13             13       0     0     0     0     2
-window.c            41         41     0              0       0     0     0     0     0
+window.c            39         39     0              0       0     0     0     0     0
 
 ----
 
@@ -641,7 +641,7 @@ vc.h, struct Selected: not sorted, 2 numbers
 
 vc.h, struct Shown: not sorted, 2 numbers
 
-vc.h, struct Box: not sorted, 3 numbers
+vc.h, struct Box: not sorted, 2 numbers
 
 vc.h, struct Onward: not sorted, 2 numbers
 
@@ -757,7 +757,7 @@ copy.c: not sorted, 81 numbers, 6 u32
 copy_t.c: as a whole, 38 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-dialog.c: not sorted, 112 numbers
+dialog.c: not sorted, 111 numbers
 
 digits.c, HexByt: parameter byte, u32
     bits: eight of them are read, four at a time, by a shift and a
@@ -952,4 +952,4 @@ view.c: not sorted, 154 numbers, 13 u32
 view_t.c: as a whole, 23 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-window.c: not sorted, 41 numbers
+window.c: not sorted, 39 numbers

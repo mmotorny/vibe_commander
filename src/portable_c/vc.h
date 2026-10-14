@@ -832,7 +832,7 @@ void PutInf(struct WCBdef *panel);                      /* info.c */
 struct Box {
     u16 begin;                          /* the row in the high byte */
     u16 size;                           /* the rows in the high byte */
-    u16 saved;                          /* where what it covers is kept */
+    u16 *saved;                         /* where what it covers is kept */
 };
 
 /*
@@ -1312,7 +1312,7 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
              const void *data, struct Box *where);
 u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
            void *data);
-void InSt10(u16 place, u16 text, u16 length, u16 color);
+void InSt10(u16 place, const u8 *text, u16 length, u16 color);
 struct Buttons {                        /* what MinMnu returns: */
     u16 key;                            /* the key that is for the caller */
     u16 chosen;                         /* the button chosen, in the low
@@ -1428,8 +1428,8 @@ void HidCur(void);
 void Scroll(u16 down, u16 color, u16 upper, u16 lower);
 u16 ScrOffs(void);
 u16 SftEGA(u16 place);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
+void SavWin(u16 begin, u16 size, u16 *buffer);
+void ResWin(u16 begin, u16 size, const u16 *buffer);
 void ResUser(u16 begin, u16 size);
 void Window(u16 begin, u16 size);
 void SavScr(void);

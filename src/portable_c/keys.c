@@ -167,7 +167,9 @@ struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first)
     } else if (was.cursor == cursor) {
         /* Of the tree the original leaves the two addresses in the main
            data, neither of which is ever 0, and Rename goes by whether
-           the two are: the offsets in the list are both 0 at the root. */
+           the two are: the offsets in the list are both 0 at the root.
+           They stay the original's numbers, since what they go into is
+           BX and DX, which Rename reads as two counts. */
         if (panel->WinTyp != 0)
             return Leaves(MD_PLACE(TreeFirst), MD_PLACE(TreeCursor));
         return Leaves(first, cursor);

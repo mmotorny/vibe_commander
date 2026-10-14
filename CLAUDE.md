@@ -3184,6 +3184,16 @@ in "The portable C".
   copied four gigabytes. Set every field that either reads, and give
   the program's least of what it has.
 
+- What the last piece of the addresses in the common files met (F8):
+  - A register of the main loop that the original sets to a place and
+    nothing reads as it is left is not set, with a comment that says
+    what the assembly has there: a pointer cannot go into `struct
+    Regs`. Which commands read SI and DI was read from every `r->si`
+    and `r->di` of the tree, and from where the loop asks for them.
+  - A place that the original leaves in a register which a later
+    command reads as a number stays the number, `MD_PLACE`, with its
+    reason: the leak of `F00_50` of `keys.c` into BX and DX.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through
