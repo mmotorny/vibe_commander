@@ -98,7 +98,7 @@ extern const u8 StPalets[];
 static struct {
     u16 begin;
     u16 size;
-    u16 palette;
+    i32 palette;
 } list;
 
 /* What a key or the mouse has made of the list or of the picture. */
@@ -111,14 +111,14 @@ enum {
 
 /* The lines of the list that show: F07_60 of the assembly, which hands
    the cursor and the first line over as well. */
-static u16 Lines(void)
+static i32 Lines(void)
 {
     return (u8)((list.size >> 8) - 5);
 }
 
 /* The text number `number` of texts that stand one behind the other,
    each with its zero: F07_66, and F07_65 for the names of the items. */
-static const u8 *StF07_66(const u8 *text, u16 number)
+static const u8 *StF07_66(const u8 *text, i32 number)
 {
     for (; number != 0; number--)
         while (*text++ != 0)
@@ -132,8 +132,8 @@ static const u8 *StF07_66(const u8 *text, u16 number)
 static const u8 *StF07_70(u16 place, const u8 *text)
 {
     u16 *screen = BasAdr(place);
-    u16 room = (u8)(list.size - 12);
-    u16 color = (u16)sd.HistC << 8;
+    i32 room = (u8)(list.size - 12);
+    u16 color = (u16)(sd.HistC << 8);
     u16 character = ' ';
 
     for (;;) {
@@ -172,12 +172,13 @@ static void StF07_80(void)
    brightness on Black for 1, and White on Black for any other. */
 static void StF07_75(u16 color)
 {
-    u16 front = color & 0x0F, behind = color >> 4 & 0x0F;
-    u16 cell, i;
+    i32 front = color & 0x0F, behind = color >> 4 & 0x0F;
+    u16 cell;
+    i32 i;
     u16 *screen;
     struct LineArgs line;
 
-    Cursor(0x043D + (behind << 8 | front));
+    Cursor((u16)(0x043D + (behind << 8 | front)));
     if ((u8)sd.ColCur == ShadFl) {
         if (behind == 0 && front == 0) {
             front = 16;
@@ -190,7 +191,7 @@ static void StF07_75(u16 color)
         }
     }
     StF07_80();
-    cell = Color(StColNm_P[0]) << 8 | ' ';
+    cell = (u16)(Color(StColNm_P[0]) << 8 | ' ');
     screen = BasAdr(0x153A);
     for (i = 0; i < 22; i++)
         screen[i] = cell;
@@ -225,10 +226,11 @@ static void StF07_75(u16 color)
    shows of them and the one new line is put on the screen, 49 cells wide
    where a line is 41: what is behind it on its row, the frame and the
    shadow, as the screen has them. */
-static void StF07_10(u16 cursor, u16 first)
+static void StF07_10(i32 cursor, i32 first)
 {
-    u16 lines = Lines();
-    u16 moved, was, top, place, size, count, upper, lower;
+    i32 lines = Lines();
+    i32 moved, was, top, count;
+    u16 place, size, upper, lower;
     const u8 *text;
 
     if (cursor < first)
@@ -238,13 +240,14 @@ static void StF07_10(u16 cursor, u16 first)
     moved = first - sd.ColFrst;
     was = sd.ColCur;
     top = sd.ColFrst;
-    sd.ColCur = cursor;
-    sd.ColFrst = first;
+    sd.ColCur = (u16)cursor;
+    sd.ColFrst = (u16)first;
     if (moved == 0 && was == cursor)
         return;
 
     if (top != 0xFFF0) {                /* F07_13: where the cursor was */
-        place = list.begin + ((was - top & 0xFF) << 8) + 0x0205;
+        /* A cell of the list, which is on the screen. */
+        place = (u16)(list.begin + ((was - top & 0xFF) << 8) + 0x0205);
         StF07_70(place, StF07_66(StColrs_S, was));
         Window(place, 0x0100 | (u8)(list.size - 12));
     }
@@ -258,7 +261,7 @@ static void StF07_10(u16 cursor, u16 first)
         } while (--count != 0 && *text != 0);
         place = list.begin + 0x0205;
         size = list.size - 0x050C;
-        if (moved == 1 || moved == 0xFFFF) {
+        if (moved == 1 || moved == -1) {
             upper = place;
             lower = upper + (size - 0x0101);
             Scroll(moved != 1, sd.HistC, upper, lower);
@@ -269,7 +272,8 @@ static void StF07_10(u16 cursor, u16 first)
         Window(place, size);
     }
     /* F07_18: the cursor, and its colour. */
-    place = list.begin + ((sd.ColCur - sd.ColFrst & 0xFF) << 8) + 0x0205;
+    place = (u16)(list.begin + ((sd.ColCur - sd.ColFrst & 0xFF) << 8)
+                  + 0x0205);
     size = 0x0100 | (u8)(list.size - 12);
     MvsColr(BasAdr(place), size & 0xFF, sd.HstCuC);
     Window(place, size);
@@ -286,7 +290,7 @@ static void StF07_40(void)
 /* Down, and the mouse held below the lines. */
 static void StF07_41(void)
 {
-    u16 cursor = sd.ColCur + 1;
+    i32 cursor = sd.ColCur + 1;
 
     if (cursor >= sd.ColNum)
         cursor--;
@@ -298,8 +302,8 @@ static void StF07_41(void)
    from the first page to the first item. */
 static void StF07_44(void)
 {
-    u16 cursor = sd.ColCur, first = sd.ColFrst;
-    u16 page = Lines() - 1;
+    i32 cursor = sd.ColCur, first = sd.ColFrst;
+    i32 page = Lines() - 1;
 
     if (first == 0)
         cursor = 0;
@@ -317,9 +321,9 @@ static void StF07_44(void)
    on its last page. */
 static void StF07_48(void)
 {
-    u16 cursor = sd.ColCur, first = sd.ColFrst;
-    u16 lines = Lines();
-    u16 last = sd.ColNum >= lines ? sd.ColNum - lines : 0;
+    i32 cursor = sd.ColCur, first = sd.ColFrst;
+    i32 lines = Lines();
+    i32 last = sd.ColNum >= lines ? sd.ColNum - lines : 0;
 
     if (first >= last) {
         cursor = sd.ColNum;
@@ -342,7 +346,7 @@ static void StF07_48(void)
    cursor of the grid, which the box has hidden, comes back then too. */
 static void StF07_53(void)
 {
-    u16 at, i;
+    i32 at, i;
 
     if ((u8)Dialog(&StDfCol_B, 0, 0, 0, &md) != 0) {
         md.HlpPage = 4;
@@ -367,13 +371,15 @@ static void StCol30(u16 color)
     const u8 *colors = StPagTab[StColPage[sd.ColCur] - 1].colors;
     u16 *row = md.ScrBuf;
     u16 *screen;
-    u16 rows, count, item, paint, changed;
-    u16 first = 0xFF, last = 0;
+    i32 rows, count;
+    u16 item, paint;
+    bool changed;
+    i32 first = 0xFF, last = 0;
 
     StF07_75(color);
     for (rows = 25; rows != 0; rows--) {
         screen = row;
-        changed = 0;
+        changed = false;
         for (;;) {
             count = *colors++;
             if (count == 0)
@@ -394,8 +400,8 @@ static void StCol30(u16 color)
                 if (item & SHADED)
                     paint = ShadCol(paint, Color(ShadFl));
             }
-            screen = MvsColr(screen, count, paint);
-            changed = 1;
+            screen = MvsColr(screen, (u16)count, paint);
+            changed = true;
         }
         if (changed) {
             last = rows;
@@ -405,14 +411,14 @@ static void StCol30(u16 color)
         row += 80;
     }
     if (first != 0xFF)
-        Window((u16)(u8)(25 - first) << 8,
-               (u16)(u8)(first - last + 1) << 8 | 58);
+        Window((u16)((u8)(25 - first) << 8),
+               (u16)((u8)(first - last + 1) << 8 | 58));
 }
 
 /* What the mouse has made of the picture, and the colour that the
    cursor of the grid is to be on. */
 struct Chosen {
-    u16 what;
+    i32 what;                           /* a WHAT_ */
     u16 color;
 };
 
@@ -477,18 +483,20 @@ static void StCol00(void)
     const u8 *colors;
     u16 *row;
     u16 *screen;
-    u16 size, place, rows, count, item, paint, i;
-    u16 color, key, mouse;
+    u16 size, place, item, paint;
+    i32 rows, count, i;
+    u16 color, key;
+    bool mouse;
     struct Chosen chosen;
 
     md.Clock = 0;
     md.KeyBar = 0;
-    size = (u16)md.Lines << 8 | 58;
+    size = (u16)(md.Lines << 8 | 58);
     SavWin(0, size, md.WinBuf);
-    place = (u16)(u8)(md.Lines - 1) << 8 | 58;
+    place = (u16)((u8)(md.Lines - 1) << 8 | 58);
     row = BasAdr(place);
     for (i = 0; i < 22; i++)
-        row[i] = (u16)sd.BackC << 8 | ' ';
+        row[i] = (u16)(sd.BackC << 8 | ' ');
     Window(place, 0x0116);
     if (md.Lines > 25) {
         /* The rows below the picture, which a screen of more lines
@@ -519,7 +527,7 @@ static void StCol00(void)
                 if (item & SHADED)
                     paint = ShadCol(paint, Color(ShadFl));
             }
-            screen = MvsBw(screen, page, count, paint << 8);
+            screen = MvsBw(screen, page, (u16)count, (u16)(paint << 8));
             page += count;
         }
         row += 80;
@@ -601,10 +609,11 @@ static void StCol00(void)
    went down on a line and is held above the lines or below them is Up or
    Down for as long as it is held. The left button that went down
    elsewhere and is let go outside the box leaves. */
-static u16 StF07_30(void)
+static i32 StF07_30(void)
 {
     struct Mouse mouse = GetMous(0);
-    u16 held, item, row, click;
+    u16 held;
+    i32 item, row, click;
 
     for (;;) {                          /* F07_31 */
         ClrKbd();
@@ -664,26 +673,28 @@ static u16 StF07_30(void)
    the cursor has. It is cleared down to the key bar, or to the last row
    if there is none. Returns when the list is left: to the setup's
    menu. */
-static void StF07_01(const u8 *name, u16 palette)
+static void StF07_01(const u8 *name, i32 palette)
 {
     const u8 *mode;
     const u8 *text;
     u16 *screen;
-    u16 size, rows, i, cell, shape, key, what, mouse;
+    u16 size, cell, shape, key;
+    i32 rows, i, what;
+    bool mouse;
 
     md.HlpPage = 4;
     mode = StColMd_S;
     if (md.ScrMod == 7)
         mode = StMonMd_S;
     list.palette = palette;
-    size = (u16)md.Lines << 8 | 22;
+    size = (u16)(md.Lines << 8 | 22);
     if (md.KeyBar != 0)
         size -= 0x0100;
     sd.BackC = (u8)Color(Back_C);
     screen = BasAdr(58);
     for (rows = size >> 8; rows != 0; rows--) {
         for (i = 0; i < 22; i++)
-            screen[i] = (u16)sd.BackC << 8 | ' ';
+            screen[i] = (u16)(sd.BackC << 8 | ' ');
         screen += 80;
     }
     screen = BasAdr(58);
@@ -701,12 +712,12 @@ static void StF07_01(const u8 *name, u16 palette)
     Window(58, size);
 
     list.begin = 0x0203;
-    list.size = (u16)(u8)(md.Lines - 3) << 8 | 53;
+    list.size = (u16)((u8)(md.Lines - 3) << 8 | 53);
     sd.HstCuC = (u8)Color(HstCu_C);
     sd.HistC = (u8)Color(Hist_C);
-    MinBox(list.begin, list.size, (u16)sd.HistC << 8);
+    MinBox(list.begin, list.size, (u16)(sd.HistC << 8));
     MvsBw(BasAdr(list.begin) + 80 + 19, StColor_S, 13,
-          (u16)sd.HistC << 8);
+          (u16)(sd.HistC << 8));
     Window(list.begin, list.size);
     sd.ColNum = 0;
     text = StColrs_S;
@@ -778,7 +789,7 @@ static void StF07_01(const u8 *name, u16 palette)
     HidCur();
     CursorShape(shape);
     StUser(0, md.Lines);
-    Window(0, (u16)md.Lines << 8 | 80);
+    Window(0, (u16)(md.Lines << 8 | 80));
 }
 
 /* F5, F6 and F7 of the setup's menu: Set Black & White palette, Set

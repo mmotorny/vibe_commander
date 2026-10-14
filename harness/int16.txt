@@ -244,31 +244,27 @@ stcolor.c, StCol00: index
     ColAddr answers with a place in ColTab: IN_TABLE of screen.c adds to
     md.ColTab and takes nothing away.
 
-stcolor.c, StF07_10: compare
-    | if (cursor >= lines + first)
-    first is no more than cursor, by the lines above, and lines is a byte,
-    as Lines answers: the sum leaves 16 bits only for a cursor of 65,281
-    and more, and the cursor is the number of a colour of the list.
-
-stcolor.c, StF07_10: index
+stcolor.c, StF07_10: widen
     | StF07_75(md.ColTab[sd.ColCur * 6 + list.palette * 2
     ColCur is the number of a colour of the list, of which there are
-    ColNum, and palette is below 3: StCol00 is handed it so.
+    ColNum, 39, and palette is below 3: StCol00 is handed it so. The
+    index is below 240 in either width.
 
-stcolor.c, StF07_30: compare
+stcolor.c, StF07_30: widen
     | if (item > sd.ColNum - 1) {
-    ColNum is 1 at the least: StCol00 counts the names of the colours in
-    a loop that goes round once before it asks.
+    ColNum is 1 at the least: StF07_01 counts the names of the colours in
+    a loop that goes round once before it asks, so ColNum - 1 is not
+    below 0, and item is a byte and a first line, as the next place has.
 
-stcolor.c, StF07_44: compare
-    | if (cursor > page + first)
-    The line above has made first what it was less page, or 0: the sum
-    is what first was, or page.
+stcolor.c, StF07_30: widen
+    | item = (u8)((mouse.place >> 8) - (list.begin >> 8) - 2) + sd.ColFrst;
+    A byte and ColFrst, the first line shown, which StF07_10 keeps below
+    ColNum, 39, once StF07_01 has drawn the list: the sum fits 16 bits.
 
-stcolor.c, StF07_53: index
-    | md.ColTab[at + i * 6] = StPalets[at + i * 6];
-    The line above the loop makes at 5 at the most, of a palette below 3,
-    and i is below LenColr, 40.
+stcolor.c, StF07_41: widen
+    | i32 cursor = sd.ColCur + 1;
+    ColCur is the number of a colour of the list, below ColNum, 39: the
+    sum is 39 at the most.
 
 sthelp.c, StHelp: back
     | entry = (struct StHlpData *)(buffer + (at - HELPBUF));

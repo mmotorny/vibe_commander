@@ -9395,7 +9395,7 @@ for.
 | N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | **Done**: "N18, `menu.c`, `help.c`: done, and what a later cluster should know" below. The help's lines widened with the original's cuts written where a help file that is not true to its text takes them past 16 bits |
 | N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | |
 | N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | |
-| N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | |
+| N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | **Done**: "N20, `stcolor.c`, `stopts.c`: done, and what a later cluster should know" below |
 | N21 | `stmain.c`, `sthelp.c` | 1,086; 121 | F8 | |
 
 A cluster and a piece of the addresses never have the same lines: a
@@ -14743,6 +14743,89 @@ what was declared as changed, 24 in what may differ", the 24 those of
 `blank-timed`, as before.
 
 It took some 60 tool calls to hand back.
+
+### N20, `stcolor.c`, `stopts.c`: done, and what a later cluster should know
+
+**What there is.** The two files sorted by "The rule for a number",
+with clang's warnings of a conversion silent for both. The whole suite
+passes, no golden and no patch changed, and the image of each scenario
+is that of the build before (below). Nothing a user sees, nothing that
+DOS is asked, and no limit moved: the list has 39 items and the grid 256
+colours whatever the widths.
+
+**The numbers.** Of the 113 of 8 or 16 bits, none a `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 49 | The cursor of the list, its first line, the lines shown, how far they moved, the page, the last first line, the items of `StF07_66`, the room of a line, a colour's two halves made the numbers of its names (`front` and `behind`, with `0xFF` for no background), the counts and rows of the pictures, `first` and `last` of `StCol30`, the rows and the indexes of the loops, `palette` of `StF07_01` and of `list`, `what` of `struct Chosen` and what `StF07_30` answers, a `WHAT_`; in `stopts.c` the row of the key bar, the delay's line of the group, the seconds, the hundredths, the zeros and the limit of the delay, and the counts |
+| Made `bool` | 3 | `changed` of `StCol30`; `mouse` of `StCol00` and of `StF07_01` |
+| Kept by a word | 58 | `text` 17, `place` 10, `colour` 9, `character` 7, `setup` 6, `cell` 3, `key` 2, `bits` 2, `system` 1 (the shape of the cursor), `small` 1 (`StColPage`, the picture of each item), counted by the record |
+| Kept by a sentence | 3 | What `Dialog` answers, handed to `Accepted` and to `StF04_10` as `dirfunc.c` has it; and `number` of `StF04_10`, which `TxtNum` writes through a pointer of 16 bits |
+
+No place of the kind `sign`. `refused` of `struct Checked` gets `false`
+and `true`, as N10 asked.
+
+**What was decided and not done: `struct StData` of `vc.h`.** Its six
+fields of the palettes, `BackC`, `HistC`, `HstCuC`, `ColCur`, `ColFrst`
+and `ColNum`, are read by `stcolor.c` alone, and by "The rule for a
+number" a structure laid over a buffer is sorted field by field as a
+variable is. It was left as it is: the record has it as one scope of
+`vc.h`, with the setup's other seven numbers, which are `stmain.c`'s,
+N21's; and a field made wider moves `Aside` and `Row50` behind it in
+`MenuBuf`, which the images hold, so that piece wants its own look at
+the images. The variables of `stcolor.c` read the three counts into
+`i32` and put them back with a cast, `sd.ColCur = (u16)cursor`. For
+whoever sorts it: `ColCur` and `ColNum` are a count and an index below
+40, `ColFrst` is a first line or `0xFFF0` while none is shown, which
+`StF07_10` takes for no line by `top != 0xFFF0` and through `moved`
+(below), and the three colours are `colour`.
+
+**`moved` of `StF07_10`.** It was `first - sd.ColFrst` in 16 bits, held
+against 0, 1 and `0xFFFF`. As an `i32` it is held against -1 for the
+line back. With `ColFrst` at `0xFFF0` before the first drawing it is
+-65,520 where it was 16, and either is neither 0 nor 1 nor one back:
+the first is at most 39 and `ColFrst` either below 40 or `0xFFF0`, so
+the two widths give the same answer at every test.
+
+**The casts.** clang named 20 places before anything changed: one went
+by a type, `click`, which `DoublMo` answers as an `i32`; 19 are casts,
+each a cell, a place or a size of a window made of a row and a column
+or of a colour shifted into the high byte. The widening made 9 more:
+the cursor and the first line put back into `sd`; the count of cells
+handed to `MvsColr` and `MvsBw` of `screen.c`, which keep a `u16`; the
+row handed to `StUser` of `stmain.c`, N21's, until it widens the
+parameter, and to `Window` shifted; the delay's line put into `TmpBuf`
+twice; and the seconds and the hundredths put into `DelayTm`, where
+the two casts that `StF04_10` had at `seconds = (u8)number` went. So 27
+casts, one with a comment, the cell of a line of the list, which fits
+by the list being on the screen. `VC.EXE` was the same bytes with the
+casts as without them, `73115e3a...`.
+
+**Across clusters.** No prototype of another file changed, and no line
+of another's file. `StUser` of `stmain.c` is handed `(u16)row` by
+`StF02_00`: N21 takes the cast out when it widens the parameter. The
+functions that `vc.h` declares for these files take and answer what
+they did.
+
+**`harness/int16.py`.** Its five places in `stcolor.c` that were
+comparisons and indexes of numbers of 16 bits went; four are new, each
+`widen`, a field of `struct StData` reckoned with into an `i32`, with
+the reason why it fits 16 bits in either width. The place of
+`StCol00`, `ColAddr(...) - md.ColTab`, is as it was.
+
+**The program.** `stcolor.c` is 125 bytes shorter in its code, 0FBCh for
+1039h, and `stopts.c` 20, 040Ah for 041Eh; `dialog.c`, which calls
+`StF04_10`, is the bytes it was. The image of every scenario, `python3
+harness/dataimage.py compare`, against the build of `main` that the
+piece began on: "156 scenarios, 156 with nothing that differs; 0
+differences, 0 more in what was declared as changed, 0 in what may
+differ".
+
+It took some 50 tool calls to hand back: the brief, the plan and
+the sections 12; the images of the build before, on a machine with a
+load of 60, the longest wait; the files read with the finder's lists
+beside them 4; the types, the casts and the reasons by three scripts
+6; the records, the suite and the documents the rest.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

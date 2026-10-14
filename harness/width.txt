@@ -89,11 +89,11 @@ N17b            74         74     0              0       0     0     0     0    
 N18             70          0     1              0      50     1     0     5    40  menu.c help.c
 N19a           108        108     1              1       0     0     0     0     0  bars.c window.c system.c setup.c
 N19b            40         40     0              0       0     0     0     0     1  start.c
-N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
+N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
 headers        279         95    12              1     153     3     0     0     0  vc.h sys.h tables.h
-all           2389        919   115              8     825    46    46    98   558
+all           2337        806   115              8     883    49    46   101   607
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               222         38    11              0     153     3     0     0     0
@@ -132,10 +132,10 @@ read.c              20          0     1              0      20     1     1     5
 screen.c            12          0     0              0      10     2     0     0     3
 setup.c              8          8     0              0       0     0     0     0     0
 start.c             40         40     0              0       0     0     0     0     1
-stcolor.c           85         85     0              0       0     0     0     0     0
+stcolor.c           43          0     0              0      43     0     0     3    39
 sthelp.c            46         46     3              3       0     0     0     0     2
 stmain.c            35         35     0              0       0     0     0     0     0
-stopts.c            28         28     0              0       0     0     0     0     0
+stopts.c            18          0     0              0      15     3     0     0    10
 string.c             6          0     0              0       6     0     0     0     8
 system.c            21         21     1              1       0     0     0     0     0
 tree.c               5          0     0              0       5     0     0     4    14
@@ -3038,7 +3038,138 @@ stack.c: as a whole, 1 number
 
 start.c: not sorted, 40 numbers
 
-stcolor.c: not sorted, 85 numbers
+stcolor.c, (): variable StColor_S, u8[]
+    text
+
+stcolor.c, (): variable StMode_S, u8[]
+    text
+
+stcolor.c, (): variable StPalet_S, u8[]
+    text
+
+stcolor.c, (): variable StBwPal_S, u8[]
+    text
+
+stcolor.c, (): variable StLapTp_S, u8[]
+    text
+
+stcolor.c, (): variable StColMd_S, u8[]
+    text
+
+stcolor.c, (): variable StMonMd_S, u8[]
+    text
+
+stcolor.c, (): variable StColrs_S, u8[]
+    text
+
+stcolor.c, (): variable StOn_S, u8[]
+    text
+
+stcolor.c, (): variable StColNm_S, u8[]
+    text
+
+stcolor.c, (): variable StColNm_P, u8[]
+    colour
+
+stcolor.c, (): variable StColPage, u8[]
+    small: the picture of each of the 39 items, 1 to 4, a byte of
+    the table of stcolor_t.c.
+
+stcolor.c, (): variable StPalets, u8[]
+    setup: the default palettes, as the colour table of the setup has
+    them.
+
+stcolor.c, StF07_70: parameter place, u16
+    place
+
+stcolor.c, StF07_70: variable color, u16
+    cell
+
+stcolor.c, StF07_70: variable character, u16
+    character
+
+stcolor.c, StF07_80: variable was, u8
+    colour
+
+stcolor.c, StF07_75: parameter color, u16
+    colour
+
+stcolor.c, StF07_75: variable cell, u16
+    cell
+
+stcolor.c, StF07_10: variable lower, u16
+    place
+
+stcolor.c, StF07_10: variable place, u16
+    place
+
+stcolor.c, StF07_10: variable size, u16
+    place
+
+stcolor.c, StF07_10: variable upper, u16
+    place
+
+stcolor.c, StCol30: parameter color, u16
+    colour
+
+stcolor.c, StCol30: variable item, u16
+    bits: a byte of a picture's colours, the item in the low six
+    bits and SHADED and BLINKS above them, or GREY.
+
+stcolor.c, StCol30: variable paint, u16
+    colour
+
+stcolor.c, struct Chosen: field color, u16
+    colour
+
+stcolor.c, StCol11: parameter color, u16
+    colour
+
+stcolor.c, StCol11: variable at, u16
+    place: of the pointer in the grid.
+
+stcolor.c, StCol00: variable bar, u8
+    setup: KeyBar as it was, put back.
+
+stcolor.c, StCol00: variable clock, u8
+    setup: Clock as it was, put back.
+
+stcolor.c, StCol00: variable palette, u8
+    setup: ColTyp as it was, put back.
+
+stcolor.c, StCol00: variable item, u16
+    bits: a byte of a picture's colours, the item in the low six
+    bits and SHADED and BLINKS above them, or GREY.
+
+stcolor.c, StCol00: variable paint, u16
+    colour
+
+stcolor.c, StCol00: variable place, u16
+    place
+
+stcolor.c, StCol00: variable size, u16
+    place
+
+stcolor.c, StCol00: variable color, u16
+    colour
+
+stcolor.c, StCol00: variable key, u16
+    key
+
+stcolor.c, StF07_30: variable held, u16
+    place
+
+stcolor.c, StF07_01: variable cell, u16
+    cell
+
+stcolor.c, StF07_01: variable key, u16
+    key
+
+stcolor.c, StF07_01: variable shape, u16
+    system: the shape of the cursor, as ChgCur answers it.
+
+stcolor.c, StF07_01: variable size, u16
+    place
 
 stcolor_t.c: as a whole, 24 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -3053,7 +3184,66 @@ stmain.c: not sorted, 35 numbers
 stmain_t.c: as a whole, 29 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-stopts.c: not sorted, 28 numbers
+stopts.c, (): variable StInf02_S, u8[]
+    text
+
+stopts.c, (): variable StInf05_S, u8[]
+    text
+
+stopts.c, (): variable StInf06_S, u8[]
+    text
+
+stopts.c, (): variable StInf07_S, u8[]
+    text
+
+stopts.c, (): variable StInf09_S, u8[]
+    text
+
+stopts.c, (): variable StInf10_S, u8[]
+    text
+
+stopts.c, (): variable StInf11_S, u8[]
+    text
+
+stopts.c, (): variable StDelay_T, u8[6]
+    setup: the minutes of BlDelay that Screen and Mouse offers.
+
+stopts.c, StF02_00: variable bar, u8
+    setup: KeyBar as it was before the dialog.
+
+stopts.c, StF04_00: variable digits, u16
+    character: two digits, as HexDec answers them, the tens in the
+    low byte.
+
+stopts.c, Accepted: parameter answer, u16
+    What Dialog answers, in two bytes, as every caller takes it
+    apart: in the low byte 0, a button or FFh for Esc, and 1 or 0
+    above it for F10 and Alt-F10.
+
+stopts.c, StF04_10: parameter answer, u16
+    What Dialog answers, in two bytes, as every caller takes it
+    apart: in the low byte 0, a button or FFh for Esc, and 1 or 0
+    above it for F10 and Alt-F10.
+
+stopts.c, StF04_10: variable number, u16
+    What TxtNum reads a number into, through a pointer of 16 bits, so
+    that a number of more digits wraps round there as the original's
+    does. It is the parameter of digits.c that decides.
+
+stopts.c, StF04_10: variable separator, u8
+    character
+
+stopts.c, StF09_00: variable first, u8
+    character
+
+stopts.c, StF09_00: variable second, u8
+    character
+
+stopts.c, StF09_00: variable separator, u8
+    character
+
+stopts.c, StF09_00: variable third, u8
+    character
 
 stopts_t.c: as a whole, 71 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

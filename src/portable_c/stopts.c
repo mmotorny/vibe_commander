@@ -70,14 +70,14 @@ static const u8 StDelay_T[] = { 40, 20, 5, 3, 1, 0 };
 void StF02_00(void)
 {
     u8 bar = md.KeyBar;
-    u16 row;
+    i32 row;
 
     Dialog(&StConf_B, 0, 0, 0, &md);
     if (md.KeyBar != 0 || bar == 0)
         return;
     row = (u8)(md.Lines - 1);
-    StUser(row, 1);
-    Window(row << 8, 0x150);
+    StUser((u16)row, 1);
+    Window((u16)(row << 8), 0x150);
     md.BarPrev = 0xFF;
 }
 
@@ -94,14 +94,14 @@ void StF02_00(void)
    DEVIATIONS.md): the byte is left as the setup has it. */
 void StF03_00(void)
 {
-    u8 delay;
+    i32 delay;
 
     md.TmpBuf[0] = md.ColTyp;
     md.TmpBuf[1] = md.ColTyp;
     for (delay = 0; md.BlDelay < StDelay_T[delay]; delay++)
         ;
-    md.TmpBuf[2] = delay;
-    md.TmpBuf[3] = delay;
+    md.TmpBuf[2] = (u8)delay;
+    md.TmpBuf[3] = (u8)delay;
     if ((u8)Dialog(&StScrn_B, 0, 0, 0, &md) != 0)
         return;
     md.ColTyp = md.TmpBuf[0];
@@ -117,7 +117,7 @@ void StF04_00(void)
 {
     u8 *text = md.TmpBuf + 9;
     u16 digits;
-    u8 number;
+    i32 number;
 
     number = md.DelayTm[1];
     if (number > 99)
@@ -144,7 +144,7 @@ static struct Checked Accepted(u16 answer)
     struct Checked checked;
 
     checked.answer = answer;
-    checked.refused = 0;
+    checked.refused = false;
     return checked;
 }
 
@@ -173,8 +173,9 @@ struct Checked StF04_10(u16 answer)
 {
     struct Checked checked;
     const u8 *text, *from;
-    u16 number, limit;
-    u8 seconds = 0, hundredths = 0, zeros;
+    u16 number;
+    i32 limit;
+    i32 seconds = 0, hundredths = 0, zeros;
     u8 separator = md.Country.DecimalSep[0];
 
     if ((u8)answer != 0)
@@ -187,7 +188,7 @@ struct Checked StF04_10(u16 answer)
         text = TxtNum(from, &number);
         if (text == from || number > 99)
             goto refused;
-        seconds = (u8)number;
+        seconds = number;
         if (*FndLet(text) == 0)
             goto taken;
         if (*text != separator)
@@ -216,10 +217,10 @@ struct Checked StF04_10(u16 answer)
     }
     while (number >= limit)
         number /= 10;
-    hundredths = (u8)number;
+    hundredths = number;
 taken:
-    md.DelayTm[0] = hundredths;
-    md.DelayTm[1] = seconds;
+    md.DelayTm[0] = (u8)hundredths;
+    md.DelayTm[1] = (u8)seconds;
     return Accepted(0);
 
 refused:
@@ -227,14 +228,14 @@ refused:
     /* The box has no page of the help, and the dialog that goes on has
        its own again. */
     md.HlpPage = PAGE_PANELS;
-    checked.refused = 1;
+    checked.refused = true;
     return checked;
 }
 
 /* The capitals of 40 characters, */
 static void StF09_10(const u8 *from, u8 *to)
 {
-    u16 count = 40;
+    i32 count = 40;
 
     do
         *to++ = (u8)UpCase(*from++);
@@ -244,7 +245,7 @@ static void StF09_10(const u8 *from, u8 *to)
 /* and their small letters. */
 static void StF09_20(const u8 *from, u8 *to)
 {
-    u16 count = 40;
+    i32 count = 40;
 
     do
         *to++ = (u8)LowCase(*from++);
@@ -263,7 +264,7 @@ void StF09_00(void)
     u8 *info = StInf02_S;
     u8 *line;
     u8 separator, first, second, third;
-    u16 count;
+    i32 count;
 
     StF09_10(StInf05_S + 4,
              StInf06_S + 7);
