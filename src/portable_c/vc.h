@@ -1056,9 +1056,8 @@ struct Onward F20_00(struct WCBdef *panel);
 
 /* Enter, the directory changed and the history, enter.c. F21_10 is Enter
    on the entry under the cursor, F21_25 a command of the command line
-   run, F21_31 the program started over to run what DosBuf holds, and
-   F21_40 the list of a panel cut down to what is kept of it while a
-   command runs, which is no command; F24_01 goes to the directory whose
+   run, F21_31 the program started over to run what DosBuf holds;
+   F24_01 goes to the directory whose
    path is at `path` in the main data.
    F24_02 has the panels show the directory that DOS is in when they
    are drawn next, `panel` being the current one: it is no command, and
@@ -1067,7 +1066,6 @@ struct Onward F21_00(struct WCBdef *panel);
 struct Onward F21_10(struct WCBdef *panel);
 struct Onward F21_25(void);
 struct Onward F21_31(void);
-void F21_40(struct WCBdef *panel);
 struct Onward F22_00(struct WCBdef *panel);
 struct Onward F23_00(struct WCBdef *panel);
 struct Onward F24_00(struct WCBdef *panel);

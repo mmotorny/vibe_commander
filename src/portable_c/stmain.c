@@ -73,12 +73,11 @@
    word for word, or go by StOpen where the setup program's copy does
    something else that shows: PutKey0, Dialog and Input.
 
-   F21_40 cuts the list of a panel down to what is kept of it while a
-   command runs, Quit puts into the screen buffer what DOS had on the
-   screen, and ClsLine empties a row of it. SavMous notes where the mouse
-   pointer is, for the main program to put it back, and CurMous shows or
-   hides it. RestVct gives the two interrupts that the program has taken
-   back to whoever had them.
+   Quit puts into the screen buffer what DOS had on the screen, and
+   ClsLine empties a row of it. SavMous notes where the mouse pointer is,
+   for the main program to put it back, and CurMous shows or hides it.
+   RestVct gives the two interrupts that the program has taken back to
+   whoever had them.
 
    DialBox draws a box and says where it is, Dialog asks a question and
    answers with the button in the low byte, 0 for the first and FFh for
@@ -534,8 +533,6 @@ void StSetup(void)
 
     md.LoadRes = md.LoadFl & 0x7F;      /* F21_30 */
     SavMous();                          /* F21_31 */
-    F21_40(LeftPanel);
-    F21_40(RightPanel);
     Quit();
     ClsLine((u16)md.DosLin << 8, &md);
     Window(0, (u16)md.Lines << 8 | 80);

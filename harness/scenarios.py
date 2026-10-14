@@ -1580,6 +1580,21 @@ _STAMPS = (
     "Down Enter",                         # Full
 )
 
+# A directory of 288 small programs of DOS, made in the first minute, so
+# that its time shows in it, and shown one to a line: more files than
+# the original keeps of a panel while a command runs.
+_MANY_FILES = (
+    'F7 "big" Enter',
+    "Enter",
+    "Shift+F5",                           # small programs of DOS
+    '"a:\\freedos\\bin\\v*.com" Tab "c:\\work\\big" Enter',
+    'GrayPlus "*.com" Enter',
+    # Eighteen files, fifteen times over: 288 with the first ones, and
+    # 256 are kept.
+    *(f'Ctrl+m F5 "*.{number:x}" Enter' for number in range(15)),
+    "F9 l f",                             # one to a line
+)
+
 _STAMPS_STEPS = _STAMPS + (
     "Down Down Down",                     # the status line of a file
     "Ctrl+a",                             # its date and time in full
@@ -2770,19 +2785,25 @@ SCENARIOS = {
         "A command run from a directory of more files than are kept "
         "while it runs, with the cursor on the last of them",
         steps=(
-            'F7 "big" Enter',             # in the first minute: its time
-            "Enter",                      # shows in it
-            "Shift+F5",                   # small programs of DOS
-            '"a:\\freedos\\bin\\v*.com" Tab "c:\\work\\big" Enter',
-            'GrayPlus "*.com" Enter',
-            # Eighteen files, fifteen times over: 288 with the first
-            # ones, and 256 are kept.
-            *(f'Ctrl+m F5 "*.{number:x}" Enter' for number in range(15)),
-            "F9 l f",                     # one to a line
+            *_MANY_FILES,
             "End",
             '"ver" Enter',                # the last one is kept, and the
                                           # cursor is on it afterwards
             "Up",
+            "Home",
+            "End",
+        )),
+
+    "enter-many-selected": Scenario(
+        "A command run from a directory of more files than are kept "
+        "while it runs, all of them selected and the cursor on the last",
+        steps=(
+            *_MANY_FILES,
+            "End",
+            'GrayPlus "*.*" Enter',       # all 288 selected
+            '"ver" Enter',                # 256 are kept, and what is
+                                          # selected beyond them is no
+                                          # longer afterwards
             "Home",
             "End",
         )),

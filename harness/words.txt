@@ -22,7 +22,7 @@ dos32.c       ARENA 1, AT 1
 drive.c       DSKBUF 2
 edit.c        RoomParas 1
 edit_t.c      MD_AT 15, NUMBER 1
-enter.c       ENTRY 14, DSKBUF 11, MAIN_AS_PANEL 1
+enter.c       ENTRY 10, DSKBUF 10, MAIN_AS_PANEL 1
 exec.c        MD_PLACE 2
 extfile.c     none
 files.c       ENTRY 7, DSKBUF 7

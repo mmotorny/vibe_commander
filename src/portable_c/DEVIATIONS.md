@@ -116,11 +116,9 @@ below the megabyte stays the extender.
   command the room is given back, and afterwards the program asks for
   the largest block that there is, as the original does; DOS gains
   nothing by it.
-- A panel is left with 256 files for a command, as the original leaves
-  it, the cursor's file and the first one shown put last if they are
-  beyond, and is read again afterwards: what stays selected is what the
-  original keeps. The limit has no reason any more; lifting it would be
-  a deviation of its own.
+- A panel keeps all of its files for a command, where the original
+  keeps 256, and is read again afterwards: what was selected stays
+  selected. That is entry 20.
 - What the main data has behind the command line, which the original
   has as whatever the memory holds after a command until it is set
   again, is as it was before the command.
@@ -1051,12 +1049,13 @@ of it.
   is two rows taller. The item has no page of the help: F1 on it shows
   the index.
 - Choosing it does what running a command does, without a command: the
-  lists of the panels are cut down to 256 files, the screen is what DOS
-  had shown, the row of the command line is emptied, where the original
+  screen is what DOS had shown, the row of the command line is emptied, where the original
   has its prompt and the command of the setup program there, and the
   cursor goes on to the next row, which moves the screen up if that row
   was the last. Nothing is noted in the history. The program keeps the
-  two interrupts that it has taken.
+  two interrupts that it has taken. The lists of the panels are not
+  cut down to 256 files, as the original's are for its setup program
+  (see 20).
 - Then the setup is on the screen as the original's setup program is,
   but for three settings of what the program has no more, which its
   dialogs do not have: Memory allocation and TSR manager in the
@@ -2029,3 +2028,41 @@ shows one, so the line says 2,001,050,624 bytes where the original says
 1,967,496,192, and neither says the 6 GB that the files take. The
 other scenarios that show the Info panel are held to the original's
 goldens as they are.
+||||||| parent of 367661c (Keep a panel whole while a command runs, and what was selected in it)
+
+### 20. A panel keeps all of its files while a command runs
+
+**What the original does.** Before a command it gives its main data and
+its panels back to DOS, and keeps of each panel, in the part of it that
+stays in the memory, the start of its list and the names and attributes
+of 256 entries, `..` among them. A longer list loses its end. If the
+cursor is on an entry that is dropped, that entry is put into the last
+place that is kept, and the first entry shown, if it is dropped too,
+into the place before; both lose the marks of being selected. When the
+command is done the panel is read again, and what was selected is
+found by name among what was kept: what was selected beyond the 256th
+entry, and the two that were moved, are no longer. `F21_40` of
+`VCFUNC.INC`, which the setup, entered as a command is run, goes
+through too. With 288 files selected and the cursor on the last, 253
+are selected after a command.
+
+**What the portable C does.** The panels stay where they are, whole,
+while a command runs, and nothing is cut: a panel that is read again
+behind the command finds every file that was selected and selects it
+again, the cursor's and the first one shown among them. The same when
+the setup is left. `F21_31` of `enter.c` and `StSetup` of `stmain.c`
+no longer cut; `F21_40` is gone.
+
+**Why.** The user's decision, on 13 October 2026, as `CLAUDE.md` has it
+under "The portable C": the cut was there because the original gives
+its memory up for a command, which the portable C does not (entry 1),
+so it is the removal of what only made sense on DOS.
+
+**Which scenarios show it.** `enter-many-selected`, which selects all
+288 files of a directory, with the cursor on the last, and runs a
+command: the original then shows 253 selected, with none of those on the
+screen, and the portable C 288, the eighteen on the screen and the
+cursor's file among them, until the end. Its patch has those rows.
+`enter-many` runs a command from the same directory with nothing
+selected, which shows the same in both, and no other scenario has a list
+longer than 256 entries when a command runs or the setup is entered.

@@ -9240,7 +9240,7 @@ of `enter.c`, `enter-many`). Nothing needs them cut from F1 on: a
 panel keeps its block. F1 cuts them all the same, since what a user
 sees of it is behaviour and a golden holds it. Whether the cut goes
 is question 4, which is asked when F1 has landed, and N14 carries the
-answer out.
+answer out. **Done**: it goes, entry 20 of `DEVIATIONS.md`.
 
 **The numbers that count the room.** The room on the bench is some 15
 MB once it is the extender's, and these are 16 bits today. Each is
@@ -9309,7 +9309,7 @@ entry 1 of `DEVIATIONS.md`.
 | l | "Not enough memory to load", a viewer or an editor of another's | For want of DOS's memory | The same | | Nothing changes |
 | m | What a command finds of memory | DOS's whole; none above the megabyte | The same | `command`, by what `mem` prints | Nothing changes. X saw it: `mem` and `above.asm`, run from a toy that holds the largest block of the extender's and from one that has given it back, are told the same, which is what `command`'s patch has today (row 21 of X) |
 | n | A second copy of the program | Runs, with the 640 KB of its own | Runs, with what the first copy gave back. It is loaded behind the first copy's two panels, not right behind the first copy | `second-copy`, `start-memory` | Nothing to see. X saw a second program of the extender get what the first gave back, by 0502h or by 0503h, and none while the first holds all (rows 17 to 20 and 27 of X). The driver of the tests is told the copy's new place, which is F9's |
-| o | The 256 files kept while a command runs | Cut | Cut, until question 4 is answered | `enter-many` | Question 4, asked when F1 has landed |
+| o | The 256 files kept while a command runs | Cut | Not cut: question 4, answered, and done by N14 | `enter-many-selected` | Entry 20 |
 
 What the scenarios lose by it is what they have lost already: the
 refusal of a file that is too large and the editor with its memory
@@ -9672,7 +9672,12 @@ piece named carries the answer out. They are here in the order in
 which the work comes to them; each is short enough for a dialog, the
 recommendation first.
 
-4. **The 256 files kept while a command runs.**
+4. **The 256 files kept while a command runs.** **Answered, 13 October
+   2026** (`CLAUDE.md`, "The portable C"): **gone**, as recommended,
+   and done by N14: entry 20 of `src/portable_c/DEVIATIONS.md`, the
+   setup's cut with it. `enter-many` shows nothing of it, since
+   nothing is selected when its command runs: `enter-many-selected`,
+   new, runs one with all 288 files selected, and has the patch.
    - *When*: F1 has landed. From then on a panel keeps its block
      through a command, and nothing needs the cut. N14, which has
      `enter.c`, carries the answer out.

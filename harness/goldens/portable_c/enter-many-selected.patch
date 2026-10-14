@@ -1,0 +1,99 @@
+The portable C in the scenario enter-many-selected: what it is expected to
+show otherwise than the original. A patch of
+harness/goldens/enter-many-selected.txt, see harness/goldens.py: a line with -
+is the golden's, a line with + is what is expected in its place.
+Deviation: 20 of src/portable_c/DEVIATIONS.md
+Why: a panel keeps all of its files while a command runs: the 288 files
+that were selected before the command are selected after it, where the
+original keeps 253 of them, none of those on the screen, so the eighteen
+rows of the list show them selected, the cursor's file among them, and the
+line under the list counts them all
+
+== 24: "ver" Enter
+rows 2-19
+-|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
+-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
+-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+-|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+-|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+-|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
++|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx1 1Ex38 1Bx1 6Cx1 1Bx39
++|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 3Ex38 1Bx41
+row 21
+-|║ 576,277 bytes in 253 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
++|║ 654,992 bytes in 288 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
+
+== 25: Home
+row 21
+-|║ 576,277 bytes in 253 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
++|║ 654,992 bytes in 288 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
+
+== 26: End
+rows 2-19
+-|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
+-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
+-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+-|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+-|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+-|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+-|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
++|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx1 1Ex38 1Bx1 6Cx1 1Bx39
++|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
++|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 3Ex38 1Bx41
+row 21
+-|║ 576,277 bytes in 253 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
++|║ 654,992 bytes in 288 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43

@@ -10,8 +10,7 @@
  * file of its directory has for files of its kind.
  *
  * A command is run by Exec of exec.c: F21_31 makes the program ready
- * for that, the interrupts given back, the panels cut down to what is
- * kept of them while a command runs and the screen as DOS left it, and
+ * for that, the interrupts given back and the screen as DOS left it, and
  * returns NEXT_EXEC, or NEXT_INIT11 if there is nothing to run after
  * all. The main loop leaves for that: the program does not come back
  * here, it starts over.
@@ -66,62 +65,14 @@ static struct Onward To(u16 place)
     return next;
 }
 
-/* Cut the list of a panel down to what is kept of it while a command
-   runs: F21_40.
-
-   No more than MinFls files are kept. Of a longer list the last ones are
-   dropped, and if the cursor is on one of those, its file is put into the
-   last place that is kept; the first file shown, if it is not kept either,
-   into the place before. Both lose the marks of being selected. The list
-   is read again when the command is done, and these two are looked for
-   in it by their names.
-
-   The original does this to save the panel: it gives its main data and
-   its panels back to DOS for the command, and keeps of a panel the
-   start of its segment and of each of so many files the name and the
-   attributes, in the part of it that stays in the memory. The portable
-   C keeps the panel where it is, and has no need of the limit; the
-   list is cut all the same, so that what a command leaves selected is
-   what the original leaves (see DEVIATIONS.md). The setup, which is
-   entered as a command is run, cuts it too: StSetup of stmain.c. */
-void F21_40(struct WCBdef *panel)
-{
-    struct FILENT *file;
-    u16 end = panel->EndBuf;
-    u16 limit = DSKBUF + MinFls * sizeof(struct FILENT);
-    u16 place, first;
-
-    if (end > limit) {
-        end = limit;
-        panel->EndBuf = end;
-        if (end <= panel->CurAdr) {
-            place = end - sizeof(struct FILENT);
-            first = panel->First;
-            if (first >= place) {
-                place -= sizeof(struct FILENT);
-                panel->First = place;
-                file = ENTRY(panel, first);
-                file->AttrF &= 0x3F;
-                *ENTRY(panel, place) = *file;
-                place += sizeof(struct FILENT);
-            }
-            file = ENTRY(panel, panel->CurAdr);
-            panel->CurAdr = place;
-            file->AttrF &= 0x3F;
-            *ENTRY(panel, place) = *file;
-        }
-    }
-}
-
 /* Make the program ready for what the command line holds to be run:
    F21_31, where the program also comes when it has started and read its
    setup with a command to run.
 
-   The vectors go back to their owners, the panels are cut down to what
-   is kept of them, and the screen is as DOS left it but for the prompt.
-   With no command the program only starts over, NEXT_INIT11; else the
-   commands are run, NEXT_EXEC: Exec of exec.c, which the loop's end
-   in main.c calls.
+   The vectors go back to their owners, and the screen is as DOS left it
+   but for the prompt. With no command the program only starts over,
+   NEXT_INIT11; else the commands are run, NEXT_EXEC: Exec of exec.c,
+   which the loop's end in main.c calls.
 
    The original asks DOS for the current drive here and leaves a command
    in DosChg that goes to it, if it is not the drive that was the
@@ -133,13 +84,17 @@ void F21_40(struct WCBdef *panel)
 
    The original saves the setup, the command and the panels here, in the
    part of it that stays in the memory, and gives the main data back to
-   DOS; what it reads from then on is the copy. */
+   DOS; what it reads from then on is the copy. Of a panel it keeps 256
+   files, F21_40: a longer list loses its end, the cursor's file and the
+   first one shown are put last if they are beyond, and both lose the
+   marks of being selected; the list is read again when the command is
+   done, and what was selected beyond the 256th file is no longer. The
+   portable C keeps its panels where they are, whole, and cuts nothing
+   (see DEVIATIONS.md). */
 struct Onward F21_31(void)
 {
     RestVct();
     SavMous();
-    F21_40(LeftPanel);
-    F21_40(RightPanel);
     Quit();
     if (!(md.LoadFl & 0x80))
         PutPrm(MAIN_AS_PANEL);          /* Quit leaves DS on the main data */
