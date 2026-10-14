@@ -2226,7 +2226,11 @@ says that they no longer test what their titles say.
   of 16 bits, two parts, and 641,000 in that of 32, one. Untested then:
   a file read and written in more than one part, and the question
   whether to overwrite asked with only a part of the file read, which
-  the scenario answers with Skip, by the comments at its steps.
+  the scenario answers with Skip, by the comments at its steps. Since
+  F1 of step 2 the room is 524,240 bytes, the panels having 64K each,
+  and the file is read in two parts again, the first of 523,776 bytes:
+  both are tested again, until the memory is the extender's ("F1, three
+  blocks where there was one").
 - The list of the file search is in the same memory. No scenario fills
   it in any build.
 
@@ -9141,11 +9145,11 @@ entry 1 of `DEVIATIONS.md`.
 
 | | What | Today, 640 KB | With the machine's memory | Scenarios | Covered, or a question |
 |---|---|---|---|---|---|
-| a | The editor's room | 641,824 bytes on the bench; the original has 345,840 there. A file that is not shorter is refused, "is too large for Edit." | What the machine has, some 15 MB on the bench, with the same box for a file that is not shorter | `editor-big`, not run today. `view-window`, and step 38 of `editor-big`, have a file that says a megabyte in its entry, which is refused today and fits then: question 8, "The test" | Covered. What the status line shows of so much room is question 8, and a test of a text beyond the original's room question 9 |
+| a | The editor's room | 524,240 bytes since F1, on any machine, and 641,824 on the bench before; the original has 345,840 there. A file that is not shorter is refused, "is too large for Edit." | What the machine has, some 15 MB on the bench, with the same box for a file that is not shorter | `editor-big`, not run today. `view-window`, and step 38 of `editor-big`, have a file that says a megabyte in its entry, which is refused today and fits then: question 8, "The test" | Covered. What the status line shows of so much room is question 8, and a test of a text beyond the original's room question 9 |
 | b | The editor with its memory full | Never full in the scenario | The same, with more left | `editor-full`, which passes without reaching its point | Covered. Untested, as today |
 | c | The editor's count of free bytes in its status line | What is left of the room, in seven cells | The same of the larger room, which from a million on does not fit the cells | Left out of the comparison | Covered as a figure. What stands in the cells from a million on is question 8 |
 | d | What the viewer reads at a time | 65,504 bytes at the most | The same: it does not take more | `view` and its like | Nothing to see |
-| e | A copy's buffer | The room in whole 512 bytes; a longer file is read and written in parts | The same of the larger room: a file of up to some 15 MB is read whole before any of it is written. DOS is asked in the pieces of 8000h bytes that it is asked in today. A user sees parts only where something comes between two, a disk that is full or changed, Ctrl-Break, a file that is skipped half read | `copy-big`, which passes without reaching its point; `copy-full` | Covered: entry 13 says it of 640 KB already |
+| e | A copy's buffer | The room in whole 512 bytes; a longer file is read and written in parts | The same of the larger room: a file of up to some 15 MB is read whole before any of it is written. DOS is asked in the pieces of 8000h bytes that it is asked in today. A user sees parts only where something comes between two, a disk that is full or changed, Ctrl-Break, a file that is skipped half read | `copy-big`, which reads its file in two parts again since F1, as the original does; `copy-full` | Covered: entry 13 says it of 640 KB already |
 | f | The file search's list | Full at some 9,870 lines on the bench | Full at some 230,000, with its counts in 32 bits (N5) | None fills it | Covered: entry 13 names it |
 | g | The tree | 768 directories, a buffer of the main data | The same | `tree-deep` | Nothing to see |
 | h | The files of a panel | 64K, 2,704 files, or fewer if the memory is short | 64K, 2,704, always: a panel has its whole block from the start. The original shows fewer on a machine with little memory | None fills a panel | Covered, as more room. The limit itself is question 3 |
@@ -9194,7 +9198,7 @@ thought and long in lines.
 |---|---|---|---|---|---|
 | F0, the net and the record. **Done**: "F0, the net and the record" below | The data's image at the end of a scenario, of the main data and of the program's blocks by name, and the tool that holds two builds' images against each other. The record of the words, with its test | `harness/`, `CMakeLists.txt` for the test | Nothing | The image of a build against itself is equal; against a build with one byte of the main data written wrongly by hand, it is not. Every golden derived again leaves `harness/goldens/` clean | What differs between two runs of one build, if anything, and how a piece names what it means to change |
 | X, the extender's memory tried. **Done**: "X, the extender's memory on the bench" below | A toy on the bench, of `harness/trial32/memory.c`: what DPMI 0500h says is free of the 16 MB; the largest block taken, given back and taken again, and where it then is; a block made shorter and longer, 0503h, whether it moves and keeps what it held; a second copy of the toy while the first holds the largest block, and while it has given it back; what a command's `mem` prints either way; and by `harness/trial32/calls.asm`, that DOS is asked nothing by any of it | `harness/trial32/` | Nothing; beside F0 and F1 | It has run, and the table of what it found is in this plan | What F9 goes by: whether the room is all that the extender has or leaves some, and whether rows m and n of "What a user would see otherwise" stand |
-| F1, three blocks where there was one. The proof | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, which answers in paragraphs of 16 bits as the seven places did and needs no cap, since inside the 640 KB it cannot pass A000h; 16 bytes of a pattern in front of each block and behind the last, written when a block is taken, which the image's tool holds at the end of every scenario ("What could go wrong", 15); `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the hand-out of the 640 KB in the system's file and the image's tool, for the 16 bytes; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
+| F1, three blocks where there was one. The proof. **Done**: "F1, three blocks where there was one" below | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, which answers in paragraphs of 16 bits as the seven places did and needs no cap, since inside the 640 KB it cannot pass A000h; 16 bytes of a pattern in front of each block and behind the last, written when a block is taken, which the image's tool holds at the end of every scenario ("What could go wrong", 15); `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the hand-out of the 640 KB in the system's file and the image's tool, for the 16 bytes; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
 | F2, a panel is a pointer. A sweep | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
 | F3, what a dialog is handed. A sweep | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
 | F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
@@ -10142,6 +10146,186 @@ to know:
   first, at every place where a piece meets what another still has as
   a segment.
 
+### F1, three blocks where there was one: done, and what a later piece should know
+
+The program has a block for each panel and one for the room, inside
+the 640 KB, and nothing is moved any more. All 155 scenarios pass with
+no golden and no patch changed, at the first run.
+
+**What it is now.**
+
+- `Init11` takes two blocks of `PANEL_BLOCK`, 1000h paragraphs, and
+  then the largest that there is, the room. `GiveMem` gives the room
+  back and `TakeMem` takes the largest block again; neither touches a
+  panel. `Aexec0` makes the room as short as `ROOM_LEAST` and then as
+  long as it goes. `ReDr00` and `ReDr50` of `read.c` have lost their
+  halves that moved the other panel up and down, 60 lines: the list's
+  limit is what the original has with memory enough, a paragraph short
+  of 64K less two entries, and the old list is kept where the room
+  begins.
+- Beside the main data, in `main.c`: `Room`, where the room begins, and
+  `RoomEnd`, where it ends, both `u8 *`. `RoomParas()` of `start.c` is
+  the one function that says how long the room is, in paragraphs of 16
+  bits. `ViewSeg`, `MemSeg` and `FreMem2` are in `struct MainDat` with
+  "Not set or read here". Two pointers and not three: `MemSeg` was the
+  block that all of it was in and has no successor, and `ViewSeg` no
+  longer moves, so where the room begins is its block.
+- Elsewhere `SEG_OF(Room)`, 22 places in `copy.c`, `edit.c`, `find.c`,
+  `view.c`, `files.c` and `start.c`, by one line of a script.
+- `dos32.c` keeps what it knows of its blocks in a table beside the
+  memory, `OwnBlocks` with `OwnHeld`, where it kept a paragraph in front
+  of each block in the memory itself. That paragraph holds the pattern
+  now, F0h down to E1h, written when the block is taken, and the last
+  paragraph of the memory holds it from the start. So the room is
+  0x7FFD paragraphs, 524,240 bytes, on any machine: 640 KB and a
+  paragraph, less two panels and four paragraphs of the pattern.
+
+**What the plan had wrong or had not.**
+
+- "The room equal where it was written" does not hold against the
+  build before, and cannot. The original keeps the old list of a
+  directory that is read behind the panel as it is moved up, some 64K
+  beyond where the room begins afterwards; with nothing moved it is
+  where the room begins. So the room's bytes differ from the build
+  before in 142 of 155 scenarios, by where things lie in it and by what
+  each has left under the next. See "The image" for what held it
+  instead.
+- `ReDr50` moves a panel too, down again, and was not named.
+- The 16 bytes cost the hand-out its place for what it keeps of a
+  block. The plan's 64 bytes are right only with that in a table, which
+  F0's section had as F9's. It is F1's now, and `_blocks` of the
+  image's tool reads it.
+- `PANEL_PARAS` and `VIEW_PARAS` are gone as the record wants, and a
+  count of paragraphs is still what the functions for the memory take:
+  `PANEL_BLOCK`, `ROOM_LEAST` and `RoomParas` are in `WORDS` of
+  `harness/words.py` for F9, which makes them bytes.
+- What `Init11` answers where there is too little: the paragraphs that
+  there were for the room, or for a panel that got none. On the bench
+  neither can happen, the memory being the program's own.
+- `copy-big` gets to its point again, and `editor-full` does not:
+  below.
+- The image's tool looked for the pattern in the images of the build
+  before as soon as it was declared, and said of each that it was not
+  there. A build is known to write the pattern by having the table.
+- The clock's separator follows the hundredths of a second, and is in
+  the program's copy of the screen: `clock-path` differed in that byte
+  against the build before, which takes thousands of instructions more
+  to a step for the panels that it moves, where `save --early` of the
+  piece's own build did not differ. It is in `UNSTEADY` by reading
+  `Input` of `input.c`, not by F0's trial, which is too fine for it.
+
+**The image, and how it was read.** Three sets of images: of the build
+before, saved before anything was changed; of the piece's build, as the
+scenarios' test left them; and of a third build made for this alone, in
+`build/` and not kept: the source before with its panels fixed at 64K,
+three lines, `PANEL_PARAS` 0x1000, `OWN_PARAGRAPHS` 0x9FFD so that its
+room is as long as the piece's, and in `ReDr50` the place that the
+other panel is moved down to made `panel + 0x1000`. That build does
+what the original's routines do and moves nothing, since everything is
+where it would be moved to.
+
+| Held against the piece's build | Declared | What was left |
+|---|---|---|
+| The third build | `FreMem2`, `MemSeg`, `the blocks`, `ViewSeg`, `dos32.OwnCount` | Two runs of bytes in one scenario, `view-commands`: three bytes at +8000 of the room, where the old hand-out wrote what it kept of the free block behind the room while a viewer of another's ran. Everything else equal in all 155: the main data, both panels in all of their 64K, all 524,240 bytes of the room, the variables. "2 differences, 467 more in what was declared as changed, 191 in what may differ" |
+| The build before | `FreMem2`, `MemSeg`, `the blocks`, `ViewSeg` | 17,722 differences in 144 scenarios, of two kinds. The room, in 142 scenarios, for the reason above. And in the main data what follows the room's length: the editor's count of free bytes as digits, in `TmpErr` and at the start of `TmpBuf`, in 27 scenarios; `EdSpace` and `ViSpace`; `FndSize`, 8,064 lines for 9,873, in five; and in `copy-big` how much was read, the source's handle and a cell of the bar. No panel differs as far as the build before has it, and no variable. With those declared too, `behind the panels`, `TmpErr`, `TmpBuf`, `ErrBuf`: "0 differences, 18652 more in what was declared as changed, 209 in what may differ" |
+
+What each declared name is: `FreMem2` names the end of the room, which
+is another length; `MemSeg` is 0 where it was a segment; `the blocks`
+are three where there was one; `ViewSeg`, in `start-memory` alone,
+names a room that is given back when the image is taken, which the
+build before has as the end of its block made short; `dos32.OwnCount`
+is the third build's own.
+
+So the judgement rests on the third build. Declaring the room and
+`TmpBuf` as changed against the build before would have passed
+anything.
+
+**The pattern, tried.** A line at the end of `Init11` that writes a 0
+behind the end of the first panel's block, not committed:
+`portable_c-scenarios` failed for all 155, each with "the 16 bytes in
+front of block 1 are not the pattern, from the byte at +0 of them on",
+and `save` says the same. `python3 harness/dataimage.py check` catches
+a byte in each kind of place in the piece's images and in those of the
+build before.
+
+**The scenarios that the plan names**, with the room at 524,240 bytes:
+
+| Scenario | What it does |
+|---|---|
+| `start-memory`, `second-copy`, `command`, `enter-many` | Pass. `enter-many` holds the 256 files, which are cut as they were: question 4 is not touched |
+| `copy-big` | Reads its file of 526,632 bytes in two parts again, the first of 523,776, and is skipped with not all of it read: `CpRead` and the source's handle in the image say so. It gets to its point, as it did not while the room was 641,824 bytes |
+| `editor-full` | Passes, and is still never full: 130,270 bytes free at its end, where the build before had 247,854 and the original has none |
+| `editor-big` | Not run, as before: its file of 381,338 bytes still fits |
+| `view-window` | Passes: a megabyte is refused as it was |
+
+Entry 13 of `DEVIATIONS.md` has the new figures and entry 1 the three
+blocks.
+
+**The records.** The words that were F1's are at nothing: `md.ViewSeg`
+38, `md.MemSeg` 14, `md.FreMem2` 8, `PANEL_PARAS` 6, `VIEW_PARAS` 2.
+Left to go, by piece: F2 496, where it was 536, since `read.c` and
+`start.c` lost 40 mentions of a panel with what moved them; F3 277;
+F5 45; F6 44; F7 67; F8 212; F9 13, new; F10 211, where it was 198,
+`SEG_OF` being up by 22 and `MAIN_SEG` down by 8. `harness/int16.txt` has one place more,
+`RoomParas`, with its reason. The host check's record did not move.
+
+**How long it took**, in tool calls, some 95 in all: reading the brief,
+the plan and F0's section 8; reading the code 9; the program and the
+tool written, to a build without warnings, 12; the records and the
+first run of the scenarios, which passed, 6; the images, with the third
+build, 16; the pattern's trial 4; the tool's own check, the records and
+the documents the rest. The change to the program is small: 185 lines
+of `dos32.c`, 160 of `start.c`, 90 fewer in `read.c`, and the 22 places
+of the bridge.
+
+**What a sweep should do otherwise, F2 above all.**
+
+- Save "before" first, and with the tool as it is at that commit. F1
+  changed the tool and had to save a set again.
+- A sweep moves nothing and changes no length, so its images are to be
+  equal to the build's before with nothing declared but the four words
+  that leave the main data, each by its `variable=` in `ADDRESSES`.
+  Anything else that differs is a fault. No third build is needed
+  where no layout changes; where one does, make the build that
+  separates the layout from the code, as here.
+- The bridge is as cheap as the plan thought: `SEG_OF(Room)` is exact
+  and costs nothing to write. It is read anew at every use, which is
+  what makes it safe with a room that may move; a sweep that keeps a
+  panel's pointer in a variable is safe too, since a panel never moves
+  from F1 on.
+- The compiler holds a sweep both ways, tried with `wcc386 -wx -we`: a
+  pointer handed where a number is taken and a number where a pointer
+  is taken are W102, and a pointer held against a number is refused
+  too. So F2 can go by a script and then by what the build refuses.
+- What the plan feared most of F2, arithmetic on a panel and two
+  panels held against each other by `<`, is gone with F1: it was all in
+  `ReDr00`, `ReDr50`, `GiveMem` and `TakeMem`. What is left are twelve
+  places that hold a panel against a word of the main data by `==` or
+  `!=`, counted by `grep`, which are right of pointers.
+- Count a table of the system's file in 32 bits: a `u16` index was six
+  places for `portable_c-int16` to ask about. A difference of two
+  pointers that is shifted is a place too, and wants its reason.
+- `harness/dataimage.py check DIRECTORY` after any change to the tool.
+
+**The pieces behind, from here.** Opinions, by what F1 cost.
+
+- F2 is one agent's, if it goes by a script: its 496 places are of
+  four patterns, and nothing in it needs thought once F1 has taken the
+  arithmetic out. The reading is in the five places of kind i and in
+  whatever held a panel under another name.
+- F3 is the one to watch. It changes what `Dialog` and its like are
+  handed in 21 files and teaches `harness/reads.py` a new form, and
+  the test of the data judges it as well as the scenarios. If it is cut,
+  then by `reads.py` first, alone, with the program unchanged.
+- F4, F6, F7 and F8 look rightly sized. F4 and F6 meet the room: each
+  takes `SEG_OF(Room)` out of its files and has `Room` itself.
+- F5 is more than one agent holds, as the plan says: 29 `AT`, 24
+  `AddressOf`, 21 `OFFSET_OF` and 13 `SEG_OF(Room)` in one file, and
+  the arithmetic of `struct Address` is where C1's fault was. Cut it as
+  the plan offers, `T50_00` to `T54_00` apart.
+- F9 has less to do in the system's file than the plan has: the table
+  of the blocks is there, and the tool reads it. It has `RoomParas`,
+  `PANEL_BLOCK` and `ROOM_LEAST` to take out, 13 places.
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 
 **What there is.** `harness/width.py`, its record `harness/width.txt`
@@ -10325,6 +10509,7 @@ the record's table are what to cut by, not the lines:
 5. clang's three warnings for the files ("Booleans"), the tests that
    start no machine, then the whole suite and the images held against
    those of step 1.
+||||||| parent of 742d10a (Write down the three blocks of step 2, and what a later piece should know)
 
 ## An implementation of the layer for tests: future work
 

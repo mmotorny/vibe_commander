@@ -2845,6 +2845,32 @@ in "The portable C".
     difference of two numbers of 16 is a new place, `widen`, with its
     reason.
 
+- The panels and the room are three blocks since the piece F1 of step
+  2 (`TODO.md`, "F1, three blocks where there was one"), and nothing
+  is moved: a panel has 64K from the start. What that met:
+  - A piece that changes where things lie in the memory cannot be held
+    to the images of the build before: the room differed in 142 of 155
+    scenarios, by where the old list of a directory lies. What held it
+    was a third build, not kept: the source of before with three lines
+    changed so that it lays the memory out as the piece does and is
+    otherwise the old code. Against that the images were equal. Make
+    the build that separates the layout from the code before reading
+    17,000 differences.
+  - What is declared as changed is not looked at. `--changed "behind
+    the panels"` or `--changed TmpBuf` passes anything there: declare
+    a word or a count, not a buffer.
+  - A piece that changes the image's tool saves its "before" with the
+    tool as it was.
+  - The clock's separator is a colon in the second half of a second:
+    it is in the program's copy of the screen, and a build that is
+    much slower or faster to a step has the other. `save --early` is
+    too fine a trial for it.
+  - The 16 bytes of a pattern round each block are looked at when a
+    scenario ends, and a scenario that has written into them fails
+    `portable_c-scenarios` with the block and the byte. The line says
+    "in front of block 1" of a write behind the end of block 0: they
+    are the same bytes.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through
