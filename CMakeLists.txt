@@ -557,6 +557,13 @@ set_tests_properties(portable_c-host PROPERTIES SKIP_RETURN_CODE 77)
 add_test(NAME portable_c-int16
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/int16.py)
 set_tests_properties(portable_c-int16 PROPERTIES SKIP_RETURN_CODE 77)
+# The words by which the portable C says where a thing is in the memory,
+# which stand for what a segment and an offset were on DOS, counted file
+# by file and held to what was counted last: the measure of the work
+# that takes them out. See harness/words.py. It reads the source and
+# builds nothing.
+add_test(NAME portable_c-words
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/words.py)
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see

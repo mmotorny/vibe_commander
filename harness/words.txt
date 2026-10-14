@@ -1,0 +1,72 @@
+The words of the addresses in the portable C, src/portable_c/: of each
+file, how often it writes each, or that it has none. harness/words.py
+counted it, and says what the words are and which piece of step 2 is
+to have each at nothing. Not to be edited: the test portable_c-words
+holds the tree to it, and `python3 harness/words.py --record` writes it
+anew.
+
+bars.c        AT 1, PANEL 1, u16 panel 1, md.WCBcrn 1, u16 segment 1, MD_PLACE 1
+bars_t.c      none
+blank.c       none
+box.c         MAIN_SEG 1
+cmdline.c     MAIN_SEG 1, PANEL 3, u16 panel 4, u16 segment 1, md.TreAdr 1, md.TreFrst 1, md.HstAdr 1, MD_PLACE 6, TRELIST 1, ENTRY 4, DSKBUF 3
+commands.c    AT 2, MAIN_SEG 5, PANEL 20, u16 panel 32, md.WCBcrn 8, md.WCBsec 1, md.WCB1seg 1, OFFSET 22, AsmSeg 1, ENTRY 2, DSKBUF 4
+commands_t.c  MD_AT 45, WCB_AT 3, NUMBER 17
+copy.c        AT 6, MAIN_SEG 2, PANEL 6, u16 panel 3, md.WCBcrn 3, md.WCBsec 1, md.ViewSeg 3, md.FreMem2 1, OFFSET 39, AsmSeg 3, u16 segment 1, md.TreAdr 2, NEAR 13, MD_PLACE 9, MD_POINTER 4, TRELIST 1, ENTRY 4
+copy_t.c      MD_AT 22, NUMBER 4
+dialog.c      AT 18, md.WCB1seg 1, AsmSeg 5, NAMED 11, u16 segment 3, MD_PLACE 2, MD_POINTER 3, NUMBER_OF 9
+digits.c      none
+dirfunc.c     MAIN_SEG 19, PANEL 8, u16 panel 8, md.WCBcrn 4, OFFSET 48, NEAR 25, MD_PLACE 1, ENTRY 7, DSKBUF 2
+dirfunc_t.c   MD_AT 75, NUMBER 9
+dos32.c       ARENA 1, AT 1
+drive.c       PANEL 1, u16 panel 1, md.WCBcrn 1, MD_PLACE 2, DSKBUF 2
+edit.c        AT 29, OFFSET_IN_SEG 1, MAIN_SEG 11, md.ViewSeg 14, md.FreMem2 1, OFFSET 29, AsmSeg 1, u16 segment 10, AddressOf 24, OFFSET_OF 21, NEAR 4, MD_PLACE 13, MD_POINTER 3
+edit_t.c      MD_AT 15, NUMBER 1
+enter.c       OFFSET_IN_SEG 2, MAIN_SEG 1, PANEL 11, u16 panel 14, md.WCB1seg 1, md.WCB2seg 1, OFFSET 2, md.HstAdr 5, MD_PLACE 3, MD_POINTER 8, ENTRY 14, DSKBUF 11
+exec.c        md.BatAdr 7, MD_PLACE 3, MD_POINTER 3
+extfile.c     NEAR 1, MD_PLACE 2, MD_POINTER 1
+files.c       OFFSET_IN_SEG 1, PANEL 5, u16 panel 5, md.ViewSeg 1, ENTRY 7, DSKBUF 7
+find.c        AT 2, SEG_OF 1, MAIN_SEG 3, PANEL 2, u16 panel 1, md.WCBcrn 1, md.ViewSeg 3, md.FreMem2 2, OFFSET 5, NEAR 6, MD_PLACE 3, DSKBUF 3
+find_t.c      MD_AT 2, NUMBER 2
+format.c      none
+help.c        MAIN_SEG 2, OFFSET 5, NEAR 1, MD_PLACE 4
+help_t.c      MD_AT 2
+info.c        OFFSET_IN_SEG 1, PANEL 3, u16 panel 1, MD_PLACE 4, ENTRY 1, DSKBUF 1
+input.c       AT 1, u16 segment 1, NEAR 1, MD_PLACE 2
+keys.c        MAIN_SEG 4, PANEL 28, u16 panel 41, md.WCBcrn 7, md.WCBsec 5, md.WCB1seg 3, md.WCB2seg 3, OFFSET 7, md.TreAdr 1, md.TreFrst 1, ENTRY 6, DSKBUF 3
+keys_t.c      MD_AT 10, NUMBER 1
+line.c        none
+main.c        AT 8, OFFSET_IN_SEG 2, MAIN_SEG 6, PANEL 11, u16 panel 12, md.WCBcrn 6, md.WCBsec 2, md.WCB1seg 4, md.WCB2seg 4, OFFSET 11, AsmSeg 3, NAMED 1, md.TreAdr 1, md.TreFrst 1, MD_PLACE 6, MD_POINTER 1, TRELIST 3, DSKBUF 4
+main_t.c      MD_AT 8
+mask.c        none
+menu.c        AT 1, PANEL 5, u16 panel 2, md.WCB1seg 1, md.WCB2seg 1, OFFSET 1, AsmSeg 1, MD_PLACE 7
+misc.c        TABLES_BY 1, AsmSeg 1
+mouse.c       none
+panel.c       PANEL 5, u16 panel 9, md.WCBcrn 2, md.WCB2seg 1, md.TreAdr 3, md.TreCrnt 1, NEAR 1, MD_POINTER 1, TRELIST 1, ENTRY 4, DSKBUF 1
+place.c       PANEL 5, u16 panel 8, md.WCB1seg 3, md.WCB2seg 1, md.TreAdr 4, md.TreFrst 4, TRELIST 2, DSKBUF 2
+read.c        OFFSET_IN_SEG 1, MAIN_SEG 2, PANEL 16, u16 panel 13, md.WCBcrn 4, md.WCBsec 4, md.WCB1seg 6, md.WCB2seg 6, md.ViewSeg 8, md.FreMem2 2, ENTRY 5, DSKBUF 10
+screen.c      none
+setup.c       AT 1, PANEL 1, u16 panel 1, md.WCB1seg 1, md.WCB2seg 1, OFFSET 1, AsmSeg 1
+stack.c       none
+start.c       AT 5, MAIN_SEG 1, PANEL 5, md.WCBcrn 2, md.WCBsec 2, md.WCB1seg 11, md.WCB2seg 9, md.ViewSeg 6, md.MemSeg 10, md.FreMem2 1, PANEL_PARAS 6, VIEW_PARAS 2, OFFSET 3, AsmSeg 1, u16 segment 1, md.HstAdr 1, MD_PLACE 1, DSKBUF 3
+stcolor.c     AT 3, MAIN_SEG 1, OFFSET 1, AsmSeg 3, NAMED 3, MD_PLACE 2
+stcolor_t.c   MD_AT 2
+sthelp.c      MAIN_SEG 1, OFFSET 3, MD_PLACE 2
+sthelp_t.c    MD_AT 2
+stmain.c      AT 1, MAIN_SEG 5, md.WCB1seg 1, md.WCB2seg 1, OFFSET 7, AsmSeg 1
+stmain_t.c    MD_AT 8
+stopts.c      AT 9, MAIN_SEG 5, OFFSET 14, AsmSeg 1, NEAR 3
+stopts_t.c    MD_AT 62, NUMBER 28
+string.c      none
+sys.h         none
+system.c      MAIN_SEG 1, OFFSET 1
+system_t.c    MD_AT 3
+tables.h      none
+tree.c        u16 panel 3, md.WCBcrn 1, md.TreAdr 5, md.TreFrst 6, md.TreCrnt 2, MD_PLACE 7, MD_POINTER 2, TRELIST 8
+treebox.c     MAIN_SEG 1, PANEL 4, md.WCBcrn 1, md.WCB1seg 2, md.WCB2seg 2, OFFSET 2, md.TreAdr 10, md.TreFrst 10, NEAR 1, MD_PLACE 4, MD_POINTER 6, TRELIST 8, NUMBER 2
+treebox_t.c   MD_AT 3
+usermenu.c    MAIN_SEG 3, PANEL 2, md.WCBcrn 5, OFFSET 1, NEAR 2, MD_PLACE 9, MD_POINTER 6, ENTRY 5, DSKBUF 2
+vc.h          ARENA 2, AT 3, SEG_OF 1, u16 panel 88, OFFSET 1, TABLES_BY 1, AsmSeg 1, u16 segment 5, MD_PLACE 1
+view.c        AT 9, MAIN_SEG 10, PANEL 7, u16 panel 12, md.WCB1seg 1, md.WCB2seg 1, md.ViewSeg 3, md.MemSeg 4, md.FreMem2 1, OFFSET 28, AsmSeg 6, u16 segment 21, NEAR 3, MD_PLACE 9, MD_POINTER 8, ENTRY 1
+view_t.c      MD_AT 21, NUMBER 2
+window.c      MD_POINTER 2
