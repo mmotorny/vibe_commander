@@ -112,10 +112,15 @@ edit.c, T01_10: widen
     wraps: written so. The low word of the place alone is stepped by a
     line of hex and back, as the assembly steps it, and the cast is that.
 
-edit.c, T25_00: widen
-    | EdUndo = size + 2;
-    `size` is what the line buffer holds of the line, EdSizLn, no more
-    than LenEdit - 100 bytes, which T50_00 keeps it to.
+edit.c, T20_02: widen
+    | for (count = EditBuf + EdSizLn - end; count; count--)
+    Two places of the line buffer, which has 4,000 bytes: the line
+    above asks that the end of what it holds is behind `end`.
+
+edit.c, T20_02: widen
+    | i32 count = end - from;
+    Two places of the line buffer, which has 4,000 bytes, `end` not
+    before `from`: what is cut out of the line, within 16 bits.
 
 edit.c, T26_00: widen
     | left = (i32)(from - (EditBuf + EdCursr - 1));

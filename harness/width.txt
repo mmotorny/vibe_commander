@@ -75,7 +75,7 @@ N1              81          0     2              0      77     6     5     4    
 N2              79          0     0              0      68    11     0     3    29  dialog.c
 N3, N4          56          0    13              0      67     2     7    22    88  view.c
 N5              76          0     0              0      70     6     3     4    44  find.c
-N6 to N8       121         64     4              0      61     0    12    22   102  edit.c
+N6 to N8        68          0     4              0      72     0    13    35   144  edit.c
 N9              41          0     6              0      39     8     2     7    37  copy.c
 N10             55          0     0              0      49     6     3     9    37  dirfunc.c
 N11             47          0     1              0      46     2     2     9    34  files.c read.c place.c
@@ -93,7 +93,7 @@ N20             61          0     0              0      58     3     0     3    
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
 headers        271         69    12              1     162     5     0     0     0  vc.h sys.h tables.h
-all           2018        173   115              1    1171    65    51   157   874
+all           1965        109   115              1    1182    65    52   170   916
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               214         12    11              0     162     5     0     0     0
@@ -109,7 +109,7 @@ dialog.c            79          0     0              0      68    11     0     3
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           55          0     0              0      49     6     3     9    37
 drive.c             16          0     0              0      16     0     2     2    10
-edit.c             121         64     4              0      61     0    12    22   102
+edit.c              68          0     4              0      72     0    13    35   144
 enter.c             12          0     0              0      12     0     0     1    14
 exec.c              13          0     0              0      13     0     0     1     2
 extfile.c            4          0     0              0       4     0     0     2     1
@@ -2136,63 +2136,74 @@ edit.c, T80_14: variable letter, u16
     character: the drive's letter, in the low byte of the first two
     characters of the name read as a word.
 
-edit.c, T14_12: not sorted, 1 number
+edit.c, T01_03: parameter key, u16
+    key: the low byte goes into the line.
 
-edit.c, T14_11: not sorted, 1 number
+edit.c, T01_10: parameter key, u16
+    key: the low byte is the byte typed, or the hex digit.
 
-edit.c, T14_00: not sorted, 1 number
-
-edit.c, T08_01: not sorted, 1 number
-
-edit.c, T06_10: not sorted, 1 number
-
-edit.c, T06_00: not sorted, 1 number
-
-edit.c, T01_03: not sorted, 2 numbers
-
-edit.c, T01_10: not sorted, 2 numbers
-
-edit.c, T02_03: not sorted, 1 number
-
-edit.c, T02_00: not sorted, 1 number
-
-edit.c, T05_02: not sorted, 1 number
-
-edit.c, T10_02: not sorted, 4 numbers
-
-edit.c, T12_01: not sorted, 4 numbers
+edit.c, T01_10: variable value, u8
+    text: the byte that goes into the text, made of the key.
 
 edit.c, T16_00: sign
     | EdLine = ed.EdLen >> 4; /* T16_10 */
     ed.EdLen is the length of the text, which T00_00 has held below the room and nothing makes less than 0: not below 0.
 
-edit.c, T20_02: not sorted, 2 numbers
-
-edit.c, T20_06: not sorted, 4 numbers
-
-edit.c, T20_05: not sorted, 1 number
-
-edit.c, T21_00: not sorted, 2 numbers
-
-edit.c, T25_00: not sorted, 2 numbers
-
-edit.c, T26_00: not sorted, 3 numbers
-
 edit.c, T30_00: sign
     | EdLine = place >> 4;
     place is the cursor's place in the text, EdOffst and EdCursr, each a place or a count in the line buffer that nothing makes less than 0: not below 0.
 
-edit.c, T32_00: not sorted, 1 number, 1 of a sign
+edit.c, T32_00: sign
+    | EdLine = place >> 4;
+    place is base, a place in the text made a multiple of 16, and the end of what the viewer's search found, which it counts from there: not below 0.
 
-edit.c, T00_83: not sorted, 4 numbers
+edit.c, T00_83: parameter key, u16
+    key
 
-edit.c, T00_71: not sorted, 7 numbers, 4 of a sign
+edit.c, T00_83: variable scan, u16
+    key: its scan code alone.
 
-edit.c, T00_20: not sorted, 13 numbers, 1 of a sign
+edit.c, T00_83: variable c, u16
+    character: of the key.
 
-edit.c, T00_19: not sorted, 2 numbers
+edit.c, T00_71: parameter mouse, u16
+    place: of the mouse.
 
-edit.c, Ends: not sorted, 2 numbers
+edit.c, T00_71: variable base, u16
+    place: where the window begins.
+
+edit.c, T00_71: variable size, u16
+    place: the rows and columns of the window.
+
+edit.c, T00_71: sign
+    | where = column / 13 << 2;
+    column is the low byte of the mouse's column in the window less 11, where that byte is 11 or more: not below 0.
+
+edit.c, T00_71: sign
+    | column %= 13;
+    The same column, which is not below 0.
+
+edit.c, T00_71: sign
+    | ed.EdHex1 = column % 3 != 0; /* 2, the space behind
+    column is what is left of 13, less one if it is 12: 0 to 11, not below 0.
+
+edit.c, T00_71: sign
+    | where = column / 3 | where;
+    The same column, 0 to 11: not below 0.
+
+edit.c, T00_20: variable color, u16
+    cell: the character, a space, an asterisk or a quote, and then the colour of the status line above it.
+
+edit.c, T00_20: sign
+    | Number(md.TmpBuf, (u16)(free >> 16), (u16)free, /* T00_54 */
+    free is made 0 where it is below 0 in text; in hex it is the room less the length of the text, which T00_00 has below the room and T01_10 keeps there: not below 0.
+
+edit.c, T00_20: sign
+    | column = column * 3 + (column >> 2) + 11;
+    column is a byte, the cursor's column less the first that is shown, cut to 8 bits: not below 0.
+
+edit.c, T00_19: variable key, u16
+    key
 
 edit.c, T00_00: parameter begin, u16
     place: where the box "Reading the file" begins.

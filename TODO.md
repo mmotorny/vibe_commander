@@ -9381,7 +9381,7 @@ for.
 | N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | **Done**, with question 11 answered and its fix: "N4, `view.c`, its second part" below |
 | N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | **Done**, the room in bytes; questions 8, 5 and 9 prepared, and where the file is cut: "N6, `edit.c`, its data" below |
-| N7, N8 | `edit.c`, the rest, in two halves by its routines: N7 to `T80_00`, N8 the keys ("N6" below) | 76 and 65 numbers | N6 | Whoever carries out the answer to question 5 has three places of the lines ("N6") |
+| N7, N8 | `edit.c`, the rest, in two halves by its routines: N7 to `T80_00`, N8 the keys ("N6" below) | 76 and 65 numbers | N6 | Whoever carries out the answer to question 5 has three places of the lines ("N6"). **Done**: "N7, `edit.c`, the lines, the text, the screen and saving" and "N8, `edit.c`, the keys" below |
 | N9 † | `copy.c` | 1,571; 147 | F6 | **Done**, the buffer in bytes, with its question answered and its fix: "N9, `copy.c`: done, and what a later cluster should know" below |
 | N10 | `dirfunc.c` | 1,405; 174 | F6 | **Done**: "N10, `dirfunc.c`: done, and what a later cluster should know" below |
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | **Done**: "N11, `files.c`, `read.c`, `place.c`" below. Question 3 prepared there |
@@ -14495,6 +14495,92 @@ before: not compared".
 
 It took some 105 tool calls, of which the bench for question 5 was a
 helper's 19, run beside the work.
+
+### N8, `edit.c`, the keys: done, and what a later cluster should know
+
+**What there is.** The second half of `edit.c` sorted by "The rule for
+a number", by the steps of "N0d": the keys, `T14_12` to `T00_19`, and
+`Ends`, as N6's section cut the file. clang's warnings are silent for
+all of `edit.c`. The whole suite passes, no golden and no patch
+changed, and the image of every scenario is that of the build before,
+with nothing that differs (below).
+
+**The numbers.** Of the 64 of 8 or 16 bits that the half had, none a
+`u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 41 | The cursor in the line buffer and the columns, the counts of the loops that move it and copy the buffer, the rows of the window, the counts of `T32_00`'s search, the bar of `T00_19`, `how` of `Ends`; and the lines of `T00_20` and `T20_06`, `line`, `first_line`, `old_line` and `delta`, as the user's decision of 14 October 2026 on the editor's lines has them (below) |
+| Made `bool` | 13 | `down` of `T10_02` and `T12_01`, `failed` of both, `mouse` of `T06_10`, `digit` of `T05_02`, `drawn` of `T20_06` and `T20_05`, `line` of `T26_00`, `written` of `Ends`, `down` of `T00_71`, and what `T00_83` and `T00_71` answer |
+| Kept by a word | 10 | `key` 5 (the keys of `T01_03`, `T01_10`, `T00_83`, `T00_19`, and `scan`, its scan code alone), `place` 3 (the mouse and the window of `T00_71`), `character` 1 (`c` of `T00_83`), `cell` 1 (`color` of `T00_20`) |
+| Kept by a sentence | 0 | |
+
+Two numbers are new, each where a variable held two things in turn:
+`value` of `T01_10`, a `u8` with the word `text`, the byte that goes
+into the text, where the key was made that byte; and `answer` of
+`T00_83`, an `i32`, the button of the box that asks whether to save,
+where `c`, the character of the key, held it. Seven places of a sign
+are new, each with why the number is not below 0 there: `T32_00`'s
+line of hex, four of the column of a click in hex in `T00_71`, and in
+`T00_20` the free bytes and the cursor's column in hex.
+
+Where a number counted on a wrap at 16 bits: none. `delta` of `T00_20`
+was held against 0FFFFh for one line back, and is held against -1; it
+is a difference of two lines that are below 65,536, so the two say the
+same. `T26_00` asked whether the buffer has room with `(u16)(LenEdit +
+1 - count)`, which is below 0 only for a count above `LenEdit + 1`, and
+such a count is a line from `T25_00`, ending with CR LF, which takes
+the branch before: the cut is gone. `count` of `T00_71`, a number of
+rows that was made positive by `(u16)-count` behind a comparison, is
+`-count` behind `count < 0`. The loops that count down, `while
+(--count)`, begin at 1 or more in every one of the half: the window
+has more than one row (`T12_01`, `T20_06`, `T00_20`), or a test in
+front of the loop asks.
+
+**The casts.** clang named 5 places after the widening, the row handed
+to `T70_00` and three times to `T72_00` in `T00_20`, and the column
+limit handed to `T57_01` by `T14_12`, each a parameter of 16 bits of
+N7's half when this began; each had its cast, and each went by a type
+at the rebase onto N7, which made those parameters `i32`. 40 casts
+went by a type in the work itself: 38 `(u16)` and the `(u8)` of `down`
+and of `digit`; and 6 more at the rebase (below). No cast is new in
+the half but the two `(u8)` of `value` in `T01_10`. `harness/int16.txt`: `EdUndo = size + 2` of
+`T25_00` gone, `size` being an `i32`; two places new in `T20_02`, the
+difference of two places of the line buffer kept in an `i32`, each
+with its reason.
+
+**Where it met N7.** N7 landed first. It made `T70_00`'s row,
+`T71_00`'s step, `T72_00`'s row, `T57_01`'s limit and `T55_00`'s
+cursor `i32`, `T57_02` and `T55_00` answer an `i32`, and `T53_00` and
+`T54_00` a `bool`, which `failed` of `T10_02` and `T12_01` now is; and
+it wrote two casts into this half, `(u16)T57_00().left` in `T14_00`
+and `(u16)T57_02()` in `T00_20`, for the variables that this cluster
+widened. At the rebase those two went, this cluster's five casts at
+N7's parameters, and three that were there before either cluster,
+`(u16)EdCursr` handed to `T55_00` twice and the row handed to `T70_00`
+in `T21_00`. `edit.c` merged without a conflict; the three records
+were written anew on N7's and this cluster's entries put back.
+
+**For the piece that counts the editor's lines in 32 bits** (the
+user's decision of 14 October 2026, `CLAUDE.md`). Nothing in this
+half cuts a line to 16 bits any more: `T00_20` keeps the cursor's line,
+the first line of the window and the step between two windows in
+`i32`, and `T20_06` its line. What a row of the window is, `(u8)(EdLine
+- EdLin0)` in `T00_20`, `T01_10`, `T00_71` and `T02_03`, is a row and
+stays a byte. What holds the limit is of N7's half, as N6 said: the
+test of 0FFFFh in `T53_00`, and the number of the line cut to 16 bits
+in `T75_00`, with question 8 for its cells. The figure of free bytes,
+which is to go, is the block of `T00_20` from `free = EdSpace -
+ed.EdLen` to the `MvsBw` behind `Number`, with the sign entry of
+`T00_20` for `free >> 16` in `harness/width.txt`, and `free` with it.
+
+**The program.** `VC.EXE` is 24 bytes shorter. The image of every
+scenario, `compare` of the build of `main` that the cluster began on,
+saved before anything changed: "156 scenarios, 156 with nothing that
+differs; 0 differences, 0 more in what was declared as changed, 0 in
+what may differ", 497 pointers that name the same in both.
+
+It took some 50 tool calls.
 
 ### N13, `tree.c`, `treebox.c`, `extfile.c`: done, and what a later cluster should know
 
