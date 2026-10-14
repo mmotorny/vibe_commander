@@ -8630,9 +8630,10 @@ that. Steps 3 to 6 are not planned here.
   holds. N0 makes the finder and the record, and tries the rule. A cluster starts when the piece of the addresses
   that has its files has landed, so most of them run beside F4 to F10.
 - What crosses to the system, the size of a file, a count of bytes
-  read or written, a size in the memory, is a `u32` like any other
-  count (S), with no type of its own, on the user's word. How wide it
-  is on another system, and sizes beyond 32 bits, are the layer's.
+  read or written, a size in the memory, is a plain `u32` in this
+  step (S). A type whose width differs by platform, the size of a file
+  first among them, gets a name of its own, and the layer's design
+  defines it: so do sizes beyond 32 bits.
 - The main data keeps the original's layout through all of it. A word
   of it that held a segment or a place leaves it and is a pointer
   beside it, and a number of it that is widened does the same; its
@@ -8671,7 +8672,7 @@ that. Steps 3 to 6 are not planned here.
 | Questions 6 and 7 at the end: the flags of the setup file stay bytes, and the main data keeps its layout through step 2 | Taken by the session as recommended, 13 October 2026. Neither changes what the program does |
 | The sixth way: three blocks where there was one, with a panel's block fixed at 1000h paragraphs from F1 on; F9 as the piece that takes the memory from the extender, and the trial X at once | Accepted by the session, 13 October 2026 |
 | The clusters N0 to N21 with S, M and P, and their order; that no cap is in a program that has landed, with F9 behind the five clusters that count the room, and the cap as the fallback, which wants the session's word; the answer of `FileRead` and `FileWrite` as a structure of their own; the 16 bytes round each block of the 640 KB, in the program as it is shipped from F1 to F9, held by F0's tool | Accepted by the session, 13 October 2026 |
-| That no name is given to an integer type for what a number means: a number has the type of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`, and what crosses to the system is a `u32` until the layer's design says what it is; where the compiler is to hold two things apart, they are structures. It takes back the named type of the answer to question 1, the three names that the session had accepted for `sys.h`, and five that the session had asked of N0 for a character, a colour, a cell and a place, which never landed | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
+| That an integer type gets a name of its own only where its width is not the same everywhere: the size of a file is such a type, and the layer's design will define it and its like. A name for what a number merely means, a count of columns, a colour, is not made: such a number has the type of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`. Until the layer is designed, what crosses to the system is a `u32` too; where the compiler is to hold two things apart, they are structures. So the names that the session had accepted for `sys.h` are gone for now, to be defined by the layer, and five that the session had asked of N0 for a character, a colour, a cell and a place never landed | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
 | N17 and N19 as two clusters each, `start.c` by itself behind F9; and the program's own structures of the headers with the cluster of the functions that return them, those of `sys.h` with S | The session, 13 October 2026, on what N0 counted |
 | Questions 3, 4, 5, 8 and 9 | With the user, each when the work comes to it: "The questions for the user" |
 
@@ -8956,14 +8957,16 @@ a number cut by being handed to a parameter that takes fewer bits.
 
 ### What crosses to the system
 
-What crosses to the system in a number that says how much is a `u32`
-in step 2, as any other count is, and has no type of its own: no name
-is given to an integer type for what a number means, on the user's
-word of 13 October 2026 (`CLAUDE.md`, "The portable C"). C holds such a
-name apart from nothing, so it is a comment that looks like a type.
+What crosses to the system in a number that says how much is a plain
+`u32` in this step. An integer type gets a name of its own where its
+width is not the same everywhere, on the user's word of 13 October
+2026 (`CLAUDE.md`, "The portable C"): the size of a file, 32 bits on
+one platform and 64 on another, is such a type, and the layer's design,
+step 3, will define it and its like. Until then nothing defines one.
 The piece N0 had defined four in `sys.h`, `FileSize`, `FileStep`,
-`ByteCount` and `MemSize`, which nothing used yet; they are gone. What
-a number counts, its name and a comment say:
+`ByteCount` and `MemSize`, which nothing used yet; they are gone for
+now, and the layer says which of them come back and how wide each is.
+What a number counts, its name and a comment say:
 
 | What it counts | Its type | Where |
 |---|---|---|
@@ -8991,9 +8994,9 @@ it; S gives the toy of `harness/trial32/` a read and a write of more
 than 64K, so that it has
 run once.
 
-**What is left for the layer**: sizes beyond 32 bits, how wide each
-of these numbers is on another system, and all of the shape of
-`sys.h`. "Left for the layer's design", at the end.
+**What is left for the layer**: the types whose width differs by
+platform, the size of a file first among them, which it defines; sizes
+beyond 32 bits; and all of the shape of `sys.h`. "Left for the layer's design", at the end.
 
 ### Booleans
 
@@ -9501,8 +9504,10 @@ reads, that is known before twenty agents go by it.
    the layer: the pointers first, then the booleans and the widths
    together, with the reason written down for every number that stays
    16 bits. A named type for what crosses to the system was part of
-   that answer, and the user took it back on the same day: it is a
-   `u32` ("What crosses to the system").
+   that answer. The user has said since, on the same day, that the
+   layer's design defines such types, where the width differs by
+   platform, and that until then each is a `u32` ("What crosses to the
+   system").
 2. **The memory for the panels and the text.** "From the extender
    now", as much as the machine has, and what a user then sees
    otherwise is declared: the editor opens whatever fits.
@@ -9692,8 +9697,12 @@ seen to do.
   taken together, of the room that a drive has free. They want numbers
   of 64 bits, for which the tree has no helper routines, having no C
   library (the compiler calls `__U8M` and `__U8D` as it called `__U4M`
-  in 16 bits), and room for more than ten digits on a panel. The named
-  types of "What crosses to the system" are where the layer says so.
+  in 16 bits), and room for more than ten digits on a panel.
+- **The types whose width differs by platform**: the layer defines
+  them, the size of a file first among them, and with it a place in a
+  file and a step in one; whether a count of bytes read or written and
+  a size in the memory are such types is its to say. Until it does,
+  each is a plain `u32` ("What crosses to the system").
 - **The shape of `sys.h`** otherwise: `failed` and what else answers
   yes or no, a handle, DOS's forms of a time, a date and attributes.
 - **Whether the main data's layout is freed**: "The way taken", 1.
@@ -10409,11 +10418,14 @@ crosses to the system, `FileSize`, `FileStep`, `ByteCount` and
 `MemSize`, and then, asked by the session, five in `vc.h` for a
 character, a colour, a cell and a place, with a finder that took a
 number of such a type for sorted. The user overruled both on 13
-October 2026: no name is given to an integer type for what a number
-means, since C holds such a name apart from nothing (`CLAUDE.md`, "The
-portable C"). The four are gone from `sys.h`, which left `VC.EXE` the
-same bytes, and the five never landed. What they were for is done in
-the record: "The words", below.
+October 2026 (`CLAUDE.md`, "The portable C"). An integer type gets a
+name of its own only where its width is not the same everywhere: the
+size of a file is such a type, and the layer's design will define it
+and its like, so the four are gone from `sys.h` for now, which nothing
+used and which left `VC.EXE` the same bytes. And a name for what a
+number merely means, a colour, a place, is not made, since C holds
+such a name apart from nothing: the five never landed, and what they
+were for is done in the record, "The words", below.
 
 **The words.** A number that has its width by what it is has one word
 for its reason, of a fixed list that the finder knows, `WORDS` of

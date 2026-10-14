@@ -82,9 +82,9 @@ one word of a fixed list, WORDS below, which has what each word says,
 once; what is not plain of the one number goes behind a colon. The
 table counts those in a column of their own, `by word`, and a single
 word that is not of the list fails the test. The code has no type for
-such a thing: no name is given to an integer type for what a number
-means (CLAUDE.md, "The portable C"), so the word is in the record and
-nowhere else. For any other number that stays it is a sentence. For a
+such a thing: a name for what a number merely means is not made, since
+C holds it apart from nothing (CLAUDE.md, "The portable C"), so the
+word is in the record and nowhere else. For any other number that stays it is a sentence. For a
 cut it is always a sentence, also for a cut into a number that has a
 word: what at the place or just above it keeps the number within, as
 harness/int16.txt has it, or `wraps:` and where the program counts on
