@@ -8629,9 +8629,13 @@ that. Steps 3 to 6 are not planned here.
   made a boolean, or kept with its reason in a record that a test
   holds. N0 makes the finder and the record, and tries the rule. A cluster starts when the piece of the addresses
   that has its files has landed, so most of them run beside F4 to F10.
-- What crosses to the system, the size of a file, a count of bytes
-  read or written, a size in the memory, is a plain `u32` in this
-  step (S). A type whose width differs by platform, the size of a file
+- A number is signed unless there is a reason for it not to be: what
+  is widened becomes an `i32`, and a `u32` that the tree has is asked
+  the same ("The rule for a number").
+- What crosses to the system is a plain number in this step (S): a
+  count of bytes read or written and a size in the memory an `i32`,
+  the size of a file and a place in one a `u32`, since it can pass two
+  gigabytes. A type whose width differs by platform, the size of a file
   first among them, gets a name of its own, and the layer's design
   defines it: so do sizes beyond 32 bits.
 - The main data keeps the original's layout through all of it. A word
@@ -8673,6 +8677,7 @@ that. Steps 3 to 6 are not planned here.
 | The sixth way: three blocks where there was one, with a panel's block fixed at 1000h paragraphs from F1 on; F9 as the piece that takes the memory from the extender, and the trial X at once | Accepted by the session, 13 October 2026 |
 | The clusters N0 to N21 with S, M and P, and their order; that no cap is in a program that has landed, with F9 behind the five clusters that count the room, and the cap as the fallback, which wants the session's word; the answer of `FileRead` and `FileWrite` as a structure of their own; the 16 bytes round each block of the 640 KB, in the program as it is shipped from F1 to F9, held by F0's tool | Accepted by the session, 13 October 2026 |
 | That an integer type gets a name of its own only where its width is not the same everywhere: the size of a file is such a type, and the layer's design will define it and its like. A name for what a number merely means, a count of columns, a colour, is not made: such a number has the type of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`. Until the layer is designed, what crosses to the system is a `u32` too; where the compiler is to hold two things apart, they are structures. So the names that the session had accepted for `sys.h` are gone for now, to be defined by the layer, and five that the session had asked of N0 for a character, a colour, a cell and a place never landed | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
+| That a number is signed unless there is a reason for it not to be: a size, a count, an index, a length, a place in a text is an `i32` when it is widened, and a `u32` of today is asked the same question. Without a sign stay bits, a mask, a character, a colour, a cell; wrapping that the program counts on; a width that a file, DOS or the BIOS has; and a quantity that can pass two gigabytes, a `u32` until the layer's design gives the size of a file its type, which is then signed. The plan had `u32` for whatever is widened, and N0 had widened 29 numbers so: N0b turned them | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
 | N17 and N19 as two clusters each, `start.c` by itself behind F9; and the program's own structures of the headers with the cluster of the functions that return them, those of `sys.h` with S | The session, 13 October 2026, on what N0 counted |
 | Questions 3, 4, 5, 8 and 9 | With the user, each when the work comes to it: "The questions for the user" |
 
@@ -8683,8 +8688,8 @@ The plan had proposed that. It did not hold, for three reasons. Most
 of what is widened is the program's own and never crosses to the
 system: the number of a line, a column, a count of files, the length
 of a buffer, a room counted in bytes where it was in paragraphs. What
-does cross is a `u32` like the rest, and the layer says later what
-it is. And with the memory from the extender the limits
+does cross is a plain number like the rest, and the layer says later
+what it is. And with the memory from the extender the limits
 of 16 bits are within reach on DOS: the plan had to invent a guard for
 that, the room capped at 0FFFFh paragraphs, which was a way round the
 split and nothing else. One fault of the kind was real already, C1's,
@@ -8827,7 +8832,7 @@ memory from the extender" below.
    it, with what stands meanwhile: the shape is made first, inside the
    640 KB, and the blocks are the extender's once no segment names
    one. The three functions of `sys.h` stay three, asked in the order
-   in which the program asks today, in bytes from F9 on, a `u32`;
+   in which the program asks today, in bytes from F9 on, an `i32`;
    what the layer makes of them is step 3's. The screen, the BIOS's
    data, the PSP and the environment
    are behind `sys.h` already and stay there; `md.Screen` and the
@@ -8836,9 +8841,12 @@ memory from the extender" below.
 
 ### The widths: what there is
 
-**What 16 bits are today.** `u16` is written on 2,352 lines of the
-tree and `u8` on 2,108, `u32` on 195; there is no number with a sign
-but in two casts. Of 216 functions that return a `u8` or a `u16`, 46
+**What 16 bits are today.** `u16` is written on 2,020 lines of the
+tree and `u8` on 2,048, `u32` on 165 and `i32` on 26, counted behind
+N0b and the sweep of the panels; when the plan was written they were
+2,352, 2,108 and 195, with no number that had a sign but in two casts.
+What follows in this paragraph, and the first two rows of the table,
+are of that day and were not counted again. Of 216 functions that return a `u8` or a `u16`, 46
 return nothing but 0, 1 or a comparison (a count by pattern: it misses
 what returns a flag in a structure). The member `failed` of the
 answers of `sys.h` is read 281 times. 45 comparisons are with 0FFh or
@@ -8851,7 +8859,7 @@ another number, so it is the reading list:
 |---|---|---|
 | A result of more than 16 bits kept in fewer with no cast | 234, of which 232 into a `u16`: `edit.c` 23, `dialog.c` 22, `main.c` 17, `stcolor.c` 17, `view.c` 14 | clang, `-Wimplicit-int-conversion`, for the 386 |
 | The same with the cast written | `(u16)(` 194 times and `(u8)(` 233 | `grep` |
-| A result looked at before it is cut, and why it is the same number as on DOS | 59 with a reason: 29 `index`, 10 `back`, 8 `compare`, 7 `shift`, 4 `minus`, 1 `divide` | `harness/int16.txt` |
+| A result looked at before it is cut, and why it is the same number as on DOS | 59 with a reason: 29 `index`, 10 `back`, 8 `compare`, 6 `shift`, 4 `minus`, 1 `divide`, 1 `widen` | `harness/int16.txt` |
 | A variable stepped below 0 or beyond 65,535 by `--`, `++`, `-=`, `+=` | Not counted: no warning names them. The finder of `harness/int16.py` knows the range of every expression and can | N0 |
 
 A guess from those: 600 to 1,000 places to read, of which most cannot
@@ -8869,21 +8877,101 @@ gave a cast to say what DOS does, 21 places.
 `DIRENT`, `DIRTREE`, the bytes of the setup), and what DOS and the
 BIOS take and answer in (a handle, attributes, a time and a date, a
 key, a cell of the screen, a place of the cursor, the mouse's). Of
-`sys.h` the counts of bytes and the sizes are widened, to `u32`:
+`sys.h` the counts of bytes and the sizes in the memory are widened,
+to `i32`, and the size of a file with a place in one stays a `u32`:
 "What crosses to the system" below.
 
 ### The rule for a number
 
 Every number of 8 or 16 bits is one of five things, and the cluster
-that reads a file says of each which:
+that reads a file says of each which. A number that is a `u32` today
+is asked the same question, and is of kind 1, 3, 4 or 5:
 
 | | It is | It becomes | How it is known |
 |---|---|---|---|
-| 1 | As wide as it is by what it is. Laid out by someone else: a field of a structure that a file, DOS, the BIOS or the screen has, or of the main data and a panel, whose layout is the original's. Or a thing that has its width: a character, a colour, a key with its scan code, a cell of the screen, a handle, a byte of the setup | Stays. A number that is taken out of a structure into a variable is of the other kinds | The structure says whose it is, once, in the record; a variable by one word there, `character`, `colour`, `key` |
+| 1 | As wide as it is by what it is, and without a sign. Laid out by someone else: a field of a structure that a file, DOS, the BIOS or the screen has, or of the main data and a panel, whose layout is the original's. Or a thing that has its width: a character, a colour, a key with its scan code, a cell of the screen, a handle, a byte of the setup. Or bits and no number: a mask, flags, what is only taken apart and put together by shifts and masks | Stays. A number that is taken out of a structure into a variable is of the other kinds | The structure says whose it is, once, in the record; a variable by one word there, `character`, `colour`, `key`, `bits` |
 | 2 | True or false and nothing else: every value put into it is 0, 1 or a comparison, and every use asks whether it is 0 | `bool` | The finder: a range of 0 to 1 and no use in arithmetic, in a shift, or held against a number other than 0 and 1. A number that is tested by its bits, held against 0FFh, or returned as "1, 0, or 100h to stop" is none |
-| 3 | Counted on to wrap round | Stays 16 bits if it wraps all its life, a random number, a sum. If it wraps at one place, the variable is widened and the cut is written there, `(u16)(a - b)`, with the reason in the record | Read, at every place where the finder says that what is kept is cut |
-| 4 | A number that may stand for one below 0 and is added to a place or a pointer | A number with a sign, of 32 bits: a new type of `vc.h`, the tree's first | The same reading. It is what a machine of 64 bits gets wrong where 32 bits happen to get it right: FFFFFF60h added to a pointer of 64 bits is 4 GB on |
-| 5 | Anything else: a count, an index, a length, a number of a line, a size in the memory | `u32`, also where it is handed to the system or comes from it | What is left |
+| 3 | Counted on to wrap round | Stays 16 bits and without a sign if it wraps all its life, a random number, a sum. If it wraps at one place, the variable is widened, to an `i32`, and the cut is written there, `(u16)(a - b)`, with the reason in the record | Read, at every place where the finder says that what is kept is cut |
+| 4 | A quantity that can pass two gigabytes: the size of a file and a place in one, the size of a disk and of what is free on it, the sum of what is selected, which the original shows up to four gigabytes | A `u32`, until the layer's design gives the size of a file its type, which is then signed. There is no signed type of 64 bits to keep it in meanwhile: "Left for the layer's design" | By what it counts: the word `size` of the record |
+| 5 | Anything else: a count, an index, a length, a number of a line, a column, a size in the memory, a step that may be back | An `i32`, also where it is handed to the system or comes from it | What is left |
+
+**A number is signed unless there is a reason for it not to be**, on
+the user's word of 13 October 2026 (`CLAUDE.md`, "The portable C").
+The plan had `u32` for kind 5 and a sign only for a step that may be
+back, and N0 widened 29 numbers so; N0b turned them ("N0b, the rule
+turned to a sign", below). Two reasons. A size without a sign that goes
+below nothing becomes a huge number without a word, where a signed one
+is negative, a test can ask for that, and a sanitizer names a signed
+overflow, which is where step 6 is going. And here it is the
+conversion that changes least. C reckons with a `u8` or a `u16` as an
+`int`: every expression of such numbers in the tree is worked out with
+a sign today, by `wcc386` and by clang alike, and has been since the
+program is one of 32 bits. (In 16 bits a `u16` was reckoned without
+one; that the two agree at every place is what `harness/int16.txt`
+holds.) Made `i32`, the variables give the same expression, of the
+same type. Made `u32`, they give another, reckoned without a sign,
+which has another value wherever something in it goes below nothing
+and is then compared, halved, divided or widened. Two lines of the
+tree, with values that their types allow, each worked out by both
+compilers in a toy of constant expressions:
+
+    if (cursor - 5 < first)                     bars.c, DosCom
+    if (item > sd.ColNum - 1)                   stcolor.c, StF07_30
+
+For a cursor of 3 and a first of 0 the first is true as the program is
+built, with `u16`, and true with `i32`; with `u32` it is false, 3 - 5
+being 4,294,967,294. For an item and a `ColNum` of 0 the second is the
+same: true, true, false. In the tree neither goes below nothing, by the
+line above each, which is its reason in `harness/int16.txt`: as `u32`
+the two variables would rest on those reasons, as `i32` they need
+none.
+
+Where a sign does change something is a variable that cut what it was
+given, with a test that counted on the cut, and the five files have
+one. `TxtNum` of `digits.c` was
+
+    u16 digit;
+    digit = (u16)*text - '0';
+    if (digit > 9)
+        break;
+
+For a space, 32 - 48 is -16, which was kept as 65,520 and is above 9.
+An `i32` keeps -16, which is not, and the loop would read on through
+whatever follows the number; a `u32` would have kept 4,294,967,280.
+That is wrapping that the program counts on, kind 3, and the cut is
+written: `digit = (u16)(*text - '0')`. The finder names every such
+store, as a cut, before the variable is widened, so it is read; the
+mistake is to widen the variable and take the cast for noise.
+
+**What a sign changes**, to be read for at every number that is made an
+`i32`, and what names the places:
+
+| What | With a sign | What names the place |
+|---|---|---|
+| A shift to the right | Of a number below 0 it keeps the sign: -2 >> 1 is -1, where 65,534 >> 1 was 32,767. Of 0 or more it is what it was | The finder, kind `sign`: an entry of the record, with why the number is not below 0 there |
+| A division and a remainder | -7 / 2 is -3 and -7 % 16 is -7; without a sign the remainder was 9. Of numbers that are 0 or more both are what they were | The same |
+| A comparison with a `u32` | C makes the `i32` a number without a sign first: -1 is above everything. Against a `u8` or a `u16` nothing changes, since those become an `int` | clang, `-Wsign-compare`, which the test of the record asks of every file that is sorted |
+| Made a `u32` without a word: handed to a parameter that is one, in another cluster's file or in `sys.h`, kept in a field, returned; or a `u32` made an `i32` | A number below 0 becomes a huge one, and one beyond two gigabytes a negative one | clang, `-Wsign-conversion`, held the same way. The place gets the type that the number is, or the cast, which then says that the number is not below 0 there |
+| Put into 8 or 16 bits | A number below 0 is cut as one that is too large is | The finder's cuts as they were, `store`, `handed`, `returned`, `cast` |
+| An index into a table, a number added to a pointer | Nothing for 0 or more. Below 0 it steps back, which is what a sign is for, and what a machine of 64 bits gets wrong of a `u32`: FFFFFF60h added to a pointer of 64 bits is 4 GB on. That the index is within its table is the reader's, as it was | Nothing new: `harness/int16.txt` has the places where one could be below 0, as `back` |
+| A mask written for 16 bits | `~0xFF` is an `int`, -256, every bit but the low eight: `length & ~0xFF` of a number that is 0 or more is what `length & 0xFF00` was in 16 bits, with no cast. `LnStr` has it so, where N0 wrote `~(u32)0xFF` | Reading: nothing names a mask |
+| A loop that counts down to nothing, `while (--count)` | For a count of 0 a `u16` went round 65,536 times, which the editor counts on for its rows; an `i32` goes below 0 and on to an overflow, which C leaves undefined | Reading: look at whether 0 can get there. Where the program counts on the 65,536, the count stays a `u16`, kind 3 |
+
+How a cluster knows that a number cannot be below 0: by what stands at
+the place or just above it, as for a cut. The line above asks; a loop
+counts it up from 0; it is a count that nothing steps down; it is what
+a function answers whose comment says so. That is the sentence under
+the `sign` entry. A number of which it cannot be said keeps the type
+that the program counted on, with the cut written.
+
+Which of clang's warnings a cluster holds its files to: `-Wsign-compare`
+and `-Wsign-conversion`, with the three of "Booleans". All five are
+silent for the five files, and the test `portable_c-width` asks them of
+every file that is sorted, so they are held and not only tried. They
+say nothing of a `u8` or a `u16` against an `i32`, rightly: nothing
+changes there. `-Wimplicit-int-conversion` is not held: it names every
+store into 8 or 16 bits, 14 in the five files, which are the finder's
+cuts and have their reasons.
 
 And three rules for what a reader finds at a place where a result is
 cut today and would not be:
@@ -8936,12 +9024,22 @@ names those, and the cluster writes the cut at the call, in whichever
 file that is. A return that is widened is cut by a caller that keeps
 it in 16 bits, as it was: the place is in the record of the caller's
 file, and its cluster sorts it, or the widening cluster does if that
-file is done. So the clusters need no order among themselves.
+file is done. So the clusters need no order among themselves. With a
+sign there is one thing more at the border. An `i32` that is handed to
+a function of a file not yet sorted, which still takes a `u16`, is a
+cut, `handed`, as it was. One that is handed to a parameter that is a
+`u32` there, or held against what such a function answers, is named by
+clang's two warnings in the file of the cluster that is at work: if
+the other's number is of kind 4, a size, the place gets its cast, and
+if it is a count that only waits for its cluster, the cluster that met
+it gives it its sign, in the other's file, as it would write a cut
+there.
 
 **The record.** `harness/width.txt`, held by a test as
 `harness/int16.txt` is, so that a reviewer reads one file: every
 structure of kind 1 by name with whose it is; and every variable,
 parameter, return and cast that is still 8 or 16 bits outside those,
+and every one that is a `u32`,
 with its reason, by file, function and the text of its line. For the
 common reasons it has one word, as `harness/int16.txt` has `index` and
 `back`, and a sentence for the others. The test fails for a number
@@ -8958,7 +9056,8 @@ a number cut by being handed to a parameter that takes fewer bits.
 ### What crosses to the system
 
 What crosses to the system in a number that says how much is a plain
-`u32` in this step. An integer type gets a name of its own where its
+number in this step, of the kind that "The rule for a number" makes
+it. An integer type gets a name of its own where its
 width is not the same everywhere, on the user's word of 13 October
 2026 (`CLAUDE.md`, "The portable C"): the size of a file, 32 bits on
 one platform and 64 on another, is such a type, and the layer's design,
@@ -8970,13 +9069,26 @@ What a number counts, its name and a comment say:
 
 | What it counts | Its type | Where |
 |---|---|---|
-| The length of a file and a place in one, counted from its start | `u32`. A step from where the file is or from its end, which may be back, is an `i32`, of kind 4 | `FileSeek`'s offset and the `place` that it answers with; the sizes that the program adds up and shows |
-| How many bytes are read or written at once | `u32` | `FileRead`'s, `FileReadBare`'s and `FileWrite`'s `count`, and what they answer: a structure of their own in the place of `struct Answer`, with the count and the error beside it, so that a caller which was not changed does not compile. That is a structure, which the compiler does hold apart |
-| A size in the memory, in bytes | `u32` | What the three functions for the memory take and answer, from F9 on; what the room's function answers, from the first of the five clusters that count the room |
+| The length of a file and a place in one, counted from its start | `u32`, kind 4: a file of DOS may have four gigabytes less a byte, the original shows a size up to that, and there is no signed type of 64 bits to keep it in. A step from where the file is or from its end, which may be back, is an `i32` | `FileSeek`'s offset and the `place` that it answers with; the sizes that the program adds up and shows |
+| How many bytes are read or written at once | `i32`, kind 5. It holds what DOS and the room can give: DOS takes 16 bits at a call, the system's file loops for more, and no block that the program reads into is as long as two gigabytes. An error is beside the count in the answer, not in it | `FileRead`'s, `FileReadBare`'s and `FileWrite`'s `count`, and what they answer: a structure of their own in the place of `struct Answer`, with the count and the error beside it, so that a caller which was not changed does not compile. That is a structure, which the compiler does hold apart |
+| A size in the memory, in bytes | `i32`, kind 5: the room is what the machine has for a program of 32 bits, below two gigabytes, and the differences of two places in it, which may be back, are of the same type | What the three functions for the memory take and answer, from F9 on; what the room's function answers, from the first of the five clusters that count the room |
 
 And `DriveSpace`'s three figures, the clusters that are free, the
-clusters of the drive and the bytes of a sector, become `u32`: plain
-counts, of kind 5.
+clusters of the drive and the bytes of a sector, become `u32`, and stay
+without a sign: they are the factors of the size of a disk and of what
+is free on it, kind 4, which the program works out of them in 32 bits
+without a sign, and an `i32` among them would make every one of those
+products a place that clang names.
+
+So an `i32` count meets a `u32` place wherever a caller steps through
+a file, `place + count`: that sum is reckoned without a sign, which is
+right for a count that is 0 or more, and where the sum is kept in the
+place nothing is said. Where it is kept in a count, or the two are held
+against each other, clang names the place and it gets its cast. That
+is the price of the two types until the layer gives the size of a file
+a signed one: by a trial that made every local number of 16 bits an
+`i32`, some 30 places in `edit.c`, 9 in `view.c`, 7 in `copy.c`, and
+one or two in a file elsewhere.
 
 Who does it: S, a sweep that the compiler holds complete, for the
 files and the drive; F9 for the memory, where the three functions
@@ -9110,7 +9222,7 @@ nothing that 15 MB can wrap:
 
 | Still 16 bits | What more memory would do | Widened by | If F9 had to land first |
 |---|---|---|---|
-| The room in paragraphs, as its one function answers it from F1 on, and what takes it: `EdSpace` of the editor, `count` of the viewer, `room` of the file search, a copy's `left`, `size` in `ReDr00` | Wrap at a megabyte: 15 MB would count as what is left of it beyond a multiple of a megabyte | The first of the five clusters to get there adds a function beside it that answers bytes, a `u32`, each of N3, N5, N6, N9 and N11 moves the calls of its file to that, and F9 takes the one in paragraphs out, which nothing calls by then: a call that was left does not compile | The function in paragraphs answers no more than 0FFFFh, 1,048,560 bytes, as a number of the program's own, declared in entry 13; the last of the five takes that out |
+| The room in paragraphs, as its one function answers it from F1 on, and what takes it: `EdSpace` of the editor, `count` of the viewer, `room` of the file search, a copy's `left`, `size` in `ReDr00` | Wrap at a megabyte: 15 MB would count as what is left of it beyond a multiple of a megabyte | The first of the five clusters to get there adds a function beside it that answers bytes, an `i32`, each of N3, N5, N6, N9 and N11 moves the calls of its file to that, and F9 takes the one in paragraphs out, which nothing calls by then: a call that was left does not compile | The function in paragraphs answers no more than 0FFFFh, 1,048,560 bytes, as a number of the program's own, declared in entry 13; the last of the five takes that out |
 | How many lines the file search keeps, `FndSize`, and its other counts, `FndCur`, `FndFrst`, `FndNumb`, `FndFls` | Wrap at 4.2 MB of room | N5. The list is then full where the room is, some 230,000 lines on the bench | Some 16,130 under the cap |
 | The editor's line in hex, `EdLine` and `EdLin0`: a sixteenth of the place | Wrap at a megabyte | N6 | The cap is exactly what they count |
 | The editor's count of free bytes, which shows 0 for a megabyte or more in a text, and has seven cells; the 20 bits of a place in its text | A text beyond a megabyte | F5 takes `AddressOf` out, and with it the 20 bits. N6 the test of the count, and what is shown in the cells by the answer to question 8 | Not reached under the cap |
@@ -9118,7 +9230,7 @@ nothing that 15 MB can wrap:
 | The viewer's window on a file | Nothing: the viewer takes 0FFEh paragraphs at the most itself, and that stays its number. N3 writes it in bytes | N3 | None needed |
 | A panel's offsets | Nothing: its block is 1000h paragraphs whatever the machine has | Not widened in the clusters: question 3, and P if it is lifted | None needed |
 | What `Init11` answers with for `AlocEr`, paragraphs in 16 bits that the BIOS is then handed as a page | Cut | F9 answers 0FFFFh for more, with a row in entry 6 | The same |
-| What the functions of `sys.h` are asked for, paragraphs in 16 bits | No block of more than a megabyte could be asked for | F9: bytes, a `u32` | The same |
+| What the functions of `sys.h` are asked for, paragraphs in 16 bits | No block of more than a megabyte could be asked for | F9: bytes, an `i32` | The same |
 
 Whether that order is the better one, since F9 could as well land
 first with the cap in the last column: it is, and the plan is made
@@ -9217,11 +9329,11 @@ thought and long in lines.
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
-| F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, a `u32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
+| F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
-| N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and the type with a sign for kind 4; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
-| N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; each cut that the program counts on written out; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's three warnings silent; the test of the record | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
-| S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a count of 32 bits and answer with a structure of their own; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
+| N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below, and "N0b, the rule turned to a sign" behind it | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and `i32`, the type with a sign; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
+| N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; each cut that the program counts on written out; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's five warnings silent, which the test of the record asks; the test of the record | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
+| S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
 | M, the main data's numbers | Each field of the main data or of a panel that the record has as to be widened: a variable beside the structure, its word left unused, and every line that names it | Those lines, in whatever file | Every cluster; alone | The scenarios; the images, the main data equal but for those words | |
 | P, a panel as long as its directory. Only if question 3 is answered so | "The questions for the user", 3: a panel's block longer than 64K, its four offsets beside it in 32 bits, `ENTRY` without its cut, and a scenario that fills what the original can hold | `files.c`, `read.c`, `place.c`, `panel.c`, `enter.c`, `start.c`, and the lines of other files that keep an offset in a panel; `harness/scenarios.py`, `DEVIATIONS.md` | M; alone | The scenarios, with the new one held to the original's golden and its patch; the images | |
 
@@ -9506,8 +9618,8 @@ reads, that is known before twenty agents go by it.
    16 bits. A named type for what crosses to the system was part of
    that answer. The user has said since, on the same day, that the
    layer's design defines such types, where the width differs by
-   platform, and that until then each is a `u32` ("What crosses to the
-   system").
+   platform, and that until then each is a plain number, a `u32` or an
+   `i32` by what it counts ("What crosses to the system").
 2. **The memory for the panels and the text.** "From the extender
    now", as much as the machine has, and what a user then sees
    otherwise is declared: the editor opens whatever fits.
@@ -9702,7 +9814,9 @@ seen to do.
   them, the size of a file first among them, and with it a place in a
   file and a step in one; whether a count of bytes read or written and
   a size in the memory are such types is its to say. Until it does,
-  each is a plain `u32` ("What crosses to the system").
+  the size of a file is a plain `u32` and the other two an `i32`
+  ("What crosses to the system"). The size of a file is signed when it
+  has its type.
 - **The shape of `sys.h`** otherwise: `failed` and what else answers
   yes or no, a handle, DOS's forms of a time, a date and attributes.
 - **Whether the main data's layout is freed**: "The way taken", 1.
@@ -10558,11 +10672,12 @@ sorted` with its counts, as sorted with an entry and a reason for every
 number that is left and every cut that is left, as `laid out` with
 whose it is, or `as a whole`, the files of tables and the system's
 file. At its top is a table by cluster and by file: the numbers of 8 or
-16 bits that there are, how many of them nobody has sorted, how many
-are kept with a reason, the cuts, and how many numbers a file declares
-as `u32`, as `bool` and with a sign. A cluster's commit shows in that
-table what it widened, and the count that it takes to nothing is the
-column `not sorted` of its row. It is 1,036 lines with five files and
+16 bits that there are and how many of them nobody has sorted, the
+same of the numbers that are a `u32`, how many of either are kept by a
+word or with a reason, the cuts, and how many numbers a file declares
+as `bool` and as `i32`. A cluster's commit shows in that
+table what it widened, and the counts that it takes to nothing are the
+two columns `not sorted` of its row. It is 1,036 lines with five files and
 the two structures sorted, of which the fields of the main data and of
 a panel are some 450 and the five files 220: a number with a word has
 three lines, and a cut or a number with a sentence four or five. At
@@ -10586,8 +10701,8 @@ Open Watcom has in the directory that the build names for `<stddef.h>`
 and gcc and clang have without a library; a `bool` is one byte for all
 three, which a `HOLDS` line holds. clang will want nothing else at step
 6. `i32` is `int`, with a `HOLDS` line for its length and its sign. No
-number of the five files wanted it. The program was the same bytes with
-the types defined.
+number of the five files wanted it by the rule as it was then; 28 are
+one since N0b. The program was the same bytes with the types defined.
 
 Those two are all. N0 had also defined four names in `sys.h` for what
 crosses to the system, `FileSize`, `FileStep`, `ByteCount` and
@@ -10607,7 +10722,8 @@ were for is done in the record, "The words", below.
 for its reason, of a fixed list that the finder knows, `WORDS` of
 `harness/width.py`, and the record says at its top, once, what each
 word says: `character`, `colour`, `cell`, `place`, `key`, `time`,
-`handle`, `attributes`, `random`, `system`, and for a field of the main
+`handle`, `attributes`, `random`, `system`, since N0b `bits` and
+`size` for a number that has no sign, and for a field of the main
 data or of a panel `setup`, `flag`, `text`, `address`, `small`,
 `unused` and `M`. What is not plain of the one number goes behind a
 colon, `system: the keys that are held`. The table counts such numbers
@@ -10619,15 +10735,16 @@ times, which has no word, adds the word with its sentence to `WORDS`,
 in a commit of its own, before it sorts.
 
 **The rule as it stood up**, by what the 66 numbers of the five files
-became:
+became. N0 widened to `u32`, as the rule then was; the table is as N0b
+left it:
 
 | | Numbers | Which |
 |---|---|---|
-| Widened to `u32` | 29 | Counts, indexes, lengths; what `TstHex`, `LnStr`, `DoublMo` and two static functions answer |
+| Widened, to `i32` | 28 | Counts, indexes, lengths; what `TstHex`, `LnStr`, `DoublMo` and two static functions answer |
+| Widened, and without a sign | 1 | `bits`: what `HexByt` is handed, of which it reads eight bits by a shift and a mask |
 | Made `bool` | 3 | What `TstMas` and `InWind` answer, what `CurMous` is handed |
 | Kept, as wide as it is by what it is, each by a word of the record | 34 | 13 `character`, 1 `colour`, 1 `cell`; 9 `place`, a row and a column in two bytes; 6 `system`, the mouse's buttons, the keys that are held, the page, the timer's low word; 2 `time`; 2 `random` |
 | Counted on to wrap all its life | 0 | |
-| With a sign | 0 | |
 
 And of the 41 cuts that the finder named before, 29 are left, each
 with its reason: 12 are a cast that is written, of which 5 say where
@@ -10650,16 +10767,17 @@ are a number that what stands at the place keeps within.
       u16 more;
       more = (second << 8 | second & 0x7F) - 1;
 
-      u32 more;
+      i32 more;
       more = (u16)((second << 8 | second & 0x7F) - 1);
 
 - A mask that meant "all but the low byte" of 16 bits cuts a number of
   32. Nothing names it, since it is no cut by the types. In the same
-  routine:
+  routine, where `~0xFF` is an `int` and wants no cast for a length
+  with a sign that is 0 or more:
 
       length = length & 0xFF00 | length + more & 0xFF;
 
-      length = length & ~(u32)0xFF | length + more & 0xFF;
+      length = length & ~0xFF | length + more & 0xFF;
 
   Before a variable is widened, look at every mask of it that is
   written for 16 bits, `0xFF00`, `0xFFFF`, `0xFFF0`, at every `~` and
@@ -10671,7 +10789,7 @@ are a number that what stands at the place keeps within.
 **Across clusters**, as "The rule for a number" has it, and it held.
 
 - A return that is widened: `TstHex`, `LnStr` and `DoublMo` answer
-  `u32`. No caller changed. The record counts a cut more in each file
+  an `i32`. No caller changed. The record counts a cut more in each file
   that keeps the answer in 16 bits, nine in nine files, and the commit
   shows them as counts that moved: the cluster of that file meets the
   cut when it sorts the file.
@@ -10719,40 +10837,174 @@ named: 34 of them a word, and 29 a sentence that somebody has to have
 checked.
 By that, a cluster is some 150 numbers and 100 cuts, 150 reasons, for
 an agent that hands back after a hundred tool calls, and the counts of
-the record's table are what to cut by, not the lines:
+the record's table are what to cut by, not the lines. They are here as
+the finder prints them behind the sweep of the panels, F2; the table
+at the top of `harness/width.txt` has them as they are, with the
+numbers of each cluster that are a `u32` beside them:
 
-| Cluster | Numbers; cuts | |
+| Cluster | Numbers of 8 or 16 bits; cuts | |
 |---|---|---|
-| N3 and N4, `view.c` | 197; 211 | Two halves are right |
+| N3 and N4, `view.c` | 189; 211 | Two halves are right |
 | N6 to N8, `edit.c` | 248; 278 | Three thirds are right, and no fewer |
-| N17, `keys.c`, `commands.c` | 222; 58 | The largest by numbers. 116 are of `commands.c` with 13 cuts, most of them what a command is handed; F2 makes many of those pointers. Two clusters by file, N17a and N17b: accepted |
-| N19, five files | 163; 74 | `start.c` waits for F9 anyway: a cluster of its own, N19b, 49; 30: accepted |
-| N12, N13, N15 | 88; 113, 71; 101, 114; 108 | More cuts than numbers, `treebox.c`, `usermenu.c`, `panel.c`, `drive.c`: arithmetic on places. Right as they are, and the slow ones |
-| The others | 90 to 140; 50 to 100 | Right |
+| N17, `keys.c`, `commands.c` | 154; 58 | It was the largest by numbers, 222, of which 116 were of `commands.c`, most of them what a command is handed; F2 made 68 of the two files' numbers pointers. 68 are of `keys.c` and 86 of `commands.c`, with 13 cuts. Two clusters by file, N17a and N17b: accepted |
+| N19, five files | 154; 61 | `start.c` waits for F9 anyway: a cluster of its own, N19b, 42; 17: accepted |
+| N12, N13, N15 | 80; 114, 69; 102, 114; 109 | More cuts than numbers, `treebox.c`, `usermenu.c`, `panel.c`, `drive.c`: arithmetic on places. Right as they are, and the slow ones |
+| The others | 88 to 142; 48 to 106 | Right |
 
 **What a cluster does**, in this order:
 
 1. `python3 harness/dataimage.py save` of the build that it starts
    from, into `build/`.
 2. `python3 harness/width.py --show FILE`: the numbers and the cuts,
-   function by function. Read the file with that beside it and say of
-   each number which of the five kinds it is. For a parameter or a
-   return of a function that other files call, `grep` its calls, and
-   `--show NAME` for what is cut in being handed to it.
+   function by function, the numbers that are a `u32` among them. Read
+   the file with that beside it and say of each number which of the
+   five kinds it is. For a parameter or a return of a function that
+   other files call, `grep` its calls, and `--show NAME` for what is
+   cut in being handed to it.
 3. Change the types, in the file, in `vc.h` and in whatever file
-   declares the function for itself; write the cut where the program
-   counts on wrapping; look at the masks. Build.
+   declares the function for itself: an `i32` for what is widened and
+   for a `u32` that has no reason to be one. Write the cut where the
+   program counts on wrapping, above all where a variable was given a
+   difference and then held against a limit; look at the masks, at the
+   loops that count down, and at every `(u16)(signed char)` that the
+   number comes from ("N0b", below). Build.
 4. `python3 harness/width.py --sort FILE`, or `FILE:FUNCTION` for a
    part, and write the reason under every entry that has none, in
-   `harness/width.txt`: for a number that has its width by what it
-   is, its word of the list at the top of the record, with what is
-   not plain behind a colon; for any other number that stays, and for
-   every cut, a sentence. `python3 harness/int16.py`, and its record anew
-   with the reason of whatever is new there.
-5. clang's three warnings for the files ("Booleans"), the tests that
-   start no machine, then the whole suite and the images held against
-   those of step 1.
-||||||| parent of 742d10a (Write down the three blocks of step 2, and what a later piece should know)
+   `harness/width.txt`: for a number that has its width or no sign by
+   what it is, its word of the list at the top of the record, with
+   what is not plain behind a colon; for any other number that stays,
+   and for every cut, a sentence; under a cut of the kind `sign`, why
+   the number is not below 0 there. `python3 harness/int16.py`, and
+   its record anew with the reason of whatever is new there.
+5. The tests that start no machine: `portable_c-width` asks clang's
+   five warnings of every file that is sorted, and says what a place
+   that it names wants. Then the whole suite and the images held
+   against those of step 1.
+
+### N0b, the rule turned to a sign: done, and what a cluster goes by
+
+**What there is.** The rule for a number as the user decided it on 13
+October 2026, "A number is signed unless there is a reason for it not
+to be", in "The rule for a number" and "What crosses to the system"
+above, which are written anew; the finder and the record with every
+`u32` of the tree in them; and the five files of N0 under the rule. No
+golden and no patch changed, and the image of each of the 155
+scenarios is that of the build before, with no difference.
+
+**The five files.** Of the 29 numbers that N0 had widened to `u32`, 28
+are an `i32`. One stays without a sign, by a word: what `HexByt` is
+handed is `bits`, a byte read four bits at a time, which its callers
+cut out of an offset. The files had no `u32` before N0. Nothing else
+of the code changed but the mask of `LnStr`, which lost its cast. The
+program is as long as it was in those files: 21 instructions are
+others, 17 comparisons that ask with a sign where they asked without,
+`jl` for `jb`, and four shifts that keep the sign, `sar` for `shr`.
+Each is of a number that is 0 or more: a count stepped up from 0, an
+index of a loop, what a function of the same file answers. To see
+them, compile the file as it was and as it is into `build/`, by its
+line of `build/CMakeFiles/portable_c.dir/build.make`, and hold the two
+listings of `wdis` against each other.
+
+**The callers**, read one by one. `TstHex` is called in `view.c`,
+twice, and in `edit.c`; `DoublMo` in `help.c`, `stcolor.c`, `main.c`,
+`usermenu.c`, `treebox.c` and `find.c`; `LnStr` in `dialog.c`. Each
+keeps the answer in a `u16` and holds it against 2, 0 or 0FFh: a cut
+that the record counted in each of those files already, of a number
+that is 0 or more whichever type answers it. None changed, but the
+line by which `dialog.c` declares `LnStr` for itself. What `DoublMo` is
+handed for `cursor` is a `u16` at every call and arrives as it was.
+Two callers are other code all the same, `stcolor.c` 7 bytes shorter
+and `usermenu.c` 15: the compiler lays the registers out otherwise
+round a call whose parameter has a sign. The figures of the README
+moved by those 22 bytes.
+
+**The compiler, at such a call.** `usermenu.c` and `treebox.c` hand
+`DoublMo` a number that they made by `(u16)(signed char)`, the
+original's `CBW`. `wcc386 -os` hands a parameter of 32 bits the byte
+with its sign in all 32 bits, FFFFFFFEh where C says 0000FFFEh: it
+loses the cut to 16 bits between a signed byte and a number of 32. It
+did so before N0b, from the day N0 made the parameter wider than 16
+bits, and it does so for any use of such a variable in an expression,
+`line + first`, `line < first`, not only at a call; `-od` and clang do
+what C says. A toy of four lines shows it:
+
+    i32 Four(u8 c, i32 first)
+    {
+        u16 line = (u16)(signed char)c;
+        return line + first;            /* movsx eax,al; add eax,edx */
+    }
+
+Neither call can hand over a line below 0, being behind a test that
+the mouse is on a line. But the tree has such a cast on 35 lines, and each is
+right in the program of 32 bits only while its byte is below 80h or
+its result is cut to 16 bits again before it is looked at. That is
+not of this piece and was not gone through: it is for the session.
+`CLAUDE.md` has the note.
+
+**The toy** that "The rule for a number" speaks of is a file of
+constant expressions, each the line of the tree with its variables
+written as casts and held by the length of an array, so that a
+compiler which works one out otherwise does not take the file:
+
+    #define IS(name, truth) struct name { char is[(truth) ? 1 : -1]; }
+    #define SCROLLS(T) ((T)3 - 5 < (T)0)        /* cursor - 5 < first */
+    IS(scrolls_u16, SCROLLS(u16) == 1);
+    IS(scrolls_i32, SCROLLS(i32) == 1);
+    IS(scrolls_u32, SCROLLS(u32) == 0);
+
+`wcc386`, with the options of the build, and clang, for 32 bits and
+for 64, take it, and neither takes a line with the other answer. It
+was not kept: `harness/widthcheck.c` has the lines that the finder is
+held to.
+
+**The finder and the record.**
+
+- A `u32` is a number of the record, found by its type as a `u8` and a
+  `u16` are. The table counts them in two columns of their own, `u32`
+  and `u32 not sorted`, and counts `i32` where it counted `signed`. A
+  line of the record that counts has them apart: `not sorted, 189
+  numbers, 13 u32, 211 cuts`.
+- What the tree has as `u32`, 149: 1 in the five files, which is
+  sorted; 71 that the clusters meet, `edit.c` 37, `view.c` 13,
+  `copy.c` 6, and three or fewer in each of `format.c`, `find.c`,
+  `read.c`, `panel.c`, `info.c`, `input.c`, `help.c`, `system.c` and
+  `sthelp.c`; 65 in the system's file, which is in the record as a
+  whole and the layer's; and 12 in the headers, of which six are fields of structures
+  that are laid out, five are fields of the main data, sorted now by a
+  word each, `time` and `address`, and one, the `place` that
+  `FileSeek` answers with, waits for S.
+- Two words more, each with its sentence in `WORDS`: `bits`, for bits
+  and no number, and `size`, for a quantity that can pass two
+  gigabytes.
+- A kind more among the cuts, `sign`, which is no cut and is held like
+  one: a shift to the right, a division or a remainder of an `i32`
+  that may be below 0 by its type. Its reason says why the number is
+  not. The five files have three, on 28 numbers.
+- The test asks clang for five warnings of every file that is sorted,
+  and fails for one: the two of the sign and the three of "Booleans".
+- `harness/int16.txt` lost two places, both of `TstHex`, where an
+  `int` that could have been below 0 was made a `u32` by being
+  returned: an `i32` takes it as it is.
+
+**What it costs**, against the rule as it was. In the five files,
+nothing in reading: a number is read once either way, and whoever
+reads it for its width sees its comparisons and its shifts. In
+writing, three reasons more on 63, the `sign` entries, and one fewer
+cast. Turning the files took six tool calls of this piece where
+sorting them had taken N0 twelve, some of them the same. For a cluster that starts under the
+rule the measure is, by that: a `sign` entry for every ten numbers
+that it widens, so a tenth more reasons, and the numbers that are a
+`u32` in its files, which are sorted too. That moves two clusters:
+`edit.c` has 285 numbers to sort where it had 248, and `view.c` 202
+for 189. Three thirds and two halves stay right, and are no longer
+generous. What is new in kind is the border between an `i32` and a
+`u32` that stays one, the place in a file above all: clang names each
+such place and each wants its type or its cast. A trial that made
+every local number of 16 bits an `i32`, which is more than the rule
+widens, had clang name 28 places in `edit.c`, 9 in `view.c`, 7 in
+`copy.c`, 2 in `info.c`, 1 in `dialog.c` and none in `find.c` and
+`panel.c`. So N3, N4, N6 to N8 and N9 are slower by that much, a few
+tool calls each, and the others by nothing that was measured.
 
 ## An implementation of the layer for tests: future work
 

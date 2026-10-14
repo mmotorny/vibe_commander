@@ -2945,6 +2945,34 @@ in "The portable C".
     "in front of block 1" of a write behind the end of block 0: they
     are the same bytes.
 
+- A number of the portable C is given its width and its sign by the
+  rule of `TODO.md`, "The rule for a number", and held to it by the
+  test `portable_c-width`, whose top, `harness/width.py`, says what it
+  finds. What turning the first five files to a sign met:
+  - Made an `i32`, a number of 16 bits leaves every expression as it
+    was, since C reckoned it as an `int` already; the listings of
+    `wdis` for a file as it was and as it is differ only in jumps that
+    ask with a sign and in shifts that keep it, and each of those is
+    the reading list. What does change is a variable that cut what it
+    was given: `digit = *text - '0'` with `if (digit > 9)` behind it
+    took a character below '0' for no digit because 65,520 is above 9,
+    and -16 is not. The finder names such a store as a cut; the cast
+    that is written there is not noise.
+  - `wcc386 -os` loses a cut to 16 bits between a signed byte and a
+    number of 32: of `u16 line = (u16)(signed char)c;` it hands
+    `line`, to a parameter of 32 bits or into `line + first` and `line
+    < first`, as the byte with its sign in all 32 bits, FFFFFFFEh for
+    FEh where C says FFFEh. `-od` and clang do what C says. The tree
+    writes the original's `CBW` so on 35 lines, and each is right
+    only while its byte is below 80h or what is made of it is cut to
+    16 bits again before it is looked at. Before a parameter or a
+    variable that such a number gets to is widened, look at whether
+    the byte can be 80h or more. A toy of a few lines and `wdis` show
+    what the compiler made of one.
+  - The objects of two builds in two directories differ in length by
+    the paths that are in them: hold listings against each other, or
+    the places of the functions in the two maps, not the lengths.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through
