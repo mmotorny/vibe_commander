@@ -112,10 +112,10 @@ void V81_00(void);
    written to the screen buffer in a colour; and the editor's routines
    that clear a line of the window, by its number, and move the lines of
    the window up or down by one (see each). */
-void Panel(u16 panel);                                  /* panel.c */
-void PutPath(u16 panel);
-void PutFls(u16 panel);
-void PutTre(u16 panel);                                 /* tree.c */
+void Panel(struct WCBdef *panel);                       /* panel.c */
+void PutPath(struct WCBdef *panel);
+void PutFls(struct WCBdef *panel);
+void PutTre(struct WCBdef *panel);                      /* tree.c */
 u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
            u16 color);                                  /* screen.c */
 void T71_00(u16 function, u16 place, u16 step);         /* edit.c */
@@ -1346,11 +1346,11 @@ void V13_00(void)
 
 /* What PutFls of the original does: a panel shows files, the tree or
    the Info. */
-static void Files(u16 panel)
+static void Files(struct WCBdef *panel)
 {
-    if (PANEL(panel)->WinTyp == 0)
+    if (panel->WinTyp == 0)
         PutFls(panel);
-    else if (PANEL(panel)->WinTyp == 1)
+    else if (panel->WinTyp == 1)
         PutTre(panel);
     else
         PutInf(panel);
@@ -1363,25 +1363,25 @@ static void Files(u16 panel)
    are read again. */
 void V13_01(u16 changed)
 {
-    u16 panel;
+    struct WCBdef *panel;
 
     Quit();
     md.Clock = (u8)VI->ViKeyBar;
     md.KeyBar = (u8)(VI->ViKeyBar >> 8);
-    panel = md.WCB1seg;
-    if (PANEL(panel)->Visible != 0) {
+    panel = LeftPanel;
+    if (panel->Visible != 0) {
         Panel(panel);
         PutPath(panel);
         Files(panel);
     }
-    PANEL(panel)->ChgFlg |= (u8)changed;
-    panel = md.WCB2seg;
-    if (PANEL(panel)->Visible != 0) {
+    panel->ChgFlg |= (u8)changed;
+    panel = RightPanel;
+    if (panel->Visible != 0) {
         Panel(panel);
         PutPath(panel);
         Files(panel);
     }
-    PANEL(panel)->ChgFlg |= (u8)changed;
+    panel->ChgFlg |= (u8)changed;
     PutPrm(panel);
     PutMnu(0);
     PutKey(0xFF);
@@ -1887,7 +1887,7 @@ static struct Onward F44_01(u16 how)
 /* The editor on the file dirinfo of the directory that an Info panel
    shows, in the lower part of the panel, under the word Edit: F34_10,
    where a click of the mouse in that part comes in as well. */
-struct Onward F34_10(u16 panel)
+struct Onward F34_10(struct WCBdef *panel)
 {
     const u8 *from = AT(AsmSeg(), OFFSET(DrIn_F));
     u16 begin = BegBX(panel);
@@ -1910,25 +1910,24 @@ struct Onward F34_10(u16 panel)
 /* View or edit what the cursor of the panel is on, a file, or for the
    editor the dirinfo of an Info panel: F34_01. With the panels off, in a
    tree, and for the viewer in an Info panel, the name is asked for. */
-static struct Onward F34_01(u16 panel, u16 how)
+static struct Onward F34_01(struct WCBdef *panel, u16 how)
 {
-    struct WCBdef *wcb = PANEL(panel);
     const struct FILENT *file;
     u16 i;
 
-    if (wcb->Visible == 0)
+    if (panel->Visible == 0)
         return F44_01(how);
-    if (wcb->WinTyp == 0) {
-        if (wcb->CurAdr >= wcb->EndBuf)
+    if (panel->WinTyp == 0) {
+        if (panel->CurAdr >= panel->EndBuf)
             return To(NEXT_FUNC04);
-        file = ENTRY(wcb, wcb->CurAdr);
+        file = ENTRY(panel, panel->CurAdr);
         if (file->AttrF & ATTR_DIRECTORY)
             return To(NEXT_FUNC04);
         for (i = 0; i < 13; i++)
             md.ViewFil[i] = file->NameF[i];
         return F34_11(how);
     }
-    if ((how & 0xFF) == 0 || wcb->WinTyp != 2)
+    if ((how & 0xFF) == 0 || panel->WinTyp != 2)
         return F44_01(how);
     return F34_10(panel);
 }
@@ -1943,22 +1942,22 @@ struct Onward F44_00(void)              /* Shift-F4: Edit... */
     return F44_01(1);
 }
 
-struct Onward F63_00(u16 panel)         /* Alt-F3 */
+struct Onward F63_00(struct WCBdef *panel) /* Alt-F3 */
 {
     return F34_01(panel, 0x100);
 }
 
-struct Onward F64_00(u16 panel)         /* Alt-F4 */
+struct Onward F64_00(struct WCBdef *panel) /* Alt-F4 */
 {
     return F34_01(panel, 0x101);
 }
 
-struct Onward F33_00(u16 panel)         /* F3 */
+struct Onward F33_00(struct WCBdef *panel) /* F3 */
 {
     return F34_01(panel, 0);
 }
 
-struct Onward F34_00(u16 panel)         /* F4 */
+struct Onward F34_00(struct WCBdef *panel) /* F4 */
 {
     return F34_01(panel, 1);
 }

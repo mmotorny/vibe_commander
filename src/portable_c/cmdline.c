@@ -105,9 +105,8 @@ u16 F74_00(void)
    behind the name of a directory; as many as there is room for. What
    was selected is not afterwards, and is marked as having been. Returns
    0 if the panel shows no files or has none to put there. */
-u16 F80_00(u16 panel)
+u16 F80_00(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct FILENT *file;
     struct Selected selected;
     u16 any, at, length, used, column, i, c;
@@ -116,25 +115,25 @@ u16 F80_00(u16 panel)
         return 0;
     selected = TotSel(panel);
     any = selected.files | selected.directories;
-    at = wcb->CurAdr;
+    at = panel->CurAdr;
     if (any == 0) {
-        if (at >= wcb->EndBuf)
+        if (at >= panel->EndBuf)
             return 0;
-        if (ENTRY(wcb, at)->NameF[0] == '.')
+        if (ENTRY(panel, at)->NameF[0] == '.')
             return 0;
     }
-    for (i = DSKBUF; i < wcb->EndBuf; i += sizeof(struct FILENT))
-        ENTRY(wcb, i)->AttrF &= 0x7F;
+    for (i = DSKBUF; i < panel->EndBuf; i += sizeof(struct FILENT))
+        ENTRY(panel, i)->AttrF &= 0x7F;
     if (any == 0)
         goto F80_05;
     at = DSKBUF;
 F80_04:
-    if (at >= wcb->EndBuf)
+    if (at >= panel->EndBuf)
         goto F80_10;
-    if (!(ENTRY(wcb, at)->AttrF & ATTR_SELECTED))
+    if (!(ENTRY(panel, at)->AttrF & ATTR_SELECTED))
         goto F80_12;
 F80_05:                                 /* is there room for it */
-    file = ENTRY(wcb, at);
+    file = ENTRY(panel, at);
     for (length = 0; file->NameF[length] != 0; length++)
         ;
     length++;
@@ -199,14 +198,13 @@ F68_27:
 /* Ctrl+[ and Ctrl+]: put the path of the panel `panel` into the command
    line, with a backslash behind it, or the directory that the cursor of
    the tree is on. `key` is the key, for its scan code. */
-void F82_01(u16 panel, u16 key)
+void F82_01(struct WCBdef *panel, u16 key)
 {
-    struct WCBdef *wcb = PANEL(panel);
-    const u8 *path = wcb->WinPath;
+    const u8 *path = panel->WinPath;
 
-    if (wcb->WinTyp > 1)
+    if (panel->WinTyp > 1)
         return;
-    if (wcb->WinTyp == 1)
+    if (panel->WinTyp == 1)
         path = md.CrnPath;
     F68_25(path, md.DosCol, key & 0xFF00, '\\');
 }
@@ -402,16 +400,15 @@ F68_20:                                 /* the box goes */
 /* Have a key of the speed search act on what has been typed, look for
    the next name that begins with that, among the files of the panel
    `panel` or in the tree, and put the cursor there: F77_10. */
-static void F77_10(u16 key, u16 panel)
+static void F77_10(u16 key, struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     u16 segment, at, first, begin, end, step, found;
 
-    if (wcb->WinTyp == 0) {
-        segment = panel;
-        at = wcb->CurAdr;
-        first = wcb->First;
-        end = wcb->EndBuf;
+    if (panel->WinTyp == 0) {
+        segment = SEG_OF(panel);
+        at = panel->CurAdr;
+        first = panel->First;
+        end = panel->EndBuf;
         begin = DSKBUF;
         step = sizeof(struct FILENT);
     } else {
@@ -432,7 +429,7 @@ static void F77_10(u16 key, u16 panel)
    is typed is shown, while the cursor of the panel goes to the next name
    that begins with it. A key that is no part of that ends it and is
    returned, to be acted on, 0 for Esc, with where the box was. */
-struct SpeedKey F77_00(u16 key, u16 panel)
+struct SpeedKey F77_00(u16 key, struct WCBdef *panel)
 {
     struct LineArgs line;
     struct SpeedKey ended;

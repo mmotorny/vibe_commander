@@ -742,7 +742,7 @@ static struct Searched To(u16 place)
     return searched;
 }
 
-static struct Searched Shows(u16 panel)
+static struct Searched Shows(struct WCBdef *panel)
 {
     struct Searched searched;
 
@@ -783,7 +783,8 @@ struct Searched F67_00(void)
     u16 *screen;
     u16 place = 0x203;
     u16 size = (u16)(u8)(md.Lines - 3) << 8 | 76;
-    u16 color, row, count, answer, first, drive, cell, i, number, panel;
+    u16 color, row, count, answer, first, drive, cell, i, number;
+    struct WCBdef *panel;
     u16 key, mode, room;
     struct Buttons chosen;
     struct Answer fixed;
@@ -1018,10 +1019,10 @@ close:
     /* The panel that gets the directory: the current one, or the other
        if that one shows no files. Its list is emptied, but for the name
        of the file, where the cursor is to be when it is read. */
-    panel = md.WCBcrn;
-    if (PANEL(panel)->WinTyp != 0)
+    panel = CurrentPanel;
+    if (panel->WinTyp != 0)
         panel = InvWCB(panel);
-    wcb = PANEL(panel);
+    wcb = panel;
     to = wcb->WinPath;
     for (i = 0; i < LenPath + 1; i++)
         to[i] = from[i];

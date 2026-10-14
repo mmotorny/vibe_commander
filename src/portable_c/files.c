@@ -4,10 +4,11 @@
  *
  * Translated from VCSUB2.INC and VCSUB3.INC.
  *
- * A panel has a segment to itself, and its list is the file entries from
+ * A panel has a block to itself, and its list is the file entries from
  * DskBuf on. Those up to EndBuf are shown; behind them, up to EndFul, are
  * the files of the directory that the panel's filter leaves out. A place
- * in the list is an address in the segment, as the assembly has it.
+ * in the list is an offset in the block, the address that the assembly
+ * has in the panel's segment.
  *
  * Nothing here but SetMask touches the main data: FnFile and NearFl
  * take what they read as pointers. NearFl names the room there, Room,
@@ -50,9 +51,8 @@ u16 TstExe(const u8 *name)
    of the rest, but for directories, what is no program where it shows
    only programs, and what does not fit its mask. A file that is left out
    is no longer selected. The mask is put into its fixed form at TmpBuf. */
-void SetMask(u16 panel)
+void SetMask(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     u8 *mask = md.TmpBuf;
     u8 *one;
     u8 *other;
@@ -61,39 +61,39 @@ void SetMask(u16 panel)
 
     for (i = 0; i < 11; i++)
         mask[i] = '?';
-    if (wcb->DskMas[0] != 0)
-        Convert(wcb->DskMas, mask);
+    if (panel->DskMas[0] != 0)
+        Convert(panel->DskMas, mask);
     file = DSKBUF;
-    last = wcb->EndFul;
+    last = panel->EndFul;
     if (file < last) {
         last -= SIZE_FILENT;
         for (;;) {
-            attributes = ENTRY(wcb, file)->AttrF;
-            if ((wcb->Hidden != 0
+            attributes = ENTRY(panel, file)->AttrF;
+            if ((panel->Hidden != 0
                  || !(attributes & (ATTR_HIDDEN | ATTR_SYSTEM)))
                 && ((attributes & ATTR_DIRECTORY)
-                    || ((wcb->MasTyp == 0
-                         || TstExe(ENTRY(wcb, file)->NameF))
-                        && TstMas(ENTRY(wcb, file)->NameF, mask)))) {
+                    || ((panel->MasTyp == 0
+                         || TstExe(ENTRY(panel, file)->NameF))
+                        && TstMas(ENTRY(panel, file)->NameF, mask)))) {
                 file += SIZE_FILENT;
                 if (file > last)
                     break;
             } else {
                 if (file == last)
                     break;
-                one = (u8 *)wcb + file;
-                other = (u8 *)wcb + last;
+                one = (u8 *)panel + file;
+                other = (u8 *)panel + last;
                 for (i = 0; i < SIZE_FILENT; i++) {
                     c = one[i];
                     one[i] = other[i];
                     other[i] = c;
                 }
-                ENTRY(wcb, last)->AttrF &= 0x3F;
+                ENTRY(panel, last)->AttrF &= 0x3F;
                 last -= SIZE_FILENT;
             }
         }
     }
-    wcb->EndBuf = file;
+    panel->EndBuf = file;
 }
 
 /* Whether two files of a list are in the wrong order, `first` being the
@@ -159,9 +159,8 @@ static u16 CmpPar(const struct FILENT *first,
    start is laid out and made a name of all the same. And two entries
    change places by way of the room behind the last file of the
    directory, at EndFul. */
-void Sort(u16 panel)
+void Sort(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     u8 *name;
     u8 *other;
     u8 *spare;
@@ -170,7 +169,7 @@ void Sort(u16 panel)
 
     file = DSKBUF;
     do {
-        name = (u8 *)wcb + file;
+        name = (u8 *)panel + file;
         for (length = 0; length < 13 && name[length] != 0; length++)
             ;
         if (length < 12) {
@@ -200,29 +199,29 @@ void Sort(u16 panel)
             }
         }
         file += SIZE_FILENT;
-    } while (file < wcb->EndBuf);
+    } while (file < panel->EndBuf);
 
     /* A sort by exchanging entries a gap apart, the gap halved each time
        round. Behind the last exchange of a pass the list is in order, so
        the next pass ends there. */
-    gap = wcb->EndBuf - DSKBUF;
+    gap = panel->EndBuf - DSKBUF;
     for (;;) {
         gap = gap / SIZE_FILENT >> 1;
         gap = (gap << 4) + (gap << 3);  /* times the size of an entry */
         if (gap == 0)
             break;
-        end = wcb->EndBuf;
+        end = panel->EndBuf;
         do {
             swapped = 0;
             for (file = DSKBUF; (u16)(file + gap) < end;
                  file += SIZE_FILENT) {
-                if (!CmpPar(ENTRY(wcb, file), ENTRY(wcb, file + gap),
-                            wcb->SortTyp))
+                if (!CmpPar(ENTRY(panel, file), ENTRY(panel, file + gap),
+                            panel->SortTyp))
                     continue;
                 swapped = file + gap;
-                name = (u8 *)wcb + file;
-                other = (u8 *)wcb + swapped;
-                spare = (u8 *)wcb + wcb->EndFul;
+                name = (u8 *)panel + file;
+                other = (u8 *)panel + swapped;
+                spare = (u8 *)panel + panel->EndFul;
                 for (i = 0; i < SIZE_FILENT; i++) {
                     c = name[i];
                     spare[i] = c;
@@ -236,7 +235,7 @@ void Sort(u16 panel)
 
     file = DSKBUF;
     do {
-        name = (u8 *)wcb + file;
+        name = (u8 *)panel + file;
         length = 0;
         for (i = 0; i < 8; i++)
             if (name[i] != ' ')
@@ -255,20 +254,19 @@ void Sort(u16 panel)
                 length = i + 1;
         name[length] = 0;
         file += SIZE_FILENT;
-    } while (file < wcb->EndBuf);
+    } while (file < panel->EndBuf);
 }
 
 /* Find a file in the list that a panel shows, by its name. Returns the
    address of its entry, or one that is not below EndBuf if it is not
    there. */
-u16 FnFile(u16 panel, const u8 *name)
+u16 FnFile(struct WCBdef *panel, const u8 *name)
 {
-    struct WCBdef *wcb = PANEL(panel);
     const u8 *entry;
     u16 file, i;
 
-    for (file = DSKBUF; file < wcb->EndBuf; file += SIZE_FILENT) {
-        entry = (u8 *)wcb + file;
+    for (file = DSKBUF; file < panel->EndBuf; file += SIZE_FILENT) {
+        entry = (u8 *)panel + file;
         for (i = 0; entry[i] == name[i]; i++)
             if (entry[i] == 0)
                 return file;
@@ -287,7 +285,7 @@ u16 FnFile(u16 panel, const u8 *name)
    calls this: where the room begins, Room of vc.h. On DOS the
    pointer says so itself, and its offset is where the entry is in the
    list. */
-u16 NearFl(u16 panel, const u8 *name, u16 end)
+u16 NearFl(struct WCBdef *panel, const u8 *name, u16 end)
 {
     u16 start = OFFSET_IN_SEG(SEG_OF(Room), name);
     const u8 *list = name - start;
@@ -299,7 +297,7 @@ u16 NearFl(u16 panel, const u8 *name, u16 end)
         return 0;
     for (;;) {
         found = FnFile(panel, list + at);
-        if (found < PANEL(panel)->EndBuf)
+        if (found < panel->EndBuf)
             return found;
         if (forward) {
             at += SIZE_FILENT;
@@ -317,17 +315,16 @@ u16 NearFl(u16 panel, const u8 *name, u16 end)
 
 /* Count what is selected of the files that a panel shows: the files, and
    the directories. */
-struct Selected TotSel(u16 panel)
+struct Selected TotSel(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct Selected selected;
     u16 files = 0;
     u16 directories = 0;
     u16 file;
     u8 attributes;
 
-    for (file = DSKBUF; file < wcb->EndBuf; file += SIZE_FILENT) {
-        attributes = ENTRY(wcb, file)->AttrF;
+    for (file = DSKBUF; file < panel->EndBuf; file += SIZE_FILENT) {
+        attributes = ENTRY(panel, file)->AttrF;
         if (attributes & ATTR_SELECTED) {
             if (attributes & ATTR_DIRECTORY)
                 directories++;

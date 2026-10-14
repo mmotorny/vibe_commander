@@ -318,7 +318,7 @@ void DosCom(void)
    setup has no path in it, the drive alone, and the command behind it.
    The line is the one that DOS has its cursor in, or the one below the
    panel `panel` if that is further down and the active panel is on. */
-void PutPrm(u16 panel)
+void PutPrm(struct WCBdef *panel)
 {
     u16 below = (BegBX(panel) >> 8) + (SizDX() >> 8) & 0xFF;
     u16 line = md.DosLin;
@@ -328,7 +328,7 @@ void PutPrm(u16 panel)
     u16 *screen;
     u8 c;
 
-    if (line < below && PANEL(md.WCBcrn)->Visible != 0) {
+    if (line < below && CurrentPanel->Visible != 0) {
         line = below;
         md.DosLin = (u8)line;
     }

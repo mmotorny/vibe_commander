@@ -534,8 +534,8 @@ void StSetup(void)
 
     md.LoadRes = md.LoadFl & 0x7F;      /* F21_30 */
     SavMous();                          /* F21_31 */
-    F21_40(md.WCB1seg);
-    F21_40(md.WCB2seg);
+    F21_40(LeftPanel);
+    F21_40(RightPanel);
     Quit();
     ClsLine((u16)md.DosLin << 8, MAIN_SEG);
     Window(0, (u16)md.Lines << 8 | 80);

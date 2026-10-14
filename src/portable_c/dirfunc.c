@@ -70,8 +70,8 @@ const u8 *FndLet(const u8 *text);                       /* string.c */
 const u8 *TxtNum(const u8 *text, u16 *number); /* digits.c */
 void NormStr(u8 *text);                                 /* string.c */
 u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
-void PutFls(u16 panel);                                 /* panel.c */
-void PutTre(u16 panel);                                 /* tree.c */
+void PutFls(struct WCBdef *panel);                      /* panel.c */
+void PutTre(struct WCBdef *panel);                      /* tree.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 struct DateText {                                       /* format.c */
     u16 century;
@@ -921,7 +921,7 @@ failed:
     } else if (NEAR(CutPath(path)) == path) {
         /* F47_06 */
         PathLin(path);
-        wcb = PANEL(md.WCBcrn);
+        wcb = CurrentPanel;
         entry = ENTRY(wcb, wcb->EndBuf);
         wcb->CurAdr = wcb->EndBuf;
         wcb->EndBuf += sizeof(struct FILENT);
@@ -944,9 +944,9 @@ u16 F47_00(void)
 
 /* F7: make a directory, in the current directory of the tree if the
    panel shows that. */
-u16 F37_00(u16 panel)
+u16 F37_00(struct WCBdef *panel)
 {
-    const struct WCBdef *wcb = PANEL(panel);
+    const struct WCBdef *wcb = panel;
 
     if (wcb->WinTyp == 1 && wcb->Visible != 0)
         return F47_01(OFFSET(MkDi2_B));
@@ -958,9 +958,8 @@ u16 F37_00(u16 panel)
    which is then no longer the current one of the tree. It is asked
    about first; FncSel then has F38_40 called for each. For a panel that
    is off or shows neither files nor the tree, this is Shift-F8. */
-u16 F38_00(u16 panel)
+u16 F38_00(struct WCBdef *panel)
 {
-    const struct WCBdef *wcb = PANEL(panel);
     const struct FILENT *file;
     u8 *end;
     struct Selected selected;
@@ -970,9 +969,9 @@ u16 F38_00(u16 panel)
     FNC_CHANGE = 0;
     DEL_TREE = 0;
     md.FncAddr = FNC_F38_40;
-    if (wcb->Visible == 0 || wcb->WinTyp > 1)
+    if (panel->Visible == 0 || panel->WinTyp > 1)
         return F48_00();
-    if (wcb->WinTyp == 1) {
+    if (panel->WinTyp == 1) {
         if (md.CrnPath[3] == 0)         /* the root */
             return TO_FNCEXT;
         for (i = 0; i < LenPath; i++)
@@ -995,16 +994,16 @@ u16 F38_00(u16 panel)
         && md.OneFile == 0) {
         FilDir(md.TmpBuf, selected.directories, selected.files);
         for (i = 0; i < LenPath; i++)
-            md.TmpBuf[100 + i] = wcb->WinPath[i];
+            md.TmpBuf[100 + i] = panel->WinPath[i];
         box = OFFSET(DelSe_B);
         /* None of its lines has ^I: the assembly hands over what it
            has there, the number of files selected. */
         include = selected.files;
     } else {
         /* F38_06 */
-        if (wcb->CurAdr >= wcb->EndBuf)
+        if (panel->CurAdr >= panel->EndBuf)
             return TO_FNCEXT;
-        file = ENTRY(wcb, wcb->CurAdr);
+        file = ENTRY(panel, panel->CurAdr);
         if (file->NameF[0] == '.')
             return TO_FNCEXT;
         box = OFFSET(DelFi_B);
@@ -1079,7 +1078,7 @@ delete:
 }
 
 /* Ctrl-F8: delete the file under the cursor, whatever is selected. */
-u16 F58_00(u16 panel)
+u16 F58_00(struct WCBdef *panel)
 {
     md.OneFile = 1;
     return F38_00(panel);
@@ -1110,9 +1109,8 @@ static u16 M30_82(const u8 *ticks)
    The dialog has its ticks at the start of TmpBuf, those to clear at
    10, the date at 15 and the time at 30, each without the space that it
    begins with where a number has one digit, and the name at 100. */
-u16 M30_00(u16 panel)
+u16 M30_00(struct WCBdef *panel)
 {
-    const struct WCBdef *wcb = PANEL(panel);
     const struct FILENT *file;
     struct DateText date;
     struct TimeText time;
@@ -1125,9 +1123,9 @@ u16 M30_00(u16 panel)
     selected = TotSel(panel);
     if (selected.directories == 0 && selected.files == 0) {
         /* M30_03 */
-        if (wcb->CurAdr >= wcb->EndBuf)
+        if (panel->CurAdr >= panel->EndBuf)
             return TO_FUNC04;
-        file = ENTRY(wcb, wcb->CurAdr);
+        file = ENTRY(panel, panel->CurAdr);
         if (file->NameF[0] == '.')
             return TO_FUNC04;
         attributes = file->AttrF;
@@ -1312,10 +1310,10 @@ u16 FncMas(u16 include)
    FncEx1, of vc.h, has them read again whatever. */
 u16 FncEx1(void)
 {
-    u16 panel = md.WCBcrn;
+    struct WCBdef *panel = CurrentPanel;
 
-    PANEL(panel)->ChgFlg = 1;
-    PANEL(InvWCB(panel))->ChgFlg = 1;
+    panel->ChgFlg = 1;
+    InvWCB(panel)->ChgFlg = 1;
     return 1;
 }
 
@@ -1340,8 +1338,8 @@ u16 FncExt(void)
    status line. */
 u16 FncSel(void)
 {
-    u16 panel = md.WCBcrn;
-    struct WCBdef *wcb = PANEL(panel);
+    struct WCBdef *panel = CurrentPanel;
+    struct WCBdef *wcb = panel;
     struct FILENT *file;
     struct Selected selected;
     u16 address, answer, lines, number, begin, i;
@@ -1368,8 +1366,8 @@ one:
             md.TmpBuf[i] = file->NameF[i];
         answer = FncCall(file->AttrF);
         FNC_CHANGE |= (u8)answer;
-        panel = md.WCBcrn;
-        wcb = PANEL(panel);
+        panel = CurrentPanel;
+        wcb = panel;
         if (md.OneFile != 0)
             break;
         file = ENTRY(wcb, address);

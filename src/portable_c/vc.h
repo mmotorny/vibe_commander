@@ -17,8 +17,9 @@
  *   - The tables that the program names by their offsets, boxes and
  *     dialogs with their texts, are in files of their own: see
  *     tables.h.
- *   - Each file panel has a segment to itself, a number of paragraphs,
- *     in a block of the memory that the program asks the system for.
+ *   - Each file panel has a block of the memory to itself, which the
+ *     program asks the system for, and is a pointer to it; a place in
+ *     its list is kept as an offset from where the block begins.
  *
  * The original has the main data in a block that it asks DOS for and
  * gives back while a command runs; here it is of the program, which
@@ -306,10 +307,13 @@ struct MainDat {
     u8  OneFile;                        /* Do one file and exit */
     u8  ErrDat;
     u16 VerDOS;
-    u16 WCBcrn;
-    u16 WCBsec;
-    u16 WCB1seg;
-    u16 WCB2seg;
+    u16 WCBcrn;                         /* Of the original: the segments
+                                           of the current panel, */
+    u16 WCBsec;                         /* of the other one, */
+    u16 WCB1seg;                        /* of the left one */
+    u16 WCB2seg;                        /* and of the right one. Not set
+                                           or read here: see
+                                           CurrentPanel */
     u16 ViewSeg;                        /* Of the original: the segment
                                            behind the panels. Not set or
                                            read here: see Room */
@@ -365,7 +369,7 @@ struct MainDat {
     u8  TreeBuf[MinTree * sizeof(struct DIRENT) + sizeof(struct DIRTREE)];
 };
 
-/* Window control block: a file panel, in a segment of its own. */
+/* Window control block: a file panel, in a block of its own. */
 struct WCBdef {
     u8  WinTyp;
     u8  BrfFul;
@@ -403,10 +407,34 @@ LAID_OUT(WCBdef, 0x1A62);
 /* The main data, which is the first thing of the segment that DS points
    at: main.c has the object, and says how it comes to be first. Much
    of the program takes it to be at offset 0 there: the tables name a
-   place in it by the offset in the structure, and where a routine is
-   handed the main data's segment in place of a panel's, it reads the
-   main data as if it were one. */
+   place in it by the offset in the structure. */
 extern struct MainDat md;
+
+/* The panels, of main.c: the current one and the other one, the left
+   one and the right one, each a pointer to the panel's block. They are
+   WCBcrn, WCBsec, WCB1seg and WCB2seg of the original, which has the
+   segment of each in the main data; a pointer is longer than such a
+   word, so they are beside the main data. A panel's block is taken
+   once, by Init11 of start.c, and neither moved nor given back: a
+   pointer to a panel holds for as long as the program runs. The places
+   that a panel keeps in itself, CurAdr, First, EndBuf and EndFul, are
+   offsets of 16 bits from where it begins: see ENTRY. */
+extern struct WCBdef *CurrentPanel;
+extern struct WCBdef *OtherPanel;
+extern struct WCBdef *LeftPanel;
+extern struct WCBdef *RightPanel;
+
+/* The main data where a panel is asked for. The original comes to
+   three routines that go by the panel in DS with DS left on the main
+   data, and what they then read of a panel they read of the main data:
+   whether it is the left panel, which it is not, in BegBX of place.c,
+   for PutPrm of bars.c and for the main loop; its third byte for
+   Visible, in M60_02 of commands.c; and its byte 23 for WinPath[3], in
+   ReDr00 of read.c. Both bytes are of ColTab, colours of the first
+   palette. Nothing else of the main data is read so, and nothing is
+   written: whoever hands this to a routine has read what the routine
+   reads of a panel. */
+#define MAIN_AS_PANEL ((struct WCBdef *)&md)
 
 /* The room, of main.c: the memory that whatever is at work has, the
    text of the viewer or the editor, the list of the file search, a
@@ -510,7 +538,7 @@ u16 ErrRdy(u16 letter);
 /* Read what a panel shows, keeping the cursor of a list of files and
    what is selected in it if `keep` is not 0: not 0 if it could not be
    read. See read.c. */
-u16 ReDir(u16 panel, u16 keep);
+u16 ReDir(struct WCBdef *panel, u16 keep);
 /* Get the label of the current drive, a text of at most 11 characters,
    to `volume` in the main data. See read.c. */
 struct Label {                          /* what GetVol returns: */
@@ -702,32 +730,32 @@ void ShrtLin(u8 *text, u16 limit);
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
 u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
             u16 *screen, u16 color);
-void SetMask(u16 panel);                                /* files.c */
-void Sort(u16 panel);
-u16 FnFile(u16 panel, const u8 *name);
-u16 NearFl(u16 panel, const u8 *name, u16 end);
+void SetMask(struct WCBdef *panel);                     /* files.c */
+void Sort(struct WCBdef *panel);
+u16 FnFile(struct WCBdef *panel, const u8 *name);
+u16 NearFl(struct WCBdef *panel, const u8 *name, u16 end);
 struct Selected {                       /* what is selected in a panel: */
     u16 directories;                    /* how many directories, */
     u16 files;                          /* and how many files */
 };
-struct Selected TotSel(u16 panel);
-u16 BegBX(u16 panel);                                   /* place.c */
+struct Selected TotSel(struct WCBdef *panel);
+u16 BegBX(struct WCBdef *panel);                        /* place.c */
 u16 SizDX(void);
 u16 LnsAX(void);
-u16 InvWCB(u16 panel);
-u16 FilePan(u16 panel);
-void AdrNum(u16 panel, struct Place *place);
-void CorPar(u16 panel);
+struct WCBdef *InvWCB(struct WCBdef *panel);
+u16 FilePan(struct WCBdef *panel);
+void AdrNum(struct WCBdef *panel, struct Place *place);
+void CorPar(struct WCBdef *panel);
 struct Shown {                          /* what a panel shows, as addresses: */
     u16 cursor;                         /* the entry that the cursor is on, */
     u16 first;                          /* and the first one shown */
 };
-struct Shown ChgAdr(u16 panel, u16 cursor, u16 first);
-u8 *PtPt10(u16 panel);                                  /* panel.c */
+struct Shown ChgAdr(struct WCBdef *panel, u16 cursor, u16 first);
+u8 *PtPt10(struct WCBdef *panel);                       /* panel.c */
 /* The tree in a panel, tree.c: its colours are four numbers in the code,
    which come as a pointer. */
-void PutTree(u16 panel, u16 place, u16 size, const u8 *colors);
-void PutInf(u16 panel);                                 /* info.c */
+void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors);
+void PutInf(struct WCBdef *panel);                      /* info.c */
 /* Where a box is on the screen, as DialBox says it: what the assembly
    has in BX, DX and SI then. */
 struct Box {
@@ -859,7 +887,7 @@ struct Onward {
                                            panel, and for M06_00 the place
                                            in the menu bar that is lit
                                            meanwhile */
-    u16 panel;                          /* the panel that the routine of
+    struct WCBdef *panel;               /* the panel that the routine of
                                            the menu is for */
 };
 
@@ -906,7 +934,7 @@ enum {
    put it there: see main.c for what is read. */
 struct Regs {
     u16 ax, bx, cx, dx, si, di, bp;
-    u16 ds;                             /* the current panel */
+    struct WCBdef *ds;                  /* the current panel */
 };
 
 /* The keys of the panels, keys.c: `panel` is the current panel. F00_60,
@@ -922,37 +950,37 @@ struct Left {
     u16 dx;                             /* DX: see F00_50 for what each
                                            holds */
 };
-struct Left F00_50(u16 panel, u16 cursor, u16 first);
-struct Onward F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
+struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first);
+struct Onward F00_60(struct WCBdef *panel, u16 cursor, u16 first, u16 buttons,
                      struct Regs *r);
-struct Onward F00_00(u16 panel, struct Regs *r);
-struct Onward F00_05(u16 panel, u16 cursor, u16 first, u16 buttons,
+struct Onward F00_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F00_05(struct WCBdef *panel, u16 cursor, u16 first, u16 buttons,
                      struct Regs *r);
-struct Onward F01_00(u16 panel, struct Regs *r);
-struct Onward F01_05(u16 panel, u16 cursor, u16 first, u16 last,
+struct Onward F01_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F01_05(struct WCBdef *panel, u16 cursor, u16 first, u16 last,
                      u16 buttons, struct Regs *r);
-struct Onward F02_00(u16 panel, struct Regs *r);
-struct Onward F03_00(u16 panel, struct Regs *r);
-struct Onward F04_00(u16 panel, struct Regs *r);
-struct Onward F05_00(u16 panel, struct Regs *r);
-struct Onward F06_00(u16 panel, struct Regs *r);
-struct Onward F07_00(u16 panel, struct Regs *r);
-struct Onward F08_00(u16 panel, struct Regs *r);
-struct Onward F76_00(u16 panel);
-struct Onward F76_01(u16 panel);
-struct Onward F09_00(u16 panel);
-struct Onward F10_00(u16 panel);
-struct Onward F78_00(u16 panel);
-struct Onward F11_00(u16 panel);
-struct Onward F12_00(u16 panel);
+struct Onward F02_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F03_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F04_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F05_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F06_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F07_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F08_00(struct WCBdef *panel, struct Regs *r);
+struct Onward F76_00(struct WCBdef *panel);
+struct Onward F76_01(struct WCBdef *panel);
+struct Onward F09_00(struct WCBdef *panel);
+struct Onward F10_00(struct WCBdef *panel);
+struct Onward F78_00(struct WCBdef *panel);
+struct Onward F11_00(struct WCBdef *panel);
+struct Onward F12_00(struct WCBdef *panel);
 struct Onward F13_00(void);
 struct Onward F14_00(void);
-struct Onward F15_00(u16 panel);
+struct Onward F15_00(struct WCBdef *panel);
 struct Onward F16_00(void);
-struct Onward F17_01(u16 panel);
-struct Onward F79_00(u16 panel);
-struct Onward F18_00(u16 panel);
-struct Onward F20_00(u16 panel);
+struct Onward F17_01(struct WCBdef *panel);
+struct Onward F79_00(struct WCBdef *panel);
+struct Onward F18_00(struct WCBdef *panel);
+struct Onward F20_00(struct WCBdef *panel);
 
 /* Enter, the directory changed and the history, enter.c. F21_10 is Enter
    on the entry under the cursor, F21_25 a command of the command line
@@ -963,21 +991,21 @@ struct Onward F20_00(u16 panel);
    F24_02 has the panels show the directory that DOS is in when they
    are drawn next, `panel` being the current one: it is no command, and
    what calls it goes on at Init50, which draws them. */
-struct Onward F21_00(u16 panel);
-struct Onward F21_10(u16 panel);
+struct Onward F21_00(struct WCBdef *panel);
+struct Onward F21_10(struct WCBdef *panel);
 struct Onward F21_25(void);
 struct Onward F21_31(void);
-void F21_40(u16 panel);
-struct Onward F22_00(u16 panel);
-struct Onward F23_00(u16 panel);
-struct Onward F24_00(u16 panel);
-struct Onward F24_01(u16 panel, u16 path);
-void F24_02(u16 panel);
+void F21_40(struct WCBdef *panel);
+struct Onward F22_00(struct WCBdef *panel);
+struct Onward F23_00(struct WCBdef *panel);
+struct Onward F24_00(struct WCBdef *panel);
+struct Onward F24_01(struct WCBdef *panel, u16 path);
+void F24_02(struct WCBdef *panel);
 struct Onward F25_00(void);
 struct Onward F26_00(void);
-struct Onward F27_00(u16 panel);
-struct Onward F30_00(u16 panel);
-struct Onward F75_00(u16 panel);
+struct Onward F27_00(struct WCBdef *panel);
+struct Onward F30_00(struct WCBdef *panel);
+struct Onward F75_00(struct WCBdef *panel);
 
 /* The viewer and the editor, view.c and edit.c: the commands, and what
    they go on in. V00_02 opens the file ViewFil and says in `open` what it
@@ -1006,11 +1034,11 @@ struct EditEnd {
 };
 struct Onward F43_00(void);
 struct Onward F44_00(void);
-struct Onward F63_00(u16 panel);
-struct Onward F64_00(u16 panel);
-struct Onward F33_00(u16 panel);
-struct Onward F34_00(u16 panel);
-struct Onward F34_10(u16 panel);
+struct Onward F63_00(struct WCBdef *panel);
+struct Onward F64_00(struct WCBdef *panel);
+struct Onward F33_00(struct WCBdef *panel);
+struct Onward F34_00(struct WCBdef *panel);
+struct Onward F34_10(struct WCBdef *panel);
 u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open);
 void V00_10(u16 handle);
 void V13_00(void);
@@ -1041,44 +1069,44 @@ struct Sought V82_00(u16 segment, u16 at, u16 count);
    original has in CX, from the menu bar the menu in the low byte and the
    item in the high one. M01_01, M03_00, M06_00 and M06_10 are where the
    keys of the panels and the box of the drives go on. */
-u16 M01_00(u16 panel, u16 item);
-u16 M01_01(u16 panel, u16 item);
-u16 M03_00(u16 panel, u16 item);
-u16 M06_00(u16 panel, u16 item);
-u16 M06_10(u16 panel, u16 item);
-u16 M08_00(u16 panel, u16 item);
-u16 M16_00(u16 panel);
-u16 M16_01(u16 panel);
-u16 M16_10(u16 panel);
+u16 M01_00(struct WCBdef *panel, u16 item);
+u16 M01_01(struct WCBdef *panel, u16 item);
+u16 M03_00(struct WCBdef *panel, u16 item);
+u16 M06_00(struct WCBdef *panel, u16 item);
+u16 M06_10(struct WCBdef *panel, u16 item);
+u16 M08_00(struct WCBdef *panel, u16 item);
+u16 M16_00(struct WCBdef *panel);
+u16 M16_01(struct WCBdef *panel);
+u16 M16_10(struct WCBdef *panel);
 u16 M21_00(void);
 u16 M41_00(void);
-u16 M42_00(u16 panel);
-u16 M49_00(u16 panel);
+u16 M42_00(struct WCBdef *panel);
+u16 M49_00(struct WCBdef *panel);
 u16 M60_00(void);
 u16 M61_00(void);
 u16 M53_00(u16 item);
 u16 M62_00(u16 item);
 u16 M63_00(u16 item);
 u16 M64_00(u16 item);
-u16 M66_00(u16 panel);
-u16 M67_00(u16 panel);
-u16 M69_00(u16 panel);
-u16 M70_00(u16 panel);
-u16 M71_00(u16 panel);
-u16 M72_00(u16 panel);
-u16 M75_00(u16 panel);
+u16 M66_00(struct WCBdef *panel);
+u16 M67_00(struct WCBdef *panel);
+u16 M69_00(struct WCBdef *panel);
+u16 M70_00(struct WCBdef *panel);
+u16 M71_00(struct WCBdef *panel);
+u16 M72_00(struct WCBdef *panel);
+u16 M75_00(struct WCBdef *panel);
 
 /* Directories made, files deleted, attributes and the label, dirfunc.c;
    and where a command ends that goes through files: FncSel for those
    that are selected, FncMas for those of a mask, with the title of its
    boxes, and FncExt, which like FncSel returns 1 if the panels are to be
    read again. */
-u16 F37_00(u16 panel);
+u16 F37_00(struct WCBdef *panel);
 u16 F47_00(void);
-u16 F38_00(u16 panel);
+u16 F38_00(struct WCBdef *panel);
 u16 F48_00(void);
-u16 F58_00(u16 panel);
-u16 M30_00(u16 panel);
+u16 F58_00(struct WCBdef *panel);
+u16 M30_00(struct WCBdef *panel);
 u16 F54_00(void);
 u16 FncMas(u16 include);
 u16 FncSel(void);
@@ -1107,8 +1135,10 @@ struct Copied {                         /* what they return: */
                                            boxes, as the offset of the
                                            text */
 };
-struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files);
-struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files);
+struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
+                     u16 files);
+struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
+                     u16 files);
 
 /* The file search, find.c; the command line, cmdline.c: a key for it,
    Esc, the selected files and the path of a panel put into it, the
@@ -1118,7 +1148,7 @@ struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files);
 struct Searched {                       /* what the file search returns: */
     u16 place;                          /* where the program goes on: a
                                            TO_ */
-    u16 panel;                          /* with TO_F24_02 the panel that is
+    struct WCBdef *panel;               /* with TO_F24_02 the panel that is
                                            to show the directory which DOS
                                            is in now */
 };
@@ -1143,13 +1173,13 @@ struct Picked {                         /* what the menu bar returns: */
 struct Searched F67_00(void);
 void F73_00(u16 key);
 u16 F74_00(void);
-u16 F80_00(u16 panel);
-void F82_01(u16 panel, u16 key);
+u16 F80_00(struct WCBdef *panel);
+void F82_01(struct WCBdef *panel, u16 key);
 u16 F68_00(void);
-struct SpeedKey F77_00(u16 key, u16 panel);
+struct SpeedKey F77_00(u16 key, struct WCBdef *panel);
 u16 F32_00(u16 main);
-u16 F62_01(u16 panel, u16 item);
-struct Picked F39_00(u16 again, u16 panel);
+u16 F62_01(struct WCBdef *panel, u16 item);
+struct Picked F39_00(u16 again, struct WCBdef *panel);
 
 /* Make the program ready for what the command line holds to be run: the
    interrupts given back, the screen as DOS left it. Returns the place
@@ -1226,7 +1256,7 @@ void PutKey(u16 bar);
 void PutKey0(u16 bar, u16 shift);
 void PutMnu(u16 item);
 void PtMnu1(u16 item);
-void PutPrm(u16 panel);
+void PutPrm(struct WCBdef *panel);
 void DosCom(void);
 /* The entries of an extension file or a menu file: FndItem returns where
    the next one is, and whether that is the end of the file; FindExt
@@ -1426,11 +1456,6 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #define OFFSET_IN_SEG(segment, pointer) \
     ((u16)((const u8 *)(pointer) - AT(segment, 0)))
 
-/* The panel in the segment `panel`. It takes for granted what AT does,
-   and that a number is read at any address, even or not, which the 386
-   does: a panel begins wherever its paragraph is. */
-#define PANEL(panel) ((struct WCBdef *)AT(panel, 0))
-
 /* The segment of the tables, by one of them: the paragraph that the
    address 32K below that one is in, so that what stands in front of it
    has an offset too. AsmSeg of misc.c answers with it, by Title_S, and
@@ -1476,16 +1501,16 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #define MD_PLACE(pointer) ((u16)((const u8 *)(pointer) - (const u8 *)&md))
 #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
 
-/* Where in a panel's segment its list of files begins, DskBuf, and where
+/* Where in a panel's block its list of files begins, DskBuf, and where
    in the main data the list of the tree's directories, TreeBuf.TreList.
    The assembly keeps places in both as addresses, not as numbers. */
 #define DSKBUF  (sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT))
 #define TRELIST MD_PLACE(&((struct DIRTREE *)md.TreeBuf)->TreSum2)
 
-/* The file entry at an address in a panel's segment. The address is
+/* The file entry at an address in a panel's block. The address is
    cut to 16 bits, so one that has wrapped round means what it means on
    DOS, where the offset of a pointer wraps round with it: `wcb` is
-   where the panel's segment begins, PANEL of it, at every use. */
+   the panel, where its block begins, at every use. */
 #define ENTRY(wcb, address) \
     ((struct FILENT *)((u8 *)(wcb) + (u16)(address)))
 

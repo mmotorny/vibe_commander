@@ -353,7 +353,7 @@ static u16 C00_01(void)
     count = LenName;
     end = C00_End(CpDest, &count);
     to = (u8 *)end;
-    other = PANEL(md.WCBsec);
+    other = OtherPanel;
     count = end - CpDest;
     for (i = 0; other->WinPath[i] == CpDest[i]; )
         if (++i == count)
@@ -444,13 +444,13 @@ static struct Answer DelTree(const u8 *path)
    if neither name has a path. */
 static void C10_13(void)
 {
-    struct WCBdef *wcb = PANEL(md.WCBcrn);
+    struct WCBdef *wcb = CurrentPanel;
     u8 *entry;
     u16 file, i;
 
     if (NEAR(CutPath(CpSrc)) != CpSrc || NEAR(CutPath(CpDest)) != CpDest)
         return;
-    file = FnFile(md.WCBcrn, CpSrc);
+    file = FnFile(CurrentPanel, CpSrc);
     if (file >= wcb->EndBuf)
         return;
     entry = (u8 *)wcb + file;
@@ -1295,17 +1295,16 @@ static void F35_70(void)
    `directories` and `files` are the numbers of what is selected, where
    the command has counted, and what BX and DX happened to hold where it
    has not: after Shift-F6, or F6 with the panel switched off. */
-static u8 *F35_50(u16 panel, u16 directories, u16 files)
+static u8 *F35_50(struct WCBdef *panel, u16 directories, u16 files)
 {
     const struct WCBdef *wcb;
     const u8 *from;
     u8 *to;
-    u16 other, title, words, length, i;
+    u16 title, words, length, i;
 
     from = md.ToFile;                                   /* F35_55 */
     if (md.OneFile == 0 || CopyMov == 0) {
-        other = InvWCB(panel);
-        wcb = PANEL(other);
+        wcb = InvWCB(panel);
         if (wcb->Visible != 0 && wcb->WinTyp <= 1) {
             from = md.CrnPath;
             if (wcb->WinTyp == 0)
@@ -1315,7 +1314,7 @@ static u8 *F35_50(u16 panel, u16 directories, u16 files)
         if (CopyMov == 0 || (directories | files) != 0)
             goto F35_57;
     }
-    wcb = PANEL(panel);                                 /* F35_54 */
+    wcb = panel;                                        /* F35_54 */
     if (wcb->CurAdr < wcb->EndBuf
         && ENTRY(wcb, wcb->CurAdr)->NameF[0] != '.')
         from = ENTRY(wcb, wcb->CurAdr)->NameF;
@@ -1347,7 +1346,8 @@ F35_57:
 /* Copy or rename, as the 1 in the low byte of `command` says, files that
    are asked for by name: Shift-F5 and Shift-F6, and F5 and F6 where the
    panel shows no files. Returns where to go on. */
-struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files)
+struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
+                     u16 files)
 {
     u8 *to;
     u16 i;
@@ -1415,9 +1415,9 @@ F36_05:
    and to rename that only a name is asked for. `directories` and `files`
    are what BX and DX hold when the key arrives: see F35_50. Returns
    where to go on. */
-struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files)
+struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
+                     u16 files)
 {
-    const struct WCBdef *wcb = PANEL(panel);
     const u8 *from;
     const u8 *name, *typed;
     u8 *to, *end;
@@ -1427,9 +1427,9 @@ struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files)
     command &= 0xFF;
     CopyMov = (u8)command;
     md.HlpPage = (u8)(20 + command);
-    if (wcb->Visible == 0 || wcb->WinTyp > 1)
+    if (panel->Visible == 0 || panel->WinTyp > 1)
         return F45_01(panel, command, directories, files);
-    if (wcb->WinTyp == 1) {
+    if (panel->WinTyp == 1) {
         if (md.TreAdr <= TRELIST)                       /* the root */
             return Go(GO_KEYS);
         if (command != 0)
@@ -1443,14 +1443,14 @@ struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files)
             files = selected.files;
         }
         if ((directories | files) == 0
-            && (wcb->CurAdr >= wcb->EndBuf
-                || ENTRY(wcb, wcb->CurAdr)->NameF[0] == '.'))
+            && (panel->CurAdr >= panel->EndBuf
+                || ENTRY(panel, panel->CurAdr)->NameF[0] == '.'))
             return Go(GO_KEYS);
     }
 
     /* F35_04: what is to be copied, and the dialog. */
     to = F35_50(panel, directories, files);
-    if (wcb->WinTyp == 1) {
+    if (panel->WinTyp == 1) {
         for (i = 0; i < LenName; i++)
             md.TmpErr[i] = md.CrnPath[i];
         ShrtLin(md.TmpErr, LenStr - 10);
@@ -1461,7 +1461,7 @@ struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files)
     if ((directories | files) != 0) {
         to = FilDir(to, directories, files) - 1;
     } else {
-        from = ENTRY(wcb, wcb->CurAdr)->NameF;
+        from = ENTRY(panel, panel->CurAdr)->NameF;
         length = 13;
 F35_06:
         *to++ = '"';
@@ -1480,7 +1480,7 @@ F35_06:
         md.ToFile[i] = CpInpt[i];
     if (md.ToFile[0] == 0)
         return Go(GO_PANELS);
-    if (PANEL(md.WCBcrn)->WinTyp == 1) {
+    if (CurrentPanel->WinTyp == 1) {
         F36_04();
         return Go(GO_DONE);
     }

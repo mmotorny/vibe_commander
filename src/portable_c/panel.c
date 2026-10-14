@@ -16,10 +16,10 @@
  */
 #include "vc.h"
 
-void Panel(u16 panel);
-void PutPath(u16 panel);
-void PutFls(u16 panel);
-void SetCur(u16 panel, u16 set);
+void Panel(struct WCBdef *panel);
+void PutPath(struct WCBdef *panel);
+void PutFls(struct WCBdef *panel);
+void SetCur(struct WCBdef *panel, u16 set);
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);
 
 /* PtPt10 is in vc.h. */
@@ -88,9 +88,8 @@ static const u8 FilDi_S[24] = {
    tree, or a panel of yet another kind, with the line over its last row.
 
    Nothing here has a line to include, and the assembly names none. */
-void Panel(u16 panel)
+void Panel(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct LineArgs line;
     u16 place = BegBX(panel);
     u16 *screen = BasAdr(place);
@@ -98,9 +97,9 @@ void Panel(u16 panel)
     u16 full, count, i;
 
     screen = BoxDubl(screen, color, (SizDX() >> 8) - 2, 0, 38) - 3 * 80;
-    if (wcb->WinTyp == 1 || wcb->WinTyp == 3) {
+    if (panel->WinTyp == 1 || panel->WinTyp == 3) {
         BoxLine(screen, color | LINE, LEFT_RIGHT, 0, 38);
-    } else if (wcb->WinTyp == 2) {
+    } else if (panel->WinTyp == 2) {
         /* The name, and below it what the program is based on, each in
            the middle of its row; the line under them, which the
            original has a row further up, under its one line of a title;
@@ -120,9 +119,9 @@ void Panel(u16 panel)
                          LEFT_RIGHT, 0, 38);
         BoxLine(screen + 6 * 80, color | LINE, LEFT_RIGHT, 0, 38);
     }
-    if (wcb->WinTyp != 0)
+    if (panel->WinTyp != 0)
         return;
-    full = wcb->BrfFul != 0 ? 1 : 0;
+    full = panel->BrfFul != 0 ? 1 : 0;
     screen = BasAdr(place);
     line.value = color | 33;
     line.screen = screen + 85;
@@ -160,20 +159,19 @@ void Panel(u16 panel)
    TmpErr+1: between two spaces its path, with its mask if it has one, the
    whole then written as a path is, and with Progs behind it if it shows
    only programs. Returns the address of the zero byte that ends it. */
-u8 *PtPt10(u16 panel)
+u8 *PtPt10(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     u8 *end = md.TmpErr + 1;
 
     *end++ = ' ';
-    end = MvzLine(end, wcb->WinPath, LenPath);
-    if (wcb->DskMas[0] != 0) {
-        end = MvzLine(AddFile(end), wcb->DskMas, 13);
+    end = MvzLine(end, panel->WinPath, LenPath);
+    if (panel->DskMas[0] != 0) {
+        end = MvzLine(AddFile(end), panel->DskMas, 13);
         LetLin(md.TmpErr + 1);
     }
     /* 25 bytes for a text of 7: the rest stays behind the end of this
        text, as far as 106 bytes into TmpErr if the path is long. */
-    if (wcb->MasTyp != 0)
+    if (panel->MasTyp != 0)
         end = MvzLine(end, Progs_S, sizeof Progs_S);
     end[0] = ' ';
     end[1] = 0;
@@ -190,9 +188,9 @@ u8 *PtPt10(u16 panel)
    the clock leaves, 31 or 32, and one that is longer than 28 or 30 with
    its spaces is moved to the left by half of what it has more, as it was
    before it was shortened and of no more than the 32 or 33. */
-void PutPath(u16 panel)
+void PutPath(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
+    struct WCBdef *wcb = panel;
     struct LineArgs line;
     u16 place = BegBX(panel);
     u16 limit, least, length;
@@ -207,7 +205,7 @@ void PutPath(u16 panel)
     } else {
         length = (u8)(PtPt10(panel) - (md.TmpErr + 1));
         limit = 38;
-        if (place >> 8 == 0 && md.Clock != 0 && panel == md.WCB2seg) {
+        if (place >> 8 == 0 && md.Clock != 0 && panel == RightPanel) {
             limit = 0x20;
             least = 0x1C;
             if (md.Country.TimeFmt != 0) {
@@ -224,7 +222,7 @@ void PutPath(u16 panel)
         line.line = Var_S;
     }
     line.value = place;
-    if (panel == md.WCBcrn)
+    if (panel == CurrentPanel)
         line.colors = PutPt_P + 1;
     else
         line.colors = PutPt_P;
@@ -243,9 +241,9 @@ void PutPath(u16 panel)
    how many bytes they have. A directory counts only when the sizes of
    directories have been worked out. What is too long for the line has
    its bytes in thousands, with a K. */
-void PutFls(u16 panel)
+void PutFls(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
+    struct WCBdef *wcb = panel;
     struct LineArgs line;
     const struct FILENT *file;
     const u8 *name;
@@ -268,7 +266,7 @@ void PutFls(u16 panel)
             break;
         file = ENTRY(wcb, address);
         color = Back_C;
-        if (address == wcb->CurAdr && panel == md.WCBcrn)
+        if (address == wcb->CurAdr && panel == CurrentPanel)
             color = Cursr_C;
         if (file->AttrF & ATTR_SELECTED)
             color += Slct_C;
@@ -395,9 +393,8 @@ void PutFls(u16 panel)
    So is, in the tree, the cell before the name, which is a space under
    the cursor and without it a piece of the line that leads to the name;
    that piece is not given the colour of the rest. */
-void SetCur(u16 panel, u16 set)
+void SetCur(struct WCBdef *panel, u16 set)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct Place at;
     u16 *screen;
     u8 *mark;
@@ -408,14 +405,14 @@ void SetCur(u16 panel, u16 set)
     color = set != 0 ? Cursr_C : Back_C;
     AdrNum(panel, &at);
     below = at.cursor - at.first;
-    if (wcb->WinTyp > 1)
+    if (panel->WinTyp > 1)
         return;
-    if (wcb->WinTyp == 0) {
-        if (wcb->CurAdr >= wcb->EndBuf)
+    if (panel->WinTyp == 0) {
+        if (panel->CurAdr >= panel->EndBuf)
             return;
         place = BegBX(panel) + 0x201;
         width = 38;
-        if (wcb->BrfFul == 0) {
+        if (panel->BrfFul == 0) {
             /* The column, 13 cells wide, and the row in it: bytes, of a
                division by the low byte of the number of lines. */
             lines = at.lines & 0xFF;
@@ -425,7 +422,7 @@ void SetCur(u16 panel, u16 set)
         }
         place += (below & 0xFF) << 8;
         screen = BasAdr(place);
-        attributes = ENTRY(wcb, wcb->CurAdr)->AttrF;
+        attributes = ENTRY(panel, panel->CurAdr)->AttrF;
         mark = (u8 *)(screen + 8);
         *mark = ' ';
         if (attributes & (ATTR_HIDDEN | ATTR_SYSTEM))

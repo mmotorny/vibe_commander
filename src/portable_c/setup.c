@@ -40,14 +40,13 @@ u8 IniSave[INI_LEN];
 /* What the file holds of a panel, to `to`. The mask of the panel and its
    path are filled with zeros behind their ends first, in the panel
    itself. Returns where the next bytes go. */
-static u8 *MkIni1(u8 *to, u16 panel)
+static u8 *MkIni1(u8 *to, struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
-    const u8 *from = (const u8 *)wcb;
+    const u8 *from = (const u8 *)panel;
     u16 i;
 
-    FilZero(wcb->DskMas, 13);
-    FilZero(wcb->WinPath, LenPath);
+    FilZero(panel->DskMas, 13);
+    FilZero(panel->WinPath, LenPath);
     for (i = 0; i < WCBini; i++)
         *to++ = from[i];
     return to;
@@ -64,8 +63,8 @@ u16 MakeIni(void)
     *to++ = 'V';
     *to++ = 'V';
     *to++ = 'V';
-    to = MkIni1(to, md.WCB1seg);
-    to = MkIni1(to, md.WCB2seg);
+    to = MkIni1(to, LeftPanel);
+    to = MkIni1(to, RightPanel);
     for (i = 0; i < CmnIni; i++)
         *to++ = from[i];
     length = to - md.MenuBuf;

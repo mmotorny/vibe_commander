@@ -128,6 +128,10 @@ WORDS = [
     _word("NUMBER_OF", None, "a word of a table that holds a number"),
     _word("ENTRY", None, "an offset in a panel, added to the panel"),
     _word("DSKBUF", None, "where a panel's list begins in it"),
+    _word("MAIN_AS_PANEL", None, "the main data where a panel is asked "
+                                 "for, as the original has DS left on it: "
+                                 "it rests on the two layouts, not on the "
+                                 "megabyte"),
     _word("MD_AT", None, "in a table: an offset in the main data"),
     _word("WCB_AT", None, "in a table: an offset in a panel"),
     _word("NUMBER", None, "in a table: a number where a name could be"),

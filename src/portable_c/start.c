@@ -425,11 +425,11 @@ struct Answer Init11(void)
         answer.failed = block.failed != 0;
         if (answer.failed)
             return answer;
-        if (panel == 0)
-            md.WCB1seg = block.value;
+        wcb = (struct WCBdef *)AT(block.value, 0);
+        if (panel == 0)                 /* Init13 */
+            LeftPanel = wcb;
         else
-            md.WCB2seg = block.value;
-        wcb = PANEL(block.value);       /* Init13 */
+            RightPanel = wcb;
         for (i = 0; i < WCBini; i++)
             ((u8 *)wcb)[i] = *from++;
         wcb->CurAdr = DSKBUF;
@@ -631,13 +631,13 @@ void IniData(void)
     if (system.version == 4 && system.other >> 8 == 0xFF)       /* Init36 */
         system.version = 0x0104;
     md.VerDOS = system.version;         /* Init37 */
-    PANEL(md.WCB1seg)->ChgFlg = 1;      /* WCBseg */
-    PANEL(md.WCB2seg)->ChgFlg = 1;
-    md.WCBcrn = md.WCB1seg;
-    md.WCBsec = md.WCB2seg;
+    LeftPanel->ChgFlg = 1;              /* WCBseg */
+    RightPanel->ChgFlg = 1;
+    CurrentPanel = LeftPanel;
+    OtherPanel = RightPanel;
     if (md.Active != 0) {
-        md.WCBcrn = md.WCB2seg;
-        md.WCBsec = md.WCB1seg;
+        CurrentPanel = RightPanel;
+        OtherPanel = LeftPanel;
     }
 
     /* Set DOS color. The carriage returns and the line feed are typed

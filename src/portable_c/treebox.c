@@ -412,10 +412,10 @@ u16 ChTree(u16 column)
     SavWin(begin, size, MD_PLACE(md.WinBuf));
     color = Color(ChTr_P[0]) << 8 | column & 0xFF;
     MinBox(begin, size, color);
-    if (PANEL(md.WCB1seg)->WinTyp == 1)
-        PANEL(md.WCB1seg)->ChgFlg = 1;
-    if (PANEL(md.WCB2seg)->WinTyp == 1)
-        PANEL(md.WCB2seg)->ChgFlg = 1;
+    if (LeftPanel->WinTyp == 1)
+        LeftPanel->ChgFlg = 1;
+    if (RightPanel->WinTyp == 1)
+        RightPanel->ChgFlg = 1;
     for (i = 0; i < LenPath; i++)
         md.MenuBuf[KEPT + i] = md.CrnPath[i];
 
@@ -487,7 +487,7 @@ ChTr12:                                 /* the cursor within the lines */
             screen[i] = cell;
         screen += 80;
     } while (--count);
-    PutTree(md.WCBcrn, begin + 0x104, size - 0x40A, ChTr_P);
+    PutTree(CurrentPanel, begin + 0x104, size - 0x40A, ChTr_P);
     if (moved != 0) {
         /* On the screen: all of them, or the screen moved by a line and
            the one that is new. */

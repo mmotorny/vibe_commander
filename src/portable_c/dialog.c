@@ -836,7 +836,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     if (!(head->bFlags & BOX_THERE)) {
         begin = head->BoxBase;
         /* Of a panel: in the half of the screen that the panel has. */
-        if (key == 1 && segment != md.WCB1seg) {
+        if (key == 1 && segment != SEG_OF(LeftPanel)) {
             key = 5;
             begin = ADD_LOW(begin, 40);
         }

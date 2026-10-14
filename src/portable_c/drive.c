@@ -57,9 +57,8 @@ static const u8 Driv_S[7] = " drive:";
 /* Ask for the drive of the panel `panel`, with the item `item` of the
    menu bar marked, 1 for the left panel and 5 for the right one, and put
    the panel on the drive that is chosen. Returns 0 if none was. */
-u16 F62_01(u16 panel, u16 item)
+u16 F62_01(struct WCBdef *panel, u16 item)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct Answer asked;
     struct Mouse pointer;
     u16 *next;
@@ -153,7 +152,7 @@ F62_06:
     } while (i != count);
     cursor = 0;
     for (i = 0; i < count; i++)
-        if (DRIVES[i] == wcb->WinPath[0]) {
+        if (DRIVES[i] == panel->WinPath[0]) {
             cursor = i;
             break;
         }
@@ -298,10 +297,10 @@ F62_41:                                 /* the drive, and where it is */
     unit = (u8)(letter - ('A' - 1));
     DriveSetLetter(unit);
     md.BlocEr = 1;
-    asked = DirCurrent(unit, wcb->WinPath + 3);
+    asked = DirCurrent(unit, panel->WinPath + 3);
     if (!asked.failed) {
-        wcb->WinPath[0] = (u8)letter;
-        asked = DirChange(wcb->WinPath);
+        panel->WinPath[0] = (u8)letter;
+        asked = DirChange(panel->WinPath);
     }
     md.BlocEr = 0;
     if (asked.failed) {
@@ -310,14 +309,14 @@ F62_41:                                 /* the drive, and where it is */
     }
     /* The drive is DOS's too, unless the other panel is the current one
        and shows files. */
-    if (panel != md.WCBcrn && FilePan(InvWCB(panel)))
+    if (panel != CurrentPanel && FilePan(InvWCB(panel)))
         goto F62_45;
     DriveSelect(unit - 1);
 F62_45:
-    wcb->WinTyp = 0;
-    wcb->ChgFlg = 1;
+    panel->WinTyp = 0;
+    panel->ChgFlg = 1;
     md.BlocEr = 1;
-    wcb->CurAdr = DSKBUF;
-    wcb->EndBuf = DSKBUF;
+    panel->CurAdr = DSKBUF;
+    panel->EndBuf = DSKBUF;
     return 1;
 }

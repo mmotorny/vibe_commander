@@ -20,7 +20,7 @@
  */
 #include "vc.h"
 
-void PutTre(u16 panel);
+void PutTre(struct WCBdef *panel);
 void TreeCur(void);
 void TrCr10(void);
 void TrCr20(u16 lines);
@@ -120,7 +120,7 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
    tree either. That choice is made by who wants a panel written, PtFs00
    of keys.c and its like, so that the Info is not written from inside
    another function. */
-void PutTre(u16 panel)
+void PutTre(struct WCBdef *panel)
 {
     CorPar(panel);
     PutTree(panel, BegBX(panel), SizDX(), PutTr_P);
@@ -148,14 +148,14 @@ void PutTre(u16 panel)
 
    The entry behind the last one is looked at too, for whether it begins
    a level: that is whatever follows the list in TreeBuf. */
-void PutTree(u16 panel, u16 place, u16 size, const u8 *colors)
+void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
 {
     struct DIRENT *entry;
     u16 *screen, *cell;
     u8 *goes_on, *text;
     u16 lines, color, width, i, n;
 
-    OWNER = panel;
+    OWNER = SEG_OF(panel);
     STATUS = place + (size & 0xFF00) - 0x200 + 1;
     md.TreCrnt = 0;
     entry = (struct DIRENT *)MD_POINTER(TRELIST);
@@ -243,7 +243,7 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 *colors)
             color = Color(colors[color]) << 8;
         } else {
             n = BRACKETS;
-            if (OWNER == md.WCBcrn) {
+            if (OWNER == SEG_OF(CurrentPanel)) {
                 n = ' ' << 8 | ' ';
                 color++;
             }

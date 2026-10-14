@@ -223,10 +223,10 @@ FiLs02:
     if (FileDelete(LIST_NAME).failed)
         goto FiLs18;
 FiLs03:
-    wcb = PANEL(md.WCBcrn);
-    if (!FilePan(md.WCBcrn))
+    wcb = CurrentPanel;
+    if (!FilePan(CurrentPanel))
         goto FiLs18;
-    selected = TotSel(md.WCBcrn);
+    selected = TotSel(CurrentPanel);
     any = selected.files | selected.directories;
     if (any == 0) {
         if (wcb->CurAdr >= wcb->EndBuf)
@@ -425,10 +425,10 @@ Run_18:                                 /* the name of the file */
                 goto Run_30;
         }
     } else {
-        wcb = PANEL(md.WCBcrn);
+        wcb = CurrentPanel;
         /* The assembly leaves DS on the panel when the commands have no
            room for the name: see ClsLine below. */
-        segment = md.WCBcrn;
+        segment = SEG_OF(CurrentPanel);
         if (wcb->Visible == 0)
             goto Run_23;
         if (wcb->WinTyp != 0)

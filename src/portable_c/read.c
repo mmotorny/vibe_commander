@@ -39,14 +39,14 @@ struct OldList {
     u16 first;                          /* and the first entry shown */
 };
 
-static void ReDr00(u16 panel, u16 keep, struct OldList *old);
-static void ReDr45(u16 panel);
-static void ReDr50(u16 panel, struct OldList *old);
-static void RdInfo(u16 panel);
+static void ReDr00(struct WCBdef *panel, u16 keep, struct OldList *old);
+static void ReDr45(struct WCBdef *panel);
+static void ReDr50(struct WCBdef *panel, struct OldList *old);
+static void RdInfo(struct WCBdef *panel);
 u16 ReadTre(void);                                      /* treebox.c */
-void DirSize(u16 panel);
+void DirSize(struct WCBdef *panel);
 u16 DiSi10(u16 attributes);
-void TstInfo(u16 panel);
+void TstInfo(struct WCBdef *panel);
 
 /* ReDir and GetVol are in vc.h. */
 
@@ -95,9 +95,8 @@ static const u8 DrIn_F[] = "DIRINFO";
    lies where the fourth character of the path lies in a panel, which is
    the 24th colour of the first palette: the assembly has DS on the main
    data there. */
-static void ReDr00(u16 panel, u16 keep, struct OldList *old)
+static void ReDr00(struct WCBdef *panel, u16 keep, struct OldList *old)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct FILENT *entry;
     u8 *to;
     const u8 *from;
@@ -122,9 +121,9 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
         size = 0xFFF;
     size <<= 4;
     size = size / SIZE_FILENT * SIZE_FILENT;
-    count = wcb->EndBuf - DSKBUF;
-    oldCursor = wcb->CurAdr;
-    oldFirst = wcb->First;
+    count = panel->EndBuf - DSKBUF;
+    oldCursor = panel->CurAdr;
+    oldFirst = panel->First;
     if (count > size) {
         count = size;
         size += DSKBUF - SIZE_FILENT;
@@ -134,7 +133,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
                 oldFirst = size;
         }
     }
-    from = (const u8 *)wcb + DSKBUF;
+    from = (const u8 *)panel + DSKBUF;
     to = Room;
     for (i = 0; i < count; i++)
         to[i] = from[i];
@@ -147,13 +146,13 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
     retries = 0;
     for (;;) {
         /* ReDr20 */
-        to = MvzLine(md.TmpBuf, wcb->WinPath, LenPath);
+        to = MvzLine(md.TmpBuf, panel->WinPath, LenPath);
         to = AddFile(to);
         MvzLine(to, Mask_S + 1, LenPath);
         number = 0;
         file = DSKBUF;
-        if (wcb->WinPath[3] != 0) {
-            entry = ENTRY(wcb, file);
+        if (panel->WinPath[3] != 0) {
+            entry = ENTRY(panel, file);
             entry->NameF[0] = '.';
             entry->NameF[1] = '.';
             for (i = 2; i < SIZE_FILENT; i++)
@@ -163,7 +162,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
             file += SIZE_FILENT;
             number = 1;
         }
-        drive = (u8)(wcb->WinPath[0] - ('A' - 1));
+        drive = (u8)(panel->WinPath[0] - ('A' - 1));
         if (Fantom(drive))
             goto unread;
         SetDTA();
@@ -180,21 +179,21 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
         if (retries > 2)
             goto unread;
         if (retries == 2) {
-            wcb->WinPath[0] = md.DosPth[0];
-            wcb->WinPath[3] = 0;
+            panel->WinPath[0] = md.DosPth[0];
+            panel->WinPath[3] = 0;
         }
         for (;;) {
             /* ReDr24 */
-            drive = (u8)(wcb->WinPath[0] - ('A' - 1));
+            drive = (u8)(panel->WinPath[0] - ('A' - 1));
             if (Fantom(drive))
                 goto unread;
-            asked = DirCurrent(drive, wcb->WinPath + 3);
+            asked = DirCurrent(drive, panel->WinPath + 3);
             if (!asked.failed)
                 break;
             if (asked.value != ERR_NO_DRIVE)
                 goto unread;
-            wcb->WinPath[0] = md.DosPth[0];
-            wcb->WinPath[3] = 0;
+            panel->WinPath[0] = md.DosPth[0];
+            panel->WinPath[3] = 0;
         }
     }
     for (;;) {
@@ -204,15 +203,15 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
         if (md.DTA.FilName[0] == '.' && (attributes & ATTR_DIRECTORY)) {
             /* What the assembly reads as WinPath[3], with DS on the main
                data. */
-            if (md.ColTab[OFFSET_IN_SEG(panel, wcb->WinPath + 3)] != 0) {
+            if (MAIN_AS_PANEL->WinPath[3] != 0) {
                 md.DTA.FilAttr &= 0xF9;
                 md.DTA.FilAttr &= 0x3F;
-                to = &ENTRY(wcb, DSKBUF)->AttrF;
+                to = &ENTRY(panel, DSKBUF)->AttrF;
                 for (i = 0; i < 9; i++)
                     to[i] = (&md.DTA.FilAttr)[i];
             }
         } else {
-            entry = ENTRY(wcb, file);
+            entry = ENTRY(panel, file);
             entry->NumbF = number;
             number++;
             for (i = 0; i < 13; i++) {
@@ -239,29 +238,29 @@ static void ReDr00(u16 panel, u16 keep, struct OldList *old)
         }
     }
 read:
-    wcb->ChgFlg = 0;
+    panel->ChgFlg = 0;
     goto ended;
 unread:
     keep = 0;
 ended:
     /* ReDr35 */
-    wcb->EndFul = file;
-    wcb->EndBuf = file;
-    wcb->CurAdr = DSKBUF;
-    wcb->First = DSKBUF;
+    panel->EndFul = file;
+    panel->EndBuf = file;
+    panel->CurAdr = DSKBUF;
+    panel->First = DSKBUF;
     md.BlocEr = 0;
 
     /* The extension file of the directory, or else the main one. */
-    if (wcb->ChgFlg == 0) {
+    if (panel->ChgFlg == 0) {
         to = (u8 *)CutPath(md.TmpBuf);
         MvzLine(to, Ext_F, LenPath);
         opened = OpenFil(md.TmpBuf, 0x40);
         answer = opened.value;
         if (opened.failed == 0) {
-            got = FileRead(opened.value, wcb->ExtBuf, LenExt - 1);
+            got = FileRead(opened.value, panel->ExtBuf, LenExt - 1);
             closed = FileClose(opened.value);
             if (!closed.failed && !got.failed) {
-                wcb->ExtBuf[got.value] = 0x1A;
+                panel->ExtBuf[got.value] = 0x1A;
                 goto done;
             }
             /* A drive that was not ready has the panel read again: for
@@ -283,10 +282,10 @@ ended:
                 answer = closed.value;
         }
         if ((answer & 0xFF) == ERR_NOT_READY)
-            wcb->ChgFlg = 1;
+            panel->ChgFlg = 1;
     }
     for (i = 0; i < LenExt; i++)
-        wcb->ExtBuf[i] = md.ExtMain[i];
+        panel->ExtBuf[i] = md.ExtMain[i];
 done:
     old->keep = keep;
 }
@@ -294,10 +293,10 @@ done:
 /* When the directory has been read: work out the sizes of the
    directories, if that is switched on and the directory was read, and
    filter and sort the list. */
-static void ReDr45(u16 panel)
+static void ReDr45(struct WCBdef *panel)
 {
-    PANEL(panel)->SizDir = 0;
-    if (PANEL(panel)->ChgFlg == 0 && md.AutoSiz != 0)
+    panel->SizDir = 0;
+    if (panel->ChgFlg == 0 && md.AutoSiz != 0)
         DirSize(panel);
     SetMask(panel);
     Sort(panel);
@@ -310,9 +309,8 @@ static void ReDr45(u16 panel)
    on, or on the nearest that are left, and what was selected stays
    selected. Without, only what Ctrl-M would select again is taken over,
    and by name alone: a file of that name in another directory gets it. */
-static void ReDr50(u16 panel, struct OldList *old)
+static void ReDr50(struct WCBdef *panel, struct OldList *old)
 {
-    struct WCBdef *wcb = PANEL(panel);
     const u8 *from;
     u16 i;
     u16 attributes, found;
@@ -328,16 +326,16 @@ static void ReDr50(u16 panel, struct OldList *old)
                 continue;
         }
         found = FnFile(panel, from + i);
-        if (found < wcb->EndBuf)
-            ENTRY(wcb, found)->AttrF |= attributes;
+        if (found < panel->EndBuf)
+            ENTRY(panel, found)->AttrF |= attributes;
     }
     if (old->keep != 0) {
         found = NearFl(panel, from + old->cursor, old->end);
         if (found != 0)
-            wcb->CurAdr = found;
+            panel->CurAdr = found;
         found = NearFl(panel, from + old->first, old->end);
         if (found != 0)
-            wcb->First = found;
+            panel->First = found;
     }
 
     /* Compress, in the original: it moves the panel behind this one
@@ -362,15 +360,14 @@ static void ReDr50(u16 panel, struct OldList *old)
    set, and what is in AX then counts as the error of a drive that is not
    ready if it is 53h: what DOS left in AH, and the eleventh character of
    the label. */
-static void RdInfo(u16 panel)
+static void RdInfo(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct Space space;
     u16 drive, handle;
     struct Label label;
     struct Answer opened, read;
 
-    if (wcb->WinTyp != 2)
+    if (panel->WinTyp != 2)
         return;
     md.ClstSiz = 1;
     md.Total = 0;
@@ -402,7 +399,7 @@ static void RdInfo(u16 panel)
     label = GetVol(md.Volume);
     if (label.local != 0 && label.answer == ERR_NOT_READY)
         return;
-    wcb->ChgFlg = 0;
+    panel->ChgFlg = 0;
 }
 
 /* Read what a panel shows: the files of its directory, the tree of the
@@ -410,22 +407,21 @@ static void RdInfo(u16 panel)
    cursor of a list of files and what is selected in it stay where they
    are. Returns 0 if it has been read, and else something that is not 0:
    the original answers in the carry flag, which it makes of ChgFlg. */
-u16 ReDir(u16 panel, u16 keep)
+u16 ReDir(struct WCBdef *panel, u16 keep)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct OldList old;
 
-    wcb->ChgFlg = 1;
-    if (wcb->WinTyp == 0) {
+    panel->ChgFlg = 1;
+    if (panel->WinTyp == 0) {
         ReDr00(panel, keep, &old);
         ReDr45(panel);
         ReDr50(panel, &old);
-    } else if (wcb->WinTyp == 1) {      /* ReDr01: the tree */
+    } else if (panel->WinTyp == 1) {      /* ReDr01: the tree */
         if (!ReadTre())
-            wcb->ChgFlg = 0;
+            panel->ChgFlg = 0;
     } else                              /* ReDr02: the Info */
         RdInfo(panel);
-    return wcb->ChgFlg;                 /* ReDr70 */
+    return panel->ChgFlg;                 /* ReDr70 */
 }
 
 /* What GetVol returns: what DOS answered, and whether the drive is a
@@ -503,19 +499,18 @@ struct Label GetVol(u8 *volume)
 
    The files are gone through by DirFunc, which takes the path at TmpBuf
    and for every file calls what FncAddr names, here DiSi10. */
-void DirSize(u16 panel)
+void DirSize(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct FILENT *entry;
     u8 *to;
     u16 file, i;
 
     md.FncAddr = FNC_DISI10;
-    to = MvzLine(md.TmpBuf, wcb->WinPath, LenPath);
+    to = MvzLine(md.TmpBuf, panel->WinPath, LenPath);
     if (to[-1] != '\\')
         *(u16 *)to = '\\';
-    for (file = DSKBUF; file < wcb->EndFul; file += SIZE_FILENT) {
-        entry = ENTRY(wcb, file);
+    for (file = DSKBUF; file < panel->EndFul; file += SIZE_FILENT) {
+        entry = ENTRY(panel, file);
         if (!(entry->AttrF & ATTR_DIRECTORY) || entry->NameF[0] == '.')
             continue;
         *(u16 *)(md.TmpBuf + 90) = 0;
@@ -527,7 +522,7 @@ void DirSize(u16 panel)
             return;
         entry->SizeF = *(u32 *)(md.TmpBuf + 90);
     }
-    wcb->SizDir = 1;
+    panel->SizDir = 1;
 }
 
 /* What DirSize has done with every file that DirFunc finds, whose
@@ -552,10 +547,10 @@ u16 DiSi10(u16 attributes)
 
 /* Have the other panel read again if it is of a kind that shows what
    this one has: the tree next to files, or the Info next to either. */
-void TstInfo(u16 panel)
+void TstInfo(struct WCBdef *panel)
 {
-    u16 other = InvWCB(panel);
+    struct WCBdef *other = InvWCB(panel);
 
-    if (PANEL(panel)->WinTyp < PANEL(other)->WinTyp)
-        PANEL(other)->ChgFlg = 1;
+    if (panel->WinTyp < other->WinTyp)
+        other->ChgFlg = 1;
 }

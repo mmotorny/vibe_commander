@@ -57,16 +57,17 @@ static const u8 PtIn_P[] = {Back_C, Title_C};
 
    One byte is "1 byte" only where the files take a single byte, which a
    disk with clusters of more than a byte does not have. */
-void PutInf(u16 panel)
+void PutInf(struct WCBdef *panel)
 {
     struct LineArgs line;
     const struct FILENT *file;
     u8 *text, *cell;
     u16 *screen;
     u32 size, total;
-    u16 place, other, count, cluster, high, lines, room, i;
+    u16 place, count, cluster, high, lines, room, i;
+    struct WCBdef *other;
 
-    if (PANEL(panel)->WinTyp != 2)
+    if (panel->WinTyp != 2)
         return;
     place = BegBX(panel) + 0x514;
     line.colors = PtIn_P;
@@ -105,8 +106,9 @@ void PutInf(u16 panel)
         total = 0;
         count = 0;
         cluster = md.ClstSiz;
-        for (file = ENTRY(PANEL(other), DSKBUF);
-             OFFSET_IN_SEG(other, file) < PANEL(other)->EndBuf; file++) {
+        for (file = ENTRY(other, DSKBUF);
+             (u16)((const u8 *)file - (const u8 *)other) < other->EndBuf;
+             file++) {
             if (file->AttrF & ATTR_DIRECTORY)
                 continue;
             count++;

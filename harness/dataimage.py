@@ -198,10 +198,16 @@ TEXT = "behind the panels"
 # The piece that takes a word out of the main data names its variable
 # here, next to the field.
 ADDRESSES = (
-    Address("WCB1seg", "WCB1seg", SEGMENT, cut=PANEL),
-    Address("WCB2seg", "WCB2seg", SEGMENT, cut=PANEL),
-    Address("WCBcrn", "WCBcrn", SEGMENT),
-    Address("WCBsec", "WCBsec", SEGMENT),
+    # The panels: pointers beside the main data since a panel is one,
+    # LeftPanel, RightPanel, CurrentPanel and OtherPanel of main.c. They
+    # keep the names of the original's words here, by which a thing in
+    # a block is named.
+    Address("WCB1seg", "WCB1seg", SEGMENT, ("main", "_LeftPanel"),
+            cut=PANEL),
+    Address("WCB2seg", "WCB2seg", SEGMENT, ("main", "_RightPanel"),
+            cut=PANEL),
+    Address("WCBcrn", "WCBcrn", SEGMENT, ("main", "_CurrentPanel")),
+    Address("WCBsec", "WCBsec", SEGMENT, ("main", "_OtherPanel")),
     # Where the room begins and where it ends: beside the main data
     # since the program has three blocks where it had one to cut. The
     # word MemSeg, the block that all of it was in, names nothing since
@@ -210,6 +216,11 @@ ADDRESSES = (
     Address("ViewSeg", "ViewSeg", SEGMENT, ("main", "_Room"), cut=TEXT),
     Address("FreMem2", "FreMem2", PARAGRAPHS, ("main", "_RoomEnd")),
 )
+
+# The variables that have such a word, as Build.variables names them:
+# each is held by what it names, as the field was, and not as bytes.
+POINTERS = {"{}.{}".format(one.variable[0], one.variable[1].lstrip("_"))
+            for one in ADDRESSES if one.variable}
 
 # What two builds may have otherwise with no fault in either, each with
 # its reason. See "What differs by design" at the top; TODO.md, "F0,
@@ -234,11 +245,38 @@ UNSTEADY = (
                        "it: a colon in the second half of a second and "
                        "a space in the first. " + TIME),
     ("ScrBuf", 154, 1, "the same, of a clock of 24 hours"),
+    # Found by F2. The record of a search comes up from DOS's memory, 43
+    # bytes of it, and behind a name that is shorter than twelve
+    # characters is what that memory held before. What was seen: the
+    # byte is 95h in one build and 91h in the next, in every scenario
+    # that has it, and the files of the two builds have those two bytes
+    # at one offset and nowhere else, 6E24h, in the table that says
+    # where the relocations of each page begin. What is inferred from
+    # that, and was not looked at in DOS's memory: that it is a byte of
+    # the program's own file, left there by the extender's loading of
+    # it, so that a build with other relocations has another. The
+    # program copies a name as 13 bytes in places, so the same two
+    # bytes may differ in TmpBuf and TmpErr too, which are not listed:
+    # they are known by being this pair.
+    ("DTA", 41, 1, "a byte behind a name that DOS found, of what DOS's "
+                   "memory held before: by what was seen, and inferred "
+                   "from it, a byte of the program's file, left by the "
+                   "extender's loading of it, which follows the build's "
+                   "relocations"),
 )
 # Of the variables, by name.
 UNSTEADY_VARIABLES = {
     "dos32.OwnFirst": "the paragraph of the megabyte that the program's "
                       "own memory begins in: by where the linker has it",
+    # Found by F2, whose four pointers are 16 bytes in front of the
+    # memory that the program hands out.
+    "dos32.OwnBlocks": "the paragraphs of the megabyte that the blocks "
+                       "begin in: by where the linker has the memory. "
+                       "How many blocks there are, how long each is "
+                       "and which are taken is held as `the blocks`",
+    "dos32.Below": "the stack pointer at the last call of DOS or of "
+                   "the extender: by the frames of the build's "
+                   "functions, as the stack is, which is left out",
 }
 # Of a panel's list: the field of an entry.
 UNSTEADY_ENTRY = {
@@ -697,6 +735,8 @@ class Read:
                                self.data[begins:begins + size], "a block",
                                self._namer(one))
         for name, (begins, size) in build.variables.items():
+            if name in POINTERS:        # held by what it names
+                continue
             found[name] = Part(name, build.address + begins,
                                self.data[begins:begins + size],
                                "a variable")
@@ -1162,9 +1202,17 @@ def check(directory, out=print):
     # with its panels once and has as a block of its own since.
     room = next(one for one in read.blocks
                 if one[0] <= text < sum(one[:2]))
+    # A variable that two builds are held to have alike, and a word
+    # that holds an address, where this build has it: beside the main
+    # data, or in its field.
     variable, (at, _) = next(iter(sorted(
         (name, where) for name, where in build.variables.items()
-        if where[1] and not name.startswith("("))))
+        if where[1] and not name.startswith("(")
+        and name not in UNSTEADY_VARIABLES and name not in POINTERS)))
+    word = next(one for one in ADDRESSES if one.name == "WCBsec")
+    held = build._symbol(*word.variable) if word.variable else None
+    if held is None:
+        held = build.main + build.fields[word.field]
     # Where a byte is changed, and what has to be said of it.
     trials = [
         (build.main + build.fields["TmpBuf"] + 3, "the main data, TmpBuf+3"),
@@ -1175,7 +1223,7 @@ def check(directory, out=print):
         (text + 1000, f"{TEXT}, +1000"),
         (sum(room[:2]) - 1, f"{TEXT}, +"),
         (at, variable),
-        (build.main + build.fields["WCBsec"], "WCBsec: names "),
+        (held, "WCBsec: names "),
     ]
     failed = False
     with tempfile.TemporaryDirectory(dir=Path(directory).parent) as copy:

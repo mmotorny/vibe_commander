@@ -385,9 +385,9 @@ static void F39_52(u16 *top, u16 size, u16 lines)
    files; and its items that cannot be chosen as things are. `panel` is
    the panel that was the current one when the bar came up; the Left and
    the Right menu are of their own panels. */
-static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
+static void F39_58(u16 menu, struct WCBdef *panel, u16 *top, u16 size)
 {
-    const struct WCBdef *wcb = PANEL(panel);
+    const struct WCBdef *wcb = panel;
     const struct WCBdef *other;
     u16 *mark;
     u16 order;
@@ -432,18 +432,18 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
             F40_30(3, menu, top, size);
             F40_30(9, menu, top, size);
         } else {
-            other = PANEL(InvWCB(panel));
+            other = InvWCB(panel);
             if (other->Visible == 0 || other->WinTyp != 0)
                 F40_30(9, menu, top, size);
         }
     } else {                            /* Left / Right */
-        panel = md.WCB1seg;
+        panel = LeftPanel;
         if (menu != 1) {
-            panel = md.WCB2seg;
+            panel = RightPanel;
             ++*(u8 *)(top + 422);       /* Ctrl-F2 */
             ++*(u8 *)(top + 1221);      /* and Alt-F2 */
         }
-        wcb = PANEL(panel);
+        wcb = panel;
         mark = top + 401;               /* On/Off */
         if (wcb->Visible != 0) {
             mark -= 320;                /* Brief */
@@ -467,7 +467,7 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
             *(u8 *)(top + order * 80 + 561) = TICK;
         } else
             F40_30(14, menu, top, size);
-        other = PANEL(InvWCB(panel));
+        other = InvWCB(panel);
         if (other->Visible != 0 && other->WinTyp == 1)
             F40_30(4, menu, top, size);
     }
@@ -487,7 +487,7 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
 
    On the bar alone the item is 0. FFh is a menu that is open with no
    item under the cursor, which only the mouse brings about. */
-struct Picked F39_00(u16 again, u16 panel)
+struct Picked F39_00(u16 again, struct WCBdef *panel)
 {
     const u8 *names = AT(AsmSeg(), OFFSET(PtMnu_S));
     struct MenuMouse mouse;
@@ -502,7 +502,7 @@ struct Picked F39_00(u16 again, u16 panel)
         item = md.LastMnu >> 8;
     } else {
         item = 0;
-        menu = PANEL(panel)->Visible != 0 && md.Active != 0 ? 5 : 1;
+        menu = panel->Visible != 0 && md.Active != 0 ? 5 : 1;
     }
     HidCur();                           /* F39_01 */
     SavWin(0, 0x150, MD_PLACE(md.ErrBuf));

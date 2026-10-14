@@ -38,7 +38,7 @@
 
 /* The registers that go round the loop are struct Regs of vc.h. */
 static u16 CmdEnd(struct Onward next, struct Regs *r);
-static u16 Command(u16 command, u16 panel, struct Regs *r);
+static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r);
 u16 ErrRdy(u16 letter);
 static void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
@@ -100,10 +100,10 @@ enum {
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
-void Panel(u16 panel);                                  /* panel.c */
-void PutPath(u16 panel);
-void PutFls(u16 panel);
-void PutTre(u16 panel);                                 /* tree.c */
+void Panel(struct WCBdef *panel);                       /* panel.c */
+void PutPath(struct WCBdef *panel);
+void PutFls(struct WCBdef *panel);
+void PutTre(struct WCBdef *panel);                      /* tree.c */
 u16 StrLen(const u8 *text);                             /* string.c */
 const u8 *FndLet(const u8 *text);
 
@@ -141,6 +141,12 @@ struct MainDat md;
 u8 *Room;
 u8 *RoomEnd;
 
+/* The panels: see vc.h. Beside the main data for the same reason. */
+struct WCBdef *CurrentPanel;
+struct WCBdef *OtherPanel;
+struct WCBdef *LeftPanel;
+struct WCBdef *RightPanel;
+
 #define ALT_KEYS 38                     /* the length of AltSr_T */
 
 #define KEY_MOUSE 0xFC                  /* the scan code that Input has
@@ -158,13 +164,11 @@ u8 *RoomEnd;
 /* What a panel shows, written to the screen buffer: PutFls of the
    original, which goes on in what writes the tree or the Info for a
    panel of that kind. */
-static void PtFs00(u16 panel)
+static void PtFs00(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
-
-    if (wcb->WinTyp == 0)
+    if (panel->WinTyp == 0)
         PutFls(panel);
-    else if (wcb->WinTyp == 1)
+    else if (panel->WinTyp == 1)
         PutTre(panel);
     else
         PutInf(panel);
@@ -202,8 +206,8 @@ static u16 Init40(void)
     /* Init41 */
     md.MenuBuf[0] = (u8)row;
     line = row;
-    if (PANEL(md.WCBcrn)->Visible != 0) {
-        bottom = (u8)((SizDX() >> 8) + (BegBX(MAIN_SEG) >> 8));
+    if (CurrentPanel->Visible != 0) {
+        bottom = (u8)((SizDX() >> 8) + (BegBX(MAIN_AS_PANEL) >> 8));
         if (line < bottom)
             line = bottom;
     }
@@ -241,24 +245,23 @@ static u16 Init40(void)
 
 /* Give a panel that could not be read something to show: no files, a
    tree of the root alone, or an Info without figures. */
-static void Init90(u16 panel)
+static void Init90(struct WCBdef *panel)
 {
-    struct WCBdef *wcb = PANEL(panel);
     struct DIRENT *root;
     u16 i;
 
-    if (wcb->WinTyp == 0) {
-        wcb->EndBuf = DSKBUF;
-        wcb->EndFul = DSKBUF;
-        wcb->CurAdr = DSKBUF;
-        wcb->First = DSKBUF;
-    } else if (wcb->WinTyp == 2) {
+    if (panel->WinTyp == 0) {
+        panel->EndBuf = DSKBUF;
+        panel->EndFul = DSKBUF;
+        panel->CurAdr = DSKBUF;
+        panel->First = DSKBUF;
+    } else if (panel->WinTyp == 2) {
         md.Total = 0;
         md.FreeDsk = 0;
         md.ClstSiz = 1;
         md.Volume[0] = 0;
         md.InfoLen = 0xFFFF;
-    } else if (wcb->WinTyp < 2) {       /* Init92 */
+    } else if (panel->WinTyp < 2) {       /* Init92 */
         root = (struct DIRENT *)MD_POINTER(TRELIST);
         for (i = 0; i < sizeof(struct DIRENT); i++)
             ((u8 *)root)[i] = 0;
@@ -293,13 +296,14 @@ static void Init90(u16 panel)
 static void Init50(void)
 {
     struct WCBdef *wcb;
-    u16 panel, size, drive, keep, failed, letter, length, same, i;
+    struct WCBdef *panel;
+    u16 size, drive, keep, failed, letter, length, same, i;
 
     HidCur();
-    panel = md.WCBcrn;
-    if (PANEL(md.WCBsec)->WinTyp < PANEL(panel)->WinTyp)
-        panel = md.WCBsec;
-    wcb = PANEL(panel);
+    panel = CurrentPanel;
+    if (OtherPanel->WinTyp < panel->WinTyp)
+        panel = OtherPanel;
+    wcb = panel;
     size = (u16)md.Lines << 8 | 80;     /* Init51 */
     drive = 0;
     if (wcb->ChgFlg == 0)
@@ -369,7 +373,7 @@ Init53:
 
 Init70:
     panel = InvWCB(panel);
-    wcb = PANEL(panel);
+    wcb = panel;
     keep = 1;
     if (wcb->Visible == 0)
         return;
@@ -508,19 +512,19 @@ static struct Asked Func21(struct Regs *r)
     if ((r->cx >> 8) >= (r->dx >> 8))
         return Nothing(FUNC07);
     if ((r->cx & 0xFF) < 40) {          /* Change panel */
-        r->ds = md.WCB1seg;
+        r->ds = LeftPanel;
         if (md.Active == 0)
             goto Func30;
     } else {                            /* Func27 */
-        r->ds = md.WCB2seg;
+        r->ds = RightPanel;
         if (md.Active != 0)
             goto Func30;
     }
-    r->ds = md.WCBcrn;                  /* Func28 */
+    r->ds = CurrentPanel;               /* Func28 */
     return Asks(CMD_F20_00);
 
 Func30:
-    wcb = PANEL(r->ds);
+    wcb = r->ds;
     if ((r->ax & 3) == 0 || wcb->Visible == 0)
         return Nothing(FUNC07);
     if (wcb->WinTyp < 2)
@@ -735,7 +739,7 @@ static u16 Loop(u16 entry, struct Regs *r)
             /* fall through */
         case INIT50:
             Init50();
-            r->ds = md.WCBcrn;          /* Init80 */
+            r->ds = CurrentPanel;       /* Init80 */
             goto Func02;
         case FUNC01:
             Panel(r->ds);
@@ -798,8 +802,8 @@ static u16 Loop(u16 entry, struct Regs *r)
             /* fall through */
         case FUNC07:
             Cursor1();
-            r->ds = md.WCBcrn;
-            wcb = PANEL(r->ds);
+            r->ds = CurrentPanel;
+            wcb = r->ds;
             /* When the cursor of a tree has moved, the directory under
                it becomes the current one after a while: AutoTim is when,
                or has 0FFFFh in its low word for never. */
@@ -964,7 +968,7 @@ static u16 MnuEnd(u16 answer, struct Regs *r)
 static u16 CmdEnd(struct Onward next, struct Regs *r)
 {
     u16 item = next.item;
-    u16 panel = next.panel;
+    struct WCBdef *panel = next.panel;
 
     switch (next.place) {
     case NEXT_FUNC07:
@@ -977,7 +981,7 @@ static u16 CmdEnd(struct Onward next, struct Regs *r)
         return FUNC04;
     case NEXT_FUNC01:                   /* CmdF01: Tab has made another
                                            panel the current one */
-        r->ds = md.WCBcrn;
+        r->ds = CurrentPanel;
         return FUNC01;
     case NEXT_INPUT:
         F73_00(r->ax);
@@ -992,8 +996,8 @@ static u16 CmdEnd(struct Onward next, struct Regs *r)
         return INIT50;
     case NEXT_M01_01:                   /* CmdM01: in the order and the
                                            form that the panel has */
-        return MnuEnd(M01_01(panel, (u16)PANEL(panel)->BrfFul << 8
-                                    | PANEL(panel)->SortTyp), r);
+        return MnuEnd(M01_01(panel, (u16)panel->BrfFul << 8
+                                    | panel->SortTyp), r);
     case NEXT_M03_00:                   /* CmdM03 */
         return MnuEnd(M03_00(panel, item << 8), r);
     case NEXT_M06_00:                   /* CmdM06 */
@@ -1054,7 +1058,7 @@ static u16 F35_90(struct Copied copied)
 /* The box of the drives for a panel, and the panel switched on if a
    drive was chosen: F62_01 of the original, where Alt-F1 and Alt-F2 go
    on. `item` is the menu to mark meanwhile. */
-static u16 F62_02(u16 panel, u16 item, struct Regs *r)
+static u16 F62_02(struct WCBdef *panel, u16 item, struct Regs *r)
 {
     if (F62_01(panel, item) == 0)
         return FUNC04;                  /* F62_46 */
@@ -1071,11 +1075,16 @@ static u16 F62_02(u16 panel, u16 item, struct Regs *r)
    The command gets the registers as the original has them at that jump:
    in AX the item and the table, in BX twice the place of the item in its
    table, in CX the item and the menu, in DX 1 and what the bar left in
-   DL, in SI the table, in DI the panel of the Left menu, or of the Right
-   one if that is the menu. Rename goes by BX and DX, the editors of the
+   DL, in SI the table. Rename goes by BX and DX, the editors of the
    menu file and the extension files by CX, and a key that an item hands
    on to the command line is what AX holds. A command of the Left or the
-   Right menu is for the panel of that menu. */
+   Right menu is for the panel of that menu.
+
+   The original has in DI the segment of the Left menu's panel, or of the
+   Right one's if that is the menu, and `r->di` is not set to it: a panel
+   is a pointer, and nothing reads DI as a menu leaves it. The three
+   commands that take DI are the mouse's, which Loop asks for with DI set
+   to the first entry shown, and no table of a menu has one of them. */
 static u16 F39_01(u16 again, struct Regs *r)
 {
     struct Picked picked = F39_00(again, r->ds);
@@ -1083,7 +1092,7 @@ static u16 F39_01(u16 again, struct Regs *r)
     u16 item = picked.item;
     u16 table = picked.table;
     u16 code = AsmSeg();
-    u16 panel = r->ds;
+    struct WCBdef *panel = r->ds;
 
     r->cx = item << 8 | menu;
     if (table == 0)
@@ -1091,9 +1100,8 @@ static u16 F39_01(u16 again, struct Regs *r)
     r->ax = item << 8 | table;
     r->bx = (item - 1) & 0xFF00 | (item - 1) << 1 & 0xFF;
     r->dx = 0x100 | picked.held;
-    r->di = menu == 5 ? md.WCB2seg : md.WCB1seg;
     if (table == 1)
-        panel = r->di;
+        panel = menu == 5 ? RightPanel : LeftPanel;
     r->si = NAMED(*(const u16 * const *)
                   AT(code, OFFSET(Menu_T) + (table - 1) * sizeof *Menu_T));
     return Command(*(const u16 *)AT(code, r->si + r->bx), panel, r);
@@ -1107,7 +1115,7 @@ static u16 F39_01(u16 again, struct Regs *r)
    `panel` is the panel that the command is for, which the original has
    in DS when it jumps to the command: the current panel, `r->ds`, but for
    a command of the Left or the Right menu. */
-static u16 Command(u16 command, u16 panel, struct Regs *r)
+static u16 Command(u16 command, struct WCBdef *panel, struct Regs *r)
 {
     struct SpeedKey ended;
     struct Searched searched;
@@ -1140,10 +1148,10 @@ static u16 Command(u16 command, u16 panel, struct Regs *r)
         return FUNC12;
     case CMD_F80_00: return F80_00(panel) ? FUNC01 : FUNC05;
     case CMD_F81_00:
-        F82_01(md.WCB1seg, r->ax);
+        F82_01(LeftPanel, r->ax);
         return FUNC04;
     case CMD_F82_00:
-        F82_01(md.WCB2seg, r->ax);
+        F82_01(RightPanel, r->ax);
         return FUNC04;
     case CMD_F68_00:                     /* the history: a command to run? */
         if (F68_00() == 0)
@@ -1233,8 +1241,8 @@ static u16 Command(u16 command, u16 panel, struct Regs *r)
 
     /* The box of the drives, drive.c: by the keys, and from the menu of
        a panel. */
-    case CMD_F61_00: return F62_02(md.WCB1seg, 1, r);
-    case CMD_F62_00: return F62_02(md.WCB2seg, 5, r);
+    case CMD_F61_00: return F62_02(LeftPanel, 1, r);
+    case CMD_F62_00: return F62_02(RightPanel, 5, r);
     case CMD_F62_01: return F62_02(panel, r->cx & 0xFF, r);
 
     /* The file search, find.c: Go to has the current directory be
@@ -1295,7 +1303,8 @@ static u16 MainLoop(void)
 
     /* What the start of the program leaves in the registers: nothing of
        it is read. Loop sets each before it is. */
-    r->ax = r->bx = r->cx = r->dx = r->si = r->di = r->bp = r->ds = 0;
+    r->ax = r->bx = r->cx = r->dx = r->si = r->di = r->bp = 0;
+    r->ds = 0;
     for (;;) {
         command = Loop(entry, r);
         entry = Command(command, r->ds, r);
