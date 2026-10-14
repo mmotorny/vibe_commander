@@ -9210,7 +9210,7 @@ thought and long in lines.
 | F0, the net and the record. **Done**: "F0, the net and the record" below | The data's image at the end of a scenario, of the main data and of the program's blocks by name, and the tool that holds two builds' images against each other. The record of the words, with its test | `harness/`, `CMakeLists.txt` for the test | Nothing | The image of a build against itself is equal; against a build with one byte of the main data written wrongly by hand, it is not. Every golden derived again leaves `harness/goldens/` clean | What differs between two runs of one build, if anything, and how a piece names what it means to change |
 | X, the extender's memory tried. **Done**: "X, the extender's memory on the bench" below | A toy on the bench, of `harness/trial32/memory.c`: what DPMI 0500h says is free of the 16 MB; the largest block taken, given back and taken again, and where it then is; a block made shorter and longer, 0503h, whether it moves and keeps what it held; a second copy of the toy while the first holds the largest block, and while it has given it back; what a command's `mem` prints either way; and by `harness/trial32/calls.asm`, that DOS is asked nothing by any of it | `harness/trial32/` | Nothing; beside F0 and F1 | It has run, and the table of what it found is in this plan | What F9 goes by: whether the room is all that the extender has or leaves some, and whether rows m and n of "What a user would see otherwise" stand |
 | F1, three blocks where there was one. The proof. **Done**: "F1, three blocks where there was one" below | Inside the 640 KB: a block of 1000h paragraphs for each panel and one for the room. `Init11`, `GiveMem`, `TakeMem` and `Aexec0` as "The memory from the extender" has them; `ReDr00` moves no panel; the room is one function, which answers in paragraphs of 16 bits as the seven places did and needs no cap, since inside the 640 KB it cannot pass A000h; 16 bytes of a pattern in front of each block and behind the last, written when a block is taken, which the image's tool holds at the end of every scenario ("What could go wrong", 15); `ViewSeg`, `MemSeg`, `FreMem2` leave the main data. Elsewhere `SEG_OF(pointer)`. Entry 13 gets the room's new figure | `start.c`, `main.c` for the structure, `vc.h`; the hand-out of the 640 KB in the system's file and the image's tool, for the 16 bytes; the top of `ReDr00` in `read.c`, `Aexec0` in `view.c`; the 63 places that name the three words | The switch's third stage, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images: the main data equal but for the three words, each panel equal as far as its list goes, the room equal where it was written | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
-| F2, a panel is a pointer. A sweep | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
+| F2, a panel is a pointer. A sweep. **Done**: "F2, a panel is a pointer" below | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
 | F3, what a dialog is handed. A sweep | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
 | F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images. And the machine's clock of the step that searches for a text, counted before the piece and after it, in `view-search` and in `find`: it is three and a half times the original's there, 8.70 seconds against 2.60 and 11.07 against 3.01, which the C translation does not show and nobody has looked into ("The machine's clock of the portable C against the original's", above, has the figures and how they are counted) | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
@@ -10359,6 +10359,182 @@ of the bridge.
 - F9 has less to do in the system's file than the plan has: the table
   of the blocks is there, and the tool reads it. It has `RoomParas`,
   `PANEL_BLOCK` and `ROOM_LEAST` to take out, 13 places.
+### F2, a panel is a pointer: done, and what a later piece should know
+
+A panel is a `struct WCBdef *` wherever it was a segment in a `u16`,
+and `PANEL` is gone. All 155 scenarios pass with no golden and no patch
+changed, at the first run of the swept build.
+
+**What it is now.**
+
+- Beside the main data, in `main.c`: `CurrentPanel`, `OtherPanel`,
+  `LeftPanel` and `RightPanel`, which are `WCBcrn`, `WCBsec`, `WCB1seg`
+  and `WCB2seg` of the original. The four words are in `struct MainDat`
+  with "Not set or read here".
+- Every `u16 panel` is a `struct WCBdef *panel`: 259 declarations, 88
+  of them in `vc.h` and 171 in 19 files. `PANEL(x)` is `x`, 141 places.
+  `InvWCB` answers with a panel. Three fields of structures are
+  pointers: `ds` of `struct Regs`, the current panel as the main loop
+  has it, and `panel` of `struct Onward` and of `struct Searched`.
+- `MAIN_AS_PANEL` of `vc.h` is the main data where a panel is asked
+  for, the five places of kind i, with one comment that says what is
+  read so.
+- A function that had `struct WCBdef *wcb = PANEL(panel);` had two
+  names for one pointer once `PANEL` was gone. In 55 functions, where
+  neither is set again, `wcb` went and the function says `panel`; 16
+  keep both, where one of them is set again or `wcb` is declared apart
+  from where it is set.
+
+**How it was done.** A script of a hundred lines for the three
+patterns, the four words, `PANEL(x)` and `u16 panel`, which wraps a
+line that got too long at a comma and keeps a comment in its column;
+then every file compiled by itself, so that one file's refusals do not
+hide the next file's, 77 refusals the first time, which is the list of
+what was read by hand. A second script for the second names.
+
+**What was read by hand**, 44 places, and what each kind became:
+
+| Kind | Places | What it became |
+|---|---|---|
+| The main data read as a panel, kind i | 5 | `MAIN_AS_PANEL`. `BegBX` of `place.c` reads nothing of the panel that it is handed: it holds the pointer against the left panel, and the main data is not that. So the two calls of `BegBX`, in `Init40` of `main.c` and `F16_00` of `keys.c`, and `PutPrm` of `bars.c`, called by `F21_31` of `enter.c`, read no byte of the main data so. `M60_02` of `commands.c` reads `Visible`, byte 2, and `ReDr00` of `read.c` `WinPath[3]`, byte 23: both are of `ColTab`, in the first 82 bytes, as the plan took it |
+| A panel under another name | 13 | `other` in `commands.c`, three times, in `info.c`, `keys.c` and `read.c`, `current` in `commands.c` and `keys.c`, `left` in `keys.c`, and `panel` in a list of names in `find.c` and `main.c`: each a `struct WCBdef *`. `other` of `copy.c` went, its one use being a line. `i` of `F20_02` in `keys.c`, which held the other panel for three lines: those say `other`, which the function has from its first line and nothing changes between |
+| A register of the main loop | 1 | `r->di` in `F39_01` of `main.c`, where the original has the segment of the menu's panel in DI: not set any more, with the reason at the place. Nothing reads DI as a menu leaves it: the three commands that take it are the mouse's, which `Loop` asks for with DI set, and no table of a menu has one of them |
+| A panel's segment kept in a word of a buffer | 2 | `OWNER` of `tree.c`, a word of `MenuBuf` at 48 with the path behind it at 50: it stays a segment, `SEG_OF(panel)` where it is set and `SEG_OF(CurrentPanel)` where it is held against the current panel. F7 has `tree.c` |
+| A panel handed on as the segment that something is in | 8 | `SEG_OF(panel)`: the fifth argument of `Dialog`, four calls in `commands.c` and one in `enter.c`, and `segment != SEG_OF(LeftPanel)` in `Dialog` itself, which are F3's; `segment` of `Run_00` in `usermenu.c`, for `ClsLine`, F3's too; `segment` of `F77_10` in `cmdline.c`, the list that the speed search goes through, a panel's or the tree's, which is F7's |
+| An offset in a panel's segment reckoned with | 2 | In `F23_02` of `enter.c` two offsets of one path were held against each other: two pointers into that path are now. In `PutInf` of `info.c` the offset of an entry is held against `EndBuf`: `(u16)((const u8 *)file - (const u8 *)other)`, the number that it was |
+| Where a panel is made | 1 | `Init11` of `start.c`: `(struct WCBdef *)AT(block.value, 0)`, of the segment that `MemTake` answers with. F9's |
+| Two panels held against each other | 12 | All by `==` or `!=`, as F1 counted: right of pointers, and left as they were |
+
+Nothing of it changes what DOS is handed. No function of `sys.h` took
+a panel as a number: the compiler would have refused the call, and
+refused none. The rows of entry 6 of `DEVIATIONS.md` that speak of DS
+on a panel's segment say what the original has there; the functions
+have DS on the main data, before and after.
+
+**What the compiler does not refuse**, and was looked for by `grep`:
+
+- A pointer handed to a word of `vc.h` that casts what it is handed,
+  `AT(panel, 0)`, `OFFSET_IN_SEG(panel, x)`: the cast makes a number
+  of the pointer with no word said. There were four, all read.
+- `u16 panel, size, drive;` made `struct WCBdef *panel, size, drive;`
+  by a script declares structures. The compiler refused the one there
+  was, by what was assigned to them; one that is never assigned would
+  be 6,754 bytes of the stack.
+- A pointer that is stepped, added to or held against another by `<`:
+  none.
+
+**The image.** `compare` of the build before, saved before anything
+was changed, with the piece's build: "155 scenarios, 0 with nothing
+that differs; 6 differences, 0 more in what was declared as changed,
+883 in what may differ", and "313 pointers that name the same in
+both". The four words are held by what they name, each by its
+`variable=` in `ADDRESSES`, and nothing was declared as changed. No
+panel differs, nothing behind the panels, no byte of the main data but
+the six. What differed at first was 732 bytes of three kinds, each of
+which follows the build with no fault in either, and each is in the
+tool now with its reason, which the session has approved:
+
+- `dos32.OwnBlocks`, in every scenario: the paragraphs that the blocks
+  begin in, one further on, since the four pointers are 16 bytes of
+  `_BSS` in front of the 640 KB. The linker's maps say that nothing
+  else of the data moved: the main data and everything in front of
+  `_BSS` are where they were, the code being 459 bytes shorter and
+  within the same page.
+- `dos32.Below`, in 152 scenarios: the stack pointer at the last call
+  of DOS, 468 bytes further down. See "The stack" below.
+- `DTA+41`, in 108 scenarios, 95h before and 91h after, and the six
+  that are left: the same byte where the program has copied a name as
+  13 bytes, in `TmpBuf` and `TmpErr` of `copy` and `copy-dirs`. The
+  record of a search comes up from DOS's memory, and behind a name of
+  fewer than twelve characters is what that memory held before the
+  program was handed it. What was seen: at 6E24h the two files have
+  95h and 91h, in the table that says where the relocations of each
+  page begin, and that is the one place where the two files have those
+  two bytes at the same offset; and this build has fewer relocations,
+  since `PANEL` named `md`. What is inferred, and was not looked at in
+  DOS's memory: that the byte is one of the program's own file, as the
+  extender read it to load it. **Every piece that changes the code
+  may move this byte**: where a difference is a pair of bytes that
+  `DTA+41` has too, it is this. Whoever wants it shown and not
+  inferred: a build that differs from another in its relocations and
+  in nothing that runs, a function that nothing calls with a few
+  addresses in it, and the two builds' images.
+
+No variant was built: the layout differs in one known thing, and the
+three kinds are each one value in every scenario.
+
+The tool, besides: a word's variable is held by what it names and no
+longer as bytes too (`POINTERS`), so a pointer that names another
+place is one difference and not two, and "pointers that name the same"
+counts each once; and `check` changes its byte of a word where the
+build has the word, and of a variable that two builds are held to have
+alike. `check` catches each of its nine bytes in the images of the
+build before and of this one.
+
+**The stack.** `struct Onward` is a pointer, a byte and a byte: eight
+bytes where it was four, so it comes back through a pointer to room in
+the caller's frame, and `wcc386` gives every call its own room.
+`Command` of `main.c` calls some fifty commands that return one: its
+frame is 396 bytes where it was 12. The least that a scenario leaves of
+the stack is 14,410 of 16,384 bytes. A variable that the calls share
+would take it back, in N16 or whenever `Command` is next read.
+
+**The records.** The words that were F2's are at nothing: `u16 panel`
+259, `PANEL` 141, `md.WCBcrn` 42, `md.WCB1seg` 23, `md.WCB2seg` 20,
+`md.WCBsec` 11. `SEG_OF` is up by 10 to 34, `OFFSET_IN_SEG` down by 4
+to 4, `MAIN_SEG` down by 4 to 73, and `MAIN_AS_PANEL` is new, 5 places,
+and stays. Left to go: F3 277, F5 45, F6 44, F7 67, F8 212, F9 13, F10
+213. The record of the widths has 150 numbers fewer and one cut more:
+by file, the 135 `u16 panel` that a file writes and not only declares,
+the 12 under other names, and the three fields, held against the
+record's rows file for file; the cut is the cast of `info.c`. The host
+check's record and that of `portable_c-int16` did not move.
+
+**A number that the piece added.** One: in `PutInf` of `info.c` the
+offset of an entry in the other panel, `(u16)((const u8 *)file - (const
+u8 *)other)`, a difference of two pointers cut to 16 bits and without
+a sign, held against `EndBuf`. It is what `OFFSET_IN_SEG` gave there
+and is left so, an offset in a panel being 16 bits for as long as
+`EndBuf` is: N12, which has `info.c`, sorts it with the rest of the
+file, by the rule for a number and for its sign. Nothing else that the
+piece wrote is a number: what it changed became pointers.
+
+**As it landed.** Rebased onto `c4e1c06`, behind the four names taken
+out of `sys.h` and the record of the widths in its new form, which was
+written anew and read again file for file: the same 150 numbers and
+the one cut. The program is the same bytes as before the rebase, and
+that of `c4e1c06` the same as the build that the piece started from.
+Its images, saved anew, against the piece's: "155 scenarios, 0 with
+nothing that differs; 6 differences, 0 more in what was declared as
+changed, 883 in what may differ", the same six.
+
+**How long it took**, in tool calls, some 105: reading 14; the script
+and what the compiler refused, to a clean build, 22; the records 6; the
+images, with what the three kinds were, 14; the second names 3; the
+tool's check 4; the documents and the rest.
+
+**F3, from here.** Opinions.
+
+- It is larger than F2 in thought, and cut in two it is two pieces of
+  F2's size. What a dialog's fields are in, the last argument of
+  `Dialog`, `ClsLine` and their like, a panel or the main data: that is
+  F2 again, 73 `MAIN_SEG` and the eight `SEG_OF` of this piece, a
+  script and the compiler. What a table is handed as, `OFFSET`,
+  `AsmSeg`, `NAMED`, 277 places, is the other, and has
+  `harness/reads.py` to teach first, with the program unchanged, as
+  F1 said.
+- The compiler holds less of it than of F2. A box is a structure of
+  its own type, so whatever takes any box takes a `const void *` or a
+  `const u8 *`, and anything is handed to that without a word. And
+  `OFFSET` is reckoned with where `PANEL` never was: `OFFSET(Menu_T) +
+  (table - 1) * sizeof *Menu_T` in `F39_01`, `r->si` and `r->di` of the
+  main loop holding a table's offset, `OFFSET(AltSr_T) + i`. Those are
+  read, not swept.
+- A structure that is returned and grows over four bytes costs the
+  caller's frame a room for every call: look at the frames in the
+  listings, `enter` at a function's first line, if one does.
+- Any change of the code moves `DTA+41`; see above.
+
 ### N0, the finder, the record, the types: done, and what a cluster goes by
 
 **What there is.** `harness/width.py`, its record `harness/width.txt`

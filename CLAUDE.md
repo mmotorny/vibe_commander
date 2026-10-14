@@ -2587,6 +2587,44 @@ in "The portable C".
     right one.
   - A cast with a step in it, `*(const u8 *)entry--`, is the same
     bytes with the step as a statement of its own behind it.
+- A panel is a pointer, `struct WCBdef *`, since the piece F2
+  (`TODO.md`, "F2, a panel is a pointer"), and `PANEL` of the words
+  above is gone: the four panels are `CurrentPanel`, `OtherPanel`,
+  `LeftPanel` and `RightPanel` of `main.c`, beside the main data. What
+  a sweep of that kind met:
+  - Compile every file by itself and read all that is refused, before
+    anything is mended: the build stops at the first file, and what one
+    file refuses says how another is to be written.
+  - The compiler refuses a pointer where a number is taken, the
+    reverse, and the two held against each other. It does not refuse a
+    pointer handed to a word of `vc.h` that casts what it is handed,
+    `AT(panel, 0)`, `OFFSET_IN_SEG(panel, x)`: look for those by `grep`.
+    Nor a list of names behind a type that a script has changed: `u16
+    panel, size;` made `struct WCBdef *panel, size;` declares a
+    structure.
+  - A structure that a function returns and that grows over four bytes
+    comes back through a pointer to room in the caller's frame, and
+    `wcc386` gives each call a room of its own: `Command` of `main.c`,
+    which calls some fifty commands that return `struct Onward`, has a
+    frame of 396 bytes where it had 12. The frame is the `enter` at a
+    function's first line in the listing.
+  - A function that had a second name for what a word made, `wcb =
+    PANEL(panel)`, has two names for one pointer when the word is gone.
+    Taking one out by a script changes the bytes of the program, by
+    what the compiler keeps in which register, so it is judged by the
+    scenarios and the images like the sweep.
+  - The images of two builds whose code differs differ in three things
+    with no fault in either, which `harness/dataimage.py` knows since:
+    where the 640 KB begin, if a variable was added in front of them;
+    the stack pointer at the last call of DOS; and one byte behind the
+    name in the record of a search, `DTA+41`, which by what was seen
+    of the two files is a byte of the program's own file left in DOS's
+    memory by the extender, of the table of its relocations: that is
+    inferred, the memory was not looked at. The program copies a name
+    as 13 bytes, so
+    that byte is in `TmpBuf` and `TmpErr` after a copy, where the tool
+    does not know it: a difference there that is the pair of bytes of
+    `DTA+41` is this.
 - A word of a table that names something, a line of a box, the box
   and the buttons of a dialog, is a pointer in `tables.h`, as long as
   a pointer is, and code never reads through it: it asks `NAMED` of
