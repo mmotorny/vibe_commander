@@ -2180,3 +2180,48 @@ not change, and none of them is eleven characters long. The program's
 own way to a label, Ctrl+F4, makes none on FreeDOS, which keeps the
 label that the disk has and reports no error (`label`). The scenarios
 that show the Info panel are held to the original's goldens as they are.
+
+### 23. A help file whose entry has a text of no bytes is refused
+
+**What the original does.** An entry of the help file, the index or a
+page, says how long its text is, and the program reads that many bytes
+and takes the mark of 1Ah off each, by `DeCode`, which counts with
+`LOOP`: a text that the entry says has no bytes is read as none, and
+then decoded as one of 65,536 bytes, all of the segment from the text
+round to it again. The main program takes such an entry, refusing only
+a text too long for its room, and changes the whole of its main data so;
+what it does from there is by what that makes of it. With the third
+page of the help file made so, it shows the index again, a row higher,
+and comes back to wait for a key. The setup program does the same with
+the index's text, if its entry says that it has none, and with its own
+pages when the page of the index behind them begins where they do, so
+that there is nothing to read between: its one segment is its code as
+well, and it changes its own code as it runs, and does not come back to
+wait for a key on the bench.
+
+**What the portable C does.** Such a file is refused as one that cannot
+be read: the help says "There was error reading data from the help
+file." as it does for a page that is not where the index says or too
+long, `RdEntry` of `help.c`; and the setup goes on without its pages,
+which F1 then says it has none of, as it does for any file that it
+cannot read, `StRdHelp` of `sthelp.c`. In a flat memory the 64K that
+the original goes round would be written behind the text, past the end
+of the main data. What the help does with the numbers of the lines of a
+file that is not true to its text, which wrap at 65,535 as the
+original's do, is not changed: the user decided that it stays.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed.
+
+**Which scenarios show it.** None. Such a file can be made through the
+program: the editor types the bytes of the help file in hex, and a page
+whose length is typed as 1A 1A, the mark on 0, is one. But what the
+original does then rests on every byte of the 64K that it goes round,
+and the C translation, which is taken through every scenario of the
+main program, has other bytes there past its main data and shows
+another screen: such a scenario was made, and is not in the tree for
+that. The setup's two places have none either: the original's setup
+program does not come back from such a file to wait for a key, so no
+golden can be derived of it, as was tried with both on the bench.
+`help-broken` and `setup-help-file`, which have the help refuse files
+for other reasons, are held to the original's goldens as they are.

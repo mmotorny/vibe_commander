@@ -148,9 +148,13 @@ static const u8 Empty_S[] = "";
 #define SHOWN() (md.Lines - 12)
 
 /* Take the mark off `count` bytes that were read from the file. A count
-   of 0 is one of 65536. Not static: the help of the setup, sthelp.c,
-   calls it for its own pages, as the setup program has the routine word
-   for word. */
+   of 0 is one of 65536, as the original's LOOP has it, and is handed
+   over by no caller: the original's takes an entry whose text has no
+   bytes, and goes round all of its segment, where in a flat memory that
+   would be 64K behind HlpInfo, past the end of the main data. Such a
+   file is refused, here and in sthelp.c (DEVIATIONS.md, 23). Not static:
+   the help of the setup calls it for its own pages, as the setup program
+   has the routine word for word. */
 void DeCode(u8 *at, u16 count)
 {
     do
@@ -185,7 +189,12 @@ static bool ReadDsk(u8 *to, i32 count)
    line of the index is kept and the page is shown from its start; for the
    index, or a page that follows a page, the cursor goes to the line that
    the entry before named and the first line is the one kept. True if the
-   entry could not be read: what is in the memory is neither then. */
+   entry could not be read: what is in the memory is neither then.
+
+   An entry whose text is too long for the room is refused as one that
+   could not be read, and here one whose text has no bytes too, which the
+   original takes and decodes the 64K of its main data for
+   (DEVIATIONS.md, 23). */
 static bool RdEntry(void)
 {
     i32 cursor = hd.HlpBkLn;
@@ -201,7 +210,7 @@ static bool RdEntry(void)
     if (ReadDsk((u8 *)&hd.HlpMode, 26))
         return true;
     DeCode((u8 *)&hd.HlpMode, 26);
-    if (hd.HlpSize >= LenHelp - 0x20)
+    if (hd.HlpSize == 0 || hd.HlpSize >= LenHelp - 0x20)
         return true;
     if (ReadDsk(hd.HlpInfo, hd.HlpSize))
         return true;

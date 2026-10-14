@@ -2818,9 +2818,9 @@ help.c, (): variable Empty_S, u8[1]
 
 help.c, DeCode: parameter count, u16
     Counted on to wrap: a count of 0 is one of 65,536, by do ... while
-    (--count), as the original's LOOP has it, for an entry that says it
-    has no text; sthelp.c hands it counts of 16 bits as well. A bug of
-    the original that stays.
+    (--count), as the original's LOOP has it; sthelp.c hands it counts
+    of 16 bits as well. No caller hands it 0: an entry that says it has
+    no text is refused, here and in sthelp.c, DEVIATIONS.md, 23.
 
 help.c, SeekDsk: parameter high, u16
     size: the high word of a place in the help file, as an entry has

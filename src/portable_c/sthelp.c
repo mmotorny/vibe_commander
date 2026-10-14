@@ -168,7 +168,13 @@ static bool ReadDsk(u16 handle, u8 *to, i32 count)
    real one, which StHelp takes for the length of the pages. The
    original leaves what its memory held where it has read nothing; here
    that is zeros, so that what F1 then shows does not hang on what was
-   in the memory before. */
+   in the memory before.
+
+   A count of no bytes is refused as a file that cannot be read: the
+   index's text, where its entry says it has none, and the setup's pages,
+   where the page of the index behind them begins where they do. The
+   original hands its DeCode the 0, which goes round all of its one
+   segment, its own code with it (DEVIATIONS.md, 23). */
 void StRdHelp(void)
 {
     u8 *buffer = StHelpBuf();
@@ -199,7 +205,7 @@ void StRdHelp(void)
         goto RdHlp1;                    /* what the index begins with, */
     DeCode(buffer, HlpInfo);
     count = index->HlpSize;             /* and its text, if it fits */
-    if ((u16)(LIMIT - HELPBUF) < count)
+    if (count == 0 || (u16)(LIMIT - HELPBUF) < count)
         goto RdHlp1;
     if (ReadDsk(handle, buffer + HlpInfo, count))
         goto RdHlp1;
@@ -223,6 +229,8 @@ void StRdHelp(void)
                            + 6 * (BegHlp - 1 + NumHlp)) - first;
         if (between >> 16 == 0 && count > (u16)between)
             count = (u16)between;
+        if (count == 0)                 /* the next page is the first */
+            goto RdHlp1;
     }
     answer = FileRead(handle, buffer + 2, (u16)count);
     if (answer.failed)

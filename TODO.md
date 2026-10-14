@@ -16915,7 +16915,9 @@ than it is would pass.
   from its text; and a line whose end is missing is looked for
   through 65535 bytes. Ported like that. The file of the distribution
   has none of these, and what a scenario makes of it by typing a letter
-  into it has pages that are refused for their length.
+  into it has pages that are refused for their length. **The first is
+  dealt with in the portable C**, on the user's word of 14 October
+  2026: such a file is refused (`src/portable_c/DEVIATIONS.md`, 23).
 
 - Of the file search's command, `F67_00`, three instructions are listed
   as out of reach: two for a drive that the CD-ROM extensions answer
