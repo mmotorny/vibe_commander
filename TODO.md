@@ -10283,6 +10283,52 @@ No patch: the rule changes 42 scenarios' screens of the editor. The
 text `Run2_S` of `view_t.c` still holds the bytes `Free`, which the
 original has behind its text and which are copied with it.
 
+**The lines (entry 25).** `T53_00` no longer refuses the next line
+from 0FFFFh, and `T75_00` shows the line plus one in 32 bits, the cut
+and its `wraps` gone. Nothing else of the editor counted a line in 16
+bits any more (N6 to N8): the rows of the window stay bytes, as
+differences of two lines. The scenario `editor-lines`, of the original,
+the C translation and the portable C: two files appended to each other
+in turn with Shift+F5, 41 empty lines typed to begin with, make 65,477
+empty lines; `zebra` and 40,467 more appended behind them, and `zebra`
+again: 105,947 lines, 211,902 bytes, in 41 screens and some ten seconds
+on the bench. Then Ctrl+End, Ctrl+Home, F7 to the first `zebra` (line
+65,478, which both reach), three PgDn past the 65,536th, Down, Up,
+Shift+F7 to the second, Ctrl+PgUp and Ctrl+PgDn. The original stops at
+the 65,536th, `Line 0`, and its Shift+F7 says nothing; the patch, with
+entry 14's rows of the Advanced options, has the status line and the
+window where the portable C goes on. Its golden derived again after F9
+is the same bytes. The C translation passes it against the golden.
+In the original it runs two instructions of `T00_28` that the batch of
+`T00_00` had listed as out of reach, 6400h and 6402h, a window that
+moves up by fewer lines than the cursor is below its first: they are
+out of `harness/ported.py`.
+
+**Where a sixth digit of the line goes: decided by the user, way A.**
+`T75_00` writes five cells or as many as the number has digits, and
+answers how many; `T00_20` writes the space, `Col`, the space and the
+column behind that, and blanks the rest of the line, where a longer
+line had the column before. The patch of `editor-lines` has 105,947 and
+105,946 in six cells. The ways that were offered (`|` marks the ends of
+the 80 cells; `Line` at 41, its number at 46, `Col` at 52, its number at
+56; cells 61 to 79 are empty since entry 24):
+
+- *A, recommended and taken*: the column moves only for a line that needs it.
+  The number of the line in as many cells as it has, five at least, a
+  space, `Col` and its number. A text of fewer than 100,000 lines shows
+  the original's line to the cell; ten digits fit.
+  `|Edit: x                                  Line 65544 Col 1                       |`
+  `|Edit: x                                  Line 105947 Col 6                      |`
+- *B*: six cells for the line in every text, `Col` at 53: a rule for
+  every screen of the editor, in 42 scenarios, and a line that does not
+  stand where the original's does.
+  `|Edit: x                                  Line 65544  Col 1                      |`
+  `|Edit: x                                  Line 105947 Col 6                      |`
+- *C*: `Line` and its number move left by a cell for a sixth digit, and
+  `Col` stays. A seventh digit, which the room of 15 MB allows with
+  lines of two bytes, would reach the flag of the quote at 39.
+  `|Edit: x                                 Line 105947 Col 6                       |`
+
 ### F0, the net and the record: done, and what a later piece should know
 
 Two tools of the harness, and no line of the program: `VC.EXE` is the

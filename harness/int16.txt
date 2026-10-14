@@ -135,6 +135,12 @@ edit.c, T72_00: widen
     The place of a byte of the text, an address less the address of the
     text, which is not below 0 and is shown as eight digits of hex.
 
+edit.c, T75_00: widen
+    | i32 width = (i32)(end - md.TmpBuf);
+    How many digits Number has written at the start of TmpBuf and
+    answered the end of: one to ten, a number of 32 bits without
+    separators.
+
 edit.c, T80_14: widen
     | count = file - md.TmpBuf;
     The length of the path in front of the name: CutPath answers a

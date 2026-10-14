@@ -4609,6 +4609,53 @@ SCENARIOS = {
             "Right Enter",                # Cancel
         )),
 
+    "editor-lines": Scenario(
+        "The editor in a text of more than 65,535 lines, which the "
+        "original reaches only as far as the 65,536th",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of a file made
+            "Shift+F4",                   # a new file of 41 empty lines
+            '"x" Enter',
+            "Enter",
+            " ".join(("Enter",) * 41),
+            "F2",
+            "Esc",
+            "Shift+F4",                   # and one of a line
+            '"z" Enter',
+            "Enter",
+            '"zebra" Enter',
+            "F2",
+            "Esc",
+            # Each file appended to the other in turn: 65,477 empty lines
+            # in x, and 40,467 in y.
+            'Shift+F5 "x" Tab "y" Enter',
+            *('Shift+F5 "y" Tab "x" Enter p '
+              'Shift+F5 "x" Tab "y" Enter p',) * 7,
+            'Shift+F5 "y" Tab "x" Enter p',
+            # x: those lines, zebra in the 65,478th, the 40,467 of y, and
+            # zebra in the 105,946th, which ends with the two characters:
+            # 105,947 lines.
+            'Shift+F5 "z" Tab "x" Enter p',
+            'Shift+F5 "y" Tab "x" Enter p',
+            'Shift+F5 "z" Tab "x" Enter p',
+            "Shift+F4",
+            '"x" Enter',
+            "Ctrl+End",                   # the last line
+            "Ctrl+Home",
+            'F7 "zebra" Enter',           # the first, the 65,478th
+            "PgDn PgDn PgDn",             # past the 65,536th
+            "Down",
+            "Up",
+            "Shift+F7",                   # the second
+            "Ctrl+PgUp",                  # the top of the text
+            "Ctrl+PgDn",                  # and its end
+            "Esc",
+        )),
+
     "find": Scenario(
         "Looking for files by name and by what they contain, with keys "
         "that a search finds waiting when it begins",

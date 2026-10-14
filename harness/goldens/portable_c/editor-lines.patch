@@ -1,0 +1,106 @@
+The portable C in the scenario editor-lines: what it is expected to show
+otherwise than the original. A patch of harness/goldens/editor-lines.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 14, 25 of src/portable_c/DEVIATIONS.md
+Why: the Advanced options have no Quick execute commands (14): Clear keyboard
+buffer and what is below it in the box stand a row further up, the cursor with
+them where it is on that box, the box is a row shorter, and the two rows that
+its last row and the shadow below it were on show what is behind the box, the
+upper one in the shadow; and the editor reaches every line of the text (25):
+where the original stops at the 65,536th line and calls it 0, the portable C
+goes on, to the 105,946th with Shift+F7 and to the last with Ctrl+End and
+Ctrl+PgDn, shows the line that zebra or the end is on, and the status line has
+the number of the line, 105,946 and 105,947 in six cells, with Col and the
+column a cell further on; back at line 1 the line is the original's again
+
+== 1: F9 o o
+rows 12-21
+-|║            │    ║  │  [ ] Quick execute commands       │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+-|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+-|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+-|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
++|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
++|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
++|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
++|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │                                                    │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx17 03x49 1Bx14
++|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+
+== 2: Down Down Down Down Down Space
+rows 12-21
+-|║            │    ║  │  [ ] Quick execute commands       │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+-|║            │    ║  │  [ ] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+-|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+-|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
++|║            │    ║  │  [ ] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
++|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
++|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
++|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │                                                    │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx17 03x49 1Bx14
++|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-cursor 25 13 lines 6 7 mode 3
++cursor 25 12 lines 6 7 mode 3
+
+== 31: Ctrl+End
+row 0
+-|Edit: x                                  Line 0     Col 1                       | 30x80
++|Edit: x                                  Line 105947 Col 1                      | 30x80
+row 22
+-|                                                                                | 1Bx80
++|zebra                                                                           | 1Bx80
+
+== 34: PgDn PgDn PgDn
+row 0
+-|Edit: x                                  Line 0     Col 1                       | 30x80
++|Edit: x                                  Line 65544 Col 1                       | 30x80
+
+== 35: Down
+row 0
+-|Edit: x                                  Line 0     Col 1                       | 30x80
++|Edit: x                                  Line 65545 Col 1                       | 30x80
+
+== 36: Up
+row 0
+-|Edit: x                                  Line 65535 Col 1                       | 30x80
++|Edit: x                                  Line 65544 Col 1                       | 30x80
+-cursor 0 23 lines 6 7 mode 3
++cursor 0 22 lines 6 7 mode 3
+
+== 37: Shift+F7
+row 0
+-|Edit: x                                  Line 0     Col 1                       | 30x80
++|Edit: x                                  Line 105946 Col 6                      | 30x80
+row 23
+-|                                                                                | 1Bx80
++|zebra                                                                           | 1Bx80
+-cursor 0 23 lines 6 7 mode 3
++cursor 5 23 lines 6 7 mode 3
+
+== 39: Ctrl+PgDn
+row 0
+-|Edit: x                                  Line 0     Col 1                       | 30x80
++|Edit: x                                  Line 105947 Col 1                      | 30x80
+row 22
+-|                                                                                | 1Bx80
++|zebra                                                                           | 1Bx80

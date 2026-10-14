@@ -525,11 +525,6 @@ BATCHES = [
             0x63B7: "T00_25, for a cursor that is below the window in a "
                     "line whose number is less than the window has rows: "
                     "the window then begins at line 0 and shows it",
-            **dict.fromkeys(
-                (0x6400, 0x6402),
-                "T00_28, for a window that moves up by fewer lines than "
-                "the cursor is below its first: it moves up only to the "
-                "line of the cursor"),
         },
     ),
     Batch(

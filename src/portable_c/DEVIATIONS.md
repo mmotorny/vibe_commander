@@ -1825,7 +1825,7 @@ original's golden with what its row says made to it, by its patch:
 
 | Scenario | What changes in it |
 |---|---|
-| `command-edit`, `comspec`, `dirinfo`, `ended`, `sizes`, `view-search`, `editor-hex`, `editor-long`, `editor-save`, `editor-words`, `editor-full`, `editor-keys`, `editor-hex-keys`, `editor-buffer`, `editor-dirinfo`, `mouse-edit`, `start-setup`, `start-screen`, `start-memory`, `setup-delay-file`, `setup-help-file`, `stay-left` | The Advanced options, on two screens: opened, and with Clear keyboard buffer unticked, which is four times Down and Space where the original has five. From the row of Quick execute commands down the box has what the original's has a row further down, and the cursor on Clear keyboard buffer is a row further up with it; the row that the original's box ends on shows what is behind the box in the shadow of the box, and the row of that shadow what is behind it. The mouse pointer is in the middle of the screen, on the row that Quick execute commands was on: the cell whose colours it exchanges holds a letter of Clear keyboard buffer, the line that stands there now. `comspec`, `ended`, `start-setup`, `start-screen`, `start-memory` and `stay-left` have patches of other entries, which name this one too; `setup-delay-file` shows Screen and Mouse besides, which is otherwise by 5 |
+| `command-edit`, `comspec`, `dirinfo`, `ended`, `sizes`, `view-search`, `editor-hex`, `editor-long`, `editor-save`, `editor-words`, `editor-full`, `editor-keys`, `editor-hex-keys`, `editor-buffer`, `editor-dirinfo`, `mouse-edit`, `start-setup`, `start-screen`, `start-memory`, `setup-delay-file`, `setup-help-file`, `stay-left`, `editor-lines` | The Advanced options, on two screens: opened, and with Clear keyboard buffer unticked, which is four times Down and Space where the original has five. From the row of Quick execute commands down the box has what the original's has a row further down, and the cursor on Clear keyboard buffer is a row further up with it; the row that the original's box ends on shows what is behind the box in the shadow of the box, and the row of that shadow what is behind it. The mouse pointer is in the middle of the screen, on the row that Quick execute commands was on: the cell whose colours it exchanges holds a letter of Clear keyboard buffer, the line that stands there now. `comspec`, `ended`, `start-setup`, `start-screen`, `start-memory` and `stay-left` have patches of other entries, which name this one too, and `editor-lines` one of 25; `setup-delay-file` shows Screen and Mouse besides, which is otherwise by 5 |
 | `user-menu`, `user-menu-run`, `view-commands` | The same, on one screen: the step that unticks Clear keyboard buffer also leaves the dialog |
 | `command-line`, `setup-cancel`, `setup-defaults` | The Advanced options so, on one screen, with the original's steps: in `command-line` Escape toggles panels on/off is unticked, the second box, and in the other two the dialog is looked at for what the setup left |
 | `setup-config` | The Configuration of the setup where it shows: without Execute options, and by 1 and 7 without the two other boxes of that group. The Keyboard options are five rows further up, and the last five rows of the right half are empty. Down from Show logical drive B: is Alt alone selects menu, which is unticked there by Space where the original goes down three lines first; the three steps on the way, which untick Memory allocation, tick Quick execute commands and untick TSR manager, are left out. Left from Clear keyboard buffer is Full screen, the box of its row, where the original has Show logical drive B: there. And the setup file that is saved has the three bytes as it had them, 1, 0 and 1, where the original's has 0, 1 and 0, with another sum for that: four bytes of the file |
@@ -2259,3 +2259,38 @@ among them, by a rule of `harness/deviations.py` for the editor's first
 line: where the golden has the figure, which is blanked there, and the
 word, the rule expects spaces. No patch.
 
+### 25. The editor reaches every line of a text of more than 65,535
+
+**What the original does.** The editor counts the lines of its text in
+16 bits, from 0, and has no next line from the 65,536th on, in text and
+in hex: Down, PgDn, Ctrl+End and Ctrl+PgDn stop there, and a search for
+a text further on, F7 or Shift+F7, says nothing and leaves the cursor at
+the end of that line, as if it had found it. The status line shows the
+line plus one in 16 bits, `Line 0` for the 65,536th. The text is not
+harmed: it is saved whole. That was seen on the bench (`TODO.md`, "N6",
+question 5), and the scenario `editor-lines` shows it: `T53_00` and
+`T75_00` of `VCEDIT.INC`.
+
+**What the portable C does.** A line is counted in 32 bits, and every
+line of the text is reached by every key that goes from line to line,
+and by a search; the status line shows the number of the line as it is.
+The number has five cells as in the original, and a number of more
+digits has as many cells as it has digits: `Col` and the column move on
+by the cells that it has more, `Line 105947 Col 6`, on the user's word
+of 14 October 2026 (`TODO.md`, "E, the editor's lines and its free
+bytes", has the ways that were offered). So a text of fewer than 100,000
+lines shows the line as the original does, and one of fewer than 65,536
+is as before in every way. `T53_00` and `T75_00` of `edit.c`, and the
+status line of `T00_20`.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed, held by a
+scenario of both programs. The clusters N6 to N8 counted the lines in
+32 bits and kept the limit until this was carried out.
+
+**Which scenarios show it.** `editor-lines`, which makes a text of
+105,947 lines by appending two files to each other in turn, with
+`zebra` in its 65,478th line and in its 105,946th, and goes through it:
+its patch has the status line and the window where the original stops
+at the 65,536th line. Every other scenario of the editor has fewer
+lines, and is held to the original's golden as it is.

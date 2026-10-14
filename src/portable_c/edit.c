@@ -178,7 +178,7 @@ void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base);
 void T73_00(void);
 struct Drawn T73_10(void);
 void T74_00(void);
-void T75_00(i32 number, u16 *screen, u16 color);
+i32 T75_00(i32 number, u16 *screen, u16 color);
 void T76_00(u16 place, const u8 *text, const u8 *colors);
 bool T80_00(void);
 
@@ -518,15 +518,14 @@ struct Ending T53_10(i32 place)
    text has that many.
 
    The assembly counts the lines in 16 bits and has no next line from
-   the line 0FFFFh on, in text and in hex: a limit of the original, kept
-   until its fix is carried out (TODO.md, question 5). */
+   the line 0FFFFh on, in text and in hex: the 65,536th line is the
+   last that it reaches. Here a line is counted in 32 bits and every
+   line of the text is reached (src/portable_c/DEVIATIONS.md, 25). */
 bool T53_00(struct Where *where)
 {
     i32 place = where->place;
     struct Ending end;
 
-    if (where->line == 0xFFFF)
-        return true;
     if (T63_01(place))
         return true;
     end = T53_10(place);
@@ -903,18 +902,28 @@ void T74_00(void)
 }
 
 /* Write a number counted from 0 as one counted from 1, at the left of
-   five cells of the screen buffer, in the colour in the high byte of
-   `color`. */
-void T75_00(i32 number, u16 *screen, u16 color)
+   five cells of the screen buffer, or in as many as it has digits where
+   that is more, in the colour in the high byte of `color`. Returns how
+   many cells it has written.
+
+   The assembly counts in 16 bits, shows the 65,536th line as 0, and
+   writes five cells whatever the number. Here the number is of 32 bits
+   and a line of more than five digits has its cells, T00_20 moving the
+   column behind it (src/portable_c/DEVIATIONS.md, 25). A column has
+   five digits at the most: 3900 characters of tabs. */
+i32 T75_00(i32 number, u16 *screen, u16 color)
 {
-    /* wraps: the assembly counts in 16 bits, and shows the 65,536th
-       line as 0 (TODO.md, question 5). */
-    u8 *end = Number(md.TmpBuf, 0, (u16)(number + 1), 0);
+    u8 *end = Number(md.TmpBuf, (u16)((number + 1) >> 16),
+                     (u16)(number + 1), 0);
+    i32 width = (i32)(end - md.TmpBuf);
     i32 count;
 
     for (count = 5; count; count--)
         *end++ = ' ';
-    MvsBw(screen, md.TmpBuf, 5, color);
+    if (width < 5)
+        width = 5;
+    MvsBw(screen, md.TmpBuf, (u16)width, color);
+    return width;
 }
 
 /* Write six lines of the help that the editor shows for a menu file or
@@ -1661,8 +1670,8 @@ static void T20_05(bool drawn)
 
     T60_10(&where);
     /* The assembly has in DI, for the number of the line, whatever was
-       left there. T53_00 goes by it only where it is 0FFFFh, which
-       nothing leaves. */
+       left there, and its T53_00 refuses the next line where that is
+       0FFFFh, which nothing leaves. Nothing reads the number here. */
     where.line = 0;
     if (T53_00(&where) != 0)
         return;
@@ -2211,7 +2220,7 @@ static void T00_20(void)
     i32 column, first_column, first_line, line, old_column, old_line;
     i32 delta, row, count, size, state, i;
     u16 color;
-    u16 *saved;
+    u16 *saved, *cell;
 
     column = T57_02();
     EdCol = column;
@@ -2371,8 +2380,19 @@ shown:
             color = '"';
         *(u8 *)(md.ScrBuf + 39) = (u8)color;
         color |= md.ScrBuf[0] & 0xFF00;
-        T75_00(EdLine, md.ScrBuf + 46, color);
-        T75_00(EdCol, md.ScrBuf + 56, color);
+        /* The line from 46 on, a space, Col and a space, and the
+           column: where the assembly has them, at 52 and 56, for a line
+           of five digits or fewer, and further on by as many cells as
+           the line has more (src/portable_c/DEVIATIONS.md, 25). What is
+           behind the column is blank to the end of the line, where a
+           longer line had the column before. */
+        cell = md.ScrBuf + 46 + T75_00(EdLine, md.ScrBuf + 46, color);
+        *cell++ = color & 0xFF00 | ' ';
+        cell = MvsBw(cell, Col_S, 3, color);
+        *cell++ = color & 0xFF00 | ' ';
+        cell += T75_00(EdCol, cell, color);
+        while (cell < md.ScrBuf + 80)
+            *cell++ = color & 0xFF00 | ' ';
         /* The assembly writes here, T00_54, what is free of the room
            in seven cells from 62 on, behind "Free" at 70: a figure of
            free memory, which goes (src/portable_c/DEVIATIONS.md, 24). */

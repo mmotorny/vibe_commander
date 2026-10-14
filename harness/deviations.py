@@ -886,7 +886,7 @@ TREES = {
                      "editor-keys", "editor-hex-keys", "editor-buffer",
                      "editor-dirinfo", "mouse-edit", "start-setup",
                      "start-screen", "start-memory", "setup-delay-file",
-                     "setup-help-file", "stay-left")),
+                     "setup-help-file", "stay-left", "editor-lines")),
                    (_FIVE_DOWN + " Enter",
                     ("user-menu", "user-menu-run", "view-commands")))
                for name in names},

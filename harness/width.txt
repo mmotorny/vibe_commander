@@ -75,7 +75,7 @@ N1              81          0     2              0      77     6     5     4    
 N2              79          0     0              0      68    11     0     3    29  dialog.c
 N3, N4          56          0    13              0      67     2     7    22    88  view.c
 N5              76          0     0              0      70     6     3     4    44  find.c
-N6 to N8        67          0     4              0      71     0    12    35   143  edit.c
+N6 to N8        67          0     4              0      71     0    13    35   145  edit.c
 N9              41          0     6              0      39     8     2     7    37  copy.c
 N10             55          0     0              0      49     6     3     9    37  dirfunc.c
 N11             47          0     1              0      46     2     2    10    34  files.c read.c place.c
@@ -93,7 +93,7 @@ N20             61          0     0              0      58     3     0     3    
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
 as a whole     567          0    58              0       0     0     0     0    13  the tables, dos32.c stack.c
 headers        270         68    12              1     162     5     0     0     0  vc.h sys.h tables.h
-all           1945        105   108              1    1181    65    53   171   931
+all           1945        105   108              1    1181    65    54   171   933
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               214         12    11              0     162     5     0     0     0
@@ -109,7 +109,7 @@ dialog.c            79          0     0              0      68    11     0     3
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           55          0     0              0      49     6     3     9    37
 drive.c             16          0     0              0      16     0     2     2    10
-edit.c              67          0     4              0      71     0    12    35   143
+edit.c              67          0     4              0      71     0    13    35   145
 enter.c             12          0     0              0      12     0     0     1    14
 exec.c              13          0     0              0      13     0     0     1     2
 extfile.c            4          0     0              0       4     0     0     2     1
@@ -2105,6 +2105,10 @@ edit.c, T74_00: variable blank, u16
 
 edit.c, T75_00: parameter color, u16
     cell: the colour in the high byte.
+
+edit.c, T75_00: sign
+    | u8 *end = Number(md.TmpBuf, (u16)((number + 1) >> 16),
+    number is a line or a column of the editor counted from 0, EdLine or EdCol, which no key takes below 0: number + 1 is 1 or more.
 
 edit.c, T76_00: parameter place, u16
     place
