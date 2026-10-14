@@ -9379,7 +9379,7 @@ for.
 | N2 | `dialog.c` | 1,126; 110 | F3 | **Done**: "N2, `dialog.c`: done, and what a later cluster should know" below |
 | N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | The viewer's room in bytes. It names what `ViewDat` and `EdData` share, for N6. It says where it cut the file |
 | N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | |
-| N5 † | `find.c` | 1,044; 125 | F4 | The list's room in bytes, and its counts |
+| N5 † | `find.c` | 1,044; 125 | F4 | **Done**, but for question 10: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
 | N9 † | `copy.c` | 1,571; 147 | F6 | The buffer in bytes |
@@ -9821,6 +9821,36 @@ recommendation first.
      program's command line, which P tries first, or put on the
      bench's disk where no other scenario lists it. A change of the
      bench that changes a golden is asked first.
+
+10. **A part of a file read behind the end of the room** (open; the
+   cluster N5 met it, and its section has the reading).
+   - *When*: before F9, which would have the extender end the program
+     there. Nothing else waits for it.
+   - *The original*: a file that is searched for a text is read in
+     parts of 8000h and 80 bytes into the room behind the list, and
+     the part's length is taken from the whole room, not from what is
+     left of it behind the list. With the list within that much of the
+     room's end, its last 505 lines or so, a part is read behind the
+     end: DOS writes the file's bytes behind the original's block of
+     memory, which is the last on the machine, into what lies above
+     DOS's memory, and the text is then looked for in what that
+     memory gives back. By reading, not tried: it takes thousands of
+     files found by one search, which no scenario gets near.
+   - *The program of 32 bits*: the same, into its own memory behind
+     the room today, from some 7,560 of its 8,064 lines; from F9 on,
+     with some 230,000 lines, the extender ends the program there.
+   - *Recommended*: a part is as long as what is left behind the
+     list, 8000h and 80 bytes at the most; with less than 4,000 bytes
+     left the search stops, as it stops today when the whole room is
+     that short, and the box says how many files were found, as for a
+     full list. Nothing changes before the list is within 32 KB of its
+     end.
+   - *Or*: the list is held 8000h and 80 bytes shorter, so that a part
+     always fits: a full list has some 505 lines fewer, whether a text
+     is looked for or not. *Or*: as the original, which from F9 on
+     ends the program.
+   - *The test*: no scenario can get near it; the image of the room,
+     with its pattern behind it, holds that nothing is written behind.
 
 Everything else that a user would see otherwise by the memory is
 covered by answer 2, as its table has it row for row. Two rows there
@@ -13253,6 +13283,111 @@ differ", the one in `mouse-dialog`, which the tool lets differ.
 It took some 45 tool calls, the reading of the file and of the plan
 some 25 of them, with the file read whole once and the reasons
 written by one script; and some 20 more to land.
+
+### N5, `find.c`: done, and what a later cluster should know
+
+**What there is.** `find.c` sorted by "The rule for a number", with the
+steps of "N0d" in their order, the room counted in bytes where the file
+search takes it, and `struct Searched` of `vc.h`, which `F67_00`
+answers in. clang's warnings of a conversion are silent for the file.
+One question for the user is open, question 10 of "The questions for
+the user": a part of a file read behind the end of the room. The code
+there is the original's, in bytes, with a comment that says so.
+
+**The numbers.** Of the 120 of 8 or 16 bits that the record had, and
+none that was a `u32`:
+
+| | Numbers | Which |
+|---|---|---|
+| Widened, to `i32` | 41, and 1 new | The counts of the list, `FndCur`, `FndFrst`, `FndNumb`, `FndSize` and `FndFls` of `struct FndData`; every line number, cursor, first line, target and count of lines in `Line`, `FndLine`, `FndCurs`, `FnMv00`, `FndMove`, `FndStuf` and Go to; what `Find_T` and `FnMv00` answer, a choice of the `ASK_` constants; the length of the path, the place of the suffix, the room, the part and what was read in `FindFil`; the counts and indexes of the loops; the width of the cursor's line; `place` of `struct Searched` and of `To`, a `TO_`. New: `unit`, the drive that is searched as DOS numbers it, which `drive` held before it held two characters |
+| Made `bool` | 4 | What `FndStuf` and `FndBack` answer, `go` of `FndBack`, `found` of `FindFil` |
+| Kept by a word | 70 | `place` 21, `character` 14, `text` 12, `colour` 5, `bits` 5, `key` 4, `cell` 3, `attributes` 2, `system` 1, `handle` 1, `small` 1 (`FndMenu`, a button of three), `unused` 1. New among them: `letter`, the drive's letter that `drive` held first |
+| Kept by a sentence | 6 | Two numbers in a word, each tested by its byte, as the original has them in a register: what `FndMove` answers and `answer` of `FndBack`, which is new and holds it where `key` did; `mode` of `FndBack` and of `F67_00`, the mouse's row or a button; `answer` of `F67_00`; what `FindFil` answers, as `FncFn` has it |
+| Gone | 1 | `room` of `F67_00`: `FndSize` is `RoomBytes() / LenFnf - 1` |
+| `sign` | 3 | `shown >> 8` of `FndStuf`, the division of the room, and the high word of `FndFls` that `Number` is handed |
+
+**The room in bytes.** The plan has the first of the five clusters that
+count the room add a function that answers it in bytes: `RoomBytes` of
+`start.c`, an `i32`, beside `RoomParas`, which `copy.c`, `edit.c`,
+`read.c` and `view.c` still call. `FindFil` takes the part as long as
+the room or 8000h and 80 bytes, the shorter, which is what the
+original's two tests of paragraphs come to; `FndSize` is the room's
+bytes over 65, less one, where the original divides 32 bits by 16. No
+cap: what keeps a line inside the room is `FndSize`, which `FndStuf`
+holds a new line to, and two lines more where a directory is listed,
+both as they were. What writes behind it is the question.
+
+**`struct FndData` grew**, from 18 bytes to 28, the five counts of 32
+bits; `LAID_OUT` says 28, and a `HOLDS` line that it ends before byte
+200 of `TmpBuf`, where `ViewDat` begins, of which the search reads
+`ViTxHex`. Nothing else of `TmpBuf` is used while a search runs but the
+path at its start, 81 bytes at the most, and `DirFunc`'s, below 100. The
+data's image lays the original's `FndData` over those bytes, so they
+differ wherever a search ran, and are declared, `--changed FndData`.
+
+**The casts.** clang named 16 places before anything changed. 9 went by
+a type: what `PgUp` and `PgDn` answer, four; what `DoublMo` answers; the
+first line of `FndMove`; the button of `MnMn10`; and the colour that
+`FndCurs` was handed in a high byte twice, which it now takes as the
+number and hands to `Color` itself. 7 are casts: a colour of `Color`
+put in a high byte, four times, and a size of the box, a size of a
+window and a place, each of bytes. Widening made 13 more, at the
+border of a number that stays narrow: a column or a count handed to
+`MvsColr`, `Window` and `struct LineArgs`, a count of bytes handed to
+`FileRead` and to `V82_00`, the drive handed to `DriveCd`, `DriveRemote`
+and `DriveFixed`, the halves of the count of files that `Number` takes,
+and the button of `MnMn10` handed on as `mode` and to `MnMn40`. So 20
+casts, all `(u16)`; three have a comment, by what each fits. Four casts
+that were there went with the widening: `(u16)(rows + first)`,
+`(u16)(FND->FndNumb + 2)`, the `(u16)` of the division, and the `(u8)`
+of the drive less 'A', which is never below 'A'. And `moved == 0xFFFF`
+of `FndMove` is `moved == -1`: the line one up, which the original's
+16 bits said by FFFFh.
+
+`harness/int16.py` lost its one place in the file, the index of
+`Mask_S`, whose two numbers are `i32` now. `harness/words.txt` lost the
+two `RoomParas` of the file.
+
+**Across clusters.** `struct Searched` is `vc.h`'s: `main.c` hands its
+`place` to `F1Next`, which takes a `u16`, and clang will name that when
+N16 sorts `main.c`. `V82_00` and `FileRead` are handed a count with a
+cast, which their clusters take out when they widen what they take.
+
+**The program.** `VC.EXE` is other bytes, `436561d5...` for
+`82ec67c9...` of the head that the piece began on, 12 bytes shorter;
+the whole suite passes, fourteen tests, no golden and no patch changed.
+The image of every scenario, `python3 harness/dataimage.py compare
+--changed FndData`, against the build of that head: "155 scenarios,
+149 with nothing that differs; 0 differences, 17 more in what was
+declared as changed, 24 in what may differ". The 17 are in the five
+scenarios that search, `find`, `find-drives`, `mouse-find`, `stamps`
+and `stamps-russia`, all between bytes 102 and 127 of `TmpBuf`, and
+each is the same count at its new place: `FndSize` 1F80h, 8,064, at
+112 for 106. Without `--changed` the same 17 are the differences.
+
+What a later cluster should know:
+
+- `RoomBytes` is there; N3, N6, N9 and N11 move their calls of
+  `RoomParas` to it, and the last of them, or F9, takes `RoomParas`
+  out. A cluster that lands beside this one may have made the same
+  function under another name: keep one.
+- A structure that a file lays over a buffer grows when its fields are
+  widened, and the image says so field for field by the original's
+  layout: declare it with `--changed NAME` and read that each
+  difference is the same number at its new place. Look first at what
+  else uses the buffer while the structure is live, and write the
+  bound as a `HOLDS` line.
+- A colour that a function took in the high byte, to hand it on as
+  the number, is better taken as the number: three casts at the
+  callers went for none inside.
+- A difference of two counts that the original held against FFFFh,
+  `moved == 0xFFFF`, is `-1` once the counts have a sign; the finder
+  names no such comparison, since nothing is cut there.
+
+It took some 75 tool calls, of which some 25 were the brief, the plan
+and the sections, 10 the file and its listings, 15 the edits and the
+records, and the rest the suite, the image and the documents; the
+scenarios and the images ran once.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 
