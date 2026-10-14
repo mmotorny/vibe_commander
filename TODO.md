@@ -9370,7 +9370,7 @@ thought and long in lines.
 | F10, the megabyte goes. **Done**: "F10, the megabyte goes" below | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
 | N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below, and "N0b, the rule turned to a sign" behind it | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and `i32`, the type with a sign; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
 | N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; every cut that clang names written as a cast, with a comment where the program counts on it; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's warnings of a conversion silent, which the test of the record asks; the test of the record; `portable_c-cut` | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
-| S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
+| S, what crosses to the system. **Done**: "S, what crosses to the system" below | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
 | M, the main data's numbers. **Done**: "M, the numbers of the main data and of a panel" below | Each field of the main data or of a panel that the record has as to be widened: a variable beside the structure, its word left unused, and every line that names it. `ClstSiz` among them, decided by the user on 14 October 2026 (question A of "N12" below): a cluster of 64K is its bytes and not 0, declared then as an entry of `DEVIATIONS.md` of its own, which rests on the count of entry 19; `cluster` of `PutInf` is widened with it | Those lines, in whatever file | Every cluster; alone | The scenarios; the images, the main data equal but for those words | |
 | P, a panel as long as its directory. Wanted: question 3 is answered so, 14 October 2026 | "The questions for the user", 3: a panel's block longer than 64K, its four offsets beside it in 32 bits, `ENTRY` without its cut, and a scenario that fills what the original can hold | `files.c`, `read.c`, `place.c`, `panel.c`, `enter.c`, `start.c`, and the lines of other files that keep an offset in a panel; `harness/scenarios.py`, `DEVIATIONS.md` | M; alone | The scenarios, with the new one held to the original's golden and its patch; the images | |
 
@@ -16090,6 +16090,119 @@ question 3 has. `NumbF` of `struct FILENT`, the number of an entry, is
 `PutInf`, `main.c` near "The numbers fit", and two in `panel.c`. `grep
 -n '2,703' src/portable_c/*.c` finds them; each is a cut to widen or a
 number to show in 32 bits when the limit goes.
+
+### S, what crosses to the system: done, and what a later piece should know
+
+The row of S in "The pieces", made from `main` at b98f2b3 and brought
+onto M at c238b02.
+
+**`sys.h`.**
+
+- `FileRead`, `FileReadBare` and `FileWrite` take a count that is an
+  `i32`, 0 or more, and answer with `struct Moved`: `count`, an `i32`;
+  `error`, DOS's error if it failed and else 0; `failed`. `struct
+  Answer` had one word for the count or the error, and a structure
+  with other members has every old reader of `.value` refused by the
+  compiler, which is how the sweep was held complete. If a call
+  failed, `count` is what the pieces before the one that failed moved:
+  0 for every count that the program asks.
+- `FileSeek(handle, place)` goes to a place counted from the start, a
+  `u32`, and `FileStep(handle, from, step)`, which is new, a step from
+  where the file is (1) or from its end (2), an `i32` that may be back.
+  The plan had one function take a place and a step in one parameter,
+  which no type does: a place is a size of a file and has no sign until
+  the layer gives it one, and a step has one. The three arguments of
+  the old call are refused by their count. When the layer gives the
+  size of a file a signed type, the two can be one again, as `lseek`
+  is. DOS is asked 42h with AL 0, 1 or 2 as before, and the same
+  registers. The README counts 97 functions, 18 of them for files, and
+  the table of `CLAUDE.md`, "Moving a file to the system's functions",
+  has the row for 42h written anew.
+- `DriveSpace`'s `free`, `sector` and `total` are `u32`. DOS answers in
+  16 bits, so on DOS they hold what they held; another system's figures
+  may be larger, and then `DiskClusters * ClusterBytes`, which M says
+  cannot wrap while the figures are 16 bits, can: a size that wraps at
+  4 GB, as every size of the program does until the layer.
+
+**`dos32.c`.** `Move` asks 3Fh or 40h at one call for a count of
+0FFFFh or less, which is every count that the program asks, with the
+registers that `Handled` gave it before; for more, a piece of 0FFFFh
+at a time, for as long as each piece comes back whole, and a count of 0
+is one call, which cuts a file off. `Seek` is the old `FileSeek`, behind
+both functions.
+
+**The callers**, 13 files: each variable that took one of the answers
+is a `struct Moved`, split from the `struct Answer` that it shared with
+an open or a close where it did; `.value` read as a count is `.count`,
+and read as the error where the call failed is `.error`. Three places
+read AX whichever it was: `DelTr0` of `dirfunc.c` hands it on as the
+answer, `wrote.failed ? wrote.error : (u16)wrote.count`; `ReDr00` of
+`read.c` reads it only where the read or the close failed, `got.error`;
+and `SaveSet` of `setup.c` returned the write's answer, which it now
+makes, `Failed(wrote.error)` or the count as its `value`. Every count
+that was handed over with a cast to 16 bits, for the old parameter,
+went: 14 casts, most with a comment that the count fits, and
+`(u32)-80L` of `find.c` is `FileStep(handle, 1, -80)`. A count that is
+kept in a word of 16 bits by the layout has its cast now: `InfoLen` of
+the main data in `RdInfo`, and the first word of the setup's help in
+`StRdHelp`. `copy.c` hands what is free on the disk, a `u32` below the
+piece's count by the line above, as `(i32)free`.
+
+**The toy** of `harness/trial32/sys.c` did not compile: F9 had made the
+three functions of the memory take bytes and answer with a pointer, and
+its page of the memory still asked for paragraphs by segments. That
+page asks in bytes now, and follows a block that `MemResize` moved,
+which the extender does; it gives every block back, and finds all of
+the memory free again. A function more, `Bigger`, takes a block of
+18000h bytes, writes it to a file at one call of `FileWrite`, reads it
+back at one of `FileRead`, 18000h each and no byte wrong, and has
+`FileReadBare` read nothing at the end, `FileWrite` of 0 cut the file
+at 10000h and `FileStep` find it so. That is the one run of the loop
+for more than 0FFFFh bytes, "What could go wrong", 18. No test builds
+the toy (`CLAUDE.md` has a note on that now): `harness/trial32/build.sh
+sys 32` from `build/`, then `harness/trial32/asked.py`.
+
+**What DOS is asked.** `harness/trial32/calls.asm` over the program of
+`main` and over this one, with the steps F3, Esc, Shift+F9, Enter, F4,
+Esc, Alt+F1, Esc and F10 Enter: 229 lines each, the same calls in the
+same order with the same AX, BX and counts. ES differs at two calls of
+4300h and two of 40h, which do not take it, and in the extender's own
+reading of the program's file, which is of another length: ES there is
+what the extender leaves in real mode, and follows the layout, since a
+second run of `main`'s build gave its list to the byte. The script was
+`build/s/calls.sh` of the checkout, not kept: `run.py --name VC.COM
+--extra VC.EXE=FILE --keep OUT build/trial32/calls.com` with those
+steps, and `listed.py OUT.D.img`.
+
+**The images.** The code is 268 bytes longer, so the room begins 272
+bytes later, and against `main`'s build every scenario differs, in all
+of the room. Against a build of `main` padded to the same length, 272
+bytes of a constant behind the last of `dos32.c`, not kept: 151 of 158
+scenarios with nothing that differs, `cursor` with nothing but what may
+differ, and six that do, `comspec`,
+`ended`, `second-copy`, `start-screen`, `start-setup`, whose second
+copy of the program lives in the room with code of another layout, and
+`start-memory`, `ViewSeg` and `FreMem2` naming nothing known at the same
+address, as N19b found. Nothing is declared as changed.
+
+**For the cluster that sorts these numbers**, and for the layer:
+
+- `sys.h` is still `not sorted`, 35 numbers and 4 `u32`, as the brief of
+  S had it: the plan gave the numbers of `sys.h`'s structures to S, and
+  M wrote "with S", but nothing of them was given a word here.
+  `struct Moved` and `FileStep` are new among them.
+- `struct Moved` is eight bytes and comes back through a pointer to
+  room in the caller's frame, where `struct Answer` came back in EAX.
+- `failed` stays a `u16` in every answer, the layer's shape ("Booleans").
+- `Move` is the only place that knows DOS's limit of 0FFFFh bytes. A
+  system with no such limit loops never; one with another sets its own
+  `PIECE_MOST`. No caller asks for more than it did, and what a user
+  sees between two pieces, a disk that is full, Ctrl-Break, stays the
+  caller's.
+
+The program: `VC.EXE` e2c14915... from 8e4931e3... of `main` at
+b98f2b3; brought onto M, `main` at c238b02, a9421c89.... The tests of
+the portable C pass on both.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 
