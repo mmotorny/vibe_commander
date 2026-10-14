@@ -11214,7 +11214,13 @@ the original's `CBW`:
     return line + first;                    /* movsx eax,al; add eax,edx */
 
 One size up it is the same, `(u64)(u32)word` for a short: `cwde` and
-`cdq`.
+`cdq`. The cause is the next piece's finding, "The compiler's lost
+cut: what Open Watcom does, and where": the code generator folds two
+conversions that follow one another into one, from the first type to
+the third, which is wrong exactly when the first has a sign, the
+second is wider and has none, and the third is wider still or is a
+floating type. What is said here of forms and uses is what was tried
+before that was known, and agrees with it.
 
 - Which forms. The conversion itself, with the cast written or not
   (`u16 line = byte;` for a `signed char byte`), wherever the byte is,
@@ -11242,13 +11248,31 @@ One size up it is the same, `(u64)(u32)word` for a short: `cwde` and
 
 **Which cast is safe to write, and which is not.** Not safe: a
 `signed char` made a `u16`, by a cast or without one, in any spelling
-that has no `short` in it. Safe, and the form of the tree:
+that has no `short` in it. Safe, and the form of the tree, the only
+one:
 
     (u16)(short)(signed char)byte           /* cbw; movzx eax,ax */
 
-Safe as well: arithmetic on the byte before the cut, `(u16)((signed
-char)byte - 1)`, which is no conversion of the byte; a mask, `& 0xFFFF`.
-And safe, in every use that was tried: every other cast that narrows.
+It is safe by how the fold is written, not by what was tried: a change
+of sign at the same size is no instruction, so the conversion of the
+byte to the short and that of the word to 32 bits do not follow one
+another. Nothing else is. Arithmetic that the compiler folds away
+protects nothing, `+ 0`, also by a name that is 0, `| 0`, `* 1`,
+`-(-byte)`, `byte + 1 - 1`: each is `movsx eax,al`. Arithmetic with a
+number that is written, `(u16)((signed char)byte - 1)`, and a mask, `&
+0xFFFF`, come out right today by the order of the compiler's passes
+alone: they are not to be written, and the test fails for them. Where
+the byte is added to something that is no constant before it is cut,
+`(u16)((signed char)a + b - c)` of `edit.c`, the sum is made in 32
+bits and cut from there, which is a narrowing like any other.
+
+Safe, and what the tree leans on once every narrowing is a cast: every
+cast that narrows. A conversion that narrows is never the first of a
+fold, and a fold whose second conversion narrows is right: of the 392
+chains of three among the eight types of whole numbers, 384 are right
+in every form that the next piece tried, and the eight that are wrong
+are a signed char by way of a `u16` to 32 or 64 bits, a signed char by
+way of a `u32` to 64 bits, and a short by way of a `u32` to 64 bits.
 A number of 32 bits, with a sign or without, cast to `u16` or to `u8`;
 a number of 16 bits, with a sign or without, cast to `u8`; a short
 cast to `u16`; a difference of two numbers cast to either. Each is
@@ -11256,7 +11280,13 @@ cast to `u16`; a difference of two numbers cast to either. Each is
 register, before the number is used in 32 bits. A byte made 32 bits
 with its sign, `(i32)(signed char)byte`, is `movsx`, which is what is
 meant there. A number of 64 bits is not safe until the finder knows
-the fault one size up: the test fails for one.
+the fault one size up, nor a floating type, which a word made of a
+signed char is converted to with its sign as well, `cbw` and `fild
+word ptr`: the test fails for either. And the options of the build are
+a part of this: with `-oe` or `-ox`, which expand a function in
+place, the fault is also across a call and across a return, where a
+function that takes or returns 16 bits cuts for itself today. The test
+fails for a build that has one.
 
 How it was found out: a matrix of 60 forms by 33 uses, some 1,900
 functions, compiled with the build's options, linked as a program for
@@ -11306,16 +11336,32 @@ open:
   `u16` with no `short` between, wherever it is and however it is
   used: a place that is right today because its number stays in 16
   bits is wrong the day a variable behind it is widened, with no line
-  of it changing. And for a number of 64 bits.
+  of it changing. Its rule is closed, no list of what changes nothing:
+  the byte is looked for through every conversion but one to a short,
+  through every operator of one operand, and through every operator of
+  two of which one is a number that is written; a field of bits is a
+  signed char like any other. And it fails for a number of 64 bits and
+  for a floating type.
+- It fails for a build whose options have `-oe` or `-ox`.
 - It compiles `harness/cutcheck.c` with the build's compiler and the
-  options of `build/portable_c/compiled.txt` and holds 54 functions to
-  the instructions written in front of each. Ten have the fault and
-  are held to the wrong instructions, so that a compiler which is
-  mended, or which does it otherwise, is noticed. The others are held
-  to the right ones: the tree's form in every use, and every cast that
-  narrows, each handed to a parameter of 32 bits, added, compared and
-  made an index. That half is what the tree leans on once every
-  narrowing is a cast: a compiler that loses another cut fails it.
+  options of `build/portable_c/compiled.txt` and holds 63 functions to
+  the instructions written in front of each. Fifteen have the fault
+  and are held to the wrong instructions, so that a compiler which is
+  mended, or which does it otherwise, is noticed: the form in each
+  use, added to a pointer, from a field of bits, through arithmetic
+  that is folded away, and with a number of 64 bits and a floating one
+  as the third type. Two have the forms that are right by the order of
+  the passes, held to the right instructions so that the day they
+  change is seen. The others are held to the right ones: the tree's
+  form in every use, and every cast that narrows, each handed to a
+  parameter of 32 bits, added, compared and made an index. That half
+  is what the tree leans on once every narrowing is a cast: a compiler
+  that loses another cut fails it.
+
+The three things that the next section says the finder should have
+besides, as it read the test while it was being written, the closed
+rule, the floating types and the options that expand in place, are in
+it as it stands.
 
 What a later piece should know:
 

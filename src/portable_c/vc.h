@@ -64,10 +64,14 @@ typedef int            i32;
    the cast written or not; the byte made a word is the one such case
    that a program without numbers of 64 bits has. With a conversion to
    the type of 16 bits that has a sign between the two it is `cbw` and
-   `movzx eax,ax`, which is right. Every other cast that narrows, of 32
+   `movzx eax,ax`, which is right, and is the one form that is right by
+   how the compiler works: it folds two conversions that follow one
+   another into one, and a change of sign at the same size is none. A
+   mask or arithmetic in the place of the `(short)` comes out right
+   today and is not to be written. Every other cast that narrows, of 32
    or 16 bits to a u16 or a u8, it keeps. The test `portable_c-cut`
-   fails for the second form anywhere in the tree, and holds the
-   compiler to both: harness/cut.py. */
+   fails for anything but the first form anywhere in the tree, and
+   holds the compiler to both: harness/cut.py. */
 
 /* True or false and nothing else: bool, with true and false, as C has
    them since 1999, from the compiler's own header, which is no part of

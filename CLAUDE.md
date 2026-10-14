@@ -3002,8 +3002,10 @@ in "The portable C".
     < first`, as the byte with its sign in all 32 bits, FFFFFFFEh for
     FEh where C says FFFEh. `-od` and clang do what C says. The
     original's `CBW` is written `(u16)(short)(signed char)c` for that,
-    with the `short`, which the compiler keeps, on every line that
-    has it: `vc.h` says so at "A byte with a sign made a word", and
+    with the `short`, the one form that the compiler keeps by how
+    it works and not by chance, on every line that has it: a mask or
+    arithmetic in its place is not written. `vc.h` says so at "A
+    byte with a sign made a word", and
     `TODO.md`, "N0c", has which forms are lost, in which uses, and
     that every other cast that narrows is kept. The test
     `portable_c-cut` fails for the other form anywhere in the tree,

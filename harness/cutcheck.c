@@ -11,15 +11,24 @@
    C says 0000FFFEh for the byte FEh, `movsx eax,al` makes FFFFFFFEh. A
    function called Kept has the form that the tree is written in, or
    another cut that the tree rests on, and its instructions are right.
+   A function called Chance has a form that is right today and that the
+   tree does not write.
 
    The finder of the test, which reads the tree for the form that is
-   wrong, has to find every function called Lost here and no other. */
+   wrong, has to find every function called Lost or Chance here and no
+   other. */
 
 typedef unsigned char  u8;
 typedef unsigned short u16;
 typedef unsigned int   u32;
 typedef int            i32;
 typedef unsigned long long u64;
+
+struct Bits {
+    signed char field : 5;
+};
+
+#define NOTHING 0
 
 extern u32 Takes(u32 number);
 extern u32 Number;
@@ -99,7 +108,79 @@ u64 LostWide(short word)
     return (u32)word;
 }
 
-/* The form that the tree is written in, in the same places. */
+/* A floating type as the last of the three: the word is loaded with its
+   sign, `fild word ptr`, and never had its upper half to lose. The
+   finder finds any floating type that is written, as it does a number
+   of 64 bits. */
+/* is: enter 0x0004,0x00; cbw; mov -0x4[ebp],eax; fild word ptr -0x4[ebp]; leave; ret */
+double LostFloating(signed char byte)
+{
+    return (u16)byte;
+}
+
+/* Added to a pointer, which is a third size as a number of 32 bits is. */
+/* is: movsx edx,dl; add eax,edx; ret */
+u8 *LostPointed(u8 *base, u8 byte)
+{
+    return base + (u16)(signed char)byte;
+}
+
+/* From a field of bits, which is a signed char like any other. */
+/* is: mov al,[eax]; shl al,0x03; sar al,0x03; movsx eax,al; ret */
+u32 LostField(const struct Bits *bits)
+{
+    return (u16)bits->field;
+}
+
+/* Through arithmetic that changes nothing, which the compiler folds
+   away before it folds the two conversions: nothing to add, also by a
+   name, and one added and taken off again. */
+/* is: movsx eax,al; ret */
+u32 LostNothingAdded(signed char byte)
+{
+    return (u16)(byte + NOTHING);
+}
+
+/* is: movsx eax,al; add eax,edx; ret */
+u32 LostUndone(signed char byte, u32 to)
+{
+    return (u16)(byte + 1 - 1) + to;
+}
+
+/* Arithmetic with a number that is written, and a mask: right, and by
+   the order of the compiler's passes alone, since nothing in how it
+   folds two conversions says that these are left. The tree does not
+   write them, and the finder refuses them like the form itself: it
+   looks for the byte through all arithmetic with a constant. */
+/* is: cbw; dec eax; movzx eax,ax; ret */
+u32 ChanceLess(signed char byte)
+{
+    return (u16)(byte - 1);
+}
+
+/* is: cbw; movzx eax,ax; ret */
+u32 ChanceMasked(signed char byte)
+{
+    return (u16)(byte & 0xFFFF);
+}
+
+/* The form that the tree is written in, in the same places. A change of
+   sign at the same size is no instruction, so the conversion of the
+   byte to a short and that of the word to 32 bits are two that the
+   compiler cannot fold into one. */
+
+/* is: movsx dx,dl; movzx edx,dx; add eax,edx; ret */
+u8 *KeptPointed(u8 *base, u8 byte)
+{
+    return base + (u16)(short)(signed char)byte;
+}
+
+/* is: mov al,[eax]; shl al,0x03; sar al,0x03; cbw; movzx eax,ax; add eax,edx; ret */
+u32 KeptField(const struct Bits *bits, u32 to)
+{
+    return (u16)(short)bits->field + to;
+}
+
 
 /* is: cbw; movzx eax,ax; ret */
 u32 KeptReturned(u8 byte)

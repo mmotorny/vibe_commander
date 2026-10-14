@@ -4,10 +4,15 @@
 The fault. Open Watcom's code generator extends a number with a sign
 that is converted to a wider type without a sign, and from there to a
 still wider type, with its sign both times, where C says that the
-second time fills with zeros. It takes three sizes, so a program of 32
-bits that has no number of 64 meets it in one shape: a byte with a sign
-that is converted to a number of 16 bits without a sign and from there
-goes on into 32 bits. For
+second time fills with zeros. Its cause is in TODO.md, "The compiler's
+lost cut: what Open Watcom does, and where": the code generator folds
+two conversions that follow one another into one, from the first type
+to the third, and that is wrong exactly when the first type has a sign,
+the second is wider and has none, and the third is wider still or is a
+floating type. It takes three sizes, so a program of 32 bits that has
+no number of 64 and no floating one meets it in one shape: a byte with
+a sign that is converted to a number of 16 bits without a sign and from
+there goes on into 32 bits, as a number or added to a pointer. For
 
     u16 line = (u16)(signed char)byte;
 
@@ -21,10 +26,12 @@ It does not where the number is only used in 16 bits: kept in a field of
 itself, or compared with a number of 16 bits.
 
 Which forms. The conversion itself, written or not: `(u16)(signed
-char)x`, `u16 line = x` for an `x` that is a signed char, and the same
-by way of something that changes no number, `(u16)(int)(signed char)x`,
-`(u16)(u32)(signed char)x`, a `+` in front, a choice of two such. With
-every option of the optimiser, -os, -ot, -ox and none at all; -od alone,
+char)x`, `u16 line = x` for an `x` that is a signed char, a field of
+bits among them, and the same by way of something that changes no
+number, `(u16)(int)(signed char)x`, `(u16)(u32)(signed char)x`, a
+choice of two such, and arithmetic that the compiler folds away, `+ 0`,
+`| 0`, `* 1`, `-(-x)`, `x + 1 - 1`. With every option of the optimiser,
+-os, -ot, -ox and none at all; -od alone,
 which the debugging build has, is right, and so is clang. The compiler
 for C++ of the same download has it, and the one for 16 bits, which the
 C translation is built by, has it for a byte made a word that goes on
@@ -35,11 +42,22 @@ the two,
 
     u16 line = (u16)(short)(signed char)byte;
 
-which is `cbw` and `movzx eax,ax`. That is the form that the tree is
-written in, and src/portable_c/vc.h says so at "A byte with a sign made
-a word". Right as well, and not used: a mask, `& 0xFFFF`, and arithmetic
-on the byte before the cut, `(u16)((signed char)x - 1)`, which is no
-conversion of the byte.
+which is `cbw` and `movzx eax,ax`. That is the one form that is right
+by how the fold is written: a change of sign at the same size is no
+instruction, so the two conversions do not follow one another. It is
+the form that the tree is written in, and src/portable_c/vc.h says so
+at "A byte with a sign made a word". A mask, `& 0xFFFF`, and arithmetic
+with a number that is written, `(u16)((signed char)x - 1)`, come out
+right today, by the order of the compiler's passes and by nothing
+else: the tree does not write them, and the finder refuses them.
+
+Right too, and what the tree leans on: a conversion that narrows is
+never the first of a fold, and a fold whose second conversion narrows
+is right. Of the 392 chains of three among the eight types of whole
+numbers, 384 are right in every form that was tried. The eight that
+are wrong: a signed char by way of a u16 to 32 or 64 bits, with a sign
+or without; a signed char by way of a u32 to 64 bits; a short by way
+of a u32 to 64 bits.
 
 Why it matters. Step 2 of the road makes numbers of 16 bits into numbers
 of 32, and each takes a cut away or moves one. Where a number was kept
@@ -49,20 +67,28 @@ The test, `portable_c-cut` of the build, does two things.
 
 It reads the tree, src/portable_c/, through clang, as harness/int16.py
 has it read, and fails for every place where a signed char is converted
-to a number of 16 bits without a sign, with nothing between that changes
-the number and no `short`. It fails for all of them, also where the
-number is only used in 16 bits today: the next widening would make such
-a place wrong without a line of it changing. It fails as well for a
-number of 64 bits, declared or made by a cast: the tree has none, the
-fault is there one size up, for a number with a sign made 32 bits
-without one and then 64, and the finder does not look for that.
+to a number of 16 bits without a sign. The rule is closed, and no list
+of what changes nothing: the byte is looked for through every
+conversion but one to a short, through every operator of one operand,
+and through every operator of two of which one is a number that is
+written. Only a `short` between, and arithmetic with something that is
+no constant, which is done in 32 bits and cut from there, end the
+search. It fails for all such places, also where the number is only
+used in 16 bits today: the next widening would make such a place wrong
+without a line of it changing. It fails as well for a number of 64
+bits and for a floating type, declared or made by a cast: the tree has
+neither, the fault is there with either as the third type, and the
+finder does not look for those chains.
 
 And it compiles harness/cutcheck.c with the compiler of the build and
 the options that the build compiles a file of the tree with, which the
 build writes into build/portable_c/compiled.txt, and holds every
 function of it to the instructions that are written in front of it
-there. The functions called Lost are the fault, held to the wrong
-instructions: a compiler that no longer has it fails the test, and this
+there. It fails before that if those options have -oe or -ox, which
+expand a function in place: the fault is then also across a call and
+across a return, where a function that takes or returns 16 bits cuts
+for itself today. The functions called Lost are the fault, held to the
+wrong instructions: a compiler that no longer has it fails the test, and this
 check, the form and the note of vc.h are then looked at again. Those
 called Kept are what the tree rests on, held to the right ones: the
 form of the tree, and every other cast that narrows, of a number of 32
@@ -73,10 +99,13 @@ compared with one and made an index. The tree is to say every narrowing
 by such a cast, so it leans on the compiler keeping each: a compiler
 that loses one fails the test. A function that is added gets its
 instructions from what the test then says the compiler makes of it,
-read before they are written down.
+read before they are written down. The two called Chance are the
+forms that are right by the order of the passes: held to the right
+instructions, so that the day they change is seen, and nothing of the
+tree is wrong by it.
 
 The finder is held against the same file first: it has to find the
-functions called Lost and no other.
+functions called Lost or Chance and no other.
 
     python3 harness/cut.py --compiled build/portable_c/compiled.txt \\
         --out build/cutcheck          the test
@@ -105,21 +134,32 @@ SOURCE = int16.SOURCE
 CHECK = Path(__file__).resolve().parent / "cutcheck.c"
 SKIPPED = 77
 
-# The conversions that change no number that a signed char can hold,
-# through which the finder looks: to these types. A short is not among
-# them: with one between, the compiler is right.
+# The conversions through which the finder looks for the signed char:
+# to these types, each as wide as 16 bits or wider. A short is not among
+# them: it alone breaks the chain. A conversion to a byte without a sign
+# is none either: behind it the number has no sign.
 THROUGH = {"int", "unsigned int", "long", "unsigned long", "long long",
            "unsigned long long", "unsigned short"}
 CASTS = {"CStyleCastExpr", "ImplicitCastExpr"}
 
-# A number of 64 bits, declared or made by a cast: the tree has none, and
-# the fault is there one size up, which the finder does not look for.
-WIDE = {"long long", "__int64"}
+# What is a third size besides a number of 32 bits, declared or made by
+# a cast: a number of 64 bits, where the fault is one size up, of a
+# number with a sign made 32 bits without one, and a floating type,
+# which a number of 16 bits without a sign made of a signed char is
+# converted to with its sign as well. The tree has neither, and the
+# finder does not look for those chains: it finds the types.
+WIDE = {"long long", "__int64", "float", "double", "long double"}
 DECLARED = {"VarDecl", "ParmVarDecl", "FieldDecl", "FunctionDecl"}
 
 # What a place is found for, as the line of it says.
 LOST = "a signed char made a number of 16 bits without a sign"
-WIDER = "a number of 64 bits"
+WIDER = "a number of 64 bits or a floating one"
+
+# The options of the optimiser that expand a function in place, letters
+# behind -o: with one of them the fault is also across a call and across
+# a return, where the number is handed to a parameter of 16 bits or
+# returned as 16 bits, which this takes to be right.
+EXPANDING = "ex"
 
 
 def type_of(node):
@@ -131,23 +171,55 @@ def inner(node):
     return [each for each in node.get("inner", []) if isinstance(each, dict)]
 
 
+def constant(node):
+    """Whether `node` is a number that is written: a literal, the length
+    of something, a name of an enumeration, and what is made of such."""
+    kind, parts = node.get("kind"), inner(node)
+    if kind in ("IntegerLiteral", "CharacterLiteral",
+                "UnaryExprOrTypeTraitExpr", "OffsetOfExpr"):
+        return True
+    if kind == "DeclRefExpr":
+        return node.get("referencedDecl", {}).get("kind") \
+            == "EnumConstantDecl"
+    if kind in {"ParenExpr", "ConstantExpr", "UnaryOperator",
+                "BinaryOperator", "ConditionalOperator"} | CASTS:
+        return bool(parts) and all(constant(each) for each in parts)
+    return False
+
+
 def signed_bytes(node):
-    """Whether what `node` works out is a signed char that nothing has
-    changed: itself, or behind what changes no number."""
+    """Whether what `node` works out may be a signed char that the
+    compiler takes to be unchanged. The rule is closed, and not a list of
+    what changes nothing: the compiler folds `+ 0`, `| 0`, `* 1`, `- 0`,
+    `-(-c)`, `c + 1 - 1` and their like away, and other arithmetic with
+    a number that is written is right by the order of its passes and by
+    nothing else. So the chain is looked for through every conversion to
+    a type of 16 bits or more but a short, through every operator of one
+    operand, through every operator of two of which one is a number that
+    is written, and into both answers of a choice. What breaks it is a
+    conversion to a short, and arithmetic with something that is no
+    constant, which is done in 32 bits and cut from there."""
     while True:
         kind, parts = node.get("kind"), inner(node)
-        if kind == "ParenExpr" and parts:
+        if kind in ("ParenExpr", "ConstantExpr") and parts:
             node = parts[0]
         elif (kind in CASTS and parts
               and node.get("castKind") in ("IntegralCast", "NoOp")
               and type_of(node) in THROUGH):
             node = parts[-1]
-        elif (kind == "UnaryOperator" and node.get("opcode") == "+"
-              and parts):
+        elif (kind == "UnaryOperator" and parts
+              and node.get("opcode") in ("+", "-", "~")):
             node = parts[0]
         elif (kind == "BinaryOperator" and node.get("opcode") == ","
               and len(parts) == 2):
             node = parts[1]
+        elif (kind == "BinaryOperator" and len(parts) == 2
+              and node.get("opcode") in ("+", "-", "*", "/", "%", "|",
+                                         "&", "^", "<<", ">>")
+              and (constant(parts[0]) or constant(parts[1]))):
+            if constant(parts[0]) and constant(parts[1]):
+                return False
+            node = parts[1] if constant(parts[0]) else parts[0]
         elif kind == "ConditionalOperator" and len(parts) == 3:
             return signed_bytes(parts[1]) or signed_bytes(parts[2])
         else:
@@ -171,7 +243,8 @@ def places(ast, name):
             found.add((file if file.endswith(".h") else name, line, LOST))
         elif (node.get("kind") in DECLARED | CASTS
               and not node.get("isImplicit")
-              and type_of(node).replace("unsigned ", "") in WIDE):
+              and type_of(node).replace("unsigned ", "")
+              .replace("_Complex ", "") in WIDE):
             file, line = node["_at"][0][:2]
             file = os.path.basename(file)
             found.add((file if file.endswith(".h") else name, line, WIDER))
@@ -208,7 +281,7 @@ def functions(text):
     and its first and last line."""
     found = []
     for each in re.finditer(
-            r"/\* is: ([^\n]*?)\s*\*/\n[\w ]+?\b(\w+)\([^)]*\)\n\{.*?\n\}",
+            r"/\* is: ([^\n]*?)\s*\*/\n[\w *]+?\b(\w+)\([^)]*\)\n\{.*?\n\}",
             text, re.S):
         first = text.count("\n", 0, each.start()) + 1
         last = text.count("\n", 0, each.end()) + 1
@@ -225,10 +298,11 @@ def finder_wrong(command):
     for name, _, first, last in functions(CHECK.read_text()):
         within = sorted(line for file, line, _ in found
                         if file == CHECK.name and first <= line <= last)
-        if name.startswith("Lost") and not within:
+        has = name.startswith(("Lost", "Chance"))
+        if has and not within:
             wrong.append(f"{CHECK.name}: {name} has the form and is not "
                          f"found")
-        if not name.startswith("Lost") and within:
+        if not has and within:
             wrong.append(f"{CHECK.name}:{within[0]}: found in {name}, "
                          f"which has not the form")
     return wrong
@@ -272,6 +346,19 @@ def compiler_wrong(compiled, out):
                  if os.path.basename(part) == "wcc386"), None)
     if tool is None:
         return [f"{compiled} names no wcc386"]
+    expanding = [part for part in command
+                 if re.match(r"^[-/]o[a-z+]", part)
+                 and set(re.match(r"^[-/]o([a-z+]*)", part).group(1))
+                 & set(EXPANDING)]
+    if expanding:
+        return [f"the build compiles with {' '.join(expanding)}, which "
+                f"expands a function in place. The fault is then also "
+                f"where a signed char made a number of 16 bits is handed "
+                f"to a parameter of 16 bits or returned as 16 bits and "
+                f"goes on into 32 bits in the function that it is "
+                f"expanded in, which neither the form of the tree nor "
+                f"this test's finder is made for: pin it down again with "
+                f"that option before the build has it."]
     out.mkdir(parents=True, exist_ok=True)
     # Compiled where the object goes: for a file with a warning the
     # compiler writes NAME.err into the directory that it is run in.
@@ -308,6 +395,12 @@ def compiler_wrong(compiled, out):
                      "has it right now, the fault is mended or has moved: "
                      "read the top of harness/cut.py, and pin it down "
                      "again before the form of the tree is changed.")
+    if any(line.startswith("Chance") for line in wrong):
+        wrong.append("A function called Chance is right by the order of "
+                     "the compiler's passes alone. The tree has no such "
+                     "form, and the finder refuses it: nothing is wrong by "
+                     "this, and what the file says of the form is to be "
+                     "written anew.")
     if any(line.startswith("Kept") for line in wrong):
         wrong.append("A function called Kept is a cut that the tree rests "
                      "on. Read its instructions: if a cut to 16 or 8 bits "
@@ -370,10 +463,12 @@ def main():
               f"byte with a sign made a word\".")
     if len(found) > lost:
         print(f"cut: {len(found) - lost} places of the tree have a number "
-              f"of 64 bits. The compiler has the same fault one size up, "
-              f"for a number with a sign made 32 bits without one and then "
-              f"64, LostWide of harness/cutcheck.c, and this does not look "
-              f"for it: teach it to before such a number goes in.")
+              f"of 64 bits or a floating one. The compiler has the same "
+              f"fault with either as the last of three types, for a number "
+              f"with a sign made a wider one without and then that, "
+              f"LostWide and LostFloating of harness/cutcheck.c, and this "
+              f"does not look for it: teach it to before such a number "
+              f"goes in.")
     if found:
         return 1
     print(f"cut: no place of the {len(names)} files of the tree has the "
