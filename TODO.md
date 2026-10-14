@@ -9375,7 +9375,7 @@ for.
 
 | Cluster | Its files | Lines; narrow | Starts when | Besides sorting |
 |---|---|---|---|---|
-| N1 | `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c` | 891; 133 | F3, N0 | |
+| N1 | `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c` | 891; 133 | F3, N0 | **Done**: "N1, `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c`" below |
 | N2 | `dialog.c` | 1,126; 110 | F3 | |
 | N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | The viewer's room in bytes. It names what `ViewDat` and `EdData` share, for N6. It says where it cut the file |
 | N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | |
@@ -13091,6 +13091,87 @@ What the clusters should know:
   today. When a system gives the program a screen of its own size,
   the rows are to be held to that again: `Func21` above is where a
   screen taller than 47 lines already shows something.
+
+### N1, `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c`: done, and what a later cluster should know
+
+**What there is.** The five files sorted by "The rule for a number",
+with the steps of "N0d" in their order, and `struct Paged` of `vc.h`,
+which `PgUp` and `PgDn` answer in. Of their 130 numbers of 8 or 16 bits
+and 2 `u32`:
+
+| | Numbers | Which |
+|---|---|---|
+| Widened, to `i32` | 45 | Counts, indexes, lengths, rows: `MvzLine`, `FilZero`, `StrLen`, `ShrtLin`, `MainFil`; what `HexDec` is handed, the year and the hour of a date and a time; the margins, widths and rows of a box, `BoxLine`, `BoxDubl`, `MinBx5`; the palette of `Color`, the row of `BasAdr`; and all of `PgUp` and `PgDn`, with the two fields of `struct Paged` |
+| Made `bool` | 4 | What `IsCrLf` and `InvVar` answer, `started` of `Number` and what `PutFill` is handed |
+| Kept by a word | 77 | `character` 28, of which 17 are two in a word, as `PUT16` and `HexDec` have them and as the ends of a box's line are; `cell` 15; `place` 9; `colour` 8; `bits` 5, among them the two bytes of a length and where it begins that `MinBx5` answers; `system` 4, the timer's low word; `size` 4, the two halves that `Number` is handed, its number and the powers of ten; `time` 2; `setup` 1; `unused` 1 |
+| Kept with a sentence | 6 | The counts that count down to nothing as the original's `LOOP` does, so that 0 is 65,536: `count` of `MvsBw` and `MvsColr`, `length` of `ChkSum`, `count` of the shadow in `ShadBox`; and the check sum of `ChkSum`, which wraps all its life, as it returns and as it is made |
+| `sign` | 5 | `HexDec`, two in `PutDate`, `PutTime`, `MinBx5` |
+
+The casts. clang named 4 places, before anything was widened and
+after: none went by a type, since each is the border of a number that
+is narrow for a reason, two characters that `HexDec` answers, the two
+bytes of `MinBx5`, and the size that `MinBox` makes of two of them,
+twice, where the cast cuts off the beginning that the high byte had,
+which its comment says. Widening made no place more. One cast more is
+of kind 3, a wrap that is written: `ShrtLin` counts what is left of
+its limit as the original does, so that a limit too small for the
+drive and the dots moves some 64K, `limit = (u16)(limit - 2)` with
+`wraps` in its comment. Two casts that were there, the width of a box
+cut to a byte in `ShadBox` and `StdLine`, got a comment that says so.
+`portable_c-cut` needed no function more.
+
+`harness/int16.txt` lost five places, each of a number that is an
+`i32` now: the index of the colour table twice, the row of `BasAdr`,
+the step back in `ShrtLin`, the division of `MinBx5`, which is a
+`sign` entry of the other record now. `LowCase` keeps its `back`: the
+letter stays a character.
+
+**The program.** `VC.EXE` is other bytes, `d404bd28...` for
+`966c59d1...` of the head that the piece began on, 121 bytes shorter
+in the memory, and the whole suite passes, fourteen tests, no golden
+and no patch changed. The data's image of each of the 155 scenarios is
+that of the build before but for what may differ: the two random
+numbers, in six scenarios, which follow the time. No listing has a
+byte extended with its sign into 32 bits but `menu.c`, as before.
+
+**The colour.** N0d left open whether the number of a colour and the
+attribute that `Color` makes of it want two words. They keep one,
+`colour`, as `WORDS` has it: both are a byte for the same reason, a
+byte of the original's tables and of the display, and what tells them
+apart in the code is the name and the comment, the number being handed
+to `Color` and `ColAddr` and the attribute coming back. Where it is the
+number, the record says so behind the colon. A colour in the high byte
+of a word, to be put together with a character, is a `cell`, as N0
+had it.
+
+**Across clusters.** Three functions that other files declare for
+themselves were widened, and their lines changed with them, one each:
+`FilZero` in `find.c`, `setup.c` and `treebox.c`; `StrLen` in `keys.c`
+and `main.c`; `HexDec` in `input.c` and `stopts.c`. `vc.h` has the
+others. `python3 harness/width.py --show NAME` named one call that
+hands a parameter that was widened a number that is not cut, `limit -
+1` of `PutPath` in `panel.c`, which is 31 or more there. No caller
+changed but by those lines.
+
+What a later cluster should know:
+
+- `PgUp` and `PgDn` take and answer `i32`. `help.c`, `find.c` and
+  `treebox.c` keep what they answer in a `u16`, which clang will name
+  when their clusters sort them: the cursor and the first line are
+  counts there too. `PgDn` keeps the original's test of a sum that
+  passed 64K, which an `i32` does not, with a comment.
+- `MvsBw`, `MvsColr` and `ChkSum` take a `u16` count, for the 65,536 of
+  0. A caller that widens what it hands them gets a place from clang
+  and writes the cast there: it says that the count is the original's.
+- `BoxLine` and `BoxDubl` take `i32` margins, widths and rows; a
+  caller that hands them a byte of a size cut to a byte, `(u8)(size -
+  10)`, keeps its cast.
+- Every number of the five files that is a character, a cell or a
+  colour stays `u16` where the original has it in a register: the
+  words are most of the record here, as in N0's files.
+
+It took 62 tool calls of the piece, of which some 15 were reading the
+brief and the plan, and the scenarios and the images ran once.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 
