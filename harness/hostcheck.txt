@@ -23,7 +23,7 @@ drive.c       clean
 edit.c        clean
 edit_t.c      clean
 enter.c       clean
-exec.c        aborts 1
+exec.c        clean
 extfile.c     clean
 files.c       clean
 find.c        clean
@@ -36,7 +36,7 @@ input.c       clean
 keys.c        clean
 keys_t.c      clean
 line.c        clean
-main.c        data_seg 2, aborts 1
+main.c        data_seg 2
 main_t.c      clean
 mask.c        clean
 menu.c        clean
@@ -66,7 +66,7 @@ tree.c        clean
 treebox.c     clean
 treebox_t.c   clean
 usermenu.c    clean
-vc.h          aborts 3
+vc.h          clean
 view.c        clean
 view_t.c      clean
 window.c      clean

@@ -326,7 +326,7 @@ function(add_portable_c target directory)
          ${source_dir}/*.c)
     # The files in the order of their names, and dos32.c, the file of
     # the system's functions, behind them all: the linker's command,
-    # below, says why.
+    # below, says why it was, and that nothing rests on it now.
     if(NOT dos32.c IN_LIST c_files)
         message(FATAL_ERROR
             "src/portable_c/dos32.c is named in CMakeLists.txt and is not "
@@ -396,9 +396,7 @@ function(add_portable_c target directory)
     # names, which is the segment of the class STACK, of stack.c.
     #
     # The order of the segments is said here, by their classes, and the
-    # program rests on it: a segment and an offset are still numbers of
-    # 16 bits in it, counted from 64K below the main data (see "The words
-    # of the addresses" in vc.h).
+    # tests rest on it:
     #
     #   CODE    the code, an object of the file by itself
     #   STACK   the stack, the first thing of the data
@@ -408,21 +406,19 @@ function(add_portable_c target directory)
     #   MAIN    the main data, md of main.c, in the file as zeros
     #   BSS     what has no value, which the file does not hold
     #
-    # - A table is known by its offset from 32K below Title_S of
-    #   main_t.c: every table has to lie within 32K of that, those that
-    #   are written to among them, so _DATA stands with the constants;
-    #   and Title_S no more than 32K in front of the main data.
-    # - What has no value follows the main data at once: IniSave of
-    #   setup.c is known to the main loop by how far it is behind md, in
-    #   16 bits, and the main data leaves 2.9K of those. And dos32.c is
-    #   linked last, since a segment holds what the objects have of it in
-    #   their order: the memory that it hands out to the program, 640K
-    #   without a value, is then behind everything else that has none,
-    #   and still within the megabyte that a segment can name.
-    # - So the stack cannot stand behind the main data. Between the
-    #   tables and the main data its 16K leave Title_S further than 32K
-    #   from md. Behind what has no value, it would have all of that in
-    #   the file as zeros in front of it. It is first.
+    # - The stack is in the file as zeros, by which the scenarios' test
+    #   tells how much of it a scenario has left: so it stands in front
+    #   of what has no value, which would otherwise be in the file as
+    #   zeros in front of it. It is first, for the reason below.
+    # - The program itself rests on no place of the linker's since the
+    #   piece F10 of TODO.md, "The portable C in a flat memory: the
+    #   plan": until then a segment and an offset were numbers of 16 bits
+    #   in it, counted from 64K below the main data, and the tables had
+    #   to lie within 32K of Title_S of main_t.c, IniSave of setup.c
+    #   within 64K of md, and the program within the megabyte that a
+    #   segment could name. dos32.c is linked last as it was for that, so
+    #   that its variables are behind everything else that has none:
+    #   nothing rests on it now, and it leaves the program as it was.
     # - The machine of the tests is many times slower at a write to a
     #   page of the memory that has code which it has run, and the
     #   extender packs the data right behind the code, in the same page
@@ -431,8 +427,8 @@ function(add_portable_c target directory)
     #   and the scenarios' test fails one that uses half. The constants
     #   stand between the stack and everything else that is written.
     #
-    # The test <target>-layout holds the linked file to each of these, by
-    # the linker's map: harness/layoutcheck.py.
+    # The test <target>-layout holds the linked file to what the tests
+    # rest on of these, by the linker's map: harness/layoutcheck.py.
     #
     # The extender writes two lines of its name when it starts, onto what
     # would be the program's first screen: tools/stub.c switches that off

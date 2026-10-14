@@ -122,6 +122,18 @@ HOLDS(a_bool_is_one_byte, sizeof(bool) == 1);
 /* Fails to compile when a structure is not laid out as in the assembly. */
 #define LAID_OUT(type, size) typedef char type##_size[sizeof(struct type) == (size) ? 1 : -1]
 
+/* A function that does not return, written in front of it where it is
+   declared: Open Watcom then ends its caller at the call, with nothing
+   behind it, the same instructions as `#pragma aux NAME aborts` made
+   before. Another compiler is told nothing here: _Noreturn of C11 is
+   its word, and the functions of sys.h that end the program would want
+   it too. */
+#ifdef __WATCOMC__
+#define NO_RETURN __declspec(aborts)
+#else
+#define NO_RETURN
+#endif
+
 #define LenColr 40                      /* Length of color table */
 #define LenHist 512                     /* Length of hisory buffer */
 #define LenExt  512                     /* Length of extension file buffer */
@@ -547,10 +559,8 @@ void Alloc3(void);
 void TakeEnd(void);
 void SetBrk(void);
 void Exec(void);
-void AlocEr(u16 bx);
-void Exit00(u16 code);
-#pragma aux AlocEr aborts
-#pragma aux Exit00 aborts
+NO_RETURN void AlocEr(u16 bx);
+NO_RETURN void Exit00(u16 code);
 
 /* Texts that the code of more than one file shows: the first three are
    constants of main_t.c and Var_S besides, and the last is one of
@@ -646,8 +656,7 @@ struct Answer Init11(void);
 void IniData(void);
 void GiveMem(void);
 struct Answer TakeMem(void);
-void Main(void);
-#pragma aux Main aborts
+NO_RETURN void Main(void);
 
 /* What the setup file holds: three letters V, of each panel what a
    WCBdef has before CurAdr, of the main data what it has before LoadRes,
@@ -1460,83 +1469,23 @@ struct Paged {
 struct Paged PgUp(i32 cursor, i32 first, i32 rows);
 struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
 
-/* The words of the addresses. The program keeps a place of the memory
-   in numbers wherever the original kept it in registers: a segment, an
-   offset in one, a place of the main data as a word. A table is no
-   such number any more: it is handed on by a pointer to it (see the
-   boxes and the dialogs, above). These words make a pointer of such
-   numbers and the numbers of a pointer, and the code of the program
-   is to do it through them and nowhere else: a cast between a pointer
-   and a number that is written out in a file is a place that has still
-   to go through one of them, and harness/hostcheck.py counts it.
+/* The words of the addresses. The program keeps a few places of the
+   memory in numbers where the original kept them in registers or in
+   words: an offset in a panel, an entry of the tree's list, a place of
+   the main data. A segment is no such number any more: a panel, a text,
+   a block and a table are pointers. These words make a pointer of such
+   a number and the number of a pointer, and the code of the program is
+   to do it through them and nowhere else: a cast between a pointer and
+   a number that is written out in a file is a place that has still to
+   go through one of them, and harness/hostcheck.py counts it.
 
-   The program has the memory of the original inside its own, which is
-   one address after another, so that every number means what it meant:
-   a megabyte counted in paragraphs from ARENA, which is 64K below the
-   main data. A segment `s` and an offset `o` are the address ARENA +
-   16 * s + o there, as they are 16 * s + o on DOS. The main data is
-   then in the segment 1000h whatever its address, and the viewer's text
-   is in whatever paragraphs the system's functions for the memory hand
-   out. What each word takes for granted is said at it, and what all of
-   them do:
-
-     - Whatever is named by a segment lies between ARENA and a megabyte
-       and 64K behind it, at an address that is ARENA and a number of
-       whole paragraphs where it is named with the offset 0. The order
-       in which the program is linked and the functions that hand out
-       the memory see to both.
-     - An address is formed that is in no object, between ARENA and the
-       main data. The language promises nothing of that. Open Watcom
-       and gcc take it.
-     - A pointer that such a word has made is stepped as a pointer. On
-       DOS in 16 bits a pointer that is stepped past FFFFh begins its
-       segment again; here it goes on, 64K further. What wraps round
-       has to do so in the number, before the word makes the pointer:
-       the words cut a segment and an offset to 16 bits each, as a
-       register does.
-     - Which of two pointers is the greater, and how far they are
-       apart, is said by their addresses. In the original it is said
-       by two offsets alone, whatever their segments.
-
-   TODO.md, "The portable C in a flat memory: the plan", has who takes
-   the megabyte down again: the words go when the numbers have become
-   pointers. */
-
-/* Where the megabyte begins. It takes for granted that an address 64K
-   below the main data can be formed and counted from. */
-#define ARENA ((u8 *)&md - 0x10000L)
-
-/* The segment of the main data: the megabyte begins 64K below it so
-   that this is a constant, whatever the address of the main data is. It
-   takes for granted that what is read in this segment behind the main
-   data, up to its offset FFFFh, is what the linker has put behind
-   `md`. */
-#define MAIN_SEG 0x1000
-
-/* What is at an offset in a segment: a pointer to the byte. Both are
-   cut to 16 bits, so a segment or an offset that has wrapped round
-   means what it means on DOS. It takes for granted that the segment is
-   one of the megabyte: the main data's, that of the tables, or one that
-   the functions for the memory handed out. A segment of DOS's own, the
-   PSP's or the environment's, is not: those are read in dos32.c alone. */
-#define AT(segment, offset) \
-    (ARENA + ((u32)(u16)(segment) << 4) + (u16)(offset))
-
-/* The segment of a pointer: the paragraph of the megabyte that it is
-   in. That is the segment it was made with only where the offset was
-   below 16; of any other pointer it is another segment, by which the
-   same byte is reached at an offset below 16. It takes for granted that
-   the pointer is not below ARENA, and less than a megabyte behind it. */
-#define SEG_OF(pointer) ((u16)(((const u8 *)(pointer) - ARENA) >> 4))
-
-/* The offset of a pointer in a segment: how far it is behind where the
-   segment begins. It is what AT is handed to make the pointer again. It
-   takes for granted that the pointer was made with this segment, or is
-   less than 64K behind where it begins, and what AT does of the segment.
-   Of a pointer anywhere else it gives a number that means nothing, with
-   no word said. */
-#define OFFSET_IN_SEG(segment, pointer) \
-    ((u16)((const u8 *)(pointer) - AT(segment, 0)))
+   Each counts from where its block, list or structure begins, and says
+   at it what it takes for granted. None of them rests on where the
+   linker or the system has put anything, as the program kept the
+   memory of the original inside its own until the piece F10 of
+   TODO.md, "The portable C in a flat memory: the plan": a megabyte
+   counted in paragraphs from 64K below the main data, in which a
+   segment and an offset were made a pointer. */
 
 /* The number in a word of a table that holds one where it could name
    something, NUMBER of tables.h: the pointer's low 16 bits, by way of a
@@ -1553,10 +1502,9 @@ struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
 /* A place of the main data as a number: how far it is behind where the
    main data begins; and the pointer to a place that is kept as a
    number, which is cut to 16 bits first. They take for granted that the
-   place is within 64K of where `md` begins: in the main data, which is
-   shorter than that, or in what the linker has put just behind it. A
-   pointer to anything else, a table, a local variable, a panel, gives a
-   number that means nothing, with no word said. */
+   place is in the main data, which is shorter than 64K. A pointer to
+   anything else, a table, a local variable, a panel, gives a number
+   that means nothing, with no word said. */
 #define MD_PLACE(pointer) ((u16)((const u8 *)(pointer) - (const u8 *)&md))
 #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
 

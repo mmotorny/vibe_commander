@@ -2845,9 +2845,9 @@ in "The portable C".
     the offset was reckoned with inside the brackets, `OFFSET(Table) +
     n * sizeof *Table`: read every place where a table's name is
     followed by `+`.
-  - `harness/layoutcheck.py` still holds the tables to the 64K round
-    `Title_S`, which nothing rests on any more: that is a limit of a
-    test, and was left for the session.
+  - `harness/layoutcheck.py` still held the tables to the 64K round
+    `Title_S`, which nothing rested on any more: that was a limit of a
+    test, left for the session, and went with the megabyte in F10.
 
 - The program of 32 bits is linked by the build since the piece B2
   (`TODO.md`, "B2, the program"), `build/portable_c/VC.EXE` and
@@ -3254,6 +3254,24 @@ in "The portable C".
   - A place that the original leaves in a register which a later
     command reads as a number stays the number, `MD_PLACE`, with its
     reason: the leak of `F00_50` of `keys.c` into BX and DX.
+
+- What taking the megabyte down met (F10; `TODO.md`, "F10, the
+  megabyte goes"):
+  - A function that does not return is `NO_RETURN` of `vc.h` in front
+    of its declaration, Open Watcom's `__declspec(aborts)`, which is
+    the same instructions as `#pragma aux name aborts` behind it; on a
+    static function it goes on the definition, `static NO_RETURN void
+    Round(void)`. `_Noreturn` and `__declspec(noreturn)` are taken by
+    `wcc386` without a word and are not the same: the caller goes on
+    behind the call.
+  - A macro that nothing uses is no code, and neither is a
+    `__declspec(aborts)` where the `#pragma aux` stood: both programs
+    of the build were the same bytes after the piece as before it,
+    which `sha256sum` of `build/portable_c/VC.EXE` and of
+    `debug/VC.EXE` says.
+  - A rule of the test of the layout that goes takes its row of the
+    figures with it: `tools/figures.py` read `room` of
+    `harness/layoutcheck.py`, which is gone.
 
 ### Moving a file to the system's functions
 

@@ -1595,7 +1595,7 @@ static void Exit(void)
    In the original the part of it that stays in the memory while a
    command runs has this loop, Stay there: it jumps to the rest of the
    program, at Init11, and is jumped back to with something to do. */
-static void Round(void)
+static NO_RETURN void Round(void)
 {
     struct Answer memory;
     i32 end;
@@ -1616,7 +1616,6 @@ static void Round(void)
         }
     }                                   /* CmdIni */
 }
-#pragma aux Round aborts
 
 /* The program, from when DOS has loaded it: the system calls this
    where it enters the program, Start of dos32.c, and it does not return.

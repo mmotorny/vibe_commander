@@ -17,8 +17,9 @@ fails for a file that has another count than the record, fewer as well
 as more, so that a commit which changes a count carries the record's
 lines that say so: write the record anew with `--record`, read what its
 diff says, and commit it with the change. A count may go up: the pieces
-that come first write `SEG_OF` and `AT` where they meet what another
-piece still has as a segment, and the last piece takes those out.
+that came first wrote `SEG_OF` and `AT` where they met what another
+piece still had as a segment, and the last, F10, took those out with
+the megabyte that they counted in, and the words with them from vc.h.
 
 What is counted is the text, as hostcheck.py's words of the segments
 are: a word as a whole word, outside comments, strings and characters,
@@ -65,7 +66,9 @@ def _word(name, by, what, pattern=PLAIN, text=None):
 
 
 WORDS = [
-    # What rests on the megabyte: gone when F10 takes it down.
+    # What rested on the megabyte, gone with it since F10 took it down
+    # and no longer defined in vc.h: one that is written again is
+    # counted, and is a word that the compiler does not know.
     _word("ARENA", "F10", "where the megabyte begins that segments count "
                          "in"),
     _word("AT", "F10", "a segment and an offset made a pointer: F3 for "
@@ -121,10 +124,13 @@ WORDS = [
     _word("md.HstAdr", "F7", "the history's", OF_MAIN, "HstAdr"),
     _word("md.BatAdr", "F7", "the commands'", OF_MAIN, "BatAdr"),
     _word("NEAR", "F8", "a cast that does nothing: F4 to F8, by file"),
-    _word("MD_PLACE", "F8", "a pointer into the main data made a "
-                            "number: F4 to F8, by file"),
-    _word("MD_POINTER", "F8", "and the number made the pointer again"),
     # What stays.
+    _word("MD_PLACE", None, "a pointer into the main data made a number, "
+                            "kept by F8 where the original leaves a place "
+                            "in a register that a later command reads as "
+                            "a number: it rests on the main data's layout, "
+                            "not on the megabyte"),
+    _word("MD_POINTER", None, "and the number made the pointer again"),
     _word("TRELIST", None, "the tree's list: a pointer since F7"),
     _word("TREE_OFFSET", None, "an entry of the tree's list as an offset "
                                "in it, where one routine moves a cursor "

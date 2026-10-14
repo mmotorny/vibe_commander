@@ -22,11 +22,10 @@ of the file and of the extender's stub in it, its code and its data, the
 addresses that the extender sets, the stack; how many words of its
 tables are pointers where the original has a word of 16 bits, and how
 many of those are such addresses, as the test of its data counts them,
-harness/datacheck.py; how much room the layout that it rests on has
-left, as the test of that works it out, harness/layoutcheck.py; and the
-length of the same program compiled for finding a fault. What is
-counted, in src/portable_c/, comments left out: inline assembly, by its
-pieces and instructions, and the lines of #pragma aux and pack; and the
+harness/datacheck.py; and the length of the same program compiled for
+finding a fault. What is counted, in src/portable_c/, comments left
+out: inline assembly, by its pieces and instructions, and the lines of
+#pragma aux and pack; and the
 calls that still hand registers to an interrupt, which tools/calls.py
 counts. The other things that only Open Watcom reads, by their kinds,
 are the host check's to count, harness/hostcheck.py, and its table is
@@ -122,7 +121,6 @@ def table():
     debug = layoutcheck.Check(
         (directory / "debug" / "VC.EXE").read_bytes(),
         directory / "debug" / "VC.MAP").program
-    room = check.room
     # The test of the data, for what it counts: it says nothing here.
     _, tables = datacheck.check(BUILD / "shareware-layout", directory,
                                 SOURCE, say=lambda line: None)
@@ -166,16 +164,6 @@ def table():
          f"{number(tables['pointers'])} and "
          f"{number(tables['addresses'])}"),
         ("Its stack", f"{number(top - bottom)} bytes"),
-        ("How far its tables may grow, in front of `Title_S` and behind "
-         "it, before the offset of one wraps round, as the test "
-         "`portable_c-layout` holds them",
-         f"{number(room['in front of Title_S'])} and "
-         f"{number(room['behind Title_S'])} bytes"),
-        ("How much more may stand between `Title_S` and the main data, "
-         "and between the main data and the end of `IniSave`, by the "
-         "same test",
-         f"{number(room['between Title_S and the main data'])} and "
-         f"{number(room['behind IniSave'])} bytes"),
         ("The same program compiled for finding a fault, "
          "`build/portable_c/debug/VC.EXE`",
          f"{number(len(debug.contents))} bytes, "
@@ -194,10 +182,7 @@ def table():
                                for name, (count, total) in by_file.items())))
     pragmas = [line for text in texts.values()
                for line in re.findall(r"^#pragma aux [^\n]*", text, flags=re.M)]
-    rows.append(("Lines of `#pragma aux`",
-                 f"{len(pragmas)}, of which "
-                 f"{sum(1 for line in pragmas if line.endswith('aborts'))} "
-                 "say that a function does not return"))
+    rows.append(("Lines of `#pragma aux`", f"{len(pragmas)}"))
     intrinsics = [name.strip() for text in texts.values()
                   for found in re.findall(r"^#pragma intrinsic\(([^)]*)\)",
                                           text, flags=re.M)

@@ -189,8 +189,7 @@ OFFSETOF = ("-Doffsetof(type,field)="
 # The words of the addresses, of vc.h: what is written in one is no
 # place. PLACE is of harness/int16check.c, which has it written as one
 # of them, to hold this to.
-WORDS = {"ARENA", "MAIN_SEG", "AT", "SEG_OF", "OFFSET_IN_SEG",
-         "MAIN_AS_PANEL", "PANEL_AS_MAIN", "NUMBER_OF", "NEAR", "MD_PLACE",
+WORDS = {"MAIN_AS_PANEL", "PANEL_AS_MAIN", "NUMBER_OF", "NEAR", "MD_PLACE",
          "MD_POINTER", "TREE_OFFSET", "TREE_ENTRY", "PLACE"}
 
 # The kinds, in the order of the summary: the name that the record has

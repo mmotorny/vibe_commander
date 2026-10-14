@@ -170,8 +170,9 @@ BLOCKS_MOST = 8
 STACK = "STACK"                   # segments of the map
 TABLES = ("CONST", "CONST2")
 VARIABLES = ("_DATA", "_BSS")
-# A megabyte that segments count in begins this far below the main data
-# (ARENA of vc.h).
+# A megabyte that segments counted in began this far below the main data
+# (ARENA of vc.h, until the piece F10): for a word that holds a segment,
+# in the images of a build from before then and in the buffers of any.
 ARENA = 0x10000
 PARAGRAPH = 16
 

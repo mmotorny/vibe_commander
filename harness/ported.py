@@ -1580,10 +1580,10 @@ def check_layout(program):
     the segments of 64K. The second is there in another form: nothing
     that a scenario writes lies in a page of 4K that has code, of the
     stack the part that check_stack() lets a scenario use. That, and
-    what the words of the program's addresses take for granted of where
-    the linker has put things, is harness/layoutcheck.py's to say and to
-    hold, which this asks: the test of the layout does the same without
-    a machine, and holds the stub of the file besides."""
+    where the driver of the tests finds the stack, is
+    harness/layoutcheck.py's to say and to hold, which this asks: the
+    test of the layout does the same without a machine, and holds the
+    stub of the file besides."""
     if not le.linear(program.contents):
         return True
     check = layoutcheck.Check(program.contents, program.linked)

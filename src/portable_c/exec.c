@@ -318,14 +318,13 @@ static void SetStat(void)
 }
 
 /* No memory when the program begins: say so and end. */
-static void Alloc9(void)
+static NO_RETURN void Alloc9(void)
 {
     OutStr0(Aloc_S, RESPARS_WAS);       /* BX: the paragraphs of the part
                                            of the original that stays */
     SetStat();
     ProgramEnd(1);
 }
-#pragma aux Alloc9 aborts
 
 /* What the program does first, before anything else is asked of the
    system: Main of main.c calls this when the system has entered the

@@ -1658,7 +1658,7 @@ this compiler reads. The first count, of the program of 16 bits, was
 | `registers` | 1 | 1 | The `#pragma aux` of `Arrived` in `dos32.c`, which names its registers | The same |
 | `intrinsic` | 1 | 1 | `_disable` and `_enable` of `dos32.c` | The same |
 | `data_seg` | 4 | 2 | The segment of the main data, in `main.c`, and of the stack, `stack.c`: a line in front of each and one behind | For the first, a program that counts nothing from where the main data begins, which the words of the addresses do until step 2 of the road has taken them down; for the second, a stack that the system gives |
-| `aborts` | 5 | 3 | A `#pragma aux` that says a function does not return: `Alloc9` of `resident.c`, `Round` of `main.c`, and `AlocEr`, `Exit00` and `Main` in `vc.h` | Nothing: another compiler passes over the line. A word of `vc.h` could say it to every compiler, which the plan of the flat memory has in F9 |
+| `aborts` | 0 since F10, 5 in 3 files before | | A `#pragma aux` that says a function does not return: `Alloc9` of `exec.c`, `Round` of `main.c`, and `AlocEr`, `Exit00` and `Main` in `vc.h` | Done in F10: `NO_RETURN` of `vc.h` in front of each, Open Watcom's `__declspec(aborts)` and nothing to another compiler, which gcc does not count. `_Noreturn` when the program is built by clang, with the functions of `sys.h` that end the program |
 
 The script knows six kinds more, which have no place now: `layout`, a
 structure that is not as long as the program takes it to be; `inconstant`,
@@ -9333,13 +9333,13 @@ scenario of the program's own: questions 8 and 9.
 | The data's image, new (F0) | At the end of every scenario, the main data and each block that the program has, by name, a panel, the other panel, the room, by QEMU's `pmemsave`, which `harness/dos.py` has; a tool holds the images of two builds against each other. For a piece that is to change nothing they are equal but for what the piece names. It is what would have shown C1's fault, where eleven scenarios passed over a write 64K off. Not a test of the build: run by the piece, before and after |
 | The words' record, new (F0) | The count of each word of the addresses by file, held as the host check's record is. It is the measure of the addresses: up at F1 to F3, nothing left that rests on the megabyte at F10 |
 | The 16 bytes round a block, new (F1) | A pattern in front of each block of the 640 KB and behind the last, held by the image's tool at the end of every scenario: a write just behind the end of a block, or in front of one, is named with its scenario from F1 on, where the extender ends the program for it from F9 on. "What could go wrong", 15 |
-| `portable_c-host` | Clean already in every file of the common code, since gcc reads the flat bodies, which cast nothing: it does not measure step 2. It guards it: a file must stay clean. Of what it still counts, `aborts` (5 places) can go to a word of `vc.h` in F10; `data_seg` and all of the system's file wait for the layer |
+| `portable_c-host` | Clean already in every file of the common code, since gcc reads the flat bodies, which cast nothing: it does not measure step 2. It guards it: a file must stay clean. Of what it still counted, `aborts` (5 places) went to a word of `vc.h` in F10; `data_seg` and all of the system's file wait for the layer |
 | Not counted by it, and worth knowing | gcc's `-Wcast-align=strict` names 376 casts that make a pointer to something wider of a pointer to bytes, `copy.c` 85, `view.c` 64, `stcolor.c` 53. Right on the 386 and on x86-64; what clang's sanitizer will name first in step 6. Not step 2's to mend, and not held to |
 | `portable_c-width` | The numbers of step 2 (N0): what is narrow or without a sign, with why, in a record; and, since N0d, every file that is sorted held to the casts, by clang's `-Wconversion` and `-Wsign-compare`, and to nothing beyond what clang names. Its finder also prints the cuts of a file, a step and a sum of a narrow number among them, which a cluster reads and no test holds. It is the measure of the clusters: the two `not sorted` of a row, to nothing |
 | `portable_c-cut` | That every cast which narrows is one that the compiler keeps (N0c): the form that it loses is refused in the tree, and the compiler is held to the instructions of the forms that the tree writes. It matters more since N0d, with every cut a cast |
 | `portable_c-int16` | Its question, whether two builds differ, is gone with the second build. Its finder is the finder of the widths (N0), and its record the start of theirs. N0 has made that finder, `harness/width.py`, and left this test, its record and its reasons beside it: a widening moves its places, and each is read as before. What it still holds that no cast and no warning does is in "N0d". Accepted by the session on 13 October 2026: it stays until the clusters are done, each cluster reading the places of its file before it widens, and is decided on then by what is left |
 | The test of the data and `harness/reads.py` | Unchanged by the plan, since no table and no layout changes. `reads.py` goes by the text `OFFSET(name)`: F3 teaches it the new form |
-| The test of the layout | Loses in F10 the three rules that are of the megabyte: what a segment names within it, the tables within 32K of `Title_S`, `IniSave` within 64K of the main data |
+| The test of the layout | Lost in F10 the three rules that were of the megabyte: what a segment names within it, the tables within 32K of `Title_S`, `IniSave` within 64K of the main data |
 | `CHECKED`, the debug program's checks | Not worth writing now. They were to be a third body of the words, and the words are what goes; and C1 showed that the fault to fear goes through no word. The image is the better net and costs less |
 | clang's sanitizers | Step 6. F10 leaves the tree with no address formed outside an object by the megabyte, which is what they would stop at first |
 | A scenario of the program's own, with no golden of the original | Not there, and not without the user's word. Question 9 has the least that it takes |
@@ -9364,7 +9364,7 @@ thought and long in lines.
 | F7, the tree, the history, the commands. **Done**: "F7, the tree, the history, the commands" below, and the commands of a line, which waited for F4, by the small piece F7b: "F7b, the commands of a line" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest. **Done**: "F8, the rest" below | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
 | F9, the memory from the extender. **Done**: "F9, the memory from the extender" below | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
-| F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
+| F10, the megabyte goes. **Done**: "F10, the megabyte goes" below | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
 | N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below, and "N0b, the rule turned to a sign" behind it | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and `i32`, the type with a sign; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
 | N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; every cut that clang names written as a cast, with a comment where the program counts on it; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's warnings of a conversion silent, which the test of the record asks; the test of the record; `portable_c-cut` | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
 | S, what crosses to the system | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
@@ -10328,6 +10328,100 @@ the 80 cells; `Line` at 41, its number at 46, `Col` at 52, its number at
   `Col` stays. A seventh digit, which the room of 15 MB allows with
   lines of two bytes, would reach the flag of the quote at 39.
   `|Edit: x                                 Line 105947 Col 6                       |`
+
+### F10, the megabyte goes: done, and what a later piece should know
+
+The program keeps no megabyte of DOS inside its own memory any more,
+and nothing of it rests on where the linker has put a thing. Both
+programs of the build are the same bytes as before the piece, the one
+that is shipped and the one of `debug/`:
+`966bc13e06f5f1db708b82f4b965d7e6f1573b26125b9baf44c2247ef969ca56` and
+`4be17424dbd2faa9f0cd3e6e3177dc3667a3feefa9a598499c2179eb0c8a66e4`,
+before and after, at `766d5e0`; and brought onto the piece E,
+`4ce4827fd69b7e09c19103a22bb56ca36546febaa1cdbf1f9e879ee5c6ce96cc` and
+`a2874e0760988366915451b1e6565cdac4477fa6b5b0c9cd7d155a7785d52eb9`,
+both the same as those of `c11bed2` built beside it. So no image can differ, and none does: the whole
+suite passes, and the images of the run are equal to those of
+origin's build saved before anything changed.
+
+**What went.**
+
+- From `vc.h`: `ARENA`, `MAIN_SEG`, `AT`, `SEG_OF` and `OFFSET_IN_SEG`,
+  which nothing but `vc.h` itself wrote since F9; `PANEL` had gone in
+  F2. The comment at the head of "The words of the addresses" says what
+  the words that are left count from, and that the megabyte was. Of
+  `MD_PLACE` it says that the place is in the main data: `IniSave`,
+  behind `md`, is no longer kept as a place by the main loop, which
+  copies it by its own pointer, and every `MD_PLACE` and `MD_POINTER`
+  of the tree is of a place in `md`, read at each.
+- From `harness/layoutcheck.py`, the three rules that were of the
+  megabyte, each with why it no longer holds:
+  - every object of the files of tables within the 64K that begin 32K
+    below `Title_S`, and that 32K below `Title_S` lies within the
+    megabyte (`tables`): a table has been handed on as a pointer since
+    F3b, and no word of the tree makes an offset of one or a pointer
+    of an offset among the tables, `OFFSET`, `TABLES_BY` and `AsmSeg`
+    being gone; `NUMBER_OF` takes the low 16 bits of a word that holds
+    a number, wherever the table lies;
+  - `IniSave` ending within 64K of where the main data begins (the
+    first half of `behind`): the main loop left its end in DI as
+    `MD_PLACE` in 16 bits, and since F8 (`8cd5bf9`) it leaves no place
+    of it in a register and reads it through its own pointer, `saved =
+    IniSave`;
+  - the program ending within the megabyte that a segment can name
+    (the rest of `behind`): the memory that was named by segments, the
+    640 KB of `dos32.c`, went in F9, and no segment is made or read.
+  What it still holds, all of which still holds for the program of 32
+  bits: the stack where the driver looks for it and in the file as
+  zeros; the file holding of the data all but what has no value; no
+  page that a scenario writes holding code; and of the file, two
+  objects as the map has them, the entry, every relocation an address,
+  and the stub. Its top says so, and the README's row of the test. Its
+  `room`, the distances to the three limits, went with them, and with
+  that the two rows of the figures that `tools/figures.py` made of it.
+- `aborts` behind a word: `NO_RETURN` of `vc.h`, in front of the
+  declaration of `AlocEr`, `Exit00` and `Main` there and of the
+  definitions of `Round` of `main.c` and `Alloc9` of `exec.c`, the two
+  lines in other pieces' files being the least that it took. It is
+  `__declspec(aborts)` to Open Watcom, which `wcc386` makes into the
+  same instructions as the `#pragma aux` (tried on a toy: `jmp` to the
+  function and nothing behind it, where without it the caller goes on;
+  `_Noreturn` and `__declspec(noreturn)` are taken without a word and
+  do not do that), and nothing to another compiler. A compiler that
+  builds the program, clang at step 6, is to be given `_Noreturn` there
+  with `ProgramEnd` and `ProgramEndOld` of `sys.h`, or it says that a
+  function which is not to return does. The host check counts no
+  `aborts` any more: `exec.c` and `vc.h` are clean, `main.c` has its two
+  places of `data_seg`.
+- The words' record: `ARENA` 2 and `AT` 1 in `vc.h` to nothing, and
+  every word of F10 at nothing. They stay in `WORDS` of
+  `harness/words.py`, so that one written again is counted, and in
+  `harness/int16.py` they are taken out of its `WORDS`, which a word
+  that the compiler no longer knows does not need.
+
+**What else changed with it**: the comments that said the megabyte or
+the words, in `CMakeLists.txt` at the linker's command (the order of
+the segments, with what the tests still rest on of it, and that
+`dos32.c` is linked last only so that the program stays as it was
+linked), `harness/hostcheck.py`, `harness/ported.py`,
+`harness/dataimage.py` (whose `ARENA` stays, for a word that holds a
+segment in the images of a build from before and in a buffer of any),
+`tools/figures.py`, the README (the paragraph on how the program is
+laid out, "What rests on Open Watcom" for the portable C, which loses
+its rows 3 and 4 and is numbered again, the tests `portable_c-words`
+and `portable_c-layout`, and the figures written anew), and a note of
+`CLAUDE.md`.
+
+**What is left of the words**, by the record: `MD_PLACE` 10 and
+`MD_POINTER` 1, which the record had as F8's, kept by F8 with their
+reasons where the original leaks a place into a register that a later
+command reads as a number (`keys.c`, `copy.c`, `exec.c`, `dirfunc.c`,
+`treebox.c`). They rest on the main data's layout and not on the
+megabyte, and the record says `stays` for them since this piece, on
+the session's word.
+
+**For a cluster that sorts these files**: F10 adds no number. The two
+lines of `NO_RETURN` in `main.c` and `exec.c` change no type.
 
 ### F0, the net and the record: done, and what a later piece should know
 

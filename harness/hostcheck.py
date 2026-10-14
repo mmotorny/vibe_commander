@@ -34,15 +34,15 @@ pointer of a number in every file that named it, and was counted in
 each, while there was one. What is wrong in a header itself is counted once, for the header,
 however many files read it. A file with no place of any kind is clean.
 
-The words of the addresses in vc.h, AT, OFFSET, PANEL, MAIN_SEG, NEAR,
-MD_PLACE, MD_POINTER and their like, are written for a memory without
-segments and cast no pointer to a number. So a segment and an offset
-that go through those words are not counted, and what is counted of
-the two casts is what does not go through them: a cast that is written
-out, a macro of a file, and what is DOS's. That the words compile for
-this machine says nothing of whether a place is right on it: they hold
-a megabyte of segments in the memory, and gcc has nothing to say of
-what a number means there.
+The words of the addresses in vc.h, NEAR, MD_PLACE, MD_POINTER,
+ENTRY and their like, cast no pointer to a number that does not hold
+it. So a place that goes through those words is not counted, and what
+is counted of the two casts is what does not go through them: a cast
+that is written out, a macro of a file, and what is DOS's. That the
+words compile for this machine says nothing of whether a place is
+right on it: gcc has nothing to say of what a number means. Until the
+piece F10 of step 2 they held a megabyte of segments in the memory, AT,
+PANEL, MAIN_SEG and the others, which went with it.
 
 What was counted last is kept in harness/hostcheck.txt, of every file,
 and the test `portable_c-host` of the build fails when a file has
