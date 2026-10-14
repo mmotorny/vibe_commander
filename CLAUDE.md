@@ -317,7 +317,14 @@ These held while `src/c/` was made, and they say what it is.
   text has no bytes, for which the program of 32 bits would write 64K
   behind the main data where the original went round its own segment,
   is refused as a broken file, a bug of the original fixed and
-  declared.
+  declared. A scenario that makes such a file in the editor was
+  offered and not taken, since the C translation cannot pass it. The
+  editor's line number takes a sixth digit and more by moving Col to
+  the right only where it is needed, so that a text of fewer than
+  100,000 lines shows as the original's does; and the word Free goes
+  with the figure that it named. The rules of the test of the layout
+  that only held for the program of 16 bits, the tables within 64K of
+  `Title_S` among them, go with the piece F10.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
