@@ -9808,6 +9808,9 @@ seen to do.
 
 ### Left for the layer's design
 
+The layer's design, step 3, is drafted in `src/portable_c/LAYER.md`,
+which takes up what is listed here and says what the user has approved.
+
 - **Sizes beyond 32 bits**: of a file, of the files that are selected
   taken together, of the room that a drive has free. They want numbers
   of 64 bits, for which the tree has no helper routines, having no C
