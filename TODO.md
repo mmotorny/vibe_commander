@@ -9391,7 +9391,7 @@ for.
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
 | N16 | `main.c` | 1,601; 117 | F8 | |
 | N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | |
-| N17b | `commands.c` | 604 lines; in the record's table | F8 | |
+| N17b | `commands.c` | 604 lines; in the record's table | F8 | **Done**: "N17b, `commands.c`: done, and what a later cluster should know" below |
 | N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | **Done**: "N18, `menu.c`, `help.c`: done, and what a later cluster should know" below. The help's lines widened with the original's cuts written where a help file that is not true to its text takes them past 16 bits |
 | N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | |
 | N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | |
@@ -14826,6 +14826,83 @@ the sections 12; the images of the build before, on a machine with a
 load of 60, the longest wait; the files read with the finder's lists
 beside them 4; the types, the casts and the reasons by three scripts
 6; the records, the suite and the documents the rest.
+
+### N17b, `commands.c`: done, and what a later cluster should know
+
+**What there is.** `commands.c` sorted by "The rule for a number", with
+the lines of `vc.h` that declare its commands; clang's warnings of a
+conversion silent for it. The whole suite passes, no golden and no
+patch changed, and the image of each scenario is that of the build
+before (below).
+
+**The numbers.** Of the 74 of 8 or 16 bits, none a `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 41 | What 31 commands answer, a `MNU_` of `vc.h`, where the program goes on, as the commands of `dirfunc.c` answer a `TO_`; three indexes of 13 and 80 bytes; the drive of `M02_10`; the order of a panel and the order it had, in `M01_01`; the kind of a panel in `M03_00`; the line of the minutes in `M60_00`; the page of the help and the button chosen in `M64_02` |
+| Made `bool` | 5 | What `M02_10` answers and `failed` there, which keeps what `SetPth` answers as "not 0"; what `M49_10` answers and what it is handed, and `marked` of `M49_00` |
+| Kept by a word | 28 | `bits` 11, `item` of every command that has one, what the original has in CX: the menu in the low byte and the item in the high one, taken apart by shifts and handed to `PutMnu`; `text` 10, the texts and names of `commands_t.c` that the file declares; `address` 6, the offsets in a panel's block that `FnFile` answers and that `EndBuf` and `CurAdr` are, question 3; `setup` 1, `Delay_T`, the minutes as `BlDelay` has them |
+| Kept by a sentence | 0 | |
+
+No place of the kind `sign`: `item >> 8` is of a `u16`, and nothing
+else is shifted to the right or divided. `harness/int16.py` had no
+place in the file, and has none.
+
+**The casts.** clang named 4 places before anything changed, each a
+place of the screen or a word of CX made of two bytes and handed on in
+16 bits: `M01_00`, `M08_00`, the window of `M06_00` and of `M60_00`.
+None could go by a type, the parameters being 16 bits by a word, and
+all four are a cast around the whole expression where the cast had
+stood on its first operand. The widening made 5 more: the drive handed
+to `Fantom` of `system.c`, which takes a `u16` until N19a; and the
+kind, the order and the line of the minutes put back into a byte of a
+panel or of `TmpBuf`. So 9 casts, of which one has a comment: the kind
+of `M03_00`, `(u8)(5 - (item >> 8))`, which the program counts on to
+wrap. The keys of the panels hand on five less a kind in a byte of
+`struct Onward`, a kind that `F17_01` of `keys.c` takes from what DOS
+left in AL behind `DelTr0`, and the cut here gives that kind back
+whatever byte it was, as the original's `SUB CL,CH` does. The cast
+`(u8)` of the drive's letter less 40h in `M02_10` went: the letter is
+that of a panel's path, A to Z, and `Fantom` reads the low byte. The
+two macros `LOW` and `HIGH`, which nothing used, went.
+
+With the four casts alone, on the file as it was, `commands.c` compiles
+to the same instructions but in `M08_00`, whose two operands of the
+`or` are worked out in the other order, the same length; so the casts
+were not held by `VC.EXE`'s bytes but by that listing, and the types
+by the scenarios.
+
+**Across clusters.**
+
+- The 26 commands that `vc.h` declares answer an `i32`. Their one
+  caller is `main.c`, N16's, which hands each answer to `MnuEnd`, a
+  `u16` there, and four of them from `CmdEnd` and `F62_02`: no line of
+  it changed. When N16 sorts `main.c`, clang names `MnuEnd(M..._..())`
+  only if `MnuEnd` keeps a `u16`; an `i32` there takes them as they are.
+  `main.c` is other code all the same, by its frame: 4 bytes longer.
+- `Fantom((u16)drive)`: the cast goes when N19a widens what `Fantom`
+  takes. `M02_10` keeps what `SetPth` answers as a `bool` by `!= 0`,
+  which stays right whatever N19a makes of it.
+- `commands.c` declares `ChTree(u16 column)` of `treebox.c` for
+  itself, as `copy.c` does: whoever widens that parameter changes the
+  line here too.
+
+**The program.** `VC.EXE` is another by the types, `commands.c` 40
+bytes shorter: the bytes and the booleans had been made words and
+cut again; the code of the program is 36 bytes shorter, with the 4 that
+`main.c`'s frame grew. The image of every scenario, `python3
+harness/dataimage.py compare`, against the build of `main` that the
+work began on, 0f5d6fd: "156 scenarios, 155 with nothing that differs;
+0 differences, 0 more in what was declared as changed, 34 in what may
+differ", the 34 all in `blank-timed`, among what follows the time,
+which the tool lets differ (`UNSTEADY`).
+
+It took some 50 tool calls to hand back: reading the brief, the plan
+and the sections 12; the file read once with the finder's lists beside
+it, and the callers 6; the types and the casts by two scripts 3; the
+record's reasons by one script 2; the listings of the casts alone and
+of `main.c` 4; the tests, the images and the documents the rest, on a
+machine that a dozen other agents were testing on.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

@@ -1138,32 +1138,32 @@ struct Sought V82_00(const u8 *text, i32 at, i32 count);
    original has in CX, from the menu bar the menu in the low byte and the
    item in the high one. M01_01, M03_00, M06_00 and M06_10 are where the
    keys of the panels and the box of the drives go on. */
-u16 M01_00(struct WCBdef *panel, u16 item);
-u16 M01_01(struct WCBdef *panel, u16 item);
-u16 M03_00(struct WCBdef *panel, u16 item);
-u16 M06_00(struct WCBdef *panel, u16 item);
-u16 M06_10(struct WCBdef *panel, u16 item);
-u16 M08_00(struct WCBdef *panel, u16 item);
-u16 M16_00(struct WCBdef *panel);
-u16 M16_01(struct WCBdef *panel);
-u16 M16_10(struct WCBdef *panel);
-u16 M21_00(void);
-u16 M41_00(void);
-u16 M42_00(struct WCBdef *panel);
-u16 M49_00(struct WCBdef *panel);
-u16 M60_00(void);
-u16 M61_00(void);
-u16 M53_00(u16 item);
-u16 M62_00(u16 item);
-u16 M63_00(u16 item);
-u16 M64_00(u16 item);
-u16 M66_00(struct WCBdef *panel);
-u16 M67_00(struct WCBdef *panel);
-u16 M69_00(struct WCBdef *panel);
-u16 M70_00(struct WCBdef *panel);
-u16 M71_00(struct WCBdef *panel);
-u16 M72_00(struct WCBdef *panel);
-u16 M75_00(struct WCBdef *panel);
+i32 M01_00(struct WCBdef *panel, u16 item);
+i32 M01_01(struct WCBdef *panel, u16 item);
+i32 M03_00(struct WCBdef *panel, u16 item);
+i32 M06_00(struct WCBdef *panel, u16 item);
+i32 M06_10(struct WCBdef *panel, u16 item);
+i32 M08_00(struct WCBdef *panel, u16 item);
+i32 M16_00(struct WCBdef *panel);
+i32 M16_01(struct WCBdef *panel);
+i32 M16_10(struct WCBdef *panel);
+i32 M21_00(void);
+i32 M41_00(void);
+i32 M42_00(struct WCBdef *panel);
+i32 M49_00(struct WCBdef *panel);
+i32 M60_00(void);
+i32 M61_00(void);
+i32 M53_00(u16 item);
+i32 M62_00(u16 item);
+i32 M63_00(u16 item);
+i32 M64_00(u16 item);
+i32 M66_00(struct WCBdef *panel);
+i32 M67_00(struct WCBdef *panel);
+i32 M69_00(struct WCBdef *panel);
+i32 M70_00(struct WCBdef *panel);
+i32 M71_00(struct WCBdef *panel);
+i32 M72_00(struct WCBdef *panel);
+i32 M75_00(struct WCBdef *panel);
 
 /* Directories made, files deleted, attributes and the label, dirfunc.c;
    and where a command ends that goes through files: FncSel for those

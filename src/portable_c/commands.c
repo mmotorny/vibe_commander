@@ -86,9 +86,6 @@ extern const struct BOXHD SvSt_B;       /* "Do you wish to save the current
 extern const struct BOXHD SetEr_B;      /* "There was an error while saving
                                            the setup file" */
 
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
-
 #define ERR_PATH      3                 /* DOS's error where a directory is
                                            made current: there is no such */
 #define ERR_NOT_READY 0x53              /* a drive is not ready, and the
@@ -113,23 +110,23 @@ static void PtFs00(struct WCBdef *panel)
 
 /* Have DOS go to the drive and the directory of a panel, and write the
    prompt for it. A directory that is not there any more is no error: DOS
-   then stays in the one it has on that drive. Returns something that is
-   not 0 if the diskette of the drive was not put in, if DOS will not go
-   to the directory for another reason, or if it will not tell where it
-   is afterwards. */
-static u16 M02_10(struct WCBdef *panel)
+   then stays in the one it has on that drive. Returns true if the
+   diskette of the drive was not put in, if DOS will not go to the
+   directory for another reason, or if it will not tell where it is
+   afterwards. */
+static bool M02_10(struct WCBdef *panel)
 {
     struct Answer changed;
-    u16 drive = (u8)(panel->WinPath[0] - ('A' - 1));
-    u16 failed;
+    i32 drive = panel->WinPath[0] - ('A' - 1);
+    bool failed;
 
-    if (Fantom(drive))
-        return 1;
+    if (Fantom((u16)drive))
+        return true;
     changed = DirChange(panel->WinPath);
     if (changed.failed && changed.value != ERR_PATH)
-        return 1;
+        return true;
     DriveSelect((u8)(panel->WinPath[0] - 'A'));
-    failed = SetPth();
+    failed = SetPth() != 0;
     PutPrm(panel);
     return failed;
 }
@@ -142,7 +139,8 @@ static void M16_20(struct WCBdef *panel)
 {
     const u8 *from;
     u16 was = panel->EndBuf;
-    u16 cursor, first, found, i;
+    u16 cursor, first, found;
+    i32 i;
 
     from = (const u8 *)panel + panel->CurAdr;
     for (i = 0; i < 13; i++)
@@ -170,7 +168,7 @@ static void M16_20(struct WCBdef *panel)
    becomes the current one. Where the panel is to be read again, an Info
    next to it is too. `item` is the menu to mark meanwhile, of which the
    low byte counts. */
-u16 M06_10(struct WCBdef *panel, u16 item)
+i32 M06_10(struct WCBdef *panel, u16 item)
 {
     HidCur();
     panel->Visible = 1;
@@ -187,13 +185,13 @@ u16 M06_10(struct WCBdef *panel, u16 item)
 }
 
 /* M03_05: the panel is to be on, with its menu marked meanwhile. */
-static u16 M03_05(struct WCBdef *panel)
+static i32 M03_05(struct WCBdef *panel)
 {
     return M06_10(panel, panel == LeftPanel ? 1 : 5);
 }
 
 /* M16_11: the list of a panel made anew, and the panel drawn. */
-static u16 M16_11(struct WCBdef *panel)
+static i32 M16_11(struct WCBdef *panel)
 {
     M16_20(panel);
     return M03_05(panel);
@@ -205,11 +203,11 @@ static u16 M16_11(struct WCBdef *panel)
    before, and nothing changes if that fails. The list is put in order
    here if only the order has changed; a panel that is to be read is put
    in order then. */
-u16 M01_01(struct WCBdef *panel, u16 item)
+i32 M01_01(struct WCBdef *panel, u16 item)
 {
     struct WCBdef *wcb = panel;
-    u8 order = (u8)item;
-    u8 was;
+    i32 order = (u8)item;
+    i32 was;
 
     HidCur();
     if (wcb->WinTyp != 0) {
@@ -219,7 +217,7 @@ u16 M01_01(struct WCBdef *panel, u16 item)
         wcb->ChgFlg = 1;
     }
     was = wcb->SortTyp;
-    wcb->SortTyp = order;
+    wcb->SortTyp = (u8)order;
     wcb->BrfFul = (u8)(item >> 8);
     if (was != order && wcb->ChgFlg == 0)
         return M16_11(panel);
@@ -227,18 +225,18 @@ u16 M01_01(struct WCBdef *panel, u16 item)
 }
 
 /* Brief and Full, the first two items of a panel's menu. */
-u16 M01_00(struct WCBdef *panel, u16 item)
+i32 M01_00(struct WCBdef *panel, u16 item)
 {
-    return M01_01(panel, (u16)(u8)((item >> 8) - 1) << 8
-                         | panel->SortTyp);
+    return M01_01(panel, (u16)((u8)((item >> 8) - 1) << 8
+                               | panel->SortTyp));
 }
 
 /* The order of a panel, items 7 to 11 of its menu: by name, extension,
    time, size, or as the disk has the files. */
-u16 M08_00(struct WCBdef *panel, u16 item)
+i32 M08_00(struct WCBdef *panel, u16 item)
 {
-    return M01_01(panel, (u16)panel->BrfFul << 8
-                         | (u8)((item >> 8) - 7));
+    return M01_01(panel, (u16)(panel->BrfFul << 8
+                               | (u8)((item >> 8) - 7)));
 }
 
 /* Info and Tree, the third and the fourth item of a panel's menu, and
@@ -247,9 +245,12 @@ u16 M08_00(struct WCBdef *panel, u16 item)
    the current one and the other one shows files, DOS first goes to that
    one's directory, and nothing changes if that fails. Ctrl_L keeps what
    the panel showed before. */
-u16 M03_00(struct WCBdef *panel, u16 item)
+i32 M03_00(struct WCBdef *panel, u16 item)
 {
-    u8 kind = (u8)(5 - (item >> 8));
+    /* The byte wraps, as the original's SUB in CL does: the keys of the
+       panels hand on five less a kind that DOS may have answered, which
+       wraps alike in struct Onward, and this gives the kind back. */
+    i32 kind = (u8)(5 - (item >> 8));
     struct WCBdef *other;
 
     HidCur();
@@ -264,7 +265,7 @@ u16 M03_00(struct WCBdef *panel, u16 item)
         if (panel->WinTyp != kind)
             panel->Ctrl_L = panel->WinTyp;
     }
-    panel->WinTyp = kind;
+    panel->WinTyp = (u8)kind;
     panel->ChgFlg = 1;
     if (kind == 1)
         md.CrnPath[0] = 0;
@@ -276,7 +277,7 @@ u16 M03_00(struct WCBdef *panel, u16 item)
    the current one and the other one is on, that one becomes the current
    one. The low byte of `item` is the menu to mark meanwhile. Func02 of
    the loop is Window for all of the screen and then Func04. */
-u16 M06_00(struct WCBdef *panel, u16 item)
+i32 M06_00(struct WCBdef *panel, u16 item)
 {
     struct WCBdef *current;
 
@@ -293,14 +294,14 @@ u16 M06_00(struct WCBdef *panel, u16 item)
         PutPath(current);
         PtFs00(current);
     }
-    Window(0, (u16)md.Lines << 8 | 80);
+    Window(0, (u16)(md.Lines << 8 | 80));
     return MNU_FUNC04;
 }
 
 /* M16_01: the dialog of a panel's filter, whose fields are in the
    panel. The lines of its box have no ^I, so the text for that, which
    the assembly leaves as DX happens to be, is not read. */
-u16 M16_01(struct WCBdef *panel)
+i32 M16_01(struct WCBdef *panel)
 {
     if ((u8)Dialog(&Filt_B, 0, 0, 0, panel) != 0)
         return MNU_FUNC04;
@@ -308,7 +309,7 @@ u16 M16_01(struct WCBdef *panel)
 }
 
 /* ^F: the filter of the current panel, if that shows files. */
-u16 M16_00(struct WCBdef *panel)
+i32 M16_00(struct WCBdef *panel)
 {
     if (!FilePan(panel))
         return MNU_FUNC04;
@@ -317,7 +318,7 @@ u16 M16_00(struct WCBdef *panel)
 
 /* ^H: hidden files shown or not, in the current panel if that shows
    files. */
-u16 M16_10(struct WCBdef *panel)
+i32 M16_10(struct WCBdef *panel)
 {
     if (!FilePan(panel))
         return MNU_FUNC04;
@@ -327,7 +328,7 @@ u16 M16_10(struct WCBdef *panel)
 
 /* Help, the first item of the Files menu: the page that the menu bar has
    set. */
-u16 M21_00(void)
+i32 M21_00(void)
 {
     Help00();
     return MNU_FUNC04;
@@ -335,7 +336,7 @@ u16 M21_00(void)
 
 /* Alt-F10: the tree in a box, to go to the directory that is chosen
    there. */
-u16 M41_00(void)
+i32 M41_00(void)
 {
     PutMnu(3);
     md.HlpPage = 28;
@@ -348,7 +349,7 @@ u16 M41_00(void)
    shows files, worked out with a box on the screen meanwhile; the list
    is put in order again, which may be by size. The lines of the box have
    no ^I. */
-u16 M42_00(struct WCBdef *panel)
+i32 M42_00(struct WCBdef *panel)
 {
     struct Box where;
 
@@ -372,7 +373,7 @@ u16 M42_00(struct WCBdef *panel)
    one, for a column that it does not use. The test finds the third byte
    of the main data, the colour of selected files in the first palette,
    which is 0Fh as the program comes: the panels are drawn again. */
-static u16 M60_02(struct WCBdef *panel)
+static i32 M60_02(struct WCBdef *panel)
 {
     PutPrm(panel);
     if (panel->Visible == 0)
@@ -381,14 +382,15 @@ static u16 M60_02(struct WCBdef *panel)
 }
 
 /* Mark in a panel every file that the other panel has not, has as a
-   directory, or has with an earlier date and time. Returns 1 if there is
-   one, and `marked` otherwise. */
-static u16 M49_10(struct WCBdef *panel, u16 marked)
+   directory, or has with an earlier date and time. Returns true if there
+   is one, and `marked` otherwise. */
+static bool M49_10(struct WCBdef *panel, bool marked)
 {
     struct WCBdef *other = InvWCB(panel);
     struct FILENT *file;
     const struct FILENT *its;
-    u16 address, found, i;
+    u16 address, found;
+    i32 i;
 
     for (address = DSKBUF; address < panel->EndBuf;
          address += sizeof(struct FILENT)) {
@@ -406,7 +408,7 @@ static u16 M49_10(struct WCBdef *panel, u16 marked)
                    && its->TimeF >= file->TimeF))
             continue;
         file->AttrF |= ATTR_SELECTED;   /* M49_12 */
-        marked = 1;
+        marked = true;
     }
     return marked;
 }
@@ -415,19 +417,19 @@ static u16 M49_10(struct WCBdef *panel, u16 marked)
    the files that are in one only, or newer in one, are selected there,
    in addition to what is selected. A box says so if there is none; its
    lines have no ^I. */
-u16 M49_00(struct WCBdef *panel)
+i32 M49_00(struct WCBdef *panel)
 {
     struct WCBdef *other;
-    u16 marked;
+    bool marked;
 
     if (!FilePan(panel))
         return MNU_FUNC04;
     other = InvWCB(panel);
     if (!FilePan(other))
         return MNU_FUNC04;
-    marked = M49_10(other, 0);
+    marked = M49_10(other, false);
     marked = M49_10(panel, marked);
-    if (marked == 0) {
+    if (!marked) {
         Dialog(&CmpDi_B, 0, 0, 0, panel);
         return MNU_FUNC04;
     }
@@ -441,28 +443,28 @@ u16 M49_00(struct WCBdef *panel)
    everything but the last two lines is as DOS left it, and the panels
    are drawn anew: the menu bar may have come or gone. The assembly loads
    CL with MenuVs before the dialog, and nothing reads that. */
-u16 M60_00(void)
+i32 M60_00(void)
 {
-    u8 delay;
+    i32 delay;
 
     md.TmpBuf[0] = md.ColTyp;
     md.TmpBuf[1] = md.ColTyp;
     for (delay = 0; md.BlDelay < Delay_T[delay]; delay++)
         ;
-    md.TmpBuf[2] = delay;
-    md.TmpBuf[3] = delay;
+    md.TmpBuf[2] = (u8)delay;
+    md.TmpBuf[3] = (u8)delay;
     if ((u8)Dialog(&Conf_B, Chk1_S, 0, 0, &md) != 0)
         return MNU_FUNC04;
     md.ColTyp = md.TmpBuf[0];
     md.BlDelay = Delay_T[md.TmpBuf[2]];
-    ResUser(0, (u16)(u8)(md.Lines - 2) << 8 | 80);
+    ResUser(0, (u16)((u8)(md.Lines - 2) << 8 | 80));
     PutMnu(0);
     return M60_02(MAIN_AS_PANEL);
 }
 
 /* The advanced options: all of them boxes to tick, which the dialog
    sets. */
-u16 M61_00(void)
+i32 M61_00(void)
 {
     Dialog(&Sets_B, Chk2_S, 0, 0, &md);
     return MNU_FUNC04;
@@ -477,10 +479,10 @@ u16 M61_00(void)
    what follows them there, and 64 of those bytes go on into ViewFil
    behind the name. So as many are copied here, and ExFl_S is written
    in commands_t.c with the 80 that the original has there. */
-static u16 M64_02(u16 item, const u8 *name, const u8 *title,
-                  const u8 *include, u16 page)
+static i32 M64_02(u16 item, const u8 *name, const u8 *title,
+                  const u8 *include, i32 page)
 {
-    u16 answer, i;
+    i32 answer, i;
 
     md.HlpPage = (u8)page;
     PutMnu(item);
@@ -501,55 +503,55 @@ static u16 M64_02(u16 item, const u8 *name, const u8 *title,
 }
 
 /* Menu file edit, of the Commands menu. */
-u16 M53_00(u16 item)
+i32 M53_00(u16 item)
 {
     return M64_02(item, Menu_F, User_S, UsMnu_S, 38);
 }
 
 /* Extension file edit, Viewers and Editors, of the Options menu. */
-u16 M62_00(u16 item)
+i32 M62_00(u16 item)
 {
     return M64_02(item, Ext_F, ExFl_S, ExtFl_S, 42);
 }
 
-u16 M63_00(u16 item)
+i32 M63_00(u16 item)
 {
     return M64_02(item, ViewE_F, ExFl_S, ExtFl_S, 43);
 }
 
-u16 M64_00(u16 item)
+i32 M64_00(u16 item)
 {
     return M64_02(item, EditE_F, ExFl_S, ExtFl_S, 44);
 }
 
 /* M66_01: a switch of the Options menu, a byte of the setup that is 0 or
    1, made the other. */
-static u16 M66_01(struct WCBdef *panel, u8 *option)
+static i32 M66_01(struct WCBdef *panel, u8 *option)
 {
     *option = *option == 0;             /* InvVar */
     return M60_02(panel);
 }
 
-u16 M66_00(struct WCBdef *panel)        /* Auto menus */
+i32 M66_00(struct WCBdef *panel)        /* Auto menus */
 {
     return M66_01(panel, &md.AutoMnu);
 }
 
-u16 M67_00(struct WCBdef *panel)        /* Path prompt */
+i32 M67_00(struct WCBdef *panel)        /* Path prompt */
 {
     return M66_01(panel, &md.Prompt);
 }
 
 /* Full screen: the panels have another height, so what DOS has shown is
    put back where the two are. */
-u16 M69_00(struct WCBdef *panel)
+i32 M69_00(struct WCBdef *panel)
 {
     ResUser(BegBX(panel) & 0xFF00, SizDX() & 0xFF00 | 80);
     return M66_01(panel, &md.FulScr);
 }
 
 /* Auto directory sizes: switched on, both panels are read again. */
-u16 M70_00(struct WCBdef *panel)
+i32 M70_00(struct WCBdef *panel)
 {
     if (md.AutoSiz == 0) {
         panel->ChgFlg = 1;
@@ -558,12 +560,12 @@ u16 M70_00(struct WCBdef *panel)
     return M66_01(panel, &md.AutoSiz);
 }
 
-u16 M71_00(struct WCBdef *panel)        /* Mini status */
+i32 M71_00(struct WCBdef *panel)        /* Mini status */
 {
     return M66_01(panel, &md.MiniSta);
 }
 
-u16 M72_00(struct WCBdef *panel)        /* Clock */
+i32 M72_00(struct WCBdef *panel)        /* Clock */
 {
     return M66_01(panel, &md.Clock);
 }
@@ -576,7 +578,7 @@ u16 M72_00(struct WCBdef *panel)        /* Clock */
    not be written, unless the drive was not ready, which a box of its own
    has said. The boxes show nothing of what the caller has in DS, which
    is the current panel. */
-u16 M75_00(struct WCBdef *panel)
+i32 M75_00(struct WCBdef *panel)
 {
     struct Answer saved;
 
