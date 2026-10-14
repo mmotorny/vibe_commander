@@ -249,6 +249,16 @@ These held while `src/c/` was made, and they say what it is.
   beyond the 256th file stays selected; that is the removal of what
   only made sense on DOS, and the piece that has `enter.c` makes it
   and declares it.
+- Two things that the work on the addresses met, decided by the user
+  on 13 October 2026. Go to of the file search asks DOS for the disk
+  of the drive that the chosen line is on, where the original, by
+  reading the drive's letter at the wrong place, asks for that of the
+  current drive: a bug of the original, fixed and declared. And a
+  search for a text stays as slow as it is in the program of 32 bits,
+  three to four times the original's time on the machine's clock,
+  since every byte's capital is asked of DOS through the extender as
+  the original asks it: remembering the answers was offered and not
+  taken.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
@@ -290,7 +300,11 @@ These held while `src/c/` was made, and they say what it is.
   comment where the program counts on what the cast cuts off. Writing
   the cast is the point: it makes whoever writes it think what happens
   at the edges. A list beside the code of the places and their reasons
-  is not kept in place of that.
+  is not kept in place of that. What clang does not name stays as it
+  is written, by the same word: a step or a sum that is kept at its
+  own width, `word++` or `byte = a - b` of numbers of 8 or 16 bits,
+  wraps in that width, which is what C says of it; no rule of the
+  project's own is put on top of the compiler's.
 - An integer type gets a name of its own only where its width is not
   the same everywhere, on the user's word of 13 October 2026: the size
   of a file, 32 bits on one platform and 64 on another, is such a type,
