@@ -1,12 +1,13 @@
 # The layer: running programs, and the program's life
 
-**Draft of 13 October 2026. Nothing in it is decided.** It is one area
-of step 3 of the road (`CLAUDE.md`, "The portable C"), surveyed from the
-platforms' side, as the user asked: what each target platform provides,
-where they agree, where one has another shape, what common ground there
-is, and only then how the program's needs map onto it. `LAYER.md` has the
-user's decisions so far and the inventory of what the program asks; this
-file takes both as given.
+**Draft of 13 October 2026. What the user has decided of it is under
+"Decided in this area", and nothing else here is decided.** It is one
+area of step 3 of the road (`CLAUDE.md`, "The portable C"), surveyed
+from the platforms' side, as the user asked: what each target platform
+provides, where they agree, where one has another shape, what common
+ground there is, and only then how the program's needs map onto it.
+`LAYER.md` has the user's decisions so far and the inventory of what the
+program asks; this file takes both as given.
 
 How to read it:
 
@@ -17,6 +18,74 @@ How to read it:
   or "That means" is an inference, and says so.
 - Nothing was tried on any platform but DOS. What is said of DOS is read
   in the program, `sys.h`, `dos32.c` and its callers, at f7ae44e.
+- The columns "macOS, a native app" are of the survey. The user has
+  decided that macOS is a terminal program (decision 9), so they bear
+  on no design.
+
+## Decided in this area
+
+The user's answers to the nine questions at the end, 13 and 14 October
+2026, as the session passed them on. Each question is marked there with
+its answer.
+
+1. **The command line on iOS: none.** The command line, the user
+   menu's commands and the extension file are hidden there; Enter opens
+   a file in another app or a preview. Shape C below, on iOS.
+2. **A command's output behind the panels, in a terminal: later, and
+   with libvterm when it comes.** On Windows, Linux and macOS Vibe
+   Commander runs in a terminal, not in a window of its own, as
+   Midnight Commander does. The way to have the panels over a command's
+   output there, which the session put to the user, is shape B: each
+   command runs on a pseudo-terminal, and every byte is passed through
+   to the real terminal both ways, as Midnight Commander's subshell
+   does, so that the command draws on the real terminal; the same bytes
+   go to a shadow emulator that keeps only a grid of what the screen
+   shows, and that grid is the screen behind the panels, which Ctrl-O
+   and a hidden panel show, as on DOS. libvterm is the emulator: a small
+   library under the MIT licence, a new dependency, to be pinned and
+   fetched at build time when it comes. Until then the terminal builds
+   hand a command the real terminal, and Ctrl-O shows the terminal's
+   own screen with no panels over it: shape A. The layer is designed now
+   so that the grid can be added without reshaping it: "A command's
+   run, and where the shadow grid sits", under the recommendation.
+3. **The shell on Linux and macOS: the user's**, `$SHELL -c`, and
+   `/bin/sh` if `SHELL` is not set.
+4. **Where the setup, the menu files, the extension files and the help
+   live off DOS: the platform's place for a user's settings**,
+   `~/.config` on Linux, AppData on Windows, Application Support on
+   Apple's; the variable `VC` still overrides. DOS keeps them beside
+   the program.
+5. **Enter on a file that the extension file has no line for: handed to
+   the platform's opener** where there is one: `xdg-open`, `open`,
+   `ShellExecute`, iOS's document interaction. DOS has none, so nothing
+   changes there. A deviation, to be declared when it is built.
+6. **The box of a device that fails, off DOS: kept**, with Retry and
+   Abort, for what waiting can cure: a disk not in its drive, a share
+   gone, a file of iCloud not yet downloaded. Other failures are
+   ordinary errors.
+7. **The program saves by itself, on every platform** (14 October
+   2026). Asked what iOS should do when it ends the program in the
+   background, the user asked instead how hard it would be to save the
+   setup and the state automatically everywhere ("It's 2026"), and
+   decided, after the session's answer: the program saves its
+   preferences and its session, the panels' directories and cursors,
+   the sort modes, the command line and its history, by itself, when
+   they change (debounced) and when it is put away (in the background
+   on iOS, its terminal gone, ended by a signal), on every platform,
+   DOS included. "Save setup" and the setting "Auto save setup" go. On
+   DOS that is a deviation, and the comparison of the scenarios' disks
+   will leave the setup file out by one rule of the harness, but in the
+   scenarios that are about the setup itself (`CLAUDE.md`, step 3 of
+   the road). iOS's return to where the user was follows from it: the
+   session is read when the program starts, and the system's state
+   restoration is not needed for it. How this sits with decision 15 of
+   the file systems, one format of the setup file everywhere, is in
+   `../LAYER.md`, under "Decided in this area" of "Area: file systems".
+8. **Ctrl-Z in a terminal: a key**, as on DOS. A stop sent by another
+   program still stops the program cleanly, with the terminal put back,
+   and it redraws when it is continued.
+9. **macOS: a terminal program** (see 2). A native app is not planned
+   there; iOS draws a view of its own.
 
 ## What the program does in this area today
 
@@ -166,7 +235,8 @@ today: the same calls of DOS, in the same order, with the same bytes.
 2. **A native app on macOS has processes and no terminal.** Running a
    command there means hosting it: a pseudo-terminal, and something that
    reads what the command writes, escape sequences and all, into cells.
-   A terminal program on macOS is POSIX and has neither problem.
+   A terminal program on macOS is POSIX and has neither problem, and
+   that is what the program is to be there (decision 9).
 3. **What a command wrote stays readable on DOS, on the console of
    Windows and on the Linux console, and nowhere else.** In a terminal
    emulator, which is where a program for Linux or macOS runs, nothing
@@ -174,12 +244,15 @@ today: the same calls of DOS, in the same order, with the same bytes.
    panels or output, one at a time. The original's half-panels over the
    output, and its panels drawn over what the commands left, need the
    cells: in a terminal that means hosting the command too (finding 2),
-   at the cost of a terminal emulator in the program.
+   at the cost of a terminal emulator in the program, which will be
+   libvterm, later (decision 2).
 4. **The shell exists everywhere but iOS, and has the same shape:**
    `COMSPEC /C` on DOS and Windows, `sh -c` on POSIX. ISO C's `system`
    is exactly that on POSIX and on Windows. So a "run this command line
    through the user's shell, and wait" is common ground, and standard C,
-   as the user asked, where a platform has it.
+   as the user asked, where a platform has it. With the user's shell on
+   POSIX (decision 3) it is `posix_spawn` of `$SHELL` there, not
+   `system`, which runs `sh`.
 5. **The terminal is handed over and taken back.** On DOS nothing is
    asked for that. On POSIX and Windows the program puts back the modes
    that it changed for its own keys before the command, and its own
@@ -230,44 +303,49 @@ the layer of the screen gives it up before and takes it back after.
   4B00h of `COMSPEC` with `/C`, 3300h, 3301h, 25h for INT 23h; the tail
   as the program has it in `DosBuf`, with the 128 bytes that DOS copies.
   The screen is read back after, as today.
-- **POSIX in a terminal.** `system`, or `posix_spawn` of `$SHELL -c` with
-  SIGINT ignored and the terminal's modes put back around it. The output
-  is on the terminal's main screen, the panels on the alternate one:
-  Ctrl-O switches, and no panel stands over the output.
-- **Windows.** `CreateProcessW` of `cmd /c`, the console inherited; the
-  program's screen in a second buffer of the console, so the output can
-  be read back with `ReadConsoleOutput` as on DOS, an interface that is
-  kept but not developed.
-- **macOS native, iOS.** None. Run answers "cannot here".
+- **POSIX in a terminal.** `posix_spawn` of `$SHELL -c`, `/bin/sh` if
+  `SHELL` is not set (decision 3), with SIGINT ignored and the
+  terminal's modes put back around it. The output is on the terminal's
+  main screen, the panels on the alternate one: Ctrl-O switches, and no
+  panel stands over the output.
+- **Windows.** `CreateProcessW` of `cmd /c`, the console inherited. A
+  program in a terminal as on POSIX (decision 2): the output on the
+  terminal's own screen, the panels on the alternate one. The output
+  could be read back with `ReadConsoleOutput` in the classic console
+  window, an interface that is kept but not developed, and not surely
+  under Windows Terminal; it is not used, the shadow grid of B being
+  the one way for all three.
+- **macOS native.** Not planned (decision 9). **iOS.** None (decision
+  1): run answers "cannot here".
 - **What the program changes**: the prompt and the echo of the command
-  stay the program's; the half-panels over the output are DOS's and
-  Windows's only.
+  stay the program's; the half-panels over the output are DOS's only.
 - **Cost**: least. One function of a few lines on POSIX and Windows.
 
 ### B. Host the command: the layer reads its output into cells
 
 As A, but where a terminal emulator can read the output the layer runs
 the command on a pseudo-terminal it owns, passes what the command writes
-on to the real terminal as it comes, if there is one, and keeps it as
-cells too, so the program has the screen behind its panels as on DOS.
+on to the real terminal as it comes, and the real terminal's keys to the
+command, and keeps what was written as cells too, so the program has the
+screen behind its panels as on DOS.
 
 - **DOS.** As A: the display's memory is the cells.
 - **POSIX in a terminal.** `posix_openpt`, a child on its slave side, a
-  loop that copies the master to the terminal and into an emulator's
-  cells, the window's size passed on with SIGWINCH. A full-screen program,
-  an editor, runs on the real terminal as before, since its output is
-  passed on; where the emulator falls short, only the picture behind the
-  panels is wrong.
-- **Windows.** ConPTY, with the same emulator, or the console's buffer as
-  in A.
-- **macOS native.** This is the only way to run a command there.
-- **iOS.** No processes; a Shortcut's text could be shown in the cells,
-  if commands on iOS are Shortcuts (question 1).
+  loop that copies the terminal's keys to the master and the master to
+  the terminal and into an emulator's cells, the window's size passed on
+  with SIGWINCH. A full-screen program, an editor, runs on the real
+  terminal as before, since its output is passed on; where the emulator
+  falls short, only the picture behind the panels is wrong.
+- **Windows.** ConPTY, with the same emulator.
+- **macOS native.** This would be the only way to run a command there;
+  no native app is planned (decision 9).
+- **iOS.** No processes, and no command line (decision 1).
 - **What the program changes**: nothing beyond A; Ctrl-O and the
   half-panels work everywhere there are processes.
-- **Cost**: a terminal emulator in the program, a VT parser of some
-  thousand lines at the least; a loop that copies while waiting, threads
-  on Windows; job control (Ctrl-Z) inside the hosted terminal.
+- **Cost**: a terminal emulator in the program, libvterm (decision 2), a
+  dependency pinned and fetched at build time; a loop that copies both
+  ways while waiting, threads on Windows; job control (Ctrl-Z) inside
+  the hosted terminal.
 
 ### C. Ask by what the user wants, with what the platform can do
 
@@ -296,29 +374,70 @@ layer's error. Under it, run is A or B.
 |---|---|---|---|
 | DOS | today | today | today |
 | Linux terminal | small; output and panels one at a time | an emulator; output behind panels | as A or B |
-| Windows console | small; read-back as on DOS | ConPTY and the emulator, or as A | as A or B |
+| Windows console | small; read-back as on DOS in the classic console, not used (decision 2) | ConPTY and the emulator, or as A | as A or B |
 | macOS terminal | as Linux | as Linux | as A or B |
-| macOS native | nothing runs | the only way | as B |
-| iOS | nothing runs | Shortcuts' text at most | the only shape that says what iOS can do |
+| macOS native, not planned | nothing runs | the only way | as B |
+| iOS | nothing runs | Shortcuts' text at most | the only shape that says what iOS can do; chosen (decision 1) |
 
 ## Recommendation
 
-**C's interface, with A underneath first, and B when a platform without a
-terminal comes.**
+**C's interface, with A underneath first, and B later, with libvterm.**
+The user has decided as much: no command line on iOS (decision 1), a
+terminal program on Windows, Linux and macOS (decisions 2 and 9), and
+the panels over a command's output later (decision 2).
 
 Why: the user's iOS shows that the program cannot assume that a command
 can be run at all, so the interface must say what a platform can do, and
 C does that at little cost, and nothing of it shows on DOS. Running a
 command line through the user's shell is the one thing that DOS, POSIX
-and Windows share, and on two of them it is standard C's `system`. A is
-what a Linux terminal program does as a matter of course, and it is the
-next platform on the road. B is needed the moment the program is a
-native app on macOS, and it is the only way to keep the original's
-half-panels over the output in a terminal; it costs a terminal emulator,
-which is a project of its own, and should not hold up the first port.
-The functions are the same under A and B: what differs is whether the
-screen's layer can answer "what is behind the panels" on that platform,
-so the interface says that it may not.
+and Windows share. A is what a Linux terminal program does as a matter
+of course, and it is the next platform on the road. B is the only way
+to keep the original's half-panels over the output in a terminal; it
+costs a terminal emulator, which will be libvterm, and does not hold up
+the first port. The functions are the same under A and B: what differs
+is whether the screen's layer can answer "what is behind the panels" on
+that platform, so the interface says that it may not.
+
+### A command's run, and where the shadow grid sits
+
+So that B can come without reshaping the layer, a command's run goes
+through these functions of the layer, in this order, and through
+nothing else; the names are for this text, not yet the layer's.
+
+1. **Give the terminal up**, of the screen's layer: the program's modes
+   put back, the alternate screen left, the cursor shown. On DOS, what
+   the program does today before a command.
+2. **Write the prompt and the command**, as text, on the terminal that
+   has been given up: the program's echo, which on DOS it writes into
+   the screen today.
+3. **Run a command line through the shell and wait**, or **run a
+   program with arguments and wait**: it answers that the shell or the
+   program could not be run, "not found" apart, or that it ended, with
+   its status. The common code hands it the command and nothing of the
+   terminal: no descriptor, no handle, no size.
+4. **Take the terminal back**: the program's modes, the alternate
+   screen.
+5. **The screen behind the panels**: what the program draws its panels
+   over, and what Ctrl-O and a hidden panel show. It answers cells, as
+   the display's memory gives them on DOS today, or "none here"; where
+   it is none, Ctrl-O asks the screen's layer to **show the terminal's
+   own screen until a key**.
+
+The shadow grid is the layer's, in the file of the terminal platforms,
+behind 2, 3 and 5; the common code never sees it. Without it, which is
+the first terminal builds, 3 hands the command the real terminal, 2
+writes to the real terminal, and 5 answers "none here". With it, 3 runs
+the command on a pseudo-terminal of the real terminal's size and modes
+(ConPTY on Windows), copies the keys to it and what it writes to the
+real terminal, both ways and as they come, while it waits, and feeds
+what it writes to libvterm too; 2 feeds the echo to it as well; a
+change of the terminal's size is passed on to the pseudo-terminal and
+to the grid; and 5 answers the grid's cells, converted to the screen's
+layer's cells. The grid lives as long as the program does and is as
+large as the terminal, so it holds what all the commands since the start
+have left, as the display does on DOS. When it comes, what changes is
+the platform's file and the answer of 5, which the program already
+takes on DOS: nothing of the common code.
 
 ## The common ground, with its trade-offs
 
@@ -326,9 +445,10 @@ so the interface says that it may not.
   wait** (DOS, POSIX, Windows). Answers whether the shell could be run,
   "not found" apart from other failures, as the program asks today, and
   the command's status, which the program does not read but every
-  platform has. Trade-off: the shell is the platform's (`COMSPEC`, `sh`
-  or `$SHELL`), so what the user types means what it means there, which
-  is what the user expects of a command line.
+  platform has. Trade-off: the shell is the platform's (`COMSPEC`, or
+  `$SHELL` and `/bin/sh` without it, decision 3), so what the user types
+  means what it means there, which is what the user expects of a
+  command line.
 - **Run a program with arguments and wait** (DOS, POSIX, Windows).
   Arguments as a list of texts on POSIX and Windows; on DOS one tail.
   Trade-off: the original's tail for a viewer of another's has bytes
@@ -344,20 +464,26 @@ so the interface says that it may not.
   places: one function "where the program's settings are", one "where a
   temporary file goes".
 - **The stop keys as keys** (all). The layer only keeps the system from
-  ending the program for them. Ctrl-Break, the PC's key, is a key of DOS
-  and Windows alone.
+  ending or stopping the program for them: Ctrl-Z is a key in a
+  terminal, and a stop that another program sends stops the program
+  with the terminal put back, and it redraws when it is continued
+  (decision 8). Ctrl-Break, the PC's key, is a key of DOS and Windows
+  alone.
 - **A question to the user from inside a call**: "a device needs the
   user: retry or fail?", a function that the program hands the layer.
   DOS calls it from INT 24h, as today; Windows from the layer, after
   `SEM_FAILCRITICALERRORS`, for a drive not ready; iOS for a file of
   iCloud not downloaded or a provider offline; POSIX for a medium that is
-  missing, where the platform says so. Trade-off: elsewhere than on DOS
-  the layer decides which errors are of that kind, and repeats the call
-  itself on Retry.
-- **The program asked to end, or about to be ended**: an event in the
-  program's loop, with "save now" for iOS's background. DOS has neither,
-  and keeps `ProgramEnded...` in its own file. Trade-off: the program
-  decides what it saves, which is a matter for the user (question 7).
+  missing, where the platform says so; any of them for a share that has
+  gone (decision 6). Trade-off: elsewhere than on DOS the layer decides
+  which errors are of that kind, and repeats the call itself on Retry.
+- **The program put away**: an event in the program's loop, at which
+  it saves its preferences and its session (decision 7): iOS's
+  background, the terminal gone (SIGHUP), SIGTERM, Windows's
+  `CTRL_CLOSE_EVENT`. DOS has none, and keeps `ProgramEnded...` in its
+  own file; there the program saves when the things change and when it
+  ends by itself. Trade-off: the save has to be done within the time
+  that the platform gives, about 5 seconds on iOS and Windows.
 - **Idle** becomes "nothing to do until a key, an event or a time": INT
   28h and a return on DOS, as today; a wait elsewhere. The keyboard's
   area has the same question.
@@ -369,61 +495,75 @@ under the recommendation, which is what it does now.
 
 | Today | In the layer | DOS | Elsewhere |
 |---|---|---|---|
-| `ProgramRunBare` of `COMSPEC` with `/C`, in `Exec02`, with `SetBreakCheck` before and `SetBrk` after | run a command line through the shell | the same row: 3301h, 4B00h, 3300h, 3301h, 25h; the tail in place in `DosBuf`, the 128 bytes behind it read as DOS reads them, said at the declaration as the 68 bytes of the environment are | `system`-like, A; hosted, B; "not here" on iOS |
-| `md.ComSpec`, the shell's place in the environment, and `NotFind` with "COMMAND.COM" | the shell's name, or none | the environment's `COMSPEC`, as now | `$SHELL` or `sh` (question 3); `COMSPEC` |
+| `ProgramRunBare` of `COMSPEC` with `/C`, in `Exec02`, with `SetBreakCheck` before and `SetBrk` after | run a command line through the shell | the same row: 3301h, 4B00h, 3300h, 3301h, 25h; the tail in place in `DosBuf`, the 128 bytes behind it read as DOS reads them, said at the declaration as the 68 bytes of the environment are | `$SHELL -c` on the real terminal, A; on a pseudo-terminal with the shadow grid, B, later (decision 2); "not here" on iOS (decision 1) |
+| `md.ComSpec`, the shell's place in the environment, and `NotFind` with "COMMAND.COM" | the shell's name, or none | the environment's `COMSPEC`, as now | `$SHELL`, `/bin/sh` if it is not set (decision 3); `COMSPEC` |
 | `ProgramRun` of `Aexec0`, the viewer or editor of another's | run a program with arguments | the tail with `ViewPar`, made in a file of DOS's, `view_dos.c` | the file's name as the one argument; the Norton block is DOS's alone, a removal of the kind that is declared without asking |
 | Enter on `.com`, `.exe`, `.bat` | "runnable", asked of the platform | the three extensions, as now | the execute permission; `PATHEXT`; none on iOS |
-| Enter on another file with no line in `VC.EXT` | open by its kind | not here: nothing, as now | the platform's opener (question 5) |
+| Enter on another file with no line in `VC.EXT` | open by its kind | not here: nothing, as now | the platform's opener (decision 5), a deviation declared when it is built |
 | `ProgramTail` | the arguments, as texts | the tail, as now | `argv`, converted to UTF-8 |
-| `ProgramEnvironment`, read for `COMSPEC`, `VC`, `TEMP` and the path behind it | a variable by name; where the program's files are; where a temporary file goes | DOS's block, read as now | `getenv`; the platform's places (question 4) |
+| `ProgramEnvironment`, read for `COMSPEC`, `VC`, `TEMP` and the path behind it | a variable by name; where the program's files are; where a temporary file goes | DOS's block, read as now | `getenv`; the platform's place for a user's settings, `VC` still overriding (decision 4) |
 | `ProgramEnd`, `ProgramEndOld`, `SystemVersion` | end, with a number | as now; the old DOS stays DOS's | `exit` with the terminal put back |
-| `ProgramEndedBreakCheck`, `Take`, `Give` | none in the common code | DOS's own file | the system's "asked to end" event |
-| `DeviceErrorFn`, `Note`, `Take`, `Give`, `IntOn` | a function that the program hands the layer: retry or fail | INT 24h, as now; `IntOn` into the DOS file's screen writes | called by the layer for the conditions it knows (question 6) |
-| `CtrlBreakNote`, `Take`, `Give`, `CtrlCTake`, `BreakCheck`, `SetBreakCheck` | the stop keys as keys | INT 1Bh and 23h, and 3300h and 3301h of DOS, as now, in the same places | a raw terminal; a console handler; nothing |
+| `ProgramEndedBreakCheck`, `Take`, `Give` | none in the common code | DOS's own file | the system's "put away" event, at which the program saves (decision 7) |
+| `DeviceErrorFn`, `Note`, `Take`, `Give`, `IntOn` | a function that the program hands the layer: retry or fail | INT 24h, as now; `IntOn` into the DOS file's screen writes | called by the layer for what waiting can cure (decision 6) |
+| `CtrlBreakNote`, `Take`, `Give`, `CtrlCTake`, `BreakCheck`, `SetBreakCheck` | the stop keys as keys | INT 1Bh and 23h, and 3300h and 3301h of DOS, as now, in the same places | a raw terminal, Ctrl-Z a key (decision 8); a console handler; nothing |
 | `Idle` | wait for something to do | INT 28h, as now | `poll`; a wait; the run loop |
-| `SavScr` and `ScreenGet` after a command | the screen behind the panels, which a platform may not have | the display's memory | the console's buffer; the emulator's cells; the alternate screen where there are none |
+| `SavScr` and `ScreenGet` after a command | the screen behind the panels, which a platform may not have | the display's memory | none in the first terminal builds, Ctrl-O showing the terminal's own screen; the shadow grid's cells, later (decision 2) |
 
 ## Questions for the user
 
-Each with its ways, the recommended one first.
+Each with its ways, the recommended one first. All are answered, on 13
+and 14 October 2026: see "Decided in this area". They are kept here as
+they were put, each marked with the answer.
 
 1. **The command line on iOS**, where nothing can be run. (a) None: the
    command line, the user menu's commands and the extension file are
    hidden; Enter opens a file in another app or a preview. (b) A command
    runs a Shortcut by name; its text shows behind the panels. (c)
-   Commands built into the app.
+   Commands built into the app. **Answered:** (a); see decision 1.
 2. **A command's output behind the panels, in a terminal** (Linux, macOS).
    (a) For now, the command has the real terminal; Ctrl-O shows the
    terminal's own screen; no panel stands over the output. Hosting comes
    with the native apps. (b) Host commands now, with a terminal emulator
-   in the program, so it looks as on DOS.
+   in the program, so it looks as on DOS. **Answered:** (a) for now, on
+   Windows, Linux and macOS, all three terminal programs; hosting comes
+   later, with libvterm, and not with native apps, of which none is
+   planned but iOS's; see decision 2.
 3. **The shell on Linux and macOS.** (a) The user's, `$SHELL -c`, and
    `/bin/sh` if none is set: the command line means what it means at the
    user's prompt. (b) Always `/bin/sh -c`, as C's `system` does: the same
-   on every machine.
+   on every machine. **Answered:** (a); see decision 3.
 4. **Where the setup, menus, extension files and help live off DOS.** (a)
    The platform's place for a user's settings: `~/.config` on Linux,
    AppData on Windows, Application Support on Apple's; `VC` still
-   overrides. (b) Beside the program, as on DOS.
+   overrides. (b) Beside the program, as on DOS. **Answered:** (a); see
+   decision 4.
 5. **Enter on a file that `VC.EXT` has no line for.** It does nothing in
    the original. (a) Hand it to the platform's opener where there is one;
    DOS has none, so nothing changes there. This is a deviation, declared.
-   (b) Nothing, as the original.
+   (b) Nothing, as the original. **Answered:** (a); see decision 5.
 6. **The box of a device that fails, off DOS.** (a) Keep it, Retry and
    Abort, for what waiting can cure: a disk not in its drive, an iCloud
    file not yet downloaded. (b) DOS only; elsewhere such a failure is an
-   ordinary error.
+   ordinary error. **Answered:** (a), a share that has gone among what
+   waiting can cure; see decision 6.
 7. **iOS ends the program in the background without a word.** (a) It
    comes back where it was: panels, directories, command line, by the
    system's state restoration; nothing is saved into the setup that the
-   user did not save. (b) It starts afresh, as on DOS.
+   user did not save. (b) It starts afresh, as on DOS. **Answered:**
+   neither: the program saves its preferences and its session by
+   itself, on every platform, DOS included, and comes back where it was
+   on iOS by that; "Save setup" and "Auto save setup" go; see decision
+   7.
 8. **Ctrl-Z on Linux and macOS.** (a) A key, as on DOS: the program is
    not stopped by it; a stop that another program sends stops it with
    the terminal put back, and it redraws when continued. (b) It stops the
-   program, as in most terminal programs.
+   program, as in most terminal programs. **Answered:** (a); see
+   decision 8.
 9. **macOS: a terminal program or a native app?** (a) A terminal program
    first, as Linux, at little cost; a native app later, sharing iOS's
    work. (b) A native app from the start, with commands hosted.
+   **Answered:** a terminal program, with no native app planned; iOS
+   draws a view of its own; see decisions 9 and 2.
 
 ## What is not sure
 
@@ -434,10 +574,8 @@ Each with its ways, the recommended one first.
 - That `ReadConsoleOutput` gives the output back under Windows Terminal,
   through ConPTY, as it does in the classic console window. Inferred, not
   read.
-- How large a terminal emulator good enough for shape B is; the figure
-  of some thousand lines is a guess.
-- Whether the Shortcuts app's round trip, out of the program and back,
-  is bearable for a command line (question 1, b).
+- How well libvterm does for shape B, and what it costs the build: it
+  was not tried, nor its documentation read for this draft.
 - Whether the list of platforms is complete. Android is not on it: it
   has processes, unlike iOS, and limits what an app may execute; if it
   ever comes, it sits between Linux and iOS here. And iPhone and iPad

@@ -57,6 +57,21 @@ else in this document is decided.
   the setup file one format of the program's own everywhere, DOS
   included, against the recommendation. The answers are under "Decided
   in this area" there.
+- **Running programs and the program's life**, the nine questions of
+  `layer/programs.md`, 13 and 14 October 2026: no command line on iOS;
+  Vibe Commander a terminal program on Windows, Linux and macOS, with no
+  native app on macOS, and a view of its own on iOS; a command's output
+  on the real terminal first, and the panels over it later, by a shadow
+  grid that libvterm keeps; the user's shell; the program's files in
+  the platform's place for a user's settings, `VC` still overriding;
+  Enter on a file that the extension file has no line for handed to the
+  platform's opener; the box of a device that fails kept for what
+  waiting can cure; the preferences and the session saved by the
+  program itself, on every platform, DOS included, with "Save setup"
+  and "Auto save setup" gone; Ctrl-Z a key in a terminal. The answers
+  are under "Decided in this area" there; how the saving sits with
+  decision 15 of the file systems is under "Decided in this area" of
+  "Area: file systems" below.
 
 Each of these stands in the design that is being made anew.
 
@@ -457,7 +472,11 @@ takes.
   the main data's first bytes as they lie, paths of 68 bytes among
   them. With UTF-8 inside it cannot be a copy of the memory any more;
   it is written field by field, with the paths converted to the code
-  page on DOS.
+  page on DOS. It will not be held against the original's either: by
+  decision 15 of the file systems it is a format of the program's own on
+  every platform, DOS included, and by decision 7 of `layer/programs.md`
+  the program writes it by itself; see "Decided in this area" of "Area:
+  file systems".
 
 ## Area: file systems
 
@@ -546,6 +565,27 @@ What the design must settle for 15: the format, whether text, in which
 encoding, and how roots, paths and the bookmarks of iOS are kept in it;
 and what becomes of the scenarios that hold the setup file byte for
 byte against the original's.
+
+Decision 7 of `layer/programs.md`, of 14 October 2026, sits on top of
+15: the program saves its preferences and its session by itself, when
+they change and when it is put away, on every platform, DOS included,
+and "Save setup" and "Auto save setup" go. The one format of 15 is then
+the format of what is saved, and the preferences and the session may be
+two files of it: the setup that the user sets once, and the panels'
+directories and cursors, the sort modes, the command line and its
+history, which change at every key. Of the scenarios, the comparison of
+the disks leaves the setup file out by one rule of the harness, but in
+those that are about the setup itself (`CLAUDE.md`, step 3 of the
+road). What the design must settle besides what 15 asks: whether they
+are one file or two, and which field is in which, the panels' kinds
+and views among them; where each lives, a user's settings or,
+for the session, the platform's place for state where it has one
+(`$XDG_STATE_HOME` on Linux), and on DOS beside the program under names
+of eight and three; how long a change waits before it is written, and
+how a write is made so that an end in the middle of it leaves the file
+before it whole; what two copies of the program running at once do
+with one file; and what the scenarios that are about the setup hold,
+now that the file is written when the setup changes, not by a command.
 
 ### The survey
 
