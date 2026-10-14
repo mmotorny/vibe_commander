@@ -157,8 +157,8 @@ static const u8 PtMnu_B[] = { Menu_C };
 u16 *ClsLine(u16 place, const struct MainDat *data)
 {
     u16 *screen = BasAdr(place & 0xFF00);
-    u16 cell = data->CrntCol << 8 | ' ';
-    u16 count;
+    u16 cell = (u16)(data->CrntCol << 8 | ' ');
+    i32 count;
 
     for (count = 80; count != 0; count--)
         *screen++ = cell;
@@ -178,31 +178,32 @@ u16 *ClsLine(u16 place, const struct MainDat *data)
    the first of the next row of the screen buffer, or, on a screen of 50
    lines, of what stands behind the buffer, which is what DOS had on the
    screen. Not here: the bar is 80 cells in both (see DEVIATIONS.md). */
-void PutKey0(u16 bar, u16 shift)
+void PutKey0(i32 bar, i32 shift)
 {
-    u16 index = ((bar << 2 & 0xFF) | shift) & 0xFF;
-    u16 row = 0;
-    u16 place, title, number, key, name, i;
+    i32 index = ((bar << 2 & 0xFF) | shift) & 0xFF;
+    i32 row = 0;
+    u16 place, title, number;
+    i32 key, name, i;
     u16 *screen;
 
     if (StOpen != 0) {
-        if (index < sizeof StKeyB_T)
+        if (index < (i32)sizeof StKeyB_T)
             row = StKeyB_T[index >> 2][index & 3];
-    } else if (index < sizeof KeyB_T)
+    } else if (index < (i32)sizeof KeyB_T)
         row = KeyB_T[index >> 2][index & 3];
     if (row == md.BarPrev)
         return;
     md.BarPrev = (u8)row;
-    place = (u16)(u8)(md.Lines - 1) << 8;
+    place = (u16)((u8)(md.Lines - 1) << 8);
     screen = BasAdr(place);
-    title = Color(KeyTi_C) << 8;
-    number = Color(KeyNu_C) << 8;
+    title = (u16)(Color(KeyTi_C) << 8);
+    number = (u16)(Color(KeyNu_C) << 8);
     for (key = 0; key < 10; key++) {
         if (key == 9) {
             *screen++ = number | '1';
             *screen++ = number | '0';
         } else {
-            *screen++ = number | ('1' + key);
+            *screen++ = (u16)(number | ('1' + key));
         }
         if (StOpen != 0) {
             name = StKeyC_T[row][key];
@@ -222,7 +223,7 @@ void PutKey0(u16 bar, u16 shift)
 /* Draw the key bar `bar` for the keys among Shift, Ctrl and Alt that are
    held, if the setup has a key bar. Without one, the next bar that is
    asked for is drawn whatever was there. */
-void PutKey(u16 bar)
+void PutKey(i32 bar)
 {
     u16 keys;
 
@@ -236,12 +237,12 @@ void PutKey(u16 bar)
 
 /* Draw the menu bar with the menu `item` marked as open: 1 to 5, anything
    else for none. Only the low byte of `item` counts. */
-void PtMnu1(u16 item)
+void PtMnu1(i32 item)
 {
     struct LineArgs line;
-    u16 i = 0;
-    u16 column = 0xFE;                  /* two cells before the name */
-    u16 width = 3;                      /* and as many behind it */
+    i32 i = 0;
+    i32 column = 0xFE;                  /* two cells before the name */
+    i32 width = 3;                      /* and as many behind it */
     u8 c;
 
     item &= 0xFF;
@@ -254,7 +255,8 @@ void PtMnu1(u16 item)
     line.include = PtMnu_S;
     NgLine(&line);
     if (item != 0 && item <= 5) {
-        /* The column is counted in a byte, as the assembly counts it. */
+        /* The column is counted in a byte, as the assembly counts it:
+           it wraps, and only its low byte is taken. */
         do {
             do {
                 c = PtMnu_S[i++];
@@ -266,13 +268,13 @@ void PtMnu1(u16 item)
             c = PtMnu_S[i++];
             width++;
         } while (c != 0xFF);
-        MvsColr(BasAdr(column & 0xFF), width, Color(MnCur_C));
+        MvsColr(BasAdr(column & 0xFF), (u16)width, Color(MnCur_C));
     }
     Window(0, 0x150);
 }
 
 /* Draw the menu bar if the setup has it always visible. */
-void PutMnu(u16 item)
+void PutMnu(i32 item)
 {
     if (md.MenuVs != 0)
         PtMnu1(item);
@@ -284,11 +286,11 @@ void PutMnu(u16 item)
    the command has as many, and stays on the screen. */
 void DosCom(void)
 {
-    u16 cursor = md.DosCol;
-    u16 first = 0;
-    u16 width = (u8)(79 - md.BegCol);
-    u16 color = md.CrntCol << 8;
-    u16 count;
+    i32 cursor = md.DosCol;
+    i32 first = 0;
+    i32 width = (u8)(79 - md.BegCol);
+    u16 color = (u16)(md.CrntCol << 8);
+    i32 count;
     const u8 *text;
     u16 *screen;
     u8 c;
@@ -302,7 +304,7 @@ void DosCom(void)
         first = cursor - width;
     md.OutCol = (u8)first;
     text = md.DosBuf + first;
-    screen = BasAdr(md.DosLin << 8 | md.BegCol);
+    screen = BasAdr((u16)(md.DosLin << 8 | md.BegCol));
     for (count = width + 1; count != 0; count--) {
         c = *text;
         if (c == 0)
@@ -311,7 +313,7 @@ void DosCom(void)
             text++;
         *screen++ = color | c;
     }
-    Window(md.DosLin << 8, 0x150);
+    Window((u16)(md.DosLin << 8), 0x150);
 }
 
 /* Draw the prompt of the command line, the current directory or, if the
@@ -320,10 +322,10 @@ void DosCom(void)
    panel `panel` if that is further down and the active panel is on. */
 void PutPrm(struct WCBdef *panel)
 {
-    u16 below = (BegBX(panel) >> 8) + (SizDX() >> 8) & 0xFF;
-    u16 line = md.DosLin;
-    u16 color = md.CrntCol << 8;
-    u16 column = 1;
+    i32 below = (BegBX(panel) >> 8) + (SizDX() >> 8) & 0xFF;
+    i32 line = md.DosLin;
+    u16 color = (u16)(md.CrntCol << 8);
+    i32 column = 1;
     const u8 *path = md.DosPth;
     u16 *screen;
     u8 c;
@@ -332,7 +334,7 @@ void PutPrm(struct WCBdef *panel)
         line = below;
         md.DosLin = (u8)line;
     }
-    screen = BasAdr(line << 8);
+    screen = BasAdr((u16)(line << 8));
     *screen++ = color | *path++;
     if (md.Prompt != 0)
         while ((c = *path++) != 0) {

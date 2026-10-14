@@ -7,14 +7,6 @@ that is not here is read, and gets the cast that says what DOS does
 or its reason. `python3 harness/int16.py --record` writes the places
 anew and keeps the reasons.
 
-bars.c, DosCom: compare
-    | if (cursor - 5 < first)
-    The line above asks that cursor is 5 or more.
-
-bars.c, DosCom: compare
-    | if (cursor >= width && cursor - width > first)
-    The same line asks first that cursor is width or more.
-
 cmdline.c, F68_00: widen
     | count = (begin >> 8) + (size >> 8) - 4 - row;
     The box is on the screen, and the cursor on a line of its list, which
@@ -225,6 +217,12 @@ read.c, ReDr00: widen
     | limit = ((PANEL_BLOCK - 1) << 4) - 2 * SIZE_FILENT;
     A constant, FFF0h less two entries of 24 bytes: FFC0h.
 
+setup.c, MakeIni: widen
+    | length = to - md.MenuBuf;
+    How far to has gone from md.MenuBuf: the three letters, what the
+    file holds of two panels and of the main data, INI_LEN - 2 bytes,
+    which the u16 that it was kept in held as it is.
+
 start.c, IniData: back
     | md.LowTab[c - 128] = (u8)(0x80 + i);
     The line above asks that c is 80h or more.
@@ -414,3 +412,10 @@ window.c, ResUser: index
     | const u16 *from = md.UserScr + (row - md.ScrBuf);
     How far row is behind md.ScrBuf, in cells: BasAdr, which the line
     above has it from, adds to md.ScrBuf and takes nothing away.
+
+window.c, Window: widen
+    | i32 cell = from - md.ScrBuf;
+    How far from is behind md.ScrBuf, in cells: BasAdr, which the line
+    above has it from, adds a place of the screen buffer to md.ScrBuf,
+    a cell of its rows of 80, which the u16 that it was cut to held as
+    it is.

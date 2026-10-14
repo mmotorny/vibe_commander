@@ -43,11 +43,11 @@ void ClrKbd(void)
 
 /* Look whether the user wants to stop what is going on: take Esc, Ctrl-C
    and F10 from the keyboard, and the 0 that Ctrl-Break leaves there, as
-   long as one of them is the next key. Not 0 if one was. Another key
+   long as one of them is the next key. True if one was. Another key
    stays, and whatever is behind it. */
-u16 TstBrk(void)
+bool TstBrk(void)
 {
-    u16 pressed = 0;
+    bool pressed = false;
     struct Keys keys;
     u16 key;
 
@@ -60,7 +60,7 @@ u16 TstBrk(void)
             && key != KEY_F10)
             break;
         KeyRead();
-        pressed = 1;
+        pressed = true;
     }
     return pressed;
 }
@@ -95,15 +95,16 @@ void SetDTA(void)
 /* Is there a drive of this letter, the low byte of `letter`? DOS is asked
    to make it the current one, then which the current one is, and the one
    that was is made current again. */
-u16 TstDrv(u16 letter)
+bool TstDrv(u16 letter)
 {
-    u16 drive = (u8)(letter - 'A');
-    u16 was, now;
+    i32 drive = (u8)(letter - 'A');
+    i32 was, now;
 
+    /* A drive is 0 to 255 here, as DOS takes it in a byte. */
     was = DriveCurrent();
-    DriveSelect(drive);
+    DriveSelect((u16)drive);
     now = DriveCurrent();
-    DriveSelect(was);
+    DriveSelect((u16)was);
     return now == drive;
 }
 
@@ -123,10 +124,10 @@ struct Answer OpenFil(const u8 *name, u16 mode)
 /* Ask DOS for the current drive and its current directory, into DosPth,
    with the disk of the drive asked for first. PathEr is 1 if that
    failed, and DosPth is the root of the drive then; what is returned is
-   not 0. */
-u16 SetPth(void)
+   true. */
+bool SetPth(void)
 {
-    u16 drive;
+    i32 drive;
 
     md.PathEr = 1;
     drive = DriveCurrent();
@@ -136,56 +137,57 @@ u16 SetPth(void)
     md.DosPth[3] = 0;
     drive = (u8)(drive + 1);
     if (Fantom(drive))
-        return 1;
-    if (DirCurrent(drive, md.DosPth + 3).failed)
-        return 1;
+        return true;
+    if (DirCurrent((u16)drive, md.DosPth + 3).failed)
+        return true;
     md.PathEr = 0;
-    return 0;
+    return false;
 }
 
 /* The disk of a drive that shares a floppy drive with another: `drive`
    is 1 for A:, in its low byte. DOS is asked which of the letters the
    drive goes by at the moment; if that is another, and DOS takes the
    new one, the old one is put back, the user is asked to put the disk
-   in, and with Ok the new one is set. Not 0 if the user would not. The
+   in, and with Ok the new one is set. True if the user would not. The
    page of the help is the same afterwards as before.
 
    The dialog names the drive by its letter, a text of one letter at
    TmpErr+1: the letter and, behind it, the end of the text. */
-u16 Fantom(u16 drive)
+bool Fantom(i32 drive)
 {
     struct Answer unit;
-    u16 goes_by, answer;
-    u8 page;
+    i32 goes_by, page;
+    u16 answer;
 
+    /* The drive is a byte's, 0 to 255, below. */
     drive &= 0xFF;
-    unit = DriveLetter(drive);
+    unit = DriveLetter((u16)drive);
     if (unit.failed)
-        return 0;
+        return false;
     goes_by = unit.value & 0xFF;
     if (goes_by == 0 || goes_by == drive)
-        return 0;
-    unit = DriveSetLetter(drive);
+        return false;
+    unit = DriveSetLetter((u16)drive);
     if (unit.failed)
-        return 0;
+        return false;
     if ((unit.value & 0xFF) == goes_by)
-        return 0;
-    if (DriveSetLetter(goes_by).failed)
-        return 0;
+        return false;
+    if (DriveSetLetter((u16)goes_by).failed)
+        return false;
     *(u16 *)(md.TmpErr + 1) = (u8)(drive + 'A' - 1);
     page = md.HlpPage;
     answer = Dialog(&Fant_B, 0, 0, 0, &md);
-    md.HlpPage = page;
+    md.HlpPage = (u8)page;
     if ((answer & 0xFF) != 0)
-        return 1;
-    DriveSetLetter(drive);
-    return 0;
+        return true;
+    DriveSetLetter((u16)drive);
+    return false;
 }
 
 /* The disk of the drive that a path names, or of the current one for a
-   path without a drive: `path` is in the main data. Not 0 if the user
+   path without a drive: `path` is in the main data. True if the user
    would not put it in. */
-u16 ChgDisk(const u8 *path)
+bool ChgDisk(const u8 *path)
 {
     u16 letter = path[0];
 

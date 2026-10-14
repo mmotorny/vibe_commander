@@ -213,7 +213,7 @@ i32 V00_02(i32 menu, bool edit, bool whole, struct Open *open)
         VI->ViSize = (u16)((u8)(md.Lines - 2) << 8 | 80);
     }
     md.WinMous = 0;
-    PutMnu((u16)menu);
+    PutMnu(menu);
     VI->ViewEdit = edit;
     include = ViFl_S;
     if (edit)

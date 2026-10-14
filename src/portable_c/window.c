@@ -15,13 +15,13 @@
 #include "vc.h"
 
 /* Can the program draw on the screen as it is: 80 columns, in mode 2, 3
-   or 7? Returns 1 if it can. `screen` gets how the screen is set, the
+   or 7? Returns true if it can. `screen` gets how the screen is set, the
    mode without its highest bit where there are 80 columns: the code
    that starts the program goes on with the mode, the columns and the
    page. */
-u16 ChkMode(struct Screen *screen)
+bool ChkMode(struct Screen *screen)
 {
-    u16 ok = 0;
+    bool ok = false;
 
     *screen = ScreenState();
     if (screen->columns == 80) {
@@ -42,8 +42,8 @@ void Cursor(u16 place)
 /* Put the cursor where the command line has it. */
 void Cursor1(void)
 {
-    Cursor((u16)md.DosLin << 8
-           | (u8)(md.DosCol - md.OutCol + md.BegCol));
+    Cursor((u16)(md.DosLin << 8
+                 | (u8)(md.DosCol - md.OutCol + md.BegCol)));
 }
 
 /* Give the cursor the shape it has in a line that is typed into: two
@@ -80,8 +80,8 @@ void HidCur(void)
     Cursor(0x7F00);
 }
 
-/* Move what a window of the screen shows a line up, or down if `down` is
-   not 0, with the mouse pointer hidden, which would move along with the
+/* Move what a window of the screen shows a line up, or down if `down`,
+   with the mouse pointer hidden, which would move along with the
    rest: `upper` is the upper left corner of the window and `lower` the
    lower right one, and the line that comes in is empty, of the colour
    `color`.
@@ -90,7 +90,7 @@ void HidCur(void)
    any registers, and called for nothing but this. The assembly goes on
    with CX and DX as the BIOS leaves them, the corners, which is as they
    went: a caller goes on with its own. */
-void Scroll(u16 down, u16 color, u16 upper, u16 lower)
+void Scroll(bool down, u16 color, u16 upper, u16 lower)
 {
     CurMous(0);
     ScreenScroll(down, 1, color, upper, lower);
@@ -135,7 +135,8 @@ void SavWin(u16 begin, u16 size, u16 *buffer)
 {
     const u16 *row = BasAdr(begin);
     u16 *to = buffer;
-    u16 rows = size >> 8, columns = size & 0xFF, column;
+    u16 rows = size >> 8;
+    i32 columns = size & 0xFF, column;
 
     do {
         for (column = 0; column != columns; column++)
@@ -150,7 +151,8 @@ void ResWin(u16 begin, u16 size, const u16 *buffer)
 {
     u16 *row = BasAdr(begin);
     const u16 *from = buffer;
-    u16 rows = size >> 8, columns = size & 0xFF, column;
+    u16 rows = size >> 8;
+    i32 columns = size & 0xFF, column;
 
     do {
         for (column = 0; column != columns; column++)
@@ -166,7 +168,8 @@ void ResUser(u16 begin, u16 size)
 {
     u16 *row = BasAdr(begin);
     const u16 *from = md.UserScr + (row - md.ScrBuf);
-    u16 rows = size >> 8, columns = size & 0xFF, column;
+    u16 rows = size >> 8;
+    i32 columns = size & 0xFF, column;
 
     do {
         for (column = 0; column != columns; column++)
@@ -190,12 +193,14 @@ void ResUser(u16 begin, u16 size)
    calls the program for a critical error with the machine kept from
    interrupting, and the box that the program shows then is put on the
    screen through here. */
-static void MovScr(u16 cell, u16 *buffer, u16 rows, u16 read)
+static void MovScr(i32 cell, u16 *buffer, i32 rows, bool read)
 {
-    if (read != 0)
-        ScreenGet(cell, buffer, rows * 80);
+    /* The cell is one of the screen buffer's, and the rows a byte's
+       worth: both fit the 16 bits that the system takes. */
+    if (read)
+        ScreenGet((u16)cell, buffer, (u16)(rows * 80));
     else
-        ScreenPut(cell, buffer, rows * 80);
+        ScreenPut((u16)cell, buffer, (u16)(rows * 80));
     IntOn();
 }
 
@@ -214,22 +219,22 @@ static void MovScr(u16 cell, u16 *buffer, u16 rows, u16 read)
 void Window(u16 begin, u16 size)
 {
     u16 *from = BasAdr(begin);
-    u16 cell = (u16)(from - md.ScrBuf);
-    u16 rows = size >> 8;
-    u16 columns = size & 0xFF;
+    i32 cell = from - md.ScrBuf;
+    i32 rows = size >> 8;
+    i32 columns = size & 0xFF;
 
     CurMous(0);
     if (rows != 1) {
-        MovScr(cell - (begin & 0xFF), from - (begin & 0xFF), rows, 0);
+        MovScr(cell - (begin & 0xFF), from - (begin & 0xFF), rows, false);
     } else {
         if (columns != 0)
-            ScreenPut(cell, from, columns);
+            ScreenPut((u16)cell, from, (u16)columns);
         else {
             /* 65536 cells, as the original's loop counts none: twice
                round the 64K that the display's memory and the main data
                each have, which is the same 32768 cells twice. */
-            ScreenPut(cell, from, 0x8000);
-            ScreenPut(cell, from, 0x8000);
+            ScreenPut((u16)cell, from, 0x8000);
+            ScreenPut((u16)cell, from, 0x8000);
         }
         IntOn();
     }
@@ -239,5 +244,5 @@ void Window(u16 begin, u16 size)
 /* Read the screen into the screen buffer, all its lines. */
 void SavScr(void)
 {
-    MovScr(0, md.ScrBuf, md.Lines, 1);
+    MovScr(0, md.ScrBuf, md.Lines, true);
 }

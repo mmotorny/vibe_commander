@@ -9393,7 +9393,7 @@ for.
 | N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | |
 | N17b | `commands.c` | 604 lines; in the record's table | F8 | **Done**: "N17b, `commands.c`: done, and what a later cluster should know" below |
 | N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | **Done**: "N18, `menu.c`, `help.c`: done, and what a later cluster should know" below. The help's lines widened with the original's cuts written where a help file that is not true to its text takes them past 16 bits |
-| N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | |
+| N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | **Done**: "N19a, `bars.c`, `window.c`, `system.c`, `setup.c`" below |
 | N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | |
 | N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | **Done**: "N20, `stcolor.c`, `stopts.c`: done, and what a later cluster should know" below |
 | N21 | `stmain.c`, `sthelp.c` | 1,086; 121 | F8 | |
@@ -14903,6 +14903,75 @@ it, and the callers 6; the types and the casts by two scripts 3; the
 record's reasons by one script 2; the listings of the casts alone and
 of `main.c` 4; the tests, the images and the documents the rest, on a
 machine that a dozen other agents were testing on.
+
+### N19a, `bars.c`, `window.c`, `system.c`, `setup.c`: done, and what a later cluster should know
+
+**What there is.** The four files sorted by "The rule for a number",
+clang's warnings of a conversion silent for all four. The whole suite
+passes, no golden and no patch changed, and the image of each scenario
+is that of the build before (below). No limit of the original moved,
+nothing that a user sees, and nothing that DOS is asked: no question
+for the user. None of the four files shows a figure of free memory.
+
+**The numbers.** Of the 108 of 8 or 16 bits and the one `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 44 | The counts and the indexes of the loops; the number of a key bar, of its row and of a name in it, and what `PutKey0` makes of the bar and the keys held; the menu of `PtMnu1` and `PutMnu`, its column, counted in a byte, and its width; the cursor, the first column shown and the width of the command line, and the row and the column of the prompt; the drives of `TstDrv`, `SetPth` and `Fantom`, `Fantom`'s parameter among them, and the page of the help that `Fantom` keeps; the cell and the rows of `MovScr` and `Window`, and their columns, and those of `SavWin`, `ResWin` and `ResUser`; the length of the setup file in `MakeIni` and `SaveSet`, and what `MakeIni` answers |
+| Made `bool` | 10 | What `ChkMode`, `TstBrk`, `TstDrv`, `SetPth`, `Fantom` and `ChgDisk` answer; `ok` of `ChkMode` and `pressed` of `TstBrk`; `down` of `Scroll`, which every caller hands a comparison; `read` of `MovScr` |
+| Kept by a word | 51, and the `u32` | `place` 16, `character` 8, `cell` 5, `system` 9 (the shape of the cursor four times, the page's start twice, the keys held, the mode of opening, DOS's error), `small` 4 (the tables of the key bars), `text` 4, `colour` 2, `key` 2 (one is what `Dialog` answers), `setup` 1 (`IniSave`), and `Timer`'s `u32`, `system`, the BIOS's count of ticks |
+| Kept by a sentence | 3 | `rows` of `SavWin`, `ResWin` and `ResUser`: counted down to nothing as the original's `LOOP` counts, so that a window of no rows has 65,536, as the functions' comment says and as `ChkSum` and `MvsColr` keep their counts. F8's note for this cluster said so; no caller hands 0, which was not looked into further |
+
+Two places of the kind `sign`, both `index >> 2` of `PutKey0`, an index
+that the line which makes it masks to its low byte.
+
+**The casts.** clang named 11 places before anything changed: one went
+by a type, `length` of `MakeIni` an `i32`; ten are casts, each a cell, a
+place or a colour made of a byte shifted into the high one. The
+widening made 22 more: a drive handed to a function of `sys.h`, seven,
+`DriveSelect`, `DriveLetter`, `DriveSetLetter` and `DirCurrent`; the
+cell and the count handed to `ScreenPut` and `ScreenGet`, eight; the
+length handed to `ChkSum` and `FileWrite`; the width to `MvsColr`; the
+page put back into `HlpPage`; a key's digit made a cell; and two loops
+to `(i32)sizeof`. So 32 casts. Comments: the column of `PtMnu1` says
+`wraps`, where the assembly counts it in a byte and the code takes its
+low byte; the drive of `TstDrv` and of `Fantom`, the cell and the rows
+of `MovScr`, and the length that `ChkSum` is handed say what they fit
+by. Five casts went from other clusters' files, each written for a
+parameter of 16 bits that is an `i32` now: `PutMnu((u16)menu)` of
+`view.c`, `PutMnu((u16)item)` of `drive.c`, and `Fantom((u16)drive)`
+three times in `read.c`, which N12 said would go when `system.c` is
+sorted.
+
+**Across clusters.** `vc.h` has the new types: `PutKey`, `PutKey0`,
+`PutMnu` and `PtMnu1` take an `i32`, as `Fantom` does; `ChkMode`,
+`TstBrk`, `TstDrv`, `SetPth`, `Fantom` and `ChgDisk` answer a `bool`,
+and `Scroll` takes one; `MakeIni` answers an `i32`. Every caller
+compiled as it was: a `bool` kept in a `u16`, `failed = SetPth()` of
+`commands.c`, or held against 0, `Fantom(...) == 0` of `keys.c`, is
+named by no warning, and the callers of the others hand numbers of 16
+bits or an `i32` already. `PutKey0` and `PtMnu1` mask what they are
+handed as before, so `PutKey(0xFF)` and `PutMnu(key)` of `dialog.c`
+draw what they drew. The parameters of `Window`, `SavWin`, `ResWin`,
+`ResUser`, `Cursor`, `SftEGA` and `ClsLine` are places, and `UpCase`
+and `TstDrv` take a character: those stay 16 bits, and no caller
+changes.
+
+**`harness/int16.py`.** The two places of `DosCom` went, its numbers
+being `i32` now; two are new, of the kind `widen`, a difference of
+two pointers that was cut to 16 bits and is kept whole now, `length`
+of `MakeIni` and `cell` of `Window`, each with its reason.
+
+**The program.** `VC.EXE` is another by the types, `e00c99f4...` where
+the head that the work began on gave `25a4cdc7...`; the types and the
+casts were made in one stage and judged together by the scenarios,
+which pass. The image of every scenario, `python3 harness/dataimage.py
+compare`, against the build of that head: "156 scenarios, 148 with
+nothing that differs; 0 differences, 0 more in what was declared as
+changed, 36 in what may differ". The README's figures moved with the
+code, `tools/figures.py --write`.
+
+It took some 60 tool calls: reading the brief, the plan and the sections 15; the files with the finder's lists beside them 10, the finder being slow, a minute or more for each call, since it has clang read the tree; the types and the casts by scripts 10; the record's reasons by one script 5; the tests, the images and the documents the rest to hand back.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

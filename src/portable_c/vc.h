@@ -626,7 +626,7 @@ struct Label GetVol(u8 *volume);
    the file holds, and returns how long that is. SaveSet writes it to the
    file, and answers with the bytes written, or with what DOS said was
    wrong if it could not, 53h for a drive that is not ready. */
-u16 MakeIni(void);
+i32 MakeIni(void);
 struct Answer SaveSet(void);
 
 /* The start of the program, start.c. Init00 reads the setup, when the
@@ -1332,10 +1332,10 @@ u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, const u8 *table);
 /* The key bar and the menu bar, the command line and its prompt: see
    each in bars.c. `data` is where ClsLine reads the colour, &md. */
 u16 *ClsLine(u16 place, const struct MainDat *data);
-void PutKey(u16 bar);
-void PutKey0(u16 bar, u16 shift);
-void PutMnu(u16 item);
-void PtMnu1(u16 item);
+void PutKey(i32 bar);
+void PutKey0(i32 bar, i32 shift);
+void PutMnu(i32 item);
+void PtMnu1(i32 item);
 void PutPrm(struct WCBdef *panel);
 void DosCom(void);
 /* The entries of an extension file or a menu file, in MenuBuf: FndItem
@@ -1381,21 +1381,21 @@ u16 Search(const u8 *list, u16 at, u16 begin, u16 end, u16 step,
 /* What the program makes of the system at every turn: see each in
    system.c. OpenFil opens a file, `mode` as DOS takes it in AL, and
    answers with the handle, or with the error. SetPth asks for the
-   current drive and directory, into DosPth, and is not 0 if that fails.
+   current drive and directory, into DosPth, and is true if that fails.
    Fantom asks for the disk of a drive that shares a floppy drive with
    another, 1 for A:, and ChgDisk for that of the drive that a path of
-   the main data names: not 0 if the user would not put it in. */
+   the main data names: true if the user would not put it in. */
 u32 Timer(void);
 void ClrKbd(void);
-u16 TstBrk(void);
+bool TstBrk(void);
 void Beep(void);
 u16 UpCase(u16 letter);
 void SetDTA(void);
-u16 TstDrv(u16 letter);
+bool TstDrv(u16 letter);
 struct Answer OpenFil(const u8 *name, u16 mode);
-u16 SetPth(void);
-u16 Fantom(u16 drive);
-u16 ChgDisk(const u8 *path);
+bool SetPth(void);
+bool Fantom(i32 drive);
+bool ChgDisk(const u8 *path);
 /* The mouse: see each in mouse.c. GetMous says which buttons are held
    and where the pointer is, InWind is not 0 for a place
    outside a window, and DoublMo is 2 to go on, 1 for a second click and 0
@@ -1417,14 +1417,14 @@ bool InWind(u16 where, u16 begin, u16 size);
 /* The screen, its cursor, and windows of the screen buffer: see each in
    window.c. A place has the row in its high byte, and a size the rows.
    `buffer` is an address in the main data. */
-u16 ChkMode(struct Screen *screen);
+bool ChkMode(struct Screen *screen);
 void Cursor(u16 place);
 void Cursor1(void);
 u16 ChgCur(void);
 void CurShp(u16 shape);
 u16 GetCur(void);
 void HidCur(void);
-void Scroll(u16 down, u16 color, u16 upper, u16 lower);
+void Scroll(bool down, u16 color, u16 upper, u16 lower);
 u16 ScrOffs(void);
 u16 SftEGA(u16 place);
 void SavWin(u16 begin, u16 size, u16 *buffer);

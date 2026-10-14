@@ -87,19 +87,19 @@ N16             95         95     0              0       0     0     3     0    
 N17a            65         65     0              0       0     0     0     0     0  keys.c
 N17b            28          0     0              0      28     0     0     5    41  commands.c
 N18             70          0     1              0      50     1     0     5    40  menu.c help.c
-N19a           108        108     1              1       0     0     0     0     0  bars.c window.c system.c setup.c
+N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
 N19b            40         40     0              0       0     0     0     0     1  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
 headers        279         95    12              1     153     3     0     0     0  vc.h sys.h tables.h
-all           2291        732   115              8     911    49    46   106   648
+all           2237        624   115              7     963    52    48   116   692
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               222         38    11              0     153     3     0     0     0
 sys.h               37         37     1              1       0     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
-bars.c              40         40     0              0       0     0     0     0     0
+bars.c              19          0     0              0      19     0     2     0    21
 blank.c             12          0     0              0      12     0     2     0     7
 box.c               30          0     0              0      29     1     1     0    18
 cmdline.c           37          0     0              0      37     0     0     4    22
@@ -130,19 +130,19 @@ panel.c             20          0     1              0      21     0     3     1
 place.c              5          0     0              0       5     0     0     1    11
 read.c              20          0     1              0      20     1     1     5    11
 screen.c            12          0     0              0      10     2     0     0     3
-setup.c              8          8     0              0       0     0     0     0     0
+setup.c              3          0     0              0       3     0     0     0     5
 start.c             40         40     0              0       0     0     0     0     1
 stcolor.c           43          0     0              0      43     0     0     3    39
 sthelp.c            46         46     3              3       0     0     0     0     2
 stmain.c            35         35     0              0       0     0     0     0     0
 stopts.c            18          0     0              0      15     3     0     0    10
 string.c             6          0     0              0       6     0     0     0     8
-system.c            21         21     1              1       0     0     0     0     0
+system.c             8          0     1              0       9     0     0     6     7
 tree.c               5          0     0              0       5     0     0     4    14
 treebox.c           21          0     0              0      21     0     1     3    20
 usermenu.c          49         49     0              0       0     0     0     0     1
 view.c              56          0    13              0      67     2     7    22    88
-window.c            39         39     0              0       0     0     0     0     0
+window.c            24          0     0              0      21     3     0     4    11
 
 ----
 
@@ -700,7 +700,72 @@ sys.h: not sorted, 37 numbers, 1 u32
 
 tables.h: not sorted, 20 numbers
 
-bars.c: not sorted, 40 numbers
+bars.c, (): variable KeyB_T, u8[15][4]
+    small: the number of a row of KeyC_T, below 18.
+
+bars.c, (): variable KeyC_T, u8[18][10]
+    small: the number of a name of Key_S, below 32.
+
+bars.c, (): variable Key_S, u8[32][6]
+    text
+
+bars.c, (): variable StKeyB_T, u8[4][4]
+    small: the number of a row of StKeyC_T, below 5.
+
+bars.c, (): variable StKeyC_T, u8[5][10]
+    small: the number of a name of StKey_S, below 11.
+
+bars.c, (): variable StKey_S, u8[11][6]
+    text
+
+bars.c, (): variable PtMnu_S, u8[]
+    text: of the tables, bars_t.c
+
+bars.c, (): variable PtMnu_B, u8[1]
+    colour
+
+bars.c, ClsLine: parameter place, u16
+    place
+
+bars.c, ClsLine: variable cell, u16
+    cell
+
+bars.c, PutKey0: variable number, u16
+    cell: the colour alone in its place.
+
+bars.c, PutKey0: variable place, u16
+    place
+
+bars.c, PutKey0: variable title, u16
+    cell: the colour alone in its place.
+
+bars.c, PutKey0: sign
+    | row = StKeyB_T[index >> 2][index & 3];
+    index is the low byte of what the line that makes it works out,
+    & 0xFF: 0 to 255.
+
+bars.c, PutKey0: sign
+    | row = KeyB_T[index >> 2][index & 3];
+    index is the low byte of what the line that makes it works out,
+    & 0xFF: 0 to 255.
+
+bars.c, PutKey: variable keys, u16
+    system: the keys that are held, in the bits that it answers in.
+
+bars.c, PtMnu1: variable c, u8
+    character
+
+bars.c, DosCom: variable color, u16
+    cell: the colour alone in its place.
+
+bars.c, DosCom: variable c, u8
+    character
+
+bars.c, PutPrm: variable color, u16
+    cell: the colour alone in its place.
+
+bars.c, PutPrm: variable c, u8
+    character
 
 bars_t.c: as a whole, 1 number
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -3147,7 +3212,14 @@ screen.c, MovDz0: variable c, u8
 screen.c, BasAdr: parameter place, u16
     place
 
-setup.c: not sorted, 8 numbers
+setup.c, (): variable Init_F, u8[]
+    text: of the tables, system_t.c
+
+setup.c, (): variable IniSave, u8[511]
+    setup: the bytes that the setup file would hold.
+
+setup.c, Failed: parameter error, u16
+    system: DOS's number of an error, as struct Answer has it.
 
 stack.c: as a whole, 1 number
     the stack, an array of bytes
@@ -3382,7 +3454,34 @@ string.c, PathLin: variable c, u8
 string.c, LetLin: variable c, u8
     character
 
-system.c: not sorted, 21 numbers, 1 u32
+system.c, Timer: returns, u32
+    system: the timer's count of ticks since midnight, as the BIOS keeps
+    it.
+
+system.c, TstBrk: variable key, u16
+    key
+
+system.c, UpCase: parameter letter, u16
+    character: in the low byte, and the high byte comes back as it
+    went.
+
+system.c, UpCase: returns, u16
+    character: in the low byte, and the high byte as it was handed.
+
+system.c, UpCase: variable al, u16
+    character
+
+system.c, TstDrv: parameter letter, u16
+    character
+
+system.c, OpenFil: parameter mode, u16
+    system: the mode of opening, as DOS takes it in AL.
+
+system.c, Fantom: variable answer, u16
+    key: what Dialog answers.
+
+system.c, ChgDisk: variable letter, u16
+    character
 
 system_t.c: as a whole, 9 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -3721,4 +3820,85 @@ view.c, F34_01: parameter how, u16
 view_t.c: as a whole, 23 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-window.c: not sorted, 39 numbers
+window.c, Cursor: parameter place, u16
+    place
+
+window.c, ChgCur: returns, u16
+    system: the shape of the cursor, as the BIOS has it.
+
+window.c, ChgCur: variable was, u16
+    system: the shape of the cursor, as the BIOS has it.
+
+window.c, ChgCur: variable shape, u16
+    system: the shape of the cursor, as the BIOS has it.
+
+window.c, CurShp: parameter shape, u16
+    system: the shape of the cursor, as the BIOS has it.
+
+window.c, GetCur: returns, u16
+    place
+
+window.c, Scroll: parameter color, u16
+    colour
+
+window.c, Scroll: parameter lower, u16
+    place
+
+window.c, Scroll: parameter upper, u16
+    place
+
+window.c, ScrOffs: returns, u16
+    system: where the page that is shown begins in the display's memory,
+    as the BIOS answers it.
+
+window.c, ScrOffs: variable offset, u16
+    system: where the page that is shown begins in the display's memory,
+    as the BIOS answers it.
+
+window.c, SftEGA: parameter place, u16
+    place
+
+window.c, SftEGA: returns, u16
+    place
+
+window.c, SavWin: parameter begin, u16
+    place
+
+window.c, SavWin: parameter size, u16
+    place
+
+window.c, SavWin: variable rows, u16
+    the rows of the window, counted down to nothing as the original's
+    LOOP counts them, so that a window of no rows has 65,536, as the
+    function's comment says: kept so, as ChkSum and MvsColr keep
+    their counts.
+
+window.c, ResWin: parameter begin, u16
+    place
+
+window.c, ResWin: parameter size, u16
+    place
+
+window.c, ResWin: variable rows, u16
+    the rows of the window, counted down to nothing as the original's
+    LOOP counts them, so that a window of no rows has 65,536, as the
+    function's comment says: kept so, as ChkSum and MvsColr keep
+    their counts.
+
+window.c, ResUser: parameter begin, u16
+    place
+
+window.c, ResUser: parameter size, u16
+    place
+
+window.c, ResUser: variable rows, u16
+    the rows of the window, counted down to nothing as the original's
+    LOOP counts them, so that a window of no rows has 65,536, as the
+    function's comment says: kept so, as ChkSum and MvsColr keep
+    their counts.
+
+window.c, Window: parameter begin, u16
+    place
+
+window.c, Window: parameter size, u16
+    place

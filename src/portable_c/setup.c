@@ -42,7 +42,7 @@ u8 IniSave[INI_LEN];
 static u8 *MkIni1(u8 *to, struct WCBdef *panel)
 {
     const u8 *from = (const u8 *)panel;
-    u16 i;
+    i32 i;
 
     FilZero(panel->DskMas, 13);
     FilZero(panel->WinPath, LenPath);
@@ -53,11 +53,11 @@ static u8 *MkIni1(u8 *to, struct WCBdef *panel)
 
 /* Write into MenuBuf what the setup file holds, as the setup is now.
    Returns how many bytes that is. */
-u16 MakeIni(void)
+i32 MakeIni(void)
 {
     const u8 *from = (const u8 *)&md;
     u8 *to = md.MenuBuf;
-    u16 length, i;
+    i32 length, i;
 
     *to++ = 'V';
     *to++ = 'V';
@@ -67,7 +67,7 @@ u16 MakeIni(void)
     for (i = 0; i < CmnIni; i++)
         *to++ = from[i];
     length = to - md.MenuBuf;
-    *(u16 *)to = ChkSum(md.MenuBuf, length);
+    *(u16 *)to = ChkSum(md.MenuBuf, (u16)length);  /* INI_LEN - 2 */
     return length + 2;
 }
 
@@ -94,7 +94,7 @@ struct Answer SaveSet(void)
 {
     struct FileAttr had;
     struct Answer opened, wrote, closed;
-    u16 length;
+    i32 length;
 
     length = MakeIni();
     MainFil(md.TmpBuf, Init_F);
@@ -109,7 +109,7 @@ struct Answer SaveSet(void)
     opened = FileCreate(md.TmpBuf, had.attributes | ARCHIVE);   /* SavSt1 */
     if (opened.failed)
         return opened;
-    wrote = FileWrite(opened.value, md.MenuBuf, length);
+    wrote = FileWrite(opened.value, md.MenuBuf, (u16)length);
     closed = FileClose(opened.value);
     if (closed.failed)
         return closed;

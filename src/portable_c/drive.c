@@ -76,7 +76,7 @@ bool F62_01(struct WCBdef *panel, i32 item)
     bool right;
 
     HidCur();
-    PutMnu((u16)item);
+    PutMnu(item);
     count = 0;
     for (letter = 'A'; letter <= 'Z'; letter++) {
         if (!TstDrv(letter))

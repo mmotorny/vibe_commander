@@ -163,7 +163,7 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
             number = 1;
         }
         drive = (u8)(panel->WinPath[0] - ('A' - 1));
-        if (Fantom((u16)drive))
+        if (Fantom(drive))
             goto unread;
         SetDTA();
         asked = FindFirst(md.TmpBuf, 0x37);
@@ -185,7 +185,7 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
         for (;;) {
             /* ReDr24 */
             drive = (u8)(panel->WinPath[0] - ('A' - 1));
-            if (Fantom((u16)drive))
+            if (Fantom(drive))
                 goto unread;
             asked = DirCurrent((u16)drive, panel->WinPath + 3);
             if (!asked.failed)
@@ -376,7 +376,7 @@ static void RdInfo(struct WCBdef *panel)
     md.InfoLen = 0xFFFF;
     md.Volume[0] = 0;
     drive = (u8)(md.DosPth[0] - ('A' - 1));
-    if (Fantom((u16)drive))
+    if (Fantom(drive))
         return;
     space = DriveSpace((u16)drive, 0);
     if (space.failed)
