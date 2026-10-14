@@ -65,7 +65,7 @@ void PutInf(struct WCBdef *panel)
     u16 *screen;
     u32 size, total;
     u16 place;
-    u16 cluster, high, clusters;        /* of a size, in 16 bits */
+    u16 cluster;                        /* bytes of a cluster */
     u16 two;                            /* two characters of dirinfo */
     i32 count, lines, room, skip, i;
     struct WCBdef *other;
@@ -116,22 +116,15 @@ void PutInf(struct WCBdef *panel)
                 continue;
             count++;
             size = file->SizeF;
-            if (cluster > 1) {
-                /* The clusters that the high half of the size fills, and
-                   then those of the rest, of which one may be filled in
-                   part. They are counted in 16 bits, and the count of the
-                   rest wraps round to 0 where it is 65,535 and one more
-                   is filled in part, as in the original: a size that
-                   lies inside the last cluster below a multiple of
-                   65,536 clusters counts 65,536 clusters less. */
-                high = (u16)(size >> 16);
-                total += (u32)(u16)(high - high % cluster) << 16;
-                size = (u32)(high % cluster) << 16 | (u16)size;
-                clusters = (u16)(size / cluster);
-                if ((u16)((u16)size - clusters * cluster) != 0)
-                    clusters++;
-                size = (u32)clusters * cluster;
-            }
+            /* The size in whole clusters, in 32 bits: wrapping at 4 GB
+               as the sum does. The original counts the clusters of what
+               lies below a multiple of 65,536 clusters in 16 bits, and
+               that count wraps round to 0 where it is 65,535 and one
+               more is filled in part, so that such a file counts 65,536
+               clusters less: a bug of the original, fixed on the user's
+               word of 14 October 2026 (DEVIATIONS.md, 19). */
+            if (cluster > 1 && size % cluster != 0)
+                size += cluster - size % cluster;
             total += size;
         }
         /* The count fits: a panel holds 2,703 entries, ReDr00. */

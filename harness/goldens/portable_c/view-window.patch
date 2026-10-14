@@ -1,0 +1,71 @@
+The portable C in the scenario view-window: what it is expected to show
+otherwise than the original. A patch of harness/goldens/view-window.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 19 of src/portable_c/DEVIATIONS.md
+Why: the Info panel counts each file of the other panel in whole clusters
+in 32 bits. LAST.DAT of STAMPS, 4,294,967,295 bytes, lies inside the last
+cluster below a multiple of 65,536 clusters of 512 bytes, 32 MB, where the
+original's count of 16 bits wraps round to 0: it counts 32 MB more here. The
+sum of the seven files wraps at 4 GB in both, so the figure is 33,554,432
+bytes higher and neither is the 6 GB that the files take
+
+== 3: Down Down Enter
+row 8
+-|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
++|║evening  dat│            │            ║║  7 files use 2,001,050,624 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+
+== 4: Down Down Down Down Down
+row 8
+-|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
++|║evening  dat│            │            ║║  7 files use 2,001,050,624 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+
+== 6: "dirinfo" Enter
+row 8
+-|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
++|║evening  dat│            │            ║║  7 files use 2,001,050,624 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+
+== 7: Tab
+row 8
+-|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
++|║evening  dat│            │            ║║  7 files use 2,001,050,624 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+
+== 8: F4
+row 8
+-|║evening  dat│            │   ║     dirinfo      ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
++|║evening  dat│            │   ║     dirinfo      ║   e 2,001,050,624 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+
+== 9: Enter
+row 8
+-|║evening  dat│            │   ║     dirinfo      ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
++|║evening  dat│            │   ║     dirinfo      ║   e 2,001,050,624 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+
+== 10: Down
+row 8
+-|║evening  dat│            │   ║     dirinfo      ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
++|║evening  dat│            │   ║     dirinfo      ║   e 2,001,050,624 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+
+== 11: F2
+row 8
+-|║evening  dat│            │   ║     dirinfo      ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
++|║evening  dat│            │   ║     dirinfo      ║   e 2,001,050,624 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+
+== 12: F4
+row 8
+-|║evening  dat│            │   ║     dirinfo      ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
++|║evening  dat│            │   ║     dirinfo      ║   e 2,001,050,624 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+
+== 13: End
+row 8
+-|║evening  dat│            │   ║     dirinfo      ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
++|║evening  dat│            │   ║     dirinfo      ║   e 2,001,050,624 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+
+== 14: Home
+row 8
+-|║evening  dat│            │   ║     dirinfo      ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
++|║evening  dat│            │   ║     dirinfo      ║   e 2,001,050,624 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+
+== 15: Esc
+row 8
+-|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
++|║evening  dat│            │            ║║  7 files use 2,001,050,624 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12

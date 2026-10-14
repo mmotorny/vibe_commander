@@ -1988,3 +1988,44 @@ have, and which a scenario would have to type into the editor, or make
 by doubling a line of tabs with the editor's blocks, as `editor-big`
 makes its file. Its golden, from the original, would show the wrong
 columns, and its patch the rows of the status line and the window.
+
+### 19. The Info panel counts every file in its whole clusters
+
+**What the original does.** The Info panel says how many files the
+other panel has and how many bytes they take on the disk, each file
+counted in whole clusters. It counts in 16 bits: the clusters that the
+high word of a size fills by multiples of the cluster's size first,
+then those of the rest, a quotient of 16 bits, and one more if there is
+a remainder. Where that quotient is 65,535 and there is a remainder, the
+one more wraps it round to 0: a file whose size lies inside the last
+cluster below a multiple of 65,536 clusters, and not at its end, counts
+65,536 clusters less. On a disk of 2K clusters a file of 134,217,000
+bytes counts 0 bytes, where it takes 134,217,728; on one of 512 bytes, a
+file of 33,554,000. That is known by reading the assembly, `PtIn02` to
+`PtIn04` of `VCSUB3.INC`, and was not tried.
+
+**What the portable C does.** It rounds the size of each file up to
+whole clusters in 32 bits, so that such a file counts all its clusters.
+Every other file counts as in the original, and the sum wraps at 4 GB
+as the original's does. `PutInf` of `info.c`.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed. The cluster N12
+met it where it sorted the numbers of `info.c` (`TODO.md`, "N12,
+`panel.c`, `info.c`, `drive.c`", question B). Its other question there,
+a cluster of 64K, which the original keeps as 0 bytes, is decided to be
+fixed too, by the piece M, and is declared then: it rests on this
+count, which divides in 32 bits.
+
+**Which scenarios show it.** `enter` and `view-window`, by their
+patches, which have the line of the files of `C:\STAMPS` on the Info
+panel, under the viewer's window in `view-window`. Of its seven files,
+whose sizes the bench writes into their entries, `LAST.DAT` has
+4,294,967,295 bytes, which on the bench's clusters of 512 bytes lies
+inside the last cluster below 65,536 times 128 clusters: the original
+counts it 32 MB short, and the portable C counts its 4 GB. The sum of
+the seven wraps at 4 GB in both, as a size does wherever the program
+shows one, so the line says 2,001,050,624 bytes where the original says
+1,967,496,192, and neither says the 6 GB that the files take. The
+other scenarios that show the Info panel are held to the original's
+goldens as they are.
