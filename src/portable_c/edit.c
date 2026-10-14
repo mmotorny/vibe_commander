@@ -156,7 +156,7 @@ void T73_00(void);
 struct Drawn T73_10(void);
 void T74_00(void);
 void T75_00(u16 number, u16 *screen, u16 color);
-void T76_00(u16 place, u16 segment, u16 text, u16 colors);
+void T76_00(u16 place, const u8 *text, const u8 *colors);
 u16 T80_00(void);
 
 /* T00_00, the editor itself, is declared in vc.h. Of the others the
@@ -176,8 +176,7 @@ u16 T80_00(void);
    had, which CurShp gives it back. ClrKbd empties the keyboard buffer, if
    the setup has it so. GetMous returns the buttons of the mouse that are down
    and where it is; what it is given comes back for that if there is no
-   mouse. InWind is not 0 if that is outside a window. AsmSeg
-   is the segment of the program's constants. */
+   mouse. InWind is not 0 if that is outside a window. */
 
 /* C routines of other files that vc.h does not have. */
 u16 *HexByt(u16 *screen, u32 byte);                     /* digits.c */
@@ -189,26 +188,26 @@ void PathLin(u8 *text);                                 /* string.c */
    SrchStr; V82_00, of vc.h, looks for it in `count` bytes, and returns
    where the search ended, behind what it found, and 1 for the text
    found, 0 for the bytes that it names in hex, and 100h for neither. */
-void V80_00(u16 include, struct Box *where);            /* view.c */
+void V80_00(const u8 *include, struct Box *where);      /* view.c */
 
 /* How long the text is that V80_00 has made ready. */
 #define SrchLen (*(u16 *)(md.HelpBuf + 90))
 
 /* Boxes, dialogs and texts of edit_t.c and view_t.c, and
    three of other files: Prot_B, Menu_F and Ext_F. DialBox and Dialog
-   take theirs by their offsets in the segment that AsmSeg returns, and
-   only those are used here: a text is read at its offset in AsmSeg. */
-extern const u8 SavFi_P[];              /* "Saving the file" */
-extern const u8 SavEr_B[];              /* "There was an error writing..." */
-extern const u8 Prot_B[];               /* "... is a read-only file" */
+   take a pointer to theirs: a box and a dialog are declared here as
+   what each begins with, as vc.h has it at the two. */
+extern const struct BOXTOP SavFi_P;     /* "Saving the file" */
+extern const struct BOXHD SavEr_B;      /* "There was an error writing..." */
+extern const struct BOXHD Prot_B;       /* "... is a read-only file" */
 extern const u8 EdFl_S[];               /* " Edit " */
 extern const u8 ViFl_S[];               /* " View " */
-extern const u8 BigFi_B[];              /* "... is too large for Edit" */
-extern const u8 NewFi_B[];              /* "Can't find the file" */
-extern const u8 SavAs_B[];              /* "Save this file as" */
-extern const u8 SavCn_B[];              /* "You've made changes ..." */
-extern const u8 Srch_B[];               /* "Search for the string" */
-extern const u8 SrEr_B[];               /* "Could not find the string" */
+extern const struct BOXHD BigFi_B;      /* "... is too large for Edit" */
+extern const struct BOXHD NewFi_B;      /* "Can't find the file" */
+extern const struct BOXHD SavAs_B;      /* "Save this file as" */
+extern const struct BOXHD SavCn_B;      /* "You've made changes ..." */
+extern const struct BOXHD Srch_B;       /* "Search for the string" */
+extern const struct BOXHD SrEr_B;       /* "Could not find the string" */
 extern const u8 Menu_F[];               /* the names of the menu file and */
 extern const u8 Ext_F[];                /* of the three extension files */
 extern const u8 ViewE_F[];
@@ -969,17 +968,16 @@ void T75_00(u16 number, u16 *screen, u16 color)
 
 /* Write six lines of the help that the editor shows for a menu file or
    an extension file, one below the other from `place` on: texts one
-   behind the other at `text` in the segment `segment`, where `colors`
-   are too. */
-void T76_00(u16 place, u16 segment, u16 text, u16 colors)
+   behind the other at `text`, in the colours `colors`. */
+void T76_00(u16 place, const u8 *text, const u8 *colors)
 {
     struct LineArgs line;
     u16 count;
 
     line.value = 0xFF;                  /* no limit to the width */
-    line.line = AT(segment, text);
-    line.colors = AT(segment, colors);
-    line.include = line.line;           /* none of the lines has ^I */
+    line.line = text;
+    line.colors = colors;
+    line.include = text;                /* none of the lines has ^I */
     for (count = 6; count; count--) {
         line.screen = BasAdr(place);
         NgLine(&line);
@@ -1197,7 +1195,7 @@ u16 T80_00(void)
     T51_00();
     T50_00();
     /* None of its lines has ^I: no include line. */
-    DialBox(0x528, OFFSET(SavFi_P), 0, &md, &box);
+    DialBox(0x528, &SavFi_P, 0, &md, &box);
     Window(box.begin, box.size);
     if (ChgDisk(md.ViewFil))
         goto done;
@@ -1205,7 +1203,7 @@ u16 T80_00(void)
     if (!answer.failed) {
         if (answer.value & 1) {
             T80_Name();
-            if ((u8)Dialog(OFFSET(Prot_B), OFFSET(EdFl_S), 0, 0, &md) != 0)
+            if ((u8)Dialog(&Prot_B, EdFl_S, 0, 0, &md) != 0)
                 goto done;
         }
         answer = T80_02(answer.value);
@@ -1223,7 +1221,7 @@ u16 T80_00(void)
         goto done;
 report:
     /* None of its lines has ^I: no include line. */
-    Dialog(OFFSET(SavEr_B), 0, 0, 0, &md);
+    Dialog(&SavEr_B, 0, 0, 0, &md);
 done:
     ResWin(box.begin, box.size, box.saved);
     Window(box.begin, box.size);
@@ -1940,7 +1938,7 @@ static void T32_00(void)
     if (md.SrchStr[0] == 0)
         return;
     T51_00();
-    V80_00(OFFSET(EdFl_S), &box);
+    V80_00(EdFl_S, &box);
     place = ed.EdOffst + ed.EdCursr;
     for (;;) {                          /* T32_01 */
         if (TstBrk())
@@ -1974,7 +1972,7 @@ static void T32_00(void)
     }
     goto done;
 none:
-    Dialog(OFFSET(SrEr_B), OFFSET(EdFl_S), 0, 0, &md);    /* T32_03 */
+    Dialog(&SrEr_B, EdFl_S, 0, 0, &md);    /* T32_03 */
 done:
     T50_00();                           /* T32_07 */
     ResWin(box.begin, box.size, box.saved);
@@ -2129,7 +2127,7 @@ delete:
             T30_00();
             return 0;
         case 0x41:                      /* F7: T31_00 */
-            if ((u8)Dialog(OFFSET(Srch_B), OFFSET(EdFl_S), 0, 0, &md) != 0)
+            if ((u8)Dialog(&Srch_B, EdFl_S, 0, 0, &md) != 0)
                 return 0;
             T32_00();
             return 0;
@@ -2137,7 +2135,7 @@ delete:
             T32_00();
             return 0;
         case 0x55:                      /* Shift F2: T33_00 */
-            if ((u8)Dialog(OFFSET(SavAs_B), 0, 0, 0, &md) != 0)
+            if ((u8)Dialog(&SavAs_B, 0, 0, 0, &md) != 0)
                 return 0;
             T34_00();
             return 0;
@@ -2148,7 +2146,7 @@ delete:
 quit:
             if (ed.EdChng == 0)
                 return 1;
-            c = (u8)Dialog(OFFSET(SavCn_B), 0, 0, 0, &md);
+            c = (u8)Dialog(&SavCn_B, 0, 0, 0, &md);
             if (c == 1)
                 return 1;
             if (c > 1)
@@ -2530,8 +2528,8 @@ static struct EditEnd Ends(u16 how, u16 written)
 /* The editor: T00_00 of the assembly, to which the viewer's code jumps
    once it has opened the file, with the file's handle, or 0FFFFh for a
    file that is not there, and its size in EdLen. The box "Reading the
-   file" is on the screen: `begin` and `size` say where, and `saved` where
-   what it covers is kept.
+   file" is on the screen: `begin` and `size` say where. Where what it
+   covers is kept, which the assembly has in SI, nothing reads.
 
    Returns how it was left: EDIT_VIEW if the file is to be viewed
    instead, EDIT_CLOSE if it is to be closed and nothing more, and
@@ -2545,7 +2543,7 @@ static struct EditEnd Ends(u16 how, u16 written)
    gives fewer bytes than its size says is as long as it gives. A window
    as wide as the screen has a status line above it, and the menu file
    and the extension files have ten lines of help below theirs. */
-struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
+struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
 {
     struct Answer read;
     struct LineArgs line;
@@ -2554,18 +2552,19 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     u16 *cell;
     u16 *screen;
     u32 left;
-    u16 code = AsmSeg();
-    u16 help, file, count, segment, place, color, i;
+    const u8 *file;
+    u16 help, count, segment, place, color, i;
 
     ed.EdSpace = RoomParas();
     if ((u32)ed.EdSpace << 4 <= ed.EdLen) {
         /* T00_01. The assembly leaves in DX for the text that ^I stands
            for, and in BX and SI for a box that is on the screen, what the
-           box before had there; so does this. */
-        if ((u8)Dialog(OFFSET(BigFi_B), size, begin, saved, &md) != 0)
+           box before had there. Nothing reads the three: the box has no
+           ^I in its lines, and the dialog puts its box up itself. */
+        if ((u8)Dialog(&BigFi_B, 0, 0, 0, &md) != 0)
             goto closed;
         place = (begin & 0xFF00) + 0x100 | 37;  /* T00_02 */
-        MovDz0(BasAdr(place), AT(code, OFFSET(ViFl_S)));
+        MovDz0(BasAdr(place), ViFl_S);
         Window(place, 0x106);
         return Ends(EDIT_VIEW, 0);
     }
@@ -2577,15 +2576,15 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     PathLin(md.TmpBuf);
     count = MD_PLACE(NEAR(end)) - MD_PLACE(md.TmpBuf);
     help = 0x0A01;
-    file = OFFSET(Menu_F);
-    if (!T64_00(AT(code, file), md.TmpBuf, count)) {
+    file = Menu_F;
+    if (!T64_00(file, md.TmpBuf, count)) {
         help = 0x0A02;
-        file = OFFSET(Ext_F);
-        if (!T64_00(AT(code, file), md.TmpBuf, count)) {
-            file = OFFSET(ViewE_F);
-            if (!T64_00(AT(code, file), md.TmpBuf, count)) {
-                file = OFFSET(EditE_F);
-                if (!T64_00(AT(code, file), md.TmpBuf, count))
+        file = Ext_F;
+        if (!T64_00(file, md.TmpBuf, count)) {
+            file = ViewE_F;
+            if (!T64_00(file, md.TmpBuf, count)) {
+                file = EditE_F;
+                if (!T64_00(file, md.TmpBuf, count))
                     help = 0;
             }
         }
@@ -2595,7 +2594,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     if (handle == 0xFFFF) {
         /* A new file. */
         if ((u8)(md.Lines - 2) <= ed.EdSizeY
-            && (u8)Dialog(OFFSET(NewFi_B), size, begin, file, &md) != 0)
+            && (u8)Dialog(&NewFi_B, 0, 0, 0, &md) != 0)
             goto closed;
     } else {
         left = ed.EdLen;                /* T00_06 */
@@ -2629,11 +2628,11 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         color = Color(Menu_C) << 8 | ' ';
         for (i = 0; i < 80; i++)
             md.ScrBuf[i] = color;
-        cell = MovDz0(BasAdr(0), AT(code, OFFSET(EdFl_S) + 1));
+        cell = MovDz0(BasAdr(0), EdFl_S + 1);
         *(u8 *)(cell - 1) = ':';
-        MovDz0(BasAdr(41), AT(code, OFFSET(Line_S)));
-        MovDz0(BasAdr(52), AT(code, OFFSET(Col_S)));
-        MovDz0(BasAdr(70), AT(code, OFFSET(FrBuf_S)));
+        MovDz0(BasAdr(41), Line_S);
+        MovDz0(BasAdr(52), Col_S);
+        MovDz0(BasAdr(70), FrBuf_S);
         T74_00();
         ed.EdStat = 1;
     }
@@ -2645,25 +2644,22 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         color = Color(HlBrd_C) << 8;
         for (i = 0; i < 80; i++)
             *screen++ = color | 0xDC;
-        screen = BoxDubl(screen, Color(*AT(code, OFFSET(EdtH_P))) << 8 | 0xDC,
-                         6, 1, 76);
+        screen = BoxDubl(screen, Color(*EdtH_P) << 8 | 0xDC, 6, 1, 76);
         for (i = 0; i < 80; i++)
             *screen++ = color | 0xDF;
-        file = OFFSET(EdtH1_S);
+        file = EdtH1_S;
         if (EdHelp != 1)
-            file = OFFSET(EdtH2_S);
+            file = EdtH2_S;
         line.value = (place & 0xFF00) + 0x100 | 40;     /* T00_15 */
         line.screen = screen;
-        line.line = AT(code, file);
-        line.colors = AT(code, OFFSET(EdtH_P));
+        line.line = file;
+        line.colors = EdtH_P;
         /* None of the lines has ^I; the assembly leaves in DX what it
-           had for BoxDubl. */
-        line.include = AT(code, 76);
+           had for BoxDubl, 76, which names no text. */
+        line.include = 0;
         CntLine(&line);
-        T76_00((place & 0xFF00) + 0x200 | 3, code,
-               OFFSET_IN_SEG(code, line.line), OFFSET(EdtH_P));
-        T76_00((place & 0xFF00) + 0x200 | 46, code, OFFSET(EdtH_S),
-               OFFSET(EdtH_P));
+        T76_00((place & 0xFF00) + 0x200 | 3, line.line, EdtH_P);
+        T76_00((place & 0xFF00) + 0x200 | 46, EdtH_S, EdtH_P);
         Window(place, 0x0A50);
     }
     md.Quote = 0;                       /* T00_16 */

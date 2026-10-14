@@ -45,12 +45,12 @@ u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
 /* The tables: of help_t.c, which the setup program has byte for byte,
    the title of the window and the numbers of the colours of the button;
    of sthelp_t.c the button, for MinMnu, and the box that says there is
-   no such page, which Dialog takes by its offset; and of the setup's
+   no such page, which Dialog takes a pointer to; and of the setup's
    other tables the text of the button as the window has it. */
 extern const u8 Help_S[];               /* " Help " */
 extern const u8 HlpMn_P[];
 extern const u8 StHlpMn_D[];            /* Ok */
-extern const u8 StHlpEr_B[];            /* "Help contents is not available" */
+extern const struct BOXHD StHlpEr_B;    /* "Help contents is not available" */
 extern const u8 StOk_S[];               /* "[ Ok ]" */
 
 #define Help_C  27                      /* the colours of the help: its text, */
@@ -307,7 +307,7 @@ void StHelp(void)
         goto Help04;
 
 Help02:                                 /* there is none */
-    Dialog(OFFSET(StHlpEr_B), 0, 0, 0, &md);
+    Dialog(&StHlpEr_B, 0, 0, 0, &md);
     goto Help41;
 
 Help04:                                 /* the window */
@@ -376,8 +376,8 @@ Help20:                                 /* a key */
         goto Help22;
     md.WinMous = 0;
     md.MousEnt = 0;
-    key = MinMnu(OFFSET(StHlpMn_D), BEGIN + (size & 0xFF00) - 0x400 + 13,
-                 0x130, OFFSET(HlpMn_P), 2, 0).key;
+    key = MinMnu(StHlpMn_D, BEGIN + (size & 0xFF00) - 0x400 + 13,
+                 0x130, HlpMn_P, 2, 0).key;
     if (key >> 8 == 0xFC)
         goto Help21;
     first = entry->HlpFrst;

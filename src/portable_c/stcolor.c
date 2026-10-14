@@ -41,10 +41,9 @@ u8 *ColAddr(u16 number);                                /* screen.c */
 u16 ShadCol(u16 color, u16 how);
 u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color);
 
-/* The tables, of stcolor_t.c, in the segment that AsmSeg returns: see
-   there. A picture of StPagTab is two words that name what it is made
-   of, which the table has as pointers: NAMED of vc.h makes of each the
-   offset in that segment. */
+/* The tables, of stcolor_t.c: see there. A picture of StPagTab is two
+   words that name what it is made of, which the table has as
+   pointers. */
 struct Picture {
     const u8 *page;                     /* 25 rows of 58 characters */
     const u8 *colors;                   /* and which item colours which */
@@ -60,7 +59,7 @@ extern const u8 StColrs_S[];            /* the names of the 39 items */
 extern const u8 StOn_S[];               /* "on" and a colour */
 extern const u8 StColNm_S[];            /* the names of the colours */
 extern const u8 StColNm_P[];            /* the colour of such a name */
-extern const u8 StDfCol_B[];            /* "set default colors?" */
+extern const struct BOXHD StDfCol_B;    /* "set default colors?" */
 extern const u8 StColPage[];            /* the picture of each item */
 extern const struct Picture StPagTab[];
 
@@ -345,7 +344,7 @@ static void StF07_53(void)
 {
     u16 at, i;
 
-    if ((u8)Dialog(OFFSET(StDfCol_B), 0, 0, 0, &md) != 0) {
+    if ((u8)Dialog(&StDfCol_B, 0, 0, 0, &md) != 0) {
         md.HlpPage = 4;
         return;
     }
@@ -365,8 +364,7 @@ static void StF07_53(void)
    changed. */
 static void StCol30(u16 color)
 {
-    const u8 *colors = AT(AsmSeg(),
-        NAMED(StPagTab[StColPage[sd.ColCur] - 1].colors));
+    const u8 *colors = StPagTab[StColPage[sd.ColCur] - 1].colors;
     u16 *row = md.ScrBuf;
     u16 *screen;
     u16 rows, count, item, paint, changed;
@@ -504,8 +502,8 @@ static void StCol00(void)
     }
     md.ColTyp = (u8)list.palette;
     picture = &StPagTab[StColPage[sd.ColCur] - 1];
-    page = AT(AsmSeg(), NAMED(picture->page));
-    colors = AT(AsmSeg(), NAMED(picture->colors));
+    page = picture->page;
+    colors = picture->colors;
     row = md.ScrBuf;
     for (rows = 25; rows != 0; rows--) {
         screen = row;

@@ -2689,6 +2689,39 @@ in "The portable C".
     `build/portable_c/*.lst` against a copy of the build before says
     which files changed, and within one, the bytes of each routine,
     without their addresses, say which routines.
+- A table is handed on by a pointer to it, since the second half of
+  the piece F3 (`TODO.md`, "F3b, what a table is handed as"), and the
+  two notes above are of before: `OFFSET`, `AsmSeg`, `TABLES_BY` and
+  `NAMED` are gone, and a word of a table that names something is read
+  as the pointer that it is. What making it so met:
+  - A file of code declares a box as what every box begins with,
+    `extern const struct BOXTOP Name;`, and a dialog as its header,
+    `extern const struct BOXHD Name;`, and hands on `&Name`; a text,
+    buttons and colours stay `extern const u8 Name[];`. The compiler
+    then holds the three apart at a call, which the names do not: a
+    `_B` is a dialog in one file and a box in another. It found two
+    variables that had held now a box and now a dialog.
+  - What it does not refuse is a 0 where a pointer is asked for, and
+    any pointer for a word of a table that is `const void *`. A script
+    that reads every call and the files of tables says what each call
+    hands, and whether a box whose lines have `^I` is handed a text.
+  - `harness/reads.py` goes by the text and knows both forms, the C
+    translation's and this one. A variable that keeps a box for a
+    routine of `READERS` is known by its name, one of four there:
+    under another name the place is "not known" and the data's test
+    fails.
+  - An offset that the assembly left in a register for a text which
+    nothing reads, the size of a window, a count of files, 76, was
+    handed on as an offset among the tables. A pointer cannot be that:
+    it is 0 there, with the comment that says what the assembly has.
+    Where the register is on a text of the main data, it is that text.
+  - A script that takes `OFFSET(Name)` for `Name` writes wrong C where
+    the offset was reckoned with inside the brackets, `OFFSET(Table) +
+    n * sizeof *Table`: read every place where a table's name is
+    followed by `+`.
+  - `harness/layoutcheck.py` still holds the tables to the 64K round
+    `Title_S`, which nothing rests on any more: that is a limit of a
+    test, and was left for the session.
 
 - The program of 32 bits is linked by the build since the piece B2
   (`TODO.md`, "B2, the program"), `build/portable_c/VC.EXE` and

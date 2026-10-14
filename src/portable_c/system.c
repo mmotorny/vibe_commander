@@ -16,7 +16,7 @@
 
 /* The dialog that asks for the disk of a drive, a constant of
    system_t.c: Dialog takes it by its offset. */
-extern const u8 Fant_B[];
+extern const struct BOXHD Fant_B;
 
 #define KEY_CTRL_C 0x2E03
 #define KEY_ESC    0x011B
@@ -176,7 +176,7 @@ u16 Fantom(u16 drive)
     *(u16 *)(md.TmpErr + 1) = (u16)(short)(signed char)drive & 0xFF00
                               | (u8)(drive + 'A' - 1);
     page = md.HlpPage;
-    answer = Dialog(OFFSET(Fant_B), 0, 0, 0, &md);
+    answer = Dialog(&Fant_B, 0, 0, 0, &md);
     md.HlpPage = page;
     if ((answer & 0xFF) != 0)
         return 1;

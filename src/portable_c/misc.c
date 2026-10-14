@@ -1,22 +1,11 @@
 /*
  * Small routines that many parts of the program share and that belong to
  * none of them: the end of a line, a switch turned over, a sum of bytes,
- * and a page up or down in a list; and where the program's tables are
- * in the memory.
+ * and a page up or down in a list.
  *
  * Translated from VCSUB1.INC.
  */
 #include "vc.h"
-
-/* The segment of the program's tables. The original is one segment,
-   and has its texts and tables at offsets in it, which its code reads
-   through CS. Here what is known by its offset, a box, a dialog, a text
-   of one, is read at that offset in this segment: a number that the
-   words of the addresses of vc.h make, by one of the tables. */
-u16 AsmSeg(void)
-{
-    return TABLES_BY(Title_S);
-}
 
 /* Is `word` the two bytes that end a line, in either order? */
 u16 IsCrLf(u16 word)

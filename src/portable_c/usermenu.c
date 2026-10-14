@@ -77,7 +77,7 @@ void Help00(void);                                      /* help.c */
    it. */
 extern const u8 Menu_F[];               /* "VC.MNU" */
 extern const u8 User_S[];               /* " User Menu " */
-extern const u8 UsrEr_B[];              /* "Could not find the menu file" */
+extern const struct BOXHD UsrEr_B;      /* "Could not find the menu file" */
 extern const u8 List_F[];               /* "vc.lst" */
 extern const u8 Mask_S[];               /* "\*.*" */
 
@@ -487,7 +487,8 @@ u16 F32_00(u16 main)
     u16 begin, size;                    /* BX and DX: the box */
     u16 keys;                           /* CL: how wide the keys are */
     u16 row;                            /* CH: the line of the cursor */
-    u16 include, c, next, width, widest, lines, length;
+    const u8 *include;                  /* DX: what ^I stands for in a box */
+    u16 c, next, width, widest, lines, length;
     u16 limit, i, to, answer, room, command;
 
     if (main)
@@ -495,7 +496,7 @@ u16 F32_00(u16 main)
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = Menu_F[i];
     F42_10();
-    include = MD_PLACE(md.TmpBuf);
+    include = md.TmpBuf;
     if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
@@ -512,7 +513,7 @@ F42_00:                                 /* Shift+F2 */
 F32_01:                                 /* the main menu */
     MainFil(md.TmpBuf, Menu_F);
 F32_02:
-    include = MD_PLACE(md.TmpBuf);
+    include = md.TmpBuf;
     if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
@@ -521,7 +522,7 @@ F32_02:
     if ((u8)opened.value > 3)
         goto F32_04;
 F32_03:
-    Dialog(OFFSET(UsrEr_B), include, 0, 0, &md);
+    Dialog(&UsrEr_B, include, 0, 0, &md);
 F32_04:
     return 0;
 
@@ -532,7 +533,7 @@ F32_05:                                 /* read it */
     if (read.failed)
         goto F32_04;
     md.MenuBuf[read.value] = EOF_CHAR;
-    include = MD_PLACE(md.MenuBuf);
+    include = md.MenuBuf;
     item = FndItem(md.MenuBuf);
     if (item.end)
         goto F32_03;

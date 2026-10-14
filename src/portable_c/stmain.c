@@ -91,16 +91,15 @@
    see StMain00. */
 u16 F32_70(u16 begin, u16 size);
 
-/* The tables of stmain_t.c that the code names, by their offsets in the
-   segment that AsmSeg returns. */
+/* The tables of stmain_t.c that the code names. */
 extern const u8 StPalets[];             /* the setup without a file */
-extern const u8 StIniEr_B[];            /* the setup file is missing or
+extern const struct BOXHD StIniEr_B;    /* the setup file is missing or
                                            wrong, */
 extern const u8 StNoFnd_S[];            /* with one of these for its */
 extern const u8 StNoIni_S[];            /* second line */
-extern const u8 StMain_P[];             /* the menu */
-extern const u8 StDeflt_B[];            /* "reset all options?" */
-extern const u8 StSvSt_B[];             /* "save the current setup?" */
+extern const struct BOXTOP StMain_P;    /* the menu */
+extern const struct BOXHD StDeflt_B;    /* "reset all options?" */
+extern const struct BOXHD StSvSt_B;     /* "save the current setup?" */
 
 /* Not 0 while the setup is open: see vc.h. */
 u8 StOpen;
@@ -195,7 +194,7 @@ void StUser(u16 first, u16 rows)
    saved. Here those 64 bytes are zeros (see DEVIATIONS.md). */
 static void StDefault(void)
 {
-    const u8 *from = AT(AsmSeg(), OFFSET(StPalets));
+    const u8 *from = StPalets;
     u8 *first = (u8 *)WCB1;
     u8 *second = (u8 *)WCB2;
     u16 i;
@@ -287,7 +286,7 @@ static void StMain40(u16 color, u16 item, u16 begin, u16 size)
    program has without a setup file. */
 static void StF08_00(void)
 {
-    if ((u8)Dialog(OFFSET(StDeflt_B), 0, 0, 0, &md) == 0)
+    if ((u8)Dialog(&StDeflt_B, 0, 0, 0, &md) == 0)
         StDefault();
 }
 
@@ -320,7 +319,7 @@ static void StMain00(void)
 
 Main00:
     PutKey(0);
-    DialBox(0x528, OFFSET(StMain_P), 0, &md, &where);
+    DialBox(0x528, &StMain_P, 0, &md, &where);
     Window(where.begin, where.size);
     item = sd.MnItem;
     last = (u8)((where.size >> 8) - 6); /* the item Exit */
@@ -455,7 +454,7 @@ static void StExit(void)
         if (sd.SrcIni[i] != ((u8 *)&md)[i])
             break;
     if (i != CmnIni
-        && (u8)Dialog(OFFSET(StSvSt_B), 0, 0, 0, &md) == 0)
+        && (u8)Dialog(&StSvSt_B, 0, 0, 0, &md) == 0)
         save = 1;
     StUser(0, md.Lines);                /* Exit1: Restore screen */
     Window(0, (u16)md.Lines << 8 | 80);
@@ -530,7 +529,8 @@ void StSetup(void)
 {
     struct CursorAt cursor;
     u8 *name;
-    u16 page, answer, reason, i;
+    const u8 *reason;
+    u16 page, answer, i;
 
     md.LoadRes = md.LoadFl & 0x7F;      /* F21_30 */
     SavMous();                          /* F21_31 */
@@ -577,10 +577,10 @@ void StSetup(void)
     answer = 0;
     if (sd.IniStat != 1) {              /* Error */
         if (sd.IniStat < 1)
-            reason = OFFSET(StNoFnd_S);
+            reason = StNoFnd_S;
         else
-            reason = OFFSET(StNoIni_S);
-        answer = Dialog(OFFSET(StIniEr_B), reason, 0, 0, &md);
+            reason = StNoIni_S;
+        answer = Dialog(&StIniEr_B, reason, 0, 0, &md);
         /* Err2, with Ok: nothing is stored in SrcIni. */
     }
     *name = 0;                          /* NcPath is the directory again */

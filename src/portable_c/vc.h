@@ -1078,7 +1078,7 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open);
 void V00_10(u16 handle);
 void V13_00(void);
 void V13_01(u16 changed);
-struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved);
+struct EditEnd T00_00(u16 handle, u16 begin, u16 size);
 /* Two that the viewer and the editor share, and the file search the
    second: T70_00 of edit.c clears a line of the window in the screen
    buffer, and V82_00 of view.c looks for the text of a search in `count`
@@ -1143,7 +1143,7 @@ u16 F48_00(void);
 u16 F58_00(struct WCBdef *panel);
 u16 M30_00(struct WCBdef *panel);
 u16 F54_00(void);
-u16 FncMas(u16 include);
+u16 FncMas(const u8 *include);
 u16 FncSel(void);
 u16 FncExt(void);
 /* What the dialog of attributes has Dialog call when it is answered,
@@ -1166,9 +1166,8 @@ struct Checked StF04_10(u16 answer);
 struct Copied {                         /* what they return: */
     u16 place;                          /* where the program goes on: a
                                            GO_ */
-    u16 title;                          /* with GO_MASKED the title of the
-                                           boxes, as the offset of the
-                                           text */
+    const u8 *title;                    /* with GO_MASKED the title of the
+                                           boxes */
 };
 struct Copied F35_01(struct WCBdef *panel, u16 command, u16 directories,
                      u16 files);
@@ -1260,14 +1259,23 @@ struct Answer DelTr0(const u8 *path);
    word. See help.c. */
 void DeCode(u8 *at, u16 count);
 
-/* The boxes and the dialogs, which the assembly describes: `box`,
-   `include`, `table`, `control` and `colors` are offsets in its code
-   segment, and `data` is what a box shows of and a dialog sets in, at
-   the offsets that their tables name: &md for the main data, or a panel.
-   See each in dialog.c. */
-void DialBox(u16 place, u16 box, u16 include, const void *data,
-             struct Box *where);
-u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data);
+/* The boxes and the dialogs, which the assembly describes, each handed
+   on by a pointer to it. A box is handed on as what every box begins
+   with and a dialog as its header, the two structures of tables.h: a
+   file of code declares one as that structure, `extern const struct
+   BOXTOP Name;` and `extern const struct BOXHD Name;`, and hands on its
+   address, so a box is refused where a dialog is asked for, and a text
+   for either. `include` is a text, or 0 for none; `table` and `control`
+   are a line of buttons and `color` numbers of colours, bytes all. And
+   `data` is what a box shows of and a dialog sets in, at the offsets
+   that their tables name: &md for the main data, or a panel. See each
+   in dialog.c. */
+struct BOXTOP;
+struct BOXHD;
+void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
+             const void *data, struct Box *where);
+u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
+           void *data);
 void InSt10(u16 place, u16 text, u16 length, u16 color);
 struct Buttons {                        /* what MinMnu returns: */
     u16 key;                            /* the key that is for the caller */
@@ -1282,10 +1290,11 @@ struct Taken {                          /* what MnMn10 returns: */
     u8  taken;                          /* not 0 if the buttons have dealt
                                            with the key */
 };
-struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
-                      u16 item);
-struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table);
-u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table);
+struct Buttons MinMnu(const u8 *control, u16 begin, u16 size,
+                      const u8 *color, u16 keys, u16 item);
+struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size,
+                    const u8 *table);
+u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, const u8 *table);
 /* The key bar and the menu bar, the command line and its prompt: see
    each in bars.c. `data` is where ClsLine reads the colour, &md. */
 u16 *ClsLine(u16 place, const struct MainDat *data);
@@ -1393,18 +1402,15 @@ u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
 u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
 void MinBox(u16 begin, u16 size, u16 color);
 u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
-void OncZoom(u16 place, u16 box, u16 include, struct Box *where);
+void OncZoom(u16 place, const struct BOXTOP *head, const u8 *include,
+             struct Box *where);
 /* The screen blanker, which comes back when a key is pressed or the mouse
    moved, and the word to DOS that the program is idle: see each in
    blank.c. */
 void Blank(void);
 void LeaveTm(void);
 /* Small ones: see each in misc.c. PgUp and PgDn return where a list is
-   after a page up or down. AsmSeg is the
-   segment of the program's tables, the texts, boxes and dialogs of the
-   files whose names end in _t, where what is known by its offset is
-   read. */
-u16 AsmSeg(void);
+   after a page up or down. */
 u16 IsCrLf(u16 word);
 u16 InvVar(u8 *variable);
 u16 ChkSum(const u8 *data, u16 length);
@@ -1417,8 +1423,9 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 
 /* The words of the addresses. The program keeps a place of the memory
    in numbers wherever the original kept it in registers: a segment, an
-   offset in one, a table as its offset in the segment of the tables, a
-   place of the main data as a word. These words make a pointer of such
+   offset in one, a place of the main data as a word. A table is no
+   such number any more: it is handed on by a pointer to it (see the
+   boxes and the dialogs, above). These words make a pointer of such
    numbers and the numbers of a pointer, and the code of the program
    is to do it through them and nowhere else: a cast between a pointer
    and a number that is written out in a file is a place that has still
@@ -1429,8 +1436,7 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    a megabyte counted in paragraphs from ARENA, which is 64K below the
    main data. A segment `s` and an offset `o` are the address ARENA +
    16 * s + o there, as they are 16 * s + o on DOS. The main data is
-   then in the segment 1000h whatever its address, the tables are known
-   by offsets from 32K below Title_S, and a panel or the viewer's text
+   then in the segment 1000h whatever its address, and the viewer's text
    is in whatever paragraphs the system's functions for the memory hand
    out. What each word takes for granted is said at it, and what all of
    them do:
@@ -1441,8 +1447,8 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
        in which the program is linked and the functions that hand out
        the memory see to both.
      - An address is formed that is in no object, between ARENA and the
-       main data and 32K below Title_S. The language promises nothing
-       of that. Open Watcom and gcc take it.
+       main data. The language promises nothing of that. Open Watcom
+       and gcc take it.
      - A pointer that such a word has made is stepped as a pointer. On
        DOS in 16 bits a pointer that is stepped past FFFFh begins its
        segment again; here it goes on, 64K further. What wraps round
@@ -1493,34 +1499,11 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #define OFFSET_IN_SEG(segment, pointer) \
     ((u16)((const u8 *)(pointer) - AT(segment, 0)))
 
-/* The segment of the tables, by one of them: the paragraph that the
-   address 32K below that one is in, so that what stands in front of it
-   has an offset too. AsmSeg of misc.c answers with it, by Title_S, and
-   OFFSET counts from it by the same, which is what makes the two agree:
-   it takes for granted that it is asked by Title_S and nothing else.
-   And that Title_S is no more than 32K in front of the main data, or
-   behind it; the first, so that this address is not below ARENA. */
-#define TABLES_BY(text) SEG_OF((text) - 0x8000)
-
-/* A table as a number: how far it is behind where the segment of the
-   tables begins. It takes for granted that everything handed to it, the
-   tables that are written to among them, lies from 32K below Title_S to
-   32K less 16 bytes behind it: what does not gets an offset that has
-   wrapped round, with no word said. And the compiler makes no constant
-   of it: it cannot stand in the value of a static object. */
-#define OFFSET(object) \
-    ((u16)((const u8 *)(object) - AT(TABLES_BY(Title_S), 0)))
-
-/* What a word of a table names, as the same number: the word is a
-   pointer to it, and OFFSET makes the number, for the routines that
-   take a table as one. It takes for granted what OFFSET does, and that
-   the word names something: one that names nothing, a line across a
-   box, is the pointer 0, of which this makes a number like any other.
-   That is asked of the word itself, before this. And the number in a
-   word that holds one where it could name something, NUMBER of
-   tables.h: the pointer's low 16 bits, by way of a number that is as
-   long as a pointer, size_t of the header that OFFSET_IN includes. */
-#define NAMED(names) OFFSET(names)
+/* The number in a word of a table that holds one where it could name
+   something, NUMBER of tables.h: the pointer's low 16 bits, by way of a
+   number that is as long as a pointer, size_t of the header that
+   OFFSET_IN includes. A word that names something is read as the
+   pointer that it is. */
 #define NUMBER_OF(names) ((u16)(size_t)(names))
 
 /* A pointer into the main data is a pointer. It takes nothing for

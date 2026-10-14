@@ -16,9 +16,8 @@
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* AsmSeg, of vc.h, returns the segment of the program's constants: the
-   name of the file is one of system_t.c, and the code that starts
-   the program reads it there too. */
+/* The name of the file is a constant of system_t.c, and the code that
+   starts the program reads it there too. */
 extern const u8 Init_F[];
 
 /* C routines of other files that vc.h does not have. */
@@ -98,7 +97,7 @@ struct Answer SaveSet(void)
     u16 length;
 
     length = MakeIni();
-    MainFil(md.TmpBuf, AT(AsmSeg(), OFFSET(Init_F)));
+    MainFil(md.TmpBuf, Init_F);
     if (ChgDisk(md.TmpBuf))
         return Failed(0);
     had = FileAttributes(md.TmpBuf);

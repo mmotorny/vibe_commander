@@ -93,11 +93,11 @@ u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
 u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
 
 /* The tables of the help, in help_t.c: the title of the window, the
-   box of the error, which Dialog takes by its offset, and for MinMnu the
+   box of the error, which Dialog takes a pointer to, and for MinMnu the
    buttons under the index and under a page and the numbers of their
    colours. */
 extern const u8 Help_S[];               /* " Help " */
-extern const u8 HlpEr_B[];              /* "There was error reading data..." */
+extern const struct BOXHD HlpEr_B;      /* "There was error reading data..." */
 extern const u8 HlMn1_D[];              /* Help, Cancel */
 extern const u8 HlMn2_D[];              /* Next, Previous, Index, Cancel */
 extern const u8 HlpMn_P[];
@@ -282,6 +282,7 @@ static void Help05(void)
     u16 cursor, first;                  /* SI and DI: where to go */
     u16 was, shown;                     /* and where the screen is */
     u16 *screen;
+    const u8 *control;                  /* the buttons */
     u16 color, place, moved, count, key, buttons, mouse, held, third;
     struct Buttons menu;
     struct Paged paged;
@@ -375,11 +376,11 @@ Help25:                                 /* a key */
     md.WinMous = 0;
     md.MousEnt = 0;
     if (NO_INDEX())
-        place = OFFSET(HlMn1_D);
+        control = HlMn1_D;
     else
-        place = OFFSET(HlMn2_D);
-    menu = MinMnu(place, BEGIN + (size & 0xFF00) - 0x400 + 12, 0x130,
-                  OFFSET(HlpMn_P), 2, item);
+        control = HlMn2_D;
+    menu = MinMnu(control, BEGIN + (size & 0xFF00) - 0x400 + 12, 0x130,
+                  HlpMn_P, 2, item);
     key = menu.key;
     item = menu.chosen;
     if (key >> 8 == 0xFC)
@@ -541,7 +542,7 @@ Help64:
         goto Help06;
 
 Help65:                                 /* it could not be read */
-    Dialog(OFFSET(HlpEr_B), 0, 0, 0, &md);
+    Dialog(&HlpEr_B, 0, 0, 0, &md);
 
 Help66:                                 /* Esc */
     ResWin(BEGIN, size, MD_PLACE(md.ErrBuf1));
@@ -584,7 +585,7 @@ static void HelpFil(void)
     goto Help67;
 
 Help01:
-    Dialog(OFFSET(HlpEr_B), 0, 0, 0, &md);
+    Dialog(&HlpEr_B, 0, 0, 0, &md);
 
 Help67:
     FileClose(hd.HlpHndl);

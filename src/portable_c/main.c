@@ -94,9 +94,7 @@ enum {
    MakeIni writes into MenuBuf what the setup file holds, and SaveSet
    writes that file: both of vc.h. ReDir reads what a panel shows,
    keeping the cursor and the marks if `keep` is not 0: not 0 if it could
-   not be read.
-
-   AsmSeg returns the segment of the program's tables. */
+   not be read. */
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
@@ -109,13 +107,13 @@ const u8 *FndLet(const u8 *text);
 
 /* What this reads or names of other files: the scan codes of Alt with a
    digit or a letter, which begin the speed search; of main_t.c the box
-   that says a drive is not ready, which DialBox takes by its offset;
+   that says a drive is not ready, which DialBox takes a pointer to;
    and of setup.c the setup as it was last saved or found. Menu_T, of
    commands_t.c, is a word for each table of a menu's commands that
    names it, a pointer there: see NAMED of vc.h. */
 extern const u8 AltSr_T[];
 extern const u16 * const Menu_T[];
-extern const u8 NoRd_P[];
+extern const struct BOXTOP NoRd_P;
 extern u8 IniSave[];
 
 /* The main data: one structure, which is all that the original has in
@@ -867,7 +865,7 @@ static u16 Loop(u16 entry, struct Regs *r)
                     goto Func20;
                 if (wcb->Visible != 0 && wcb->WinTyp <= 1
                     && (key & 0xFF) == 0) {
-                    keys = AT(AsmSeg(), OFFSET(AltSr_T));
+                    keys = AltSr_T;
                     same = 0;
                     for (i = 0; i < ALT_KEYS; ) {
                         i++;
@@ -876,7 +874,10 @@ static u16 Loop(u16 entry, struct Regs *r)
                             break;
                         }
                     }
-                    r->di = OFFSET(AltSr_T) + i;
+                    /* The assembly has DI behind the key that it found
+                       in the table, or behind the table: a table is a
+                       pointer, `r->di` is not set to it, and nothing
+                       reads DI as this leaves it. */
                     r->cx = ALT_KEYS - i;
                     if (same)
                         return CMD_F77_00;
@@ -926,8 +927,7 @@ static u16 V00_03(u16 menu, u16 edit, u16 whole)
     if (what == 0)
         return FUNC04;
     if (what == 1) {
-        end = T00_00(open.handle, open.box.begin, open.box.size,
-                     open.box.saved);
+        end = T00_00(open.handle, open.box.begin, open.box.size);
         if (end.how == EDIT_CLOSE) {    /* T00_10: not read */
             V13_00();
             return INIT50;
@@ -1075,23 +1075,28 @@ static u16 F62_02(struct WCBdef *panel, u16 item, struct Regs *r)
    The command gets the registers as the original has them at that jump:
    in AX the item and the table, in BX twice the place of the item in its
    table, in CX the item and the menu, in DX 1 and what the bar left in
-   DL, in SI the table. Rename goes by BX and DX, the editors of the
-   menu file and the extension files by CX, and a key that an item hands
-   on to the command line is what AX holds. A command of the Left or the
-   Right menu is for the panel of that menu.
+   DL. Rename goes by BX and DX, the editors of the menu file and the
+   extension files by CX, and a key that an item hands on to the command
+   line is what AX holds. A command of the Left or the Right menu is for
+   the panel of that menu.
 
-   The original has in DI the segment of the Left menu's panel, or of the
-   Right one's if that is the menu, and `r->di` is not set to it: a panel
-   is a pointer, and nothing reads DI as a menu leaves it. The three
-   commands that take DI are the mouse's, which Loop asks for with DI set
-   to the first entry shown, and no table of a menu has one of them. */
+   The original has in SI the table, and in DI the segment of the Left
+   menu's panel, or of the Right one's if that is the menu. `r->si` and
+   `r->di` are not set to them: a table and a panel are pointers, and
+   nothing reads SI or DI as a menu leaves them. The three commands that
+   take the two are the mouse's, which Loop asks for with SI set to the
+   entry under the cursor and DI to the first one shown, and no table of
+   a menu has one of them.
+
+   The command is read in the menu's table at half of what BX holds,
+   which is below 256 and even: a table is asked only with an item
+   chosen, 1 to 254. */
 static u16 F39_01(u16 again, struct Regs *r)
 {
     struct Picked picked = F39_00(again, r->ds);
     u16 menu = picked.menu;
     u16 item = picked.item;
     u16 table = picked.table;
-    u16 code = AsmSeg();
     struct WCBdef *panel = r->ds;
 
     r->cx = item << 8 | menu;
@@ -1102,9 +1107,7 @@ static u16 F39_01(u16 again, struct Regs *r)
     r->dx = 0x100 | picked.held;
     if (table == 1)
         panel = menu == 5 ? RightPanel : LeftPanel;
-    r->si = NAMED(*(const u16 * const *)
-                  AT(code, OFFSET(Menu_T) + (table - 1) * sizeof *Menu_T));
-    return Command(*(const u16 *)AT(code, r->si + r->bx), panel, r);
+    return Command(Menu_T[table - 1][r->bx >> 1], panel, r);
 }
 
 /* Do a command: call its function, with what it reads of the registers,
@@ -1336,7 +1339,7 @@ u16 ErrRdy(u16 letter)
     *(u16 *)(md.TmpErr + 1) = (u16)(short)(signed char)letter;
     drive = letter & 0xFF;
     PutKey(2);
-    DialBox(0x528, OFFSET(NoRd_P), 0, &md, &where);
+    DialBox(0x528, &NoRd_P, 0, &md, &where);
     Window(where.begin, where.size);
     Cursor(where.begin + 0x42C);
     ClrKbd();
@@ -1424,14 +1427,14 @@ void RestVct(void)
 
 /*--------------------- Fatal error ---------------------
    What main_t.c has for it: the texts and the two boxes, with
-   Retry and Abort or with Ok alone, which go to Dialog by their offsets. */
+   Retry and Abort or with Ok alone, which Dialog takes a pointer to. */
 extern const u8 Err_S[];
 extern const u8 OnDr_S[];
 extern const u8 OnDv_S[];
 extern const u8 Errs_S[];
 extern const u8 FatEr_S[];
-extern const u8 FtEr1_B[];
-extern const u8 FtEr2_B[];
+extern const struct BOXHD FtEr1_B;
+extern const struct BOXHD FtEr2_B;
 
 /* A critical error of DOS, which the system asks the program about once
    HookVct has handed it this function: `how`, `code` and `device` are
@@ -1456,7 +1459,6 @@ extern const u8 FtEr2_B[];
    setup's, and the setup draws its own key bar anew afterwards. */
 static u16 FtErr1(u16 how, u16 code, const u8 *device)
 {
-    u16 assembly = AsmSeg();
     const u8 *from;
     const u8 *text;
     u8 *to = md.TmpErr + 1;
@@ -1466,21 +1468,21 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
 
     if (md.ErrDat | md.BlocEr)
         return DEVICE_FAIL;
-    from = AT(assembly, OFFSET(Err_S) + 1);
+    from = Err_S + 1;
     for (i = 6; i; i--)
         *to++ = *from++;
-    text = AT(assembly, OFFSET(Errs_S));
+    text = Errs_S;
     if (device == 0) {                  /* a disk */
-        from = AT(assembly, OFFSET(OnDr_S));
+        from = OnDr_S;
         for (i = 11; i; i--)
             *to++ = *from++;
         to[-2] += (u8)how;
         if (how & 0x8000) {
-            text = AT(assembly, OFFSET(FatEr_S));
+            text = FatEr_S;
             goto FtErr5;
         }
     } else {                            /* FtErr2: a device, by its name */
-        from = AT(assembly, OFFSET(OnDv_S));
+        from = OnDv_S;
         for (i = 10; i; i--)
             *to++ = *from++;
         name = to;
@@ -1514,11 +1516,10 @@ FtErr5:
     StOpen = 0;
     *(u16 *)&md.AutoTim = 0xFFFF;
     if (how & 0x1000)
-        answer = (u8)Dialog(OFFSET(FtEr1_B), OFFSET_IN_SEG(assembly, text),
-                            0, 0, &md)
+        answer = (u8)Dialog(&FtEr1_B, text, 0, 0, &md)
                  == 0 ? DEVICE_RETRY : DEVICE_FAIL;
     else {
-        Dialog(OFFSET(FtEr2_B), OFFSET_IN_SEG(assembly, text), 0, 0, &md);
+        Dialog(&FtEr2_B, text, 0, 0, &md);
         answer = DEVICE_FAIL;
     }
     md.Clock = clock;                   /* FtErr8 */

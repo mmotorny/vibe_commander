@@ -30,7 +30,6 @@
 /* Init00, Init11, IniData, GiveMem and TakeMem are declared in vc.h:
    Main of main.c calls them. */
 
-/* AsmSeg, of vc.h, returns the segment of the program's tables. */
 
 /* What this reads of other files: in the segment of the tables, the
    names of the setup file and of the main extension file, 13 bytes each
@@ -302,11 +301,10 @@ void Init00(void)
     u8 *path = md.TmpBuf;
     const u8 *env = ProgramEnvironment();
     u8 *end, *to;
-    u16 code = AsmSeg();
     u16 length, sum, drive, wrong, i;
 
     end = MnPth0(path, env, NcEnv, sizeof NcEnv, 0);
-    length = ReadOne(path, end, AT(code, OFFSET(Init_F)), image,
+    length = ReadOne(path, end, Init_F, image,
                      INI_LEN + 1);
     wrong = 0;
     if (length == INI_LEN) {
@@ -347,7 +345,7 @@ void Init00(void)
 Init04:                                 /* Output Report */
     if (!ChkMode(&screen))
         ScreenSetMode(3);               /* 80 columns, in colour */
-    to = MvzTxt(md.ExtMain, AT(code, OFFSET(Title_S) + 2));     /* Init05 */
+    to = MvzTxt(md.ExtMain, Title_S + 2);     /* Init05 */
     to = MvzTxt(to, Copyr_S);
     MvzTxt(to, CrLf_S);
     ConsoleText(md.ExtMain);            /* as far as its $ */
@@ -356,7 +354,7 @@ Init04:                                 /* Output Report */
 
     /* Init09: read main extension file, and end it. */
     to = md.ExtMain;
-    length = ReadOne(path, end, AT(code, OFFSET(Ext_F)), to, LenExt - 1);
+    length = ReadOne(path, end, Ext_F, to, LenExt - 1);
     if (length != FAILED)
         to += length;
     *to = 0x1A;                         /* Init10 */

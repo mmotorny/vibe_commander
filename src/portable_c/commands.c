@@ -56,24 +56,23 @@ u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
    HidCur puts the cursor below the screen. ResUser writes what DOS has shown, which
    the panels cover, to the screen buffer, for a window given like
    Window's, and ResWin what a box covers, from where it was kept.
-   AsmSeg returns the segment of the program's constants, and SaveSet
-   writes the setup to its file. */
+   SaveSet writes the setup to its file. */
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what
-   follows them: constants, most of them of commands_t.c, in the
-   segment that AsmSeg returns, where DialBox and Dialog read them by
-   their offsets. */
-extern const u8 Filt_B[];               /* the filter of a panel */
-extern const u8 DiSiz_P[];              /* "Scanning sizes of
+   follows them: constants, most of them of commands_t.c, which DialBox
+   and Dialog take a pointer to. A box and a dialog are declared here
+   as what each begins with, as vc.h has it at the two. */
+extern const struct BOXHD Filt_B;       /* the filter of a panel */
+extern const struct BOXTOP DiSiz_P;     /* "Scanning sizes of
                                            subdirectories" */
-extern const u8 CmpDi_B[];              /* "The two directories appear to
+extern const struct BOXHD CmpDi_B;      /* "The two directories appear to
                                            be identical." */
-extern const u8 Conf_B[];               /* the configuration */
+extern const struct BOXHD Conf_B;       /* the configuration */
 extern const u8 Chk1_S[];               /* what begins a box to tick in it, */
-extern const u8 Sets_B[];               /* the advanced options, */
+extern const struct BOXHD Sets_B;       /* the advanced options, */
 extern const u8 Chk2_S[];               /* and what begins one there */
-extern const u8 MnLoc_B[];              /* "Main, Local, Cancel" */
+extern const struct BOXHD MnLoc_B;      /* "Main, Local, Cancel" */
 extern const u8 User_S[];               /* " User Menu " */
 extern const u8 ExFl_S[];               /* " Extension File " */
 extern const u8 UsMnu_S[];              /* "user menu" */
@@ -82,9 +81,9 @@ extern const u8 Menu_F[];               /* "VC.MNU" */
 extern const u8 Ext_F[];                /* "VC.EXT" */
 extern const u8 ViewE_F[];              /* "VCVIEW.EXT" */
 extern const u8 EditE_F[];              /* "VCEDIT.EXT" */
-extern const u8 SvSt_B[];               /* "Do you wish to save the current
+extern const struct BOXHD SvSt_B;       /* "Do you wish to save the current
                                            setup?" */
-extern const u8 SetEr_B[];              /* "There was an error while saving
+extern const struct BOXHD SetEr_B;      /* "There was an error while saving
                                            the setup file" */
 
 #define LOW(pair)  ((u16)(pair))
@@ -303,7 +302,7 @@ u16 M06_00(struct WCBdef *panel, u16 item)
    the assembly leaves as DX happens to be, is not read. */
 u16 M16_01(struct WCBdef *panel)
 {
-    if ((u8)Dialog(OFFSET(Filt_B), 0, 0, 0, panel) != 0)
+    if ((u8)Dialog(&Filt_B, 0, 0, 0, panel) != 0)
         return MNU_FUNC04;
     return M16_11(panel);
 }
@@ -356,7 +355,7 @@ u16 M42_00(struct WCBdef *panel)
     if (FilePan(panel)) {
         *(u16 *)md.TmpBuf = panel->WinPath[0];
         PutMnu(3);
-        DialBox(0x528, OFFSET(DiSiz_P), 0, &md, &where);
+        DialBox(0x528, &DiSiz_P, 0, &md, &where);
         Window(where.begin, where.size);
         DirSize(panel);
         M16_20(panel);
@@ -429,7 +428,7 @@ u16 M49_00(struct WCBdef *panel)
     marked = M49_10(other, 0);
     marked = M49_10(panel, marked);
     if (marked == 0) {
-        Dialog(OFFSET(CmpDi_B), 0, 0, 0, panel);
+        Dialog(&CmpDi_B, 0, 0, 0, panel);
         return MNU_FUNC04;
     }
     return M60_02(panel);
@@ -452,7 +451,7 @@ u16 M60_00(void)
         ;
     md.TmpBuf[2] = delay;
     md.TmpBuf[3] = delay;
-    if ((u8)Dialog(OFFSET(Conf_B), OFFSET(Chk1_S), 0, 0, &md) != 0)
+    if ((u8)Dialog(&Conf_B, Chk1_S, 0, 0, &md) != 0)
         return MNU_FUNC04;
     md.ColTyp = md.TmpBuf[0];
     md.BlDelay = Delay_T[md.TmpBuf[2]];
@@ -465,39 +464,35 @@ u16 M60_00(void)
    sets. */
 u16 M61_00(void)
 {
-    Dialog(OFFSET(Sets_B), OFFSET(Chk2_S), 0, 0, &md);
+    Dialog(&Sets_B, Chk2_S, 0, 0, &md);
     return MNU_FUNC04;
 }
 
 /* M64_02: ask whether the main file of the name at `name` is meant, the
    one in the program's directory, or that of the current directory, and
    have the editor open it. `title` is the title of the box, `include`
-   what it calls the file, `page` its page of the help; all three and
-   the name are offsets in the segment that AsmSeg returns.
+   what it calls the file, `page` its page of the help.
 
    The original copies the title as 80 bytes and the name as 13, with
    what follows them there, and 64 of those bytes go on into ViewFil
    behind the name. So as many are copied here, and ExFl_S is written
    in commands_t.c with the 80 that the original has there. */
-static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
+static u16 M64_02(u16 item, const u8 *name, const u8 *title,
+                  const u8 *include, u16 page)
 {
-    u16 code = AsmSeg();
-    const u8 *from;
     u16 answer, i;
 
     md.HlpPage = (u8)page;
     PutMnu(item);
-    from = AT(code, title);
     for (i = 0; i < 80; i++)
-        md.TmpBuf[i] = from[i];
-    answer = Dialog(OFFSET(MnLoc_B), include, 0, 0, &md) & 0xFF;
+        md.TmpBuf[i] = title[i];
+    answer = Dialog(&MnLoc_B, include, 0, 0, &md) & 0xFF;
     if (answer >= 2)
         return MNU_FUNC04;
-    from = AT(code, name);
     for (i = 0; i < 13; i++)
-        md.TmpBuf[i] = from[i];
+        md.TmpBuf[i] = name[i];
     if (answer == 0)
-        MainFil(md.TmpBuf, from);
+        MainFil(md.TmpBuf, name);
     LetLin(md.TmpBuf);
     for (i = 0; i < LenStr; i++)
         md.ViewFil[i] = md.TmpBuf[i];
@@ -508,25 +503,23 @@ static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
 /* Menu file edit, of the Commands menu. */
 u16 M53_00(u16 item)
 {
-    return M64_02(item, OFFSET(Menu_F), OFFSET(User_S), OFFSET(UsMnu_S), 38);
+    return M64_02(item, Menu_F, User_S, UsMnu_S, 38);
 }
 
 /* Extension file edit, Viewers and Editors, of the Options menu. */
 u16 M62_00(u16 item)
 {
-    return M64_02(item, OFFSET(Ext_F), OFFSET(ExFl_S), OFFSET(ExtFl_S), 42);
+    return M64_02(item, Ext_F, ExFl_S, ExtFl_S, 42);
 }
 
 u16 M63_00(u16 item)
 {
-    return M64_02(item, OFFSET(ViewE_F), OFFSET(ExFl_S), OFFSET(ExtFl_S),
-                  43);
+    return M64_02(item, ViewE_F, ExFl_S, ExtFl_S, 43);
 }
 
 u16 M64_00(u16 item)
 {
-    return M64_02(item, OFFSET(EditE_F), OFFSET(ExFl_S), OFFSET(ExtFl_S),
-                  44);
+    return M64_02(item, EditE_F, ExFl_S, ExtFl_S, 44);
 }
 
 /* M66_01: a switch of the Options menu, a byte of the setup that is 0 or
@@ -587,10 +580,10 @@ u16 M75_00(struct WCBdef *panel)
 {
     struct Answer saved;
 
-    if ((u8)Dialog(OFFSET(SvSt_B), 0, 0, 0, panel) == 0) {
+    if ((u8)Dialog(&SvSt_B, 0, 0, 0, panel) == 0) {
         saved = SaveSet();
         if (saved.failed != 0 && saved.value != ERR_NOT_READY)
-            Dialog(OFFSET(SetEr_B), 0, 0, 0, panel);
+            Dialog(&SetEr_B, 0, 0, 0, panel);
     }
     return MNU_FUNC04;
 }

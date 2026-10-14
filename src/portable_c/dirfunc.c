@@ -43,7 +43,7 @@ u16 F38_40(u16 attributes);
 static u16 F38_70(void);
 u16 M30_50(u16 attributes);
 static struct Answer F38_60(void);
-static u16 FncMs1(u16 include);
+static u16 FncMs1(const u8 *include);
 
 /* DirFunc, DelTr0 and M30_60 are in vc.h. */
 /* The commands, with FncMas, FncSel and FncExt, are declared in vc.h:
@@ -53,9 +53,9 @@ static u16 FncMs1(u16 include);
    of vc.h.
 
    OncZoom puts a box on the screen with its middle at `place`, zooming it
-   only for the first box of a command: `box` is where the assembly
-   describes it, an offset in its code segment, and `include` the text that
-   ^I stands for in a line of the box, another such offset. Dialog, which
+   only for the first box of a command: `box` is the box as the assembly
+   describes it, and `include` the text that ^I stands for in a line of
+   the box. Dialog, which
    is C, does that and takes the keys; the low byte of what it returns is
    the number of the answer, 0 for the first, and more than any for Esc:
    here always for a box that is not on the screen yet, with what it sets
@@ -88,19 +88,20 @@ void PutTime(u16 time, struct TimeText *text);
 u8 *BufTime(const struct TimeText *text, u8 *buffer);
 
 /* Boxes and texts, constants of dirfunc_t.c but for Empty_S, which
-   OncZoom and Dialog take by their offsets in the segment that the
-   constants are in: only those are used here. */
-extern const u8 DelFl_P[];              /* "Deleting the file" */
-extern const u8 DelDr_P[];              /* "Deleting the subdirectory" */
-extern const u8 DelCo_B[];              /* "You are DELETING ... from" */
-extern const u8 RdOnl_B[];              /* "... is marked read-only." */
-extern const u8 NoEmp_B[];              /* "... is not empty." */
-extern const u8 DelEr_B[];              /* "Can't delete the file" */
-extern const u8 CntDi_B[];              /* "Can't delete the subdirectory" */
-extern const u8 StAtr_P[];              /* "Setting attributes:" */
-extern const u8 AtrEr_B[];              /* a line and the file's name */
-extern const u8 NoDat_B[];              /* "Illegal date or time." */
-extern const u8 PthEr_B[];              /* "Path too long" */
+   OncZoom and Dialog take a pointer to. A box and a dialog are declared
+   as what each begins with, as vc.h has it at the two, and are only
+   handed on here. */
+extern const struct BOXTOP DelFl_P;     /* "Deleting the file" */
+extern const struct BOXTOP DelDr_P;     /* "Deleting the subdirectory" */
+extern const struct BOXHD DelCo_B;      /* "You are DELETING ... from" */
+extern const struct BOXHD RdOnl_B;      /* "... is marked read-only." */
+extern const struct BOXHD NoEmp_B;      /* "... is not empty." */
+extern const struct BOXHD DelEr_B;      /* "Can't delete the file" */
+extern const struct BOXHD CntDi_B;      /* "Can't delete the subdirectory" */
+extern const struct BOXTOP StAtr_P;     /* "Setting attributes:" */
+extern const struct BOXHD AtrEr_B;      /* a line and the file's name */
+extern const struct BOXHD NoDat_B;      /* "Illegal date or time." */
+extern const struct BOXHD PthEr_B;      /* "Path too long" */
 extern const u8 Del_S[];                /* " Delete " */
 extern const u8 DelFs_S[];              /* "s" */
 extern const u8 Empty_S[];              /* nothing */
@@ -108,25 +109,25 @@ extern const u8 NoFnd_S[];              /* "Can't find the file" */
 extern const u8 NoAtr_S[];              /* "Can't set attributes" */
 /* Those of the commands. DlWr4_S is copied with what follows it there,
    81 bytes in all. */
-extern const u8 MkDi1_B[];              /* "Create the directory", a path */
-extern const u8 MkDi2_B[];              /* the same, a name: in the tree */
-extern const u8 MkErr_B[];              /* "Can't create the directory" */
+extern const struct BOXHD MkDi1_B;      /* "Create the directory", a path */
+extern const struct BOXHD MkDi2_B;      /* the same, a name: in the tree */
+extern const struct BOXHD MkErr_B;      /* "Can't create the directory" */
 extern const u8 CrDir_S[];              /* "Create the directory" */
 extern const u8 MkDir_S[];              /* " Make directory " */
-extern const u8 DelDi_B[];              /* "Do you wish to delete" a */
+extern const struct BOXHD DelDi_B;      /* "Do you wish to delete" a */
 extern const u8 Subdi_S[];              /* " the directory" */
-extern const u8 DelFi_B[];              /* "Do you wish to delete" a file */
-extern const u8 DelSe_B[];              /* "You have selected" */
-extern const u8 DlMas_B[];              /* "Delete the file:" */
-extern const u8 DlWrn_B[];              /* "WARNING!" */
+extern const struct BOXHD DelFi_B;      /* "Do you wish to delete" a file */
+extern const struct BOXHD DelSe_B;      /* "You have selected" */
+extern const struct BOXHD DlMas_B;      /* "Delete the file:" */
+extern const struct BOXHD DlWrn_B;      /* "WARNING!" */
 extern const u8 DlWr4_S[];              /* "in the current directory" */
-extern const u8 StAt1_B[];              /* the attributes of a file */
-extern const u8 StAt2_B[];              /* those to set and to clear */
+extern const struct BOXHD StAt1_B;      /* the attributes of a file */
+extern const struct BOXHD StAt2_B;      /* those to set and to clear */
 extern const u8 Attr8_S[];              /* " for" */
-extern const u8 Label_B[];              /* "Change volume label ... to" */
-extern const u8 DelVo_B[];              /* "Do you wish to delete" it */
-extern const u8 ErVol_B[];              /* "Could not set" it */
-extern const u8 NoFnc_B[];              /* "Can't find file" */
+extern const struct BOXHD Label_B;      /* "Change volume label ... to" */
+extern const struct BOXHD DelVo_B;      /* "Do you wish to delete" it */
+extern const struct BOXHD ErVol_B;      /* "Could not set" it */
+extern const struct BOXHD NoFnc_B;      /* "Can't find file" */
 
 /* What FncAddr can name, by the numbers of vc.h: a routine that is called
    with the attributes of a file in AL and answers in AX. The original
@@ -188,7 +189,7 @@ u16 F38_10(u16 answer)
     if ((u8)answer != 0)
         return answer;
     /* None of its lines has ^I: no include line. */
-    answer = Dialog(OFFSET(DelCo_B), 0, 0, 0, &md);
+    answer = Dialog(&DelCo_B, 0, 0, 0, &md);
     if ((u8)answer > 1)
         return answer;
     DEL_ALL = (u8)answer;
@@ -213,10 +214,11 @@ u16 F38_40(u16 attributes)
     u8 *end;
     struct FileAttr had;
     struct Answer asked, removed, marked;
-    u16 answer, error, report, count;
+    const struct BOXHD *report;
+    u16 answer, error, count;
 
     if (!(attributes & ATTR_DIRECTORY)) {
-        OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(Empty_S), &box);
+        OncZoom(BOX_PLACE, &DelFl_P, Empty_S, &box);
         if (ChgDisk(md.TmpBuf))
             goto stop;
         asked = FileDelete(md.TmpBuf);
@@ -231,7 +233,7 @@ u16 F38_40(u16 attributes)
                    of a drive that is not ready, whatever DOS left. */
                 error &= 0xFF00;
                 if (had.attributes & 1) {
-                    answer = (u8)Dialog(OFFSET(RdOnl_B), OFFSET(Del_S),
+                    answer = (u8)Dialog(&RdOnl_B, Del_S,
                                         0, 0, &md);
                     if (answer == 1)
                         goto not_done;
@@ -252,24 +254,24 @@ u16 F38_40(u16 attributes)
         /* F38_42 */
         for (count = 0; count < LenPath + 13; count++)
             md.TmpBuf[130 + count] = md.TmpBuf[count];
-        report = OFFSET(DelEr_B);
+        report = &DelEr_B;
         goto failed;
     }
 
     /* F38_50 */
-    OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S), &box);
+    OncZoom(BOX_PLACE, &DelDr_P, Del_S, &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     removed = F38_60();
     if (removed.failed != 0) {
         error = removed.value;
         if (error < 100 && (u8)error != ERR_NO_ACCESS) {
-            report = OFFSET(CntDi_B);
+            report = &CntDi_B;
             goto failed;
         }
         /* F38_51: it is not empty */
         if (DEL_ALL == 0) {
-            answer = (u8)Dialog(OFFSET(NoEmp_B), OFFSET(Del_S), 0, 0, &md);
+            answer = (u8)Dialog(&NoEmp_B, Del_S, 0, 0, &md);
             if (answer > 1)
                 goto not_done;
             if (answer == 1)
@@ -291,7 +293,7 @@ u16 F38_40(u16 attributes)
         answer = DirFunc();
         if (answer >> 8)
             goto out;
-        OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S), &box);
+        OncZoom(BOX_PLACE, &DelDr_P, Del_S, &box);
         removed = F38_60();
         if (removed.failed != 0) {
             if (removed.value == ERR_NOT_READY)
@@ -316,7 +318,7 @@ done:
 failed:
     /* F38_43 */
     if (error != ERR_NOT_READY
-        && (u8)Dialog(report, OFFSET(Del_S), 0, 0, &md) == 0) {
+        && (u8)Dialog(report, Del_S, 0, 0, &md) == 0) {
 not_done:
         answer = NOT_DONE;
         goto close;
@@ -390,7 +392,7 @@ static u16 F38_70(void)
     name = NEAR(CutPath(md.TmpBuf));
     if ((u8)FcbParse(name, fcb + 7, 2) != 1)
         return NOT_DONE;
-    OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(DelFs_S), &box);
+    OncZoom(BOX_PLACE, &DelFl_P, DelFs_S, &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     *back = 0;
@@ -452,12 +454,13 @@ u16 M30_50(u16 attributes)
     struct FileAttr had;
     struct FileStamp stamp;
     struct Answer opened, asked;
-    u16 answer, old, include, error;
+    const u8 *include;
+    u16 answer, old, error;
 
     if (attributes & ATTR_DIRECTORY)
         return DirFunc();
     /* None of its lines has ^I: no include line. */
-    OncZoom(BOX_PLACE, OFFSET(StAtr_P), 0, &box);
+    OncZoom(BOX_PLACE, &StAtr_P, 0, &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     had = FileAttributes(md.TmpBuf);
@@ -504,10 +507,10 @@ u16 M30_50(u16 attributes)
 failed:
     /* M30_56 */
     if (error != ERR_NOT_READY) {
-        include = OFFSET(NoAtr_S);
+        include = NoAtr_S;
         if (error <= ERR_NO_PATH)
-            include = OFFSET(NoFnd_S);
-        if ((u8)Dialog(OFFSET(AtrEr_B), include, 0, 0, &md) == 0) {
+            include = NoFnd_S;
+        if ((u8)Dialog(&AtrEr_B, include, 0, 0, &md) == 0) {
             answer = NOT_DONE;
             goto close;
         }
@@ -671,7 +674,7 @@ struct Checked M30_60(u16 answer)
 
 refused:
     /* None of its lines has ^I: no include line. */
-    checked.answer = Dialog(OFFSET(NoDat_B), 0, 0, 0, &md);
+    checked.answer = Dialog(&NoDat_B, 0, 0, 0, &md);
     checked.refused = 1;
     return checked;
 }
@@ -714,7 +717,7 @@ u16 DirFunc(void)
         if (count == 0) {
             if (md.FncAddr != FNC_DISI10)
                 /* None of its lines has ^I: no include line. */
-                Dialog(OFFSET(PthEr_B), 0, 0, 0, &md);
+                Dialog(&PthEr_B, 0, 0, 0, &md);
             return 0;
         }
         if (*end++ == 0)
@@ -871,7 +874,7 @@ struct Answer DelTr0(const u8 *path)
    goes into the byte after CrnPath, the first of ViewFil. And the entry
    is added to the list of the current panel whatever that shows, and
    without asking whether the list has room. */
-static u16 F47_01(u16 box)
+static u16 F47_01(const struct BOXHD *box)
 {
     struct Answer made;
     struct WCBdef *wcb;
@@ -881,14 +884,14 @@ static u16 F47_01(u16 box)
     u16 i;
 
     md.TmpBuf[0] = 0;
-    if ((u8)Dialog(box, OFFSET(CrDir_S), 0, 0, &md) != 0)
+    if ((u8)Dialog(box, CrDir_S, 0, 0, &md) != 0)
         return TO_FUNC04;
     if (md.TmpBuf[0] == 0)
         return TO_FUNC04;
     name = NEAR(CutPath(md.TmpBuf));
     Convert(name, md.TmpBuf + 100);
     UnConv(name, md.TmpBuf + 100);
-    if (box == OFFSET(MkDi2_B)) {
+    if (box == &MkDi2_B) {
         if (NEAR(CutPath(md.TmpBuf)) != md.TmpBuf)
             goto failed;
         path = md.TmpBuf + 100;
@@ -908,11 +911,11 @@ failed:
         /* F47_03 */
         for (i = 0; i < LenPath + 13; i++)
             md.TmpBuf[130 + i] = md.TmpBuf[i];
-        Dialog(OFFSET(MkErr_B), OFFSET(MkDir_S), 0, 0, &md);
+        Dialog(&MkErr_B, MkDir_S, 0, 0, &md);
         return TO_FUNC04;
     }
     /* F47_05 */
-    if (box == OFFSET(MkDi2_B)) {
+    if (box == &MkDi2_B) {
         for (i = 0; i < LenPath - 2; i++)
             md.CrnPath[2 + i] = path[i];
         md.ViewFil[0] = 0;              /* the byte behind CrnPath */
@@ -938,7 +941,7 @@ failed:
 /* Shift-F7: make a directory, by a path. */
 u16 F47_00(void)
 {
-    return F47_01(OFFSET(MkDi1_B));
+    return F47_01(&MkDi1_B);
 }
 
 /* F7: make a directory, in the current directory of the tree if the
@@ -948,8 +951,8 @@ u16 F37_00(struct WCBdef *panel)
     const struct WCBdef *wcb = panel;
 
     if (wcb->WinTyp == 1 && wcb->Visible != 0)
-        return F47_01(OFFSET(MkDi2_B));
-    return F47_01(OFFSET(MkDi1_B));
+        return F47_01(&MkDi2_B);
+    return F47_01(&MkDi1_B);
 }
 
 /* F8: delete what is selected in the panel, or what the cursor is on if
@@ -962,7 +965,9 @@ u16 F38_00(struct WCBdef *panel)
     const struct FILENT *file;
     u8 *end;
     struct Selected selected;
-    u16 box, include, i;
+    const struct BOXHD *box;
+    const u8 *include;
+    u16 i;
 
     DEL_ALL = 0;
     FNC_CHANGE = 0;
@@ -975,7 +980,7 @@ u16 F38_00(struct WCBdef *panel)
             return TO_FNCEXT;
         for (i = 0; i < LenPath; i++)
             md.TmpBuf[i] = md.CrnPath[i];
-        if ((u8)Dialog(OFFSET(DelDi_B), OFFSET(Subdi_S), 0, 0, &md)
+        if ((u8)Dialog(&DelDi_B, Subdi_S, 0, 0, &md)
             != 0)
             return TO_FUNC04;
         md.ZoomOne = 0;
@@ -994,10 +999,11 @@ u16 F38_00(struct WCBdef *panel)
         FilDir(md.TmpBuf, selected.directories, selected.files);
         for (i = 0; i < LenPath; i++)
             md.TmpBuf[100 + i] = panel->WinPath[i];
-        box = OFFSET(DelSe_B);
+        box = &DelSe_B;
         /* None of its lines has ^I: the assembly hands over what it
-           has there, the number of files selected. */
-        include = selected.files;
+           has there, the number of files selected, which names no
+           text. */
+        include = 0;
     } else {
         /* F38_06 */
         if (panel->CurAdr >= panel->EndBuf)
@@ -1005,11 +1011,11 @@ u16 F38_00(struct WCBdef *panel)
         file = ENTRY(panel, panel->CurAdr);
         if (file->NameF[0] == '.')
             return TO_FNCEXT;
-        box = OFFSET(DelFi_B);
-        include = OFFSET(Empty_S);
+        box = &DelFi_B;
+        include = Empty_S;
         if (file->AttrF & ATTR_DIRECTORY) {
-            box = OFFSET(DelDi_B);
-            include = OFFSET(Subdi_S);
+            box = &DelDi_B;
+            include = Subdi_S;
         }
         for (i = 0; i < 13; i++)
             md.TmpBuf[i] = file->NameF[i];
@@ -1029,10 +1035,11 @@ u16 F48_00(void)
 {
     const u8 *from;
     u8 *name;
-    u16 i, answer, include;
+    const u8 *include;
+    u16 i, answer;
 
     /* None of its lines has ^I: no include line. */
-    if ((u8)Dialog(OFFSET(DlMas_B), 0, 0, 0, &md) != 0)
+    if ((u8)Dialog(&DlMas_B, 0, 0, 0, &md) != 0)
         return TO_FUNC04;
     for (i = 0; i < LenStr + 1; i++)
         md.TmpBuf[i] = md.ViewFil[i];
@@ -1058,7 +1065,7 @@ u16 F48_00(void)
     for (i = 0; i < LenPath + 13; i++)
         md.TmpBuf[100 + i] = from[i];
     /* No ^I here either. */
-    if ((u8)Dialog(OFFSET(DlWrn_B), 0, 0, 0, &md) != 0)
+    if ((u8)Dialog(&DlWrn_B, 0, 0, 0, &md) != 0)
         return TO_FUNC04;
 delete:
     /* F48_04 */
@@ -1072,7 +1079,7 @@ delete:
         return TO_FNCEXT;
     include = 0;
     if ((u8)answer == 0)
-        include = OFFSET(Del_S);
+        include = Del_S;
     return FncMs1(include);
 }
 
@@ -1149,7 +1156,7 @@ u16 M30_00(struct WCBdef *panel)
             *end = 0;
             for (i = 0; i < 13; i++)
                 md.TmpBuf[100 + i] = file->NameF[i];
-            if ((u8)Dialog(OFFSET(StAt1_B), OFFSET(Attr8_S), 0, 0, &md)
+            if ((u8)Dialog(&StAt1_B, Attr8_S, 0, 0, &md)
                 != 0)
                 return TO_FUNC04;
             bits = M30_82(md.TmpBuf);
@@ -1161,7 +1168,7 @@ u16 M30_00(struct WCBdef *panel)
     /* M30_01 */
     for (i = 0; i < 100; i++)
         md.TmpBuf[i] = 0;
-    if ((u8)Dialog(OFFSET(StAt2_B), OFFSET(Empty_S), 0, 0, &md) != 0)
+    if ((u8)Dialog(&StAt2_B, Empty_S, 0, 0, &md) != 0)
         return TO_FUNC04;
     ATTR_SET = (u8)M30_82(md.TmpBuf);
     ATTR_KEEP = (u8)~M30_82(md.TmpBuf + 10);
@@ -1205,7 +1212,7 @@ u16 F54_00(void)
         end[1] = 0;
     }
     /* F54_01 */
-    if ((u8)Dialog(OFFSET(Label_B), 0, 0, 0, &md) != 0)
+    if ((u8)Dialog(&Label_B, 0, 0, 0, &md) != 0)
         return TO_FUNC04;
     md.TmpBuf[20] = 0xFF;               /* an extended FCB, */
     md.TmpBuf[26] = 8;                  /* for a label, */
@@ -1216,7 +1223,7 @@ u16 F54_00(void)
     if (md.TmpBuf[1] == 0) {
         if (md.Volume[0] == 0)
             return TO_FUNC04;
-        if ((u8)Dialog(OFFSET(DelVo_B), 0, 0, 0, &md) != 0)
+        if ((u8)Dialog(&DelVo_B, 0, 0, 0, &md) != 0)
             return TO_FUNC04;
         FcbDelete(md.TmpBuf + 20, 0);
         return TO_FNCEXT;
@@ -1234,7 +1241,7 @@ u16 F54_00(void)
     /* F54_04 */
     *(u16 *)(md.TmpBuf + 9) = *(u16 *)(md.TmpBuf + 10);
     *(u16 *)(md.TmpBuf + 11) = *(u16 *)(md.TmpBuf + 12);
-    Dialog(OFFSET(ErVol_B), 0, 0, 0, &md);
+    Dialog(&ErVol_B, 0, 0, 0, &md);
     return TO_FNCEXT;
 }
 
@@ -1245,7 +1252,7 @@ u16 F54_00(void)
    DOS finds no file at all and `include` is not 0, a box says so,
    "Can't find file", or "files" for a mask, with `include`, the name of
    the command, for its title. Returns where to go on: FncExt. */
-static u16 FncMs1(u16 include)
+static u16 FncMs1(const u8 *include)
 {
     struct Answer found;
     const u8 *text;
@@ -1290,13 +1297,13 @@ static u16 FncMs1(u16 include)
             *(u16 *)(md.TmpBuf + 100) = 's';
             break;
         }
-    Dialog(OFFSET(NoFnc_B), include, 0, 0, &md);
+    Dialog(&NoFnc_B, include, 0, 0, &md);
     return TO_FNCEXT;
 }
 
 /* FncMas of the assembly, which a command jumps to: the files of the
    mask at TmpBuf, each by what FncAddr names. */
-u16 FncMas(u16 include)
+u16 FncMas(const u8 *include)
 {
     md.ZoomOne = 0;
     FNC_CHANGE = 0;

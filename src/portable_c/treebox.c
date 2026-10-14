@@ -48,9 +48,9 @@ u16 ChTree(u16 column);
    the cursor and the first line shown.
 
    ChkSum adds up `length` bytes at `at` in the main data. OncZoom
-   puts the box on the screen that the assembly describes at `box`, an
-   offset in its code segment, with its middle at `place`; only the first
-   box since ZoomOne was cleared grows. */
+   puts the box `box` on the screen, as the assembly describes it, with
+   its middle at `place`; only the first box since ZoomOne was cleared
+   grows. */
 
 /* C routines of other files that vc.h does not have. */
 void FilZero(u8 *text, u16 length);                     /* string.c */
@@ -59,11 +59,11 @@ void TrCr20(u16 lines);
 
 /* The tables of the tree, in treebox_t.c: the name of the tree
    file, which DelTr0 has too, and the boxes that are shown while the
-   disk is read and while the file is written, which OncZoom takes by
-   their offsets. */
+   disk is read and while the file is written, which OncZoom takes a
+   pointer to. */
 extern const u8 Tree_F[];               /* "\TREEINFO.NCD" */
-extern const u8 Tree_P[];               /* "Scanning the directory..." */
-extern const u8 TrSav_P[];              /* "Saving the directory..." */
+extern const struct BOXTOP Tree_P;      /* "Scanning the directory..." */
+extern const struct BOXTOP TrSav_P;     /* "Saving the directory..." */
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
@@ -202,7 +202,7 @@ RdTr11:                                 /* one more: with five, a box that
     if (count >= 5) {
         if (count == 5) {
             *(u16 *)md.MenuBuf = (u16)(short)(signed char)md.DosPth[0];
-            OncZoom(0x728, OFFSET(Tree_P), 0, &box);
+            OncZoom(0x728, &Tree_P, 0, &box);
         }
         Number(md.MenuBuf, 0, count, NUM_SEPARATED);
         line.value = box.begin + 0x400 & 0xFF00 | 0x28;
@@ -326,7 +326,7 @@ RdTr26:
         goto RdTr40;
 
     /* The file. */
-    OncZoom(0x728, OFFSET(TrSav_P), 0, &box);
+    OncZoom(0x728, &TrSav_P, 0, &box);
     for (i = 0; i < 5; i++)
         md.TreeBuf[i] = TreBeg[i];
     count = TREE->TreeLen;

@@ -61,10 +61,9 @@ u16 F35_61(u16 answer, u16 place);
    of vc.h.
 
    OncZoom puts a box on the screen with its middle at `place`, growing
-   only if it is the first of a command: `box` is where the assembly
-   describes it and `include` the text that ^I stands for in its lines,
-   both offsets in the assembly's code segment; where the box is comes back
-   as a struct Box of vc.h. ResWin puts back what a box covers. ChgDisk
+   only if it is the first of a command: `box` is the box as the assembly
+   describes it and `include` the text that ^I stands for in its lines;
+   where the box is comes back as a struct Box of vc.h. ResWin puts back what a box covers. ChgDisk
    asks for the disk of a drive that shares the floppy drive with another,
    and is not 0 to stop.
 
@@ -72,8 +71,7 @@ u16 F35_61(u16 answer, u16 place);
    files, directories and the room of a drive with the program's errors,
    where the assembly calls DOS through Intr21, and bare for the current
    drive, where it calls DOS itself. */
-/* AsmSeg returns the segment of the program's constants, where its
-   texts are (see dialog.c). */
+
 
 /* A dialog whose box is not on the screen yet, and which sets what it
    sets in the main data: Dialog of vc.h. The low byte of what it returns
@@ -91,9 +89,10 @@ u8 *UnConv(u8 *name, const u8 *buffer);                         /* mask.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 u16 ChTree(u16 column);                                 /* treebox.c */
 
-/* Boxes and texts, which OncZoom and Dialog take by their offsets in the
-   segment that the constants are in: those of copy_t.c, and some of
-   deleting. Only the offsets are used here, but for the texts that the
+/* Boxes and texts, which OncZoom and Dialog take a pointer to: those of
+   copy_t.c, and some of deleting. A box and a dialog are declared as
+   what each begins with, as vc.h has it at the two, and are only
+   handed on here; so are the texts, but for those that the
    commands copy from there into what their dialogs show. */
 extern const u8 Copy0_S[];              /* " Copy " */
 extern const u8 Move0_S[];              /* " Move " */
@@ -101,25 +100,25 @@ extern const u8 Ren0_S[];               /* " Rename " */
 extern const u8 RnMv_S[];               /* "Rename or move " */
 extern const u8 CopTo_S[];              /* "^V to" */
 extern const u8 CopFi_S[];              /* "Copying the file" */
-extern const u8 Copy1_B[];              /* the dialog of F5 and F6 */
-extern const u8 Copy2_B[];              /* and that of Shift-F5 and -F6 */
-extern const u8 Renam_B[];              /* "Rename ... to" */
-extern const u8 RenFi_P[];              /* "Renaming or moving the file" */
-extern const u8 CopFi_P[];              /* "Copying the file" */
-extern const u8 MovFi_P[];              /* "Moving the file" */
-extern const u8 CopDi_P[];              /* "Copying the directory" */
-extern const u8 MovDi_P[];              /* "Renaming or moving the directory" */
-extern const u8 DelDr_P[];              /* "Deleting the subdirectory" */
-extern const u8 OvrCo_B[];              /* "The following file exists" */
-extern const u8 Prot_B[];               /* "... is a read-only file" */
-extern const u8 Cont_B[];               /* "There isn't enough room to copy" */
-extern const u8 OpnEr_B[];              /* "Can't open the file" */
-extern const u8 Itslf_B[];              /* "You can't copy a file to itself" */
-extern const u8 RenEr_B[];              /* "Can't rename the file" */
-extern const u8 MkErr_B[];              /* "Can't create the directory" */
-extern const u8 DelEr_B[];              /* "Can't delete the file" */
-extern const u8 RdOnl_B[];              /* "... is marked read-only" */
-extern const u8 CntDi_B[];              /* "Can't delete the subdirectory" */
+extern const struct BOXHD Copy1_B;      /* the dialog of F5 and F6 */
+extern const struct BOXHD Copy2_B;      /* and that of Shift-F5 and -F6 */
+extern const struct BOXHD Renam_B;      /* "Rename ... to" */
+extern const struct BOXTOP RenFi_P;     /* "Renaming or moving the file" */
+extern const struct BOXTOP CopFi_P;     /* "Copying the file" */
+extern const struct BOXTOP MovFi_P;     /* "Moving the file" */
+extern const struct BOXTOP CopDi_P;     /* "Copying the directory" */
+extern const struct BOXTOP MovDi_P;     /* "Renaming or moving the directory" */
+extern const struct BOXTOP DelDr_P;     /* "Deleting the subdirectory" */
+extern const struct BOXHD OvrCo_B;      /* "The following file exists" */
+extern const struct BOXHD Prot_B;       /* "... is a read-only file" */
+extern const struct BOXHD Cont_B;       /* "There isn't enough room to copy" */
+extern const struct BOXHD OpnEr_B;      /* "Can't open the file" */
+extern const struct BOXHD Itslf_B;      /* "You can't copy a file to itself" */
+extern const struct BOXHD RenEr_B;      /* "Can't rename the file" */
+extern const struct BOXHD MkErr_B;      /* "Can't create the directory" */
+extern const struct BOXHD DelEr_B;      /* "Can't delete the file" */
+extern const struct BOXHD RdOnl_B;      /* "... is marked read-only" */
+extern const struct BOXHD CntDi_B;      /* "Can't delete the subdirectory" */
 
 /* What is put behind a path to find everything in the directory. */
 static const u8 AllIn_S[] = "\\*.*";
@@ -145,15 +144,15 @@ static const u8 AllIn_S[] = "\\*.*";
 #define HIGH(pair) ((u16)((pair) >> 16))
 #define PAIR(high, low) ((u32)(high) << 16 | (low))
 
-/* The title of the boxes, as the offset of the text in the assembly:
-   Copy, Move, or Rename once a file is being renamed. */
-static u16 F35_40(void)
+/* The title of the boxes: Copy, Move, or Rename once a file is being
+   renamed. */
+static const u8 *F35_40(void)
 {
     if (CopyMov == 0)
-        return OFFSET(Copy0_S);
+        return Copy0_S;
     if (CopyMov <= 2)
-        return OFFSET(Move0_S);
-    return OFFSET(Ren0_S);
+        return Move0_S;
+    return Ren0_S;
 }
 
 /* Where the text at `text` ends, looked for in `count` bytes: the address
@@ -478,10 +477,11 @@ static u16 C10_00(u16 *fits)
     struct Box box;
     struct FileAttr attr;
     struct Answer asked;
-    u16 result, answer, error, report;
+    const struct BOXHD *report;
+    u16 result, answer, error;
 
     CopyMov = 3;
-    OncZoom(0x528, OFFSET(RenFi_P), 0, &box);
+    OncZoom(0x528, &RenFi_P, 0, &box);
     error = 0;
     if (*fits == 0)
         goto failed;
@@ -507,7 +507,7 @@ static u16 C10_00(u16 *fits)
     if (attr.attributes & ATTR_DIRECTORY)
         goto failed;
     if (CpAll == 0) {
-        answer = (u8)Ask(OFFSET(OvrCo_B), OFFSET(Ren0_S));
+        answer = (u8)Ask(&OvrCo_B, Ren0_S);
         if (answer == 2) {
             *fits = attr.attributes;
             goto copy;
@@ -522,7 +522,7 @@ static u16 C10_00(u16 *fits)
         if (error != ERR_NO_ACCESS)
             goto undeleted;
         C50_00();
-        if ((u8)Ask(OFFSET(Prot_B), F35_40()) != 0)
+        if ((u8)Ask(&Prot_B, F35_40()) != 0)
             goto nothing;
         asked = FileSetAttributes(CpDest, 0x20);
         if (asked.failed) {
@@ -542,14 +542,14 @@ static u16 C10_00(u16 *fits)
     error = asked.value;
 failed:
     /* None of the lines of this box has ^I: no include line. */
-    report = OFFSET(RenEr_B);
+    report = &RenEr_B;
     goto say;
 undeleted:
-    report = OFFSET(DelEr_B);
+    report = &DelEr_B;
 say:
     if (error == ERR_NOT_READY)
         goto stop;
-    if ((u8)Ask(report, OFFSET(Ren0_S)) != 0)
+    if ((u8)Ask(report, Ren0_S) != 0)
         goto stop;
 nothing:
     result = NOTHING;
@@ -605,18 +605,20 @@ static u16 C20_00(u16 fits)
     struct FileAttr attr;
     struct FileStamp stamp;
     struct Space space;
-    u16 result, error, report, answer, info, attributes;
+    const struct BOXTOP *shown;
+    const struct BOXHD *report;
+    u16 result, error, answer, info, attributes;
     u16 segment, offset, count, got, i;
     u16 *screen;
     u8 *part, *end;
     u8 c;
 
     C50_00();
-    report = OFFSET(CopFi_P);
+    shown = &CopFi_P;
     if (CopyMov != 0)
-        report = OFFSET(MovFi_P);
+        shown = &MovFi_P;
     /* None of the lines of these boxes has ^I: no include line. */
-    OncZoom(0x428, report, 0, &box);
+    OncZoom(0x428, shown, 0, &box);
     CpCntBg = box.begin + 0x605;
     CpCntSz = (u8)(box.size - 12);
     screen = BasAdr(CpCntBg);
@@ -624,11 +626,11 @@ static u16 C20_00(u16 fits)
     for (i = CpCntSz; i; i--)
         *screen++ = count;
     Window(CpCntBg, 0x100 | CpCntSz);
-    report = OFFSET(OpnEr_B);
+    report = &OpnEr_B;
     if (fits == 0)
         goto ask;
     if (C40_00(&count)) {
-        report = OFFSET(Itslf_B);
+        report = &Itslf_B;
         goto ask;
     }
     if (ChgDisk(CpSrc))
@@ -742,7 +744,7 @@ open:
     if (CpAll == 0) {
         if (CopyMov == 3)
             goto append;
-        answer = (u8)Ask(OFFSET(OvrCo_B), F35_40());
+        answer = (u8)Ask(&OvrCo_B, F35_40());
         if (answer > 1) {
             if (answer != 2)
                 goto skip;
@@ -751,7 +753,7 @@ open:
         CpAll |= (u8)answer;
     }
     if (attr.attributes & 1) {
-        if ((u8)Ask(OFFSET(Prot_B), F35_40()) != 0)
+        if ((u8)Ask(&Prot_B, F35_40()) != 0)
             goto skip;
         asked = FileSetAttributes(CpDest, 0x20);
         if (asked.failed) {
@@ -783,10 +785,10 @@ opened:
     error = 0;
     goto no_target;
 undeleted:
-    report = OFFSET(DelEr_B);
+    report = &DelEr_B;
     goto say;
 no_target:
-    report = OFFSET(OpnEr_B);
+    report = &OpnEr_B;
 say:
     if (error == ERR_NOT_READY)
         goto terminate;
@@ -809,7 +811,7 @@ append:
         error = opened.value;
         if (error != ERR_NO_ACCESS)
             goto no_target;
-        if ((u8)Ask(OFFSET(Prot_B), F35_40()) != 0)
+        if ((u8)Ask(&Prot_B, F35_40()) != 0)
             goto skip;
         attributes = 0x20;
         asked = FileSetAttributes(CpDest, attributes);
@@ -890,7 +892,7 @@ write:
         goto done;
     error = asked.value;
     if (error == ERR_NO_ACCESS) {
-        answer = (u8)Ask(OFFSET(RdOnl_B), F35_40());
+        answer = (u8)Ask(&RdOnl_B, F35_40());
         if (answer == 1)
             goto done;
         if (answer > 1)
@@ -908,7 +910,7 @@ write:
         goto stop;
     for (i = 0; i < LenName; i++)
         CpDest[i] = CpSrc[i];
-    if ((u8)Ask(OFFSET(DelEr_B), F35_40()) != 0)
+    if ((u8)Ask(&DelEr_B, F35_40()) != 0)
         goto stop;
 done:
     result = DONE;
@@ -955,7 +957,7 @@ full:
         if (asked.failed && asked.value != ERR_NO_ACCESS)
             goto forget;
     }
-    if ((u8)Ask(OFFSET(Cont_B), F35_40()) != 1) {
+    if ((u8)Ask(&Cont_B, F35_40()) != 1) {
         asked = FileDelete(CpDest);
         if (asked.failed && asked.value == ERR_NO_ACCESS
             && !FileSetAttributes(CpDest, 0x20).failed)
@@ -1023,7 +1025,7 @@ no_source:
     LetLin(CpSrc);
     for (i = 0; i < LenName; i++)
         CpDest[i] = CpSrc[i];
-    report = OFFSET(OpnEr_B);
+    report = &OpnEr_B;
 ask:
     if ((u8)Ask(report, F35_40()) != 0)
         goto stop;
@@ -1055,15 +1057,16 @@ static u16 C30_00(u16 across, u16 fits)
     struct Box box;
     struct FileAttr attr, there;
     struct Answer marked, asked;
+    const struct BOXTOP *shown;
     u16 result, error, i;
     u8 *end;
 
     if (CpDev2 != 0)
         goto walk;
-    result = OFFSET(CopDi_P);
+    shown = &CopDi_P;
     if (CopyMov != 0)
-        result = OFFSET(MovDi_P);
-    OncZoom(0x428, result, F35_40(), &box);
+        shown = &MovDi_P;
+    OncZoom(0x428, shown, F35_40(), &box);
     if (fits == 0)
         goto unmade;
     if (C40_00(&i))
@@ -1145,7 +1148,7 @@ walk:
         return result;
 
     md.SftErr = 0;
-    OncZoom(0x528, OFFSET(DelDr_P), OFFSET(Move0_S), &box);
+    OncZoom(0x528, &DelDr_P, Move0_S, &box);
     if (ChgDisk(CpSrc))
         goto stop;
     asked = DirRemove(CpSrc);
@@ -1165,7 +1168,7 @@ walk:
             if (asked.value == ERR_NOT_READY)
                 goto stop;
         }
-        Ask(OFFSET(CntDi_B), OFFSET(Move0_S));
+        Ask(&CntDi_B, Move0_S);
         goto nothing;
     }
 removed:
@@ -1183,7 +1186,7 @@ failed:
     if (error == ERR_NOT_READY)
         goto stop;
 unmade:
-    Ask(OFFSET(MkErr_B), F35_40());
+    Ask(&MkErr_B, F35_40());
 nothing:
     result = NOTHING;
     goto close;
@@ -1261,7 +1264,7 @@ static struct Copied Go(u16 place)
     return copied;
 }
 
-static struct Copied Masked(u16 title)
+static struct Copied Masked(const u8 *title)
 {
     struct Copied copied;
 
@@ -1270,7 +1273,7 @@ static struct Copied Masked(u16 title)
     return copied;
 }
 
-#define ASM(object, offset) AT(AsmSeg(), OFFSET(object) + (offset))
+
 
 /* Init variables: nothing has been copied yet, and C00_00 is what is
    called for every file. */
@@ -1300,7 +1303,9 @@ static u8 *F35_50(struct WCBdef *panel, u16 directories, u16 files)
     const struct WCBdef *wcb;
     const u8 *from;
     u8 *to;
-    u16 title, words, length, i;
+    const u8 *title;
+    const u8 *words;
+    u16 length, i;
 
     from = md.ToFile;                                   /* F35_55 */
     if (md.OneFile == 0 || CopyMov == 0) {
@@ -1323,23 +1328,23 @@ F35_57:
         CpInpt[i] = from[i];
     CpInpt[LenStr] = 0;
 
-    title = OFFSET(Copy0_S);
-    words = OFFSET(Copy0_S) + 1;
+    title = Copy0_S;
+    words = Copy0_S + 1;
     length = 5;
     if (CopyMov != 0) {
-        title = OFFSET(Ren0_S);
-        words = OFFSET(RnMv_S);
+        title = Ren0_S;
+        words = RnMv_S;
         length = 15;
     }
     /* The title and what follows it, 20 bytes: see copy_t.c. */
     for (i = 0; i < CpVar2 - CpVar1; i++)
-        CpVar1[i] = *AT(AsmSeg(), title + i);
+        CpVar1[i] = title[i];
     for (i = 0; i < LenStr; i++)
         CpVar2[i] = ' ';
     CpVar2[LenStr] = 0;
     to = CpVar2;
     for (i = 0; i < length; i++)
-        *to++ = *AT(AsmSeg(), words + i);
+        *to++ = words[i];
     return to;
 }
 
@@ -1356,8 +1361,8 @@ struct Copied F45_01(struct WCBdef *panel, u16 command, u16 directories,
     md.HlpPage = (u8)(20 + command);
     to = F35_50(panel, directories, files);
     for (i = 0; i < 4; i++)                             /* "file" */
-        to[i] = *ASM(CopFi_S, 12 + i);
-    if ((u8)Ask(OFFSET(Copy2_B), F35_40()) != 0)
+        to[i] = CopFi_S[12 + i];
+    if ((u8)Ask(&Copy2_B, F35_40()) != 0)
         return Go(GO_PANELS);
     for (i = 0; i < LenStr + 1; i++)
         md.ToFile[i] = CpInpt[i];
@@ -1469,12 +1474,12 @@ F35_06:
         *to++ = '"';
     }
     for (i = 0; i < 3; i++)                             /* " to" */
-        *to++ = *ASM(CopTo_S, 2 + i);
+        *to++ = CopTo_S[2 + i];
     end = CpVar2 + LenStr;
     while (to < end)
         *to++ = ' ';
     *to = 0;
-    if ((u8)Ask(OFFSET(Copy1_B), F35_40()) != 0)
+    if ((u8)Ask(&Copy1_B, F35_40()) != 0)
         return Go(GO_PANELS);
     for (i = 0; i < LenStr + 1; i++)
         md.ToFile[i] = CpInpt[i];
@@ -1492,7 +1497,7 @@ F36_03:
     /* A new name for the directory, which stays where it is. */
     for (i = 0; i < 13; i++)
         CpDest[i] = *MD_POINTER(md.TreAdr + i);
-    if ((u8)Ask(OFFSET(Renam_B), 0) != 0)
+    if ((u8)Ask(&Renam_B, 0) != 0)
         return Go(GO_KEYS);
     typed = CpDest;
     if (NEAR(CutPath(typed)) != typed)
@@ -1512,7 +1517,7 @@ F36_03:
     return Go(GO_DONE);
 
 F36_01:
-    Ask(OFFSET(MkErr_B), F35_40());
+    Ask(&MkErr_B, F35_40());
     return Go(GO_KEYS);
 }
 

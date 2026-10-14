@@ -3,24 +3,27 @@
  *
  * The program has texts, boxes, dialogs and lines of buttons that name one
  * another by address: a box its lines, a dialog its box and its buttons.
- * The addresses are words, offsets in the one segment that the assembly
- * has all of them in, and the routines that show them, DialBox, Dialog,
- * MinMnu, OncZoom, take such an offset and find the rest from there.
+ * In the assembly the addresses are words, offsets in the one segment
+ * that it has all of them in, and the routines that show them, DialBox,
+ * Dialog, MinMnu, OncZoom, take such an offset and find the rest from
+ * there. Here they take a pointer.
  *
  * In C such a thing is a constant like any other, written with the names
  * of what it names, in a file of nothing else: help_t.c has those of
- * help.c. A file of code declares what it uses of one as `extern const
- * u8`, and hands the routines its place as the number that they take:
- * OFFSET of vc.h, which counts from where AsmSeg of misc.c says that
- * the tables begin.
+ * help.c. A file of code declares what it uses of one, and hands the
+ * routines a pointer to it: a text, buttons or colours as `extern const
+ * u8 Name[]`, a box as what every box begins with, `extern const struct
+ * BOXTOP Name`, and a dialog as its header, `extern const struct BOXHD
+ * Name`, so that the compiler holds the three apart where one is handed
+ * on. No file of code sees how many lines or fields a table has: that
+ * is read in the table.
  *
  * A word that names something is a pointer here, and as long as one:
  * four bytes where the original has a word, with whatever stands behind
  * it that much further on. So the routines that read a table read such
- * a word as the pointer that it is, by the structures below, and step
- * over it by its size. They do not read through it: they ask NAMED of
- * vc.h what it names, as the number that those routines take, and
- * NUMBER_OF there where it holds a number.
+ * a word as the pointer that it is, by the structures below, step over
+ * it by its size, and read through it; NUMBER_OF of vc.h makes the
+ * number of a word that holds one.
  *
  * A constant that only its own file names is static, and one that code
  * or another file names is not. Either has the name that it has in the

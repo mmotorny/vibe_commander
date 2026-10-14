@@ -43,9 +43,9 @@ u16 StrLen(const u8 *text);                             /* string.c */
 
 /* The dialog that asks for a mask, the box that says no file is like it,
    and what ^I stands for in both: constants of keys_t.c, which
-   Dialog takes by their offsets. */
-extern const u8 Sel_B[];
-extern const u8 ErSel_B[];
+   Dialog takes a pointer to. */
+extern const struct BOXHD Sel_B;
+extern const struct BOXHD ErSel_B;
 extern const u8 Sel_S[];                /* "Select" */
 extern const u8 Unsl_S[];               /* "Unselect" */
 extern const u8 Inv_S[];                /* "Invert" */
@@ -476,14 +476,14 @@ struct Onward F08_00(struct WCBdef *panel, struct Regs *r)
    as `include` says, the word that the dialog has for ^I. Directories
    are unselected by a mask and nothing else. In a panel that shows no
    files the key goes to the command line. */
-static struct Onward F10_01(struct WCBdef *panel, u16 include)
+static struct Onward F10_01(struct WCBdef *panel, const u8 *include)
 {
     struct FILENT *file;
     u16 address, found;
 
     if (!FilePan(panel))
         return To(NEXT_INPUT);
-    if ((u8)Dialog(OFFSET(Sel_B), include, 0, 0, &md) != 0
+    if ((u8)Dialog(&Sel_B, include, 0, 0, &md) != 0
         || md.SelMas[0] == 0)
         return To(NEXT_FUNC04);
     Convert(md.SelMas, md.TmpBuf);
@@ -493,12 +493,12 @@ static struct Onward F10_01(struct WCBdef *panel, u16 include)
         file = ENTRY(panel, address);
         if (file->NameF[0] == '.' || !TstMas(file->NameF, md.TmpBuf))
             continue;
-        if (include == OFFSET(Unsl_S)) {
+        if (include == Unsl_S) {
             found = 1;
             file->AttrF &= ~ATTR_SELECTED;
         } else if (!(file->AttrF & ATTR_DIRECTORY)) {
             found = 1;
-            if (include == OFFSET(Sel_S))
+            if (include == Sel_S)
                 file->AttrF |= ATTR_SELECTED;
             else
                 file->AttrF ^= ATTR_SELECTED;
@@ -506,7 +506,7 @@ static struct Onward F10_01(struct WCBdef *panel, u16 include)
     }
     if (found)
         return To(NEXT_FUNC01);
-    Dialog(OFFSET(ErSel_B), include, 0, 0, &md);
+    Dialog(&ErSel_B, include, 0, 0, &md);
     return To(NEXT_FUNC04);
 }
 
@@ -514,7 +514,7 @@ static struct Onward F10_01(struct WCBdef *panel, u16 include)
    character of a command too. F76_01 is where the menu comes in. */
 struct Onward F76_01(struct WCBdef *panel)
 {
-    return F10_01(panel, OFFSET(Inv_S));
+    return F10_01(panel, Inv_S);
 }
 
 struct Onward F76_00(struct WCBdef *panel)
@@ -527,12 +527,12 @@ struct Onward F76_00(struct WCBdef *panel)
 /* Grey + and Grey -. */
 struct Onward F09_00(struct WCBdef *panel)
 {
-    return F10_01(panel, OFFSET(Sel_S));
+    return F10_01(panel, Sel_S);
 }
 
 struct Onward F10_00(struct WCBdef *panel)
 {
-    return F10_01(panel, OFFSET(Unsl_S));
+    return F10_01(panel, Unsl_S);
 }
 
 /* ^M: select again what was selected before a command went through the

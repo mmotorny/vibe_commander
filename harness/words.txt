@@ -10,63 +10,63 @@ bars_t.c      none
 blank.c       none
 box.c         none
 cmdline.c     SEG_OF 1, MAIN_SEG 1, u16 segment 1, md.TreAdr 1, md.TreFrst 1, md.HstAdr 1, MD_PLACE 6, TRELIST 1, ENTRY 4, DSKBUF 3
-commands.c    AT 2, OFFSET 22, AsmSeg 1, ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
+commands.c    ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
 commands_t.c  MD_AT 45, WCB_AT 3, NUMBER 17
-copy.c        AT 6, SEG_OF 2, RoomParas 1, OFFSET 39, AsmSeg 3, u16 segment 1, md.TreAdr 2, NEAR 13, MD_PLACE 9, MD_POINTER 4, TRELIST 1, ENTRY 4
+copy.c        AT 3, SEG_OF 2, RoomParas 1, u16 segment 1, md.TreAdr 2, NEAR 13, MD_PLACE 9, MD_POINTER 4, TRELIST 1, ENTRY 4
 copy_t.c      MD_AT 22, NUMBER 4
-dialog.c      AT 13, AsmSeg 5, NAMED 11, MD_PLACE 2, MD_POINTER 3, NUMBER_OF 9
+dialog.c      MD_PLACE 2, MD_POINTER 3, NUMBER_OF 9
 digits.c      none
-dirfunc.c     OFFSET 48, NEAR 25, MD_PLACE 1, ENTRY 7, DSKBUF 2
+dirfunc.c     NEAR 25, MD_PLACE 1, ENTRY 7, DSKBUF 2
 dirfunc_t.c   MD_AT 75, NUMBER 9
 dos32.c       ARENA 1, AT 1
 drive.c       MD_PLACE 2, DSKBUF 2
-edit.c        AT 29, SEG_OF 13, OFFSET_IN_SEG 1, MAIN_SEG 1, RoomParas 1, OFFSET 29, AsmSeg 1, u16 segment 10, AddressOf 24, OFFSET_OF 21, NEAR 4, MD_PLACE 13, MD_POINTER 3
+edit.c        AT 14, SEG_OF 13, MAIN_SEG 1, RoomParas 1, u16 segment 8, AddressOf 24, OFFSET_OF 21, NEAR 4, MD_PLACE 13, MD_POINTER 3
 edit_t.c      MD_AT 15, NUMBER 1
-enter.c       OFFSET 2, md.HstAdr 5, MD_PLACE 3, MD_POINTER 8, ENTRY 14, DSKBUF 11, MAIN_AS_PANEL 1
+enter.c       md.HstAdr 5, MD_PLACE 3, MD_POINTER 8, ENTRY 14, DSKBUF 11, MAIN_AS_PANEL 1
 exec.c        md.BatAdr 7, MD_PLACE 3, MD_POINTER 3
 extfile.c     NEAR 1, MD_PLACE 2, MD_POINTER 1
 files.c       SEG_OF 1, OFFSET_IN_SEG 1, ENTRY 7, DSKBUF 7
-find.c        AT 2, SEG_OF 2, RoomParas 2, OFFSET 5, NEAR 6, MD_PLACE 3, DSKBUF 3
+find.c        AT 2, SEG_OF 2, RoomParas 2, NEAR 6, MD_PLACE 3, DSKBUF 3
 find_t.c      MD_AT 2, NUMBER 2
 format.c      none
-help.c        OFFSET 5, NEAR 1, MD_PLACE 4
+help.c        NEAR 1, MD_PLACE 4
 help_t.c      MD_AT 2
 info.c        MD_PLACE 4, ENTRY 1, DSKBUF 1
 input.c       AT 1, u16 segment 1, NEAR 1, MD_PLACE 2
-keys.c        OFFSET 7, md.TreAdr 1, md.TreFrst 1, ENTRY 6, DSKBUF 3, MAIN_AS_PANEL 1
+keys.c        md.TreAdr 1, md.TreFrst 1, ENTRY 6, DSKBUF 3, MAIN_AS_PANEL 1
 keys_t.c      MD_AT 10, NUMBER 1
 line.c        none
-main.c        AT 8, OFFSET_IN_SEG 2, OFFSET 11, AsmSeg 3, NAMED 1, md.TreAdr 1, md.TreFrst 1, MD_PLACE 6, MD_POINTER 1, TRELIST 3, DSKBUF 4, MAIN_AS_PANEL 1
+main.c        md.TreAdr 1, md.TreFrst 1, MD_PLACE 6, MD_POINTER 1, TRELIST 3, DSKBUF 4, MAIN_AS_PANEL 1
 main_t.c      MD_AT 8
 mask.c        none
-menu.c        AT 1, OFFSET 1, AsmSeg 1, MD_PLACE 7
-misc.c        TABLES_BY 1, AsmSeg 1
+menu.c        MD_PLACE 7
+misc.c        none
 mouse.c       none
 panel.c       md.TreAdr 3, md.TreCrnt 1, NEAR 1, MD_POINTER 1, TRELIST 1, ENTRY 4, DSKBUF 1
 place.c       md.TreAdr 4, md.TreFrst 4, TRELIST 2, DSKBUF 2
 read.c        RoomParas 1, PANEL_BLOCK 1, ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1
 screen.c      none
-setup.c       AT 1, OFFSET 1, AsmSeg 1
+setup.c       none
 stack.c       none
-start.c       AT 5, SEG_OF 1, RoomParas 1, PANEL_BLOCK 1, ROOM_LEAST 2, OFFSET 3, AsmSeg 1, u16 segment 1, md.HstAdr 1, MD_PLACE 1, DSKBUF 3
-stcolor.c     AT 3, OFFSET 1, AsmSeg 3, NAMED 3, MD_PLACE 2
+start.c       AT 2, SEG_OF 1, RoomParas 1, PANEL_BLOCK 1, ROOM_LEAST 2, u16 segment 1, md.HstAdr 1, MD_PLACE 1, DSKBUF 3
+stcolor.c     MD_PLACE 2
 stcolor_t.c   MD_AT 2
-sthelp.c      OFFSET 3, MD_PLACE 2
+sthelp.c      MD_PLACE 2
 sthelp_t.c    MD_AT 2
-stmain.c      AT 1, OFFSET 7, AsmSeg 1
+stmain.c      none
 stmain_t.c    MD_AT 8
-stopts.c      AT 9, OFFSET 14, AsmSeg 1, NEAR 3
+stopts.c      NEAR 3
 stopts_t.c    MD_AT 62, NUMBER 28
 string.c      none
 sys.h         none
-system.c      OFFSET 1
+system.c      none
 system_t.c    MD_AT 3
 tables.h      none
 tree.c        SEG_OF 2, md.TreAdr 5, md.TreFrst 6, md.TreCrnt 2, MD_PLACE 7, MD_POINTER 2, TRELIST 8
-treebox.c     MAIN_SEG 1, OFFSET 2, md.TreAdr 10, md.TreFrst 10, NEAR 1, MD_PLACE 4, MD_POINTER 6, TRELIST 8, NUMBER 2
+treebox.c     MAIN_SEG 1, md.TreAdr 10, md.TreFrst 10, NEAR 1, MD_PLACE 4, MD_POINTER 6, TRELIST 8, NUMBER 2
 treebox_t.c   MD_AT 3
-usermenu.c    OFFSET 1, NEAR 2, MD_PLACE 9, MD_POINTER 6, ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
-vc.h          ARENA 2, AT 2, SEG_OF 1, RoomParas 1, OFFSET 1, TABLES_BY 1, AsmSeg 1, u16 segment 2, MD_PLACE 1
-view.c        AT 9, SEG_OF 4, MAIN_SEG 1, RoomParas 1, ROOM_LEAST 1, OFFSET 28, AsmSeg 6, u16 segment 21, NEAR 3, MD_PLACE 9, MD_POINTER 8, ENTRY 1
+usermenu.c    NEAR 2, MD_PLACE 6, MD_POINTER 6, ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
+vc.h          ARENA 2, AT 1, RoomParas 1, u16 segment 2, MD_PLACE 1
+view.c        AT 1, SEG_OF 4, MAIN_SEG 1, RoomParas 1, ROOM_LEAST 1, u16 segment 21, NEAR 3, MD_PLACE 8, MD_POINTER 8, ENTRY 1
 view_t.c      MD_AT 21, NUMBER 2
 window.c      MD_POINTER 2

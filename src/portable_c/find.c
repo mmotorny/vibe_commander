@@ -112,19 +112,19 @@ void NormStr(u8 *text);
 u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
 void V81_00(void);                                      /* view.c */
 
-/* Objects that are named by their offsets, of find_t.c but for
+/* Tables that the code names, of find_t.c but for
    Mask_S, which is of another file: Mask_S is \*.*, and four bytes are
    copied from it or from behind it; Find5_D describes the menu of a
-   search that runs, and only its offset is used here, as are those of
-   Find6_D, the menu of one that is over, of FnFl_P, the colours of that
-   menu, and of Find_B, the dialog that asks what to look for. FnFl6_S
+   search that runs, and it is only handed on here, as are Find6_D, the
+   menu of one that is over, FnFl_P, the colours of that menu, and
+   Find_B, the dialog that asks what to look for. FnFl6_S
    is " files" and FnFl7_S " found.": each is copied with what follows it
    in the original, 15 bytes, and is written that long. */
 extern const u8 Mask_S[];
 extern const u8 Find5_D[];
 extern const u8 Find6_D[];
 extern const u8 FnFl_P[];
-extern const u8 Find_B[];
+extern const struct BOXHD Find_B;
 extern const u8 FnFl6_S[];
 extern const u8 FnFl7_S[];
 
@@ -503,14 +503,14 @@ static u16 FndBack(void)
         size = FND->FndSz;
         if (md.WinMous == 0) {
             menu = MOVED(place, (size >> 8) - 4, 21);
-            taken = MnMn10(key, menu, FND->FndMenu, 0x11F, OFFSET(Find5_D));
+            taken = MnMn10(key, menu, FND->FndMenu, 0x11F, Find5_D);
             key = taken.key;
             item = taken.button;
             mode = item;
             FND->FndMenu = (u8)item;
             if (taken.taken)
                 key = MnMn40(Conf_C << 8 | CnfRe_C, menu, item, 0x11F,
-                             OFFSET(Find5_D));
+                             Find5_D);
         }
         key = FndMove(key, mode & 0xFF00 | MODE_CURSOR, place, size);
         if ((key >> 8) == 0)
@@ -820,8 +820,8 @@ again:
     NgLine(&line);
     Window(place, size);
     /* The dialog has its box there already: its nine lines. */
-    answer = Dialog(OFFSET(Find_B), 9 << 8 | size & 0xFF,
-                    place + (size & 0xFF00) - 0x900, 0, &md);
+    answer = Dialog(&Find_B, 0, place + (size & 0xFF00) - 0x900,
+                    9 << 8 | size & 0xFF, &md);
     if ((u8)answer != 0)
         goto close;
 
@@ -977,9 +977,9 @@ found:
         } else {
             md.WinMous = 0;
             md.MousEnt = 0;
-            chosen = MinMnu(OFFSET(Find6_D),
+            chosen = MinMnu(Find6_D,
                           MOVED(place, (size >> 8) - 4, 18), 0x125,
-                          OFFSET(FnFl_P), KEY_MOUSE << 8 | FIND_BAR,
+                          FnFl_P, KEY_MOUSE << 8 | FIND_BAR,
                           FND->FndMenu);
             key = chosen.key;
             mode = chosen.chosen;

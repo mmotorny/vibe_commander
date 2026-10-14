@@ -41,7 +41,7 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 
 /* The dialog that asks whether to quit, and the name of the program for
    it: constants of keys_t.c. */
-extern const u8 Quit_B[];
+extern const struct BOXHD Quit_B;
 extern const u8 Name_S[];
 
 #define LenCmd 124                      /* Length of command line */
@@ -573,7 +573,7 @@ F27_05:
 struct Onward F30_00(struct WCBdef *panel)
 {
     if (md.QuitAck != 0
-        && (u8)Dialog(OFFSET(Quit_B), OFFSET(Name_S), 0, 0, panel) != 0)
+        && (u8)Dialog(&Quit_B, Name_S, 0, 0, panel) != 0)
         return To(NEXT_FUNC04);
     return To(NEXT_EXIT);
 }

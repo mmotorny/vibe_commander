@@ -4,17 +4,20 @@
  *
  * Translated from VCSUB1.INC.
  *
- * A box and a dialog are described where the assembly has them, in its
- * code segment, and are named by their offsets there. What one of them
- * names in turn, a box its lines, a dialog its box and its buttons, it
- * has a word for that tables.h has as a pointer: NAMED of vc.h makes of
- * such a word the offset of what it names, and NUMBER_OF the number in
- * a word of that kind that holds one.
+ * A box and a dialog are tables of a file of tables, and are handed to
+ * these routines by a pointer: a box as what every box begins with,
+ * struct BOXTOP of tables.h, a dialog as its header, struct BOXHD, a
+ * text and a line of buttons as their bytes. The assembly has them in
+ * its code segment and names them by their offsets there. What one of
+ * them names in turn, a box its lines, a dialog its box and its buttons,
+ * it has a word for that tables.h has as a pointer, and that is read as
+ * the pointer that it is; NUMBER_OF of vc.h makes the number of a word
+ * of that kind that holds one.
  *
  * A box is four numbers of colours, the number of its lines and of the
  * texts that are put into them, the place in the main data where what it
- * covers is kept, for each such text four bytes, and then a word for
- * each line: where its text is, or 0 for a line across the box. The first
+ * covers is kept, for each such text four bytes, and then a pointer for
+ * each line: to its text, or 0 for a line across the box. The first
  * line is the title, in the frame. A text to be put in is copied to
  * TmpErr, the first to its second byte and the second to its 102nd,
  * where the lines of the box have it as Var_S; its four bytes are where
@@ -88,9 +91,6 @@
 #define LEFT_RIGHT  0xC7B6              /* where one meets the frame, on the
                                            left and on the right */
 
-/* A field of a dialog, by its offset. */
-#define FIELD(offset) ((const struct BOXMN *)AT(code, offset))
-
 /* A byte and a word of the main data, by their offsets. */
 #define MD(offset)  (*MD_POINTER(offset))
 #define MDW(offset) (*(u16 *)MD_POINTER(offset))
@@ -110,12 +110,6 @@
    mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window.
-
-   AsmSeg returns the segment of the program's constants, where the boxes
-   and the dialogs are. Naming one of them would give it too, as a number
-   that is set when the program is loaded; the test of the scenarios
-   knows code by its bytes in the file and would not see a function run that
-   begins with such a number.
 
    The routines that a dialog may name for Enter and F10, the SUB_ of
    tables.h, get the answer as Dialog has it, the key. F38_10 returns the
@@ -154,22 +148,19 @@ static void DiBx30(const struct BOXTX *entry, u8 *to, const void *data)
     ShrtLin(to, (u16)(short)(signed char)entry->length);
 }
 
-/* Put the box at `box` into the screen buffer, with the middle of its
+/* Put the box `head` into the screen buffer, with the middle of its
    top at `place`, the row in the high byte, or lower on a screen of more
    than 25 lines. `include` is the text that ^I stands for in its lines,
-   an offset in the assembly too, and `data` what the texts are in that
-   it puts in, each at the offset that the box names. `where` gets where
+   or 0 for none, and `data` what the texts are in that it puts in, each
+   at the offset that the box names. `where` gets where
    the box is and where what it covers is kept. A box without a line has
    65536.
 
    The lines of the box are words that name their texts, one behind the
    other behind the texts that it puts in: `line` is at one of them. */
-void DialBox(u16 place, u16 box, u16 include, const void *data,
-             struct Box *where)
+void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
+             const void *data, struct Box *where)
 {
-    u16 code = AsmSeg();
-    const struct BOXTOP *head
-        = (const struct BOXTOP *)AT(code, box);
     const struct BOXTX *put = (const struct BOXTX *)(head + 1);
     const u8 * const *lines;
     const u8 * const *line;
@@ -192,13 +183,13 @@ void DialBox(u16 place, u16 box, u16 include, const void *data,
     args.value = 0;
     args.screen = 0;
     args.colors = head->colors;
-    args.include = AT(code, include);
+    args.include = include;
     width = 0;
     line = lines;
     count = head->lines;
     do {
         if (*line != 0) {
-            args.line = AT(code, NAMED(*line));
+            args.line = *line;
             length = LnStr(&args);
             if (length > width)
                 width = length;
@@ -220,7 +211,7 @@ void DialBox(u16 place, u16 box, u16 include, const void *data,
         row += 0x100;
         if (*line != 0) {
             args.value = row;
-            args.line = AT(code, NAMED(*line));
+            args.line = *line;
             CntLine(&args);
         } else {
             screen = BasAdr(row) - ((((size & 0xFF) - 1) & 0xFFFE) >> 1);
@@ -274,16 +265,16 @@ static u16 Slct20(u16 place)
 }
 
 /* True if the button `item` of the buttons at `table` is the last. */
-static u16 MnMn50(u16 table, u16 item, u16 code)
+static u16 MnMn50(const u8 *table, u16 item)
 {
-    return *AT(code, table + ((item & 0xFF) << 1) + 2) == 0;
+    return table[((item & 0xFF) << 1) + 2] == 0;
 }
 
 /* The size of the line that the buttons at `table` take: as far as the
    last of them goes, and one row. */
-static u16 MnMn60(u16 table, u16 code)
+static u16 MnMn60(const u8 *table)
 {
-    const u8 *button = AT(code, table);
+    const u8 *button = table;
 
     do
         button += 2;
@@ -294,14 +285,14 @@ static u16 MnMn60(u16 table, u16 code)
 /* Give the button `item` of the buttons at `table`, which begin at
    `screen`, the colour with the number `number`. Returns that colour, in
    both bytes. */
-static u16 MnMn41(u16 number, u16 item, u16 table, u16 *screen, u16 code)
+static u16 MnMn41(u16 number, u16 item, const u8 *table, u16 *screen)
 {
     u16 color = Color(number);
     const u8 *button;
     u16 count = item & 0xFF;
 
     count += count;
-    button = AT(code, table + count);
+    button = table + count;
     count = count & 0xFF00 | button[1];
     count += count;
     screen = (u16 *)((u8 *)screen + count);
@@ -314,13 +305,13 @@ static u16 MnMn41(u16 number, u16 item, u16 table, u16 *screen, u16 code)
    colour whose number is in the high byte of `colors`, and the button
    `item` in that of the low byte. Returns the second colour, in both
    bytes. */
-u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table)
+u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, const u8 *table)
 {
     u16 *screen = BasAdr(place);
     u16 both;
 
     MvsColr(screen, size & 0xFF, Color(colors >> 8));
-    both = MnMn41(colors & 0xFF, item, table, screen, AsmSeg());
+    both = MnMn41(colors & 0xFF, item, table, screen);
     Window(place, size);
     return both;
 }
@@ -337,13 +328,13 @@ struct ButtonKey {
                                            the key */
 };
 static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
-                               u16 table, u16 code)
+                               const u8 *table)
 {
     struct ButtonKey pressed;
     const u8 *button;
     u16 chosen = *state;
     u16 taken = 1;
-    u16 item, low, count, buttons, mouse, column, look, now, begin, size;
+    u16 low, count, buttons, mouse, column, look, now, begin, size;
     const u16 *screen;
     struct Mouse pointer;
 
@@ -357,11 +348,10 @@ static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
                 goto MnMn16;
             if (buttons != 1)
                 goto MnMn23;
-            if (InWind(mouse, place, MnMn60(table, code)))
+            if (InWind(mouse, place, MnMn60(table)))
                 goto MnMn23;
             column = mouse - place & 0xFF;
-            for (item = table; ; item += 2) {
-                button = AT(code, item);
+            for (button = table; ; button += 2) {
                 if (button[0] == 0 || column < button[1])
                     break;
                 if (column < (u8)(button[1] + button[0]))
@@ -369,7 +359,7 @@ static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
             }
         }
 MnMn13:
-        key = item - table >> 1;
+        key = (u16)(button - table >> 1);
         if ((key & 0xFF) != (chosen & 0xFF)) {
             chosen = chosen & 0xFF00 | key & 0xFF;
             goto MnMn16;
@@ -402,12 +392,12 @@ MnMn13:
             if ((chosen & 0xFF) != 0)
                 chosen--;
             else
-                while (!MnMn50(table, chosen, code))
+                while (!MnMn50(table, chosen))
                     chosen++;
             goto MnMn16;
         }
         if (key == 0x4D00 || low == ' ') {          /* Right, Space */
-            if (MnMn50(table, chosen, code))
+            if (MnMn50(table, chosen))
                 chosen &= 0xFF00;
             else
                 chosen++;
@@ -423,7 +413,7 @@ MnMn13:
         if (key == 0x4F00) {                        /* End */
             if (chosen & 0x8000) {
                 key = 0x5100;
-                while (!MnMn50(table, chosen, code))
+                while (!MnMn50(table, chosen))
                     chosen++;
             }
             goto MnMn23;
@@ -434,8 +424,7 @@ MnMn13:
     if (low < 'A' || low > 'Z')
         goto MnMn23;
     /* The button that has this capital in it. */
-    for (item = table; ; item += 2) {
-        button = AT(code, item);
+    for (button = table; ; button += 2) {
         if (button[0] == 0)
             goto MnMn16;
         screen = BasAdr(ADD_LOW(place, button[1]));
@@ -446,7 +435,7 @@ MnMn13:
         while (--count);
     }
 MnMn22:
-    chosen = item - table >> 1;
+    chosen = (u16)(button - table >> 1);
     key = KEY_ENTER;
 MnMn23:
     taken = 0;
@@ -461,13 +450,14 @@ MnMn16:
    that has in `*state`. Returns the key, the button chosen, and whether
    the buttons have dealt with the key. `size` is not read: the assembly
    did not read it either. */
-struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table)
+struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size,
+                    const u8 *table)
 {
     struct Taken taken;
     struct ButtonKey pressed;
 
     (void)size;
-    pressed = MnMn11(key, place, &item, table, AsmSeg());
+    pressed = MnMn11(key, place, &item, table);
     taken.key = pressed.key;
     taken.button = (u8)item;
     taken.taken = (u8)pressed.taken;
@@ -475,18 +465,16 @@ struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table)
 }
 
 /* A line of buttons: have the buttons at `control`, which take `size` at
-   `begin`, take keys until one is for the caller. `colors` is where the
-   assembly has three numbers of colours: of the line, of the button
+   `begin`, take keys until one is for the caller. `color` is three
+   numbers of colours: of the line, of the button
    chosen while it takes keys, and of the button chosen when it is left.
    `keys` is the key bar, with 80h for a field of a dialog, and `item` the
    button chosen. Returns the key, and the button chosen, with `keys` in
    the high byte of that, or 0 there for the letter of a button. */
-struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
-                      u16 item)
+struct Buttons MinMnu(const u8 *control, u16 begin, u16 size,
+                      const u8 *color, u16 keys, u16 item)
 {
     struct Buttons buttons;
-    u16 code = AsmSeg();
-    const u8 *color = AT(code, colors);
     u16 state = (keys & 0xFF) << 8 | item & 0xFF;
     u16 key;
     struct ButtonKey pressed;
@@ -495,7 +483,7 @@ struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
     for (;;) {
         MnMn40((u16)color[0] << 8 | color[1], begin, state, size, control);
         key = Input(state >> 8 & 0x7F);
-        pressed = MnMn11(key, begin, &state, control, code);
+        pressed = MnMn11(key, begin, &state, control);
         key = pressed.key;
         if (pressed.taken != 0)
             continue;
@@ -772,24 +760,26 @@ static u16 Dial18(u16 place, u16 column)
 
 /* The last field of a dialog behind the field `field`, which may not be
    the last itself. */
-static u16 Dial85(u16 field, u16 code)
+static const struct BOXMN *Dial85(const struct BOXMN *field)
 {
     do
-        field += sizeof(struct BOXMN);
-    while (FIELD(field)->mType != 0);
-    return field - sizeof(struct BOXMN);
+        field++;
+    while (field->mType != 0);
+    return field - 1;
 }
 
-/* A dialog: show the box of the dialog at `box`, have its fields take
+/* A dialog: show the box of the dialog `head`, have its fields take
    keys and the mouse, and take the box off the screen again. `data` is
    what the caller has what the fields set in, the main data or a panel,
    and a field says at which offset of it: the lines that are typed
    and the values of the boxes to tick, which get there when the dialog
    is answered with Enter on the first button, or on a field that is no
-   button. `include` is the text that ^I stands for in a line of the box.
-   For a dialog whose box is on the screen already, `begin`, `include` and
-   `saved` are where that is, its size and where what it covers is kept,
-   as DialBox has given them.
+   button. `include` is the text that ^I stands for in a line of the box,
+   or 0 for none. For a dialog whose box is on the screen already,
+   BOX_THERE, `begin` and `size` are where that is and its size, and no
+   other dialog reads the two. The fields stand behind the header, one
+   behind the other: `first` is the first of them, and `cursor` the one
+   that has the keys.
 
    Returns in the low byte 0 for that answer, the number of another
    button, 1 for F10 and Alt-F10 where they are answers, with 1 and 0 in
@@ -810,11 +800,13 @@ static u16 Dial85(u16 field, u16 code)
    NormStr, and has 0 and 1 in the high byte where F10 and Alt-F10 are
    answers, the other way round: no dialog of the setup has such a box,
    such a line or those answers. */
-u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data)
+u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
+           void *data)
 {
-    u16 code = AsmSeg();
-    const struct BOXHD *head = (const struct BOXHD *)AT(code, box);
+    const struct BOXMN * const first = (const struct BOXMN *)(head + 1);
     const struct BOXMN *field;
+    const struct BOXMN *item;
+    const struct BOXMN *cursor;
     const u8 *colors;
     const u8 *from;
     u8 *to;
@@ -827,9 +819,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data)
     struct Buttons menu;
     struct Checked checked;
     struct Mouse pointer;
-    u16 first = box + sizeof(struct BOXHD);
-    u16 size = include;
-    u16 shape, key, item, cursor, type, place, control, count, link, value;
+    u16 shape, key, type, place, control, count, link, value;
     u16 look, now, buttons, mouse, window;
 
     md.Quote = 0;
@@ -851,16 +841,15 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data)
     if (head->bFlags & BOX_ERROR)
         begin += (u16)md.SftErr << 8;
     if (!(head->bFlags & BOX_THERE)) {
-        DialBox(begin, NAMED(head->pDiBox), include, data, &where);
+        DialBox(begin, head->pDiBox, include, data, &where);
         begin = where.begin;
         size = where.size;
-        saved = where.saved;
     }
-    colors = AT(code, NAMED(head->pDiBox));
+    colors = ((const struct BOXTOP *)head->pDiBox)->colors;
 
     /* The fields as they are when the dialog opens. */
-    for (item = first; ; item += sizeof(struct BOXMN)) {
-        field = FIELD(item);
+    for (item = first; ; item++) {
+        field = item;
         type = field->mType;
         place = begin + field->mBase;
         screen = BasAdr(place);
@@ -887,7 +876,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data)
         } else if (type == FIELD_BUTTONS) {
             screen = BasAdr(Dial18(place, begin & 0xFF));
             MD(field->mPoint) = 0;
-            MnMn41(colors[2], 0, NAMED(field->mCtrl), screen, code);
+            MnMn41(colors[2], 0, field->mCtrl, screen);
         } else
             break;
     }
@@ -901,7 +890,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, void *data)
 
     cursor = first;
 Dial31:                                 /* the field of the cursor has the keys */
-    field = FIELD(cursor);
+    field = cursor;
     type = field->mType;
     place = begin + field->mBase;
     if (type == FIELD_INPUT) {
@@ -921,8 +910,8 @@ Dial31:                                 /* the field of the cursor has the keys 
         MD(field->mPoint) = (u8)ticked.value;
         key = ticked.key;
     } else if (type == FIELD_BUTTONS) {
-        menu = MinMnu(NAMED(field->mCtrl), Dial18(place, begin & 0xFF),
-                      MnMn60(NAMED(field->mCtrl), code), NAMED(head->pDiBox),
+        menu = MinMnu(field->mCtrl, Dial18(place, begin & 0xFF),
+                      MnMn60(field->mCtrl), colors,
                       head->bKeyBar | 0x80, MD(field->mPoint));
         MD(field->mPoint) = (u8)menu.chosen;
         key = menu.key;
@@ -934,8 +923,8 @@ Dial31:                                 /* the field of the cursor has the keys 
         goto Dial31;
     switch (key & 0xFF) {
     case 9:                             /* Tab */
-        cursor += sizeof(struct BOXMN);
-        if (FIELD(cursor)->mType == 0)
+        cursor++;
+        if (cursor->mType == 0)
             cursor = first;
         goto Dial31;
     case 0x0D:
@@ -945,10 +934,10 @@ Dial31:                                 /* the field of the cursor has the keys 
     }
     switch (key) {
     case 0x0F00:                        /* Shift-Tab */
-        if ((u16)(cursor - sizeof(struct BOXMN)) >= first)
-            cursor -= sizeof(struct BOXMN);
+        if (cursor > first)
+            cursor--;
         else
-            cursor = Dial85(first, code);
+            cursor = Dial85(first);
         goto Dial31;
     case 0x4800:
         link = field->mUp;
@@ -967,13 +956,13 @@ Dial31:                                 /* the field of the cursor has the keys 
         link = LINK_SET;
         break;
     case 0x4F00:                        /* End */
-        cursor = Dial85(cursor, code);
-        field = FIELD(cursor);
+        cursor = Dial85(cursor);
+        field = cursor;
         if (field->mType == FIELD_BUTTONS)
             MD(field->mPoint) = 0;
         /* and as PgDn */
     case 0x5100:                        /* PgDn */
-        cursor = Dial85(cursor, code);
+        cursor = Dial85(cursor);
         goto Dial31;
     case 0x4400:                        /* F10 */
         if (!(head->bFlags & BOX_TREE))
@@ -989,8 +978,8 @@ Dial31:                                 /* the field of the cursor has the keys 
         goto Dial31;
     }
     /* To the field that the field of the cursor names for the key. */
-    cursor = first + (link & LINK_FIELD) * sizeof(struct BOXMN);
-    field = FIELD(cursor);
+    cursor = first + (link & LINK_FIELD);
+    field = cursor;
     if (field->mType == FIELD_SELECT && (link & LINK_SET)) {
         value = 0;
         if (link & LINK_LAST)
@@ -1015,8 +1004,8 @@ Dial40:                                 /* the mouse */
             now = 0xFF;
         } else {
             /* The field that the mouse is on gets the keys. */
-            for (item = first; ; item += sizeof(struct BOXMN)) {
-                field = FIELD(item);
+            for (item = first; ; item++) {
+                field = item;
                 type = field->mType;
                 if (type == 0)
                     break;
@@ -1030,7 +1019,7 @@ Dial40:                                 /* the mouse */
                         window = 0x100 | window & 0xFF;
                 } else {
                     place = Dial18(place, begin & 0xFF);
-                    window = MnMn60(NAMED(field->mCtrl), code);
+                    window = MnMn60(field->mCtrl);
                 }
                 if (!InWind(mouse, place, window))
                     goto Dial49;
@@ -1052,17 +1041,16 @@ Dial40:                                 /* the mouse */
 
 Dial49:
     /* Buttons that the cursor leaves have none chosen any more. */
-    field = FIELD(cursor);
+    field = cursor;
     if (field->mType == FIELD_BUTTONS)
         MnMn40((u16)colors[0] << 8 | colors[2],
                Dial18(begin + field->mBase, begin & 0xFF),
-               MD(field->mPoint), MnMn60(NAMED(field->mCtrl), code),
-               NAMED(field->mCtrl));
+               MD(field->mPoint), MnMn60(field->mCtrl), field->mCtrl);
     cursor = item;
     goto Dial31;
 
 Dial70:                                 /* Enter */
-    field = FIELD(cursor);
+    field = cursor;
     key = 0;
     if (field->mType == FIELD_BUTTONS)
         key = MD(field->mPoint);
@@ -1098,8 +1086,8 @@ Dial71:
     if ((key & 0xFF) != 0)
         goto Dial82;
     /* What the fields hold goes to where the caller has it. */
-    for (item = first; ; item += sizeof(struct BOXMN)) {
-        field = FIELD(item);
+    for (item = first; ; item++) {
+        field = item;
         type = field->mType;
         if (type == 0)
             break;
@@ -1122,7 +1110,7 @@ Dial81:                                 /* Esc */
 Dial82:
     HidCur();
     if (!(head->bFlags & BOX_THERE)) {
-        ResWin(begin, size, saved);
+        ResWin(begin, size, where.saved);
         Window(begin, size);
     }
     CurShp(shape);

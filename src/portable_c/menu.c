@@ -54,8 +54,7 @@
    where a window is to be, ResWin puts it back. GetMous returns the
    buttons of the mouse that are down and where the mouse is, or `place`
    as it was if there is no mouse. InWind is not 0 if a
-   place is outside a window. AsmSeg returns the segment of the program's
-   constants.
+   place is outside a window.
 
    Of the C routines in vc.h, PutKey shows a key bar, if there is one;
    PtMnu1 writes the menu bar with an item marked, 0 for none, whether or
@@ -489,7 +488,7 @@ static void F39_58(u16 menu, struct WCBdef *panel, u16 *top, u16 size)
    item under the cursor, which only the mouse brings about. */
 struct Picked F39_00(u16 again, struct WCBdef *panel)
 {
-    const u8 *names = AT(AsmSeg(), OFFSET(PtMnu_S));
+    const u8 *names = PtMnu_S;
     struct MenuMouse mouse;
     struct Picked picked;
     u16 menu, item;                     /* CL and CH */

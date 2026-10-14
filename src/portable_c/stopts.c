@@ -30,18 +30,17 @@ const u8 *FndLet(const u8 *text);                       /* string.c */
    Dialog shows a dialog and has it answered: 0 in the low byte for Ok.
    Window writes a window of the screen buffer to the screen. UpCase and
    LowCase are the capital and the small letter of a character, as the
-   country has them. AsmSeg returns the segment of the program's
-   tables. */
+   country has them. */
 
 /* The dialogs, and the lines of Country info that are read and written
-   here: of stopts_t.c, in the segment that AsmSeg returns, where Dialog
-   reads them by their offsets. */
-extern const u8 StConf_B[];             /* the Configuration */
-extern const u8 StScrn_B[];             /* Screen and Mouse */
-extern const u8 StPanOp_B[];            /* Panel options */
-extern const u8 StNoTim_B[];            /* "Illegal format of auto change
+   here: of stopts_t.c. Dialog takes a pointer to a dialog, which is
+   declared here as its header. */
+extern const struct BOXHD StConf_B;     /* the Configuration */
+extern const struct BOXHD StScrn_B;     /* Screen and Mouse */
+extern const struct BOXHD StPanOp_B;    /* Panel options */
+extern const struct BOXHD StNoTim_B;    /* "Illegal format of auto change
                                            dir time delay." */
-extern const u8 StInfo_B[];             /* Country info */
+extern const struct BOXHD StInfo_B;     /* Country info */
 extern u8 StInf02_S[];                  /* its line of the time, the date
                                            and the number, */
 extern const u8 StInf05_S[];            /* the first 40 of its characters, */
@@ -73,7 +72,7 @@ void StF02_00(void)
     u8 bar = md.KeyBar;
     u16 row;
 
-    Dialog(OFFSET(StConf_B), 0, 0, 0, &md);
+    Dialog(&StConf_B, 0, 0, 0, &md);
     if (md.KeyBar != 0 || bar == 0)
         return;
     row = (u8)(md.Lines - 1);
@@ -103,7 +102,7 @@ void StF03_00(void)
         ;
     md.TmpBuf[2] = delay;
     md.TmpBuf[3] = delay;
-    if ((u8)Dialog(OFFSET(StScrn_B), 0, 0, 0, &md) != 0)
+    if ((u8)Dialog(&StScrn_B, 0, 0, 0, &md) != 0)
         return;
     md.ColTyp = md.TmpBuf[0];
     md.BlDelay = StDelay_T[md.TmpBuf[2]];
@@ -135,7 +134,7 @@ void StF04_00(void)
     *text++ = (u8)digits;
     *text++ = (u8)(digits >> 8);
     *text = 0;
-    Dialog(OFFSET(StPanOp_B), 0, 0, 0, &md);
+    Dialog(&StPanOp_B, 0, 0, 0, &md);
 }
 
 /* What StF04_10 returns when it has refused nothing: the answer for the
@@ -224,7 +223,7 @@ taken:
     return Accepted(0);
 
 refused:
-    checked.answer = Dialog(OFFSET(StNoTim_B), 0, 0, 0, &md);
+    checked.answer = Dialog(&StNoTim_B, 0, 0, 0, &md);
     /* The box has no page of the help, and the dialog that goes on has
        its own again. */
     md.HlpPage = PAGE_PANELS;
@@ -261,20 +260,19 @@ static void StF09_20(const u8 *from, u8 *to)
    separator of thousands, a column further on if it has none. */
 void StF09_00(void)
 {
-    u16 code = AsmSeg();
-    u8 *info = AT(code, OFFSET(StInf02_S));
+    u8 *info = StInf02_S;
     u8 *line;
     u8 separator, first, second, third;
     u16 count;
 
-    StF09_10(AT(code, OFFSET(StInf05_S) + 4),
-             AT(code, OFFSET(StInf06_S) + 7));
-    StF09_20(AT(code, OFFSET(StInf05_S) + 4),
-             AT(code, OFFSET(StInf07_S) + 7));
-    StF09_10(AT(code, OFFSET(StInf09_S) + 7),
-             AT(code, OFFSET(StInf10_S) + 7));
-    StF09_20(AT(code, OFFSET(StInf09_S) + 7),
-             AT(code, OFFSET(StInf11_S) + 7));
+    StF09_10(StInf05_S + 4,
+             StInf06_S + 7);
+    StF09_20(StInf05_S + 4,
+             StInf07_S + 7);
+    StF09_10(StInf09_S + 7,
+             StInf10_S + 7);
+    StF09_20(StInf09_S + 7,
+             StInf11_S + 7);
 
     /* The time. */
     separator = md.Country.TimeSep[0];
@@ -328,5 +326,5 @@ void StF09_00(void)
         *line++ = '0';
         *line++ = '0';
     }
-    Dialog(OFFSET(StInfo_B), 0, 0, 0, &md);
+    Dialog(&StInfo_B, 0, 0, 0, &md);
 }

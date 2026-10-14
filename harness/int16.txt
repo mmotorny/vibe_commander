@@ -26,12 +26,12 @@ copy.c, F35_50: compare
     the file, 120 and 140: 20 apart.
 
 dialog.c, MnMn11: shift
-    | chosen = item - table >> 1;
-    item steps up from table, two at a time, in the loop above.
+    | chosen = (u16)(button - table >> 1);
+    button steps up from table, two at a time, in the loop above.
 
 dialog.c, MnMn11: shift
-    | key = item - table >> 1;
-    item steps up from table, two at a time, in the loop above.
+    | key = (u16)(button - table >> 1);
+    button steps up from table, two at a time, in the loop above.
 
 dirfunc.c, DirFunc: index
     | end[count] = Mask_S[skip + count];
@@ -108,6 +108,10 @@ find.c, FindFil: index
 info.c, PutInf: index
     | cell += i + i;
     The line above has made i 8 at the most.
+
+main.c, F39_01: back
+    | return Command(Menu_T[table - 1][r->bx >> 1], panel, r);
+    table is not 0: the function has returned for that, above.
 
 main.c, Loop: back
     | if (keys[i - 1] == key >> 8) {

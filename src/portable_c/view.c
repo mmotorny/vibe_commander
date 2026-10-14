@@ -74,7 +74,7 @@ struct Line {
     u16 entry;                          /* BX */
 };
 
-void V80_00(u16 include, struct Box *where);
+void V80_00(const u8 *include, struct Box *where);
 u16 NextLin(u16 segment, struct Line *line);
 u16 PrevLin(u16 segment, struct Line *line);
 u16 V20_00(u16 segment);
@@ -104,8 +104,7 @@ void V81_00(void);
    was if there is no mouse. InWind is not 0 if a place is
    outside a window. ChgDisk asks for the disk of a drive that shares the
    floppy drive with another, and is not 0 if the user would not change it.
-   ResWin puts back what a box covers. AsmSeg returns the segment of the
-   program's constants, where the boxes and texts are. */
+   ResWin puts back what a box covers. */
 
 /* C routines of other files that vc.h does not have: a panel's frame,
    the path over it and what it lists, as files or as the tree; characters
@@ -120,16 +119,17 @@ u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
            u16 color);                                  /* screen.c */
 void T71_00(u16 function, u16 place, u16 step);         /* edit.c */
 
-/* Boxes, dialogs and texts of view_t.c, which DialBox and Dialog
-   take by their offsets in the segment that AsmSeg returns. */
+/* Boxes, dialogs and texts of view_t.c, which DialBox and Dialog take
+   a pointer to: a box and a dialog are declared here as what each
+   begins with, as vc.h has it at the two. */
 extern const u8 ViFl_S[];               /* " View " */
 extern const u8 EdFl_S[];               /* " Edit " */
 extern const u8 Col_S[];                /* "Col" */
-extern const u8 RdFil_P[];              /* "Reading the file" */
-extern const u8 FndEr_B[];              /* "Can't find the file" */
-extern const u8 Srch_B[];               /* "Search for the string" */
-extern const u8 SrFor_P[];              /* "Searching for" */
-extern const u8 SrEr_B[];               /* "Could not find the string" */
+extern const struct BOXTOP RdFil_P;     /* "Reading the file" */
+extern const struct BOXHD FndEr_B;      /* "Can't find the file" */
+extern const struct BOXHD Srch_B;       /* "Search for the string" */
+extern const struct BOXTOP SrFor_P;     /* "Searching for" */
+extern const struct BOXHD SrEr_B;       /* "Could not find the string" */
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
@@ -175,7 +175,8 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open)
     u32 length;
     struct Answer file;
     struct FilePlace end;
-    u16 include, handle;
+    const u8 *include;
+    u16 handle;
 
     if (whole) {
         VI->ViBase = 0x100;
@@ -184,10 +185,10 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open)
     md.WinMous = 0;
     PutMnu(menu);
     VI->ViewEdit = (u8)edit;
-    include = OFFSET(ViFl_S);
+    include = ViFl_S;
     if ((u8)edit != 0)
-        include = OFFSET(EdFl_S);
-    DialBox(0x528, OFFSET(RdFil_P), include, &md, &open->box);
+        include = EdFl_S;
+    DialBox(0x528, &RdFil_P, include, &md, &open->box);
     Window(open->box.begin, open->box.size);
     if (ChgDisk(md.ViewFil))
         goto none;
@@ -196,15 +197,15 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open)
     if (file.failed != 0) {
         if (handle == ERR_NOT_READY)
             goto none;
-        include = OFFSET(ViFl_S);
+        include = ViFl_S;
         if (VI->ViewEdit != 0) {
             if (handle == ERR_NO_FILE) {
                 handle = 0xFFFF;
                 goto opened;
             }
-            include = OFFSET(EdFl_S);
+            include = EdFl_S;
         }
-        Dialog(OFFSET(FndEr_B), include, 0, 0, &md);
+        Dialog(&FndEr_B, include, 0, 0, &md);
         goto none;
     }
 opened:
@@ -772,14 +773,13 @@ static void Status(void)
 {
     u16 *screen;
     u16 cell = Color(Menu_C) << 8 | ' ';
-    u16 code = AsmSeg();
     u16 count;
 
     for (count = 0; count != 80; count++)
         md.ScrBuf[count] = cell;
-    screen = MvsBw(md.ScrBuf, AT(code, OFFSET(ViFl_S) + 1), 4, cell);
+    screen = MvsBw(md.ScrBuf, ViFl_S + 1, 4, cell);
     *screen = cell & 0xFF00 | ':';
-    MvsBw(md.ScrBuf + 40, AT(code, OFFSET(Col_S)), 3, cell);
+    MvsBw(md.ScrBuf + 40, Col_S, 3, cell);
     for (count = 0; count != LenPath + 13; count++)
         md.TmpBuf[count] = md.ViewFil[count];
     LetLin(md.TmpBuf);
@@ -1208,12 +1208,12 @@ V12_00:                                 /* F2 - Wrap / Unwrap */
     goto V00_20;
 
 V14_00:                                 /* F7 - search */
-    if ((u8)Dialog(OFFSET(Srch_B), OFFSET(ViFl_S), 0, 0, &md) != 0)
+    if ((u8)Dialog(&Srch_B, ViFl_S, 0, 0, &md) != 0)
         goto V00_30;
 V15_00:                                 /* Continue search */
     if (md.SrchStr[0] == 0)
         goto V00_30;
-    V80_00(OFFSET(ViFl_S), &box);
+    V80_00(ViFl_S, &box);
     /* From the first line of the screen, or from the line behind it if
        something has been found before. */
     at = VI->ViFirst;
@@ -1270,7 +1270,7 @@ V15_06:                                 /* not in these `count` bytes: on
     VI->ViSearch += count;
     goto V15_04;
 V15_07:
-    Dialog(OFFSET(SrEr_B), OFFSET(ViFl_S), 0, 0, &md);
+    Dialog(&SrEr_B, ViFl_S, 0, 0, &md);
     result = 3;
     goto V15_22;
 V15_10:                                 /* found, as text or as bytes */
@@ -1391,11 +1391,10 @@ void V13_01(u16 changed)
 
 /* Show the box "Searching for" with the text that is looked for, and
    prepare the search: for the viewer and for the editor. `include` is
-   the title of the box, an offset in the assembly, and `where` gets
-   where the box is. */
-void V80_00(u16 include, struct Box *where)
+   the title of the box, and `where` gets where the box is. */
+void V80_00(const u8 *include, struct Box *where)
 {
-    DialBox(0x528, OFFSET(SrFor_P), include, &md, where);
+    DialBox(0x528, &SrFor_P, include, &md, where);
     Window(where->begin, where->size);
     V81_00();
 }
@@ -1556,10 +1555,10 @@ extern const u8 ViewE_F[];              /* "VCVIEW.EXT" */
 extern const u8 EditE_F[];              /* "VCEDIT.EXT" */
 extern const u8 Menu_F[];               /* "VC.MNU" */
 extern const u8 DrIn_F[];               /* "DIRINFO" */
-extern const u8 ViFil_B[];              /* "View the file:" */
-extern const u8 Viewr_P[];              /* "Loading the viewer:" */
-extern const u8 Editr_P[];              /* "Loading the editor:" */
-extern const u8 RunEr_B[];
+extern const struct BOXHD ViFil_B;      /* "View the file:" */
+extern const struct BOXTOP Viewr_P;     /* "Loading the viewer:" */
+extern const struct BOXTOP Editr_P;     /* "Loading the editor:" */
+extern const struct BOXHD RunEr_B;
 extern const u8 RunEr_S[];              /* "Not enough memory to load" */
 extern const u8 Run1_S[];               /* "Can't run commands for some
                                            reason." */
@@ -1660,8 +1659,7 @@ struct Next F34_30(u16 text)
 struct Named F34_40(u16 text, u16 view)
 {
     struct Named named;
-    u16 code = AsmSeg();
-    const u8 *suffix = AT(code, OFFSET(Menu_F) + 1);
+    const u8 *suffix = Menu_F + 1;
     const u8 *from;
     u8 *to;
     u8 *at = MD_POINTER(text);
@@ -1726,20 +1724,22 @@ command:
    that calls it says so. */
 static void Aexec0(u16 edit)
 {
-    u16 code = AsmSeg();
     struct Box where;
     struct Answer ran;
     struct Block all;
+    const struct BOXTOP *box;
+    const u8 *include;
     const u8 *from;
     u8 *tail;
-    u16 box, include, error, i;
+    u16 error, i;
 
     tail = NEAR(MvzLine(md.TmpBuf + 101, md.ViewFil, LenStr + 1));
     md.TmpBuf[100] = (u8)((u16)(tail - (md.TmpBuf + 101)) + 45);
-    box = OFFSET(Viewr_P);
+    box = &Viewr_P;
     if (edit != 0)
-        box = OFFSET(Editr_P);
-    DialBox(0x528, box, MD_PLACE(md.TmpBuf), &md, &where);
+        box = &Editr_P;
+    /* Neither box has ^I in its lines; the assembly has DX on TmpBuf. */
+    DialBox(0x528, box, md.TmpBuf, &md, &where);
     Window(where.begin, where.size);
     *(u16 *)(md.TmpBuf + 95) = where.begin;
     *(u16 *)(md.TmpBuf + 97) = where.size;
@@ -1771,14 +1771,14 @@ static void Aexec0(u16 edit)
     SavMous();
     IniMous();
     if (ran.failed && error != ERR_NOT_READY) {
-        include = OFFSET(RunEr_S);
+        include = RunEr_S;
         if (error != 8 && error != 7) {
-            include = OFFSET(Run1_S);
-            from = AT(code, OFFSET(Run2_S));
+            include = Run1_S;
+            from = Run2_S;
             for (i = 0; i < 80; i++)
                 md.TmpBuf[i] = from[i];
         }
-        Dialog(OFFSET(RunEr_B), include, 0, 0, &md);
+        Dialog(&RunEr_B, include, 0, 0, &md);
     }
     ResWin(*(u16 *)(md.TmpBuf + 95), *(u16 *)(md.TmpBuf + 97),
            MD_PLACE(md.WinBuf));
@@ -1797,7 +1797,6 @@ static void Aexec0(u16 edit)
    kind, leaves the program's own; one that cannot be read, nothing. */
 static struct Onward F34_11(u16 how)
 {
-    u16 code = AsmSeg();
     const u8 *name;
     const u8 *from;
     struct Named named;
@@ -1813,9 +1812,9 @@ static struct Onward F34_11(u16 how)
         return Own(edit);
     HidCur();
     PutMnu(2);
-    name = AT(code, OFFSET(ViewE_F));
+    name = ViewE_F;
     if (edit != 0)
-        name = AT(code, OFFSET(EditE_F));
+        name = EditE_F;
     from = name;
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = from[i];
@@ -1872,12 +1871,12 @@ static struct Onward F34_11(u16 how)
 /* Ask for the name of the file to view or to edit: F44_01. */
 static struct Onward F44_01(u16 how)
 {
-    u16 include = OFFSET(ViFl_S) + 1;
+    const u8 *include = ViFl_S + 1;
 
     if ((how & 0xFF) != 0)
-        include = OFFSET(EdFl_S) + 1;
+        include = EdFl_S + 1;
     md.HlpPage = (u8)(how + 18);
-    if ((u8)Dialog(OFFSET(ViFil_B), include, 0, 0, &md) != 0)
+    if ((u8)Dialog(&ViFil_B, include, 0, 0, &md) != 0)
         return To(NEXT_FUNC04);
     if (md.ViewFil[0] == 0)
         return To(NEXT_FUNC04);
@@ -1889,7 +1888,7 @@ static struct Onward F44_01(u16 how)
    where a click of the mouse in that part comes in as well. */
 struct Onward F34_10(struct WCBdef *panel)
 {
-    const u8 *from = AT(AsmSeg(), OFFSET(DrIn_F));
+    const u8 *from = DrIn_F;
     u16 begin = BegBX(panel);
     u16 size = SizDX();
     u16 i;
@@ -1902,7 +1901,7 @@ struct Onward F34_10(struct WCBdef *panel)
     VI->ViBase = begin;
     VI->ViSize = size;
     begin = ADD_LOW(begin - 0x100, 15);
-    MvsBw(BasAdr(begin), AT(AsmSeg(), OFFSET(EdFl_S)), 6,
+    MvsBw(BasAdr(begin), EdFl_S, 6,
           Color(Slct_C) << 8);
     return To(NEXT_DIRINFO);
 }
