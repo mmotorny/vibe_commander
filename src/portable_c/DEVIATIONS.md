@@ -1949,3 +1949,42 @@ original and the portable C alike; and the bench has no device that
 answers a read with less than it was asked for and more after it.
 `copy`, `copy-big` and the other scenarios of the copy are held to the
 original's goldens as they are.
+
+### 18. The viewer shows a text that it finds beyond column 65,535
+
+**What the original does.** The viewer counts the columns of a line in
+16 bits, a tab going on to the next multiple of eight. Where F7 or
+Shift-F7 finds a text, it counts the columns in front of it from where
+the line begins, and moves the first column that is shown so that the
+text is on the screen. A part of the file in the memory is 0FFE0h bytes
+at the most, so a line passes 65,535 columns only with tabs: with more
+than 8,191 of them in front of the text, the count wraps round, the
+first column shown is set near the wrapped number, and the screen shows
+tabs of the line where the text is not. Drawing a line, the viewer
+counts its columns in 16 bits as well, which tells where the search has
+put the first column within 80 of 65,535. That is known by reading the
+assembly, `V15_10` to `V15_21` and `V32_00` of `VCVIEW.INC`, and was
+not tried.
+
+**What the portable C does.** Both counts are of 32 bits and do not
+wrap: the text found is on the screen, and the status line says its
+column, which has room in the seven cells that the original has for
+it, some 524,000 at the most. The Right key still stops at column
+65,455, 0FFAFh, a limit of the program's own; Left goes back from a
+column beyond it. A line of fewer than 65,536 columns is shown as
+before. `V00_10`, `V25_00` and `V32_00` of `view.c`.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a bug of the original, fixed. The cluster N4
+met it where it gave the viewer's numbers their widths (`TODO.md`,
+"N4, `view.c`, its second part", and question 11).
+
+**Which scenarios show it.** None. `view-search`, `view-keys` and the
+other scenarios of the viewer have lines of a few columns, and are held
+to the original's goldens as they are. A scenario that showed it would
+view a file with a line of more than 8,191 tabs in front of a text, and
+search for that text: some 8 KB of tabs, which the bench's disks do not
+have, and which a scenario would have to type into the editor, or make
+by doubling a line of tabs with the editor's blocks, as `editor-big`
+makes its file. Its golden, from the original, would show the wrong
+columns, and its patch the rows of the status line and the window.

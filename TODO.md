@@ -9378,7 +9378,7 @@ for.
 | N1 | `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c` | 891; 133 | F3, N0 | **Done**: "N1, `string.c`, `format.c`, `box.c`, `screen.c`, `misc.c`" below |
 | N2 | `dialog.c` | 1,126; 110 | F3 | **Done**: "N2, `dialog.c`: done, and what a later cluster should know" below |
 | N3 † | `view.c`, its first part: `struct ViewDat`, `V00_02` and what reads the file and keeps the table of its lines, `Aexec0` | Half of 1,965; 269 | F4 | **Done**: "N3, `view.c`, its first part" below, with what `ViewDat` and `EdData` share and where the file is cut |
-| N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | **Done**, with question 11 asked: "N4, `view.c`, its second part" below |
+| N4 | `view.c`, the rest: what draws and what searches | The other half | N3 | **Done**, with question 11 answered and its fix: "N4, `view.c`, its second part" below |
 | N5 † | `find.c` | 1,044; 125 | F4 | **Done**, with question 10 answered and its fix: "N5, `find.c`: done, and what a later cluster should know" below |
 | N6 † | `edit.c`, its data: `struct EdData`, `struct Where`, every line that names a field of them, and `T00_00` where the editor takes its room and reads its file | A third of 2,699; 307 | F5, N3 | The room in bytes, the line in hex. Meets questions 8 and 5, and 9 with them |
 | N7, N8 | `edit.c`, the rest, in two halves by its routines; N6 says where | A third each | N6 | |
@@ -9861,6 +9861,11 @@ recommendation first.
      with its pattern behind it, holds that nothing is written behind.
 
 11. **The viewer's column of a text that is found, beyond 65,535.**
+   **Answered** by the user on 14 October 2026 (`CLAUDE.md`, "The
+   portable C"): the recommended way below, a bug of the original
+   fixed, entry 18 of `src/portable_c/DEVIATIONS.md`. The cluster N4
+   made the fix in its second commit and landed with it. What was
+   asked:
    - *When*: the cluster N4 met it and kept the original's cut. Nothing
      waits for it.
    - *The original*: the viewer counts the columns of a line in 16
@@ -13966,7 +13971,7 @@ in turn got a second one, `column` of `V25_00` beside its loop's
 | Made `bool` | 12 | What `V30_00` answers and its `result`; `in_file` and `ended` of `V00_10`; `changed` of `V13_01`; `edit` of `Own` and of `F34_11`, and `own` there; `none` of `Next` and of `struct Next`; `view` of `F34_40` and `file` of `struct Named` |
 | Kept by a word | 30 | `place` 6, the window's place and size twice, the mouse's, `V31_00`'s row; `bits` 6, the `how` of three commands, `found` of `struct Sought` and the two that take it; `size` 5; `cell` 3; `character` 4; `text` 3, two bytes held against CR LF; `colour` 1; `key` 1; `handle` 1 |
 | Kept by a sentence | 2 | `low` of `V25_00`, the low 32 bits of a hundred times the place, which wrap with the carry counted beside them; `found` of `V32_00`, a difference of two places in the file that wraps where the text is in front of the part |
-| `sign` | 4 | `ViSpace >> 1` in `V00_10`, three lines of it: not below 0, as N3 wrote for `V50_00` |
+| `sign` | 5 | `ViSpace >> 1` in `V00_10`, three lines of it: not below 0, as N3 wrote for `V50_00`; and, by the fix, the column's high word in `V25_00` |
 
 **The cuts that are written.** `V82_00` counted on a carry: with fewer
 bytes than the text, it added what was lacking, less than nothing, to
@@ -13974,8 +13979,17 @@ bytes than the text, it added what was lacking, less than nothing, to
 (more + count < SRCH_LEN)`, which is the carry for every count that it
 is handed, and `more` is what the 16 bits held. `percent` began at
 0FFFFh for its first step to make 0, and begins at -1. And the
-columns of the search and of the drawing are cut where the original
-cuts them, with `wraps`: question 11 below.
+columns of the search and of the drawing were cut where the original
+cuts them, with `wraps`, in the first commit: question 11, which the
+user answered with the fix, below.
+
+**The fix, question 11.** A second commit: the columns of the search in
+`V00_10` and of the line in `V32_00` are counted in 32 bits, and the
+three cuts with `wraps` went; `V25_00` hands `Number` the high word of
+the column too, since the search can put it beyond 64K, which is a
+place of the kind `sign` in the record with its reason. The Right key's
+limit at 0FFAFh stays. Entry 18 of `DEVIATIONS.md`, which no scenario
+shows: it says what one would take.
 
 **The casts.** Written before clang was asked, by what each routine
 hands over; clang then named one more, the count of `FileRead`, which
@@ -13984,7 +13998,8 @@ the type, with three more of a byte (`ViSrLen`, which is an `i32`, and
 `changed`, a `bool` now) and the one of `find.c` at `V82_00`: 29 taken
 out. 16 written in `view.c`: 9 `(u16)` at a parameter of another file
 or of `sys.h` that is still 16 bits, `T70_00`, `Input`, `MvsBw`,
-`Number` twice, `FileRead`, and three cuts with `wraps`; 5 `(u32)`
+`Number` twice, `FileRead`, and three cuts with `wraps`, which the fix
+took out again, giving `Number` a third for the high word; 5 `(u32)`
 where a count or a place is added to a place in the file; 2 `(i32)`,
 a difference of two places in the file which the part holds. And 2 in
 `edit.c`, at its call of `V82_00`: `(i32)` where it had `(u16)`, and

@@ -430,9 +430,9 @@ void V25_00(void)
     column = 0;
     if (VI->ViTxHex == 0)
         column = ViCol;
-    /* ViCol is below 64K: the keys keep it below 0FFAFh, and the search
-       counts it in 16 bits (V00_10). */
-    Number(md.TmpBuf, 0, (u16)column, NUM_SEPARATED);
+    /* The search can put ViCol beyond 64K, in a line of more than 8,191
+       tabs (V00_10): some 524,000 at the most, seven cells. */
+    Number(md.TmpBuf, (u16)(column >> 16), (u16)column, NUM_SEPARATED);
     screen = md.ScrBuf + 44;
     cell = *screen & 0xFF00 | ' ';
     for (count = 7; count; count--)
@@ -574,11 +574,13 @@ void V32_00(const u8 *text, i32 number, i32 at, i32 end)
             c = text[at++];
             behind = at;
             place = column;
-            /* wraps: the original counts the columns of a line in 16
-               bits. A line passes 65,535 of them only with more than
-               8,191 tabs, where the search can put ViCol (V00_10), and
-               it is drawn there as the original draws it. */
-            column = (u16)(column + 1);
+            /* The original counts the columns of a line in 16 bits, and
+               a line of more than 8,191 tabs passes 65,535 of them: it
+               wraps there, where the search can have put ViCol (V00_10),
+               and the original draws the wrong columns. A bug of the
+               original, fixed on the user's word: the count does not
+               wrap (DEVIATIONS.md, 18). */
+            column++;
             if (c == 9) {
                 c = ' ';
                 if (column & 7)
@@ -1347,10 +1349,13 @@ V15_10:                                 /* found, as text or as bytes */
     ViFirst = count;
     if (VI->ViTxHex != 0)
         goto V15_21;
-    /* The column it is in, and the line moved so that it shows. These
-       wrap as the original counts them, in 16 bits: a line of more than
-       8,191 tabs in front of what was found passes 65,535 columns, and
-       the screen then does not show it, as in the original. */
+    /* The column it is in, and the line moved so that it shows. The
+       original counts these in 16 bits: with more than 8,191 tabs in
+       front of what was found the count passes 65,535 and wraps, ViCol
+       is set near the wrapped number, and the screen does not show what
+       was found. A bug of the original, fixed on the user's word: they
+       do not wrap, and the Right key's limit, 0FFAFh, stays the
+       program's own (DEVIATIONS.md, 18). */
     at = V20_00(text);
     if (count < at)
         goto V15_21;
@@ -1359,11 +1364,11 @@ V15_10:                                 /* found, as text or as bytes */
     for (; count; count--) {
         if (text[at++] == 9)
             column |= 7;
-        column = (u16)(column + 1);     /* wraps */
+        column++;
     }
     if (column > ViCol) {
-        column = (u16)(column + ViSrLen); /* wraps */
-        edge = (u16)(ViCol + (u8)VI->ViSize); /* wraps */
+        column += ViSrLen;
+        edge = ViCol + (u8)VI->ViSize;
         if (column < edge)
             goto V15_21;
         column = column - (u8)VI->ViSize + 1;
