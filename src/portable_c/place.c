@@ -19,7 +19,7 @@
  */
 #include "vc.h"
 
-u16 NumAdr(struct WCBdef *panel, u16 number);
+u16 NumAdr(struct WCBdef *panel, i32 number);
 
 /* struct Place, BegBX, SizDX, LnsAX, InvWCB, FilePan, AdrNum and CorPar
    are in vc.h, and so is ChgAdr, with struct Shown. */
@@ -39,11 +39,13 @@ u16 NumAdr(struct WCBdef *panel, u16 number);
 #define LINES(rows) ((rows) - 3 - (md.MiniSta != 0 ? 2 : 0))
 
 /* The number of the entry at an address, and the address of the entry
-   with a number: in a list of files, and in the tree. */
+   with a number: in a list of files, and in the tree. An address in a
+   panel is 16 bits by the panel's layout, which FILE_ADDRESS says. */
 #define FILE_NUMBER(address) \
-    ((u16)((address) - DSKBUF) / sizeof(struct FILENT))
-#define TREE_NUMBER(entry) ((u16)((entry) - TRELIST))
-#define FILE_ADDRESS(number) (((number) << 4) + ((number) << 3) + DSKBUF)
+    ((i32)(u16)((address) - DSKBUF) / (i32)sizeof(struct FILENT))
+#define TREE_NUMBER(entry) ((entry) - TRELIST)
+#define FILE_ADDRESS(number) \
+    ((u16)(((number) << 4) + ((number) << 3) + (i32)DSKBUF))
 #define TREE_ADDRESS(number) (TRELIST + (number))
 
 /* Where on the screen a panel begins: the row in the high byte, below the
@@ -57,11 +59,11 @@ u16 BegBX(struct WCBdef *panel)
    low one. */
 u16 SizDX(void)
 {
-    return (u16)ROWS() << 8 | 40;
+    return (u16)(ROWS() << 8 | 40);
 }
 
 /* How many lines of a panel show files. */
-u16 LnsAX(void)
+i32 LnsAX(void)
 {
     return LINES(ROWS());
 }
@@ -74,7 +76,7 @@ struct WCBdef *InvWCB(struct WCBdef *panel)
 
 /* Whether a panel shows files and is not switched off: the original
    answers in the carry flag. */
-u16 FilePan(struct WCBdef *panel)
+bool FilePan(struct WCBdef *panel)
 {
     struct WCBdef *wcb = panel;
 
@@ -104,7 +106,7 @@ u16 FilePan(struct WCBdef *panel)
 
 void AdrNum(struct WCBdef *panel, struct Place *place)
 {
-    u16 cursor, first, last, lines;
+    i32 cursor, first, last, lines;
 
     PLACE(panel, cursor, first, last, lines);
     place->cursor = cursor;
@@ -115,11 +117,11 @@ void AdrNum(struct WCBdef *panel, struct Place *place)
 
 /* The address of the entry with a number, in the list of a panel: its
    offset in the panel, or in the tree's list. */
-u16 NumAdr(struct WCBdef *panel, u16 number)
+u16 NumAdr(struct WCBdef *panel, i32 number)
 {
     if (panel->WinTyp == 0)
         return FILE_ADDRESS(number);
-    return number << 4;
+    return (u16)(number << 4);          /* TreeBuf holds 768 entries */
 }
 
 /* Give a panel another cursor and another first line, as such offsets,
@@ -148,7 +150,7 @@ struct Shown ChgAdr(struct WCBdef *panel, u16 cursor, u16 first)
    brief has three columns of lines. */
 void CorPar(struct WCBdef *panel)
 {
-    u16 cursor, first, last, lines, below;
+    i32 cursor, first, last, lines, below;
 
     if (panel->WinTyp > 1)
         return;
@@ -161,7 +163,8 @@ void CorPar(struct WCBdef *panel)
     below = cursor - first;
     if (below > lines)
         first += below - lines;
-    last -= first;
+    last -= first;                      /* not below 0: the cursor is on
+                                           an entry, behind first */
     if (lines > last) {
         lines -= last;
         first = first >= lines ? first - lines : 0;

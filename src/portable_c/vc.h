@@ -605,9 +605,9 @@ void HookVct(void);
 void Quit(void);
 u16 ErrRdy(u16 letter);
 /* Read what a panel shows, keeping the cursor of a list of files and
-   what is selected in it if `keep` is not 0: not 0 if it could not be
-   read. See read.c. */
-u16 ReDir(struct WCBdef *panel, u16 keep);
+   what is selected in it if `keep`: true if it could not be read. See
+   read.c. */
+bool ReDir(struct WCBdef *panel, bool keep);
 /* Get the label of the current drive, a text of at most 11 characters,
    to `volume` in the main data. See read.c. */
 struct Label {                          /* what GetVol returns: */
@@ -617,10 +617,10 @@ struct Label {                          /* what GetVol returns: */
                                            a label, what it left in AH and
                                            the last of 11 characters. 0
                                            for a drive of a network */
-    u16 local;                          /* 0 for a drive of a network; 1
-                                           for any other, with a label or
-                                           without, and where DOS could
-                                           not say */
+    bool local;                         /* false for a drive of a
+                                           network; true for any other,
+                                           with a label or without, and
+                                           where DOS could not say */
 };
 struct Label GetVol(u8 *volume);
 /* The setup file: see each in setup.c. MakeIni writes into MenuBuf what
@@ -764,10 +764,10 @@ struct LineArgs {
 /* What AdrNum hands back: the original has these in SI, DI, DX and
    AX. */
 struct Place {
-    u16 cursor;                         /* the number of the cursor's entry */
-    u16 first;                          /* of the first one shown */
-    u16 last;                           /* of the last one there is */
-    u16 lines;                          /* lines of the panel that show
+    i32 cursor;                         /* the number of the cursor's entry */
+    i32 first;                          /* of the first one shown */
+    i32 last;                           /* of the last one there is */
+    i32 lines;                          /* lines of the panel that show
                                            entries */
 };
 
@@ -802,17 +802,17 @@ u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
 void SetMask(struct WCBdef *panel);                     /* files.c */
 void Sort(struct WCBdef *panel);
 u16 FnFile(struct WCBdef *panel, const u8 *name);
-u16 NearFl(struct WCBdef *panel, const u8 *name, u16 end);
+u16 NearFl(struct WCBdef *panel, const u8 *name, i32 end);
 struct Selected {                       /* what is selected in a panel: */
-    u16 directories;                    /* how many directories, */
-    u16 files;                          /* and how many files */
+    i32 directories;                    /* how many directories, */
+    i32 files;                          /* and how many files */
 };
 struct Selected TotSel(struct WCBdef *panel);
 u16 BegBX(struct WCBdef *panel);                        /* place.c */
 u16 SizDX(void);
-u16 LnsAX(void);
+i32 LnsAX(void);
 struct WCBdef *InvWCB(struct WCBdef *panel);
-u16 FilePan(struct WCBdef *panel);
+bool FilePan(struct WCBdef *panel);
 void AdrNum(struct WCBdef *panel, struct Place *place);
 void CorPar(struct WCBdef *panel);
 struct Shown {                          /* what a panel shows, as offsets

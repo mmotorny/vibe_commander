@@ -30,10 +30,10 @@
    SavMous, CurMous, Quit and Window. What is asked of the system is
    asked by the functions of sys.h. */
 
-/* C routines of other files that vc.h does not have. TstExe is 1 for a
-   name that DOS can run: com, exe or bat. TrCr10 finds the current
+/* C routines of other files that vc.h does not have. TstExe is true for
+   a name that DOS can run: com, exe or bat. TrCr10 finds the current
    directory in the tree again. */
-u16 TstExe(const u8 *name);                             /* files.c */
+bool TstExe(const u8 *name);                            /* files.c */
 void TrCr10(void);                                      /* tree.c */
 
 /* The dialog that asks whether to quit, and the name of the program for

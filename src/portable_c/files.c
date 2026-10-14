@@ -17,9 +17,9 @@
  */
 #include "vc.h"
 
-#define SIZE_FILENT sizeof(struct FILENT)
+#define SIZE_FILENT ((i32)sizeof(struct FILENT))
 
-u16 TstExe(const u8 *name);
+bool TstExe(const u8 *name);
 /* SetMask, Sort, FnFile and NearFl are in vc.h. */
 
 /* The extensions of programs. Names in a list are in small letters. */
@@ -28,22 +28,22 @@ static const u8 Ext_S[9] = {
 };
 
 /* Whether a file is a program, by the three characters behind the first
-   full stop of its name: 1 if it is, 0 if not. */
-u16 TstExe(const u8 *name)
+   full stop of its name. */
+bool TstExe(const u8 *name)
 {
-    u16 i;
+    i32 i;
     u8 c;
 
     do {
         c = *name++;
         if (c == 0)
-            return 0;
+            return false;
     } while (c != '.');
-    for (i = 0; i < sizeof Ext_S; i += 3)
+    for (i = 0; i < (i32)sizeof Ext_S; i += 3)
         if (name[0] == Ext_S[i] && name[1] == Ext_S[i + 1]
             && name[2] == Ext_S[i + 2])
-            return 1;
-    return 0;
+            return true;
+    return false;
 }
 
 /* Choose the files of a panel that it shows, by its filter, and put the
@@ -56,7 +56,8 @@ void SetMask(struct WCBdef *panel)
     u8 *mask = md.TmpBuf;
     u8 *one;
     u8 *other;
-    u16 file, last, i;
+    u16 file, last;
+    i32 i;
     u8 attributes, c;
 
     for (i = 0; i < 11; i++)
@@ -97,7 +98,7 @@ void SetMask(struct WCBdef *panel)
 }
 
 /* Whether two files of a list are in the wrong order, `first` being the
-   one that comes first now: 1 if they are, 0 if not. Their names are in
+   one that comes first now. Their names are in
    the form that Sort gives them, the extension at 9.
 
    Unsorted is the order in which they were read. Otherwise directories
@@ -105,10 +106,10 @@ void SetMask(struct WCBdef *panel)
    before other files; then it goes by the extension, by the time, the
    latest first, or by the size, the largest first; and with those the
    same, or sorting by name, by the name and then the extension. */
-static u16 CmpPar(const struct FILENT *first,
-                  const struct FILENT *second, u16 type)
+static bool CmpPar(const struct FILENT *first,
+                   const struct FILENT *second, i32 type)
 {
-    u16 i;
+    i32 i;
 
     if (type >= 4)
         return second->NumbF < first->NumbF;
@@ -164,7 +165,9 @@ void Sort(struct WCBdef *panel)
     u8 *name;
     u8 *other;
     u8 *spare;
-    u16 file, gap, end, swapped, length, dot, count, i;
+    u16 file, end, swapped;
+    i32 gap, length, dot, i;
+    u16 count;
     u8 c, c0, c1, c2;
 
     file = DSKBUF;
@@ -185,10 +188,12 @@ void Sort(struct WCBdef *panel)
                     name[9] = c0;
                     name[10] = c1;
                     name[11] = c2;
-                    /* Spaces from the full stop to the eighth character.
-                       A full stop behind the ninth, which DOS has in no
-                       name, would make that most of the segment. */
-                    count = 8 - dot;
+                    /* Spaces from the full stop to the eighth character,
+                       counted in 16 bits as the original's LOOP counts. A
+                       full stop behind the ninth, which DOS has in no
+                       name, wraps round and would make that most of the
+                       segment. */
+                    count = (u16)(8 - dot);
                     if (count != 0) {
                         other = name + dot;
                         do
@@ -204,7 +209,7 @@ void Sort(struct WCBdef *panel)
     /* A sort by exchanging entries a gap apart, the gap halved each time
        round. Behind the last exchange of a pass the list is in order, so
        the next pass ends there. */
-    gap = panel->EndBuf - DSKBUF;
+    gap = panel->EndBuf - (i32)DSKBUF;
     for (;;) {
         gap = gap / SIZE_FILENT >> 1;
         gap = (gap << 4) + (gap << 3);  /* times the size of an entry */
@@ -218,7 +223,7 @@ void Sort(struct WCBdef *panel)
                 if (!CmpPar(ENTRY(panel, file), ENTRY(panel, file + gap),
                             panel->SortTyp))
                     continue;
-                swapped = file + gap;
+                swapped = (u16)(file + gap);
                 name = (u8 *)panel + file;
                 other = (u8 *)panel + swapped;
                 spare = (u8 *)panel + panel->EndFul;
@@ -263,7 +268,8 @@ void Sort(struct WCBdef *panel)
 u16 FnFile(struct WCBdef *panel, const u8 *name)
 {
     const u8 *entry;
-    u16 file, i;
+    u16 file;
+    i32 i;
 
     for (file = DSKBUF; file < panel->EndBuf; file += SIZE_FILENT) {
         entry = (u8 *)panel + file;
@@ -285,12 +291,12 @@ u16 FnFile(struct WCBdef *panel, const u8 *name)
    calls this: where the room begins, Room of vc.h. An entry of it is
    an offset in it of 16 bits, as an entry of a panel's list is in the
    panel: the list was a panel's. */
-u16 NearFl(struct WCBdef *panel, const u8 *name, u16 end)
+u16 NearFl(struct WCBdef *panel, const u8 *name, i32 end)
 {
     const u8 *list = Room;
     u16 start = (u16)(name - list);
     u16 at = start;
-    u16 forward = 1;
+    bool forward = true;
     u16 found;
 
     if (at >= end)
@@ -303,7 +309,7 @@ u16 NearFl(struct WCBdef *panel, const u8 *name, u16 end)
             at += SIZE_FILENT;
             if (at >= end) {
                 at = start;
-                forward = 0;
+                forward = false;
             }
         } else {
             if (at < SIZE_FILENT)
@@ -318,8 +324,8 @@ u16 NearFl(struct WCBdef *panel, const u8 *name, u16 end)
 struct Selected TotSel(struct WCBdef *panel)
 {
     struct Selected selected;
-    u16 files = 0;
-    u16 directories = 0;
+    i32 files = 0;
+    i32 directories = 0;
     u16 file;
     u8 attributes;
 

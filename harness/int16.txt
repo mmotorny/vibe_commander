@@ -127,26 +127,6 @@ enter.c, F27_00: back
     | c = md.DosBuf[cursor - 1];
     The line above asks that cursor is not 0.
 
-files.c, Sort: index
-    | c0 = name[dot + 1];
-    dot is below length, and length below 12, by the lines above.
-
-files.c, Sort: index
-    | c1 = name[dot + 2];
-    dot is below length, and length below 12, by the lines above.
-
-files.c, Sort: index
-    | c2 = name[dot + 3];
-    dot is below length, and length below 12, by the lines above.
-
-files.c, TstExe: index
-    | && name[2] == Ext_S[i + 2])
-    i is below the length of Ext_S, by the loop that the line is in.
-
-files.c, TstExe: index
-    | if (name[0] == Ext_S[i] && name[1] == Ext_S[i + 1]
-    i is below the length of Ext_S, by the loop that the line is in.
-
 find.c, FindFil: widen
     | left = (i32)(RoomEnd - part);
     Two places of the room, its end and where a part is read to: the
@@ -216,6 +196,22 @@ menu.c, F40_30: index
 panel.c, PutPath: shift
     | place = ADD_LOW(place, -((length - least >> 1) + 1));
     Three lines above ask that length is least or more.
+
+place.c, AdrNum: widen
+    | PLACE(panel, cursor, first, last, lines);
+    The lines that show entries, LINES of ROWS() or ROWS() less 4: a
+    panel has 15 rows or more, half of a screen of 25 and three, so
+    those are 10 or more, the same number in 32 bits as it was in 16.
+
+place.c, CorPar: widen
+    | PLACE(panel, cursor, first, last, lines);
+    The lines that show entries, LINES of ROWS() or ROWS() less 4: a
+    panel has 15 rows or more, half of a screen of 25 and three, so
+    those are 10 or more, the same number in 32 bits as it was in 16.
+
+read.c, ReDr00: widen
+    | limit = ((PANEL_BLOCK - 1) << 4) - 2 * SIZE_FILENT;
+    A constant, FFF0h less two entries of 24 bytes: FFC0h.
 
 start.c, IniData: back
     | md.LowTab[c - 128] = (u8)(0x80 + i);

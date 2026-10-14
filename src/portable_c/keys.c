@@ -22,7 +22,7 @@ void F20_02(struct WCBdef *panel);
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
-u16 NumAdr(struct WCBdef *panel, u16 number);           /* place.c */
+u16 NumAdr(struct WCBdef *panel, i32 number);           /* place.c */
 void PutPath(struct WCBdef *panel);                     /* panel.c */
 void PutFls(struct WCBdef *panel);
 void SetCur(struct WCBdef *panel, u16 set);

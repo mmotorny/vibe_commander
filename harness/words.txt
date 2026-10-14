@@ -44,7 +44,7 @@ misc.c        none
 mouse.c       none
 panel.c       TRELIST 1, ENTRY 4, DSKBUF 1
 place.c       TRELIST 2, TREE_OFFSET 2, TREE_ENTRY 2, DSKBUF 2
-read.c        RoomParas 1, PANEL_BLOCK 1, ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1
+read.c        PANEL_BLOCK 1, ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1
 screen.c      none
 setup.c       none
 stack.c       none
