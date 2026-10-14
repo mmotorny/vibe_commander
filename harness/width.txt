@@ -29,11 +29,11 @@ N19            163        163     0    74     1     0      0  bars.c window.c sy
 N20            120        120     0    89     0     0      0  stcolor.c stopts.c
 N21             88         88     0    59     3     0      0  stmain.c sthelp.c
 as a whole     584          0     0    57    55     0      0  the tables, dos32.c stack.c
-headers        305        304     1     0     0     0      0  vc.h sys.h tables.h
-all           3352       2733    35  1856   155     3      0
+headers        305        133   139     0     0     0      0  vc.h sys.h tables.h
+all           3352       2562   173  1856   155     3      0
 
 file           8 or 16 not sorted  kept  cuts   u32  bool signed
-vc.h               248        247     1     0     0     0      0
+vc.h               248         76   139     0     0     0      0
 sys.h               37         37     0     0     0     0      0
 tables.h            20         20     0     0     0     0      0
 bars.c              42         42     0    22     0     0      0
@@ -83,23 +83,497 @@ window.c            41         41     0    13     0     0      0
 
 ----
 
-vc.h, struct EPBs: not sorted, 1 number, 0 cuts
+vc.h, struct EPBs: laid out, 1 number
+    DOS's: the block that it takes to run a program.
 
-vc.h, struct CNTRY: not sorted, 11 numbers, 0 cuts
+vc.h, struct CNTRY: laid out, 11 numbers
+    DOS's: what it answers of a country.
 
-vc.h, struct DTAs: not sorted, 6 numbers, 0 cuts
+vc.h, struct DTAs: laid out, 6 numbers
+    DOS's: what it answers of a file that a search has found.
 
-vc.h, struct FILENT: not sorted, 5 numbers, 0 cuts
+vc.h, struct FILENT: laid out, 5 numbers
+    The original's: an entry of a panel's list of files, which the
+    data's image knows field for field. Its place in the list and the
+    size of its file are of question 3 and of the piece P.
 
-vc.h, struct DIRENT: not sorted, 4 numbers, 0 cuts
+vc.h, struct DIRENT: laid out, 4 numbers
+    A file's: an entry of the tree's file, as the original writes it.
 
-vc.h, struct DIRTREE: not sorted, 4 numbers, 0 cuts
+vc.h, struct DIRTREE: laid out, 4 numbers
+    A file's: the head of the tree's file, as the original writes it.
 
-vc.h, struct STAR: not sorted, 2 numbers, 0 cuts
+vc.h, struct STAR: laid out, 2 numbers
+    The original's: a star of the main data, whose layout is kept.
 
-vc.h, struct MainDat: not sorted, 122 numbers, 0 cuts
+vc.h, struct MainDat: field ColTab, u8[240]
+    setup: a byte of the setup file, which stays a byte.
 
-vc.h, struct WCBdef: not sorted, 16 numbers, 0 cuts
+vc.h, struct MainDat: field FulScr, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field MenuVs, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field KeyBar, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field Prompt, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field InsDwn, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field AutoMnu, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field MiniSta, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field Clock, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field AutoCD, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field AutoSav, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ColTyp, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field BlDelay, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field LoadFl, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field UnSlct, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ErrSnd, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field LftMous, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ZoomWin, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field AltBar, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field EscBar, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ExecTyp, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field AutoSiz, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field HidDirs, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field QuitAck, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field SnowMod, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field AltView, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field AltEdit, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ClrBuf, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field Active, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field Ctrl_O, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ChkTSR, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ChgTree, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field DriveB, u8
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field DelayTm, u8[2]
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field StarTab, u8[5]
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field ResIni, u8[51]
+    setup: a byte of the setup file, which stays a byte.
+
+vc.h, struct MainDat: field LoadRes, u8
+    setup: LoadFl as the setup has it, kept while a command has it
+    otherwise.
+
+vc.h, struct MainDat: field ScrMod, u8
+    system: the mode of the display, as the BIOS has it.
+
+vc.h, struct MainDat: field Mouse, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field BreakFl, u8
+    system: what DOS answers of its check for Ctrl-Break.
+
+vc.h, struct MainDat: field MenuFl, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field SelMas, u8[13]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field HstBuf, u8[512]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field ExtMain, u8[512]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field MouseX, u16
+    system: where the mouse is, in dots as its driver answers, or 0FFFFh
+    for nowhere.
+
+vc.h, struct MainDat: field MouseY, u16
+    system: where the mouse is, in dots as its driver answers, or 0FFFFh
+    for nowhere.
+
+vc.h, struct MainDat: field BatAdr, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field BatPoin, u16
+    unused: of the original, and neither set nor read here.
+
+vc.h, struct MainDat: field LastMnu, u16
+    small: a menu and its item, a byte each.
+
+vc.h, struct MainDat: field OvlPth, u16
+    unused: of the original, and neither set nor read here.
+
+vc.h, struct MainDat: field ComSpec, u16
+    M: a place in the environment, counted from its start, which is
+    longer than 64K on other systems.
+
+vc.h, struct MainDat: field CrnPath, u8[68]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field ViewFil, u8[65]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field ToFile, u8[65]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field FindStr, u8[65]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field SrchStr, u8[65]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field DosChg, u8[5]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field DosBuf, u8[1000]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field DosLin, u8
+    small: a row or a column of the screen, a byte as the BIOS has them.
+
+vc.h, struct MainDat: field DosCol, u8
+    small: a row or a column of the screen, a byte as the BIOS has them.
+
+vc.h, struct MainDat: field BegCol, u8
+    small: a row or a column of the screen, a byte as the BIOS has them.
+
+vc.h, struct MainDat: field OutCol, u8
+    small: a row or a column of the screen, a byte as the BIOS has them.
+
+vc.h, struct MainDat: field ScrPage, u8
+    system: the page that the display shows.
+
+vc.h, struct MainDat: field TstEGA, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field Lines, u8
+    small: the rows of the screen, a byte as the BIOS has them.
+
+vc.h, struct MainDat: field Snow, u8
+    unused: of the original, and neither set nor read here.
+
+vc.h, struct MainDat: field TopView, u8
+    unused: of the original, and neither set nor read here.
+
+vc.h, struct MainDat: field DesqVie, u8
+    unused: of the original, and neither set nor read here.
+
+vc.h, struct MainDat: field WinLeav, u8
+    unused: of the original, and neither set nor read here.
+
+vc.h, struct MainDat: field CrntCol, u8
+    colour
+
+vc.h, struct MainDat: field Quote, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field BarPrev, u8
+    small: the number of a key bar, or 0FFh for none.
+
+vc.h, struct MainDat: field SftErr, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field BlocEr, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field PathEr, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field FlagCD, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field TreeTyp, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field WinMous, u8
+    bits: what the mouse has done in a window, each asked by itself.
+
+vc.h, struct MainDat: field MousEnt, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field OldFlg, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field HlpPage, u8
+    small: the page of the help, or 0FFh for none.
+
+vc.h, struct MainDat: field ZoomOne, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field OneFile, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field ErrDat, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct MainDat: field VerDOS, u16
+    system: DOS's version, as it answers it.
+
+vc.h, struct MainDat: field WCBcrn, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field WCBsec, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field WCB1seg, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field WCB2seg, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field ViewSeg, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field MemSeg, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field FreMem2, u16
+    address: the room in paragraphs, which the piece F1 takes out of the
+    main data. The clusters that count the room count it in bytes.
+
+vc.h, struct MainDat: field Memorys, u16
+    unused: of the original, and neither set nor read here.
+
+vc.h, struct MainDat: field HstAdr, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field TreAdr, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field TreFrst, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field TreCrnt, u16
+    address: a segment or a place of DOS's memory, which a piece of the
+    addresses takes out of the main data as a pointer.
+
+vc.h, struct MainDat: field ClstSiz, u16
+    M: the bytes of a cluster, a sector's bytes times its sectors. On a
+    disk with clusters of 64K the product wraps round to 0 here as in
+    the original: to be looked at, and asked, by the cluster that has
+    the Info.
+
+vc.h, struct MainDat: field Total, u16
+    M: the clusters of a drive, which DriveSpace is to answer in 32 bits
+    (the piece S).
+
+vc.h, struct MainDat: field FreeDsk, u16
+    M: the clusters of a drive that are free, which DriveSpace is to
+    answer in 32 bits (the piece S).
+
+vc.h, struct MainDat: field InfoLen, u16
+    small: the bytes that were read of the Info's file, within InfBuf,
+    or 0FFFFh for none.
+
+vc.h, struct MainDat: field Rand1, u16
+    wraps: one of the two words that the program's random numbers are
+    made of.
+
+vc.h, struct MainDat: field Rand2, u16
+    wraps: one of the two words that the program's random numbers are
+    made of.
+
+vc.h, struct MainDat: field FncAddr, u16
+    small: the number of a function, in the table of dirfunc.c.
+
+vc.h, struct MainDat: field MousPos, u16
+    M: the line of a list that a first click was on. As wide as the
+    lines of the lists are, and widened with them.
+
+vc.h, struct MainDat: field Volume, u8[12]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field DosPth, u8[68]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field NcPath, u8[68]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field TempDir, u8[68]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field LowTab, u8[128]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field TmpBuf, u8[256]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field TmpErr, u8[256]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field MenuBuf, u8[4000]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field InfBuf, u8[1406]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field Even, u8
+    layout: a byte that has the screen's buffer begin at an even place.
+    Nothing names it.
+
+vc.h, struct MainDat: field ScrBuf, u16[4000]
+    cells: of the screen, a character and a colour each.
+
+vc.h, struct MainDat: field UserScr, u16[3920]
+    cells: of the screen, a character and a colour each.
+
+vc.h, struct MainDat: field WinBuf, u16[3696]
+    cells: of the screen, a character and a colour each.
+
+vc.h, struct MainDat: field ErrBuf, u16[3696]
+    cells: of the screen, a character and a colour each.
+
+vc.h, struct MainDat: field ErrBuf1, u16[3696]
+    cells: of the screen, a character and a colour each.
+
+vc.h, struct MainDat: field HelpBuf, u8[3000]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct MainDat: field TreeBuf, u8[12299]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct WCBdef: field WinTyp, u8
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field BrfFul, u8
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field Visible, u8
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field Hidden, u8
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field MasTyp, u8
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field SortTyp, u8
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field Ctrl_L, u8
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field DskMas, u8[13]
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field WinPath, u8[68]
+    setup: of the part of a panel that the setup file has, which stays
+    as it is.
+
+vc.h, struct WCBdef: field CurAdr, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+vc.h, struct WCBdef: field First, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+vc.h, struct WCBdef: field EndBuf, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+vc.h, struct WCBdef: field ExtBuf, u8[512]
+    text: characters, or the bytes of a file or of a buffer.
+
+vc.h, struct WCBdef: field EndFul, u16
+    address: a place in the panel's block, 16 bits while a panel is 64K.
+    Widened only if question 3 of the plan says so, by the piece P.
+
+vc.h, struct WCBdef: field ChgFlg, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
+
+vc.h, struct WCBdef: field SizDir, u8
+    flag: true or false, in a byte of the layout. The code asks whether
+    it is 0.
 
 vc.h, struct Label: not sorted, 2 numbers, 0 cuts
 
