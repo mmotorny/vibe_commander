@@ -261,15 +261,18 @@ These held while `src/c/` was made, and they say what it is.
   rest of it does not know which system that is. Today that place is
   `sys.h`, with `dos32.c` behind it, the one file of the system's
   functions since the 16-bit build went.
-- No name is given to an integer type for what a number means, on the
-  user's word of 13 October 2026: C holds such a name apart from
-  nothing, a `Colour` that is a `u16` is taken wherever a `u16` is, so
-  the name is a comment that looks like a type. A number has the type
-  of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`; what it is,
-  its name and a comment say. That holds for what crosses to the
-  system as well, the size of a file or a count of bytes: it is a
-  `u32` until the layer's design says what it is. Where the compiler
-  is to hold two things apart, they are structures.
+- An integer type gets a name of its own only where its width is not
+  the same everywhere, on the user's word of 13 October 2026: the size
+  of a file, 32 bits on one platform and 64 on another, is such a type,
+  and the layer's design will define it and its like. A name for what
+  a number merely means, a count of columns, a colour, is not made: C
+  holds such a name apart from nothing, a `Colour` that is a `u16` is
+  taken wherever a `u16` is, so it is a comment that looks like a
+  type. Such a number has the type of its width, `u8`, `u16`, `u32`,
+  `i32`, or is a `bool`, and its name and a comment say what it is.
+  Until the layer is designed, what crosses to the system is a `u32`
+  too. Where the compiler is to hold two things apart, they are
+  structures.
 - Names may change here once a thing no longer is what its name in the
   assembly says. The C translation keeps the old names, and a comment at
   the new name says what it was.
