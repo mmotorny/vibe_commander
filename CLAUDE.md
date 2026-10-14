@@ -188,7 +188,27 @@ These held while `src/c/` was made, and they say what it is.
      whatever of the x86 is still in the common code goes behind
      `sys.h`, as Chromium has it: files `_dos.c` and `_posix.c` beside
      common headers, and macros that each platform defines in its own
-     way.
+     way. What the user decided of steps 5 and 6 on 14 October 2026:
+     one `CMakeLists.txt` builds every implementation, and finds clang
+     for those that want it; the files are `sys_dos.c` (which
+     `dos32.c` becomes), `stack_dos.c` (`stack.c`), `sys_stub.c` and
+     `sys_posix.c`. On Linux there is one drive by default, C:, the
+     root of the file system, and a path that DOS's 67 characters do
+     not hold is reached through the aliases; a file of settings may
+     map other letters. The code page, and the country with it, is
+     866 where `LANG` is Russian and 437 otherwise, and a setting
+     overrides it. The terminal is driven by the program's own escape
+     sequences and termios, no library, with the kitty protocol of
+     the keyboard where the terminal offers it. A command runs on the
+     terminal's own screen, which Ctrl-O shows, as on DOS. The program
+     for Linux is judged by the same scenarios and goldens where they
+     can be compared: told so by a variable of the environment, it
+     writes its grid of cells whenever it waits for a key, a harness
+     drives it in a pseudo-terminal with the scenarios' keys, and what
+     it draws in the terminal is held to that grid by replaying it
+     through pyte, a terminal emulator in Python, pinned, which is
+     the download that this allows; a setting gives a test the clock
+     to start from.
   7. iOS, when Linux is done. Windows and macOS are not targets for now,
      on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
