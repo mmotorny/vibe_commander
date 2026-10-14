@@ -261,6 +261,24 @@ These held while `src/c/` was made, and they say what it is.
   rest of it does not know which system that is. Today that place is
   `sys.h`, with `dos32.c` behind it, the one file of the system's
   functions since the 16-bit build went.
+- A number is signed unless there is a reason for it not to be, on the
+  user's word of 13 October 2026: a size, a count, an index, a length,
+  a place in a text is an `i32` when it is widened, and one that is a
+  `u32` today is looked at with the same question. Keeping a size in a
+  type without a sign is widely held to have been a mistake: a
+  difference that goes below nothing becomes a huge number without a
+  word, where a signed one is negative and a sanitizer names a signed
+  overflow. Here it is also the conversion that changes least, since C
+  already reckons with a `u8` or a `u16` as a signed `int`. The reasons
+  for a type without a sign, each written down where it is used: bits,
+  a mask, a character, a colour, a cell of the screen; wrapping that
+  the program counts on, with its cast written out; a width that a
+  file, DOS or the BIOS has; and a quantity that can pass two
+  gigabytes while there is no signed type of 64 bits, the size of a
+  file, of a disk and of what is free on it, the sum of what is
+  selected, which the original shows up to four gigabytes: those stay
+  `u32` until the layer's design gives the size of a file its type,
+  which is then signed.
 - An integer type gets a name of its own only where its width is not
   the same everywhere, on the user's word of 13 October 2026: the size
   of a file, 32 bits on one platform and 64 on another, is such a type,
