@@ -279,6 +279,18 @@ These held while `src/c/` was made, and they say what it is.
   selected, which the original shows up to four gigabytes: those stay
   `u32` until the layer's design gives the size of a file its type,
   which is then signed.
+- Where a number meets one of another sign or is put into fewer bits,
+  the code says so with a cast, on the user's word of 13 October 2026:
+  a file of the portable C whose numbers have been sorted is held to
+  clang's warnings of a comparison and of a conversion between signed
+  and unsigned, and of a conversion into fewer bits, each switched on,
+  none switched off for a line. A warning goes by making the type
+  right, which is the first thing to try and is what moves numbers
+  toward a sign, or else by a cast written at the place, with a
+  comment where the program counts on what the cast cuts off. Writing
+  the cast is the point: it makes whoever writes it think what happens
+  at the edges. A list beside the code of the places and their reasons
+  is not kept in place of that.
 - An integer type gets a name of its own only where its width is not
   the same everywhere, on the user's word of 13 October 2026: the size
   of a file, 32 bits on one platform and 64 on another, is such a type,
