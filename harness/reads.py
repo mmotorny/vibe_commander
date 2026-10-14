@@ -13,9 +13,8 @@ of the files of constants or of the code's own, and says
 how many bytes of it are read there. Most places it knows by their form:
 a loop to a count, MvzLine, MvsBw and MainFil with their lengths, a text
 that is read as far as its zero byte, a name that the system is handed
-or bytes that it is to write, a box or a dialog that is handed on by its
-offset. The others are in REVIEWED below, each with what
-reading the code found. A place that is neither is reported, and so is
+or bytes that it is to write, a box or a dialog that is handed on. The
+others are in REVIEWED below, each with what reading the code found. A place that is neither is reported, and so is
 an object that is shorter than what is read of it: datacheck.py fails
 for both.
 
@@ -34,7 +33,7 @@ like any other here: its places are found by that name, and REVIEWED
 has it by that name, ("stopts.c", "StConf_P"). Which of the original's
 two programs its bytes are held against is datacheck.py's to know, not
 this tool's. A function of the setup's that reads a box or a dialog
-handed to it by its offset goes into READERS. The files of the setup
+handed to it goes into READERS. The files of the setup
 program are SETUP_FILES: a tree that is declared to have no setup
 program has none of them, and what REVIEWED has for them is not held
 against it; nor is what it has for a table of the setup's in a file
@@ -53,8 +52,19 @@ the source, and a count is of bytes of a text or of a table of bytes,
 which are the same in a program of 16 bits and in a flat one of 32. What
 differs is which file of the system's functions the program is built of,
 SYSTEM_FILE, and how long an object with pointers in it is, a box or a
-dialog, of which no place reads a count of bytes: it is handed on by its
-offset and read as it is laid out.
+dialog, of which no place reads a count of bytes: it is handed on and
+read as it is laid out.
+
+A constant is handed on in one of two forms, and both are known. The C
+translation has it as a number, its offset in the segment of the tables,
+OFFSET(Name), and reads it through a far pointer made of that,
+AT(AsmSeg(), OFFSET(Name) + 1). The portable C has it as a pointer: Name
+and Name + 1 for a text or a table of bytes, which a file of code
+declares as an array of them, and &Name for a box or a dialog, which it
+declares as the structure that the thing begins with, `extern const
+struct BOXTOP Name;` and `extern const struct BOXHD Name;`. What was
+held against the offset, `box == OFFSET(Name)`, is held against the
+pointer, `box == &Name`, and reads nothing either way.
 """
 import re
 import sys
@@ -75,7 +85,8 @@ NAMED = ("FileCreate", "FileOpen", "FileOpenBare", "FileDelete",
          "FileTrueName", "FindFirst", "DirMake", "DirRemove", "DirChange",
          "ProgramRun", "ProgramRunBare")
 
-# What a call reads of a constant that is handed to it by its offset.
+# What a call reads of a constant that is handed to it, by its offset
+# or as a pointer.
 READERS = ("Dialog", "DialBox", "OncZoom", "MinMnu", "MnMn10", "MnMn40",
            "Ask")
 
@@ -340,7 +351,10 @@ def _form(statement, name, sizes):
     statement = re.sub(rf"\bAT\(\s*\w+(?:\(\))?\s*,\s*OFFSET\(\s*{n}\s*\)"
                        rf"(\s*\+\s*\d+)?\s*\)", rf"{name}\1", statement)
     rest = re.sub(rf"sizeof\s*\(?\s*{n}\b\s*\)?", "", statement)
-    rest = re.sub(rf"[!=]=\s*OFFSET\(\s*{n}\s*\)", "", rest)
+    # Held against a variable, as the number that it is in the one form
+    # or as the pointer to it in the other: nothing of it is read.
+    rest = re.sub(rf"[!=]=\s*(?:OFFSET\(\s*{n}\s*\)|&?\s*{n}\b"
+                  rf"(?!\s*[\[+(.-]))", "", rest)
     if not re.search(rf"\b{n}\b", rest):
         return NONE
     plus = rf"\b{n}\b(?:\s*\+\s*(\d+))?"
@@ -366,10 +380,14 @@ def _form(statement, name, sizes):
         count = _count(match[2], name, sizes)
         if count is not None:
             return int(match[1] or 0) + count
+    # Handed on to a routine that reads it as its kind is laid out, or
+    # kept for one: by its offset, or by a pointer to it, which is its
+    # name where it is an array of bytes and its address where the file
+    # declares it as what it begins with.
+    handed = rf"(?:OFFSET\(\s*&?{n}\s*\)|&?\s*{n}\s*(?=[,;)]))"
     if re.search(rf"\b({'|'.join(READERS)})\s*\((?:[^();]|\([^();]*\))*"
-                 rf"OFFSET\(\s*&?{n}\s*\)", statement) or re.search(
-                     rf"\b(box|report|result)\s*=\s*OFFSET\(\s*{n}\s*\)",
-                     statement):
+                 rf"(?<![\w.>]){handed}", statement) or re.search(
+                     rf"\b(box|report|result)\s*=\s*{handed}", statement):
         return TABLE
     # A loop to a count, over an index into the constant.
     loop = re.search(r"for\s*\(\s*(?:(\w+)\s*=\s*(\d+))?\s*;\s*(\w+)\s*<\s*"
@@ -419,6 +437,8 @@ def places(source, objects, variables=()):
                     continue
                 if re.match(rf"\s*(extern|static|const)\b[^=;(]*\b{name}\b"
                             rf"\s*\[", line) or re.match(
+                                rf"\s*extern\s+const\s+struct\s+\w+\s+"
+                                rf"{name}\s*;", line) or re.match(
                                 rf"\s*#\s*(pragma\s+aux|define)\s+{name}\b",
                                 line) or re.match(r"\s*#\s*define\b", line):
                     continue
