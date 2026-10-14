@@ -288,8 +288,9 @@ These held while `src/c/` was made, and they say what it is.
   taken wherever a `u16` is, so it is a comment that looks like a
   type. Such a number has the type of its width, `u8`, `u16`, `u32`,
   `i32`, or is a `bool`, and its name and a comment say what it is.
-  Until the layer is designed, what crosses to the system is a `u32`
-  too. Where the compiler is to hold two things apart, they are
+  Until the layer is designed, what crosses to the system has the
+  type of its width too, signed or not by the rule above: a count of
+  bytes an `i32`, the size of a file a `u32`. Where the compiler is to hold two things apart, they are
   structures.
 - Names may change here once a thing no longer is what its name in the
   assembly says. The C translation keeps the old names, and a comment at
