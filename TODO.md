@@ -9392,7 +9392,7 @@ for.
 | N16 | `main.c` | 1,601; 117 | F8 | |
 | N17a | `keys.c` | 810 lines; its numbers and cuts are in the record's table | F8 | |
 | N17b | `commands.c` | 604 lines; in the record's table | F8 | |
-| N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | |
+| N18 | `menu.c`, `help.c` | 1,371; 131 | F8 | **Done**: "N18, `menu.c`, `help.c`: done, and what a later cluster should know" below. The help's lines widened with the original's cuts written where a help file that is not true to its text takes them past 16 bits |
 | N19a | `bars.c`, `window.c`, `system.c`, `setup.c` | 913 lines; in the record's table | F8 | |
 | N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | |
 | N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | |
@@ -14637,6 +14637,112 @@ widen. The six are the same in a second run of each build.
 It took some 80 tool calls to hand back, of which waiting for the
 images of the build before, on a machine that four other clusters were
 testing on, was some ten, and finding what the six bytes were, ten.
+
+### N18, `menu.c`, `help.c`: done, and what a later cluster should know
+
+**What there is.** The two files sorted by "The rule for a number", and
+`F39_00` of `vc.h` taking `again` as a `bool`; clang's warnings of a
+conversion silent for both. The whole suite passes, no golden and no
+patch changed, and the image of every scenario is that of the build
+before (below).
+
+**The numbers.** Of the 112 of 8 or 16 bits, and the one `u32`:
+
+| | Of 8 or 16 bits | Which |
+|---|---|---|
+| Widened, to `i32` | 37 | The menu and the item of the bar, CL and CH of the original, with every `& 0xFF` that makes a byte of them kept as it was; an item, a count, an index, a width in columns and the rows of a menu; the column that `F40_50` looks at and the menu it answers; the order of a panel's files; the table of commands; the help's lines, `cursor`, `first`, `was`, `shown`, `moved` and `count` of `Help05`, the cursor and the first line of `RdEntry`, the line of `Help70` and `Help72`; the count of `ReadDsk`, an index of `HelpFil` |
+| Made `bool` | 5 | What `SeekDsk`, `ReadDsk` and `RdEntry` answer; `hit` of `F39_00`; `again` of `F39_00` |
+| Kept by a word | 49, and the `u32` | `place` 16, `text` 10, `cell` 5, `bits` 5, `colour` 4, `key` 2, `character` 2, `size` 3 (the two words of a place in the help file and the `u32` they make), `small` 2 (`MnuHlp`, `page` of `Help00`), `flag` 1 (`errors` of `Help00`) |
+| Kept by a sentence | 1 | `count` of `DeCode`: a count of 0 is one of 65,536, the original's `LOOP`, which `sthelp.c` counts on too |
+| Laid out | 20 | `struct HlpData`, 14: an entry of the help file as it is read, laid over `HelpBuf`; `struct MnuTab`, 4, and `struct KeyTab`, 2: the original's tables, which the test of the data holds byte for byte |
+
+One number is new, where a variable held two things in turn:
+`clicked` of `Help05`, what `DoublMo` answers, where `key` had held a
+key of `MinMnu` before (`i32`). `key` of `F39_00` holds the number of
+an item that cannot be chosen once, as the original's AX does, to be
+looked for among the letters, and is kept with that in its word.
+
+No place of the kind `sign`.
+
+**The help's lines and its cut.** F8 left the cut of
+`(u16)(text - hd.HlpInfo)` to be decided once it was known whether
+`HlpSize` can be 0. It can: the program refuses an entry only for a
+text of 2,968 bytes or more, and an entry of the file may say 0, which
+`DeCode` then takes for 65,536 ("The help trusts its file", among the
+bugs of the original that stay). But `text` is never in front of
+`HlpInfo` at that test, even so: the first `text` is what `Help72`
+answers, which only goes forward from `HlpInfo`, and each later one
+is what `Help77` answers, at least a byte behind what it was handed,
+and that is at most the one byte in front that `text--` makes. So the
+difference is never below 0, and what the cut does is at the other
+end: a line 64K or more behind the start of the text, which the
+original's difference of two offsets wraps. The cut stays, as the
+original's, with `wraps` in its comment.
+
+That is the help's lines throughout. They are the entry's, of 16 bits
+in the file and in `HlpData`, and a file whose numbers are not true to
+its text, a line of the index far behind its last, an index without
+lines, a page whose line is 65,535, takes a sum of them past 65,535,
+where the original's word wraps. Widened, they would not: what the
+help shows of such a file would be another thing than the original
+shows, which is a bug of the original's to be asked. So they are
+widened and the cut is written wherever such a sum is made, eight
+places in `Help05`, `Help72` and `Help70`, each with `wraps` and a
+word at the head of `Help05`; a valid file never gets there, the
+shipped file has 62 lines of index and pages below 2,968 bytes. Two
+places needed no cut by what stands at them: `first = cursor - lines
++ 1`, never below 0 since `first <= cursor` is made the line above;
+and `moved`, a difference of two lines, which is held against 1 and
+-1 where it was against 1 and FFFFh.
+
+**The casts.** clang named 26 places before anything changed, 16 in
+`help.c`, 10 in `menu.c`. Eight went by a type: the four of
+`struct Paged` into `cursor` and `first`, now `i32`; `DoublMo`'s
+answer, now `clicked`; `page` and `errors` of `Help00`, now the bytes
+of the main data that they keep; and `first = cursor - lines + 1`.
+Eighteen are casts, each a place, a cell or a colour in its place made
+of a row and a column or of a colour, as in the files before. The
+widening made 17 more: the count handed to `FileRead` of `sys.h`; the
+cursor and the first line put back into `HlpData`, four; the width
+handed to `MvsColr` and to `Window` in `F40_10`; the menu handed to
+`PtMnu1` of `bars.c`, twice, until N19a widens it; the item into `key`;
+`KEYS` as an `i32` for its loop; and the six cuts of the help's lines
+above that clang does not name, written to keep the original's numbers.
+So 35 casts, 11 with a comment.
+
+**Across clusters.**
+
+- `F39_00` takes a `bool` (`vc.h`): `F39_01` of `main.c`, N16's, hands
+  it its `u16` `again`, 0 or 1, unchanged.
+- `PtMnu1` of `bars.c`, N19a's, is handed `(u16)menu` twice: the casts
+  go when N19a widens its parameter.
+- `PutMnu`, which N12's section has as `menu.c`'s, is of `bars.c`:
+  the cast in `drive.c` goes with N19a.
+- `DeCode` keeps its `u16`, which `sthelp.c` of N21 hands it.
+
+**`harness/int16.py`.** The four places of `menu.c` went, `index` and
+`back`, each an index of `i32` now; one came and went in `help.c`,
+`count = hd.HlpLins - 1` of `Help60`, which has its cut now.
+
+**What a later piece should know.** In 32 bits `DeCode` with a count
+of 0 goes through 65,536 bytes from `HlpInfo` on, past the end of the
+main data, where the original went round its segment and back to where
+it began: the bug that stays now writes into whatever lies behind the
+main data. No scenario has such a file, and nothing of this cluster
+changed it; it is the flat memory's, for whoever takes up "The help
+trusts its file".
+
+**The program.** `VC.EXE` is another, by the types: 288,311 bytes, 8
+more, `77982235...` where the build of `main` that the cluster began
+on, `bed8f6f`, is `25a4cdc7...`; its code is 149 bytes shorter, and it
+has one address more for the extender to set. The types and the casts
+were written together and judged together. The image of every scenario,
+`python3 harness/dataimage.py compare`, against the build of `bed8f6f`:
+"156 scenarios, 155 with nothing that differs; 0 differences, 0 more in
+what was declared as changed, 24 in what may differ", the 24 those of
+`blank-timed`, as before.
+
+It took some 60 tool calls to hand back.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

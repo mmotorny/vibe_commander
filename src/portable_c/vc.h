@@ -1247,7 +1247,7 @@ bool F68_00(void);
 struct SpeedKey F77_00(u16 key, struct WCBdef *panel);
 u16 F32_00(u16 main);
 bool F62_01(struct WCBdef *panel, i32 item);
-struct Picked F39_00(u16 again, struct WCBdef *panel);
+struct Picked F39_00(bool again, struct WCBdef *panel);
 
 /* Make the program ready for what the command line holds to be run: the
    interrupts given back, the screen as DOS left it. Returns the place

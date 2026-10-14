@@ -86,14 +86,14 @@ N15            107        107     3              3       0     0     0     0    
 N16             95         95     0              0       0     0     3     0     1  main.c
 N17a            65         65     0              0       0     0     0     0     0  keys.c
 N17b            74         74     0              0       0     0     0     0     0  commands.c
-N18            112        112     1              1       0     0     0     0     2  menu.c help.c
+N18             70          0     1              0      50     1     0     5    40  menu.c help.c
 N19a           108        108     1              1       0     0     0     0     0  bars.c window.c system.c setup.c
 N19b            40         40     0              0       0     0     0     0     1  start.c
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
 N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
 headers        279         95    12              1     153     3     0     0     0  vc.h sys.h tables.h
-all           2431       1031   115              9     775    45    46    93   520
+all           2389        919   115              8     825    46    46    98   558
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               222         38    11              0     153     3     0     0     0
@@ -116,14 +116,14 @@ extfile.c            4          0     0              0       4     0     0     2
 files.c             22          0     0              0      21     1     1     3    12
 find.c              76          0     0              0      70     6     3     4    44
 format.c            29          0     2              0      31     0     4     2     7
-help.c              56         56     1              1       0     0     0     0     2
+help.c              39          0     1              0      25     1     0     3    17
 info.c              12          0     2              0      13     1     0     0     5
 input.c             58         58     3              3       0     0     0     0     0
 keys.c              65         65     0              0       0     0     0     0     0
 line.c               5          0     0              0       5     0     1     0    10
 main.c              95         95     0              0       0     0     3     0     1
 mask.c               4          0     0              0       4     0     0     1     3
-menu.c              56         56     0              0       0     0     0     0     0
+menu.c              31          0     0              0      25     0     0     2    23
 misc.c               4          0     0              0       1     3     0     2     9
 mouse.c             12          0     0              0      12     0     0     2     4
 panel.c             20          0     1              0      21     0     3     1    18
@@ -2486,7 +2486,96 @@ format.c, PutTim0: parameter color, u16
 format.c, SzDtTm: parameter color, u16
     cell
 
-help.c: not sorted, 56 numbers, 1 u32
+help.c, struct HlpData: laid out, 14 numbers
+    A file's: the 26 bytes of an entry of the help file as they are
+    read, behind its handle, and behind them the first line shown of
+    the index and the text, laid over HelpBuf of the main data, which
+    the data's image knows field for field.
+
+help.c, (): variable Help_S, u8[]
+    text: of the tables, help_t.c
+
+help.c, (): variable HlMn1_D, u8[]
+    text: the buttons of the menu, bytes of the tables.
+
+help.c, (): variable HlMn2_D, u8[]
+    text: the buttons of the menu, bytes of the tables.
+
+help.c, (): variable HlpMn_P, u8[]
+    colour
+
+help.c, (): variable Help_F, u8[20]
+    text
+
+help.c, (): variable HlMn1_S, u8[23]
+    text
+
+help.c, (): variable HlMn2_S, u8[48]
+    text
+
+help.c, (): variable Help_P, u8[4]
+    colour
+
+help.c, (): variable Empty_S, u8[1]
+    text
+
+help.c, DeCode: parameter count, u16
+    Counted on to wrap: a count of 0 is one of 65,536, by do ... while
+    (--count), as the original's LOOP has it, for an entry that says it
+    has no text; sthelp.c hands it counts of 16 bits as well. A bug of
+    the original that stays.
+
+help.c, SeekDsk: parameter high, u16
+    size: the high word of a place in the help file, as an entry has
+    it.
+
+help.c, SeekDsk: parameter low, u16
+    size: the low word of a place in the help file, as an entry has it.
+
+help.c, SeekDsk: variable place, u32
+    size: a place in the help file.
+
+help.c, Help77: parameter place, u16
+    place
+
+help.c, Help77: variable cell, u16
+    cell
+
+help.c, Help05: variable size, u16
+    place: the size of the window.
+
+help.c, Help05: variable item, u16
+    bits: the button with the cursor in the low byte and above it what
+    MinMnu answers there, as the original has CX, which GetMous is
+    handed for a place as well.
+
+help.c, Help05: variable buttons, u16
+    bits: the buttons of the mouse.
+
+help.c, Help05: variable color, u16
+    cell: the colour alone in its place.
+
+help.c, Help05: variable held, u16
+    place: of the mouse when a button went down.
+
+help.c, Help05: variable key, u16
+    key
+
+help.c, Help05: variable mouse, u16
+    place: of the mouse.
+
+help.c, Help05: variable place, u16
+    place
+
+help.c, Help00: variable place, u16
+    place: of the cursor.
+
+help.c, Help00: variable page, u8
+    small: HlpPage as it was, a byte of the main data, put back as it
+    is.
+
+help.c, Help00: variable errors, u8
+    flag: BlocEr as it was, put back as it is.
 
 help_t.c: as a whole, 8 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -2580,7 +2669,92 @@ mask.c, Convert: variable c, u8
 mask.c, UnConv: variable c, u8
     character
 
-menu.c: not sorted, 56 numbers
+menu.c, (): variable PtMnu_S, u8[]
+    text: of the tables, bars_t.c
+
+menu.c, (): variable MenuLn, u8[713]
+    text
+
+menu.c, (): variable Ctrl_S, u8[9]
+    text
+
+menu.c, (): variable MnuHlp, u8[64]
+    small: a page of the help, as HlpPage keeps it in a byte; the
+    original's table, which the test of the data holds.
+
+menu.c, (): variable MnuKey, u8[6]
+    character
+
+menu.c, struct MnuTab: laid out, 4 numbers
+    The original's: the table of the five menus, which the test of the
+    data holds byte for byte.
+
+menu.c, struct KeyTab: laid out, 2 numbers
+    The original's: the keys of the items of an open menu, which the
+    test of the data holds byte for byte.
+
+menu.c, struct MenuMouse: field now, u16
+    bits: the buttons of the mouse.
+
+menu.c, struct MenuMouse: field before, u16
+    bits: the buttons of the mouse, as MnuMous kept them.
+
+menu.c, struct MenuMouse: field place, u16
+    place: of the mouse.
+
+menu.c, F40_40: parameter state, u16
+    place: what GetMous answers for one where there is no mouse; the
+    original has the item and the menu there, as it has them in CX.
+
+menu.c, F40_10: parameter begin, u16
+    place: of the menu.
+
+menu.c, F40_10: parameter color, u16
+    colour
+
+menu.c, F40_10: parameter letter, u16
+    colour
+
+menu.c, F40_10: parameter size, u16
+    place: the size of the menu.
+
+menu.c, F40_10: variable cell, u16
+    cell
+
+menu.c, F40_10: variable place, u16
+    place
+
+menu.c, F40_30: parameter size, u16
+    place: the size of the menu.
+
+menu.c, F39_52: parameter size, u16
+    place: the size of the menu.
+
+menu.c, F39_52: variable box, u16
+    cell: the colour alone in its place.
+
+menu.c, F39_52: variable c, u16
+    character
+
+menu.c, F39_52: variable color, u16
+    cell: the colour alone in its place.
+
+menu.c, F39_58: parameter size, u16
+    place: the size of the menu.
+
+menu.c, F39_00: variable begin, u16
+    place: of the open menu.
+
+menu.c, F39_00: variable size, u16
+    place: the size of the open menu.
+
+menu.c, F39_00: variable held, u16
+    bits: what the BIOS says of the keys held down, or 50h, as the
+    original has DL for the command.
+
+menu.c, F39_00: variable key, u16
+    key: or, for an item that cannot be chosen, its number, which is
+    looked for among the letters as the original does.
 
 misc.c, IsCrLf: parameter word, u16
     character: two, the first in the low byte

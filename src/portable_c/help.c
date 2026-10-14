@@ -158,38 +158,38 @@ void DeCode(u8 *at, u16 count)
     while (--count);
 }
 
-/* Go to a place in the help file. Not 0 if DOS would not, or went
+/* Go to a place in the help file. True if DOS would not, or went
    elsewhere. */
-static u16 SeekDsk(u16 high, u16 low)
+static bool SeekDsk(u16 high, u16 low)
 {
     u32 place = (u32)high << 16 | low;
     struct FilePlace sought = FileSeek(hd.HlpHndl, 0, place);
 
     if (sought.failed)
-        return 1;
+        return true;
     return sought.place != place;
 }
 
-/* Read `count` bytes of the help file. Not 0 if DOS would not, or read
-   fewer. */
-static u16 ReadDsk(u8 *to, u16 count)
+/* Read `count` bytes of the help file, fewer than 2,968. True if DOS
+   would not, or read fewer. */
+static bool ReadDsk(u8 *to, i32 count)
 {
-    struct Answer read = FileRead(hd.HlpHndl, to, count);
+    struct Answer read = FileRead(hd.HlpHndl, to, (u16)count);
 
     if (read.failed)
-        return 1;
+        return true;
     return read.value != count;
 }
 
 /* Read the entry at HlpOffs. For a page that follows the index, the first
    line of the index is kept and the page is shown from its start; for the
    index, or a page that follows a page, the cursor goes to the line that
-   the entry before named and the first line is the one kept. Not 0 if the
+   the entry before named and the first line is the one kept. True if the
    entry could not be read: what is in the memory is neither then. */
-static u16 RdEntry(void)
+static bool RdEntry(void)
 {
-    u16 cursor = hd.HlpBkLn;
-    u16 first = hd.HlpBkFr;
+    i32 cursor = hd.HlpBkLn;
+    i32 first = hd.HlpBkFr;
 
     if (hd.HlpMode == 0) {
         hd.HlpBkFr = hd.HlpFrst;
@@ -197,28 +197,31 @@ static u16 RdEntry(void)
         first = 0;
     }
     if (SeekDsk(hd.HlpOffsHi, hd.HlpOffsLo))
-        return 1;
+        return true;
     if (ReadDsk((u8 *)&hd.HlpMode, 26))
-        return 1;
+        return true;
     DeCode((u8 *)&hd.HlpMode, 26);
     if (hd.HlpSize >= LenHelp - 0x20)
-        return 1;
+        return true;
     if (ReadDsk(hd.HlpInfo, hd.HlpSize))
-        return 1;
+        return true;
     DeCode(hd.HlpInfo, hd.HlpSize);
     hd.HlpLins -= hd.HlpMode;
-    hd.HlpFrst = first;
-    hd.HlpCur = cursor;
-    return 0;
+    hd.HlpFrst = (u16)first;
+    hd.HlpCur = (u16)cursor;
+    return false;
 }
 
 /* Take from the index, which is in the memory, where the page of its line
    `line` is in the file. */
-static void Help70(u16 line)
+static void Help70(i32 line)
 {
     u8 *entry;
 
     line += line;
+    /* Six bytes for each line, which wraps as the original's offset of
+       16 bits from a line of 10,923 on: only an index that is not true
+       to its text has such lines. */
     entry = hd.HlpInfo + 2 + (u16)(line + line + line);
     hd.HlpOffsLo = *(u16 *)entry;
     hd.HlpOffsHi = *(u16 *)(entry + 2);
@@ -227,18 +230,22 @@ static void Help70(u16 line)
 /* Where the text of a line is: of the index behind its six bytes for
    every line, of a page behind its title. The end of a text is looked for
    in 65535 bytes, and taken to be there if it is not. */
-static u8 *Help72(u16 line)
+static u8 *Help72(i32 line)
 {
     u8 *text = hd.HlpInfo;
-    u16 count;
+    i32 count;
 
-    line++;
+    /* Both wrap as the original's words of 16 bits, which only an entry
+       that is not true to its text gets to: the six bytes of an index
+       of 32,768 lines or more, and the line behind 65,535, which is
+       the title. */
     if (hd.HlpMode == 0) {
-        line--;
-        count = hd.HlpLins << 1;
+        count = (u16)(hd.HlpLins << 1);
         text += count;
         text += count;
         text += count;
+    } else {
+        line = (u16)(line + 1);
     }
     for (; line; line--) {
         count = 0xFFFF;
@@ -254,8 +261,8 @@ static u8 *Help72(u16 line)
 static const u8 *Help77(u16 place, const u8 *text)
 {
     struct LineArgs line;
-    u16 cell = Color(Help_P[0]) << 8 | ' ';
-    u16 i;
+    u16 cell = (u16)(Color(Help_P[0]) << 8 | ' ');
+    i32 i;
 
     line.screen = BasAdr(place);
     for (i = 0; i < WIDTH; i++)
@@ -272,24 +279,29 @@ static const u8 *Help77(u16 place, const u8 *text)
 
 /* Show the entry that is in the memory in a window, and go on from there:
    move in it, and read and show others, until a key or the mouse leaves
-   the help or an entry cannot be read. */
+   the help or an entry cannot be read.
+   The lines are the entry's, which the file and HlpData have in 16 bits.
+   Where a line is made of them that would pass 65,535, it wraps as the
+   original's word does: an entry whose numbers are not true to its text
+   gets there, one that names a line of the index far behind its last.
+   The cuts that say so are marked. */
 static void Help05(void)
 {
     const u8 *text;
-    u16 size = (u16)(u8)(md.Lines - 3) << 8 | 74;
+    u16 size = (u16)((u8)(md.Lines - 3) << 8 | 74);
     u16 item = 0;                       /* CX: the button with the cursor */
-    u16 cursor, first;                  /* SI and DI: where to go */
-    u16 was, shown;                     /* and where the screen is */
+    i32 cursor, first;                  /* SI and DI: where to go */
+    i32 was, shown, moved;              /* and where the screen is */
     u16 *screen;
     const u8 *control;                  /* the buttons */
-    u16 color, place, moved, count, key, buttons, mouse, held;
-    i32 lines, third;
+    u16 color, place, key, buttons, mouse, held;
+    i32 count, lines, third, clicked;
     struct Buttons menu;
     struct Paged paged;
     struct Mouse pointer;
 
     SavWin(BEGIN, size, md.ErrBuf1);
-    color = Color(Help_C) << 8;
+    color = (u16)(Color(Help_C) << 8);
     MinBox(BEGIN, size, color);
     screen = BasAdr(BEGIN);
     MvsBw(screen + 80 + 33, Help_S, 6, color);
@@ -325,16 +337,16 @@ Help10:                                 /* the cursor within the window */
     if (cursor < first)
         first = cursor;
     lines = (size >> 8) - 9;
-    if (cursor >= (u16)(lines + first))
+    if (cursor >= (u16)(lines + first))         /* wraps, marked */
         first = cursor - lines + 1;
     was = hd.HlpCur;
-    hd.HlpCur = cursor;
+    hd.HlpCur = (u16)cursor;            /* both of 16 bits, by the cuts */
     shown = hd.HlpFrst;
-    hd.HlpFrst = first;
+    hd.HlpFrst = (u16)first;
     moved = first - shown;
     if (moved != 0 || hd.HlpMode == 0 && was != hd.HlpCur) {
         if (shown != 0xFFF0) {          /* the line that had the cursor */
-            place = BEGIN + (was - shown << 8) + AT_TEXT;
+            place = (u16)(BEGIN + (was - shown << 8) + AT_TEXT);
             Help77(place, Help72(was));
             Window(place, 0x100 | WIDTH);
         }
@@ -344,8 +356,11 @@ Help10:                                 /* the cursor within the window */
             count = (u8)((size >> 8) - 9);
             do {
                 /* Behind the text there are only empty lines. How far
-                   into it the line is, is cut to 16 bits as in the
-                   original, where it was a difference of two offsets. */
+                   into it the line is wraps at 16 bits, as the
+                   original's difference of two offsets, marked: it is
+                   never below 0, even for a text of no bytes, since
+                   Help77 answers at least a byte behind what it is
+                   handed, which is at most a byte in front. */
                 if ((u16)(text - hd.HlpInfo) >= hd.HlpSize)
                     text--;
                 text = Help77(place, text);
@@ -355,17 +370,17 @@ Help10:                                 /* the cursor within the window */
                and the one that is new. */
             place = BEGIN + AT_TEXT;
             count = SHOWN();
-            if (moved == 1 || moved == 0xFFFF) {
+            if (moved == 1 || moved == -1) {
                 key = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
                 Scroll(key >> 8 == 7, Color(Help_C), place,
-                       ((count - 1 & 0xFF) << 8 | WIDTH - 1) + place);
+                       (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1) + place));
                 place += key << 8;
                 count = 1;
             }
-            Window(place, count << 8 | WIDTH);
+            Window(place, (u16)(count << 8 | WIDTH));
         }
         if (hd.HlpMode == 0) {          /* the cursor */
-            place = BEGIN + (hd.HlpCur - hd.HlpFrst << 8) + AT_TEXT;
+            place = (u16)(BEGIN + (hd.HlpCur - hd.HlpFrst << 8) + AT_TEXT);
             MvsColr(BasAdr(place), WIDTH, Color(HlpRe_C));
             Window(place, 0x100 | WIDTH);
         }
@@ -465,17 +480,19 @@ Help31:
         md.WinMous |= 1;
         if (hd.HlpMode == 0) {          /* a line of the index */
             first = hd.HlpFrst;
-            cursor = (u8)((mouse >> 8) - (BEGIN >> 8) - 4) + first;
-            count = hd.HlpLins - 1;
+            /* Both wrap, marked: the last line of an index without
+               lines is 65,535. */
+            cursor = (u16)((u8)((mouse >> 8) - (BEGIN >> 8) - 4) + first);
+            count = (u16)(hd.HlpLins - 1);
             if (cursor > count) {
                 cursor = count;
                 goto Help10;
             }
-            key = DoublMo(mouse & 0xFF00 | (u8)(BEGIN + 4),
-                          0x100 | (u8)(size - 10), cursor);
-            if (key == 2)
+            clicked = DoublMo(mouse & 0xFF00 | (u8)(BEGIN + 4),
+                              0x100 | (u8)(size - 10), cursor);
+            if (clicked == 2)
                 goto Help10;
-            if (key == 0)
+            if (clicked == 0)
                 goto Help25;
             md.MousEnt = 0;
             ((u16 *)&md.MousTim)[1] = 0xFFFF;
@@ -503,9 +520,9 @@ Help50:                                 /* Up */
 Help53:                                 /* Down */
     cursor = hd.HlpCur;
     first = hd.HlpFrst;
-    count = SHOWN() + first;
+    count = (u16)(SHOWN() + first);     /* both wrap, marked */
     if (hd.HlpMode == 0)
-        count = cursor + 1;
+        count = (u16)(cursor + 1);
     if (count < hd.HlpLins)
         cursor = count;
     goto Help10;
@@ -534,7 +551,7 @@ Help60:                                 /* Enter */
             if (count >= hd.HlpLins)
                 count = 0;
         } else if (count-- == 0) {
-            count = hd.HlpLins - 1;
+            count = (u16)(hd.HlpLins - 1);      /* wraps, marked */
         }
     }
     Help70(count);
@@ -556,7 +573,7 @@ Help66:                                 /* Esc */
 static void HelpFil(void)
 {
     struct Answer opened;
-    u16 i;
+    i32 i;
 
     HidCur();
     MainFil(md.HelpBuf, Help_F);
@@ -597,8 +614,8 @@ Help67:
 void Help00(void)
 {
     u16 place = GetCur();
-    u16 page = md.HlpPage;
-    u16 errors = md.BlocEr;
+    u8 page = md.HlpPage;
+    u8 errors = md.BlocEr;
 
     md.BlocEr = 1;
     if (page != 0xFF)

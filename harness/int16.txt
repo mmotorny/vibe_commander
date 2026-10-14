@@ -204,26 +204,6 @@ main.c, Loop: back
     The line above has stepped i up from what was below length: 1 at the
     least.
 
-menu.c, F39_00: back
-    | md.HlpPage = MnuHlp[MnuTab[menu - 1].help + (item == 0xFF ? 0 : item)];
-    menu is the number of a menu of the bar, from 1. Were it 0, both
-    builds would read the entry before the table: MnuTab is a constant
-    among others, and not where a segment begins.
-
-menu.c, F39_00: index
-    | md.HlpPage = MnuHlp[MnuTab[menu - 1].help + (item == 0xFF ? 0 : item)];
-    help is a byte of MnuTab, and item the number of a line of a menu, or
-    FFh for none, which is taken for 0 here.
-
-menu.c, F39_58: index
-    | *(u8 *)(top + order * 80 + 561) = TICK;
-    The lines above have made order 4 at the most.
-
-menu.c, F40_30: index
-    | u16 *line = top + item * 80 + 1;
-    item is the number of a line of a menu: the four calls, in F39_58,
-    hand it 10, 12, 13 and 14.
-
 panel.c, PutFls: compare
     | if (text - md.TmpBuf > 36) {
     text is behind TmpBuf, where the lines above have written two

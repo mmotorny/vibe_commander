@@ -214,7 +214,7 @@ static const struct KeyTab KeyTab[] = {
     { 0x5C00, 0x0F04 }, { 0x5F00, 0x0505 }, { 0x1312, 0x0D05 },
     { 0x2106, 0x0E05 }, { 0x6900, 0x0F05 },
 };
-#define KEYS (sizeof KeyTab / sizeof KeyTab[0])
+#define KEYS ((i32)(sizeof KeyTab / sizeof KeyTab[0]))
 
 /* What the mouse says, for the menu bar. */
 struct MenuMouse {
@@ -241,9 +241,9 @@ static void F40_40(u16 state, struct MenuMouse *mouse)
    columns before its name and the two behind it. `bar` is the text of
    the bar, PtMnu_S: FFh, the number of spaces before a name, the name,
    and so on. */
-static u16 F40_50(u16 column, const u8 *bar)
+static i32 F40_50(i32 column, const u8 *bar)
 {
-    u16 at = 0, menu = 0;
+    i32 at = 0, menu = 0;
 
     column &= 0xFF;
     bar++;
@@ -265,24 +265,25 @@ static u16 F40_50(u16 column, const u8 *bar)
    the cursor, or to take the cursor off it. Nothing for no item, FFh.
    The letter is the first cell of the line that has that character; a
    line without one would have its last cell coloured. */
-static void F40_10(u16 color, u16 letter, u16 item, u16 begin, u16 size)
+static void F40_10(u16 color, u16 letter, i32 item, u16 begin, u16 size)
 {
-    u16 place, width, count, cell;
+    u16 place, cell;
+    i32 width, count;
     u16 *screen;
 
     if (item == 0xFF)
         return;
-    place = (item + 1) << 8 | (begin + 1) & 0xFF;
+    place = (u16)((item + 1) << 8 | (begin + 1) & 0xFF);
     width = (size - 4) & 0xFF;
     color = Color(color);
     screen = BasAdr(place);
-    MvsColr(screen, width, color);
-    cell = color << 8 | LIST(item);
+    MvsColr(screen, (u16)width, color);
+    cell = (u16)(color << 8 | LIST(item));
     for (count = width; count != 0; count--)
         if (*screen++ == cell)
             break;
     ((u8 *)screen)[-1] = (u8)Color(letter);
-    Window(place, 0x100 | width);
+    Window(place, (u16)(0x100 | width));
 }
 
 /* Make an item of the menu that has just been drawn dark: it cannot be
@@ -290,7 +291,7 @@ static void F40_10(u16 color, u16 letter, u16 item, u16 begin, u16 size)
    the screen buffer. The minus stands a column further on in the menus
    of the panels and of the options, whose lines begin with a space: the
    first column is that of their ticks. */
-static void F40_30(u16 item, u16 menu, u16 *top, u16 size)
+static void F40_30(i32 item, i32 menu, u16 *top, u16 size)
 {
     u16 *line = top + item * 80 + 1;
     u16 *minus = line;
@@ -299,20 +300,21 @@ static void F40_30(u16 item, u16 menu, u16 *top, u16 size)
     if (menu != 2 && menu != 3)
         minus++;
     MvsColr(line, (size - 4) & 0xFF, Color(MnuDr_C));
-    *minus = Color(MnuMi_C) << 8 | '-';
+    *minus = (u16)(Color(MnuMi_C) << 8 | '-');
 }
 
 /* Draw a menu into the screen buffer: its frame, its lines from `lines`
-   in MenuLn on, and its shadow, and fill MnuList for it. A menu without
-   a line has 65536. */
-static void F39_52(u16 *top, u16 size, u16 lines)
+   in MenuLn on, and its shadow, and fill MnuList for it. Each of the
+   five has lines; one without would have 65536 in the original. */
+static void F39_52(u16 *top, u16 size, i32 lines)
 {
-    u16 box = Color(MnuBx_C) << 8;
-    u16 inner = (size - 4) & 0xFF;      /* between the corners */
-    u16 rows = ((size >> 8) - 3) & 0xFF;
+    u16 box = (u16)(Color(MnuBx_C) << 8);
+    i32 inner = (size - 4) & 0xFF;      /* between the corners */
+    i32 rows = ((size >> 8) - 3) & 0xFF;
     u8 *list = MnuList;
     u16 *line, *cell;
-    u16 color, count, c, from, cells;
+    u16 color, c;
+    i32 count, from, cells;
 
     line = BoxLine(top, box | LINE, TOP, 0, inner);
     do {
@@ -327,7 +329,7 @@ static void F39_52(u16 *top, u16 size, u16 lines)
             for (; count != 0; count--)
                 *cell++ = box | LINE;
         } else {                        /* F39_53 */
-            color = Color(MnuTx_C) << 8;
+            color = (u16)(Color(MnuTx_C) << 8);
             ((u8 *)cell)[-1] = color >> 8;
             do {                        /* F39_54 */
                 c = MenuLn[lines++];
@@ -350,7 +352,7 @@ static void F39_52(u16 *top, u16 size, u16 lines)
                 }
                 if (c <= 'Z' && c >= 'A' && *list == 0) {       /* F39_97 */
                     *list = (u8)c;
-                    *cell++ = Color(MnuBr_C) << 8 | c;
+                    *cell++ = (u16)(Color(MnuBr_C) << 8 | c);
                 } else
                     *cell++ = color | c;
                 count--;
@@ -384,12 +386,12 @@ static void F39_52(u16 *top, u16 size, u16 lines)
    files; and its items that cannot be chosen as things are. `panel` is
    the panel that was the current one when the bar came up; the Left and
    the Right menu are of their own panels. */
-static void F39_58(u16 menu, struct WCBdef *panel, u16 *top, u16 size)
+static void F39_58(i32 menu, struct WCBdef *panel, u16 *top, u16 size)
 {
     const struct WCBdef *wcb = panel;
     const struct WCBdef *other;
     u16 *mark;
-    u16 order;
+    i32 order;
 
     if (menu == 4) {                    /* Options */
         u8 *tick = (u8 *)(top + 561);
@@ -486,14 +488,16 @@ static void F39_58(u16 menu, struct WCBdef *panel, u16 *top, u16 size)
 
    On the bar alone the item is 0. FFh is a menu that is open with no
    item under the cursor, which only the mouse brings about. */
-struct Picked F39_00(u16 again, struct WCBdef *panel)
+struct Picked F39_00(bool again, struct WCBdef *panel)
 {
     const u8 *names = PtMnu_S;
     struct MenuMouse mouse;
     struct Picked picked;
-    u16 menu, item;                     /* CL and CH */
+    i32 menu, item;                     /* CL and CH */
     u16 begin = 0, size = 0x150;        /* of the open menu: BX and DX */
-    u16 key, to, i, count, hit, table, held;
+    u16 key, held;
+    i32 to, i, count, table;
+    bool hit;
     u16 *top;
 
     if (again) {                        /* F40_00 */
@@ -508,7 +512,7 @@ struct Picked F39_00(u16 again, struct WCBdef *panel)
     PutKey(1);
 
 F39_02:
-    F40_40(item << 8 | menu, &mouse);
+    F40_40((u16)(item << 8 | menu), &mouse);
     if (mouse.now != 0 && mouse.place >> 8 == 0) {
         menu = F40_50(mouse.place, names);
         if (menu == 0) {
@@ -518,7 +522,7 @@ F39_02:
             item = 0;
             do {
                 do {                    /* F39_03 */
-                    F40_40(item << 8 | menu, &mouse);
+                    F40_40((u16)(item << 8 | menu), &mouse);
                     if (mouse.now == 0)
                         goto F39_85;
                     ClrKbd();
@@ -529,12 +533,12 @@ F39_02:
     if (item != 0)                      /* F39_04 */
         goto F39_51;
 F39_07:
-    PtMnu1(menu);
+    PtMnu1((u16)menu);
 
 F39_10:
     /* The page of the help for F1, and then the mouse or a key. */
     md.HlpPage = MnuHlp[MnuTab[menu - 1].help + (item == 0xFF ? 0 : item)];
-    F40_40(item << 8 | menu, &mouse);
+    F40_40((u16)(item << 8 | menu), &mouse);
     if (mouse.now != 0) {
         ClrKbd();
         if (mouse.place >> 8 != 0) {    /* F39_17: below the bar */
@@ -612,7 +616,7 @@ F39_10:
             /* The key of an item that cannot be chosen: the number of
                the item is looked for among the letters, where it is
                not. */
-            key = to;
+            key = (u16)to;
             break;
         }
     if ((key & 0xFF) != 0) {            /* F39_23 */
@@ -712,7 +716,7 @@ F39_46:                                 /* Esc, Alt, F10 */
 F39_50:                                 /* Window */
     item = 1;
 F39_51:
-    PtMnu1(menu);
+    PtMnu1((u16)menu);
     i = (menu - 1) & 0xFF;
     begin = MnuTab[i].begin;
     size = MnuTab[i].size;
@@ -736,7 +740,7 @@ F39_85:                                 /* Exit */
     table = 0;
     held = 0x50;
     if (item != 0 && item != 0xFF) {
-        md.LastMnu = item << 8 | menu;
+        md.LastMnu = (u16)(item << 8 | menu);
         table = menu;
         if (table == 5)
             table = 1;
