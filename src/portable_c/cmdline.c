@@ -231,7 +231,8 @@ u16 F68_00(void)
     u16 begin, size;                    /* BX and DX: the box */
     u16 row;                            /* CL: the row of the cursor */
     u16 limit, length, color, width, lines, room, at, i, c, key, to;
-    u16 half, answer, count;
+    u16 half, answer;
+    i32 count;
 
     HidCur();
     PutMnu(3);
@@ -378,8 +379,9 @@ F68_20:                                 /* the box goes */
     Window(begin, size);
     if (key >> 8 != 0x1C)
         return 0;
-    count = (u16)(short)(signed char)(u8)((begin >> 8) + (size >> 8) - 4
-                                          - row);
+    /* The commands below the cursor, 0 or more: the cursor is on a line
+       of the list, which ends four rows above the bottom of the box. */
+    count = (begin >> 8) + (size >> 8) - 4 - row;
     text = md.HstBuf;
     for (; count != 0; count--) {
         length = 0;

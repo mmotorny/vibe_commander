@@ -145,7 +145,7 @@ static void DiBx30(const struct BOXTX *entry, u8 *to, const void *data)
         if (mode & 1)
             LetLin(to);
     }
-    ShrtLin(to, (u16)(short)(signed char)entry->length);
+    ShrtLin(to, entry->length);
 }
 
 /* Put the box `head` into the screen buffer, with the middle of its

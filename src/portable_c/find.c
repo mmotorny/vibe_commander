@@ -140,11 +140,10 @@ static const u8 SubDir[7] = "SUB-DIR";
 #define MOVED(place, rows, columns) \
     ((u16)((place) + ((rows) << 8) & 0xFF00 | (place) + (columns) & 0xFF))
 
-/* The rows of the box that show lines of the list: all but eight. The
-   assembly takes the number for a signed byte where it compares with it,
-   and for an unsigned one where it counts. */
+/* The rows of the box that show lines of the list: all but eight, 14 or
+   more. The assembly takes the byte with its sign where it compares with
+   it and without one where it counts, which is the same number. */
 #define ROWS(size) ((u16)(((size) >> 8) - 8 & 0xFF))
-#define SIGNED(byte) ((u16)(short)(signed char)(byte))
 
 /* What a key or the mouse asks of FndMove. */
 enum {
@@ -329,7 +328,8 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
 {
     u16 line = FND->FndCur;
     u16 first = FND->FndFrst;
-    u16 ask, rows, old, wasLine, wasFirst, moved, count, at, number;
+    i32 rows;
+    u16 ask, old, wasLine, wasFirst, moved, count, at, number;
     u16 scroll, color;
     struct Paged paged;
 
@@ -337,7 +337,7 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
         ask = FnMv00(mode, place, size, &line);
     else
         ask = Find_T(key);
-    rows = SIGNED((size >> 8) - 8);
+    rows = ROWS(size);
     switch (ask) {
     case ASK_NOTHING:
         return 0;

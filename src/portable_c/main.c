@@ -484,7 +484,8 @@ static struct Asked Func21(struct Regs *r)
     struct WCBdef *wcb;
     struct Place place;
     struct Mouse mouse;
-    u16 look, lines, rows, column, kind, answer;
+    u16 look, lines, rows, kind, answer;
+    i32 column;
 
     ClrKbd();
     if (md.WinMous != 0)
@@ -592,7 +593,12 @@ Func40:                                 /* Move the cursor */
     }
     if (column == 0)                    /* Func42 */
         return Nothing(FUNC07);
-    r->ax = (u16)(short)(signed char)rows + r->di;
+    /* The entry under the mouse. Ported as it is: the original takes
+       the line for a byte with a sign, and a line of 128 or more is one
+       of the third column on a panel of 43 lines or more, full screen
+       and brief, on a screen of 48 lines or more. The cursor then goes
+       256 entries back, or to the last entry if there are not as many. */
+    r->ax = (signed char)rows + r->di;
     r->si = r->ax;
     if (r->si > r->dx) {
         r->si = r->dx;
@@ -609,7 +615,7 @@ Func40:                                 /* Move the cursor */
     r->ax = r->ax & 0xFF00 | kind;
     if (kind == 0) {
         column = (u8)(r->cx - (r->bx & 0xFF));
-        column = (u16)(short)(signed char)column / 13 * 13;
+        column = column / 13 * 13;
         r->ax = column;
         r->cx = 13;
         r->bx = r->bx & 0xFF00 | (u8)(r->bx + column);
@@ -1344,7 +1350,7 @@ u16 ErrRdy(u16 letter)
     u16 *cell;
     u16 drive, key, c, buttons, place, look, shown, last;
 
-    *(u16 *)(md.TmpErr + 1) = (u16)(short)(signed char)letter;
+    *(u16 *)(md.TmpErr + 1) = (u8)letter;     /* and the end of the text */
     drive = letter & 0xFF;
     PutKey(2);
     DialBox(0x528, &NoRd_P, 0, &md, &where);

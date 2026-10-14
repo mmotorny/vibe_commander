@@ -33,12 +33,10 @@ u16 NumAdr(struct WCBdef *panel, u16 number);
                          : (md.Lines >> 1) + 3 + (md.Lines > 25 ? 1 : 0)))
 
 /* How many of those rows show files: all but the frame and the titles,
-   and but the two of the mini status where that is on. `rows` is a byte
-   made a word with its sign, and the mini status is held against the
-   high byte of that, which is 0 on any screen there is. */
-#define LINES(rows) \
-    (((rows) & 0xFF00) \
-     | (u8)((rows) - 3 - ((u8)((rows) >> 8) != md.MiniSta ? 2 : 0)))
+   and but the two of the mini status where that is on. The original
+   holds the mini status against the high byte of the rows made a word
+   with their sign, which is 0: they are fewer than 50. */
+#define LINES(rows) ((rows) - 3 - (md.MiniSta != 0 ? 2 : 0))
 
 /* The number of the entry at an address, and the address of the entry
    with a number: in a list of files, and in the tree. */
@@ -65,9 +63,7 @@ u16 SizDX(void)
 /* How many lines of a panel show files. */
 u16 LnsAX(void)
 {
-    u16 rows = (u16)(short)(signed char)ROWS();
-
-    return LINES(rows);
+    return LINES(ROWS());
 }
 
 /* The other panel. */
@@ -95,13 +91,12 @@ u16 FilePan(struct WCBdef *panel)
             cursor = FILE_NUMBER((wcb)->CurAdr); \
             first = FILE_NUMBER((wcb)->First); \
             last = FILE_NUMBER((wcb)->EndBuf); \
-            lines = (u16)(short)(signed char)ROWS(); \
-            lines = LINES(lines); \
+            lines = LINES(ROWS()); \
         } else { \
             cursor = TREE_NUMBER(TreeCursor); \
             first = TREE_NUMBER(TreeFirst); \
             last = ((struct DIRTREE *)md.TreeBuf)->TreeLen; \
-            lines = (u16)(short)(signed char)(u8)(ROWS() - 4); \
+            lines = ROWS() - 4; \
         } \
         if (last != 0) \
             last--; \

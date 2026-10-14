@@ -44,12 +44,15 @@ the two,
 
 which is `cbw` and `movzx eax,ax`. That is the one form that is right
 by how the fold is written: a change of sign at the same size is no
-instruction, so the two conversions do not follow one another. It is
-the form that the tree is written in, and src/portable_c/vc.h says so
-at "A byte with a sign made a word". A mask, `& 0xFFFF`, and arithmetic
-with a number that is written, `(u16)((signed char)x - 1)`, come out
-right today, by the order of the compiler's passes and by nothing
-else: the tree does not write them, and the finder refuses them.
+instruction, so the two conversions do not follow one another. The
+tree was written in it on 33 lines and is in neither form since: a
+byte that the original takes with its sign is a small number there,
+taken as it is, or with its sign into an int where that is meant, as
+src/portable_c/vc.h says at "A byte with a sign made a word". A mask,
+`& 0xFFFF`, and arithmetic with a number that is written, `(u16)((signed
+char)x - 1)`, come out right today, by the order of the compiler's
+passes and by nothing else: the tree does not write them, and the
+finder refuses them.
 
 Right too, and what the tree leans on: a conversion that narrows is
 never the first of a fold, and a fold whose second conversion narrows
@@ -89,9 +92,10 @@ expand a function in place: the fault is then also across a call and
 across a return, where a function that takes or returns 16 bits cuts
 for itself today. The functions called Lost are the fault, held to the
 wrong instructions: a compiler that no longer has it fails the test, and this
-check, the form and the note of vc.h are then looked at again. Those
-called Kept are what the tree rests on, held to the right ones: the
-form of the tree, and every other cast that narrows, of a number of 32
+check and the note of vc.h are then looked at again. Those called Kept
+are held to the right ones: the form with a short between, which the
+tree no longer writes and which is kept as what the compiler does of
+it, and every other cast that narrows, which the tree rests on, of a number of 32
 bits with a sign or without to a u16 and to a u8, of a number of 16 bits
 to a u8, of a short to a u16, and a byte made 32 bits with its sign,
 each handed to a parameter of 32 bits, added to a number of 32 bits,
@@ -458,9 +462,9 @@ def main():
     if lost:
         print(f"cut: {lost} places of the tree make a signed char a number "
               f"of 16 bits without a sign, which the compiler extends with "
-              f"its sign where the number goes on into 32 bits. Write "
-              f"(u16)(short)(signed char): see src/portable_c/vc.h, \"A "
-              f"byte with a sign made a word\".")
+              f"its sign where the number goes on into 32 bits. Take the "
+              f"byte as it is, or with its sign into an int: see "
+              f"src/portable_c/vc.h, \"A byte with a sign made a word\".")
     if len(found) > lost:
         print(f"cut: {len(found) - lost} places of the tree have a number "
               f"of 64 bits or a floating one. The compiler has the same "

@@ -144,9 +144,8 @@ static const u8 Empty_S[] = "";
    index. */
 #define NO_INDEX() ((hd.HlpOffsLo & hd.HlpOffsHi) == 0xFFFF)
 
-/* The lines of text that the window shows, as the assembly makes a word
-   of them. */
-#define SHOWN() ((u16)(short)(signed char)(md.Lines - 12))
+/* The lines of text that the window shows: 13 or more. */
+#define SHOWN() (md.Lines - 12)
 
 /* Take the mark off `count` bytes that were read from the file. A count
    of 0 is one of 65536. Not static: the help of the setup, sthelp.c,
@@ -283,7 +282,8 @@ static void Help05(void)
     u16 was, shown;                     /* and where the screen is */
     u16 *screen;
     const u8 *control;                  /* the buttons */
-    u16 color, place, moved, count, key, buttons, mouse, held, third;
+    u16 color, place, moved, count, key, buttons, mouse, held;
+    i32 lines, third;
     struct Buttons menu;
     struct Paged paged;
     struct Mouse pointer;
@@ -324,9 +324,9 @@ Help06:                                 /* the title and the buttons */
 Help10:                                 /* the cursor within the window */
     if (cursor < first)
         first = cursor;
-    count = (u16)(short)(signed char)((size >> 8) - 9);
-    if (cursor >= (u16)(count + first))
-        first = cursor - count + 1;
+    lines = (size >> 8) - 9;
+    if (cursor >= (u16)(lines + first))
+        first = cursor - lines + 1;
     was = hd.HlpCur;
     hd.HlpCur = cursor;
     shown = hd.HlpFrst;
@@ -459,7 +459,7 @@ Help31:
         }
         third = 0;
         if (hd.HlpMode != 0)
-            third = (u8)((u16)(short)(signed char)((size >> 8) - 9) / 3);
+            third = ((size >> 8) - 9) / 3;
     } else {
         md.WinMous |= 1;
         if (hd.HlpMode == 0) {          /* a line of the index */
@@ -481,7 +481,7 @@ Help31:
             TypMous(0);
             goto Help60;
         }
-        third = (u8)((u16)(short)(signed char)((size >> 8) - 9) / 3);
+        third = ((size >> 8) - 9) / 3;
     }
     /* Held above the text, or in its first third on a page: up; below it
        or in the last third: down. */
@@ -577,7 +577,7 @@ static void HelpFil(void)
     if (RdEntry())                      /* the index */
         goto Help01;
     if (md.HlpPage != 0 && hd.HlpMode == 0) {
-        Help70((u16)(short)(signed char)md.HlpPage - 1);
+        Help70(md.HlpPage - 1);
         if (RdEntry())
             goto Help01;
     }

@@ -151,8 +151,7 @@ u16 SetPth(void)
    page of the help is the same afterwards as before.
 
    The dialog names the drive by its letter, a text of one letter at
-   TmpErr+1: the letter and, behind it, the drive made a word with its
-   sign, which is 0. */
+   TmpErr+1: the letter and, behind it, the end of the text. */
 u16 Fantom(u16 drive)
 {
     struct Answer unit;
@@ -173,8 +172,7 @@ u16 Fantom(u16 drive)
         return 0;
     if (DriveSetLetter(goes_by).failed)
         return 0;
-    *(u16 *)(md.TmpErr + 1) = (u16)(short)(signed char)drive & 0xFF00
-                              | (u8)(drive + 'A' - 1);
+    *(u16 *)(md.TmpErr + 1) = (u8)(drive + 'A' - 1);
     page = md.HlpPage;
     answer = Dialog(&Fant_B, 0, 0, 0, &md);
     md.HlpPage = page;

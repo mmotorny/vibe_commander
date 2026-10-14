@@ -12243,8 +12243,8 @@ before that was known, and agrees with it.
 
 **Which cast is safe to write, and which is not.** Not safe: a
 `signed char` made a `u16`, by a cast or without one, in any spelling
-that has no `short` in it. Safe, and the form of the tree, the only
-one:
+that has no `short` in it. Safe, and the form of the tree until the piece below, "CBW, the byte
+made a word written as what it is", the only one:
 
     (u16)(short)(signed char)byte           /* cbw; movzx eax,ax */
 
@@ -12311,7 +12311,8 @@ build's listing:
 - Wrong and reachable: none. So no scenario was written, and the
   program does what it did: the image of every scenario says so.
 
-All 33 are written `(u16)(short)(signed char)` now. The seven are
+All 33 were written `(u16)(short)(signed char)` then, and none is
+since the piece below. The seven were
 right in the listings, `cbw` or `movsx` to 16 bits and `movzx` behind
 it, and no listing of the tree has a byte extended with its sign to 32
 bits but where `menu.c` means it, the index of `LIST`.
@@ -12676,8 +12677,9 @@ two halves and `edit.c` in three thirds stand for those.
    sum above all, since it is no cut afterwards and nothing names it
    then: where the program counts on it, the cast is written there,
    with `wraps` in its comment. Look at the masks, at the loops that count
-   down, and at every `(u16)(short)(signed char)` that the number
-   comes from. A variable that holds two things in turn, a count and
+   down, and at every `(signed char)` that the number comes from,
+   which the tree has only where a sign is meant ("CBW, the byte made
+   a word written as what it is", below). A variable that holds two things in turn, a count and
    then a character, gets a second variable. Build; the scenarios and
    the images of step 1, since the types change the program.
 4. `python3 harness/width.py --sort FILE`, or `FILE:FUNCTION` for a
@@ -12736,6 +12738,112 @@ What was not sure, and what became of it:
 - Whether a number put into fewer bits through a pointer of another
   type, `*(u8 *)&star->StarMod = (u8)mode`, wants more than its cast:
   it has the cast, and nothing names the pointer.
+
+### CBW, the byte made a word written as what it is: done
+
+On a remark of the user's of 13 October 2026, that the 33 lines which
+read `(u16)(short)(signed char)x` are ugly and inexplicable in code
+that is to be portable. They were the original's `CBW` written as the
+register: a byte taken with its sign and kept in a word without one,
+with the `(short)` of N0c between as the way round the compiler's
+fault. None is written so now, and the macro `SIGNED` of `find.c` is
+gone: no word of 16 bits without a sign stands between such a byte
+and what uses it. Where the number is reckoned with, the variable that
+takes it is an `i32`, and the line has no cast: every byte but one is
+a small number that cannot be below 0, for which `CBW` was the
+assembly's way to clear AH. The one whose sign the original goes by is
+`(signed char)` into an int.
+
+Each place was read in the original and in the C: what the byte is,
+what sets it, whether it can have its top bit, by the program or by
+what DOS, the BIOS, a file or a user can put there, and what takes the
+result. The screen has 25 to 50 lines: `Init29` of `start.c` takes the
+BIOS's rows only up to `MaxLins`, and a text mode of 80 columns has no
+fewer than 25. So every count of rows below is below 128.
+
+| Place | The byte | Below 0? | Now |
+|---|---|---|---|
+| `cmdline.c`, `F68_00` | The commands below the cursor of the history | No: the cursor is kept two rows below the top of the list and four above the bottom, by Up, Down and the mouse | `i32 count`, no cast |
+| `dialog.c`, `DiBx30` | How long a text of a box may be, a constant of the tables, 15 to 70 | No | `ShrtLin(to, entry->length)` |
+| `dirfunc.c`, `F38_70` | AL of DOS's delete by an FCB, 0 or 0FFh, or the low byte of the error asked about, below 7Fh; one more | No, for any of those: 1, 0, or the error and one | `(u8)(answer + 1)`, a cut of the byte's arithmetic, with the reason. The callers read the high byte as "stop", 0 here as in the original for every byte that DOS leaves |
+| `edit.c`, `T00_71` | The column of the mouse in the editor's window, by `InWind` above | No | `i32 column`, no cast |
+| `edit.c`, `T00_71` | Byte and digit in hex, up to 15 | No | `i32 where`, no cast |
+| `find.c`, `FndMove` | Rows of the box less 8, 14 or more | No | `i32 rows = ROWS(size)`; `SIGNED` gone, and the comment of `ROWS` says that the byte with a sign and without is one number |
+| `main.c`, `Func21` | The entry under the mouse on the page of a panel: up to three columns of its lines | Yes: see below | `(signed char)rows + r->di`, kept in `r->ax` of 16 bits, with the comment |
+| `main.c`, `Func21` | The column of a double click, 1 to 38 by the tests above it | No | `i32 column`, no cast |
+| `main.c`, `ErrRdy` | The letter of a drive, A to Z: from DOS's path of a panel or from the drive menu's list | No | `(u8)letter` into the word, which is the letter and the end of the text |
+| `system.c`, `Fantom` | A drive that DOS has just said is one, 1 to 26 | No | `(u8)(drive + 'A' - 1)` into the word |
+| `treebox.c`, `ReadTre` | The letter of DOS's current drive | No | `md.DosPth[0]` into the word |
+| `treebox.c`, `ChTree`, 5 | Rows of the box less 8 or less 9, from the screen's less 3: 13 to 39 | No | `i32 lines`; to `PgUp`, `PgDn` and `cursor` as `(size >> 8) - 8` and `- 9` |
+| `treebox.c`, `ChTree` | The line of the scroll, from `scroll`, 0 or 13 to 38 | No | `(u8)scroll << 4` |
+| `treebox.c`, `ChTree` | The line under the mouse, by `InWind` above | No | `i32 under`, a variable of its own, since `n` holds four things |
+| `place.c`, `LnsAX`, `AdrNum`, 3 | The rows of a panel, 15 to 48, and less 4 for the tree | No | `LINES(ROWS())`, no cast; `LINES` holds the mini status against 0, which the high byte of the word was |
+| `view.c`, `V00_10`, 2 | The rows of the viewer's window, 3 to 48 | No | `i32 third`, `i32 number`, no cast |
+| `sthelp.c`, `StHelp`, 5 | The rows of the screen less 11, 12 or 13, and the help's box less 9 | No | `i32 step` for the keys, which had `count`, a count that has to wrap; `i32 third`; `(u16)(md.Lines - 11 + first)`, the original's sum of 16 bits |
+| `usermenu.c`, `F32_70` | The line under the mouse, by `InWind` above | No | `i32 line`, no cast |
+| `help.c`, `SHOWN`, `Help05`, 4 | The lines of text, the screen's less 12, and the box's rows less 9 | No | `SHOWN()` is `md.Lines - 12`; `i32 lines` where `count` was, which has to wrap elsewhere; `i32 third` |
+| `help.c`, `HelpFil` | The page of the help, 1 to the index's count; 0FFh does not come here, by `Help00` | No | `Help70(md.HlpPage - 1)` |
+
+So: 27 places have no cast now, and one has the `(signed char)` that it
+means. Five have a cast that is no sign: two cut arithmetic that the
+original does in 8 or 16 bits, `(u8)(answer + 1)` of `F38_70`, which
+DOS's 0FFh wants, and the sum of `StHelp` that the line had cut
+already; three take a byte, the letter of `ErrRdy` and of `Fantom`,
+whose word is the letter and the end of the text, and the line in the
+low byte of `scroll`.
+
+**A bug of the original, reachable, kept.** `Func21`, the mouse at a
+panel in brief mode: the entry under the mouse is its line on the page,
+three columns of the panel's lines, and the original takes that byte
+with its sign, `MOV AL,CH`, `CBW`, `ADD AX,DI`. A panel has 43 lines
+of files or more when it is full screen on a screen of 48 lines or
+more, and then the lines from 38 of the third column are entries 128
+and up: a click there puts the cursor 256 entries back, or on the last
+entry where the list is shorter than that, since the sum wraps round
+in 16 bits and is held against the last. On the original's bench the
+command EGA lines gets there; in the portable C a screen that is that
+tall when the program starts. The line keeps it, `(signed char)rows +
+r->di` kept in `r->ax`, which cuts the sum to 16 bits as the original
+does, with a comment that says so. Nothing else of the 33 is reachable
+with a byte that has its top bit: of the 26 that N0c sorted as right as
+compiled, none goes on with a number of 16 bits that a sign makes
+another.
+
+**What was held.** The listing of every place, read once: the bytes
+are taken with `movzx`, the sum of `Func21` with `movsx dx`, in 16
+bits; no listing has `cbw` or `movsx` at those places any more, and of
+the mark of the fault, a byte extended to 32 bits, only `menu.c` has
+one, the index of `LIST` that it means. The divisions of the thirds are
+`idiv` of numbers that are not below 0. clang's five warnings of
+`portable_c-width` say nothing of the lines that changed in the
+thirteen files. `harness/int16.txt` has ten places more, each a sum or
+a third of rows that the screen keeps within, with its reason;
+`harness/width.txt` counts the variables that are `i32` now, in files
+that no cluster has sorted. The whole suite passes, 14 tests, with no
+golden and no patch changed, and the images against those of the build
+before: "155 scenarios, 154 with nothing that differs; 0 differences,
+0 more in what was declared as changed, 1 in what may differ", that
+one `mouse-dialog`, in what the tool takes to be able to differ. The
+program is other bytes, 128 fewer of code as rebased onto `d10bd50`,
+and one address more that the extender sets, as the README's figures
+say.
+
+What the clusters should know:
+
+- A number that a line of this piece made an `i32` is sorted only in
+  that its type is right: the files are not, and their clusters read
+  the variables with the rest. Of those that stayed `u16` beside them,
+  `count` of `StHelp` and of `Help05` wrap where 0 is a page of 65,536
+  or a line before the first, which is why the keys and the window
+  have variables of their own there.
+- `LINES` of `place.c` and `ROWS` of `find.c` take what is meant now; a
+  cluster that widens `LnsAX` or `struct Place` has nothing of the
+  sign to carry.
+- The places where a number of rows comes from the screen take the
+  screen to be 25 to 50 lines, which `MaxLins` and the BIOS make so
+  today. When a system gives the program a screen of its own size,
+  the rows are to be held to that again: `Func21` above is where a
+  screen taller than 47 lines already shows something.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

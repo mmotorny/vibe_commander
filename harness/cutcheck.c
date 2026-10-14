@@ -9,8 +9,9 @@
    a function that comes out otherwise. A function called Lost has the
    form that is wrong, and its instructions are the wrong ones: where
    C says 0000FFFEh for the byte FEh, `movsx eax,al` makes FFFFFFFEh. A
-   function called Kept has the form that the tree is written in, or
-   another cut that the tree rests on, and its instructions are right.
+   function called Kept has the form with a short between, which the
+   tree was written in and no longer is, or a cut that the tree rests
+   on, and its instructions are right.
    A function called Chance has a form that is right today and that the
    tree does not write.
 
@@ -164,10 +165,11 @@ u32 ChanceMasked(signed char byte)
     return (u16)(byte & 0xFFFF);
 }
 
-/* The form that the tree is written in, in the same places. A change of
-   sign at the same size is no instruction, so the conversion of the
-   byte to a short and that of the word to 32 bits are two that the
-   compiler cannot fold into one. */
+/* The form that the tree was written in, in the same places, which
+   nothing writes now and which stays as what the compiler does. A
+   change of sign at the same size is no instruction, so the conversion
+   of the byte to a short and that of the word to 32 bits are two that
+   the compiler cannot fold into one. */
 
 /* is: movsx dx,dl; movzx edx,dx; add eax,edx; ret */
 u8 *KeptPointed(u8 *base, u8 byte)

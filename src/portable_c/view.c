@@ -814,11 +814,13 @@ void V00_10(u16 handle)
     u32 rest, position;
     struct Sought sought;
     struct Mouse pointer;
-    u16 count, key, bar, step, column, at, end, number, begin, size;
+    u16 count, key, bar, step, column, at, end, begin, size;
+    i32 number;
     u16 length, panel, behind, in_file, result, edge;
     u8 *starts;
     u16 mouse = 0;
-    u8 third, quarter;
+    i32 third;
+    u8 quarter;
 
     count = RoomParas();
     if (count > 0xFFE)
@@ -873,7 +875,7 @@ V00_30:                                 /* the mouse */
     if (md.WinMous == 0 && InWind(mouse, begin, size))
         goto V00_30;
     md.WinMous = 1;
-    third = (u8)((u16)(short)(signed char)(size >> 8) / 3);
+    third = (size >> 8) / 3;
     if ((u8)(mouse >> 8) < (u8)((begin >> 8) + third))
         goto V05_00;
     if ((u8)(mouse >> 8) >= (u8)((begin >> 8) + (size >> 8) - third))
@@ -1057,7 +1059,7 @@ V06_00:                                 /* Down */
     begin = VI->ViBase;
     T71_00(0x600, begin, 2 * 80);
     V31_00(begin + ((VI->ViSize >> 8) - 1 << 8));
-    number = (u16)(short)(signed char)(VI->ViSize >> 8) - 1;
+    number = (VI->ViSize >> 8) - 1;
     count = number;
     FIRST();
     do {

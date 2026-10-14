@@ -49,29 +49,30 @@ typedef int            i32;
 
 /* A byte with a sign made a word. Where the original has `CBW`, a byte
    taken with its sign for a number of 16 bits that then counts without
-   one, the code writes
+   one, the code does not write the register. The byte is nearly always
+   a small number, a row, a column, a count of lines, for which `CBW`
+   was the assembly's way to clear AH: it is taken as it is, into an i32
+   where it is reckoned with. Where its sign is meant, it is `(signed
+   char)byte`, made an int. No word of 16 bits without a sign stands
+   between the byte and its use, and the form
 
-       (u16)(short)(signed char)byte
+       (u16)(signed char)byte
 
-   with the `(short)`, and never `(u16)(signed char)byte`. C says the
-   same of both: FFFEh for the byte FEh. Open Watcom, with every option
-   but -od, loses the second form's cut wherever the number goes on into
-   32 bits, handed to a parameter of 32 bits, kept in a variable of 32
-   bits, added to, compared, divided, shifted or made an index: it
+   is not written. C says FFFEh of it for the byte FEh. Open Watcom,
+   with every option but -od, loses the cut wherever the number goes on
+   into 32 bits, handed to a parameter of 32 bits, kept in a variable of
+   32 bits, added to, compared, divided, shifted or made an index: it
    extends the byte with its sign to all 32 bits, `movsx eax,al`,
    FFFFFFFEh. It does so for any number with a sign that is converted to
    a wider type without one and from there to a still wider type, with
    the cast written or not; the byte made a word is the one such case
-   that a program without numbers of 64 bits has. With a conversion to
-   the type of 16 bits that has a sign between the two it is `cbw` and
-   `movzx eax,ax`, which is right, and is the one form that is right by
-   how the compiler works: it folds two conversions that follow one
-   another into one, and a change of sign at the same size is none. A
-   mask or arithmetic in the place of the `(short)` comes out right
-   today and is not to be written. Every other cast that narrows, of 32
-   or 16 bits to a u16 or a u8, it keeps. The test `portable_c-cut`
-   fails for anything but the first form anywhere in the tree, and
-   holds the compiler to both: harness/cut.py. */
+   that a program without numbers of 64 bits has. The tree had the form
+   on 33 lines, with a `(short)` between, `(u16)(short)(signed
+   char)byte`, which it keeps, and has neither since. Every other cast
+   that narrows, of 32 or 16 bits to a u16 or a u8, it keeps. The test
+   `portable_c-cut` fails for a signed char made a u16 anywhere in the
+   tree, which is what keeps the form out, and holds the compiler to
+   what it makes of each form: harness/cut.py. */
 
 /* True or false and nothing else: bool, with true and false, as C has
    them since 1999, from the compiler's own header, which is no part of

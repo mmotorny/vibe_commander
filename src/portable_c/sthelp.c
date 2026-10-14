@@ -278,7 +278,8 @@ void StHelp(void)
     u16 size = (u16)(u8)(md.Lines - 3) << 8 | 74;
     u16 first;                          /* DI: the first line to show */
     u16 at, next, end, count, shown, moved, color, key, where, held;
-    u16 buttons, mouse, third, last;
+    u16 buttons, mouse, last;
+    i32 third, step;
     u16 *screen, *bottom;
     struct Mouse pointer;
 
@@ -395,22 +396,22 @@ Help20:                                 /* a key */
     case 0x47: goto Help35;             /* Home */
     case 0x4F:                          /* End */
         first = entry->HlpLins;
-        count = (u16)(short)(signed char)(md.Lines - 11);
+        step = md.Lines - 11;
         goto Help34;
     case 0x49:                          /* PgUp */
         if (first == 0)
             goto Help10;
-        count = (u16)(short)(signed char)(md.Lines - 13);
+        step = md.Lines - 13;
         goto Help34;
     case 0x51:                          /* PgDn */
-        count = (u16)(short)(signed char)(md.Lines - 12);
+        step = md.Lines - 12;
         last = entry->HlpLins - 1;
-        if (last < count)
+        if (last < step)
             goto Help10;
-        last -= count;
+        last -= step;
         if (first >= last)
             goto Help10;
-        first += count - 1;
+        first += step - 1;
         if (first > last)
             first = last;
         goto Help10;
@@ -453,7 +454,7 @@ Help22:
        third or below it: down. */
     md.WinMous |= 1;
     first = entry->HlpFrst;
-    third = (u8)((u16)(short)(signed char)((size >> 8) - 9) / 3);
+    third = ((size >> 8) - 9) / 3;
     if ((u8)(mouse >> 8) < (u8)((BEGIN >> 8) + 4 + third))
         goto Help30;
     if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
@@ -466,14 +467,13 @@ Help30:                                 /* Up */
     goto Help10;
 
 Help32:                                 /* Down */
-    if ((u16)((u16)(short)(signed char)(md.Lines - 11) + first)
-        < entry->HlpLins)
+    if ((u16)(md.Lines - 11 + first) < entry->HlpLins)
         first++;
     goto Help10;
 
-Help34:                                 /* back by `count` lines, */
-    if (first >= count) {
-        first -= count;
+Help34:                                 /* back by `step` lines, */
+    if (first >= step) {
+        first -= step;
         goto Help10;
     }
 Help35:                                 /* or to the first: Home */

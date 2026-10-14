@@ -431,9 +431,12 @@ failed:
     answer = FcbDelete(fcb, carry).value;
     if (md.TmpBuf[100] != 0 && DirChange(md.TmpBuf + 100).failed)
         goto stop;
-    /* What DOS left in AL: 0 for deleted, 0FFh for not. One more, and
-       that with its sign. */
-    answer = (u16)(short)(signed char)(u8)(answer + 1);
+    /* What DOS left in AL: 0 for deleted, 0FFh for not, or the low byte
+       of the error that it was asked about, below 7Fh. One more, as a
+       byte: 1 or 0, or the error and one. The original makes a word of
+       the byte with its sign, whose high byte, which stops the command,
+       is 0 for each of those. */
+    answer = (u8)(answer + 1);
     goto close;
 stop:
     answer = STOP;

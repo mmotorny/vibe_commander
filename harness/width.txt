@@ -73,27 +73,27 @@ cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i
 N0              35          0     1              0      36     0     3     3    28  digits.c mask.c line.c mouse.c blank.c
 N1             130        130     2              2       0     0     0     0     0  string.c format.c box.c screen.c misc.c
 N2             112        112     0              0       0     0     0     0     0  dialog.c
-N3, N4         156        156    13             13       0     0     0     0     0  view.c
-N5             121        121     0              0       0     0     0     0     1  find.c
-N6 to N8       196        196    41             41       0     0     1     0     4  edit.c
+N3, N4         154        154    13             13       0     0     0     0     2  view.c
+N5             120        120     0              0       0     0     0     0     2  find.c
+N6 to N8       194        194    41             41       0     0     5     0     6  edit.c
 N9              81         81     6              6       0     0     0     0     0  copy.c
 N10             98         98     0              0       0     0     0     0     0  dirfunc.c
-N11             91         91     1              1       0     0     0     0     0  files.c read.c place.c
+N11             90         90     1              1       0     0     0     0     0  files.c read.c place.c
 N12             80         80     3              3       0     0     0     0     0  panel.c info.c drive.c
-N13             65         65     0              0       0     0     0     0     1  tree.c treebox.c extfile.c
-N14            107        107     0              0       0     0     0     0     0  cmdline.c enter.c exec.c
-N15            110        110     3              3       0     0     0     0     0  input.c usermenu.c
-N16             96         96     0              0       0     0     0     0     0  main.c
+N13             64         64     0              0       0     0     0     0     3  tree.c treebox.c extfile.c
+N14            106        106     0              0       0     0     0     0     1  cmdline.c enter.c exec.c
+N15            109        109     3              3       0     0     0     0     1  input.c usermenu.c
+N16             95         95     0              0       0     0     3     0     1  main.c
 N17a            65         65     0              0       0     0     0     0     0  keys.c
 N17b            74         74     0              0       0     0     0     0     0  commands.c
-N18            113        113     1              1       0     0     0     0     0  menu.c help.c
+N18            112        112     1              1       0     0     0     0     2  menu.c help.c
 N19a           110        110     1              1       0     0     0     0     0  bars.c window.c system.c setup.c
 N19b            41         41     0              0       0     0     0     0     0  start.c
 N20            113        113     0              0       0     0     0     0     0  stcolor.c stopts.c
-N21             82         82     3              3       0     0     0     0     0  stmain.c sthelp.c
+N21             81         81     3              3       0     0     0     0     2  stmain.c sthelp.c
 as a whole     582          0    65              0       0     0     0     0     0  the tables, dos32.c stack.c
 headers        299        127    12              1     143     1     0     0     0  vc.h sys.h tables.h
-all           2957       2168   152             75     179     1     4     3    34
+all           2945       2156   152             75     179     1    11     3    48
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               242         70    11              0     143     1     0     0     0
@@ -102,46 +102,46 @@ tables.h            20         20     0              0       0     0     0     0
 bars.c              40         40     0              0       0     0     0     0     0
 blank.c             12          0     0              0      12     0     2     0     7
 box.c               48         48     0              0       0     0     0     0     0
-cmdline.c           59         59     0              0       0     0     0     0     0
+cmdline.c           58         58     0              0       0     0     0     0     1
 commands.c          74         74     0              0       0     0     0     0     0
 copy.c              81         81     6              6       0     0     0     0     0
 dialog.c           112        112     0              0       0     0     0     0     0
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           98         98     0              0       0     0     0     0     0
 drive.c             27         27     0              0       0     0     0     0     0
-edit.c             196        196    41             41       0     0     1     0     4
+edit.c             194        194    41             41       0     0     5     0     6
 enter.c             32         32     0              0       0     0     0     0     0
 exec.c              16         16     0              0       0     0     0     0     0
 extfile.c            8          8     0              0       0     0     0     0     0
 files.c             37         37     0              0       0     0     0     0     0
-find.c             121        121     0              0       0     0     0     0     1
+find.c             120        120     0              0       0     0     0     0     2
 format.c            38         38     2              2       0     0     0     0     0
-help.c              57         57     1              1       0     0     0     0     0
+help.c              56         56     1              1       0     0     0     0     2
 info.c              16         16     2              2       0     0     0     0     0
 input.c             58         58     3              3       0     0     0     0     0
 keys.c              65         65     0              0       0     0     0     0     0
 line.c               5          0     0              0       5     0     1     0    10
-main.c              96         96     0              0       0     0     0     0     0
+main.c              95         95     0              0       0     0     3     0     1
 mask.c               4          0     0              0       4     0     0     1     3
 menu.c              56         56     0              0       0     0     0     0     0
 misc.c              15         15     0              0       0     0     0     0     0
 mouse.c             12          0     0              0      12     0     0     2     4
 panel.c             37         37     1              1       0     0     0     0     0
-place.c             18         18     0              0       0     0     0     0     0
+place.c             17         17     0              0       0     0     0     0     0
 read.c              36         36     1              1       0     0     0     0     0
 screen.c            15         15     0              0       0     0     0     0     0
 setup.c              8          8     0              0       0     0     0     0     0
 start.c             41         41     0              0       0     0     0     0     0
 stcolor.c           85         85     0              0       0     0     0     0     0
-sthelp.c            47         47     3              3       0     0     0     0     0
+sthelp.c            46         46     3              3       0     0     0     0     2
 stmain.c            35         35     0              0       0     0     0     0     0
 stopts.c            28         28     0              0       0     0     0     0     0
 string.c            14         14     0              0       0     0     0     0     0
 system.c            21         21     1              1       0     0     0     0     0
 tree.c              18         18     0              0       0     0     0     0     1
-treebox.c           39         39     0              0       0     0     0     0     0
-usermenu.c          52         52     0              0       0     0     0     0     0
-view.c             156        156    13             13       0     0     0     0     0
+treebox.c           38         38     0              0       0     0     0     0     2
+usermenu.c          51         51     0              0       0     0     0     0     1
+view.c             154        154    13             13       0     0     0     0     2
 window.c            41         41     0              0       0     0     0     0     0
 
 ----
@@ -745,7 +745,7 @@ blank.c, Blank: sign
 
 box.c: not sorted, 48 numbers
 
-cmdline.c: not sorted, 59 numbers
+cmdline.c: not sorted, 58 numbers
 
 commands.c: not sorted, 74 numbers
 
@@ -780,7 +780,7 @@ dos32.c: as a whole, 163 numbers, 65 u32
 
 drive.c: not sorted, 27 numbers
 
-edit.c: not sorted, 196 numbers, 41 u32, 1 of a sign
+edit.c: not sorted, 194 numbers, 41 u32, 5 of a sign
 
 edit_t.c: as a whole, 26 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -793,14 +793,14 @@ extfile.c: not sorted, 8 numbers
 
 files.c: not sorted, 37 numbers
 
-find.c: not sorted, 121 numbers
+find.c: not sorted, 120 numbers
 
 find_t.c: as a whole, 6 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
 format.c: not sorted, 38 numbers, 2 u32
 
-help.c: not sorted, 57 numbers, 1 u32
+help.c: not sorted, 56 numbers, 1 u32
 
 help_t.c: as a whole, 8 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -834,7 +834,7 @@ line.c, CntLine: sign
     | line.screen = BasAdr(args->value) - (length + 1 >> 1);
     length is what LnStr has counted, from 0 up.
 
-main.c: not sorted, 96 numbers
+main.c: not sorted, 95 numbers, 3 of a sign
 
 main_t.c: as a whole, 19 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -898,7 +898,7 @@ mouse.c, InWind: parameter where, u16
 
 panel.c: not sorted, 37 numbers, 1 u32
 
-place.c: not sorted, 18 numbers
+place.c: not sorted, 17 numbers
 
 read.c: not sorted, 36 numbers, 1 u32
 
@@ -916,7 +916,7 @@ stcolor.c: not sorted, 85 numbers
 stcolor_t.c: as a whole, 24 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-sthelp.c: not sorted, 47 numbers, 3 u32
+sthelp.c: not sorted, 46 numbers, 3 u32
 
 sthelp_t.c: as a whole, 5 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
@@ -940,14 +940,14 @@ system_t.c: as a whole, 9 numbers
 
 tree.c: not sorted, 18 numbers
 
-treebox.c: not sorted, 39 numbers
+treebox.c: not sorted, 38 numbers
 
 treebox_t.c: as a whole, 7 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-usermenu.c: not sorted, 52 numbers
+usermenu.c: not sorted, 51 numbers
 
-view.c: not sorted, 156 numbers, 13 u32
+view.c: not sorted, 154 numbers, 13 u32
 
 view_t.c: as a whole, 23 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte

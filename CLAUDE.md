@@ -3128,14 +3128,18 @@ in "The portable C".
     `line`, to a parameter of 32 bits or into `line + first` and `line
     < first`, as the byte with its sign in all 32 bits, FFFFFFFEh for
     FEh where C says FFFEh. `-od` and clang do what C says. The
-    original's `CBW` is written `(u16)(short)(signed char)c` for that,
-    with the `short`, the one form that the compiler keeps by how
-    it works and not by chance, on every line that has it: a mask or
-    arithmetic in its place is not written. `vc.h` says so at "A
-    byte with a sign made a word", and
-    `TODO.md`, "N0c", has which forms are lost, in which uses, and
-    that every other cast that narrows is kept. The test
-    `portable_c-cut` fails for the other form anywhere in the tree,
+    original's `CBW` is not written as the register: the byte is
+    taken as it is, into an `i32` where it is reckoned with, or with
+    its sign into an int where that is meant, and no word of 16 bits
+    without a sign stands between. With a `short` between,
+    `(u16)(short)(signed char)c`, the compiler keeps the cut by how it
+    works, and the tree had that on 33 lines before; a mask or
+    arithmetic in its place comes out right by chance. `vc.h` says so
+    at "A byte with a sign made a word"; `TODO.md`, "N0c", has which
+    forms are lost, in which uses, and that every other cast that
+    narrows is kept, and "CBW, the byte made a word written as what it
+    is", how each of the 33 was read. The test
+    `portable_c-cut` fails for the form anywhere in the tree,
     and holds the compiler to the instructions of
     `harness/cutcheck.c`: before a cast is relied on in a use that
     the file has not, a function is added there, and its

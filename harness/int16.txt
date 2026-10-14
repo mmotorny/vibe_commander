@@ -20,6 +20,12 @@ box.c, MinBx5: divide
     What is shifted is cut to a byte first, so the half is below 128; and
     step is 4 at the most, by the loop of MinBox, which alone calls this.
 
+cmdline.c, F68_00: widen
+    | count = (begin >> 8) + (size >> 8) - 4 - row;
+    The box is on the screen, and the cursor on a line of its list, which
+    Up, Down and the mouse keep from two rows below its top to four above
+    its bottom: 0 or more, and below its rows.
+
 copy.c, F35_50: compare
     | for (i = 0; i < CpVar2 - CpVar1; i++)
     CpVar1 and CpVar2 are places of TmpBuf that are written at the top of
@@ -125,6 +131,21 @@ find.c, FindFil: index
     | *to++ = Mask_S[suffix + i];
     suffix is 1 or 4, by the lines above, and i is below 4.
 
+help.c, Help05: divide, 2 times
+    | third = ((size >> 8) - 9) / 3;
+    size has the rows of the screen less 3, at the top of the function,
+    of a screen of 25 to 50 lines: what is divided is 13 to 38.
+
+help.c, Help05: widen
+    | if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
+    Cut to a byte; third is 4 to 12, a third of the box's rows less 9,
+    and less than the rows less 5.
+
+help.c, Help05: widen
+    | lines = (size >> 8) - 9;
+    size has the rows of the screen less 3, at the top of the function,
+    of a screen of 25 to 50 lines: 13 to 38.
+
 info.c, PutInf: index
     | cell += i + i;
     The line above has made i 8 at the most.
@@ -132,6 +153,11 @@ info.c, PutInf: index
 main.c, F39_01: back
     | return Command(Menu_T[table - 1][r->bx >> 1], panel, r);
     table is not 0: the function has returned for that, above.
+
+main.c, Func21: widen
+    | r->cx = rows << 8 | column;
+    column is a remainder of 13, by the line above, and rows a byte: the
+    two bytes of CX.
 
 main.c, Loop: back
     | if (keys[i - 1] == key >> 8) {
@@ -239,6 +265,16 @@ sthelp.c, StHelp: back
     at begins two behind HELPBUF and goes up: the loop is left where the
     next would have wrapped round.
 
+sthelp.c, StHelp: divide
+    | third = ((size >> 8) - 9) / 3;
+    size has the rows of the screen less 3, at the top of the function,
+    of a screen of 25 to 50 lines: what is divided is 13 to 38.
+
+sthelp.c, StHelp: widen
+    | if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
+    Cut to a byte; third is 4 to 12, a third of the box's rows less 9,
+    and less than the rows less 5.
+
 stmain.c, StUserScr: index
     | return md.UserScr + row * 80;
     The line above asks that row is below MaxLins - 1.
@@ -278,6 +314,17 @@ treebox.c, ChTree: minus
     Held against moved, a difference of two places of 16 bits, and
     kept nowhere: nothing is added to anything.
 
+treebox.c, ChTree: widen
+    | key = DoublMo(begin + 0x204 + (under << 8), 0x100 | (u8)(size - 10),
+    under is the line of the list that the mouse is on, by InWind just
+    above: 0 or more and below the box's rows, so the place is on the
+    screen.
+
+treebox.c, ChTree: widen
+    | lines = (size >> 8) - 8;
+    size has the rows of the screen less 3, at the top of the function,
+    of a screen of 25 to 50 lines: 14 to 39.
+
 usermenu.c, F32_00: index
     | screen += keys + 1;
     keys is how many cells the widest key of the menu's lines takes: it
@@ -299,6 +346,11 @@ view.c, V00_10: minus
     The step of T71_00 of edit.c, which adds it to a place of the main
     data, a number, and makes the pointer of the sum. The sum wraps
     round there in both builds.
+
+view.c, V00_10: widen
+    | number = (VI->ViSize >> 8) - 1;
+    ViSize has the rows of the viewer's window, the screen's less 2 or a
+    panel's less 12, 3 or more and below 50.
 
 view.c, V30_00: back
     | last = text[end - 1];

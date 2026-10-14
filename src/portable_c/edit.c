@@ -2085,7 +2085,8 @@ static u16 T00_71(u16 mouse)
 {
     u16 base = ed.EdBase;
     u16 size = *(u16 *)&ed.EdSizeX;
-    u16 row, column, where, down, count;
+    u16 row, down, count;
+    i32 column, where;
 
     ClrKbd();
     ed.EdCurLn = 1;
@@ -2105,7 +2106,7 @@ static u16 T00_71(u16 mouse)
     ed.EdHex1 = 0;
     mouse -= base;
     row = mouse >> 8;
-    column = (u16)(short)(signed char)(u8)mouse;
+    column = (u8)mouse;
     if (ed.EdTxHex == 0) {
         where = column + ed.EdCol0;
         if (row == (u8)(ed.EdLine - ed.EdLin0)
@@ -2125,7 +2126,7 @@ static u16 T00_71(u16 mouse)
             if (column >= 12)
                 column--;
             ed.EdHex1 = (u8)(column % 3);
-            where = (u16)(short)(signed char)(u8)(column / 3 | where);
+            where = column / 3 | where;
         }
     } else {                            /* T00_76 */
         ed.EdHexAs = 1;
