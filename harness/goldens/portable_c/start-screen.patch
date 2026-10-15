@@ -26,7 +26,7 @@ rows 12-21
 -|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
 -|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
 -|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
--|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
 +|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 +|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
 +|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -36,7 +36,7 @@ rows 12-21
 +|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
 +|║            │                                                    │            ║| 1Bx15 3Fx49 03x2 1Bx14
 +|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx17 03x49 1Bx14
-+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 
 == 2: Down Down Down Down Down Space
 rows 12-21
@@ -49,7 +49,7 @@ rows 12-21
 -|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
 -|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
 -|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
--|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
 +|║            │    ║  │  [ ] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 +|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
 +|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -59,7 +59,7 @@ rows 12-21
 +|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
 +|║            │                                                    │            ║| 1Bx15 3Fx49 03x2 1Bx14
 +|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx17 03x49 1Bx14
-+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 -cursor 25 13 lines 6 7 mode 3
 +cursor 25 12 lines 6 7 mode 3
 
@@ -81,17 +81,17 @@ rows 2-3
 
 == 38: F10
 rows 5-11
--|║readme   txt│                                                    │            ║| 1Bx14 70x51 1Bx15
--|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║data     bin│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
--|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║empty    dat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║m        com│            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
-+|║readme   txt│                                                    │            ║| 1Bx15 70x49 1Bx16
-+|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║data     bin│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
-+|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║empty    dat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║m        com│            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14
+-|║c        com│                                                    │            ║| 1Bx14 70x51 1Bx15
+-|║data     bin│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║empty    dat│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║hello    txt│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
+-|║m        com│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║notes    doc│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║readme   txt│            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
++|║c        com│                                                    │            ║| 1Bx15 70x49 1Bx16
++|║data     bin│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║empty    dat│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║hello    txt│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
++|║m        com│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║notes    doc│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
++|║readme   txt│            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14

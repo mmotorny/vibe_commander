@@ -6,27 +6,27 @@ Deviation: 10 of src/portable_c/DEVIATIONS.md
 Why: the box of F10 names the program in its title and in its question, by a
 name that is two letters shorter: the box is two cells narrower, a cell on
 either side, and its shadow ends a cell further left. In black and white and
-on a laptop's display the box is in the colours of the panel and has no
-shadow that shows: only its frame and its lines differ
+on a laptop's display the box is in the colours of the panel and has no shadow
+that shows: only its frame and its lines differ
 
 == 4: F10
 rows 6-9
--|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 07x80
--|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 07x80
--|║data     bin│   ║                  Yes   No                 ║    │            ║| 07x35 70x5 07x40
--|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 07x80
-+|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 07x80
-+|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 07x80
-+|║data     bin│    ║                 Yes   No                ║     │            ║| 07x35 70x5 07x40
-+|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 07x80
+-|║empty    dat│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 07x80
+-|║hello    txt│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 07x80
+-|║notes    doc│   ║                  Yes   No                 ║    │            ║| 07x35 70x5 07x40
+-|║readme   txt│   ╚═══════════════════════════════════════════╝    │            ║| 07x80
++|║empty    dat│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 07x80
++|║hello    txt│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 07x80
++|║notes    doc│    ║                 Yes   No                ║     │            ║| 07x35 70x5 07x40
++|║readme   txt│    ╚═════════════════════════════════════════╝     │            ║| 07x80
 
 == 9: F10
 rows 6-9
--|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 07x80
--|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 07x80
--|║data     bin│   ║                  Yes   No                 ║    │            ║| 07x35 70x5 07x40
--|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 07x80
-+|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 07x80
-+|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 07x80
-+|║data     bin│    ║                 Yes   No                ║     │            ║| 07x35 70x5 07x40
-+|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 07x80
+-|║empty    dat│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 07x80
+-|║hello    txt│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 07x80
+-|║notes    doc│   ║                  Yes   No                 ║    │            ║| 07x35 70x5 07x40
+-|║readme   txt│   ╚═══════════════════════════════════════════╝    │            ║| 07x80
++|║empty    dat│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 07x80
++|║hello    txt│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 07x80
++|║notes    doc│    ║                 Yes   No                ║     │            ║| 07x35 70x5 07x40
++|║readme   txt│    ╚═════════════════════════════════════════╝     │            ║| 07x80

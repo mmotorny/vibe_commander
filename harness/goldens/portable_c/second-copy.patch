@@ -10,17 +10,17 @@ copy has the memory to run its command, as the original's has
 
 == 8: F10
 rows 5-11
--|║readme   txt│                                                    │            ║| 1Bx14 70x51 1Bx15
--|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║data     bin│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
--|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║empty    dat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║data     bin│                                                    │            ║| 1Bx14 70x51 1Bx15
+-|║empty    dat│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║hello    txt│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║notes    doc│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
+-|║readme   txt│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║run      bat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
 -|║            │            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
-+|║readme   txt│                                                    │            ║| 1Bx15 70x49 1Bx16
-+|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║data     bin│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
-+|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║empty    dat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
++|║data     bin│                                                    │            ║| 1Bx15 70x49 1Bx16
++|║empty    dat│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║hello    txt│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║notes    doc│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
++|║readme   txt│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║run      bat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
 +|║            │            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14

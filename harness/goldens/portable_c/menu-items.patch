@@ -6,26 +6,26 @@ Deviation: 10, 12 of src/portable_c/DEVIATIONS.md
 Why: the box of F10 names the program in its title and in its question, by a
 name that is two letters shorter: the box is two cells narrower, a cell on
 either side, and its shadow ends a cell further left. Quit of the Files menu
-brings the same box. And beside the Info, with the panel on the right off,
-the ends of the two lines of the banner show, which the original has no more
+brings the same box. And beside the Info, with the panel on the right off, the
+ends of the two lines of the banner show, which the original has no more
 there: its EGA lines, chosen twice, has moved what DOS had shown off the top
 of the screen, and the portable C is not taken through those two steps
 
 == 20: F9 f q
 rows 5-11
--|║readme   txt│                                                    │            ║| 1Bx14 70x51 1Bx15
--|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║data     bin│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
--|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
--|║empty    dat│                                                    │            ║| 1Bx1 30x12 1Bx1 70x51 03x2 1Bx13
+-|║data     bin│                                                    │            ║| 1Bx14 70x51 1Bx15
+-|║empty    dat│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║hello    txt│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║notes    doc│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
+-|║readme   txt│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║run      bat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
 -|║            │            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
-+|║readme   txt│                                                    │            ║| 1Bx15 70x49 1Bx16
-+|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║data     bin│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
-+|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
-+|║empty    dat│                                                    │            ║| 1Bx1 30x12 1Bx2 70x49 03x2 1Bx14
++|║data     bin│                                                    │            ║| 1Bx15 70x49 1Bx16
++|║empty    dat│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║hello    txt│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║notes    doc│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
++|║readme   txt│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║run      bat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
 +|║            │            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14
 
 == 41: F9 r o
