@@ -145,41 +145,34 @@ u16 F32_70(u16 begin, u16 size)
     u16 buttons, look, last = 0, mouse = 0;
     i32 answer, line;
 
-F32_71:
-    pointer = GetMous(mouse);
-    buttons = pointer.buttons;
-    if (buttons == 0)
-        goto F32_74;
-    mouse = pointer.place;
-    ClrKbd();
-    look = 'x';
-    if (buttons & 3)
-        look = 0;
-    if (look != last >> 8)
-        TypMous(look);
-    last = (u16)(look << 8 | buttons);
-    if (!(last & 3))
-        goto F32_71;
-    if (InWind(mouse, begin + 0x204, size - 0x50A))
-        goto F32_71;
-    goto F32_77;
+    for (;;) {
+        /* F32_71 */
+        pointer = GetMous(mouse);
+        buttons = pointer.buttons;
+        if (buttons == 0) {
+            /* F32_74: all let go. Buttons other than the left or the
+               right alone, and the left let go outside the box, leave
+               the list (F32_75); else what was down is answered
+               (F32_76). */
+            TypMous(0);
+            if ((u8)last == 2 || (u8)last < 1
+                || ((u8)last == 1 && !InWind(mouse, begin, size - 0x102)))
+                return (u8)last;                /* F32_76 */
+            return 0xFF00 | (u8)last;           /* F32_75 */
+        }
+        mouse = pointer.place;
+        ClrKbd();
+        look = 'x';
+        if (buttons & 3)
+            look = 0;
+        if (look != last >> 8)
+            TypMous(look);
+        last = (u16)(look << 8 | buttons);
+        if ((last & 3) && !InWind(mouse, begin + 0x204, size - 0x50A))
+            break;
+    }
 
-F32_74:
-    TypMous(0);
-    if ((u8)last == 2)
-        goto F32_76;
-    if ((u8)last < 1)
-        goto F32_76;
-    if ((u8)last != 1)
-        goto F32_75;
-    if (!InWind(mouse, begin, size - 0x102))
-        goto F32_76;
-F32_75:
-    return 0xFF00 | (u8)last;
-F32_76:
-    return (u8)last;
-
-F32_77:
+    /* F32_77 */
     line = (u8)((u16)(mouse - begin) >> 8) - 2;
     answer = DoublMo((u16)((begin + 0x204 & 0xFF)
                            | (u8)(((begin + 0x204) >> 8) + line) << 8),
