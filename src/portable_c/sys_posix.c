@@ -18,9 +18,12 @@
  *     same grid, as DOS has the BIOS do. The grid is drawn in the
  *     terminal that the program is started in, term_posix.c, the piece
  *     L4, but where the test channel below is told to drive it.
- *   - The keys come from the terminal, made the BIOS's words there, or
- *     from the test channel. The kitty protocol of the keyboard, with
- *     Shift, Ctrl and Alt held, is the piece L5; no mouse: L5 too.
+ *   - The keys come from the terminal, made the BIOS's words there, by
+ *     the kitty protocol of the keyboard where it has that, with Shift,
+ *     Ctrl and Alt held; or from the test channel.
+ *   - The mouse is the terminal's, or the test channel's, and answers as
+ *     the bench's mouse driver does, with its pointer drawn in the grid,
+ *     a cell whose colours are turned round: "The mouse" below.
  *   - The timer's ticks are the host's monotonic clock at DOS's 18.2 to
  *     the second, counted from the time of day when the program started;
  *     the time of day is the host's local time.
@@ -559,6 +562,60 @@ static void Place(i32 row, i32 column)
     CursorPlace = (u16)(row << 8 | column);
 }
 
+/*
+ * The mouse's pointer, as the bench's mouse driver draws it in the text
+ * mode: the cell that it is on kept, and in its place the cell with the
+ * bits of PointerKeep kept and those of PointerTurn turned round, while
+ * the pointer is shown. The driver puts the cell back as it kept it when
+ * the pointer moves or is hidden, whatever the program has written there
+ * meanwhile, which is why the program hides the pointer around what it
+ * writes. Places are in dots, eight to a cell, as the driver has them,
+ * and always at the top left of a cell in the text mode.
+ */
+
+#define DOTS 8
+#define X_MOST (COLUMNS * DOTS - 1)
+#define Y_MOST (ROWS * DOTS - 1)
+
+static i32 MouseX = 0, MouseY = 0;
+static i32 MouseTop = 0, MouseBottom = Y_MOST;  /* the rows it may go to */
+static u16 MouseButtons = 0;
+static i32 PointerHidden = 1;           /* shown at 0, as the driver counts */
+static u16 PointerKeep = 0x77FF, PointerTurn = 0x7700;
+static i32 PointerAt = -1;              /* the cell drawn on, or -1 */
+static u16 PointerUnder = 0;            /* what that cell had */
+
+static void PointerOff(void)
+{
+    if (PointerAt >= 0)
+        Display[PointerAt] = PointerUnder;
+    PointerAt = -1;
+}
+
+static void PointerOn(void)
+{
+    if (PointerHidden != 0)
+        return;
+    PointerAt = MouseY / DOTS * COLUMNS + MouseX / DOTS;
+    if (PointerAt >= CELLS_ALL) {       /* rows beyond the memory */
+        PointerAt = -1;
+        return;
+    }
+    PointerUnder = Display[PointerAt];
+    Display[PointerAt] = (u16)((PointerUnder & PointerKeep) ^ PointerTurn);
+}
+
+/* The pointer to a place, kept to the screen and to the rows that it may
+   go to, and drawn there. */
+static void MousePlace(i32 x, i32 y)
+{
+    MouseX = (x < 0 ? 0 : x > X_MOST ? X_MOST : x) & ~(DOTS - 1);
+    MouseY = (y < MouseTop ? MouseTop : y > MouseBottom ? MouseBottom : y)
+             & ~(DOTS - 1);
+    PointerOff();
+    PointerOn();
+}
+
 struct Screen ScreenState(void)
 {
     struct Screen screen;
@@ -575,9 +632,12 @@ void ScreenSetMode(u16 mode)
     i32 i;
 
     Mode = mode;
-    if ((mode & 0x80) == 0)
+    if ((mode & 0x80) == 0) {
         for (i = 0; i < CELLS_ALL; i++)
             Display[i] = BLANK;
+        PointerAt = -1;                 /* what it kept is gone */
+        PointerOn();
+    }
     CursorPlace = 0;
     Shape = CURSOR_SHAPE;
 }
@@ -777,6 +837,25 @@ void ConsoleText(const u8 *text)
  *              above the character
  *     held=XX  what KeysHeld answers from then on, two hex digits
  *     wait=N   nothing until the timer has ticked N times more
+ *     mouse=C,R,B  the mouse moved to column C of row R, in decimal from
+ *              0, with the buttons B held, a hex digit: the left one 1,
+ *              the right one 2, the middle one 4; the pointer goes to
+ *              the top left of the cell, kept to the rows that it may go
+ *              to, as the bench's driver takes it there
+ *     asks=N   nothing until the program has asked N times where the
+ *              mouse is (MouseWhere), N from 1 to 255: at the last of
+ *              them the next event is taken before the program is
+ *              answered, as the driver of the bench takes it
+ *
+ * Each event is taken when the program is idle with no key waiting, one
+ * at a time, as the driver takes its events: a key, a change of what is
+ * held, a move of the mouse, each in a round of its own, so that the
+ * program sees Alt held before it sees it let go. A move followed by
+ * asks= takes both at once. While asks= is counting nothing else is
+ * taken, but where the program waits for a key, which ends the count.
+ * A scenario's "Click@3,5*4>3,2" is "mouse=3,5,1 asks=4 mouse=3,2,1
+ * asks=20 mouse=3,2,0", "Move@40,12" is "mouse=40,12,0", and a click
+ * without a count has 20, as harness/driver.py has them.
  *
  * A line that begins with # is none. Every other line is a step, an
  * empty one too, which has the program go round and its screen written.
@@ -797,7 +876,7 @@ void ConsoleText(const u8 *text)
 #define TEST_VARIABLE "VC_TEST"
 #define RECORD_KIND 4
 
-enum Event { EVENT_KEY, EVENT_HELD, EVENT_WAIT };
+enum Event { EVENT_KEY, EVENT_HELD, EVENT_WAIT, EVENT_MOUSE, EVENT_ASKS };
 
 struct Due {
     enum Event event;
@@ -824,6 +903,7 @@ static u16 Held = 0;
 static bool Waiting = false;            /* for the timer, by wait= */
 static int64_t WaitUntil = 0;           /* by Elapsed */
 static i32 IdleRounds = 0;              /* with nothing left to take */
+static i32 Asks = 0;                    /* asks= that are left */
 static bool AutoSeen = false;           /* when AutoTim was first seen */
 static int64_t AutoSince = 0;
 
@@ -883,6 +963,29 @@ static void Record(const char *kind, u32 number)
     Write(ScreensFd, record, sizeof record);
 }
 
+/* The C,R,B of mouse=, made an event: the column in the low byte of its
+   value, the row in the next and the buttons above. */
+static bool MouseEvent(const char *word, struct Due *due)
+{
+    unsigned long column, row, buttons;
+    char *end;
+
+    due->event = EVENT_MOUSE;
+    column = strtoul(word, &end, 10);
+    if (end == word || *end != ',' || column > 255)
+        return false;
+    word = end + 1;
+    row = strtoul(word, &end, 10);
+    if (end == word || *end != ',' || row > 255)
+        return false;
+    word = end + 1;
+    buttons = strtoul(word, &end, 16);
+    if (end == word || *end != 0 || buttons > 7)
+        return false;
+    due->value = (u32)(column | row << 8 | buttons << 16);
+    return true;
+}
+
 /* A word of a line of `keys` made an event. False if it is none. */
 static bool Event(const char *word, struct Due *due)
 {
@@ -890,6 +993,14 @@ static bool Event(const char *word, struct Due *due)
     unsigned long value;
 
     due->event = EVENT_KEY;
+    if (strncmp(word, "mouse=", 6) == 0)
+        return MouseEvent(word + 6, due);
+    if (strncmp(word, "asks=", 5) == 0) {
+        due->event = EVENT_ASKS;
+        value = strtoul(word + 5, &end, 10);
+        due->value = (u32)value;
+        return end != word + 5 && *end == 0 && value >= 1 && value <= 255;
+    }
     if (strncmp(word, "held=", 5) == 0) {
         due->event = EVENT_HELD;
         word += 5;
@@ -1028,38 +1139,65 @@ static bool AutoPending(void)
     return Elapsed() - AutoSince < 2000;
 }
 
-/* The program is idle with no key waiting: the next event is due, or
-   the step ends. */
-static void Due(void)
+/* The next event of the step, if one is due: a key is not while one
+   waits, nor anything while the timer is waited for or the asks are
+   counted, unless `reading`, where the program waits for a key, which
+   ends both as the driver ends them. False where the step has no event
+   left. */
+static bool TakeEvent(bool reading)
 {
     struct Due *due;
 
     if (KeyThere)
-        return;
+        return true;
+    if (reading)
+        Asks = 0;
+    if (Asks > 0)
+        return true;
     if (Waiting) {
         if (Elapsed() < WaitUntil) {
             Pause();
-            return;
+            return true;
         }
         Waiting = false;
     }
-    while (StepNow < StepsAll && EventNow < Steps[StepNow].count) {
-        due = &Events[Steps[StepNow].first + EventNow++];
-        IdleRounds = 0;
-        switch (due->event) {
-        case EVENT_KEY:
-            KeyWord = (u16)due->value;
-            KeyThere = true;
-            return;
-        case EVENT_HELD:
-            Held = (u16)due->value;
-            break;
-        case EVENT_WAIT:
-            Waiting = true;
-            WaitUntil = Elapsed() + (int64_t)due->value * 65536000 / 1193180;
-            return;
-        }
+    if (StepNow == StepsAll || EventNow == Steps[StepNow].count)
+        return false;
+    due = &Events[Steps[StepNow].first + EventNow++];
+    IdleRounds = 0;
+    switch (due->event) {
+    case EVENT_KEY:
+        KeyWord = (u16)due->value;
+        KeyThere = true;
+        break;
+    case EVENT_HELD:
+        Held = (u16)due->value;
+        break;
+    case EVENT_WAIT:
+        Waiting = true;
+        WaitUntil = Elapsed() + (int64_t)due->value * 65536000 / 1193180;
+        break;
+    case EVENT_MOUSE:
+        MouseButtons = (u16)(due->value >> 16);
+        MousePlace((i32)(due->value & 0xFF) * DOTS,
+                   (i32)(due->value >> 8 & 0xFF) * DOTS);
+        if (EventNow < Steps[StepNow].count
+            && Events[Steps[StepNow].first + EventNow].event == EVENT_ASKS)
+            Asks = (i32)Events[Steps[StepNow].first + EventNow++].value;
+        break;
+    case EVENT_ASKS:
+        Asks = (i32)due->value;
+        break;
     }
+    return true;
+}
+
+/* The program is idle with no key waiting: the next event is due, or
+   the step ends. */
+static void Due(bool reading)
+{
+    if (TakeEvent(reading))
+        return;
     if (StepNow == StepsAll) {
         fprintf(stderr, "vc: the test's keys have run out\n");
         Record("end ", 2);
@@ -1094,14 +1232,69 @@ static void Show(void)
     TermDraw(Display, CursorPlace, Shape);
 }
 
+/* The mouse as the terminal has reported it, taken as the driver takes
+   a mouse's motion, where it has changed since it was last taken.
+   `looked` where the program asks where the mouse is. */
+static u32 PointerReports = 0;
+
+static void MouseFromTerminal(bool looked)
+{
+    struct TermPointer pointer = TermMouse(looked);
+
+    if (pointer.count == PointerReports)
+        return;
+    PointerReports = pointer.count;
+    MouseButtons = pointer.buttons;
+    MousePlace(pointer.column * DOTS, pointer.row * DOTS);
+}
+
 void Idle(void)
 {
     if (OnTerminal) {
+        MouseFromTerminal(false);
         Show();
         TermInput(IDLE_WAIT);
+        MouseFromTerminal(false);
         return;
     }
-    Due();
+    Due(false);
+}
+
+/*
+ * The trace: told so by the variable VC_TRACE of the environment, which
+ * names a file of the host, the program writes there what it is answered
+ * of the keyboard and the mouse, a line for each: "key XXXX" for a key
+ * read, "held XX" where KeysHeld answers otherwise than it last did, and
+ * "mouse B X Y" where MouseWhere does, the buttons and the place in dots,
+ * in hex. It is for the tests, harness/terminal.py, which hold what a
+ * terminal types to what the program receives, beside the test channel
+ * or without it; nothing else reads it.
+ */
+
+#define TRACE_VARIABLE "VC_TRACE"
+
+static FILE *Trace = 0;
+static bool TraceBegun = false;
+static i32 TracedHeld = -1;
+static i32 TracedMouse = -1;
+
+static void Traced(const char *line)
+{
+    const char *path;
+
+    if (!TraceBegun) {
+        TraceBegun = true;
+        path = getenv(TRACE_VARIABLE);
+        if (path != 0) {
+            Trace = fopen(path, "w");
+            if (Trace == 0)
+                Fail(path);
+        }
+    }
+    if (Trace == 0)
+        return;
+    fputs(line, Trace);
+    fflush(Trace);
 }
 
 /*
@@ -1116,6 +1309,7 @@ struct Keys KeyWaiting(void)
     if (OnTerminal) {
         Show();
         TermInput(0);
+        MouseFromTerminal(false);
         return TermKeyWaiting();
     }
     keys.key = KeyThere ? KeyWord : 0;
@@ -1125,22 +1319,39 @@ struct Keys KeyWaiting(void)
 
 u16 KeyRead(void)
 {
+    char line[16];
+    u16 key;
+
     if (OnTerminal) {
         while (TermKeyWaiting().none) {
+            MouseFromTerminal(false);
             Show();
             TermInput(-1);
         }
-        return TermKeyTake();
+        MouseFromTerminal(false);
+        key = TermKeyTake();
+    } else {
+        while (!KeyThere)
+            Due(true);
+        KeyThere = false;
+        key = KeyWord;
     }
-    while (!KeyThere)
-        Due();
-    KeyThere = false;
-    return KeyWord;
+    snprintf(line, sizeof line, "key %04X\n", key);
+    Traced(line);
+    return key;
 }
 
 u16 KeysHeld(void)
 {
-    return Held;
+    u16 held = OnTerminal ? TermKeysHeld() : Held;
+    char line[16];
+
+    if (held != TracedHeld) {
+        TracedHeld = held;
+        snprintf(line, sizeof line, "held %02X\n", held);
+        Traced(line);
+    }
+    return held;
 }
 
 void KeyForgetIns(void)
@@ -1149,53 +1360,102 @@ void KeyForgetIns(void)
 }
 
 /*
- * The mouse: there is none, as a driver that does not answer says.
+ * The mouse, as the bench's mouse driver answers INT 33h, which is
+ * FreeDOS's, CuteMouse, loaded with /3 for the middle button: read there
+ * on 15 October 2026 by the toy of harness/trial32/asked.py. Asked
+ * whether there is one, by 21h or by a reset, it says FFFFh, and sets
+ * itself up: the pointer hidden, in the middle of the screen, 320 by 96,
+ * the rows those of the screen. A place that the program puts it at is
+ * kept to the screen and to the rows, and made the top left of its cell:
+ * 7FFFh by 7FFFh is 632 by 192. Hidden twice, it wants showing twice;
+ * shown, it is the cell with the bits of `keep` kept and those of `turn`
+ * turned round, 1E4Dh made 694Dh by FFFFh and 7700h, and drawn anew when
+ * those change. The pointer's look before the program says it is the
+ * driver's own, which the toy did not show, since the program always
+ * says it before it shows the pointer.
  */
+
+static u16 MouseSetUp(void)
+{
+    PointerOff();
+    PointerHidden = 1;
+    MouseTop = 0;
+    MouseBottom = Y_MOST;
+    PointerKeep = 0x77FF;
+    PointerTurn = 0x7700;
+    MousePlace((X_MOST + 1) / 2, (Y_MOST + 1) / 2);
+    return 0xFFFF;
+}
 
 u16 MouseFind(void)
 {
-    return 0;
+    return MouseSetUp();
 }
 
 u16 MouseReset(void)
 {
-    return 0;
+    return MouseSetUp();
 }
 
 void MouseShow(void)
 {
+    if (PointerHidden == 0)
+        return;
+    PointerHidden--;
+    if (PointerHidden == 0)
+        PointerOn();
 }
 
 void MouseHide(void)
 {
+    if (PointerHidden++ == 0)
+        PointerOff();
 }
 
 struct MouseAt MouseWhere(void)
 {
     struct MouseAt at;
+    char line[32];
+    i32 traced;
 
-    at.buttons = 0;
-    at.x = 0;
-    at.y = 0;
+    if (OnTerminal)
+        MouseFromTerminal(true);
+    else if (Asks > 0) {
+        Asks--;
+        if (Asks == 0)
+            TakeEvent(false);
+    }
+    at.buttons = MouseButtons;
+    at.x = (u16)MouseX;
+    at.y = (u16)MouseY;
+    traced = MouseButtons << 24 | MouseX << 12 | MouseY;
+    if (traced != TracedMouse) {
+        TracedMouse = traced;
+        snprintf(line, sizeof line, "mouse %X %X %X\n", MouseButtons,
+                 (unsigned)MouseX, (unsigned)MouseY);
+        Traced(line);
+    }
     return at;
 }
 
 void MouseTo(u16 x, u16 y)
 {
-    (void)x;
-    (void)y;
+    MousePlace(x, y);
 }
 
 void MouseRows(u16 first, u16 last)
 {
-    (void)first;
-    (void)last;
+    MouseTop = first < last ? first : last;
+    MouseBottom = first < last ? last : first;
+    MousePlace(MouseX, MouseY);
 }
 
 void MousePointer(u16 keep, u16 turn)
 {
-    (void)keep;
-    (void)turn;
+    PointerKeep = keep;
+    PointerTurn = turn;
+    PointerOff();
+    PointerOn();
 }
 
 /*

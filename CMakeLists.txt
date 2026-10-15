@@ -833,11 +833,13 @@ else()
 endif()
 set_tests_properties(portable_c-posix-unit PROPERTIES SKIP_RETURN_CODE 77)
 # The program for Linux in a terminal, the piece L4 of step 6: the
-# sanitized build run in a pseudo-terminal with a few keys, what it draws
-# replayed through pyte, fetched pinned (harness/deps.py), and held cell by
-# cell to the grid that the test channel writes for the same keys, in 24
-# bits and in 16 colours, with a terminal too small, SIGTSTP, SIGCONT and
-# SIGTERM. See harness/terminal.py. It runs no machine, and is skipped
+# sanitized build run in a pseudo-terminal with a few keys and the mouse,
+# what it draws replayed through pyte, fetched pinned (harness/deps.py),
+# and held cell by cell to the grid that the test channel writes for the
+# same steps, in 24 bits and in 16 colours, with a terminal too small,
+# SIGTSTP, SIGCONT and SIGTERM; and with the kitty protocol of the
+# keyboard, and the keys that the program reads held to the BIOS's words
+# (L5). See harness/terminal.py. It runs no machine, and is skipped
 # where there is no clang.
 add_test(NAME portable_c-terminal
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/terminal.py

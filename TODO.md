@@ -19372,6 +19372,176 @@ program again. A command typed at its prompt fails for now (L6), and a
 Ctrl key that the terminal or the desktop takes (Ctrl-S without `IXON`
 is the program's; Ctrl-Alt-F keys are the desktop's) does not come.
 
+### L5, keys and mouse: done, and what L6 should know
+
+What it made, in `term_posix.c` and `sys_posix.c` (with two
+declarations at the end of `emulate_posix.h`): the kitty protocol of the
+keyboard where the terminal has it, the keys of the bench's BIOS as it
+answers them, the mouse from the terminal's SGR reports and from the
+test channel, answered as the bench's mouse driver answers and with its
+pointer drawn in the grid, and a trace of what the program receives,
+`VC_TRACE`; the test `portable_c-terminal` holds all of it. `VC.EXE` is
+the same bytes (SHA-256 `4d655512...a8a5431` before and after): nothing
+of the common code changed.
+
+**What the bench answers, read there on 15 October 2026** (not from
+memory):
+
+- The keys, by `harness/trial32/keys.c` changed to ask INT 16h 00h in
+  place of 10h (a copy that was not kept) and run by
+  `harness/trial32/run.py`, with names for the keypad added to the
+  driver's tables in a wrapper script, not kept either. The bench's BIOS
+  is SeaBIOS, which hands the keys of the enhanced keyboard on through
+  00h too: F11 8500h, F12 8600h, Shift-F12 8800h, Ctrl-F12 8A00h, Alt-F11
+  8B00h, Ctrl-Up 8D00h, Alt-Up 9800h, Alt-Down A000h, Ctrl-Tab 9400h,
+  Alt-Tab A500h, Alt-Backspace 0E00h, Alt-Enter 1C00h, Alt-Esc 0100h,
+  Alt-[ 1A00h, Alt-; 2700h, Ctrl-Ins 9200h, Ctrl-Del 9300h, Alt-Ins
+  A200h, Alt-Home 9700h, Ctrl with the keypad's 5 8F00h, with its / 9500h,
+  with its * 9600h, with its + 9000h, Alt with its / A400h, with its +
+  4E00h, with its Enter A600h, Ctrl with its Enter 1C0Ah, the keypad's 5
+  alone 4C00h, its / 352Fh, its Enter 1C0Dh, Shift with its 7 4737h, Num
+  Lock on 4737h, 4C35h and 532Eh for 7, 5 and ., Ctrl with its 7 7700h;
+  Space, Alt-Space and Ctrl-Space 3920h; Shift-Esc and Ctrl-Esc 011Bh.
+  Nothing for Ctrl-1, Alt-Del or Alt with a figure of the keypad: SeaBIOS
+  has no typing of a character by Alt and its number. Num Lock sets 20h
+  in what KeysHeld answers; Ins never sets 80h there. **L4 had F11, F12,
+  Ctrl-Up, Alt with an arrow and Alt with a sign dropped, as an IBM BIOS
+  drops them through 00h**: that was not the bench, and they are its
+  words now, in the legacy decoding too. L3b's table in `posixrun.py`
+  has Alt-Del as A300h, which the bench does not give.
+- The mouse, by the toy of `harness/trial32/asked.py`, which asks it
+  already: FreeDOS's CuteMouse, loaded with /3. MouseReset and MouseFind
+  answer FFFFh; set up, it is at 320 by 96, hidden; MouseTo 7FFFh by
+  7FFFh is 632 by 192, MouseRows 16 to 31 then 24, MouseTo 0 by 0 then 0
+  by 16: every place kept to the screen and the rows and made the top
+  left of its cell. Shown with FFFFh and 7700h a cell 1E4Dh is 694Dh,
+  hidden it is 1E4Dh again; hidden twice and shown once it stays hidden;
+  MousePointer FF00h and 7723h while shown makes it 6923h at once. A
+  click of the driver's at column 3 of row 5 is 24 by 40.
+
+**The keys.** `term_posix.c`, "The keys, and the mouse", has the tables:
+`Named` for the keys that are no character, alone, with Shift, with
+Ctrl and with Alt, Alt before Ctrl before Shift as the BIOS goes;
+`KeyOfPad` for the keypad; `KeyOfAlt` and `KeyOfCtrl` for the keys of
+characters. Where the terminal answers `CSI ? u`, which `Enter` asks,
+the program pushes the flags 31, `CSI > 31 u`: keys told apart (1),
+presses, repeats and releases (2), the key of a US layout behind a key
+(4), every key an escape code, the modifiers alone too (8), and the text
+that a key types (16). It pops them, `CSI < u`, wherever it gives the
+terminal back, in front of leaving the alternate screen, whose stack is
+its own in that protocol, and pushes them again when it takes the
+terminal back and the terminal answers again. Then:
+
+- A character is the text that the key types, made the code page's,
+  with the scan code of the US layout's key behind it: a Russian layout's
+  letters, which 437 lacks, are nothing, as before; Alt or Ctrl with
+  any key is the BIOS's word of the US key, so Alt with ф is Alt-A, the
+  speed search.
+- `KeysHeld` is what kitty's modifiers say, the left and the right Shift
+  told apart by their own keys, Num Lock 20h and Caps Lock 40h as the
+  BIOS has them; Alt alone, pressed and let go, opens the menu bar, and
+  the key bar follows Shift, Ctrl and Alt. A release does nothing else.
+  When the terminal loses the focus (`?1004h`, `CSI O`) nothing is held
+  any more, since what is let go elsewhere is not reported.
+- The order of what comes is the program's to see as the bench's driver
+  feeds it, one event at a time: a change of what is held, or of the
+  mouse's buttons, waits until no key is in the buffer, and what comes
+  behind it waits until the program has looked at it (`KeysHeld`,
+  `MouseWhere`), each `CHANGE_WAIT`, 100 ms, at the most. So a tap on
+  Alt, or a click, whose press and release come in one read, as over a
+  slow line, is seen as two; and Ctrl-F1 is read with Ctrl held.
+- Without the protocol the keys are L4's, with the bench's words above;
+  ESC in front of Tab, Enter, Backspace or a control character is Alt
+  with that key. Nothing is known to be held, `KeysHeld` 0.
+
+**The mouse.** `Enter` asks for `?1000h`, `?1002h`, `?1003h` and
+`?1006h`, every motion in SGR's form, and `Leave` takes them back. A
+report is the cell and the buttons, the left 1, the right 2, the middle
+4; `sys_posix.c` takes it as the driver takes the mouse's motion, and
+draws the pointer in the grid as the driver draws it in the display's
+memory: the cell kept and in its place the cell with `keep` and `turn`
+made of it, put back as it was kept when the pointer moves or is hidden
+(the program hides it around what it writes, as on DOS). The pointer is
+therefore in the screen records of the test channel and in what the
+terminal shows, in the middle of the screen until the mouse first moves,
+as on DOS; the terminal's own pointer is left as it is. A terminal
+larger than 80 by 25 reports cells beyond: they are kept to the screen.
+**The wheel, and the buttons beyond the third, do nothing**: a mouse
+driver of DOS has none, and what the program is to do with them is
+asked (below).
+
+**The test channel's mouse.** `keys` has two events more, and each event
+takes a round of its own, as the driver of the bench takes one event at
+each idle call: `mouse=C,R,B`, the mouse to column C of row R, in
+decimal, with the buttons B, a hex digit, the pointer at the top left
+of the cell; and `asks=N`, nothing until the program has asked N times
+where the mouse is, at the last of which the next event is taken before
+it is answered, and which a wait for a key ends, as in
+`harness/DRIVER.ASM`. A move followed by `asks=` takes both at once. So a
+scenario's steps are, as `harness/driver.py` makes its events of them:
+
+- "Move@40,12" is `mouse=40,12,0`;
+- "Click@3,5" is `mouse=3,5,1 asks=20 mouse=3,5,0`, "RightClick" with 2
+  and "MiddleClick" with 4, and "*4" is `asks=4`;
+- "Click@3,5*4>3,2*100>3,9" is `mouse=3,5,1 asks=4 mouse=3,2,1 asks=100
+  mouse=3,9,1 asks=20 mouse=3,9,0`.
+
+**`held=` takes a round now**, which it did not: the channel took every
+`held=` of a step at once up to the next key, so that `held=08 held=00`,
+Alt alone, was never seen by the program. A step that L3b's
+`posixrun.py` makes with `held=` around a key is the same to the
+program, which reads the key while it is held, as before.
+
+**The trace.** `VC_TRACE` names a file where the program writes what it
+receives: `key XXXX` for each key read, `held XX` where KeysHeld answers
+otherwise than it last did, `mouse B X Y` where MouseWhere does, in hex,
+with the channel or on a terminal. Only the tests read it.
+
+**The test**, `portable_c-terminal`, now seven runs and some forty
+seconds (its top says each): the channel and the two terminals without
+the protocol, with three steps of the mouse more, a move, a click and
+the right button, and a turn of the wheel that is nothing, each held
+cell by cell as before and, by the trace, to what the program received
+from the channel; the pointer held to the cell with its colours
+exchanged, where it is and where it was; the channel and a terminal with
+the protocol, which answers the program's question, through KITTY, 15
+steps: Alt alone, Shift held and let go, Ctrl-F1 with Ctrl held, Alt-D
+on a Russian layout, kitty's text with Shift, the keypad's +, a key
+repeated, a click whose press and release come in one write; the flags
+pushed, popped at SIGTSTP, pushed again at SIGCONT and popped at the end;
+and 43 keys in kitty's codes and 15 in other terminals', each with Esc
+twice behind it, held to the bench's words alone. Tried against itself:
+Alt-Del given A300h fails the keys, and the pointer's character cleared
+fails the pointer.
+
+**Asked of the user** (the piece is not landed while this is open):
+
+- The mouse's wheel. (a) Nothing, as a mouse driver of DOS has none and
+  the original knows none; this is what is built. (b) A turn is Up or
+  Down, a key each, three lines at a notch as terminals scroll, wherever
+  the program takes keys. (c) A turn scrolls only where the mouse is on
+  a list, the panel, the viewer, the editor, the help, by the keys that
+  scroll there. Recommended: (a) now, as DOS has it, and (c) as a
+  deviation of its own later, if wanted; (b) sends keys into dialogs
+  that the user does not look at.
+- The pointer on a terminal before the mouse has moved: it is in the
+  middle of the screen, as on DOS, also on a terminal that reports no
+  mouse (the Linux console), where it stays there. Recommended: as on
+  DOS; hiding it until the first report would be a deviation.
+
+**What L6 should know.**
+
+- `TermGive` pops the protocol's flags and switches the mouse's reports
+  off with the rest, and `TermTake` asks again, so a command runs in the
+  terminal as the user set it up. Keys that are typed while a command
+  runs are the command's.
+- `MouseFromTerminal` of `sys_posix.c` takes the terminal's mouse at
+  `Idle`, `KeyWaiting`, `KeyRead` and `MouseWhere`; a new place where
+  the program waits wants it too.
+- Keypad keys come only by the protocol: without it a terminal sends
+  the keypad's + as +, so Grey + is the main keyboard's + (0D2Bh), which
+  the panels do not take for selecting a group. xterm's keypad mode
+  (`ESC =`) would send `SS3 k` and its like; that is not asked for.
 ### SAN, what the sanitizers found in the scenarios: done
 
 What `posix-asan` stopped at when L3b took the program for Linux

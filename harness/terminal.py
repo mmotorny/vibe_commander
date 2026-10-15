@@ -8,28 +8,41 @@ What it draws is held, on the user's word of 14 October 2026 (CLAUDE.md,
 step 6), to the grid of cells that the test channel writes, by replaying
 it through pyte, a terminal emulator in Python, pinned (harness/deps.py).
 
-The program is run three times in a directory of its own, with HOME
-there and no setup file, so that it takes its defaults, in which the
+The program is run seven times, each in a directory of its own, with
+HOME there and no setup file, so that it takes its defaults, in which the
 clock is off; the files that it lists are the test's, with fixed times:
 
-  1. Through the test channel, VC_TEST, with the keys of KEYS as the
-     BIOS's words, one step each and a first step with none: the grid of
-     each step.
-  2. In a pseudo-terminal, with the same keys typed as a terminal sends
-     them, COLORTERM=truecolor: each key is typed when the program has
-     written nothing for QUIET seconds, and what it has written by then is
-     the step's screen. pyte's screen is held to the grid cell by cell,
-     the character as the VGA's font shows the byte and the colours as
-     the VGA's 16 of mode 3 in 24 bits, with blink for the attribute's
-     bit 7, and the cursor: where it is, and whether it is shown. The run
-     begins in a terminal of 70 by 20, which is to show the line that
-     asks for 80 by 25 and nothing of the program, and is then made 80
-     by 25.
+  1. Through the test channel, VC_TEST, with the events of KEYS, the
+     BIOS's words and the mouse, one step each and a first step with
+     none: the grid of each step, and what the program received, by
+     VC_TRACE, the keys that it read and every change of what was held
+     and of the mouse that it saw. The mouse's pointer is held there to
+     the cell with its colours exchanged, as the bench's driver draws it.
+  2. In a pseudo-terminal, with the same steps typed as a terminal sends
+     them, the keys as xterm sends them and the mouse in SGR's form,
+     COLORTERM=truecolor: each step is typed when the program has
+     written nothing for QUIET seconds, and what it has written by then
+     is the step's screen. pyte's screen is held to the grid cell by
+     cell, the character as the VGA's font shows the byte and the colours
+     as the VGA's 16 of mode 3 in 24 bits, with blink for the
+     attribute's bit 7, and the cursor: where it is, and whether it is
+     shown; and what the program received to what it received from the
+     channel. The run begins in a terminal of 70 by 20, which is to show
+     the line that asks for 80 by 25 and nothing of the program, and is
+     then made 80 by 25.
   3. As 2, without COLORTERM: the colours are ANSI's 16, by the codes
      that pyte reads them from. Behind the keys, the program is stopped
      by SIGTSTP, which is to give the terminal back as it was, its modes
      and its own screen, and goes on by SIGCONT, which is to draw it
      whole again: held to the last grid once more.
+  4. and 5. As 1 and 2 with the steps of KITTY, in a terminal that
+     answers the program's question for the kitty protocol of the
+     keyboard: the program is to push the protocol's flags, have every
+     key by its escape code, Shift, Ctrl and Alt held and let go among
+     them, and pop the flags when it is stopped and at its end.
+  6. and 7. The keys of DECODE_KITTY in such a terminal, and those of
+     DECODE_LEGACY in one without, each followed by Esc twice, held to
+     the BIOS's words that the program reads, without their screens.
 
 Each terminal run ends by SIGTERM, which is to end the program by that
 signal with the terminal's modes as they were before it started and its
@@ -44,7 +57,7 @@ glyphs of the code page 437, the width 1 that wcwidth gives them.
 
 The test exits with 77, which the build takes for a test that is
 skipped, where the program has not been built (no clang). It runs no
-machine and takes some fifteen seconds.
+machine and takes some forty seconds.
 """
 
 import argparse
@@ -71,32 +84,162 @@ TIMEOUT = 20                    # seconds for a step at the most
 STAMP = 1760443200              # the time of the test's files: 14 October
                                 # 2025, 12:00 UTC
 
-# The steps: the BIOS's words of each, and what a terminal sends for it.
+# The steps: the events of the test channel for each, the BIOS's words and
+# the mouse (see sys_posix.c, "The test channel"), and what a terminal
+# sends for it. A terminal of these has no kitty protocol: it sends the
+# keys as xterm does, and the mouse in SGR's form.
 ESC = b"\x1b"
+QUESTION = ESC + b"[?u"         # whether the kitty protocol is there
+PUSH = ESC + b"[>31u"           # the flags that the program asks for
+POP = ESC + b"[<u"
+MOUSE_ON = ESC + b"[?1000h" + ESC + b"[?1002h" + ESC + b"[?1003h" + ESC \
+    + b"[?1006h"
+# The end of what gives the terminal back: the mouse's and the focus's
+# reports off, and the terminal's own screen.
+LEFT = ESC + b"[?1004l" + ESC + b"[?1006l" + ESC + b"[?1003l" + ESC \
+    + b"[?1002l" + ESC + b"[?1000l" + ESC + b"[?1049l"
+# All of it, which the flags of the kitty protocol are popped in front of.
+LEAVE = ESC + b"[?2026l" + ESC + b"[0m" + ESC + b"[0 q" + ESC + b"[?25h" \
+    + ESC + b"[?7h" + LEFT
 KEYS = [
-    ("Down", [0x5000], ESC + b"[B"),
-    ("Alt-D, the speed search", [0x2000], ESC + b"d"),
-    ("F3, the viewer", [0x3D00], ESC + b"OR"),
-    ("Esc", [0x011B], ESC),
-    ("F9, the menu bar", [0x4300], ESC + b"[20~"),
-    ("Right", [0x4D00], ESC + b"[C"),
-    ("Enter", [0x1C0D], b"\r"),
-    ("Esc", [0x011B], ESC),
-    ("Esc", [0x011B], ESC),
-    ("Alt-F1, the drive", [0x6800], ESC + b"[1;3P"),
-    ("Esc", [0x011B], ESC),
-    ("typed text", [0x1265, 0x2E63, 0x2368, 0x186F],
+    ("Down", ["5000"], ESC + b"[B"),
+    ("Alt-D, the speed search", ["2000"], ESC + b"d"),
+    ("F3, the viewer", ["3D00"], ESC + b"OR"),
+    ("Esc", ["011B"], ESC),
+    ("F9, the menu bar", ["4300"], ESC + b"[20~"),
+    ("Right", ["4D00"], ESC + b"[C"),
+    ("Enter", ["1C0D"], b"\r"),
+    ("Esc", ["011B"], ESC),
+    ("Esc", ["011B"], ESC),
+    ("Alt-F1, the drive", ["6800"], ESC + b"[1;3P"),
+    ("Esc", ["011B"], ESC),
+    ("typed text", ["1265", "2E63", "2368", "186F"],
      "echo".encode()),
-    ("Backspace", [0x0E08], b"\x7f"),
-    ("Ctrl-F1, the left panel", [0x5E00], ESC + b"[1;5P"),
-    ("Tab", [0x0F09], b"\t"),
-    ("End", [0x4F00], ESC + b"[F"),
-    ("Ctrl-PgUp", [0x8400], ESC + b"[5;5~"),
-    ("F9", [0x4300], ESC + b"[20~"),
-    ("o, Options", [0x186F], b"o"),
-    ("m, More setup", [0x326D], b"m"),
-    ("F6, the colours", [0x4000], ESC + b"[17~"),
-    ("Enter, the grid of colours, half of which blink", [0x1C0D], b"\r"),
+    ("Backspace", ["0E08"], b"\x7f"),
+    ("Ctrl-F1, the left panel", ["5E00"], ESC + b"[1;5P"),
+    ("Tab", ["0F09"], b"\t"),
+    ("the mouse moved", ["mouse=60,10,0"], ESC + b"[<35;61;11M"),
+    ("a click on readme.txt", ["mouse=3,4,1", "asks=20", "mouse=3,4,0"],
+     ESC + b"[<0;4;5M" + ESC + b"[<0;4;5m"),
+    ("the right button on data.bin, which selects it",
+     ["mouse=3,3,2", "asks=20", "mouse=3,3,0"],
+     ESC + b"[<2;4;4M" + ESC + b"[<2;4;4m"),
+    ("the wheel, which is nothing", [], ESC + b"[<64;4;4M"),
+    ("End", ["4F00"], ESC + b"[F"),
+    ("Ctrl-PgUp", ["8400"], ESC + b"[5;5~"),
+    ("F9", ["4300"], ESC + b"[20~"),
+    ("o, Options", ["186F"], b"o"),
+    ("m, More setup", ["326D"], b"m"),
+    ("F6, the colours", ["4000"], ESC + b"[17~"),
+    ("Enter, the grid of colours, half of which blink", ["1C0D"], b"\r"),
+]
+
+# The steps of a terminal with the kitty protocol of the keyboard, whose
+# flags the program has pushed: every key an escape code, with Shift,
+# Ctrl and Alt pressed and let go as keys of their own, the key of a US
+# layout behind a key and the text that it types.
+CSI = ESC + b"["
+KITTY = [
+    ("Alt alone, pressed and let go at once: the menu bar",
+     ["held=08", "held=00"], CSI + b"57443;3u" + CSI + b"57443;1:3u"),
+    ("Esc, pressed and let go", ["011B"], CSI + b"27u" + CSI + b"27;1:3u"),
+    ("Shift held: the key bar of Shift", ["held=02"], CSI + b"57441;2u"),
+    ("Shift let go", ["held=00"], CSI + b"57441;1:3u"),
+    ("Ctrl-F1 with Ctrl held: the left panel off",
+     ["held=04", "5E00", "held=00"],
+     CSI + b"57442;5u" + CSI + b"1;5P" + CSI + b"1;5:3P" + CSI
+     + b"57442;1:3u"),
+    ("Ctrl-F1 again", ["held=04", "5E00", "held=00"],
+     CSI + b"57442;5u" + CSI + b"1;5P" + CSI + b"1;5:3P" + CSI
+     + b"57442;1:3u"),
+    ("Alt-D on a Russian layout, by the key of a US one: the speed search",
+     ["held=08", "2000", "held=00"],
+     CSI + b"57443;3u" + CSI + b"1074::100;3u" + CSI + b"1074::100;3:3u"
+     + CSI + b"57443;1:3u"),
+    ("Esc", ["011B"], CSI + b"27u"),
+    ("typed text, by kitty's text, Shift with c",
+     ["1265", "held=02", "2E43", "held=00", "2368", "186F"],
+     CSI + b"101;;101u" + CSI + b"57441;2u" + CSI + b"99:67;2;67u"
+     + CSI + b"99:67;2:3;67u" + CSI + b"57441;1:3u" + CSI + b"104;;104u"
+     + CSI + b"111;;111u"),
+    ("Backspace, twice", ["0E08", "0E08"], CSI + b"127u" + CSI + b"127u"),
+    ("Esc, with the text left", ["011B"], CSI + b"27u"),
+    ("Grey + of the keypad: the group to select", ["4E2B"],
+     CSI + b"57413;;43u"),
+    ("Esc", ["011B"], CSI + b"27u"),
+    ("Right, a key repeated: twice", ["4D00", "4D00"],
+     CSI + b"1;1C" + CSI + b"1;1:2C" + CSI + b"1;1:3C"),
+    ("a click on zero, pressed and let go at once",
+     ["mouse=44,5,1", "asks=20", "mouse=44,5,0"],
+     CSI + b"<0;45;6M" + CSI + b"<0;45;6m"),
+]
+
+# Keys whose BIOS's words are held without their screens: each is typed
+# in a terminal with the kitty protocol, and in one without, followed by
+# Esc twice, and what the program reads is held to the words. The words
+# are the bench's BIOS's, SeaBIOS's, as INT 16h 00h answers them (see
+# term_posix.c, "The keys, and the mouse"); [] where it answers nothing.
+DECODE_KITTY = [
+    (CSI + b"97;;97u", ["1E61"]),
+    (CSI + b"97:65;2;65u", ["1E41"]),                   # Shift-A
+    (CSI + b"97;65;65u", ["1E41"]),                     # Caps Lock on
+    (CSI + b"1092::97;;1092u", []),             # a letter that 437 lacks
+    (CSI + b"233::101;;233u", ["1282"]),        # one that it has, on e
+    (CSI + b"97;1:2u", ["1E61"]),                       # a repeat
+    (CSI + b"97;1:3u", []),                             # a release
+    (CSI + b"97;5u", ["1E01"]),                         # Ctrl-A
+    (CSI + b"49;5u", []),                               # Ctrl-1
+    (CSI + b"50;5u", ["0300"]),                         # Ctrl-2
+    (CSI + b"91;5u", ["1A1B"]),                         # Ctrl-[
+    (CSI + b"1092::97;3u", ["1E00"]),                   # Alt with ф: Alt-A
+    (CSI + b"91;3u", ["1A00"]),                         # Alt-[
+    (CSI + b"49;3u", ["7800"]),                         # Alt-1
+    (CSI + b"61;3u", ["8300"]),                         # Alt-=
+    (CSI + b"32;3u", ["3920"]),                         # Alt-Space
+    (CSI + b"1;5A", ["8D00"]),                          # Ctrl-Up
+    (CSI + b"1;3A", ["9800"]),                          # Alt-Up
+    (CSI + b"3;3~", []),                                # Alt-Del
+    (CSI + b"3;5~", ["9300"]),                          # Ctrl-Del
+    (CSI + b"23~", ["8500"]),                           # F11
+    (CSI + b"24;2~", ["8800"]),                         # Shift-F12
+    (CSI + b"13~", ["3D00"]),                           # F3, kitty's
+    (CSI + b"1;2P", ["5400"]),                          # Shift-F1
+    (CSI + b"27;3u", ["0100"]),                         # Alt-Esc
+    (CSI + b"9u", ["0F09"]),                            # Tab
+    (CSI + b"9;2u", ["0F00"]),                          # Shift-Tab
+    (CSI + b"9;5u", ["9400"]),                          # Ctrl-Tab
+    (CSI + b"127;3u", ["0E00"]),                        # Alt-Backspace
+    (CSI + b"127;5u", ["0E7F"]),                        # Ctrl-Backspace
+    (CSI + b"13;5u", ["1C0A"]),                         # Ctrl-Enter
+    (CSI + b"57399;129;48u", ["5230"]),                 # the keypad's 0
+    (CSI + b"57423u", ["4700"]),                        # its Home
+    (CSI + b"57423;2u", ["4737"]),                      # Shift with it
+    (CSI + b"57427u", ["4C00"]),                        # its 5, Num Lock off
+    (CSI + b"57427;5u", ["8F00"]),                      # Ctrl with it
+    (CSI + b"57410u", ["352F"]),                        # its /
+    (CSI + b"57411;5u", ["9600"]),                      # Ctrl with its *
+    (CSI + b"57412;3u", ["4A00"]),                      # Alt with its -
+    (CSI + b"57414;3u", ["A600"]),                      # Alt with its Enter
+    (CSI + b"57376u", []),                              # F13
+    (CSI + b"57361u", []),                              # Print Screen
+    (CSI + b"57441;2u" + CSI + b"57441;1:3u", []),      # Shift alone
+]
+DECODE_LEGACY = [
+    (CSI + b"23~", ["8500"]),                           # F11
+    (CSI + b"24;5~", ["8A00"]),                         # Ctrl-F12
+    (CSI + b"1;5A", ["8D00"]),                          # Ctrl-Up
+    (CSI + b"1;3B", ["A000"]),                          # Alt-Down
+    (CSI + b"3;3~", []),                                # Alt-Del
+    (CSI + b"E", ["4C00"]),                             # the keypad's 5
+    (CSI + b"Z", ["0F00"]),                             # Shift-Tab
+    (ESC + b"OP", ["3B00"]),                            # F1, by SS3
+    (CSI + b"[A", ["3B00"]),                            # F1, the console's
+    (ESC + b";", ["2700"]),                             # Alt-;
+    (ESC + b"\t", ["A500"]),                            # Alt-Tab
+    (ESC + b"\x7f", ["0E00"]),                          # Alt-Backspace
+    (ESC + b"A", ["1E00"]),                             # Alt-Shift-A
+    ("é".encode(), ["0082"]),
+    (b"\x01", ["1E01"]),                                # Ctrl-A
 ]
 
 # What the VGA's font shows for the bytes below 20h and for 7Fh; the rest
@@ -169,24 +312,54 @@ def environment(home, **more):
     return env
 
 
-def channel(program, home, here, work):
-    """The grids of the steps, through the test channel."""
-    test = work / "channel" / "test"
+def channel(program, home, here, work, steps, name):
+    """The grids of the steps, through the test channel, and what the
+    program received there, by VC_TRACE."""
+    test = work / name / "test"
     test.mkdir()
-    lines = [""] + [" ".join(f"{word:04X}" for word in words)
-                    for _, words, _ in KEYS]
+    trace = work / f"trace-{name}"
+    lines = [""] + [" ".join(words) for _, words, _ in steps]
     (test / "keys").write_text("\n".join(lines) + "\n")
     done = subprocess.run([str(program)], cwd=here,
-                          env=environment(home, VC_TEST=str(test)),
+                          env=environment(home, VC_TEST=str(test),
+                                          VC_TRACE=str(trace)),
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                           timeout=60)
     data = (test / "screens").read_bytes()
     records = [data[i:i + 4016] for i in range(0, len(data), 4016)]
-    if done.returncode != 2 or len(records) != len(KEYS) + 2:
-        sys.exit(f"the test channel: ended with {done.returncode} and "
-                 f"{len(records)} screens, where 2 and {len(KEYS) + 2} "
+    if done.returncode != 2 or len(records) != len(steps) + 2:
+        sys.exit(f"the test channel, {name}: ended with {done.returncode} "
+                 f"and {len(records)} screens, where 2 and {len(steps) + 2} "
                  f"were to be:\n{done.stderr.decode(errors='replace')}")
-    return records[:-1]
+    return records[:-1], trace.read_text().splitlines()
+
+
+def cell(record, column, row):
+    at = 8 + (row * 80 + column) * 2
+    return record[at] | record[at + 1] << 8
+
+
+def pointer(records, failures):
+    """The mouse's pointer, as the bench's driver draws it with the look
+    that the program asks for: the cell with its colours exchanged, in
+    the middle of the screen first, and moved by "the mouse moved", which
+    puts back the cell that it was on."""
+    at = [what for what, _, _ in KEYS].index("the mouse moved")
+    before, after = records[at], records[at + 1]
+    for column, row, want, name in (
+            (40, 12, cell(before, 40, 12) ^ 0x7700, "left"),
+            (60, 10, cell(before, 60, 10) ^ 0x7700, "drawn")):
+        if cell(after, column, row) != want:
+            failures.append(f"the test channel: the mouse's pointer is not "
+                            f"{name} at column {column} of row {row}: "
+                            f"{cell(after, column, row):04X}, where "
+                            f"{want:04X} was to be")
+
+
+def keys_of(steps):
+    """The lines of a trace for the keys that the steps' events have."""
+    return [f"key {word}" for _, words, _ in steps for word in words
+            if "=" not in word]
 
 
 def winsize(fd, columns, rows):
@@ -228,8 +401,11 @@ class Terminal:
     """The program in a pseudo-terminal, and pyte's screen of it."""
 
     def __init__(self, pyte, program, home, here, work, columns, rows,
-                 **env):
+                 name, kitty=False, **env):
         self.pyte = pyte
+        self.kitty = kitty              # answers the question for it
+        self.answered = 0
+        self.trace = work / f"trace-{name}"
         self.master, slave = os.openpty()
         winsize(slave, columns, rows)
         self.before = termios.tcgetattr(slave)
@@ -238,11 +414,13 @@ class Terminal:
         self.written = b""
         told_r, told_w = os.pipe()
         ended_r, ended_w = os.pipe()
-        self.errors = open(work / f"stderr-{len(env)}-{columns}", "wb")
+        self.errors_path = work / f"stderr-{name}"
+        self.errors = open(self.errors_path, "wb")
         self.process = subprocess.Popen(
             [sys.executable, "-I", "-c", LEADER, str(told_w), str(ended_w),
              str(program)],
-            cwd=here, env=environment(home, **env), stdin=slave,
+            cwd=here, env=environment(home, VC_TRACE=str(self.trace), **env),
+            stdin=slave,
             stdout=slave, stderr=self.errors, start_new_session=True,
             pass_fds=(told_w, ended_w))
         os.close(slave)
@@ -273,10 +451,18 @@ class Terminal:
             self.written += data
             self.stream.feed(data)
             last = time.monotonic()
+            asked = self.written.count(QUESTION)
+            if self.kitty and asked > self.answered:
+                self.answered = asked
+                os.write(self.master, ESC + b"[?0u")
 
-    def type(self, data):
+    def type(self, data, quiet=QUIET):
         os.write(self.master, data)
-        self.read()
+        self.read(quiet)
+
+    def traced(self):
+        """What the program has received, by VC_TRACE: its lines."""
+        return self.trace.read_text().splitlines()
 
     def resize(self, columns, rows):
         winsize(self.master, columns, rows)
@@ -337,12 +523,56 @@ def compare(what, pyte, screen, record, colours24):
     return wrong
 
 
-def run(pyte, program, home, here, work, records, colours24, failures):
+def held_to(name, terminal, steps, records, trace, failures):
+    """Take the terminal through the steps, each screen held to the grid
+    of the channel's step, and what the program received to what it
+    received from the channel: the same keys, which are the steps'
+    words, and the same changes of what is held and of the mouse."""
+    for number, (what, _, typed) in enumerate(
+            [("the first screen", None, None)] + steps):
+        if typed is not None:
+            terminal.type(typed)
+        failures += compare(f"{name}, step {number + 1}, {what}",
+                            terminal.pyte, terminal.screen, records[number],
+                            terminal.colours24)[:10]
+    have = terminal.traced()
+    if [line for line in trace if line.startswith("key ")] != keys_of(steps):
+        failures.append(f"the test channel, for {name}: the program does "
+                        f"not read the steps' keys:\n{trace}")
+    if have != trace:
+        failures.append(f"{name}: the program receives otherwise than from "
+                        f"the test channel:\n  terminal {have}\n  "
+                        f"channel  {trace}")
+
+
+def ended(name, terminal, failures):
+    """SIGTERM, which is to end the program by that signal and give the
+    terminal back; and nothing on standard error."""
+    status = terminal.end()
+    if not (os.WIFSIGNALED(status)
+            and os.WTERMSIG(status) == signal.SIGTERM):
+        failures.append(f"{name}: SIGTERM does not end the program by "
+                        f"that signal: the status is {status:#x}")
+    if terminal.modes() != terminal.before:
+        failures.append(f"{name}: the terminal's modes are not given back "
+                        "at SIGTERM")
+    if not terminal.written.endswith(LEFT):
+        failures.append(f"{name}: the terminal's own screen, and the "
+                        "mouse's reports, are not given back at SIGTERM")
+    errors = terminal.errors_path.read_bytes()
+    if errors:
+        failures.append(f"{name}: the program says on standard error:\n"
+                        f"{errors.decode(errors='replace')}")
+
+
+def run(pyte, program, home, here, work, channelled, colours24, failures):
+    records, trace = channelled
     env = {"COLORTERM": "truecolor"} if colours24 else {}
     name = "24 bits" if colours24 else "16 colours"
     columns, rows = (70, 20) if colours24 else (80, 25)
     terminal = Terminal(pyte, program, home, here, work, columns, rows,
-                        **env)
+                        "24" if colours24 else "16", **env)
+    terminal.colours24 = colours24
     terminal.read()
     if colours24:
         text = "\n".join(terminal.screen.display)
@@ -350,12 +580,12 @@ def run(pyte, program, home, here, work, records, colours24, failures):
             failures.append(f"{name}: a terminal of 70 by 20 does not get "
                             f"the line that asks for 80 by 25:\n{text}")
         terminal.resize(80, 25)
-    steps = [("the first screen", None, None)] + KEYS
-    for number, (what, _, typed) in enumerate(steps):
-        if typed is not None:
-            terminal.type(typed)
-        failures += compare(f"{name}, step {number + 1}, {what}", pyte,
-                            terminal.screen, records[number], colours24)[:10]
+    if MOUSE_ON not in terminal.written:
+        failures.append(f"{name}: the mouse's reports are not asked for")
+    held_to(name, terminal, KEYS, records, trace, failures)
+    if PUSH in terminal.written:
+        failures.append(f"{name}: the kitty protocol's flags are pushed "
+                        "where the terminal has not said that it has it")
     if not colours24:
         os.kill(terminal.pid, signal.SIGTSTP)
         terminal.read()
@@ -368,7 +598,7 @@ def run(pyte, program, home, here, work, records, colours24, failures):
         if terminal.modes() != terminal.before:
             failures.append(f"{name}: the terminal's modes are not given "
                             "back while the program is stopped")
-        if not terminal.written.endswith(b"\x1b[?1049l"):
+        if not terminal.written.endswith(LEFT):
             failures.append(f"{name}: the terminal's own screen is not "
                             "given back while the program is stopped")
         terminal.screen.reset()
@@ -376,21 +606,61 @@ def run(pyte, program, home, here, work, records, colours24, failures):
         terminal.read()
         failures += compare(f"{name}, after SIGCONT", pyte, terminal.screen,
                             records[-1], colours24)[:10]
-    status = terminal.end()
-    if not (os.WIFSIGNALED(status)
-            and os.WTERMSIG(status) == signal.SIGTERM):
-        failures.append(f"{name}: SIGTERM does not end the program by "
-                        f"that signal: the status is {status:#x}")
-    if terminal.modes() != terminal.before:
-        failures.append(f"{name}: the terminal's modes are not given back "
+    ended(name, terminal, failures)
+
+
+def run_kitty(pyte, program, home, here, work, channelled, failures):
+    """A terminal of 24 bits that has the kitty protocol, through KITTY,
+    held as run() holds one without; and stopped and gone on, which is to
+    pop the protocol's flags and push them again."""
+    records, trace = channelled
+    name = "kitty"
+    terminal = Terminal(pyte, program, home, here, work, 80, 25, name,
+                        kitty=True, COLORTERM="truecolor")
+    terminal.colours24 = True
+    terminal.read()
+    if PUSH not in terminal.written or terminal.answered != 1:
+        failures.append(f"{name}: the program does not ask for the kitty "
+                        "protocol and push its flags when it is there")
+    held_to(name, terminal, KITTY, records, trace, failures)
+    os.kill(terminal.pid, signal.SIGTSTP)
+    terminal.read()
+    if not terminal.written.endswith(POP + LEAVE):
+        failures.append(f"{name}: the kitty protocol's flags are not popped "
+                        "while the program is stopped")
+    os.kill(terminal.pid, signal.SIGCONT)
+    terminal.read()
+    if terminal.written.count(PUSH) != 2:
+        failures.append(f"{name}: the kitty protocol's flags are not "
+                        "pushed again when the program goes on")
+    ended(name, terminal, failures)
+    if not terminal.written.endswith(POP + LEAVE):
+        failures.append(f"{name}: the kitty protocol's flags are not popped "
                         "at SIGTERM")
-    if not terminal.written.endswith(b"\x1b[?1049l"):
-        failures.append(f"{name}: the terminal's own screen is not given "
-                        "back at SIGTERM")
-    errors = (work / f"stderr-{len(env)}-{columns}").read_bytes()
-    if errors:
-        failures.append(f"{name}: the program says on standard error:\n"
-                        f"{errors.decode(errors='replace')}")
+
+
+def decode(pyte, program, home, here, work, kitty, failures):
+    """The keys of DECODE_KITTY or DECODE_LEGACY, each with Esc twice
+    behind it, held to the words that the program reads."""
+    name = "kitty's keys" if kitty else "legacy keys"
+    terminal = Terminal(pyte, program, home, here, work, 80, 25,
+                        "decode-kitty" if kitty else "decode-legacy",
+                        kitty=kitty)
+    terminal.read()
+    esc = CSI + b"27u" if kitty else ESC
+    want = []
+    for typed, words in DECODE_KITTY if kitty else DECODE_LEGACY:
+        terminal.type(typed, 0.15)
+        terminal.type(esc, 0.15)
+        terminal.type(esc, 0.15)
+        want += [f"key {word}" for word in words] + ["key 011B"] * 2
+    have = [line for line in terminal.traced() if line.startswith("key ")]
+    if have != want:
+        wrong = [f"  {typed!r}: {words}" for typed, words in
+                 (DECODE_KITTY if kitty else DECODE_LEGACY)]
+        failures.append(f"{name}: the program reads\n  {have}\nwhere it "
+                        f"was to read\n  {want}\nfor\n" + "\n".join(wrong))
+    ended(name, terminal, failures)
 
 
 def main():
@@ -402,24 +672,40 @@ def main():
         print(f"{args.program} is not there: no clang, the test is skipped")
         sys.exit(SKIPPED)
     pyte = load_pyte()
+    program = args.program.resolve()
     failures = []
     with dos.workdir() as top:
         work = Path(top)
-        (work / "channel").mkdir()
-        home, here = lay_out(work / "channel")
-        records = channel(args.program.resolve(), home, here, work)
-        for colours24 in (True, False):
-            run_dir = work / ("24" if colours24 else "16")
+        channelled = {}
+        for name, steps in (("channel", KEYS), ("channel-kitty", KITTY)):
+            (work / name).mkdir()
+            home, here = lay_out(work / name)
+            channelled[name] = channel(program, home, here, work, steps,
+                                       name)
+        pointer(channelled["channel"][0], failures)
+        for run_name in ("24", "16", "kitty", "decode-kitty",
+                         "decode-legacy"):
+            run_dir = work / ("run-" + run_name)
             run_dir.mkdir()
             home, here = lay_out(run_dir)
-            run(pyte, args.program.resolve(), home, here, work, records,
-                colours24, failures)
+            if run_name == "kitty":
+                run_kitty(pyte, program, home, here, work,
+                          channelled["channel-kitty"], failures)
+            elif run_name.startswith("decode"):
+                decode(pyte, program, home, here, work,
+                       run_name == "decode-kitty", failures)
+            else:
+                run(pyte, program, home, here, work, channelled["channel"],
+                    run_name == "24", failures)
     for failure in failures:
         print(failure)
     if failures:
         sys.exit(1)
-    print(f"{len(KEYS) + 1} screens held, in 24 bits and in 16 colours; "
-          "a terminal too small, SIGTSTP, SIGCONT and SIGTERM")
+    print(f"{len(KEYS) + 1} screens held, in 24 bits and in 16 colours, "
+          f"{len(KITTY) + 1} with the kitty protocol; "
+          f"{len(DECODE_KITTY)} keys of kitty's and {len(DECODE_LEGACY)} "
+          "of other terminals; a terminal too small, SIGTSTP, SIGCONT and "
+          "SIGTERM")
 
 
 if __name__ == "__main__":

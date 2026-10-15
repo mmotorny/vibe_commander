@@ -566,6 +566,23 @@ void TermInput(i32 wait);
 struct Keys TermKeyWaiting(void);
 u16 TermKeyTake(void);
 
+/* What is held, as the BIOS keeps it at 40:17h, as far as the kitty
+   protocol of the keyboard has said: 0 where the terminal has none. The
+   program has seen it by this, and the next change may come. */
+u16 TermKeysHeld(void);
+
+/* The mouse as the terminal last reported it: the cell, from 0, which
+   the terminal may have larger than 80 by 25; the buttons, the left one
+   1, the right one 2 and the middle one 4; and how many reports have
+   come, 0 before the first. `looked` where the program asks where the
+   mouse is, which lets the next change of the buttons come. */
+struct TermPointer {
+    i32 column, row;
+    u16 buttons;
+    u32 count;
+};
+struct TermPointer TermMouse(bool looked);
+
 /* The character of Unicode that the VGA's font shows for a byte of the
    code page. */
 u32 TermGlyph(u8 byte);
