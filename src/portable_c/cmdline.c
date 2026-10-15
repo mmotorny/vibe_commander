@@ -95,6 +95,37 @@ bool F74_00(void)
     return false;
 }
 
+/* F80_05 of Ctrl+I: the name of `file` into the command line, with a
+   space behind it and "\*.*" behind the name of a directory, if there
+   is room for it. Returns whether there was. */
+static bool F80_05(struct FILENT *file)
+{
+    u16 c;
+    i32 length, used, column, i;
+
+    for (length = 0; file->NameF[length] != 0; length++)
+        ;
+    length++;
+    for (used = 0; md.DosBuf[used] != 0; used++)
+        ;
+    used++;
+    if (file->AttrF & ATTR_DIRECTORY)
+        length += 4;
+    /* The room wraps round to plenty, as the original's does, for a line
+       longer than EdLin makes one, LenCmd - 1 characters. */
+    if (length > (u16)(LenCmd - used))
+        return false;
+    column = md.DosCol;
+    for (i = 0; (c = file->NameF[i]) != 0; i++)
+        column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
+    if (file->AttrF & ATTR_DIRECTORY)
+        for (i = 0; (c = Mask_S[i]) != 0; i++)
+            column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
+    column = EdLin(' ', md.DosBuf, column, LenCmd - 1).cursor;
+    md.DosCol = (u8)column;
+    return true;
+}
+
 /* Ctrl+I: put the names of the selected files of the panel `panel` into
    the command line, where its cursor is, or the name of the file under
    the cursor of the panel, each with a space behind it, and "\*.*"
@@ -107,8 +138,6 @@ bool F80_00(struct WCBdef *panel)
     struct Selected selected;
     bool any;
     i32 at, entry;
-    u16 c;
-    i32 length, used, column, i;
 
     if (!FilePan(panel))
         return false;
@@ -125,44 +154,19 @@ bool F80_00(struct WCBdef *panel)
          entry += sizeof(struct FILENT))
         ENTRY(panel, entry)->AttrF &= 0x7F;
     if (!any)
-        goto F80_05;
-    at = DSKBUF;
-F80_04:
-    if (at >= PLACES(panel)->EndBuf)
-        goto F80_10;
-    if (!(ENTRY(panel, at)->AttrF & ATTR_SELECTED))
-        goto F80_12;
-F80_05:                                 /* is there room for it */
-    file = ENTRY(panel, at);
-    for (length = 0; file->NameF[length] != 0; length++)
-        ;
-    length++;
-    for (used = 0; md.DosBuf[used] != 0; used++)
-        ;
-    used++;
-    if (file->AttrF & ATTR_DIRECTORY)
-        length += 4;
-    /* The room wraps round to plenty, as the original's does, for a line
-       longer than EdLin makes one, LenCmd - 1 characters. */
-    if (length > (u16)(LenCmd - used))
-        goto F80_10;
-    column = md.DosCol;
-    for (i = 0; (c = file->NameF[i]) != 0; i++)
-        column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
-    if (file->AttrF & ATTR_DIRECTORY)
-        for (i = 0; (c = Mask_S[i]) != 0; i++)
-            column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
-    column = EdLin(' ', md.DosBuf, column, LenCmd - 1).cursor;
-    md.DosCol = (u8)column;
-    if (!any)
-        goto F80_10;
-    file->AttrF &= 0xBF;
-    file->AttrF |= 0x80;
-F80_12:
-    at += sizeof(struct FILENT);
-    goto F80_04;
-
-F80_10:
+        F80_05(ENTRY(panel, at));       /* the file under the cursor */
+    else
+        for (at = DSKBUF; at < PLACES(panel)->EndBuf;      /* F80_04 */
+             at += sizeof(struct FILENT)) {
+            file = ENTRY(panel, at);
+            if (!(file->AttrF & ATTR_SELECTED))
+                continue;                       /* F80_12 */
+            if (!F80_05(file))
+                break;
+            file->AttrF &= 0xBF;
+            file->AttrF |= 0x80;
+        }
+    /* F80_10 */
     DosCom();
     return true;
 }
@@ -179,18 +183,19 @@ static i32 F68_25(const u8 *text, i32 column, u16 scan, u16 end)
 
     for (;;) {
         c = *text;
-        if (c == 0)
-            goto F68_90;
+        if (c == 0) {
+            /* F68_90 */
+            if ((end & 0xFF) != 0 && (end & 0xFF) != text[-1])
+                column = EdLin(end, md.DosBuf, column, LenCmd - 1).cursor;
+            break;
+        }
         text++;
         edited = EdLin(scan | c, md.DosBuf, column, LenCmd - 1);
         column = edited.cursor;
         if (!edited.changed)
-            goto F68_27;
+            break;
     }
-F68_90:
-    if ((end & 0xFF) != 0 && (end & 0xFF) != text[-1])
-        column = EdLin(end, md.DosBuf, column, LenCmd - 1).cursor;
-F68_27:
+    /* F68_27 */
     md.DosCol = (u8)column;
     DosCom();
     Cursor1();
@@ -232,32 +237,36 @@ bool F68_00(void)
     u16 *screen;
     u16 begin, size;                    /* BX and DX: the box */
     i32 row;                            /* CL: the row of the cursor */
-    u16 color, c, key, half, answer;
+    u16 color, c, half, answer;
+    u16 key = 0;                        /* read only where Input has set
+                                           it, which clang cannot tell
+                                           through `mouse` */
     i32 limit, length, width, lines, room, at, i, to, next, column, count;
+    bool mouse;                         /* a button, or a key of the mouse */
+    bool gone;                          /* the box goes */
 
     HidCur();
     PutMnu(3);
     size = 0x51F;
     text = md.HstBuf;
     limit = (u8)(md.Lines - 3);
-F68_01:                                 /* how many and how wide */
-    length = 0;
-    do
-        if (text[length++] == 0)
+    do {                                /* F68_01: how many and how wide */
+        length = 0;
+        do
+            if (text[length++] == 0)
+                break;
+        while (length < 256);
+        text += length;
+        if ((u8)length > (u8)size) {
+            size = (size & 0xFF00) | (u8)length;
+            if ((u8)size > 65 + 1)
+                size = (size & 0xFF00) | 65 + 1;
+        }
+        size += 0x100;
+        if ((u8)(size >> 8) >= limit)
             break;
-    while (length < 256);
-    text += length;
-    if ((u8)length > (u8)size) {
-        size = (size & 0xFF00) | (u8)length;
-        if ((u8)size > 65 + 1)
-            size = (size & 0xFF00) | 65 + 1;
-    }
-    size += 0x100;
-    if ((u8)(size >> 8) >= limit)
-        goto F68_03;
-    if (*text != 0)
-        goto F68_01;
-F68_03:
+    } while (*text != 0);
+    /* F68_03 */
     size = ADD_LOW(size, 10 + 2 - 1);
     half = size + 0x100 - 1;
     begin = (u16)(0x0D28 - ((half >> 8) >> 1 << 8 | (half & 0xFF) >> 1));
@@ -274,108 +283,111 @@ F68_03:
     width = (u8)(size - 12);
     lines = (u8)((size >> 8) - 5);
     at = 0;
-F68_04:
-    if (text <= HistoryPlace)
-        at++;
-    room = width;
-    i = 0;
-    for (;;) {
-        c = *text++;
-        if (c == 0)
-            break;
-        if (room == 0)
-            continue;
-        screen[i++] = color | c;
-        room--;
-    }
-    screen -= 80;
-    if (--lines != 0)
-        goto F68_04;
+    do {                                /* F68_04 */
+        if (text <= HistoryPlace)
+            at++;
+        room = width;
+        i = 0;
+        for (;;) {
+            c = *text++;
+            if (c == 0)
+                break;
+            if (room == 0)
+                continue;
+            screen[i++] = color | c;
+            room--;
+        }
+        screen -= 80;
+    } while (--lines != 0);
     Window(begin, size);
     md.HlpPage = 33;
     row = (u8)((begin >> 8) + (size >> 8) - 3 - at);
     md.MousTim = (md.MousTim & 0xFFFF) | 0xFFFF0000UL;
     md.MousEnt = 0;
 
-F68_07:                                 /* the cursor */
-    F68_30(HstCu_C, begin, row, size);
-F68_08:
-    if (GetMous(0).buttons)
-        goto F68_11;
-    md.MousEnt = 0;
-    key = Input(1);
-    if (key >> 8 == 0xFC)
-        goto F68_11;
-    switch (key) {
-    case 0x4800:
-        goto F68_13;
-    case 0x5000:
-        goto F68_15;
-    case 0x4700:
-    case 0x4900:
-        goto F68_16;
-    case 0x4F00:
-    case 0x5100:
-        goto F68_14;
-    case 0x1C0A:
-    case 0x1C0D:
-    case 0x4400:
-        goto F68_20;
+    gone = false;
+    for (;;) {
+        F68_30(HstCu_C, begin, row, size);      /* F68_07: the cursor */
+        do {
+            /* F68_08: until the cursor goes elsewhere, F68_12, or the
+               box goes */
+            to = row;
+            mouse = GetMous(0).buttons != 0;
+            if (!mouse) {
+                md.MousEnt = 0;
+                key = Input(1);
+                mouse = key >> 8 == 0xFC;
+            }
+            if (mouse) {
+                /* F68_11: the mouse */
+                answer = F32_70(begin, size);
+                if (answer >> 8 < 1)
+                    continue;
+                if (answer >> 8 > 1) {
+                    key = (answer & 0xFF00) | 0x0D;
+                    gone = true;
+                    continue;
+                }
+                to = (u8)(answer + (begin >> 8) + 2);
+                continue;
+            }
+            switch (key) {
+            case 0x4800:                /* F68_13: Up */
+                to = (u8)(row - 1);
+                if (to == (u8)((begin >> 8) + 1))       /* F68_14 */
+                    to = (u8)((begin >> 8) + (size >> 8) - 4);
+                continue;
+            case 0x5000:                /* F68_15: Down */
+                to = (u8)(row + 1);
+                if (to == (u8)((begin >> 8) + (size >> 8) - 3))
+                    to = (u8)((begin >> 8) + 2);        /* F68_16 */
+                continue;
+            case 0x4700:
+            case 0x4900:                /* F68_16: Home */
+                to = (u8)((begin >> 8) + 2);
+                continue;
+            case 0x4F00:
+            case 0x5100:                /* F68_14: End */
+                to = (u8)((begin >> 8) + (size >> 8) - 4);
+                continue;
+            case 0x1C0A:
+            case 0x1C0D:
+            case 0x4400:
+                gone = true;
+                continue;
+            }
+            if ((key & 0xFF) == 0x1B && key >> 8 != 0) {
+                gone = true;
+                continue;
+            }
+            /* A letter: the next command that begins with it, from the
+               cursor down and round, but for the empty line. */
+            c = UpCase(key) & 0xFF;
+            next = row;
+            for (;;) {
+                next = (u8)(next + 1);  /* F68_09 */
+                if (next >= (u8)((begin >> 8) + (size >> 8) - 4)) {
+                    if (next == row)
+                        break;
+                    next = (u8)((begin >> 8) + 2);
+                }
+                if (next == row)        /* F68_10 */
+                    break;
+                screen = BasAdr((u16)(next << 8 | (u8)(begin + 5)));
+                if ((UpCase((u16)(c << 8 | *(u8 *)screen)) & 0xFF) == c) {
+                    to = next;
+                    break;
+                }
+            }
+        } while (!gone && to == row);
+        if (gone)
+            break;
+        /* F68_12: the cursor goes elsewhere */
+        F68_30(Hist_C, begin, row, size);
+        row = to;
     }
-    if ((key & 0xFF) == 0x1B && key >> 8 != 0)
-        goto F68_20;
-    /* A letter: the next command that begins with it, from the cursor
-       down and round, but for the empty line. */
-    c = UpCase(key) & 0xFF;
-    next = row;
-F68_09:
-    next = (u8)(next + 1);
-    if (next < (u8)((begin >> 8) + (size >> 8) - 4))
-        goto F68_10;
-    if (next == row)
-        goto F68_08;
-    next = (u8)((begin >> 8) + 2);
-F68_10:
-    if (next == row)
-        goto F68_08;
-    screen = BasAdr((u16)(next << 8 | (u8)(begin + 5)));
-    if ((UpCase((u16)(c << 8 | *(u8 *)screen)) & 0xFF) != c)
-        goto F68_09;
-    to = next;
-    goto F68_12;
 
-F68_11:                                 /* the mouse */
-    answer = F32_70(begin, size);
-    if (answer >> 8 < 1)
-        goto F68_08;
-    if (answer >> 8 > 1) {
-        key = (answer & 0xFF00) | 0x0D;
-        goto F68_20;
-    }
-    to = (u8)(answer + (begin >> 8) + 2);
-F68_12:                                 /* the cursor goes elsewhere */
-    if (to == row)
-        goto F68_08;
-    F68_30(Hist_C, begin, row, size);
-    row = to;
-    goto F68_07;
-
-F68_13:                                 /* Up */
-    to = (u8)(row - 1);
-    if (to != (u8)((begin >> 8) + 1))
-        goto F68_12;
-F68_14:                                 /* End */
-    to = (u8)((begin >> 8) + (size >> 8) - 4);
-    goto F68_12;
-F68_15:                                 /* Down */
-    to = (u8)(row + 1);
-    if (to != (u8)((begin >> 8) + (size >> 8) - 3))
-        goto F68_12;
-F68_16:                                 /* Home */
-    to = (u8)((begin >> 8) + 2);
-    goto F68_12;
-
-F68_20:                                 /* the box goes */
+    /* F68_20: the box goes */
     ResWin(begin, size, md.WinBuf);
     Window(begin, size);
     if (key >> 8 != 0x1C)
@@ -441,6 +453,7 @@ struct SpeedKey F77_00(u16 key, struct WCBdef *panel)
     u16 *screen;
     u16 begin, size, color, place;
     i32 bar, i;
+    bool search;                        /* the key acts on what is typed */
 
     PutKey(11);
     begin = BegBX(panel);
@@ -463,60 +476,61 @@ struct SpeedKey F77_00(u16 key, struct WCBdef *panel)
     md.MenuBuf[SPEED] = 0;
     bar = md.KeyBar;
     md.KeyBar = 0;
-    goto F77_02;
-
-F77_01:                                 /* what has been typed, and a key */
-    InSt10(begin + 0x10A, md.MenuBuf + SPEED, 12,
-           (u16)AltSr_P[1] << 8);
-    place = *(u16 *)(md.MenuBuf + SPEED - 2) + begin + 0x10A;
-    Cursor(place);
-    key = Input(place);
-F77_02:
-    if (key >> 8 == 0xFC)
-        goto F77_20;
-    if (key >> 8 >= 0xF0)
-        goto F77_01;
-    if (key >> 8 != 0)
-        switch (key & 0xFF) {
-        case 0x13:                      /* ^S */
-        case 0x04:                      /* ^D */
-        case 0x01:                      /* ^A */
-        case 0x06:                      /* ^F */
-        case 0x08:                      /* BackSpace */
-        case 0x07:                      /* ^G */
-        case 0x0B:                      /* ^K */
-        case 0x19:                      /* ^Y */
-        case 0x17:                      /* ^W */
-        case 0x7F:                      /* ^BackSpace */
-        case 0x14:                      /* ^T */
-        case 0x11:                      /* ^Q */
-        case 0x0A:                      /* ^Enter */
-            goto F77_11;
-        case 0x00:
-            if (key == 0x5300)          /* Del */
-                goto F77_11;
+    for (;;) {
+        /* F77_02 */
+        if (key >> 8 == 0xFC)
             break;
-        case 0x1B:                      /* Esc */
-            key = 0;
-            goto F77_20;
+        if (key >> 8 < 0xF0) {
+            if (key >> 8 != 0 && (key & 0xFF) == 0x1B) {       /* Esc */
+                key = 0;
+                break;
+            }
+            search = false;
+            if (key >> 8 != 0)
+                switch (key & 0xFF) {
+                case 0x13:              /* ^S */
+                case 0x04:              /* ^D */
+                case 0x01:              /* ^A */
+                case 0x06:              /* ^F */
+                case 0x08:              /* BackSpace */
+                case 0x07:              /* ^G */
+                case 0x0B:              /* ^K */
+                case 0x19:              /* ^Y */
+                case 0x17:              /* ^W */
+                case 0x7F:              /* ^BackSpace */
+                case 0x14:              /* ^T */
+                case 0x11:              /* ^Q */
+                case 0x0A:              /* ^Enter */
+                    search = true;
+                    break;
+                case 0x00:
+                    search = key == 0x5300;     /* Del */
+                    break;
+                }
+            if (!search) {
+                if ((key & 0xFF) != 0) {
+                    if ((key & 0xFF) < ' ')     /* F77_03 */
+                        break;
+                } else {
+                    for (i = 0; i < (i32)sizeof AltSr_T; i++)
+                        if (AltSr_T[i] == key >> 8)
+                            break;
+                    if (i == (i32)sizeof AltSr_T)
+                        break;
+                    key = (key & 0xFF00) | Ascii_T[i];
+                }
+            }
+            F77_10(key, panel);                 /* F77_11 */
         }
-    if ((key & 0xFF) != 0)
-        goto F77_03;
-    for (i = 0; i < (i32)sizeof AltSr_T; i++)
-        if (AltSr_T[i] == key >> 8)
-            break;
-    if (i == (i32)sizeof AltSr_T)
-        goto F77_20;
-    key = (key & 0xFF00) | Ascii_T[i];
-    goto F77_11;
-F77_03:
-    if ((key & 0xFF) < ' ')
-        goto F77_20;
-F77_11:
-    F77_10(key, panel);
-    goto F77_01;
+        /* F77_01: what has been typed, and a key */
+        InSt10(begin + 0x10A, md.MenuBuf + SPEED, 12,
+               (u16)AltSr_P[1] << 8);
+        place = *(u16 *)(md.MenuBuf + SPEED - 2) + begin + 0x10A;
+        Cursor(place);
+        key = Input(place);
+    }
 
-F77_20:                                 /* the box goes */
+    /* F77_20: the box goes */
     md.KeyBar = (u8)bar;
     ResWin(begin, size, md.WinBuf);
     Window(begin, size);

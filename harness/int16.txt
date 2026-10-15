@@ -25,7 +25,7 @@ cmdline.c, F77_10: widen
     4,096 entries or more, so it stays below 64K.
 
 cmdline.c, F80_00: widen
-    | at += sizeof(struct FILENT);
+    | at += sizeof(struct FILENT)) {
     A place in a panel's block, of 32 bits since the piece P: the
     16-bit build would wrap round at 64K, where the original's list
     ends short of it (ReDr00); here a panel's block is longer, and the
