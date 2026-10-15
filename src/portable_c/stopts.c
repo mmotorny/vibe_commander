@@ -166,9 +166,32 @@ static struct Checked Accepted(u16 answer)
    zero in front of it, one, or more. So ".5" is 50, ".05" is 5, ".005"
    is 0 and ".123" is 12. A separator with spaces behind it is taken,
    "5. ", and one with nothing at all in front and behind is not. */
-struct Checked StF04_10(u16 answer)
+/* F04_17 of the setup program: the delay taken, `seconds` and
+   `hundredths`, and Ok answered. */
+static struct Checked StF04_17(i32 seconds, i32 hundredths)
+{
+    md.DelayTm[0] = (u8)hundredths;
+    md.DelayTm[1] = (u8)seconds;
+    return Accepted(0);
+}
+
+/* F04_18 of the setup program: the line is no delay, which a box says.
+   Returns what the box was answered with, and that the line was
+   refused. */
+static struct Checked StF04_18(void)
 {
     struct Checked checked;
+
+    checked.answer = Dialog(&StNoTim_B, 0, 0, 0, &md);
+    /* The box has no page of the help, and the dialog that goes on has
+       its own again. */
+    md.HlpPage = PAGE_PANELS;
+    checked.refused = true;
+    return checked;
+}
+
+struct Checked StF04_10(u16 answer)
+{
     const u8 *text, *from;
     u16 number;
     i32 limit;
@@ -184,14 +207,14 @@ struct Checked StF04_10(u16 answer)
         from = text;
         text = TxtNum(from, &number);
         if (text == from || number > 99)
-            goto refused;
+            return StF04_18();
         seconds = number;
         if (*FndLet(text) == 0)
-            goto taken;
+            return StF04_17(seconds, hundredths);
         if (*text != separator)
-            goto refused;
+            return StF04_18();
         if (*FndLet(text + 1) == 0)
-            goto taken;
+            return StF04_17(seconds, hundredths);
     }
     /* F04_11 */
     text++;
@@ -201,9 +224,9 @@ struct Checked StF04_10(u16 answer)
     from = text;
     text = TxtNum(from, &number);
     if (text == from)
-        goto refused;
+        return StF04_18();
     if (*FndLet(text) != 0)
-        goto refused;
+        return StF04_18();
     if (number < 10)
         number *= 10;
     limit = 100;
@@ -215,18 +238,7 @@ struct Checked StF04_10(u16 answer)
     while (number >= limit)
         number /= 10;
     hundredths = number;
-taken:
-    md.DelayTm[0] = (u8)hundredths;
-    md.DelayTm[1] = (u8)seconds;
-    return Accepted(0);
-
-refused:
-    checked.answer = Dialog(&StNoTim_B, 0, 0, 0, &md);
-    /* The box has no page of the help, and the dialog that goes on has
-       its own again. */
-    md.HlpPage = PAGE_PANELS;
-    checked.refused = true;
-    return checked;
+    return StF04_17(seconds, hundredths);
 }
 
 /* The capitals of 40 characters, */
