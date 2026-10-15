@@ -266,6 +266,9 @@ PLACE = {"us": 176, "ru": 159}
 # scenario begins there, with the Enter that its script has first.
 BENCH_COMMANDS = [LOAD_MOUSE, Path(driver.FILENAME).stem, "PAUSE>NUL",
                   "CLS", "C:", r"CD \WORK", r"D:\VC\VC"]
+# And on a bench with the program at home on drive C: (see Bench), where
+# it is started in its own directory.
+HOME_COMMANDS = [*BENCH_COMMANDS[:-3], "C:", r"CD \VC", "VC"]
 
 
 class Bench:
@@ -294,21 +297,36 @@ class Bench:
     setup, and what it then writes is the VC.INI of every machine. It
     writes the same in every country, so a bench can be given the `setup`
     of another to use.
+
+    With `home` "C", the program is not on a disk of its own: it is in
+    C:\\VC, with what it reads there, next to C:\\WORK and C:\\STAMPS,
+    and is started in that directory, and D: is an empty disk. That is
+    for a picture of the program (see screenshot.py), which then shows
+    it as a user has it; no scenario is run so, and the setup file is
+    the one that the original saves on such a bench.
     """
 
-    def __init__(self, workdir, country="us", setup=None, memory=None):
+    def __init__(self, workdir, country="us", setup=None, memory=None,
+                 home="D"):
         self._workdir = Path(workdir)
+        self._home = home
         # The machine's memory in megabytes, dos.MEMORY if None: a state
         # is loaded into a machine of the memory that it was saved of.
         self._memory = memory or dos.MEMORY
         self._workdir.mkdir(parents=True, exist_ok=True)
-        self._floppy = _floppy(self._workdir, BENCH_COMMANDS,
+        self._floppy = _floppy(self._workdir,
+                               HOME_COMMANDS if home == "C" else
+                               BENCH_COMMANDS,
                                COUNTRIES[country], KEYBOARDS.get(country),
                                bench=country).path
         self._work = self._workdir / "c.img"
         _work_disk(self._work, self._workdir)
+        if home == "C":
+            self._empty = FatImage.hard_disk(
+                self._workdir / "empty.img", self._workdir, EPOCH,
+                label="PROGRAM", serial="20000617").path
         self._programs = {}             # Program, and the one beside it
-                                        # or None -> their disk image
+                                        # or None -> the images of C:, D:
         self._lock = threading.Lock()
         self._state = self._workdir / "state"
         shipped = distribution()[SETUP_FILE][0]
@@ -333,16 +351,16 @@ class Bench:
         workdir = self._workdir / "setup"
         workdir.mkdir()
         original = original_vc()
-        disk = self._new_disk("setup.img", original, shipped)
+        disks = self._disks("setup", original, shipped)
         script = driver.script([CLOCK_KEYS, RIGHT_PANEL_KEYS,
                                 SAVE_SETUP_KEYS], driver.facts(original))
-        with self._machine(workdir, disk, script) as machine:
+        with self._machine(workdir, disks, script) as machine:
             machine.resume()
             machine.wait_for_end(BOOT_TIME)
             if not driver.read(machine.written())[1]:
                 raise MachineError("the original did not get through "
                                    "saving its setup")
-            written = machine.disks["D"]
+            written = machine.disks[self._home]
         # The machine has been shut down: the disk image is complete.
         setup = FatImage(written, workdir, EPOCH,
                          partitioned=True).read(f"VC/{SETUP_FILE}")
@@ -359,34 +377,38 @@ class Bench:
         disk has is the first of the directory on every disk."""
         disk = FatImage.hard_disk(self._workdir / filename, self._workdir,
                                   EPOCH, label="PROGRAM", serial="20000617")
-        disk.mkdir("VC")
-        files = distribution()
-        if program:
-            disk.write(f"VC/{program.filename}", program.contents, EPOCH)
-        for name in SUPPORT_FILES:
-            data, date = files[name]
-            disk.write(f"VC/{name}", setup if name == SETUP_FILE else data,
-                       date)
-        if beside:
-            disk.write(f"VC/{beside.filename}", beside.contents, EPOCH)
-        return disk.path
+        return _fill(disk, program, setup, beside)
+
+    def _disks(self, name, program, setup, beside=None):
+        """The images of drives C: and D: with `program` in its home, made
+        under names that begin with `name`."""
+        if self._home == "D":
+            return self._work, self._new_disk(f"{name}.img", program,
+                                              setup, beside)
+        work = _work_disk(self._workdir / f"{name}-c.img", self._workdir)
+        return _fill(work, program, setup, beside), self._empty
 
     def _program_disk(self, program, beside=None):
         """The image of drive D: with `program` on it, and with `beside`
         next to it, if that is given."""
+        return self._program_disks(program, beside)[1]
+
+    def _program_disks(self, program, beside=None):
+        """The images of drives C: and D: with `program` in its home, and
+        with `beside` next to it, if that is given."""
         with self._lock:                # scenarios may run side by side
             if (program, beside) not in self._programs:
-                self._programs[program, beside] = self._new_disk(
-                    f"d{len(self._programs)}.img", program, self.setup,
-                    beside)
+                self._programs[program, beside] = self._disks(
+                    f"d{len(self._programs)}", program, self.setup, beside)
             return self._programs[program, beside]
 
-    def _machine(self, workdir, program_disk, script, trace=None):
-        """A machine with a copy of `program_disk` as drive D: and `script`
-        for the driver, in which the program is about to start: paused."""
+    def _machine(self, workdir, images, script, trace=None):
+        """A machine with copies of `images` as drives C: and D: and
+        `script` for the driver, in which the program is about to start:
+        paused."""
         disks = {"C": workdir / "c.img", "D": workdir / "d.img"}
-        shutil.copyfile(self._work, disks["C"])
-        shutil.copyfile(program_disk, disks["D"])
+        for image, disk in zip(images, disks.values()):
+            shutil.copyfile(image, disk)
         image = workdir / "script.img"
         with open(image, "wb") as file:
             file.write(script)
@@ -407,8 +429,26 @@ class Bench:
         once the machine has been shut down.
         """
         return self._machine(Path(workdir),
-                             self._program_disk(program, beside),
+                             self._program_disks(program, beside),
                              script, trace)
+
+
+def _fill(disk, program, setup, beside):
+    """Put `program`, if any, into the directory VC of `disk` with what it
+    reads there, with `setup` as its setup file, and `beside`, a second
+    program, if any, behind those: what every disk has is the first of
+    the directory on every disk. The image's file."""
+    disk.mkdir("VC")
+    files = distribution()
+    if program:
+        disk.write(f"VC/{program.filename}", program.contents, EPOCH)
+    for name in SUPPORT_FILES:
+        data, date = files[name]
+        disk.write(f"VC/{name}", setup if name == SETUP_FILE else data,
+                   date)
+    if beside:
+        disk.write(f"VC/{beside.filename}", beside.contents, EPOCH)
+    return disk.path
 
 
 def _work_disk(path, workdir):

@@ -17,6 +17,10 @@ it. Of the bench's setup file,
 which has the clock off and files in the right panel, "F9 o l" switches
 the clock on and Ctrl+l makes the right panel the Info panel.
 
+With --home C as well, the program is in C:\\VC on the bench's disk C:,
+with the same files, and started there (see setups.Bench), as a user
+has it on a disk of his own; D: is then an empty disk.
+
 Written to the output directory:
 
   screen.png    the display as the video card renders it
@@ -46,13 +50,15 @@ def capture(out, scale):
     return write(out, scale, screen, picture)
 
 
-def capture_on_bench(out, scale, program, steps):
-    """`program`, a setups.Program, on the test bench, after `steps`."""
+def capture_on_bench(out, scale, program, steps, home="D"):
+    """`program`, a setups.Program, on the test bench, after `steps`,
+    with the program in the directory VC of drive `home`."""
     scenario = scenarios.Scenario("", tuple(steps))
-    with setups.Benches() as benches:
+    with dos.workdir() as workdir:
         try:
+            bench = setups.Bench(Path(workdir) / "bench", home=home)
             made = scenarios.run(
-                scenario, program, benches[scenario.bench],
+                scenario, program, bench,
                 image=lambda machine: (machine.screen(),
                                        machine.screenshot()))
         except dos.MachineError as error:
@@ -93,13 +99,20 @@ def main():
                         help="run this build on the test bench, e.g.\n"
                              "build/portable_c/VC.EXE, in place of the\n"
                              "original from its distribution")
+    parser.add_argument("--home", choices=["C", "D"], default="D",
+                        help="with --program, the drive whose directory VC\n"
+                             "it is in and started from: D, its own disk\n"
+                             "as in the tests (default), or C, next to the\n"
+                             "bench's other files")
     args = parser.parse_args()
     if args.step and not args.program:
         parser.error("steps are for a program on the bench: --program")
+    if args.home != "D" and not args.program:
+        parser.error("--home is for a program on the bench: --program")
     if args.program:
         screen = capture_on_bench(args.out, args.scale,
                                   setups.Program.load(args.program),
-                                  args.step)
+                                  args.step, args.home)
     else:
         screen = capture(args.out, args.scale)
     print("\n".join(screen.lines()))

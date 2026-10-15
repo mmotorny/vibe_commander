@@ -1,11 +1,11 @@
 # Vibe Commander
 
 <!-- The picture is screen.png of
-     python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE "F9 o l" Ctrl+l Alt+F1 d Enter Wait*9
+     python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE --home C "F9 o l" Ctrl+l Wait*9
      with the project built: see "Running the original". -->
 <p align="center">
   <img src="docs/vibe-commander-0.1.png" width="720"
-       alt="Vibe Commander 0.1 on a blue 80x25 text screen: a file panel listing D:\VC on the left, the program and the files it reads, with the mouse pointer where it starts, in the middle of the screen on the frame of the right panel; the Info panel on the right headed &quot;Vibe Commander 0.1, based on Volkov Commander 4.05&quot;; a DOS prompt and the function key bar along the bottom">
+       alt="Vibe Commander 0.1 on a blue 80x25 text screen: a file panel listing C:\VC on the left, the program and the files it reads, with the mouse pointer where it starts, in the middle of the screen on the frame of the right panel; the Info panel on the right headed &quot;Vibe Commander 0.1, based on Volkov Commander 4.05&quot;; a DOS prompt and the function key bar along the bottom">
 </p>
 <p align="center">
   <em>Vibe Commander 0.1, the portable C, in its own directory, with the mouse pointer where it starts, in the middle of the screen,<br>
@@ -1667,22 +1667,23 @@ shape it had on a monitor.
 With `--program`, a build is run on the test bench instead, in `D:\VC`
 with the files that it reads there and nothing else, and taken through
 the steps that follow, written as a scenario's are: the screen is taken
-when the program waits for a key behind the last of them. The picture at
-the top is `screen.png` from
+when the program waits for a key behind the last of them. With `--home
+C` as well, the program and those files are in `C:\VC` instead, next to
+the bench's other files on `C:`, and the program is started there. The
+picture at the top is `screen.png` from
 
 ```sh
 python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE \
-    "F9 o l" Ctrl+l Alt+F1 d Enter Wait*9
+    --home C "F9 o l" Ctrl+l Wait*9
 ```
 
 with the project built. Of the bench's setup, which has the clock off and
 files in the right panel, `F9 o l` switches the clock on and `Ctrl+l`
-makes the right panel the Info panel; `Alt+F1 d Enter` takes the left
-panel to `D:\VC`; and `Wait*9` lets half a second pass, so that the
-colon of the clock shows when the screen is taken. The bench has a
-mouse, and the program shows its pointer where the mouse driver puts it
-when the program starts, in the middle of the screen: a step such as
-`Move@4,7` would put it elsewhere. Two runs give the same files.
+makes the right panel the Info panel, of drive `C:`; and `Wait*9` lets
+half a second pass, so that the colon of the clock shows when the screen
+is taken. The bench has a mouse, and the program shows its pointer
+where the mouse driver puts it when the program starts, in the middle of
+the screen: a step such as `Move@4,7` would put it elsewhere. Two runs give the same files.
 `python3 harness/screenshot.py --scale 3x4` makes the picture of the
 original that the top of this README showed before, byte for byte.
 
