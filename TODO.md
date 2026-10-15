@@ -18118,6 +18118,171 @@ then, nothing tried:
   for the time of day; `CLOCK_MONOTONIC`, which stops while the machine
   sleeps, or `CLOCK_BOOTTIME`, which does not, for the BIOS's ticks.
 
+## Step 6: the program for Linux
+
+The road of `CLAUDE.md`, step 6: `sys.h` for 64-bit Linux, built with
+clang by the one `CMakeLists.txt`, emulating DOS at the level of its
+services, beside `sys_dos.c` and `sys_stub.c`. Its first piece, L1, is
+the part of the emulation that has no input or output of its own and is
+tried on the host by itself.
+
+### L1, drives, names, code page, dates, errors: done, and what L2 should know
+
+What it made, a commit: four files of the implementation for Linux and
+their header, `emulate_posix.h`, which says what each function answers,
+in DOS's terms; and the test `portable_c-posix-unit`,
+`harness/posixcheck.c`. Nothing of it is compiled into `VC.EXE`, which
+is the same bytes, `2b6cc9b5...`.
+
+- `codepage_posix.c`: the code page, 437 or 866, by the setting or by
+  the first of `LC_ALL`, `LC_CTYPE` and `LANG` that is set and not
+  empty, as POSIX has them for the type of characters (XBD 8.2), Russian
+  where its language is `ru`; the character of Unicode of each byte, by
+  Unicode's mapping files `CP437.TXT` and `CP866.TXT`, as Python's
+  codecs have them, from which the tables were written; DOS's capitals
+  of a byte of a name; UTF-8, strict as RFC 3629 has it.
+- `names_posix.c`: what a name of DOS's form is; the alias of a name of
+  the host; a directory's table of names for the run; DOS's attributes
+  of a file of the host.
+- `paths_posix.c`: the file of settings, read from its text; a path of
+  DOS's made a full one, as `DOS_MakeName` of DOSBox makes it; a full
+  path of DOS's to one of the host, and back.
+- `time_posix.c`: DOS's packed date and time of a time of the host, and
+  DOS's error of an `errno`.
+
+The sources, each named in the test at its checks:
+
+- **The capitals and what a name may have** are the bench's DOS's:
+  FreeDOS 1.4's `COUNTRY.SYS`, from `x86BOOT.img` of the pinned
+  `FD14-FloppyEdition.zip` (`mcopy -i x86BOOT.img
+  ::/FREEDOS/BIN/COUNTRY.SYS`), read by its format: the table `FUCASE`,
+  DOS's capitals for names (INT 21h 6504h), and `FCHAR`, what ends a
+  name, of the country 1 with 437 and 7 with 866. Of 437 most accented
+  small letters become a plain capital, é `E` and â `A`: a check written
+  from memory had é `É`, and the table said otherwise. The bench of the
+  United States names no country, and its kernel has its own table,
+  which was not looked at: `KERNEL.SYS` is packed by UPX.
+- **The alias** is fatgen103's short name, the basis name and the
+  numeric tail: capitals, `_` for what the code page has not or a name
+  may not have, spaces and leading dots left out, 8 characters in front
+  of the first dot and 3 behind the last, and `~1` and up where anything
+  was lost or the name is taken, `LONGNA~1`, `LONGF~10`. A change of case
+  alone is no loss: `readme.txt` is `README.TXT`. Names are given in the
+  order of their bytes when a directory is first read, and later ones
+  behind them; a name keeps its alias for the run, and one that has gone
+  keeps its alias from every other, so that a panel that was read before
+  never names another file by it. Of two names that differ only in case
+  the first keeps the plain name: `README.TXT` before `readme.txt`, and
+  `readme.txt` before a `README.TXT` that comes later.
+- **A byte that is not UTF-8** in a name of the host is `_` in the alias,
+  which is then lossy and has a tail, `CAF_~1.TXT` of `caf\xE9.txt`; the
+  table keeps the host's bytes, so the alias leads back to them exactly.
+  Nothing else carries such a byte: no name of the program's has it.
+- **The attributes**: DOSBox's localDrive gives every file of the host
+  archive and a directory that of a directory, and nothing else of its
+  own; read-only of the mode, by the bits of the owner, the group or the
+  others as POSIX's `access` picks them, any of the three for the
+  superuser; hidden for a name that begins with a dot, but `.` and
+  `..`; never system, never a label. A directory is never read-only:
+  DOS lets a file be made in one that is, and `/usr` would be so.
+- **The full path** is `DOS_MakeName`'s: `/` for `\`, `.` and `..`
+  worked out, `..` at the root staying there, each name in capitals and
+  cut to 8 and 3, a second dot or a character that a name may not have
+  error 3, a drive that is no letter 0Fh. `*` and `?` are taken, as a
+  path to look for may have them.
+- **A date and a time**: DOS's packing (RBIL, INT 21h 5700h), in the
+  local time; before 1980 the first that DOS has, 1 January 1980 at
+  midnight, after 2107 the last, 31 December 2107 at 23:59:58, as Linux
+  writes them on a disk of DOS's (`fs/fat/misc.c`,
+  `fat_time_unix2fat`); an odd second is the even one before.
+- **The errors**, by RBIL's calls and DOS's extended errors: `ENOENT` 2,
+  or 3 where the caller says that a directory was wanted; `ENOTDIR`,
+  `ENAMETOOLONG`, `ELOOP` 3; `EMFILE`, `ENFILE` 4; `EACCES`, `EPERM`,
+  `EROFS`, `EEXIST`, `ENOTEMPTY` 5 (DOS answers 5 for a directory that
+  is there or is not empty, and DOSBox's drive of a CD for a write);
+  `EBADF` 6; `ENOMEM` 8; `ENOEXEC` 0Bh; `EXDEV` 11h; `ENOMEDIUM`,
+  `ENXIO`, `ENODEV` 15h, not ready; `EBUSY`, `ETXTBSY` 20h, a sharing
+  violation; `ENOSPC`, `EDQUOT` 27h; anything else, `EIO` and `EINTR`
+  among them, 1Fh, a general failure.
+
+How it is built and held: `CMakeLists.txt` compiles every `*_posix.c`
+with `harness/posixcheck.c` into `build/portable_c/posix-unit/check`,
+with the full list of warnings, `-D_XOPEN_SOURCE=700` and the sanitizers
+of addresses, of undefined behaviour, of integers and of implicit
+conversions with `-fno-sanitize-recover=all`, and writes its
+`compiled.txt`; the test runs it, and is skipped where there is no
+clang. `harness/stubcheck.py`, the test `portable_c-stub`, compiles the
+same files again with that command and has clang-tidy read them, by
+`--posix-compiled`. `harness/hostcheck.py` gives gcc
+`-D_XOPEN_SOURCE=700` for a file `_posix.c`, which is not to be read
+without it; the four files and the header are clean in its record, and
+have a line in that of the words. `_XOPEN_SOURCE` is on the command
+line and not in the files: clang-tidy names a `#define` of it as a name
+that C reserves.
+
+What clang-tidy met: `bugprone-multi-level-implicit-pointer-conversion`
+for an array of `const char *` sorted by `qsort` (a structure of one
+pointer is sorted now); `clang-analyzer-security.ArrayBound` for an
+entry at the count, where the analyser takes a count that could be
+below 0 (an `assert` says that it is not); `strcpy`, which the analyser
+calls insecure (`memcpy` with the length).
+
+**Open, for the user** (none of it is behind a scenario yet; what is
+built is the recommendation, each a few lines to change):
+
+1. Where the file of settings is, and its form. Built: its text read,
+   lines of `mount D /home/user` and `codepage 866`, `#` for a comment,
+   as DOSBox's `mount`. Recommended: `$XDG_CONFIG_HOME/vibe-commander/
+   settings`, `~/.config/...` where that is not set, and a variable of
+   the environment that names another file, for the harness. Nothing
+   reads the file yet: that is L2's.
+2. The aliases beyond DOS's rule: in the order of the names' bytes,
+   kept for the run, a gone one never given again, and of two names that
+   differ in case the first in that order keeps the plain one.
+3. What a character shows that the code page has not, a Cyrillic letter
+   under 437, a byte that is not UTF-8: `_`, as Windows makes a short
+   name, so that `Документы` is `______~1` under 437.
+4. The case of a name that the program makes on the host, a file that
+   it creates or a directory: DOS hands over capitals, and DOSBox makes
+   the file so, `NEW.TXT`, which is built; small letters, `new.txt`,
+   are what a user of Linux expects, and are recommended. A name that
+   the host has is always found whatever its case.
+5. The locale: `LC_ALL` and `LC_CTYPE` before `LANG`, as POSIX has it,
+   where `CLAUDE.md` names `LANG` alone. Recommended as built.
+
+**What L2 should know:**
+
+- The functions take what the host has and do nothing with the host:
+  a directory is read by a function that L2 gives `DirectoriesBegin`,
+  which calls `DirectoryNamesUpdate` with the names of `readdir`, `.`
+  and `..` among them or not. A name that is not found has its
+  directory read again once, so a file made by another program is
+  found.
+- `DosPathFull` is FileTrueName, and what every call that takes a name
+  does first, with the current directories that L2 keeps;
+  `HostPathOfDos` then gives the host's path, and says whether the last
+  name was there, so that a file to create is named as the program
+  wrote it (open question 4). `DosPathOfHost` gives the program's path
+  of the directory that it is started in: one that DOS's 67 characters
+  do not hold fails with 3, and the program has to start somewhere
+  else then, which is L2's, or the user's, to decide.
+- Not done here: matching a name against a pattern of FindFirst, which
+  DOS does by the 11 characters of an FCB (`*` without a dot matches
+  only names without an extension); what a directory entry that is no
+  file and no directory is (a FIFO blocks an open, a socket cannot be
+  opened, a link that leads nowhere has no status); `EINTR`, which is to
+  be tried again and not reported; the table of directories is searched
+  one by one.
+- The build of the test takes every `*_posix.c`. When `sys_posix.c`
+  comes, with the common code behind it, the test's build is to name
+  the files of L1 and its own, or the program for Linux is to be built
+  by `add_portable_c_host` and the test linked with its objects:
+  `posix_files` of `harness/stubcheck.py` follows whichever.
+- clang-tidy and the analyser read the test as well: a check is
+  written as `CHECK` or `SAME`, and a table of host names is `const
+  char *const` with each literal whole (a literal split over two lines
+  inside a list of them is `-Wstring-concatenation`).
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes
