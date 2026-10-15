@@ -206,16 +206,15 @@ static void C40_05(const u8 *path, u8 *buffer)
 
     to = AddFile(MvzLine(buffer, md.DosPth, LenPath));
     pair = *(const u16 *)path;
-    if (pair >> 8 == ':') {
-        if ((u8)UpCase(pair) != buffer[0]) {
-            to = buffer;
-            goto copy;
-        }
-        path += 2;
+    if (pair >> 8 == ':' && (u8)UpCase(pair) != buffer[0])
+        to = buffer;                                    /* C40_12 */
+    else {
+        if (pair >> 8 == ':')
+            path += 2;
+        if (*path == '\\')                              /* C40_11 */
+            to = buffer + 2;
     }
-    if (*path == '\\')
-        to = buffer + 2;
-copy:
+    /* C40_13 */
     for (count = LenName - (i32)(to - buffer); count; count--)
         *to++ = *path++;
     *to = 0;
@@ -313,6 +312,61 @@ static void PerCent(void)
     Window(CpCntBg, 0x100 | CpCntSz);
 }
 
+/* What C00_01 puts behind the name of the target, at `to`: what follows
+   `from`, as much as the line holds with `count` bytes in front of it. */
+static void C00_18(u8 *to, const u8 *from, i32 count)
+{
+    if (count < LenName)
+        for (count = LenName - count; count; count--)
+            *to++ = *from++;
+    *to = 0;
+}
+
+/* Behind the directory that ends at `to`: the name of the source, with
+   the directories that it was found in. */
+static void C00_05(u8 *to)
+{
+    const u8 *from = CpBgNam;
+    i32 count;
+
+    count = (i32)(from - CpSrc);
+    C00_18(to, from, count);
+}
+
+/* The same behind a directory whose name is followed by its zero, at
+   to[-1], which becomes a backslash. */
+static void C00_04(u8 *to)
+{
+    to[-1] = '\\';
+    C00_05(to);
+}
+
+/* Take the mask that begins at `name` to the name of the source, or of
+   the first directory that it was found in, and the rest of the source's
+   path behind it. */
+static void C00_13(u8 *name)
+{
+    u8 *part, *to;
+    i32 count, i;
+    u8 c;
+
+    Convert(name, md.TmpErr);
+    part = CpBgNam;
+    do
+        c = *part++;
+    while (c != 0 && c != '\\');
+    part--;
+    *part = 0;
+    Convert(CpBgNam, md.TmpErr + 20);
+    *part = c;
+    for (i = 0; i < 11; i++)
+        if (md.TmpErr[i] == '?')
+            md.TmpErr[i] = md.TmpErr[20 + i];
+    to = UnConv(name, md.TmpErr);
+    count = (i32)(to - CpDest);
+    C00_18(to, part, count);
+}
+
 /* Make the name of the target, CpDest, from what was typed, ToFile.
    Returns false to stop: for a drive that is not ready.
 
@@ -332,7 +386,7 @@ static bool C00_01(void)
     struct WCBdef *other;
     const u8 *from = md.ToFile;
     const u8 *end;
-    u8 *name, *part, *to;
+    u8 *name, *to;
     struct Answer opened;
     struct Device device;
     struct FileAttr attr;
@@ -346,18 +400,21 @@ static bool C00_01(void)
     if (CopyMov == 3)
         return true;
     name = CUT_PATH(CpDest);
-    to = name;
-    if (*name == 0)
-        goto source;
-    if (*(const u16 *)name == 0x2E2E && *FndLet(name + 2) == 0) {
-        to = name + 3;
-        goto directory;
+    if (*name == 0) {
+        C00_05(name);
+        return true;
     }
-    end = name;
+    if (*(const u16 *)name == 0x2E2E && *FndLet(name + 2) == 0) {
+        C00_04(name + 3);
+        return true;
+    }
+    end = name;                                         /* C00_03 */
     do {
         c = *end++;
-        if (c == '?' || c == '*')
-            goto mask;
+        if (c == '?' || c == '*') {
+            C00_13(name);
+            return true;
+        }
     } while (c != 0);
     count = LenName;
     to = CpDest + C00_End(CpDest, &count);
@@ -365,15 +422,17 @@ static bool C00_01(void)
     other = OtherPanel;
     count = (i32)(end - CpDest);
     for (i = 0; other->WinPath[i] == CpDest[i]; )
-        if (++i == count)
-            goto directory;
-    kind = CpCase;
+        if (++i == count) {
+            C00_04(to);
+            return true;
+        }
+    kind = CpCase;                                      /* C00_06 */
     if (kind == 0) {
         if (ChgDisk(CpDest))
             return false;
         opened = OpenFil(CpDest, 0x40);
         if (!opened.failed) {
-            device = FileDevice(opened.value);
+            device = FileDevice(opened.value);          /* C00_07 */
             info = device.kind;
             /* The assembly goes on with DX as it is, which DOS has not
                set if it would not say: the address of the name. */
@@ -383,54 +442,27 @@ static bool C00_01(void)
             if (info & 0x80) {
                 CpDev2 = 1;
                 kind = 3;
-                goto known;
             }
         } else if (opened.value == ERR_NOT_READY)
             return false;
-        attr = FileAttributes(CpDest);
-        if (attr.failed) {
-            if (attr.value == ERR_NOT_READY)
-                return false;
-            kind = 1;
-        } else {
-            kind = 3;
-            if (attr.attributes & ATTR_DIRECTORY)
-                kind = 2;
+        if (kind == 0) {
+            attr = FileAttributes(CpDest);              /* C00_08 */
+            if (attr.failed) {
+                if (attr.value == ERR_NOT_READY)
+                    return false;
+                kind = 1;
+            } else {
+                kind = 3;
+                if (attr.attributes & ATTR_DIRECTORY)
+                    kind = 2;
+            }
         }
     }
-known:
-    CpCase = (u8)kind;
+    CpCase = (u8)kind;                                  /* C00_12 */
     if (kind == 2)
-        goto directory;
-    if (kind > 2)
-        return true;
-mask:
-    Convert(name, md.TmpErr);
-    part = CpBgNam;
-    do
-        c = *part++;
-    while (c != 0 && c != '\\');
-    part--;
-    *part = 0;
-    Convert(CpBgNam, md.TmpErr + 20);
-    *part = c;
-    for (i = 0; i < 11; i++)
-        if (md.TmpErr[i] == '?')
-            md.TmpErr[i] = md.TmpErr[20 + i];
-    to = UnConv(name, md.TmpErr);
-    from = part;
-    count = (i32)(to - CpDest);
-    goto rest;
-directory:
-    to[-1] = '\\';
-source:
-    from = CpBgNam;
-    count = (i32)(from - CpSrc);
-rest:
-    if (count < LenName)
-        for (count = LenName - count; count; count--)
-            *to++ = *from++;
-    *to = 0;
+        C00_04(to);
+    else if (kind <= 2)
+        C00_13(name);
     return true;
 }
 
@@ -468,6 +500,88 @@ static void C10_13(void)
     entry[12] = 0;
 }
 
+/* The file has been renamed: show the two names, and give the file its
+   new name in the panel. Returns DONE. */
+static u16 C10_12(void)
+{
+    LetLin(CpSrc);
+    LetLin(CpDest);
+    C10_13();
+    return DONE;
+}
+
+/* Say that the file could not be renamed or deleted, in `report`, unless
+   the drive is not ready: `error` is what DOS answered. Returns NOTHING,
+   or STOP if that is the answer. */
+static u16 C10_10(const struct BOXHD *report, u16 error)
+{
+    if (error == ERR_NOT_READY)
+        return STOP;
+    if ((u8)Ask(report, Ren0_S) != 0)
+        return STOP;
+    return NOTHING;                                     /* C10_11 */
+}
+
+/* What C10_00 does while its box is on the screen, which it then takes
+   away whatever this returns. */
+static u16 RenameFile(i32 *fits)
+{
+    struct FileAttr attr;
+    struct Answer asked;
+    i32 answer;
+
+    /* None of the lines of the box RenEr_B has ^I: no include line. */
+    if (*fits == 0)
+        return C10_10(&RenEr_B, 0);                     /* C10_07 */
+    if (C40_00(fits))
+        return DONE;                                    /* C10_14 */
+    if (ChgDisk(CpDest))                                /* C10_02 */
+        return STOP;                                    /* C10_04 */
+    asked = FileRename(CpSrc, CpDest);
+    if (!asked.failed)
+        return C10_12();
+    if (asked.value == ERR_NOT_READY)
+        return STOP;
+    if (asked.value != ERR_NO_ACCESS) {
+        CopyMov = 2;                                    /* C10_08 */
+        return COPY;                                    /* C00_90 */
+    }
+    attr = FileAttributes(CpDest);
+    if (attr.failed)
+        return C10_10(&RenEr_B, attr.value);
+    if (attr.attributes & ATTR_DIRECTORY)
+        return C10_10(&RenEr_B, 0);
+    if (CpAll == 0) {
+        answer = (u8)Ask(&OvrCo_B, Ren0_S);
+        if (answer == 2) {
+            *fits = attr.attributes;
+            return COPY;
+        }
+        if (answer > 2)
+            return NOTHING;
+        CpAll = (u8)answer;
+    }
+    asked = FileDelete(CpDest);                         /* C10_03 */
+    if (asked.failed) {
+        if (asked.value != ERR_NO_ACCESS)
+            return C10_10(&DelEr_B, asked.value);       /* C10_09 */
+        C50_00();
+        if ((u8)Ask(&Prot_B, F35_40()) != 0)
+            return NOTHING;
+        asked = FileSetAttributes(CpDest, 0x20);
+        if (asked.failed)
+            return C10_10(&DelEr_B, asked.value);
+        FncChg = 1;
+        asked = FileDelete(CpDest);
+        if (asked.failed)
+            return C10_10(&DelEr_B, asked.value);
+    }
+    asked = FileRename(CpSrc, CpDest);                  /* C10_05 */
+    if (!asked.failed)
+        return C10_12();
+    return C10_10(&RenEr_B, asked.value);
+}
+
 /* Rename a file. Returns DONE, NOTHING or STOP, or COPY for a file that
    is to be copied and deleted after all: DOS would not rename it, or the
    user wants it appended to the one that is there. `fits` is not 0 if
@@ -485,99 +599,12 @@ static void C10_13(void)
 static u16 C10_00(i32 *fits)
 {
     struct Box box;
-    struct FileAttr attr;
-    struct Answer asked;
-    const struct BOXHD *report;
-    u16 result, error;
-    i32 answer;
+    u16 result;
 
     CopyMov = 3;
     OncZoom(0x528, &RenFi_P, 0, &box);
-    error = 0;
-    if (*fits == 0)
-        goto failed;
-    result = DONE;
-    if (C40_00(fits))
-        goto close;
-    if (ChgDisk(CpDest))
-        goto stop;
-    asked = FileRename(CpSrc, CpDest);
-    if (!asked.failed)
-        goto renamed;
-    if (asked.value == ERR_NOT_READY)
-        goto stop;
-    if (asked.value != ERR_NO_ACCESS) {
-        CopyMov = 2;
-        goto copy;
-    }
-    attr = FileAttributes(CpDest);
-    if (attr.failed) {
-        error = attr.value;
-        goto failed;
-    }
-    if (attr.attributes & ATTR_DIRECTORY)
-        goto failed;
-    if (CpAll == 0) {
-        answer = (u8)Ask(&OvrCo_B, Ren0_S);
-        if (answer == 2) {
-            *fits = attr.attributes;
-            goto copy;
-        }
-        if (answer > 2)
-            goto nothing;
-        CpAll = (u8)answer;
-    }
-    asked = FileDelete(CpDest);
-    if (asked.failed) {
-        error = asked.value;
-        if (error != ERR_NO_ACCESS)
-            goto undeleted;
-        C50_00();
-        if ((u8)Ask(&Prot_B, F35_40()) != 0)
-            goto nothing;
-        asked = FileSetAttributes(CpDest, 0x20);
-        if (asked.failed) {
-            error = asked.value;
-            goto undeleted;
-        }
-        FncChg = 1;
-        asked = FileDelete(CpDest);
-        if (asked.failed) {
-            error = asked.value;
-            goto undeleted;
-        }
-    }
-    asked = FileRename(CpSrc, CpDest);
-    if (!asked.failed)
-        goto renamed;
-    error = asked.value;
-failed:
-    /* None of the lines of this box has ^I: no include line. */
-    report = &RenEr_B;
-    goto say;
-undeleted:
-    report = &DelEr_B;
-say:
-    if (error == ERR_NOT_READY)
-        goto stop;
-    if ((u8)Ask(report, Ren0_S) != 0)
-        goto stop;
-nothing:
-    result = NOTHING;
-    goto close;
-stop:
-    result = STOP;
-    goto close;
-copy:
-    result = COPY;
-    goto close;
-renamed:
-    LetLin(CpSrc);
-    LetLin(CpDest);
-    C10_13();
-    result = DONE;
-close:
-    ResWin(box.begin, box.size, box.saved);
+    result = RenameFile(fits);
+    ResWin(box.begin, box.size, box.saved);             /* C00_80 */
     Window(box.begin, box.size);
     return result;
 }
@@ -1063,6 +1090,159 @@ close:
     return result;
 }
 
+/* What C30_00 has the directory walked for, behind its first box: not a
+   value of C00_00's. */
+#define WALK    0xFFFE
+
+/* The directory has been renamed, or is the target already: show the two
+   names, and give it its new name in the panel. Returns DONE. */
+static u16 C30_12(void)
+{
+    PathLin(CpSrc);
+    PathLin(CpDest);
+    C10_13();
+    return DONE;
+}
+
+/* Say that the directory could not be made. Returns NOTHING. */
+static u16 C30_14(void)
+{
+    Ask(&MkErr_B, F35_40());
+    return NOTHING;
+}
+
+/* The same, unless the drive is not ready: `error` is what DOS answered.
+   Returns NOTHING, or STOP. */
+static u16 C30_13(u16 error)
+{
+    if (error == ERR_NOT_READY)
+        return STOP;                                    /* C30_15 */
+    return C30_14();
+}
+
+/* The source has been removed. Returns DONE, or STOP if its tree file
+   could not be marked because the drive is not ready. */
+static u16 C30_41(void)
+{
+    struct Answer marked;
+
+    FncChg = 1;
+    if (CpTree1 == 0) {
+        CpTree1 = 1;
+        marked = DelTree(CpSrc);
+        if (marked.failed && marked.value == ERR_NOT_READY)
+            return STOP;                                /* C30_45 */
+    }
+    return DONE;                                        /* C30_42 */
+}
+
+/* What C30_00 does while its first box is on the screen, which it then
+   takes away whatever this returns: rename the directory, or make the
+   target, and remove the source if that is empty. Returns WALK where
+   what is in the source is to be copied or moved. */
+static u16 RenameOrMakeDir(bool across, i32 fits)
+{
+    struct FileAttr attr, there;
+    struct Answer marked, asked;
+    i32 left;
+
+    if (fits == 0)
+        return C30_14();
+    if (C40_00(&left))
+        return C30_12();
+    if (CopyMov != 0 && !across) {
+        if (ChgDisk(CpDest))
+            return STOP;
+        asked = FileRename(CpSrc, CpDest);
+        if (!asked.failed) {
+            FncChg = 1;                                 /* C30_10 */
+            if (CpTree1 == 0) {
+                marked = DelTree(CpSrc);
+                if (marked.failed && marked.value == ERR_NOT_READY)
+                    return STOP;
+                CpTree1 = 1;                            /* C30_11 */
+                CpTree2 = 1;
+            }
+            return C30_12();
+        }
+        if (asked.value == ERR_NOT_READY)
+            return STOP;
+    }
+    if (ChgDisk(CpSrc))                                 /* C30_20 */
+        return STOP;
+    attr = FileAttributes(CpSrc);
+    if (attr.failed)
+        return C30_13(attr.value);
+    if (ChgDisk(CpDest))
+        return STOP;
+    asked = DirMake(CpDest);
+    if (asked.failed) {
+        if (asked.value == ERR_NOT_READY)
+            return STOP;
+        there = FileAttributes(CpDest);
+        if (there.failed)
+            return C30_13(there.value);
+        if (!(there.attributes & ATTR_DIRECTORY))
+            return C30_14();
+    } else {
+        FncChg = 1;                                     /* C30_21 */
+        asked = FileSetAttributes(CpDest, attr.attributes & 0x27);
+        if (asked.failed)
+            return C30_13(asked.value);
+        if (CpTree2 == 0) {
+            CpTree2 = 1;
+            marked = DelTree(CpDest);
+            if (marked.failed && marked.value == ERR_NOT_READY)
+                return STOP;
+        }
+    }
+    if (CopyMov != 0) {                                 /* C30_22 */
+        if (ChgDisk(CpSrc))
+            return STOP;
+        asked = DirRemove(CpSrc);
+        if (!asked.failed)
+            return C30_41();
+        if (asked.value == ERR_NOT_READY)
+            return STOP;
+        if (asked.value != ERR_NO_ACCESS && asked.value != ERR_CURRENT)
+            return NOTHING;                             /* C30_44 */
+    }
+    return WALK;                                        /* C30_23 */
+}
+
+/* What C30_00 does while its second box is on the screen, when what was
+   in the source has been moved: remove the source, or say that it cannot
+   be, unless something is left in it. */
+static u16 RemoveDir(void)
+{
+    struct Answer asked;
+    u8 *end;
+    i32 i;
+
+    if (ChgDisk(CpSrc))
+        return STOP;
+    asked = DirRemove(CpSrc);
+    if (!asked.failed)
+        return C30_41();
+    if (asked.value == ERR_NOT_READY)                   /* C30_43 */
+        return STOP;
+    if (asked.value == ERR_NO_ACCESS) {
+        /* Is anything left in it? Its own two entries are. */
+        for (end = CpSrc; *end != 0; end++)
+            ;
+        for (i = 0; i < (i32)sizeof AllIn_S; i++)
+            end[i] = AllIn_S[i];
+        asked = FindFirst(CpSrc, 0x37);
+        *end = 0;
+        if (!asked.failed)
+            return NOTHING;
+        if (asked.value == ERR_NOT_READY)
+            return STOP;
+    }
+    Ask(&CntDi_B, Move0_S);                             /* C30_46 */
+    return NOTHING;
+}
+
 /* Copy, rename or move a directory. Returns what C00_00 does. `across`
    is false for a directory that DOS may be able to rename, and `fits` is not
    0 if the name of the target is short enough.
@@ -1079,146 +1259,29 @@ close:
 static u16 C30_00(bool across, i32 fits)
 {
     struct Box box;
-    struct FileAttr attr, there;
-    struct Answer marked, asked;
     const struct BOXTOP *shown;
-    u16 result, error;
-    i32 i;
-    u8 *end;
+    u16 result;
 
-    if (CpDev2 != 0)
-        goto walk;
-    shown = &CopDi_P;
-    if (CopyMov != 0)
-        shown = &MovDi_P;
-    OncZoom(0x428, shown, F35_40(), &box);
-    if (fits == 0)
-        goto unmade;
-    if (C40_00(&i))
-        goto same;
-    if (CopyMov == 0 || across)
-        goto make;
-    if (ChgDisk(CpDest))
-        goto stop;
-    asked = FileRename(CpSrc, CpDest);
-    if (asked.failed) {
-        if (asked.value == ERR_NOT_READY)
-            goto stop;
-        goto make;
+    if (CpDev2 == 0) {
+        shown = &CopDi_P;                               /* C30_01 */
+        if (CopyMov != 0)
+            shown = &MovDi_P;
+        OncZoom(0x428, shown, F35_40(), &box);
+        result = RenameOrMakeDir(across, fits);
+        ResWin(box.begin, box.size, box.saved);
+        Window(box.begin, box.size);
+        if (result != WALK)
+            return result;
     }
-    FncChg = 1;
-    if (CpTree1 == 0) {
-        marked = DelTree(CpSrc);
-        if (marked.failed && marked.value == ERR_NOT_READY)
-            goto stop;
-        CpTree1 = 1;
-        CpTree2 = 1;
-    }
-same:
-    PathLin(CpSrc);
-    PathLin(CpDest);
-    C10_13();
-    result = DONE;
-    goto close;
-
-make:
-    if (ChgDisk(CpSrc))
-        goto stop;
-    attr = FileAttributes(CpSrc);
-    error = attr.value;
-    if (attr.failed)
-        goto failed;
-    if (ChgDisk(CpDest))
-        goto stop;
-    asked = DirMake(CpDest);
-    if (asked.failed) {
-        if (asked.value == ERR_NOT_READY)
-            goto stop;
-        there = FileAttributes(CpDest);
-        error = there.value;
-        if (there.failed)
-            goto failed;
-        if (!(there.attributes & ATTR_DIRECTORY))
-            goto unmade;
-    } else {
-        FncChg = 1;
-        asked = FileSetAttributes(CpDest, attr.attributes & 0x27);
-        error = asked.value;
-        if (asked.failed)
-            goto failed;
-        if (CpTree2 == 0) {
-            CpTree2 = 1;
-            marked = DelTree(CpDest);
-            if (marked.failed && marked.value == ERR_NOT_READY)
-                goto stop;
-        }
-    }
-    if (CopyMov != 0) {
-        if (ChgDisk(CpSrc))
-            goto stop;
-        asked = DirRemove(CpSrc);
-        if (!asked.failed)
-            goto removed;
-        if (asked.value == ERR_NOT_READY)
-            goto stop;
-        if (asked.value != ERR_NO_ACCESS && asked.value != ERR_CURRENT)
-            goto nothing;
-    }
-    ResWin(box.begin, box.size, box.saved);
-    Window(box.begin, box.size);
-walk:
-    result = DirFunc();
+    result = DirFunc();                                 /* C30_30 */
     FncChg |= (u8)result;
     if (result >> 8 != 0 || CopyMov == 0)
         return result;
 
-    md.SftErr = 0;
+    md.SftErr = 0;                                      /* C30_40 */
     OncZoom(0x528, &DelDr_P, Move0_S, &box);
-    if (ChgDisk(CpSrc))
-        goto stop;
-    asked = DirRemove(CpSrc);
-    if (asked.failed) {
-        if (asked.value == ERR_NOT_READY)
-            goto stop;
-        if (asked.value == ERR_NO_ACCESS) {
-            /* Is anything left in it? Its own two entries are. */
-            for (end = CpSrc; *end != 0; end++)
-                ;
-            for (i = 0; i < (i32)sizeof AllIn_S; i++)
-                end[i] = AllIn_S[i];
-            asked = FindFirst(CpSrc, 0x37);
-            *end = 0;
-            if (!asked.failed)
-                goto nothing;
-            if (asked.value == ERR_NOT_READY)
-                goto stop;
-        }
-        Ask(&CntDi_B, Move0_S);
-        goto nothing;
-    }
-removed:
-    FncChg = 1;
-    if (CpTree1 == 0) {
-        CpTree1 = 1;
-        marked = DelTree(CpSrc);
-        if (marked.failed && marked.value == ERR_NOT_READY)
-            goto stop;
-    }
-    result = DONE;
-    goto close;
-
-failed:
-    if (error == ERR_NOT_READY)
-        goto stop;
-unmade:
-    Ask(&MkErr_B, F35_40());
-nothing:
-    result = NOTHING;
-    goto close;
-stop:
-    result = STOP;
-close:
-    ResWin(box.begin, box.size, box.saved);
+    result = RemoveDir();
+    ResWin(box.begin, box.size, box.saved);             /* C00_80 */
     Window(box.begin, box.size);
     return result;
 }
@@ -1333,24 +1396,27 @@ static u8 *F35_50(struct WCBdef *panel, i32 directories, i32 files)
     const u8 *title;
     const u8 *words;
     i32 length, i;
+    bool cursor;
 
     from = md.ToFile;                                   /* F35_55 */
+    cursor = true;
     if (md.OneFile == 0 || CopyMov == 0) {
         wcb = InvWCB(panel);
         if (wcb->Visible != 0 && wcb->WinTyp <= 1) {
             from = md.CrnPath;
             if (wcb->WinTyp == 0)
                 from = wcb->WinPath;
-            goto F35_57;
-        }
-        if (CopyMov == 0 || (directories | files) != 0)
-            goto F35_57;
+            cursor = false;
+        } else if (CopyMov == 0 || (directories | files) != 0)
+            cursor = false;
     }
-    wcb = panel;                                        /* F35_54 */
-    if (PLACES(wcb)->CurAdr < PLACES(wcb)->EndBuf
-        && ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF[0] != '.')
-        from = ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF;
-F35_57:
+    if (cursor) {
+        wcb = panel;                                    /* F35_54 */
+        if (PLACES(wcb)->CurAdr < PLACES(wcb)->EndBuf
+            && ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF[0] != '.')
+            from = ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF;
+    }
+    /* F35_57 */
     for (i = 0; i < LenStr; i++)
         CpInpt[i] = from[i];
     CpInpt[LenStr] = 0;
@@ -1427,17 +1493,52 @@ static void F36_04(void)
     length = 0;
     while (length < LenName - 1 && md.CrnPath[length] != 0)
         length++;
-    for (i = 0; i < length; i++)
-        if (md.CrnPath[i] != md.DosPth[i])
-            goto F36_05;
-    rest = md.DosPth + length;
-    to = MvzLine(CpInpt, md.ToFile, LenStr + 1);
-    for (i = 0; i < LenPath; i++)
-        to[i] = rest[i];
-    DirChange(CpInpt + 2);
-F36_05:
+    for (i = 0; i < length && md.CrnPath[i] == md.DosPth[i]; i++)
+        ;
+    if (i == length) {
+        rest = md.DosPth + length;
+        to = MvzLine(CpInpt, md.ToFile, LenStr + 1);
+        for (i = 0; i < LenPath; i++)
+            to[i] = rest[i];
+        DirChange(CpInpt + 2);
+    }
+    /* F36_05 */
     for (i = 0; i < LenStr + 1; i++)
         md.CrnPath[i] = md.ToFile[i];
+}
+
+/* Rename the directory of the tree that the cursor is on, which stays
+   where it is: the new name is asked for. Returns where to go on. */
+static struct Copied F36_03(void)
+{
+    const u8 *typed;
+    u8 *name;
+    i32 i;
+
+    for (i = 0; i < 13; i++)
+        CpDest[i] = ((const u8 *)TreeCursor)[i];
+    if ((u8)Ask(&Renam_B, 0) != 0)
+        return Go(GO_KEYS);
+    typed = CpDest;
+    if (CutPath(typed) == typed) {
+        for (i = 0; i < LenPath; i++)
+            CpInpt[i] = md.CrnPath[i];
+        name = CUT_PATH(CpInpt);
+        for (i = 0; i < 13; i++)
+            name[i] = typed[i];
+        for (i = 0; CpInpt[i] != 0 && i != LenStr; i++)
+            ;
+        if (CpInpt[i] == 0) {
+            for (i = 0; i < LenStr + 1; i++)
+                md.ToFile[i] = CpInpt[i];
+            CopyMov = 3;
+            F36_04();
+            return Go(GO_DONE);
+        }
+        /* too long */
+    }
+    Ask(&MkErr_B, F35_40());                            /* F36_01 */
+    return Go(GO_KEYS);
 }
 
 /* Copy or rename, as the 1 in the low byte of `command` says: F5 and F6,
@@ -1451,8 +1552,6 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
                      i32 files)
 {
     const u8 *from;
-    const u8 *typed;
-    u8 *name;
     u8 *to, *end;
     struct Selected selected;
     i32 length, i;
@@ -1466,7 +1565,7 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
         if (TreeCursor <= TRELIST)                      /* the root */
             return Go(GO_KEYS);
         if (command != 0)
-            goto F36_03;
+            return F36_03();
     } else {
         directories = 0;
         files = 0;
@@ -1483,21 +1582,20 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
 
     /* F35_04: what is to be copied, and the dialog. */
     to = F35_50(panel, directories, files);
-    if (panel->WinTyp == 1) {
-        for (i = 0; i < LenName; i++)
-            md.TmpErr[i] = md.CrnPath[i];
-        ShrtLin(md.TmpErr, LenStr - 10);
-        from = md.TmpErr;
-        length = LenStr;
-        goto F35_06;
-    }
-    if ((directories | files) != 0) {
+    if (panel->WinTyp != 1 && (directories | files) != 0)
         to = FilDir(to, directories, files) - 1;
-    } else {
-        from = ENTRY(panel, PLACES(panel)->CurAdr)->NameF;
-        length = 13;
-F35_06:
-        *to++ = '"';
+    else {
+        if (panel->WinTyp == 1) {
+            for (i = 0; i < LenName; i++)
+                md.TmpErr[i] = md.CrnPath[i];
+            ShrtLin(md.TmpErr, LenStr - 10);
+            from = md.TmpErr;
+            length = LenStr;
+        } else {
+            from = ENTRY(panel, PLACES(panel)->CurAdr)->NameF;
+            length = 13;
+        }
+        *to++ = '"';                                    /* F35_06 */
         to = MvzLine(to, from, length);
         *to++ = '"';
     }
@@ -1520,33 +1618,6 @@ F35_06:
     F35_70();
     CpBgNam = CpSrc;
     return Go(GO_SELECTED);
-
-F36_03:
-    /* A new name for the directory, which stays where it is. */
-    for (i = 0; i < 13; i++)
-        CpDest[i] = ((const u8 *)TreeCursor)[i];
-    if ((u8)Ask(&Renam_B, 0) != 0)
-        return Go(GO_KEYS);
-    typed = CpDest;
-    if (CutPath(typed) != typed)
-        goto F36_01;
-    for (i = 0; i < LenPath; i++)
-        CpInpt[i] = md.CrnPath[i];
-    name = CUT_PATH(CpInpt);
-    for (i = 0; i < 13; i++)
-        name[i] = typed[i];
-    for (i = 0; CpInpt[i] != 0; i++)
-        if (i == LenStr)
-            goto F36_01;                /* too long */
-    for (i = 0; i < LenStr + 1; i++)
-        md.ToFile[i] = CpInpt[i];
-    CopyMov = 3;
-    F36_04();
-    return Go(GO_DONE);
-
-F36_01:
-    Ask(&MkErr_B, F35_40());
-    return Go(GO_KEYS);
 }
 
 /* What the dialogs of the commands have Dialog call for an answer:

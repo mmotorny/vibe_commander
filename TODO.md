@@ -16919,6 +16919,67 @@ said of one function where a reason named the uses of several.
 `StMain02`'s place of `*item = (key >> 8) - 0x3C` is a line whose
 text changed, and has the reason of the line it was.
 
+### G1, the jumps of copy.c: done
+
+The piece of the sweep of jumps for `copy.c` (`CLAUDE.md`, "The portable
+C", the bullet on `goto`). The file had 133 `goto`, of which 67 are
+`C20_00`'s, which keeps them. The 66 of the other seven functions went,
+all of them jumps forward:
+
+| function | `goto` | how |
+|---|---|---|
+| `C40_05` | 1 | `if`/`else` |
+| `C00_01` | 7 | `return` behind four helpers, `C00_04`, `C00_05`, `C00_13` and `C00_18`, for the tails that several places went on in |
+| `C10_00` | 21 | the box opened and closed around `RenameFile`, which returns at every place that jumped to the end; helpers `C10_10`, the box that says so, and `C10_12`, the file renamed |
+| `C30_00` | 30 | the same for each of its two boxes, `RenameOrMakeDir` and `RemoveDir`, with `WALK` for the way from the first box to `DirFunc`; helpers `C30_12`, `C30_13`, `C30_14` and `C30_41` |
+| `F35_50` | 2 | a `bool`, `cursor` |
+| `F36_04` | 1 | the loop that compares stops where the paths differ |
+| `F35_01` | 4 | the tree's new name is `F36_03`, a helper, and `F35_06` is the `else` of the files selected |
+
+Fourteen static functions are new: eleven helpers named by the label
+of the assembly that their code begins at, and three named by what
+they do, `RenameFile`, `RenameOrMakeDir` and `RemoveDir`, which begin
+at no label. Every label that went left its name in a comment where it
+stood. Every call of the system, every box and every write is where it
+was, in the same order: a box that a function opened is closed in it,
+behind the helper that returns what the jump to its end carried.
+
+`C20_00` keeps its 67: its jumps back, to `read`, `open`, `no_target`
+and `skip`, make loops that are entered in the middle, from the paths
+of a full disk and of a target that is asked about, and each of its
+jumps crosses another.
+
+What no scenario runs, by the original's instructions that
+`harness/ported.py` lists as out of reach, and which was read old
+against new once more: in `C00_01` every `return false`, a drive that
+is not ready; in `C10_00` the box `DelEr_B` (`C10_10` with it), DOS
+refusing to delete a file that is not read-only, or to make it
+writable, and `C10_10` with a drive that is not ready; in `C30_00`
+every `STOP` of `RenameOrMakeDir`, `RemoveDir` and `C30_41`, and the
+`NOTHING` of `RenameOrMakeDir` for a directory that DOS will not remove
+for another reason than what is in it. The rest of the seven runs in
+some scenario.
+
+The harness: `RenEr_B` and `DelEr_B` are handed to `C10_10`, which no
+form of `harness/reads.py` knows, and have an entry of `REVIEWED`
+there. Two places of `harness/int16.txt` moved from `C00_01` into
+`C00_05` and `C00_13` with their reasons, by a line written as it was;
+`harness/width.txt` has the helpers' numbers with their reasons.
+
+**The images.** The code is 255 bytes longer, so the room begins 256
+bytes later, and against `main`'s build every scenario differs, in all
+of the room. Against a build of `main` padded to the same length, 256
+bytes of a constant behind the last of `sys_dos.c`, not kept: 150 of
+158 scenarios with nothing that differs, `blank-timed` and `cursor`
+with nothing but what may differ, and the six that S met, `comspec`,
+`ended`, `second-copy`, `start-screen`, `start-setup`, whose second
+copy of the program lives in the room with code of another layout, and
+`start-memory`, `ViewSeg` and `FreMem2` naming nothing known at the
+same address. Nothing is declared as changed. A padded build linked by
+hand wants `build/tools/stub` run on it after the linker, as the build
+does: without it the extender writes its banner, which is in the
+images as the screen behind the program.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

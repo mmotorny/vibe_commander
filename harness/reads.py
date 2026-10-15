@@ -152,6 +152,8 @@ REVIEWED = {
     ("copy.c", "RnMv_S"): (15, "F35_57 copies 15 bytes of words"),
     ("copy.c", "CopFi_S"): (16, "four bytes from the twelfth on"),
     ("copy.c", "CopTo_S"): (5, "three bytes from the second on"),
+    ("copy.c", "RenEr_B"): (TABLE, "a box, handed to C10_10 for Ask"),
+    ("copy.c", "DelEr_B"): (TABLE, "a box, handed to C10_10 for Ask"),
     ("dirfunc.c", "DlWr4_S"): (81, "F48_00 copies a path and a name, "
                                    "LenPath + 13 bytes"),
     ("dirfunc.c", "Mask_S"): (6, "five bytes from the first or the second "

@@ -50,12 +50,12 @@ copy.c, C00_01: widen
     end is behind the zero byte of CpDest, looked for in LenName bytes
     of it by C00_End just above: 1 to LenName.
 
-copy.c, C00_01: widen
+copy.c, C00_05: widen
     | count = (i32)(from - CpSrc);
     from is CpBgNam, the name in CpSrc behind its path, which CutPath or
     the start of CpSrc made: 0 to LenName.
 
-copy.c, C00_01: widen
+copy.c, C00_13: widen
     | count = (i32)(to - CpDest);
     to is where UnConv has written the name into CpDest, behind its
     path: within the LenName bytes of CpDest.
