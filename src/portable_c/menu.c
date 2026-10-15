@@ -150,7 +150,8 @@ extern const u8 PtMnu_S[];
     " Save setup\377\011Shift-F9\0" \
     "\0" \
     " More setup...\0"
-static const u8 MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1] =
+static const u8 MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1]
+    NONSTRING =
     LEFT_S FILES_S COMMANDS_S OPTIONS_S;
 
 /* Where in MenuLn the lines of each menu begin. */
