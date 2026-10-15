@@ -288,6 +288,16 @@ def main():
                 f"{name} is not run for {program.tree}: "
                 + scenarios.not_run(program.tree)[name])
     names = args.scenario or run
+    if program.tree in goldens.DECIDED and not args.scenario:
+        # A tree whose patches nothing else looks at (ported.py holds
+        # those of the trees of DOS): each is of a scenario that it is
+        # taken through.
+        stray = [goldens.shown(file) for file in goldens.patches(program.tree)
+                 if file.suffix != ".patch" or file.stem not in run]
+        if stray:
+            print(f"{', '.join(stray)}: no patch of a scenario that "
+                  f"{program.tree} is taken through")
+            sys.exit(1)
     failed, _ = compare(names, program, together=args.together,
                         limits=dict.fromkeys(names, args.limit),
                         first=args.first)

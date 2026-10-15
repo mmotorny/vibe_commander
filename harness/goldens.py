@@ -1095,8 +1095,10 @@ def departures(golden, run, programs):
         return [(None, ["the golden was derived for other steps than the "
                         "scenario has now: derive it again"])]
     for number, step in enumerate(steps[:len(run.screens)]):
+        commanded = getattr(run, "commanded", None)
         lines = screen_departs(golden, number, run.screens[number],
-                               getattr(run, "written", None))
+                               getattr(run, "written", None),
+                               commanded is not None and number >= commanded)
         if lines:
             found.append((f"after step {number}: {step}"
                           + _in_golden(golden, number), lines))
@@ -1145,11 +1147,12 @@ def on_the_host(disks, golden=None):
     return out
 
 
-def screen_departs(golden, number, screen, written=None):
+def screen_departs(golden, number, screen, written=None, commanded=False):
     """How `screen`, which a build showed after step `number` of the
     scenario that `golden` is of, the start being 0, departs from the
     golden's, as text lines: none if it does not. `written` is what the
-    run wrote into, where the tree's masks go by it (posixrun)."""
+    run wrote into, and `commanded` whether it has run a command by this
+    screen, where the tree's masks go by them (posixrun)."""
     # Both are blanked, the golden's screen as well: one derived before
     # a figure was left out of the comparison still holds it. The
     # golden's is without what any tree leaves out, as it was derived,
@@ -1159,7 +1162,7 @@ def screen_departs(golden, number, screen, written=None):
     expected, actual = deviations.masked(
         deviations.compared(golden.screens[number]),
         deviations.compared(screen, golden.tree),
-        deviations.declared(golden.tree).rules, written)
+        deviations.declared(golden.tree).rules, written, commanded)
     return screen_differences(
         expected, actual, made.get(place),
         mine="its own" if golden.own else "original")
@@ -1424,7 +1427,9 @@ def from_run(name, program, benches):
         want = golden.screens[number]
         got = deviations.compared(run.screens[number], tree)
         got = replace(got, cells=settled(deviations.compared(want), got))
-        got = unmasked(want, got, tree, getattr(run, "written", None))
+        commanded = getattr(run, "commanded", None)
+        got = unmasked(want, got, tree, getattr(run, "written", None),
+                       commanded is not None and number >= commanded)
         stated = PatchedScreen()
         for row in range(ROWS):
             start, end = row * COLUMNS * 2, (row + 1) * COLUMNS * 2
@@ -1475,14 +1480,14 @@ def from_run(name, program, benches):
         + (restated(old, patch, golden.codepage) if old else [])
 
 
-def unmasked(want, got, tree, written):
+def unmasked(want, got, tree, written, commanded=False):
     """The screen `got` of a build with every cell that a mask of the
     tree `tree` leaves out of the comparison where the golden has `want`
     (deviations.masked) as the golden has it: a patch says nothing of
     such a cell, and the mask is to find it on the patched golden too."""
     rules = deviations.declared(tree).rules
     blanked, _ = deviations.masked(deviations.compared(want), got, rules,
-                                   written)
+                                   written, commanded)
     if blanked.cells == deviations.compared(want).cells:
         return got
     cells = bytearray(got.cells)

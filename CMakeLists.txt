@@ -860,6 +860,26 @@ add_test(NAME portable_c-terminal
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/terminal.py
             ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
 set_tests_properties(portable_c-terminal PROPERTIES SKIP_RETURN_CODE 77)
+# The program for Linux through the scenarios, the piece L3b of step 6:
+# the sanitized build run on a bench of the host's laid out as the DOS
+# bench's, its screens and its disks held to the goldens of the original
+# with what is declared for the portable C and, on top of that, for Linux
+# (ON_LINUX of harness/deviations.py: the scenarios not run, those taken
+# as far as a step, the masks; its own patches in harness/goldens/posix/).
+# See harness/posixrun.py. The bench's setup file is made on a machine
+# of DOS the first time, and kept in build/posix-bench. Skipped where
+# there is no clang.
+if(clang)
+    add_test(NAME portable_c-posix-scenarios
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
+                ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
+else()
+    add_test(NAME portable_c-posix-scenarios
+        COMMAND Python3::Interpreter -c
+                "print('No clang: the scenarios of the program for Linux are skipped.'); raise SystemExit(77)")
+endif()
+set_tests_properties(portable_c-posix-scenarios PROPERTIES
+    SKIP_RETURN_CODE 77 LABELS "portable_c;machine")
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see

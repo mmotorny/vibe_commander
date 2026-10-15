@@ -20503,7 +20503,78 @@ step under the test channel):
     looked at again with what DOS has shown masked.
   - Not looked at: `view-window` step 6, `mouse-find` step 5.
 - Not built: the test `portable_c-posix-scenarios`, the clean asan pass
-  of all, and the FILES layout.
+  of all, and the FILES layout (stage 6 built the first two).
+
+**Stage 6, where it stands** (a sixth agent, on 15 October 2026):
+
+- The test `portable_c-posix-scenarios` (labels `portable_c` and
+  `machine`; skipped without clang): `compare.py` with
+  `posix-asan/vc`, every scenario that the tree is taken through, which
+  is 118, all passing with the sanitizers clean, in under a minute; it
+  fails as well for a patch of `harness/goldens/posix/` that is of no
+  scenario run. What does not pass yet is declared, not left failing:
+  `LINUX_CUT` takes a scenario as far as the step where it first
+  differs, with the reason, and `tree` is not run. By reason:
+  - The order of a directory's entries, the tree's and the file
+    search's, waiting on the user (`_ORDER`): `tree` not run;
+    `command-line` 42, `stamps` 18, `menu` 30, `menu-items` 24,
+    `tree-deep` 14, `tree-box` 14, `tree-choose` 4, `delete` 38,
+    `make-directory` 3, `dialog-keys` 32, `copy-ask` 29, `copy-tree` 4,
+    `mouse-dialog` 5, `mouse-tree` 12, `mouse-find` 5 (the file search
+    lists README before HELLO on the bench, the order of the disk: this
+    is what `mouse-find` step 5 was), `panel-keys` 38.
+  - `NUL`, waiting on the user (`_NUL`): `copy` 7, `copy-dirs` 15,
+    `editor-save` 20.
+  - The FILES layout, not made (`_FILES`): `sort` 19, `cursor` 2,
+    `view-parts` 3, `view-keys` 59, `view-search` 6, `move` 4,
+    `attributes-directory` 19, `mouse-select` 2, `mouse-drive` 5,
+    `mouse-view` 2, `mouse-edit` 5, `editor-keys` 5.
+  - The program's own files in `D:\VC`, whose path on Linux
+    (`R:\TMP\VC...\VC`) wants the mask of a path of R:, not built
+    (`_OWN`): `help-broken` 3, `menu-files` 4, `setup-help-file` 6,
+    `setup-damaged` 2, `setup-delay-file` 5.
+  - Others: `delete-mask` 19 (B:), `history-drives` 60 (A:),
+    `view-window` 6 (this was its step 6: a file of STAMPS renamed
+    `dirinfo` and shown in the Info panel, which on the bench has
+    nothing to read and on the host its size in zeros, NULs on the
+    screen; the reason that `find` is not run for), `user-menu` 77 and
+    `view-commands` 17 (DOS's DEL).
+  Lifting a cut is taking its line out and running the scenario: the
+  test then holds all of it.
+- Patches of the tree's own (`harness/goldens/posix/`, `sort` and
+  `filter`): hidden and system are not kept, so a file made hidden stays
+  in its panel (`filter`) and a system file is listed among the others
+  by its name (`sort`, where the original lists it first). A patch of
+  `posix` has `Decided: CLAUDE.md, step 6` where a patch of a DOS tree
+  names an entry of DEVIATIONS.md (`goldens.DECIDED`), the Linux
+  decisions being the user's in `CLAUDE.md`; `goldens.py patch --tree
+  posix NAME` writes one from a run of `posix-asan/vc`
+  (`goldens.PROGRAMS`), with the cells that a mask finds left as the
+  golden has them (`unmasked`) and the disks as the test holds them on
+  the host. `changes --tree posix` reads them. Where a scenario has no
+  patch of `posix`, the portable C's holds; one of `posix` is of the
+  whole difference, the portable C's rows too.
+- Commands, which L6 runs: `DosShown`, a mask of the tree, leaves out
+  what DOS has shown behind the panels once the run has run a command
+  (`run.commanded`, the first step that the program says on standard
+  error, `posixrun`): the rows above the command line, of each the half
+  whose outer cells are not a panel's frame. With it `command-edit`,
+  `sizes` and `blank-timed` pass whole and `history-drives` as far as
+  A:. Still out, each with its reason in `LINUX_NOT_RUN` or
+  `LINUX_CUT`: a command of DOS's that the host's shell has not, DEL, RD,
+  TIME, ATTRIB, CLS (`menu-panel`, `setup-missing`,
+  `setup-missing-saved`, `setup-save-fails`, `setup-new`,
+  `clock-morning`, and the cuts above); `enter` and `user-menu-run`,
+  which wait on L6's questions as well (Enter on a file, `!.!`).
+  `clock-morning` passed with the mask, which hid the clock that it is
+  about: the clock on the panels' top row was taken for DOS's screen
+  until a half counts as a panel's by either of its outer cells.
+- Left of commands: a command of DOS's, `del`, `rd`, `cls`, `attrib`,
+  `time`, is none of the host's shell's (L6, run by `$SHELL -c`). The
+  scenarios that use one stop there; a command of the host's in its
+  place (`rm` for `del`), by `in_place_in` as the design of stage 1 has
+  it, would let them go on, but most of them name `D:\VC`, which wants
+  the FILES layout or the mask of a path of R: first.
 
 **Left.**
 

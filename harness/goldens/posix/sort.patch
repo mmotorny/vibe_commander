@@ -1,0 +1,136 @@
+The program for Linux in the scenario sort: what it is expected to show
+otherwise than the original. A patch of harness/goldens/sort.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Decided: CLAUDE.md, step 6
+Why: hidden and system are taken when they are set and not kept on Linux,
+the host having nowhere for them (the user's word of 14 October 2026):
+notes.doc made a system file at step 10 and run.bat at step 14 are
+listed by their names among the others, where the original lists such a
+file in front of them, by every order of the Left menu, and the cursor
+goes with the file.
+
+== 10: Enter
+rows 5-9
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║hello    doc│            │            ║║            │            │            ║| 1Bx80
+-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║hello    doc│            │            ║║            │            │            ║| 1Bx80
++|║hello    txt│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+
+== 11: End
+rows 5-9
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║hello    doc│            │            ║║            │            │            ║| 1Bx80
+-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║hello    doc│            │            ║║            │            │            ║| 1Bx80
++|║hello    txt│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+
+== 12: Ctrl+a
+rows 5-9
+-|║notes    doc│          ╔═════════ Attributes ═════════╗          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║data     bin│          ║  Change file attributes for  ║          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║empty    dat│          ║          "run.bat"           ║          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║hello    doc│          ║  [ ] Read only    Date       ║          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║hello    txt│          ║  [x] Archive      6-16-2000  ║          │            ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
++|║data     bin│          ╔═════════ Attributes ═════════╗          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║empty    dat│          ║  Change file attributes for  ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║hello    doc│          ║          "run.bat"           ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║hello    txt│          ║  [ ] Read only    Date       ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║notes    doc│          ║  [x] Archive      6-16-2000  ║          │            ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+
+== 13: Tab Tab Tab Space
+rows 5-9
+-|║notes    doc│          ╔═════════ Attributes ═════════╗          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║data     bin│          ║  Change file attributes for  ║          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║empty    dat│          ║          "run.bat"           ║          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║hello    doc│          ║  [ ] Read only    Date       ║          │            ║| 1Bx21 70x38 03x2 1Bx19
+-|║hello    txt│          ║  [x] Archive      6-16-2000  ║          │            ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
++|║data     bin│          ╔═════════ Attributes ═════════╗          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║empty    dat│          ║  Change file attributes for  ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║hello    doc│          ║          "run.bat"           ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║hello    txt│          ║  [ ] Read only    Date       ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║notes    doc│          ║  [x] Archive      6-16-2000  ║          │            ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+
+== 14: Enter
+rows 5-11
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+-|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║hello    doc│            │            ║║            │            │            ║| 1Bx80
+-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║hello    doc│            │            ║║            │            │            ║| 1Bx80
++|║hello    txt│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
++|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+
+== 15: F9 l n
+rows 5-11
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+-|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║hello    doc│            │            ║║            │            │            ║| 1Bx80
+-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║hello    doc│            │            ║║            │            │            ║| 1Bx80
++|║hello    txt│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
++|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+
+== 16: F9 l x
+rows 6-9
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║hello    doc│            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║hello    doc│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+
+== 17: F9 l m
+rows 5-11
+-|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║hello    doc│            │            ║║            │            │            ║| 1Bx80
+-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║hello    doc│            │            ║║            │            │            ║| 1Bx80
++|║hello    txt│            │            ║║            │            │            ║| 1Bx80
++|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+
+== 18: F9 l s
+rows 5-8
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+-|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║readme   txt│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
++|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67

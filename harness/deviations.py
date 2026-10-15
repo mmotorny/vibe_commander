@@ -229,7 +229,7 @@ def expected(screen, rules=None):
         if isinstance(rule, Part):
             rule.made(screen, cells)
             continue
-        if isinstance(rule, (WrittenTimes, InfoUnder, DosPrompt)):
+        if isinstance(rule, _FOUND):
             continue                    # a mask of its own: masked()
         pattern, text, below = rule
         if text is None:
@@ -378,11 +378,41 @@ class DosPrompt:
                     yield row, column
 
 
+@dataclass(frozen=True)
+class DosShown:
+    """A mask of what DOS has shown behind the panels once the run has
+    run a command (masked(), `commanded`): on Linux a command writes on
+    the terminal's own screen, and the program's copy of DOS's screen has
+    the prompts and the commands typed but not what they wrote, so its
+    rows are others. Left out are the rows above the command line, the
+    row above the key bar or the last row, and of each row a half that
+    is not a panel's: a half neither of whose outer cells is of a frame on
+    the golden's screen, or a whole row where neither half is. A box
+    over DOS's screen is left out with it."""
+    what: str = "what DOS has shown behind the panels after a command"
+
+    KEYS = re.compile(r"^1\D{6,7}2")
+    FRAME = set("║╔╚╟╠╢╣╗╝╤╧│┌└┐┘├┤")
+
+    def found(self, golden, written):
+        lines = golden.lines()
+        last = next((row - 1 for row, line in enumerate(lines)
+                     if self.KEYS.match(line)), len(lines) - 1)
+        for row in range(last):
+            line = lines[row]
+            for start in (0, 40):
+                if line[start] in self.FRAME or \
+                        line[start + 39] in self.FRAME:
+                    continue
+                for column in range(start, start + 40):
+                    yield row, column
+
+
 # The masks that are found by a method of their own, `found`.
-_FOUND = (WrittenTimes, InfoUnder, DosPrompt)
+_FOUND = (WrittenTimes, InfoUnder, DosPrompt, DosShown)
 
 
-def masked(golden, screen, rules, written=None):
+def masked(golden, screen, rules, written=None, commanded=False):
     """The screen `golden` of a golden and the screen `screen` of a
     build, with the cells that a mask among `rules` finds on the
     golden's left out of both, character and colour: a mask is a rule
@@ -392,7 +422,8 @@ def masked(golden, screen, rules, written=None):
     is left out; with a pattern for the line below, only a row whose
     next one has that. A WrittenTimes among them goes by `written` as
     well, the directories that the run wrote into; it, an InfoUnder and
-    a DosPrompt find their cells by themselves."""
+    a DosPrompt find their cells by themselves, and a DosShown does
+    where `commanded`, the run having run a command by this screen."""
     masks = [rule for rule in rules
              if not isinstance(rule, (Part,) + _FOUND)
              and rule[1] is None]
@@ -403,6 +434,8 @@ def masked(golden, screen, rules, written=None):
     lines = golden.lines()
     cursor = screen.cursor
     for rule in by_run:
+        if isinstance(rule, DosShown) and not commanded:
+            continue
         for row, column in rule.found(golden, written):
             for cells in out:
                 at = (row * COLUMNS + column) * 2
@@ -1302,6 +1335,8 @@ LINUX_MASKS = (
     WrittenTimes(),
     # The prompt that DOS writes when the program has been left.
     DosPrompt(),
+    # What DOS has shown behind the panels, once a command has run.
+    DosShown(),
 )
 
 # The scenarios that the program for Linux is not taken through, not on
@@ -1343,15 +1378,16 @@ LINUX_NOT_RUN = {
          "start-memory", "second-copy", "lost", "enter-many",
          "enter-many-selected", "start-setup", "setup-defaults"], _DOS),
     # Of those that run a command, those whose value is the command
-    # itself or comes behind it (TODO.md, "L3b"): the others are taken as
-    # far as their first command, LINUX_CUT.
+    # itself or comes behind a command of DOS's that the host's shell has
+    # not, DEL, RD, TIME, ATTRIB (TODO.md, "L3b"): the others are run
+    # with what DOS has shown masked behind a command (DosShown), or as
+    # far as a step, LINUX_CUT. `enter` and `user-menu-run` wait on the
+    # questions of L6 as well, Enter on a file and `!.!`.
     "enter": "Enter on a file that DOS runs, and the commands before and "
              "after it: what it holds is DOS running them",
     "user-menu-run": "the commands of the user menu, whose parameters "
                      "show only in what the command run prints",
-    "history-drives": "the history of commands, which its first command "
-                      "at step 4 begins",
-    "menu-panel": "a panel's menu after a command, the first at step 3",
+    "menu-panel": "a panel's menu after a command, DOS's RD at step 3",
     "setup-missing": "its setup file taken away by a command, its first "
                      "step",
     "setup-missing-saved": "its setup file taken away by a command, its "
@@ -1359,28 +1395,67 @@ LINUX_NOT_RUN = {
     "setup-save-fails": "its setup file made read-only by a command of "
                         "DOS, ATTRIB, its first step",
     "setup-new": "a command at step 2, behind which all of it is",
-    "clock-morning": "the time of day set by DOS's TIME, at step 2",
-    "blank-timed": "the time of day set by DOS's TIME, at step 3",
+    "clock-morning": "the time of day set by DOS's TIME, at step 2, "
+                     "which the host's shell has not",
+    "tree": "the tree, whose order of the directories waits on the user "
+            "from its first step (TODO.md, L3b)",
 }
 
-# The scenarios that run a command and are worth holding the program for
-# Linux to before it, taken as far as their first command (CLAUDE.md,
-# step 6; L6 runs commands): scenario -> (the number of the step of the
-# first command, counted from 1; what is held before it). The step is the
-# one at which the program, given a COMSPEC, asks for a program to be run
-# (ProgramRun of sys_posix.c, which says so on standard error).
+# The scenarios that the program for Linux is taken through only as far
+# as a step, where what follows rests on what Linux has not or waits on a
+# question of the user's: scenario -> (the number of the step, counted
+# from 1 as the golden counts them, which is not taken; what is held
+# before it). Most stop at a command that the host's shell has not, the
+# step at which the program asks for a program to be run (ProgramRun of
+# sys_posix.c, which says so on standard error).
+_ORDER = ("the order of a directory's entries, the tree's and the file "
+          "search's, which waits on the user (TODO.md, L3b)")
+_NUL = "DOS's device NUL, which waits on the user (TODO.md, L3b)"
+_FILES = ("A: or D:\\VC for files to work on, until the scenario works in "
+          "C:\\FILES, H:\\FILES on Linux (CLAUDE.md, step 6; TODO.md, L3b)")
+_OWN = ("the program's own files in D:\\VC, whose path on Linux, a "
+        "directory of R:, is to be masked; the mask is not built (TODO.md, "
+        "L3b)")
 LINUX_CUT = {
-    "command-edit": (37, "the command line edited"),
-    "editor-save": (23, "the editor's errors on saving"),
-    "help-broken": (24, "a help file that cannot be read"),
-    "menu-files": (24, "the menu and extension files edited, the setup "
-                       "saved"),
-    "panel-keys": (18, "masks, the panels off and on"),
-    "setup-help-file": (22, "the setup's help file"),
-    "sizes": (8, "the sizes of directories"),
-    "user-menu": (77, "the user menu's lines"),
-    "view-commands": (17, "F3 and F4 and their extension files"),
-    "editor-keys": (33, "the editor's keys"),
+    "editor-save": (20, f"the editor's errors on saving: at step 20 {_NUL}; "
+                        "at step 23 a command of the extension file with "
+                        "!.!, a question of L6's for the user"),
+    "help-broken": (3, f"a help file that cannot be read: {_OWN}; at step "
+                       "24 DOS's DEL"),
+    "menu-files": (4, f"the menu and extension files edited: {_OWN}; at "
+                      "step 24 DOS's ATTRIB"),
+    "panel-keys": (38, f"masks, the panels off and on, and commands: at "
+                       f"step 38 {_ORDER}"),
+    "history-drives": (60, "the history of commands and the drive box: "
+                           "at step 60 the diskette in A:, which Linux has "
+                           "not"),
+    "setup-help-file": (6, f"the setup's help file: {_OWN}; at step 22 "
+                           "DOS's CLS"),
+    "setup-damaged": (2, f"the setup file damaged: {_OWN}"),
+    "setup-delay-file": (5, f"the setup file and the delay: {_OWN}"),
+    "user-menu": (77, "the user menu's lines: from step 77 its file, "
+                      "which DOS's DEL takes away at step 80"),
+    "view-commands": (17, "F3 and F4 and their extension files: at step "
+                          "17 DOS's DEL"),
+    "editor-keys": (5, f"the editor's keys: {_FILES}"),
+    "delete-mask": (19, "a mask of files deleted: at step 19 B:, the "
+                        "diskette, which Linux has not"),
+    "view-window": (6, "the viewer's window on the Info panel: at step 6 "
+                       "a file of STAMPS shown in the Info panel, which on "
+                       "the bench has nothing to read and on the host its "
+                       "size in zeros, as for `find`"),
+    "copy": (7, _NUL), "copy-dirs": (15, _NUL),
+    **{name: (step, _ORDER) for name, step in (
+        ("command-line", 42), ("stamps", 18), ("menu", 30),
+        ("menu-items", 24), ("tree-deep", 14), ("tree-box", 14),
+        ("tree-choose", 4), ("delete", 38), ("make-directory", 3),
+        ("dialog-keys", 32), ("copy-ask", 29), ("copy-tree", 4),
+        ("mouse-dialog", 5), ("mouse-tree", 12), ("mouse-find", 5))},
+    **{name: (step, _FILES) for name, step in (
+        ("sort", 19), ("cursor", 2), ("view-parts", 3), ("view-keys", 59),
+        ("view-search", 6), ("move", 4), ("attributes-directory", 19),
+        ("mouse-select", 2), ("mouse-drive", 5), ("mouse-view", 2),
+        ("mouse-edit", 5))},
 }
 
 # What the program for Linux is expected to show otherwise than the

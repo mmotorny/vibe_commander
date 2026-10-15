@@ -53,6 +53,7 @@ as driver.py has its packets (pointer()).
 import dataclasses
 import hashlib
 import os
+import re
 import subprocess
 import tempfile
 import time
@@ -448,6 +449,12 @@ def run(scenario, program, setup=..., limit=60):
     if root_written:
         ran.written.add("C:\\")
     ran.written |= removed
+    # The first step at which the program ran a command, which it says on
+    # standard error, or None: what DOS has shown behind the panels is
+    # left out from there on (deviations.DosShown).
+    steps_run = [int(found) for found in
+                 re.findall(r"a program is run at step (\d+)", said)]
+    ran.commanded = min(steps_run) if steps_run else None
     # What the program said on standard error, for whoever looks.
     ran.said = said
     ran.saved = saved
