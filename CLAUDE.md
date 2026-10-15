@@ -383,7 +383,12 @@ These held while `src/c/` was made, and they say what it is.
   the portable C's own, where the original cannot go: `editor-huge`,
   a file larger than the original's room, when the memory comes from
   the extender. On DOS, Alt with a letter goes on naming the letter of
-  a US keyboard, as the BIOS gives it. Of a help file that is broken,
+  a US keyboard, as the BIOS gives it. The menu that is none, the
+  bar pressed beside the names of the menus and the mouse moved onto
+  one, which in the original makes the menu 0 and reads in front of
+  the table of the menus and behind it, opens the menu under the
+  pointer, as the original meant: a bug of the original fixed and
+  declared, decided the same day. Of a help file that is broken,
   decided the same day: where its numbers of lines run past 65,535,
   the help wraps them as the original does; and an entry that says its
   text has no bytes, for which the program of 32 bits would write 64K
