@@ -254,44 +254,16 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 9: F5
-cursor 8 8 lines 6 7 mode 3
+== 9: Enter
+cursor 13 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
-|║                                                                              ║| 1Bx3 70x74 1Bx3
-|║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║ Copy "C:\WORK\DOCS" to                                           ║     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
-|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
-|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
-|║                                      ║║                                      ║| 1Bx5 03x74 1Bx1
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 10: "docs2" Enter
-cursor 8 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    └──DOCS2                          ║║  32,718,336 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ └──WORK                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├─ DOCS                          ◄║║      Volume in drive C: is WORK      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
+|║    └──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║                                      ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
@@ -307,132 +279,20 @@ cursor 8 23 lines 6 7 mode 3
 |╟──────────────────────────────────────╢║                                      ║| 1Bx80
 |║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 11: Down
-cursor 8 23 lines 6 7 mode 3
+== 10: Up
+cursor 13 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├─ SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx22 1Ex2 1Bx3
-|║    └──DOCS2                          ║║  32,718,336 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ └─ WORK                              ║║          ####### Bytes Free          ║| 1Bx4 30x14 1Bx33 1Ex7 1Bx22
+|║    ├──DOCS                          ◄║║      Volume in drive C: is WORK      ║| 1Bx8 1Ex13 1Bx17 1Ex1 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
+|║    └──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║                                      ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║╟──────────────────────────────────────╢| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\SRC                           ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 12: F5
-cursor 8 8 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
-|║                                                                              ║| 1Bx3 70x74 1Bx3
-|║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║ Copy "C:\WORK\SRC" to                                            ║     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║ docs2                                                            ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
-|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
-|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
-|║                                      ║║                                      ║| 1Bx5 03x74 1Bx1
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\SRC                           ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 13: "x2" Enter
-cursor 8 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├─ SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                             ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║╟──────────────────────────────────────╢| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\SRC                           ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 14: F6
-cursor 32 8 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├──DOCS                                        e in drive C: is WORK      ║| 1Bx27 70x25 1Bx11 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├─ SRC                   ╔═════ Rename ════╗   2 total bytes on drive C:  ║| 1Bx7 30x14 1Bx6 70x25 06x1 03x1 1Bx21 1Ex2 1Bx3
-|║    ├──DOCS2                 ║ Rename "SRC" to ║   4 bytes free on drive C:   ║| 1Bx27 70x25 06x1 03x1 1Bx20 1Ex2 1Bx4
-|║    └──X2                    ║ SRC             ║                              ║| 1Bx27 70x5 30x12 70x8 03x2 1Bx26
-|║                             ╚═════════════════╝                              ║| 1Bx27 70x25 03x2 1Bx26
-|║                                                   ───────────────────────────╢| 1Bx27 70x25 03x2 1Bx26
-|║                                      ║║                                      ║| 1Bx29 03x25 1Bx26
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\SRC                           ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 15: "src1" Enter
-cursor 8 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └─ WORK                             ◄║║          ####### Bytes Free          ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                             ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -447,19 +307,243 @@ cursor 8 23 lines 6 7 mode 3
 |╟──────────────────────────────────────╢║                                      ║| 1Bx80
 |║C:\WORK                               ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 16: Down
-cursor 8 23 lines 6 7 mode 3
+== 11: F6
+cursor 32 8 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
+|║ └─ WORK                              ║║          ####### Bytes Free          ║| 1Bx4 30x14 1Bx33 1Ex7 1Bx22
+|║    ├──DOCS                                          in drive C: is WORK      ║| 1Bx8 1Ex12 1Bx7 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
+|║    └──SRC                   ╔═════ Rename ═════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
+|║                             ║ Rename "WORK" to ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
+|║                             ║ WORK             ║                             ║| 1Bx27 70x5 30x12 70x9 03x2 1Bx25
+|║                             ╚══════════════════╝                             ║| 1Bx27 70x26 03x2 1Bx25
+|║                                                    ──────────────────────────╢| 1Bx27 70x26 03x2 1Bx25
+|║                                      ║║                                      ║| 1Bx29 03x26 1Bx25
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK                               ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 12: "work2" Enter
+cursor 14 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├─ DOCS                          ◄║║      Volume in drive C: is WORK      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
+|║    └──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║                                      ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\DOCS                         ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2\DOCS>                                                                  | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: Up Enter
+cursor 9 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └─ WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    └──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║                                      ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2                              ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 14: Down
+cursor 9 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
 |║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║    └──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║                                      ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\DOCS                         ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 15: F5
+cursor 8 8 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
+|║                                                                              ║| 1Bx3 70x74 1Bx3
+|║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ Copy "C:\WORK2\DOCS" to                                          ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ C:\work2                                                         ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
+|║                                      ║║                                      ║| 1Bx5 03x74 1Bx1
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\DOCS                         ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 16: "d2" Enter
+cursor 9 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    └──D2                             ║║  32,718,336 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\DOCS                         ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 17: Down
+cursor 9 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├─ SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx22 1Ex2 1Bx3
+|║    └──D2                             ║║  32,718,336 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\SRC                          ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 18: F5
+cursor 8 8 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║                                                                              ║| 1Bx3 70x74 1Bx3
+|║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ Copy "C:\WORK2\SRC" to                                           ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ d2                                                               ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
+|║                                      ║║                                      ║| 1Bx5 03x74 1Bx1
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\SRC                          ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 19: "x2" Enter
+cursor 9 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├─ SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├──D2                             ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║    └──X2                             ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
@@ -473,25 +557,53 @@ cursor 8 23 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
+|║C:\WORK2\SRC                          ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
+|C:\WORK2>                                                                       | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 17: F6
-cursor 32 8 lines 6 7 mode 3
+== 20: F5
+cursor 8 8 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├─ DOCS                                          in drive C: is WORK      ║| 1Bx7 30x14 1Bx6 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                  ╔═════ Rename ═════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
-|║    ├──DOCS2                 ║ Rename "DOCS" to ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
-|║    └──X2                    ║ DOCS             ║                             ║| 1Bx27 70x5 30x12 70x9 03x2 1Bx25
-|║                             ╚══════════════════╝                             ║| 1Bx27 70x26 03x2 1Bx25
-|║                                                    ──────────────────────────╢| 1Bx27 70x26 03x2 1Bx25
-|║                                      ║║                                      ║| 1Bx29 03x26 1Bx25
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║                                                                              ║| 1Bx3 70x74 1Bx3
+|║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ Copy "C:\WORK2\SRC" to                                           ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ x2                                                               ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
+|║                                      ║║                                      ║| 1Bx5 03x74 1Bx1
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\SRC                          ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 21: "d" Enter
+cursor 9 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                            ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├─ SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├──D2                             ║║  32,717,312 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║    ├──X2                             ║║                                      ║| 1Bx80
+|║    └──D                              ║║                                      ║| 1Bx80
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
 |║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -501,22 +613,106 @@ cursor 32 8 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
+|║C:\WORK2\SRC                          ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
+|C:\WORK2>                                                                       | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 22: Down Enter
+cursor 12 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├─ D2                            ◄║║  32,717,312 bytes free on drive C:   ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
+|║    ├──X2                             ║║                                      ║| 1Bx80
+|║    └──D                              ║║                                      ║| 1Bx80
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\D2                           ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2\D2>                                                                    | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 23: End
+cursor 12 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├──D2                            ◄║║  32,717,312 bytes free on drive C:   ║| 1Bx8 1Ex13 1Bx17 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
+|║    ├──X2                             ║║                                      ║| 1Bx80
+|║    └─ D                              ║║                                      ║| 1Bx7 30x14 1Bx59
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\D                            ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2\D2>                                                                    | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 24: F6
+cursor 33 8 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├──DOCS                                       me in drive C: is WORK      ║| 1Bx28 70x23 1Bx12 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                    ╔════ Rename ═══╗   92 total bytes on drive C:  ║| 1Bx28 70x23 06x2 1Bx22 1Ex2 1Bx3
+|║    ├──D2                     ║ Rename "D" to ║   12 bytes free on drive C:   ║| 1Bx8 1Ex12 1Bx8 70x23 06x2 1Bx21 1Ex2 1Bx4
+|║    ├──X2                     ║ D             ║                               ║| 1Bx28 70x5 30x12 70x6 03x2 1Bx27
+|║    └─ D                      ╚═══════════════╝                               ║| 1Bx7 30x14 1Bx7 70x23 03x2 1Bx27
+|║                                                  ────────────────────────────╢| 1Bx28 70x23 03x2 1Bx27
+|║                                      ║║                                      ║| 1Bx30 03x23 1Bx27
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\D                            ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2\D2>                                                                    | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 18: "a\b" Enter
+== 25: "a\b" Enter
 cursor 0 127 lines 6 7 mode 3
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                             ║║                                      ║| 1Bx80
-|║                                                                              ║| 1Bx22 4Fx36 1Bx22
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├──D2                            ◄║║  32,717,312 bytes free on drive C:   ║| 1Bx8 1Ex12 1Bx18 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
+|║    ├──X2                             ║║                                      ║| 1Bx80
+|║    └─ D                                                                      ║| 1Bx7 30x14 1Bx1 4Fx36 1Bx22
 |║                        ╔═══════════ Move ═══════════╗   ─────────────────────╢| 1Bx22 4Fx36 03x2 1Bx20
 |║                        ║ Can't create the directory ║                        ║| 1Bx22 4Fx36 03x2 1Bx20
 |║                        ║            A\B             ║   le in this directory ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
@@ -528,108 +724,24 @@ cursor 0 127 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
+|║C:\WORK2\D                            ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
+|C:\WORK2\D2>                                                                    | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 |                                                                                | 07x80
 
-== 19: Enter
-cursor 8 23 lines 6 7 mode 3
+== 26: Enter
+cursor 12 23 lines 6 7 mode 3
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                             ║║                                      ║| 1Bx80
-|║                                                                              ║| 1Bx22 4Fx36 1Bx22
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║╟──────────────────────────────────────╢| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 20: F6
-cursor 32 8 lines 6 7 mode 3
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├─ DOCS                                          in drive C: is WORK      ║| 1Bx7 30x14 1Bx6 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                  ╔═════ Rename ═════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
-|║    ├──DOCS2                 ║ Rename "DOCS" to ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
-|║    └──X2                    ║ DOCS             ║                             ║| 1Bx27 70x5 30x12 70x9 03x2 1Bx25
-|║                             ╚══════════════════╝                             ║| 1Bx27 70x26 03x2 1Bx25
-|║                                                    ──────────────────────────╢| 1Bx27 70x26 03x2 1Bx25
-|║                                      ║║                                      ║| 1Bx29 03x26 1Bx25
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 21: Esc
-cursor 8 23 lines 6 7 mode 3
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex13 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
-|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                             ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║╟──────────────────────────────────────╢| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 22: Down Down Enter
-cursor 14 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├─ DOCS2                         ◄║║  32,717,824 bytes free on drive C:   ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                             ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├──D2                            ◄║║  32,717,312 bytes free on drive C:   ║| 1Bx8 1Ex12 1Bx18 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
+|║    ├──X2                             ║║                                      ║| 1Bx80
+|║    └─ D                                                                      ║| 1Bx7 30x14 1Bx1 4Fx36 1Bx22
+|║    └─ D                              ║║                                      ║| 1Bx7 30x14 1Bx59
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
@@ -639,139 +751,27 @@ cursor 14 23 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS2                         ║║                                      ║| 1Bx80
+|║C:\WORK2\D                            ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\DOCS2>                                                                  | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 23: Up Up
-cursor 14 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║    ├─ DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                         ◄║║  32,717,824 bytes free on drive C:   ║| 1Bx8 1Ex13 1Bx17 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                             ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║╟──────────────────────────────────────╢| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\DOCS2>                                                                  | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 24: F6
-cursor 32 8 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║    ├─ DOCS                                          in drive C: is WORK      ║| 1Bx7 30x14 1Bx6 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                  ╔═════ Rename ═════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
-|║    ├──DOCS2                 ║ Rename "DOCS" to ║    bytes free on drive C:   ║| 1Bx8 1Ex12 1Bx7 70x26 03x2 1Bx19 1Ex2 1Bx4
-|║    └──X2                    ║ DOCS             ║                             ║| 1Bx27 70x5 30x12 70x9 03x2 1Bx25
-|║                             ╚══════════════════╝                             ║| 1Bx27 70x26 03x2 1Bx25
-|║                                                    ──────────────────────────╢| 1Bx27 70x26 03x2 1Bx25
-|║                                      ║║                                      ║| 1Bx29 03x26 1Bx25
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\DOCS2>                                                                  | 07x80
+|C:\WORK2\D2>                                                                    | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 25: "x" Enter
-cursor 11 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └──WORK                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║    ├──X                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └─ X2                            ◄║║                                      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║╟──────────────────────────────────────╢| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK\X2                            ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\X2>                                                                     | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 26: Home Down Down Down
-cursor 11 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └─ WORK                              ║║          ####### Bytes Free          ║| 1Bx4 30x14 1Bx33 1Ex7 1Bx22
-|║    ├──X                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └──X2                            ◄║║                                      ║| 1Bx8 1Ex13 1Bx17 1Ex1 1Bx41
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║╟──────────────────────────────────────╢| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
-|╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK                               ║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\X2>                                                                     | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 27: F6
-cursor 32 8 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
+cursor 33 8 lines 6 7 mode 3
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ └─ WORK                              ║║          ####### Bytes Free          ║| 1Bx4 30x14 1Bx33 1Ex7 1Bx22
-|║    ├──X                                             in drive C: is WORK      ║| 1Bx27 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                  ╔═════ Rename ═════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
-|║    ├──DOCS2                 ║ Rename "WORK" to ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
-|║    └──X2                    ║ WORK             ║                             ║| 1Bx8 1Ex12 1Bx7 70x5 30x12 70x9 03x2 1Bx25
-|║                             ╚══════════════════╝                             ║| 1Bx27 70x26 03x2 1Bx25
-|║                                                    ──────────────────────────╢| 1Bx27 70x26 03x2 1Bx25
-|║                                      ║║                                      ║| 1Bx29 03x26 1Bx25
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──DOCS                                       me in drive C: is WORK      ║| 1Bx28 70x23 1Bx12 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                    ╔════ Rename ═══╗   92 total bytes on drive C:  ║| 1Bx28 70x23 06x2 1Bx22 1Ex2 1Bx3
+|║    ├──D2                     ║ Rename "D" to ║   12 bytes free on drive C:   ║| 1Bx8 1Ex12 1Bx8 70x23 06x2 1Bx21 1Ex2 1Bx4
+|║    ├──X2                     ║ D             ║                               ║| 1Bx28 70x5 30x12 70x6 03x2 1Bx27
+|║    └─ D                      ╚═══════════════╝                               ║| 1Bx7 30x14 1Bx7 70x23 03x2 1Bx27
+|║                                                  ────────────────────────────╢| 1Bx28 70x23 03x2 1Bx27
+|║                                      ║║                                      ║| 1Bx30 03x23 1Bx27
 |║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -779,25 +779,81 @@ cursor 32 8 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║                                      ║| 1Bx80
-|║C:\WORK                               ║║                                      ║| 1Bx80
+|║C:\WORK2\D                            ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\X2>                                                                     | 07x80
+|C:\WORK2\D2>                                                                    | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 28: "work2" Enter
+== 28: Esc
+cursor 12 23 lines 6 7 mode 3
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├──D2                            ◄║║  32,717,312 bytes free on drive C:   ║| 1Bx8 1Ex12 1Bx18 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
+|║    ├──X2                             ║║                                      ║| 1Bx80
+|║    └─ D                              ║║                                      ║| 1Bx7 30x14 1Bx59
+|║                                      ║╟──────────────────────────────────────╢| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\D                            ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2\D2>                                                                    | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 29: F6
+cursor 33 8 lines 6 7 mode 3
+|║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──DOCS                                       me in drive C: is WORK      ║| 1Bx28 70x23 1Bx12 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                    ╔════ Rename ═══╗   92 total bytes on drive C:  ║| 1Bx28 70x23 06x2 1Bx22 1Ex2 1Bx3
+|║    ├──D2                     ║ Rename "D" to ║   12 bytes free on drive C:   ║| 1Bx8 1Ex12 1Bx8 70x23 06x2 1Bx21 1Ex2 1Bx4
+|║    ├──X2                     ║ D             ║                               ║| 1Bx28 70x5 30x12 70x6 03x2 1Bx27
+|║    └─ D                      ╚═══════════════╝                               ║| 1Bx7 30x14 1Bx7 70x23 03x2 1Bx27
+|║                                                  ────────────────────────────╢| 1Bx28 70x23 03x2 1Bx27
+|║                                      ║║                                      ║| 1Bx30 03x23 1Bx27
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|║                                      ║║                                      ║| 1Bx80
+|╟──────────────────────────────────────╢║                                      ║| 1Bx80
+|║C:\WORK2\D                            ║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK2\D2>                                                                    | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 30: "x" Enter
 cursor 12 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║ └──WORK2                             ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║    ├──X                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    ├──SRC1                           ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    ├──DOCS2                          ║║  32,717,824 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║    └─ X2                            ◄║║                                      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
-|║                                      ║║                                      ║| 1Bx80
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    ├──D2                             ║║  32,717,312 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║    ├─ X2                            ◄║║                                      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
+|║    └──X                              ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
@@ -824,17 +880,18 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  139 bytes  647a83ffd4c24550
+C:\TREEINFO.NCD  A   during the run  155 bytes  9f8494ff3a151804
 C:\WORK2  D   2000-06-16 12:00:00
+C:\WORK2\D2  D   during the run
 C:\WORK2\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
-C:\WORK2\DOCS2  D   during the run
+C:\WORK2\DOCS  D   2000-06-16 12:00:00
 C:\WORK2\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
 C:\WORK2\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
 C:\WORK2\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
 C:\WORK2\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
 C:\WORK2\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
-C:\WORK2\SRC1  D   2000-06-16 12:00:00
-C:\WORK2\X  D   2000-06-16 12:00:00
+C:\WORK2\SRC  D   2000-06-16 12:00:00
+C:\WORK2\X  D   during the run
 C:\WORK2\X2  D   during the run
 D:\VC  D   2000-06-16 12:00:00
 D:\VC\<program>  the program under test

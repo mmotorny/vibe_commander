@@ -5355,6 +5355,14 @@ SCENARIOS = {
     "copy-tree": Scenario(
         "A directory of a tree panel copied and renamed, and the "
         "current directory of DOS taken along",
+        # A directory that is renamed is the last of its parent's, and
+        # WORK is renamed before anything is made in it: the tree lists
+        # a directory in the order of the disk, where DOS keeps a
+        # renamed entry in its place, and the program for Linux, whose
+        # emulation of DOS keeps a directory's names in the order in
+        # which it met them, puts the new name at the end and lists the
+        # renamed directory's own entries anew by their names. So the
+        # tree shows the same on both.
         steps=(
             "F9 o c",
             "Tab Tab Tab Space Enter",    # Auto change directory off
@@ -5367,26 +5375,30 @@ SCENARIOS = {
             "F6",                         # nor renamed
             "Down Down Down Down",        # DOCS, behind STAMPS, SUB and
                                           # WORK
+            "Enter",                      # the current directory
+            "Up",                         # WORK, the last of the root
+            "F6",
+            '"work2" Enter',              # renamed; the current one
+                                          # follows, and the cursor goes
+                                          # to it
+            "Up Enter",                   # WORK2 the current one
+            "Down",                       # DOCS
             "F5",
-            '"docs2" Enter',              # copied with what is in it
+            '"d2" Enter',                 # copied with what is in it
             "Down",                       # SRC
             "F5",                         # offers the last target
             '"x2" Enter',
-            "F6",
-            '"src1" Enter',               # renamed; the cursor goes to
-            "Down",                       # the current directory: DOCS
-            "F6",
+            "F5",
+            '"d" Enter',                  # D, the last of WORK2
+            "Down Enter",                 # D2 is the current directory
+            "End",                        # D, whose path that of D2
+            "F6",                         # begins with
             '"a\\b" Enter',               # a path is no name
             "Enter",
             "F6",
             "Esc",
-            "Down Down Enter",            # DOCS2 is the current directory
-            "Up Up",                      # DOCS, whose path that of DOCS2
-            "F6",                         # begins with
-            '"x" Enter',                  # the current one is X2 now
-            "Home Down Down Down",        # WORK, behind STAMPS and SUB
             "F6",
-            '"work2" Enter',              # the current one follows
+            '"x" Enter',                  # the current one is X2 now
         )),
 
     "copy-dirs": Scenario(

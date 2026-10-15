@@ -1533,11 +1533,6 @@ LINUX_CUT = {
                      "Linux has not"),
     "panel-keys": (46, "masks, the panels off and on, and commands: at "
                        "step 46 D:, which Linux has not"),
-    "copy-tree": (15, "a directory of the tree renamed: at step 15 SRC "
-                      "made SRC1, which keeps its place in the directory "
-                      "on DOS and goes to its end in the program for "
-                      "Linux, whose emulation of DOS keeps a directory's "
-                      "names in the order in which it first met each"),
     "stamps": (18, "the time stamps of files: at step 18 the file "
                    "search through C:, which lists a directory as it "
                    "stands on the disk, where the bench has made the "

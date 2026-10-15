@@ -682,10 +682,21 @@ L7, are in `DIARY.md`. What they left:
   stands (`src/portable_c/DEVIATIONS.md`, L9). The mouse's wheel does
   nothing, as the original's driver has none; a turn could be Up and
   Down, or scroll the list under the pointer (L11).
-- **A renamed directory.** `copy-tree` is cut at step 15 on Linux: a
-  directory renamed keeps its place in its directory on DOS and goes to
-  the end in the emulation's table (`names_posix.c`, `Add`). Keeping the
-  place there would lift the cut, a change of the program for Linux.
+- **A renamed directory.** A directory renamed keeps its place in its
+  directory on DOS and goes to the end in the emulation's table
+  (`names_posix.c`, `Add`), and a directory renamed has its own entries
+  listed anew by their names' bytes, the host's path being another.
+  `copy-tree` is run whole on Linux since 15 October 2026, on the
+  user's word: it renames only the last directory of a parent, D made
+  X behind D2 and X2, and WORK before anything is made in it. Its new
+  steps run every byte of the original that the old ones ran, and End
+  in the tree besides; `F36_01`, the box for a path where a name is
+  asked, and `F36_05`, DOS's current directory following a rename, are
+  run by it alone. A directory renamed to the beginning of a sibling's
+  name cannot be both the last on the disk and the last by name.
+  DOS refuses to rename its current directory, and the original then
+  moves it file by file, which fails; Linux renames it, declared on
+  the user's word as L13 of `DEVIATIONS.md`, with no scenario.
   `stamps` is cut at 18, the file search, where the bench has SUB in
   front of STAMPS's files and Linux behind them.
 - **Commands of DOS's.** `del`, `rd`, `cls`, `attrib` and `time` are

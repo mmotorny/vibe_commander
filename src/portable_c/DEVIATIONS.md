@@ -2890,13 +2890,34 @@ their names' bytes. The panels are sorted by name on both (entry 29).
 **Why.** The user decided on 15 October 2026 that the bench makes its
 directories and files in the order of their names (`CLAUDE.md`,
 "Scenarios"), so that the disk's order is the names' on DOS too; what
-still differs, where a scenario renames a directory or the file search
-meets the bench's directories in front of its files, is cut, each with
-its reason in `LINUX_CUT` of `harness/deviations.py`.
+still differs, a renamed directory, which DOS keeps in its place and
+Linux puts at the end, and the file search, which meets the bench's
+directories in front of its files, is cut or kept out of the steps,
+each with its reason in `LINUX_CUT` of `harness/deviations.py`.
 
 **Which scenarios show it.** `tree` is not run on Linux. Cut at the
 first screen where the order shows: `command-line`, `stamps`, `menu`,
 `menu-items`, `tree-deep`, `tree-box`, `tree-choose`, `delete`,
-`make-directory`, `dialog-keys`, `copy-ask`, `copy-tree`,
-`mouse-dialog`, `mouse-tree`, `mouse-find`, `cursor` and `panel-keys`,
-each at the step that `harness/deviations.py` has.
+`make-directory`, `dialog-keys`, `copy-ask`, `mouse-dialog`,
+`mouse-tree`, `mouse-find`, `cursor` and `panel-keys`, each at the step
+that `harness/deviations.py` has. `copy-tree`, which renames
+directories in the tree, renames only the last of a parent's and WORK
+before anything is made in it, so that the order is the same on both,
+and is run whole.
+
+### L13. The current directory may be renamed
+
+**What the original does.** DOS refuses to rename the directory that
+is its current one. The original then takes the rename for a move and
+moves what is in the directory file by file, which fails with a box
+of its errors, "Can't create" on the bench, and the directory stays as
+it was.
+
+**What the program for Linux does.** It renames the directory, as the
+host renames it, and DOS's current directory follows it.
+
+**Why.** The user's decision of 15 October 2026: the host has no such
+refusal, and the emulation does not make one up.
+
+**Which scenarios show it.** None. `copy-tree` renames WORK while the
+current directory is a directory inside it, which DOS allows.
