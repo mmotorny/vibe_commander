@@ -208,7 +208,12 @@ These held while `src/c/` was made, and they say what it is.
      it draws in the terminal is held to that grid by replaying it
      through pyte, a terminal emulator in Python, pinned, which is
      the download that this allows; a setting gives a test the clock
-     to start from.
+     to start from. Once the stub compiles on Linux, on the user's
+     word of 14 October 2026, every build with clang has the
+     sanitizers that fit it, a high level of warnings and clang-tidy,
+     and a warning of any of them stops the build; which warnings and
+     which checks of clang-tidy is recommended to the user from what
+     popular projects of open source use, and the user decides.
   7. iOS, when Linux is done. Windows and macOS are not targets for now,
      on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
