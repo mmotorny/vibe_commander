@@ -227,20 +227,21 @@ stcolor.c, StCol00: index
     ColAddr answers with a place in ColTab: IN_TABLE of screen.c adds to
     md.ColTab and takes nothing away.
 
-sthelp.c, StHelp: back
-    | entry = (struct StHlpData *)(buffer + (at - HELPBUF));
-    at begins two behind HELPBUF and goes up: the loop is left where the
-    next would have wrapped round.
-
-sthelp.c, StHelp: divide
+sthelp.c, StHelp22: divide
     | third = ((size >> 8) - 9) / 3;
-    size has the rows of the screen less 3, at the top of the function,
-    of a screen of 25 to 50 lines: what is divided is 13 to 38.
+    size has the rows of the screen less 3, as StHelp makes it and
+    hands it on, of a screen of 25 to 50 lines: what is divided is 13
+    to 38.
 
-sthelp.c, StHelp: widen
+sthelp.c, StHelp22: widen
     | if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
     Cut to a byte; third is 4 to 12, a third of the box's rows less 9,
     and less than the rows less 5.
+
+sthelp.c, StPage: back
+    | entry = (struct StHlpData *)(buffer + (at - HELPBUF));
+    at begins two behind HELPBUF and goes up: the loop is left where the
+    next would have wrapped round.
 
 stmain.c, StMain00: widen
     | item = (key >> 8) - 0x3C;
