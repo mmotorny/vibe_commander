@@ -70,7 +70,7 @@ not plain behind a colon. The code has no name for any of them.
 cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32  its files
 N0              35          0     1              0      36     0     3     3    28  digits.c mask.c line.c mouse.c blank.c
 N1              81          0     2              0      77     6     5     4    45  string.c format.c box.c screen.c misc.c
-N2              79          0     0              0      68    11     0     3    29  dialog.c
+N2              89          0     0              0      76    13     0     4    33  dialog.c
 N3, N4          56          0    13              0      67     2     7    23    91  view.c
 N5              80          0     0              0      73     7     3     4    48  find.c
 N6 to N8        69          0     4              0      73     0    13    38   152  edit.c
@@ -91,7 +91,7 @@ N20             61          0     0              0      58     3     0     3    
 N21             60          0     3              0      46     7     0     5    34  stmain.c sthelp.c
 as a whole     647          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
 headers        329         94    15              0     201     5     0     0     0  vc.h sys.h tables.h
-all           2037         94   116              0    1213    66    62   194  1061
+all           2047         94   116              0    1221    68    62   195  1065
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               209          0    11              0     171     5     0     0     0
@@ -103,7 +103,7 @@ box.c               30          0     0              0      29     1     1     0
 cmdline.c           29          0     0              0      29     0     0     4    30
 commands.c          22          0     0              0      22     0     0     5    47
 copy.c              50          0     6              0      48     8     2     9    47
-dialog.c            79          0     0              0      68    11     0     3    29
+dialog.c            89          0     0              0      76    13     0     4    33
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           54          0     0              0      49     5     4     9    38
 drive.c             17          0     0              0      17     0     2     2    11
@@ -1539,6 +1539,13 @@ dialog.c, MnMn40: variable both, u16
 dialog.c, struct ButtonKey: field key, u16
     key
 
+dialog.c, MnMn16: parameter chosen, u16
+    The button chosen in the low byte and the key bar above it, as
+    MnMn11 has them: see its `chosen`.
+
+dialog.c, MnMn16: parameter key, u16
+    key
+
 dialog.c, MnMn11: parameter key, u16
     key
 
@@ -1624,6 +1631,9 @@ dialog.c, struct Ticked: field value, u16
     not: a value that is not changed goes back as it came, whatever it
     is, so it is no bool.
 
+dialog.c, InSt08: parameter key, u16
+    key
+
 dialog.c, InpStr: parameter place, u16
     place
 
@@ -1641,6 +1651,9 @@ dialog.c, InpStr: variable low, u16
 
 dialog.c, InpStr: variable mouse, u16
     place
+
+dialog.c, Slct13: parameter key, u16
+    key
 
 dialog.c, Select: parameter lines, u16
     bits: the line chosen in the low byte and that of the cursor in
@@ -1680,6 +1693,24 @@ dialog.c, Dial18: parameter place, u16
 
 dialog.c, Dial18: returns, u16
     place
+
+dialog.c, Dial70: returns, u16
+    key: the answer of the dialog, a button in the low byte.
+
+dialog.c, Dial82: parameter begin, u16
+    place
+
+dialog.c, Dial82: parameter size, u16
+    place
+
+dialog.c, Dial82: returns, u16
+    The answer of Dialog, which it returns: see Dialog.
+
+dialog.c, Dial82: parameter key, u16
+    key: the answer that Dialog returns.
+
+dialog.c, Dial82: parameter shape, u16
+    system: the shape of the cursor, as ChgCur answers it.
 
 dialog.c, Dialog: parameter begin, u16
     place

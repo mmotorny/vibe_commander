@@ -321,24 +321,50 @@ u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, const u8 *table)
     return both;
 }
 
+struct ButtonKey {
+    u16 key;
+    bool taken;                         /* the buttons have dealt with the
+                                           key */
+};
+
+/* MnMn16 and MnMn23, where MnMn11 ends: `chosen` goes to `*state`, and
+   `key` is returned with whether the buttons have dealt with it, which
+   is MnMn16, or not, MnMn23. */
+static struct ButtonKey MnMn16(u16 *state, u16 chosen, u16 key, bool taken)
+{
+    struct ButtonKey pressed;
+
+    *state = chosen;
+    pressed.key = key;
+    pressed.taken = taken;
+    return pressed;
+}
+
+/* MnMn12: the button of `table` that the column `column` of the buttons
+   is on, or 0 where it is on none. */
+static const u8 *MnMn12(const u8 *table, i32 column)
+{
+    const u8 *button;
+
+    for (button = table; ; button += 2) {
+        if (button[0] == 0 || column < button[1])
+            return 0;
+        if (column < (u8)(button[1] + button[0]))
+            return button;
+    }
+}
+
 /* Have the buttons at `table`, which begin at `place`, take a key.
    `*state` is the button chosen, and in its high byte the key bar, with
    80h for buttons that are a field of a dialog: there Home and End go to
    the first and the last field. Returns the key, which is Enter for the
    letter of a button and for a click on the button chosen, and whether
    the buttons have dealt with it: the carry flag of the assembly. */
-struct ButtonKey {
-    u16 key;
-    bool taken;                         /* the buttons have dealt with the
-                                           key */
-};
 static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
                                const u8 *table)
 {
-    struct ButtonKey pressed;
     const u8 *button;
     u16 chosen = *state;
-    bool taken = true;
     i32 count, column;
     u16 low, buttons, mouse, look, now, begin, size;
     const u16 *screen;
@@ -351,24 +377,21 @@ static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
             mouse = pointer.place;
             key = KEY_MOUSE << 8 | buttons;
             if (buttons == 0)
-                goto MnMn16;
+                return MnMn16(state, chosen, key, true);
             if (buttons != 1)
-                goto MnMn23;
+                return MnMn16(state, chosen, key, false);
             if (InWind(mouse, place, MnMn60(table)))
-                goto MnMn23;
+                return MnMn16(state, chosen, key, false);
             column = mouse - place & 0xFF;
-            for (button = table; ; button += 2) {
-                if (button[0] == 0 || column < button[1])
-                    break;
-                if (column < (u8)(button[1] + button[0]))
-                    goto MnMn13;
-            }
+            button = MnMn12(table, column);
+            if (button != 0)
+                break;
         }
-MnMn13:
+        /* MnMn13 */
         key = (u16)((button - table) >> 1);
         if ((key & 0xFF) != (chosen & 0xFF)) {
             chosen = (chosen & 0xFF00) | (key & 0xFF);
-            goto MnMn16;
+            return MnMn16(state, chosen, key, true);
         }
         /* The button chosen: pressed, if the mouse is let go on it. */
         begin = ADD_LOW(place, button[1]);
@@ -387,9 +410,8 @@ MnMn13:
         TypMous(0);
         key = 0;
         if (look == 0)
-            goto MnMn16;
-        key = KEY_ENTER;
-        goto MnMn23;
+            return MnMn16(state, chosen, key, true);
+        return MnMn16(state, chosen, KEY_ENTER, false);
     }
 
     if (key >> 8 != 0) {                /* Case takes none without a scan code */
@@ -400,21 +422,21 @@ MnMn13:
             else
                 while (!MnMn50(table, chosen))
                     chosen++;
-            goto MnMn16;
+            return MnMn16(state, chosen, key, true);
         }
         if (key == 0x4D00 || low == ' ') {          /* Right, Space */
             if (MnMn50(table, chosen))
                 chosen &= 0xFF00;
             else
                 chosen++;
-            goto MnMn16;
+            return MnMn16(state, chosen, key, true);
         }
         if (key == 0x4700) {                        /* Home */
             if (chosen & 0x8000) {
                 key = 0x4900;
                 chosen &= 0xFF00;
             }
-            goto MnMn23;
+            return MnMn16(state, chosen, key, false);
         }
         if (key == 0x4F00) {                        /* End */
             if (chosen & 0x8000) {
@@ -422,34 +444,29 @@ MnMn13:
                 while (!MnMn50(table, chosen))
                     chosen++;
             }
-            goto MnMn23;
+            return MnMn16(state, chosen, key, false);
         }
     }
     key = UpCase(key);
     low = key & 0xFF;
     if (low < 'A' || low > 'Z')
-        goto MnMn23;
+        return MnMn16(state, chosen, key, false);
     /* The button that has this capital in it. */
-    for (button = table; ; button += 2) {
+    for (button = table; ; button += 2) {           /* MnMn20 */
         if (button[0] == 0)
-            goto MnMn16;
+            return MnMn16(state, chosen, key, true);
         screen = BasAdr(ADD_LOW(place, button[1]));
         count = button[0];
         do
             if ((u8)*screen++ == low)
-                goto MnMn22;
+                break;
         while (--count);
+        if (count != 0)                 /* found before the count ran out */
+            break;
     }
-MnMn22:
+    /* MnMn22 */
     chosen = (u16)((button - table) >> 1);
-    key = KEY_ENTER;
-MnMn23:
-    taken = false;
-MnMn16:
-    *state = chosen;
-    pressed.key = key;
-    pressed.taken = taken;
-    return pressed;
+    return MnMn16(state, chosen, KEY_ENTER, false);
 }
 
 /* MnMn10, for a menu that is not MinMnu's: see MnMn11. `item` is what
@@ -521,6 +538,16 @@ struct Ticked {
     u16 value;                          /* not 0 if the box is ticked */
 };
 
+/* InSt08, where InpStr ends: returns `key` and the column `cursor`. */
+static struct Typed InSt08(u16 key, i32 cursor)
+{
+    struct Typed typed;
+
+    typed.key = key;
+    typed.cursor = cursor;
+    return typed;
+}
+
 /* A line to type into: `text`, in the main data, of `length` characters
    at the most, at `place`, in the colour with the number `color`, the
    cursor in the column `cursor`. Takes keys until one is not for the
@@ -528,7 +555,6 @@ struct Ticked {
 static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
                            u16 color, i32 bar)
 {
-    struct Typed typed;
     u16 key, low, buttons, mouse;
     i32 column, end, count;
     const u8 *from;
@@ -550,9 +576,9 @@ static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
                     break;
                 ClrKbd();
                 if (buttons != 1)
-                    goto InSt08;
+                    return InSt08(key, cursor);
                 if (InWind(mouse, place, 0x100 | (length & 0xFF)))
-                    goto InSt08;
+                    return InSt08(key, cursor);
                 text[-1] = 1;
                 column = mouse - place;
                 /* No further than the text goes, or one short of that
@@ -575,9 +601,11 @@ static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
         if (md.Quote == 0 && key >> 8 != 0) {
             low = key & 0xFF;
             if (low == 9 || low == 0x0D || low == 0x1B)
-                goto InSt08;
-            if (low == 0x11)            /* Ctrl-Q */
-                goto InSt04;
+                return InSt08(key, cursor);
+            if (low == 0x11) {          /* Ctrl-Q: InSt04, the line below */
+                cursor = EdLin(key, text, cursor, length).cursor;
+                continue;
+            }
             switch (key) {
             case 0x0F00:                /* Shift-Tab */
             case 0x4800:                /* Up */
@@ -586,10 +614,10 @@ static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
             case 0x5100:                /* PgDn */
             case 0x4400:                /* F10 */
             case 0x7100:                /* Alt-F10 */
-                goto InSt08;
+                return InSt08(key, cursor);
             case 0x4B00:                /* Left */
                 if (cursor == 0)
-                    goto InSt08;
+                    return InSt08(key, cursor);
             }
         }
         if (text[-1] == 0) {            /* InSt02 */
@@ -600,13 +628,20 @@ static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
                 || !(low < ' ' || low == 0x7F))
                 text[0] = 0;
         }
-InSt04:
+        /* InSt04 */
         cursor = EdLin(key, text, cursor, length).cursor;
     }
-InSt08:
-    typed.key = key;
-    typed.cursor = cursor;
-    return typed;
+}
+
+/* Slct13, where Select ends: returns `key`, and the line chosen with
+   the line of the cursor in the high byte. */
+static struct Chosen Slct13(u16 key, i32 cursor, i32 chosen)
+{
+    struct Chosen answer;
+
+    answer.key = key;
+    answer.lines = (u16)(cursor << 8 | chosen);
+    return answer;
 }
 
 /* A group of `total` lines at `place`, of which one is chosen: `lines`
@@ -615,104 +650,109 @@ InSt08:
    as they are then. */
 static struct Chosen Select(u16 place, i32 bar, i32 total, u16 lines)
 {
-    struct Chosen answer;
     i32 chosen = lines & 0xFF;
     i32 cursor = lines >> 8;
     u16 key = 0;
     u16 low, buttons, mouse;
     i32 row;
+    bool choose;                        /* the line of the cursor is to be
+                                           chosen: Slct07 */
     struct Mouse pointer;
 
     /* The lines of the group are rows of the screen, and their count and
        the bar are each a byte, as the field has them. */
-Slct01:
-    Cursor((u16)(place + (cursor << 8)));
-    if ((key & 0xFF) != 0)              /* until the mouse is let go */
-        while (GetMous(0).buttons != 0)
-            ;
-Slct03:
-    key = Input(bar);
-    if (key >> 8 == KEY_MOUSE) {
-        for (;;) {                      /* Slct04 */
-            pointer = GetMous(0);
-            buttons = pointer.buttons;
-            mouse = pointer.place;
-            key = KEY_MOUSE << 8 | buttons;
-            if (buttons == 0)
-                goto Slct03;
-            ClrKbd();
-            if (buttons != 1)
-                goto Slct13;
-            if (InWind(mouse, place - 1,
-                       (u16)(total << 8 | Slct20(place - 1))))
-                goto Slct13;
-            row = (mouse >> 8) - (place >> 8) & 0xFF;
-            key = (u16)(row << 8 | (mouse & 0xFF));
-            if (row == cursor)
+    for (;;) {                          /* Slct01 */
+        Cursor((u16)(place + (cursor << 8)));
+        if ((key & 0xFF) != 0)          /* until the mouse is let go */
+            while (GetMous(0).buttons != 0)
+                ;
+        choose = true;
+        for (;;) {                      /* Slct03 */
+            key = Input(bar);
+            if (key >> 8 == KEY_MOUSE) {
+                for (;;) {              /* Slct04 */
+                    pointer = GetMous(0);
+                    buttons = pointer.buttons;
+                    mouse = pointer.place;
+                    key = KEY_MOUSE << 8 | buttons;
+                    if (buttons == 0)
+                        break;
+                    ClrKbd();
+                    if (buttons != 1)
+                        return Slct13(key, cursor, chosen);
+                    if (InWind(mouse, place - 1,
+                               (u16)(total << 8 | Slct20(place - 1))))
+                        return Slct13(key, cursor, chosen);
+                    row = (mouse >> 8) - (place >> 8) & 0xFF;
+                    key = (u16)(row << 8 | (mouse & 0xFF));
+                    if (row != cursor) {
+                        cursor = row;
+                        break;
+                    }
+                }
+                if (buttons == 0)       /* let go: the next key */
+                    continue;
+                break;                  /* on another line: chosen */
+            }
+            /* Case takes none without a scan code. */
+            if (key >> 8 == 0)
                 continue;
-            cursor = row;
-            goto Slct07;
-        }
-    }
-    if (key >> 8 == 0)                  /* Case takes none without a scan code */
-        goto Slct03;
-    low = key & 0xFF;
-    if (low == ' ') {
-        if (cursor == chosen) {         /* on the one chosen: the next */
-            cursor = cursor + 1 & 0xFF;
-            if (cursor >= total)
+            low = key & 0xFF;
+            if (low == ' ') {
+                if (cursor == chosen) { /* on the one chosen: the next */
+                    cursor = cursor + 1 & 0xFF;
+                    if (cursor >= total)
+                        cursor = 0;
+                }
+                break;
+            }
+            if (low == 9 || low == 0x1B)
+                return Slct13(key, cursor, chosen);
+            if (low == 0x0D) {
+                if (cursor != chosen)
+                    break;
+                return Slct13(key, cursor, chosen);
+            }
+            switch (key) {
+            case 0x0F00:                /* Shift-Tab */
+            case 0x4B00:                /* Left */
+            case 0x4D00:                /* Right */
+            case 0x4400:                /* F10 */
+                return Slct13(key, cursor, chosen);
+            case 0x4800:                /* Up */
+                if (cursor == 0)
+                    return Slct13(key, cursor, chosen);
+                cursor--;
+                break;
+            case 0x5000:                /* Down */
+                cursor = cursor + 1 & 0xFF;
+                if (cursor < total)
+                    break;
+                /* past the last line */
+                FALLTHROUGH;
+            case 0x4F00:                /* End */
+            case 0x5100:                /* PgDn */
+                cursor = total - 1 & 0xFF;
+                return Slct13(key, cursor, chosen);
+            case 0x4700:                /* Home */
+            case 0x4900:                /* PgUp */
                 cursor = 0;
+                return Slct13(key, cursor, chosen);
+            default:
+                continue;
+            }
+            choose = false;             /* Up and Down: to Slct01 */
+            break;
         }
-        goto Slct07;
+        if (choose) {                   /* Slct07: the line of the cursor */
+            *(u8 *)BasAdr((u16)(place + (chosen << 8))) = ' ';
+            Window((u16)(place + (chosen << 8)), 0x101);
+            *(u8 *)BasAdr((u16)(place + (cursor << 8))) = BULLET;
+            Window((u16)(place + (cursor << 8)), 0x101);
+            chosen = cursor;
+            key = (u16)(cursor << 8 | (key & 0xFF));
+        }
     }
-    if (low == 9 || low == 0x1B)
-        goto Slct13;
-    if (low == 0x0D) {
-        if (cursor != chosen)
-            goto Slct07;
-        goto Slct13;
-    }
-    switch (key) {
-    case 0x0F00:                        /* Shift-Tab */
-    case 0x4B00:                        /* Left */
-    case 0x4D00:                        /* Right */
-    case 0x4400:                        /* F10 */
-        goto Slct13;
-    case 0x4800:                        /* Up */
-        if (cursor == 0)
-            goto Slct13;
-        cursor--;
-        goto Slct01;
-    case 0x5000:                        /* Down */
-        cursor = cursor + 1 & 0xFF;
-        if (cursor < total)
-            goto Slct01;
-        /* past the last line */
-        FALLTHROUGH;
-    case 0x4F00:                        /* End */
-    case 0x5100:                        /* PgDn */
-        cursor = total - 1 & 0xFF;
-        goto Slct13;
-    case 0x4700:                        /* Home */
-    case 0x4900:                        /* PgUp */
-        cursor = 0;
-        goto Slct13;
-    }
-    goto Slct03;
-
-Slct07:                                 /* choose the line of the cursor */
-    *(u8 *)BasAdr((u16)(place + (chosen << 8))) = ' ';
-    Window((u16)(place + (chosen << 8)), 0x101);
-    *(u8 *)BasAdr((u16)(place + (cursor << 8))) = BULLET;
-    Window((u16)(place + (cursor << 8)), 0x101);
-    chosen = cursor;
-    key = (u16)(cursor << 8 | (key & 0xFF));
-    goto Slct01;
-
-Slct13:
-    answer.key = key;
-    answer.lines = (u16)(cursor << 8 | chosen);
-    return answer;
 }
 
 /* A box to tick at `place`, which is ticked if `value` is not 0. Space
@@ -781,6 +821,31 @@ static const struct BOXMN *Dial85(const struct BOXMN *field)
         field++;
     while (field->mType != 0);
     return field - 1;
+}
+
+/* Dial70, Enter: the answer of the dialog, 0, or the button chosen
+   where the cursor is on buttons. */
+static u16 Dial70(const struct BOXMN *cursor)
+{
+    if (cursor->mType == FIELD_BUTTONS)
+        return MD(cursor->mPoint);
+    return 0;
+}
+
+/* Dial82, where Dialog ends: the box of the dialog `head`, at `begin`
+   and of `size`, is taken off the screen again where the dialog put it
+   there, `where`, the cursor gets the shape `shape` back, and `key` is
+   returned. */
+static u16 Dial82(const struct BOXHD *head, u16 begin, u16 size,
+                  const struct Box *where, u16 shape, u16 key)
+{
+    HidCur();
+    if (!(head->bFlags & BOX_THERE)) {
+        ResWin(begin, size, where->saved);
+        Window(begin, size);
+    }
+    CurShp(shape);
+    return key;
 }
 
 /* A dialog: show the box of the dialog `head`, have its fields take
@@ -904,231 +969,236 @@ u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
         Beep();
 
     cursor = first;
-Dial31:                                 /* the field of the cursor has the keys */
-    field = cursor;
-    type = field->mType;
-    place = begin + field->mBase;
-    if (type == FIELD_INPUT) {
-        control = NUMBER_OF(field->mCtrl);
-        text = INPUT(control);
-        typed = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
-                       colors[1], head->bKeyBar);
-        *(u16 *)text = (u16)typed.cursor;   /* a byte's length at most */
-        key = typed.key;
-    } else if (type == FIELD_SELECT) {
-        chosen = Select(place, head->bKeyBar,
-                        NUMBER_OF(field->mCtrl) & 0xFF, MDW(field->mPoint));
-        MDW(field->mPoint) = chosen.lines;
-        key = chosen.key;
-    } else if (type == FIELD_FLIP) {
-        ticked = FlipFl(place, head->bKeyBar, MD(field->mPoint));
-        MD(field->mPoint) = (u8)ticked.value;
-        key = ticked.key;
-    } else if (type == FIELD_BUTTONS) {
-        menu = MinMnu(field->mCtrl, Dial18(place, begin & 0xFF),
-                      MnMn60(field->mCtrl), colors,
-                      head->bKeyBar | 0x80, MD(field->mPoint));
-        MD(field->mPoint) = (u8)menu.chosen;
-        key = menu.key;
-    } else
-        key = (u16)((begin & 0xFF) << 8 | type);    /* mType is a byte */
-    if (key >> 8 == KEY_MOUSE)
-        goto Dial40;
-    if (key >> 8 == 0)                  /* Case takes none without a scan code */
-        goto Dial31;
-    switch (key & 0xFF) {
-    case 9:                             /* Tab */
-        cursor++;
-        if (cursor->mType == 0)
-            cursor = first;
-        goto Dial31;
-    case 0x0D:
-        goto Dial70;
-    case 0x1B:
-        goto Dial81;
-    }
-    switch (key) {
-    case 0x0F00:                        /* Shift-Tab */
-        if (cursor > first)
-            cursor--;
-        else
-            cursor = Dial85(first);
-        goto Dial31;
-    case 0x4800:
-        link = field->mUp;
-        break;
-    case 0x5000:
-        link = field->mDown;
-        break;
-    case 0x4B00:
-        link = field->mLeft;
-        break;
-    case 0x4D00:
-        link = field->mRight;
-        break;
-    case 0x4700:                        /* Home */
-    case 0x4900:                        /* PgUp */
-        link = LINK_SET;
-        break;
-    case 0x4F00:                        /* End */
-        cursor = Dial85(cursor);
-        field = cursor;
-        if (field->mType == FIELD_BUTTONS)
-            MD(field->mPoint) = 0;
-        /* and as PgDn */
-        FALLTHROUGH;
-    case 0x5100:                        /* PgDn */
-        cursor = Dial85(cursor);
-        goto Dial31;
-    case 0x4400:                        /* F10 */
-        if (!(head->bFlags & BOX_TREE))
-            goto Dial81;
-        key = 0x101;
-        goto Dial71;
-    case 0x7100:                        /* Alt-F10 */
-        if (!(head->bFlags & BOX_TREE))
-            goto Dial31;
-        key = 1;
-        goto Dial71;
-    default:
-        goto Dial31;
-    }
-    /* To the field that the field of the cursor names for the key. */
-    cursor = first + (link & LINK_FIELD);
-    field = cursor;
-    if (field->mType == FIELD_SELECT && (link & LINK_SET)) {
-        line = 0;
-        if (link & LINK_LAST)
-            line = NUMBER_OF(field->mCtrl) - 1;
-        MD(field->mPoint + 1) = (u8)line;
-    }
-    goto Dial31;
-
-Dial40:                                 /* the mouse */
-    look = 0;
-    for (;;) {                          /* Dial41 */
-        pointer = GetMous(0);
-        buttons = pointer.buttons;
-        mouse = pointer.place;
-        if (buttons == 0)
-            break;
-        if (buttons != 1) {
-            now = 'x';
-            if (buttons == 2)
-                now = TICK;
-        } else if (InWind(mouse, begin, size - 0x102)) {
-            now = 0xFF;
-        } else {
-            /* The field that the mouse is on gets the keys. */
-            for (item = first; ; item++) {
-                field = item;
-                type = field->mType;
-                if (type == 0)
-                    break;
-                place = begin + field->mBase;
-                if (type == FIELD_INPUT) {
-                    window = 0x100 | (NUMBER_OF(field->mCtrl) & 0xFF);
-                } else if (type <= FIELD_FLIP) {
-                    window = (u16)((NUMBER_OF(field->mCtrl) & 0xFF) << 8
-                                   | Slct20(place));    /* a byte */
-                    if (type != FIELD_SELECT)
-                        window = 0x100 | (window & 0xFF);
-                } else {
-                    place = Dial18(place, begin & 0xFF);
-                    window = MnMn60(field->mCtrl);
+    for (;;) {
+        /* Dial31: the field of the cursor has the keys. */
+        for (;;) {
+            field = cursor;
+            type = field->mType;
+            place = begin + field->mBase;
+            if (type == FIELD_INPUT) {
+                control = NUMBER_OF(field->mCtrl);
+                text = INPUT(control);
+                typed = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
+                               colors[1], head->bKeyBar);
+                /* a byte's length at most */
+                *(u16 *)text = (u16)typed.cursor;
+                key = typed.key;
+            } else if (type == FIELD_SELECT) {
+                chosen = Select(place, head->bKeyBar,
+                                NUMBER_OF(field->mCtrl) & 0xFF,
+                                MDW(field->mPoint));
+                MDW(field->mPoint) = chosen.lines;
+                key = chosen.key;
+            } else if (type == FIELD_FLIP) {
+                ticked = FlipFl(place, head->bKeyBar, MD(field->mPoint));
+                MD(field->mPoint) = (u8)ticked.value;
+                key = ticked.key;
+            } else if (type == FIELD_BUTTONS) {
+                menu = MinMnu(field->mCtrl, Dial18(place, begin & 0xFF),
+                              MnMn60(field->mCtrl), colors,
+                              head->bKeyBar | 0x80, MD(field->mPoint));
+                MD(field->mPoint) = (u8)menu.chosen;
+                key = menu.key;
+            } else
+                /* mType is a byte */
+                key = (u16)((begin & 0xFF) << 8 | type);
+            if (key >> 8 == KEY_MOUSE) {
+                /* Dial40: the mouse */
+                look = 0;
+                for (;;) {              /* Dial41 */
+                    pointer = GetMous(0);
+                    buttons = pointer.buttons;
+                    mouse = pointer.place;
+                    if (buttons == 0)
+                        break;
+                    if (buttons != 1) {
+                        now = 'x';
+                        if (buttons == 2)
+                            now = TICK;
+                    } else if (InWind(mouse, begin, size - 0x102)) {
+                        now = 0xFF;
+                    } else {
+                        /* The field that the mouse is on gets the keys. */
+                        for (item = first; ; item++) {
+                            field = item;
+                            type = field->mType;
+                            if (type == 0)
+                                break;
+                            place = begin + field->mBase;
+                            if (type == FIELD_INPUT) {
+                                window = 0x100
+                                         | (NUMBER_OF(field->mCtrl) & 0xFF);
+                            } else if (type <= FIELD_FLIP) {
+                                /* Slct20 answers a byte */
+                                window = (u16)((NUMBER_OF(field->mCtrl) & 0xFF)
+                                               << 8 | Slct20(place));
+                                if (type != FIELD_SELECT)
+                                    window = 0x100 | (window & 0xFF);
+                            } else {
+                                place = Dial18(place, begin & 0xFF);
+                                window = MnMn60(field->mCtrl);
+                            }
+                            if (!InWind(mouse, place, window))
+                                break;
+                        }
+                        if (type != 0)  /* on the field `item`: Dial49 */
+                            break;
+                        now = 0;
+                    }
+                    if (now == look)
+                        continue;
+                    look = now;
+                    TypMous(now == 0xFF ? 0 : now);
                 }
-                if (!InWind(mouse, place, window))
-                    goto Dial49;
+                if (buttons != 0) {
+                    /* Dial49: buttons that the cursor leaves have none
+                       chosen any more. */
+                    field = cursor;
+                    if (field->mType == FIELD_BUTTONS)
+                        MnMn40((u16)(colors[0] << 8 | colors[2]),
+                               Dial18(begin + field->mBase, begin & 0xFF),
+                               MD(field->mPoint), MnMn60(field->mCtrl),
+                               field->mCtrl);
+                    cursor = item;
+                    continue;
+                }
+                key = 0;
+                TypMous(0);
+                if (look == TICK) {
+                    key = Dial70(cursor);
+                    break;
+                }
+                if (look == 'x' || look == 0xFF)
+                    return Dial82(head, begin, size, &where, shape,
+                                  key | 0xFF);
+                continue;
             }
-            now = 0;
+            /* Case takes none without a scan code. */
+            if (key >> 8 == 0)
+                continue;
+            if ((key & 0xFF) == 9) {    /* Tab */
+                cursor++;
+                if (cursor->mType == 0)
+                    cursor = first;
+                continue;
+            }
+            if ((key & 0xFF) == 0x0D) {
+                key = Dial70(cursor);
+                break;
+            }
+            if ((key & 0xFF) == 0x1B)
+                return Dial82(head, begin, size, &where, shape, key | 0xFF);
+            if (key == 0x4400) {        /* F10 */
+                if (!(head->bFlags & BOX_TREE))
+                    return Dial82(head, begin, size, &where, shape,
+                                  key | 0xFF);
+                key = 0x101;
+                break;
+            }
+            if (key == 0x7100) {        /* Alt-F10 */
+                if (!(head->bFlags & BOX_TREE))
+                    continue;
+                key = 1;
+                break;
+            }
+            switch (key) {
+            case 0x0F00:                /* Shift-Tab */
+                if (cursor > first)
+                    cursor--;
+                else
+                    cursor = Dial85(first);
+                continue;
+            case 0x4800:
+                link = field->mUp;
+                break;
+            case 0x5000:
+                link = field->mDown;
+                break;
+            case 0x4B00:
+                link = field->mLeft;
+                break;
+            case 0x4D00:
+                link = field->mRight;
+                break;
+            case 0x4700:                /* Home */
+            case 0x4900:                /* PgUp */
+                link = LINK_SET;
+                break;
+            case 0x4F00:                /* End */
+                cursor = Dial85(cursor);
+                field = cursor;
+                if (field->mType == FIELD_BUTTONS)
+                    MD(field->mPoint) = 0;
+                /* and as PgDn */
+                FALLTHROUGH;
+            case 0x5100:                /* PgDn */
+                cursor = Dial85(cursor);
+                continue;
+            default:
+                continue;
+            }
+            /* To the field that the field of the cursor names for the
+               key. */
+            cursor = first + (link & LINK_FIELD);
+            field = cursor;
+            if (field->mType == FIELD_SELECT && (link & LINK_SET)) {
+                line = 0;
+                if (link & LINK_LAST)
+                    line = NUMBER_OF(field->mCtrl) - 1;
+                MD(field->mPoint + 1) = (u8)line;
+            }
         }
-        if (now == look)
-            continue;
-        look = now;
-        TypMous(now == 0xFF ? 0 : now);
-    }
-    key = 0;
-    TypMous(0);
-    if (look == TICK)
-        goto Dial70;
-    if (look == 'x' || look == 0xFF)
-        goto Dial81;
-    goto Dial31;
 
-Dial49:
-    /* Buttons that the cursor leaves have none chosen any more. */
-    field = cursor;
-    if (field->mType == FIELD_BUTTONS)
-        MnMn40((u16)(colors[0] << 8 | colors[2]),
-               Dial18(begin + field->mBase, begin & 0xFF),
-               MD(field->mPoint), MnMn60(field->mCtrl), field->mCtrl);
-    cursor = item;
-    goto Dial31;
-
-Dial70:                                 /* Enter */
-    field = cursor;
-    key = 0;
-    if (field->mType == FIELD_BUTTONS)
-        key = MD(field->mPoint);
-Dial71:
-    /* The routine that the dialog names. The assembly calls it by its
-       address, and each hands back the answer in AX and the carry flag
-       to go on with the dialog, in its own way. */
-    switch (head->SubFunc) {
-    case SUB_F38_10:
-        key = F38_10(key);
-        break;
-    case SUB_M30_60:
-        checked = M30_60(key);
-        key = checked.answer;
-        if (checked.refused != 0)
-            goto Dial31;
-        break;
-    case SUB_F35_60:
-        if (F35_61(key, begin + 0x200 + 0x305) != 0)
-            goto Dial31;
-        break;
-    case SUB_F35_61:
-        if (F35_61(key, begin + 0x305) != 0)
-            goto Dial31;
-        break;
-    case SUB_StF04_10:
-        checked = StF04_10(key);
-        key = checked.answer;
-        if (checked.refused != 0)
-            goto Dial31;
-        break;
-    }
-    if ((key & 0xFF) != 0)
-        goto Dial82;
-    /* What the fields hold goes to where the caller has it. */
-    for (item = first; ; item++) {
-        field = item;
-        type = field->mType;
-        if (type == 0)
+        /* Dial71: the routine that the dialog names, with the answer in
+           `key`. The assembly calls it by its address, and each hands
+           back the answer in AX and the carry flag to go on with the
+           dialog, in its own way. */
+        switch (head->SubFunc) {
+        case SUB_F38_10:
+            key = F38_10(key);
             break;
-        if (type == FIELD_INPUT) {
-            control = NUMBER_OF(field->mCtrl);
-            text = INPUT(control) + 3;
-            if (control & INPUT_NORMAL)
-                NormStr(text);
-            to = (u8 *)data + field->mPoint;
-            for (count = control & 0xFF; count != 0; count--)
-                *to++ = *text++;
-            *to = 0;
-        } else if (type == FIELD_FLIP)
-            *((u8 *)data + NUMBER_OF(field->mCtrl)) = MD(field->mPoint);
+        case SUB_M30_60:
+            checked = M30_60(key);
+            key = checked.answer;
+            if (checked.refused != 0)
+                continue;
+            break;
+        case SUB_F35_60:
+            if (F35_61(key, begin + 0x200 + 0x305) != 0)
+                continue;
+            break;
+        case SUB_F35_61:
+            if (F35_61(key, begin + 0x305) != 0)
+                continue;
+            break;
+        case SUB_StF04_10:
+            checked = StF04_10(key);
+            key = checked.answer;
+            if (checked.refused != 0)
+                continue;
+            break;
+        }
+        break;
     }
-    goto Dial82;
-
-Dial81:                                 /* Esc */
-    key |= 0xFF;
-Dial82:
-    HidCur();
-    if (!(head->bFlags & BOX_THERE)) {
-        ResWin(begin, size, where.saved);
-        Window(begin, size);
+    if ((key & 0xFF) == 0) {
+        /* What the fields hold goes to where the caller has it. */
+        for (item = first; ; item++) {
+            field = item;
+            type = field->mType;
+            if (type == 0)
+                break;
+            if (type == FIELD_INPUT) {
+                control = NUMBER_OF(field->mCtrl);
+                text = INPUT(control) + 3;
+                if (control & INPUT_NORMAL)
+                    NormStr(text);
+                to = (u8 *)data + field->mPoint;
+                for (count = control & 0xFF; count != 0; count--)
+                    *to++ = *text++;
+                *to = 0;
+            } else if (type == FIELD_FLIP)
+                *((u8 *)data + NUMBER_OF(field->mCtrl)) = MD(field->mPoint);
+        }
     }
-    CurShp(shape);
-    return key;
+    return Dial82(head, begin, size, &where, shape, key);
 }
