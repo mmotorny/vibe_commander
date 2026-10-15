@@ -590,9 +590,11 @@ each such cell is expected as the tree's. Fewer is a patch.
   about it where one can be. They are `LINUX_MASKS` of
   `harness/deviations.py` and the classes of `masked` there.
 - A scenario that rests on what only DOS has is not run on Linux, with its
-  reason (`LINUX_NOT_RUN`), and the steps that use DOS's names of devices
-  as devices are not run there (`LINUX_CUT`), each named by an entry of
-  "The program for Linux" in `DEVIATIONS.md`.
+  reason (`LINUX_NOT_RUN`); one that comes to such a thing part of the
+  way, a device's name used as a device, a drive or a command that Linux
+  lacks, an order of a directory that only DOS keeps, is cut there
+  (`LINUX_CUT`) or has those steps left out (`LINUX_LEFT_OUT_OF`), each
+  named by an entry of "The program for Linux" in `DEVIATIONS.md`.
 - A scenario that went to the original's directory, `D:\VC`, or to the
   diskette in A: only for files to work on works in a directory of the
   bench's laid out alike on every platform, its golden derived again from
