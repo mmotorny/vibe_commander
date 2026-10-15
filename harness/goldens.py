@@ -410,11 +410,14 @@ def cursor_of(line):
 def cells_of(line, codes):
     """The cells of the row that `line` is."""
     text, runs = line[1:1 + COLUMNS], line[COLUMNS + 3:].split()
-    attributes = [int(run[:2], 16) for run in runs
-                  for _ in range(int(run[3:]))]
-    cells = bytearray()
-    for char, attribute in zip(text, attributes, strict=True):
-        cells += bytes([codes[char], attribute])
+    attributes = b"".join(bytes([int(run[:2], 16)]) * int(run[3:])
+                          for run in runs)
+    if len(attributes) != len(text):
+        raise ValueError(f"{len(attributes)} colours for {len(text)} "
+                         "characters")
+    cells = bytearray(2 * len(text))
+    cells[0::2] = bytes(map(codes.__getitem__, text))
+    cells[1::2] = attributes
     return cells
 
 

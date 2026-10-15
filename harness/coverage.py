@@ -199,14 +199,22 @@ def executed(trace_path, contents, linked=None, others=()):
             runs[-1].append((address, code))
         else:
             runs.append([(address, code)])
+    # Where the bytes of a block are in the program, once for each that
+    # QEMU logged: most were logged many times, at one place or several.
+    where = {}
     for block in logged + runs:
         code = b"".join(code for _, code in block)
         if len(code) < MIN_BLOCK:
             continue
-        if any(code in other for other in others):
-            continue
-        offset = contents.find(code)
-        if offset >= 0 and contents.find(code, offset + 1) < 0:
+        offset = where.get(code)
+        if offset is None:
+            offset = -1
+            if not any(code in other for other in others):
+                found = contents.find(code)
+                if found >= 0 and contents.find(code, found + 1) < 0:
+                    offset = found
+            where[code] = offset
+        if offset >= 0:
             # A long stretch counts for as many blocks as it could be.
             votes[block[0][0] - offset] += len(code) // MIN_BLOCK
     bases = [base for base, count in votes.most_common()
@@ -228,7 +236,9 @@ def executed(trace_path, contents, linked=None, others=()):
                  for base, image in there.items() if image is not None}
     result = Executed()
     found = []
-    for block in logged:
+    # A block that was logged again, at the same place with the same
+    # bytes, says nothing more.
+    for block in dict.fromkeys(tuple(block) for block in logged):
         for base in there:
             if any(all(_matches(image, address - base, code, far=not flat)
                        for address, code in block)

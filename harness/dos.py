@@ -319,8 +319,8 @@ class Screen:
     def line(self, row, codepage=437):
         """The characters of a row as text, as they show in a code
         page."""
-        return "".join(_glyph(c, codepage) for c in
-                       self.cells[row * COLUMNS * 2:(row + 1) * COLUMNS * 2:2])
+        return self.cells[row * COLUMNS * 2:(row + 1) * COLUMNS * 2:2] \
+            .decode("latin-1").translate(_glyphs(codepage))
 
     def lines(self, codepage=437):
         """The characters on screen as text, one string per row, as they
@@ -336,6 +336,20 @@ class Screen:
             "blinking_cells": [{"column": c, "row": r}
                                for c, r, *_ in self.blinking],
         }
+
+
+_GLYPHS = {}
+
+
+def _glyphs(codepage):
+    """What str.translate() makes of a byte, taken as Latin-1, to have
+    its _glyph() in `codepage`: the same text as a glyph at a time, in
+    a fraction of the time."""
+    table = _GLYPHS.get(codepage)
+    if table is None:
+        table = _GLYPHS[codepage] = {code: _glyph(code, codepage)
+                                     for code in range(256)}
+    return table
 
 
 def _glyph(code, codepage=437):
@@ -366,7 +380,9 @@ class Machine:
     does, is kept in a file: written() returns it.
 
     With `trace` set, QEMU logs to that file every piece of code the guest
-    executes, the first time it does so; coverage.py reads the log.
+    executes, the first time it does so; coverage.py reads the log. With
+    `traced` as well, a first and a last address, only the code that
+    begins between them.
 
     A reset ends the machine instead of restarting it, and nothing here
     waits without a limit: a guest that crashes or hangs raises
@@ -374,7 +390,7 @@ class Machine:
     """
 
     def __init__(self, floppy, hard_disks, workdir, clock, trace=None,
-                 state=None, memory=MEMORY):
+                 state=None, memory=MEMORY, traced=None):
         self._workdir = Path(workdir)
         self._serial = self._workdir / "serial.log"
         self._scratch = self._workdir / "scratch.bin"
@@ -411,6 +427,11 @@ class Machine:
                                    f"bus=pci.0/sd{slot}/sd-bus"]
         if trace:
             command += ["-d", "in_asm", "-D", str(trace)]
+            if traced:
+                # Only the blocks that begin in this range of addresses
+                # are logged: QEMU then neither writes nor disassembles
+                # the others.
+                command += ["-dfilter", f"{traced[0]:#x}..{traced[1]:#x}"]
         if state:
             command += ["-S", "-incoming", f"file:{state}"]
         self._qemu = subprocess.Popen(command)

@@ -1526,6 +1526,7 @@ import deviations
 import dos
 import driver
 import fat
+import le
 import setups
 from dos import MachineError
 
@@ -7613,7 +7614,16 @@ def run(scenario, program, bench, trace=False, blinking=False,
             return False
 
         kept = None
-        with bench.start(workdir, program, script, log, beside) as machine:
+        # Of a flat program, only what runs above the megabyte, where the
+        # extender loads it and any copy of it: coverage.executed() looks
+        # for nothing else there, and the extender's own code below,
+        # which it writes into and QEMU translates anew at every
+        # interrupt (TODO.md, "T, the time of a wait"), made most of
+        # the log.
+        traced = (le.BENCH & ~0xFFFF, 0xFFFFFFFF) \
+            if trace and not beside and le.linear(program.contents) else None
+        with bench.start(workdir, program, script, log, beside,
+                         traced) as machine:
             if image:
                 machine.linger()
             machine.resume()

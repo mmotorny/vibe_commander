@@ -402,7 +402,7 @@ class Bench:
                     f"d{len(self._programs)}", program, self.setup, beside)
             return self._programs[program, beside]
 
-    def _machine(self, workdir, images, script, trace=None):
+    def _machine(self, workdir, images, script, trace=None, traced=None):
         """A machine with copies of `images` as drives C: and D: and
         `script` for the driver, in which the program is about to start:
         paused."""
@@ -415,11 +415,12 @@ class Bench:
             file.truncate(driver.SCRIPT_DISK)
         machine = Machine(self._floppy, [*disks.values(), image], workdir,
                           CLOCK, trace=trace, state=self._state,
-                          memory=self._memory)
+                          memory=self._memory, traced=traced)
         machine.disks = disks
         return machine
 
-    def start(self, workdir, program, script, trace=None, beside=None):
+    def start(self, workdir, program, script, trace=None, beside=None,
+              traced=None):
         """A machine in which `program` is about to start and the driver
         is about to go by `script` (see driver.script): paused, until
         resume(). With `beside`, that program is in D:\\VC as well, for
@@ -430,7 +431,7 @@ class Bench:
         """
         return self._machine(Path(workdir),
                              self._program_disks(program, beside),
-                             script, trace)
+                             script, trace, traced)
 
 
 def _fill(disk, program, setup, beside):
@@ -481,6 +482,12 @@ class Benches:
         self._directory = dos.workdir()
         self._benches = {}
         self._lock = threading.Lock()
+        # One for each bench, so that a scenario whose bench is there is
+        # not kept waiting while another bench boots; and the setup file
+        # that the first bench made, which every other is given.
+        self._locks = {}
+        self._first = threading.Lock()
+        self._setup = None
         return self
 
     def __exit__(self, *exc):
@@ -489,10 +496,19 @@ class Benches:
     def __getitem__(self, key):
         country, memory = key if isinstance(key, tuple) else (key, None)
         with self._lock:                # scenarios may run side by side
+            lock = self._locks.setdefault(key, threading.Lock())
+        with lock:
             if key not in self._benches:
-                made = [bench.setup for bench in self._benches.values()]
-                directory = country + (f"-{memory}" if memory else "")
-                self._benches[key] = Bench(
-                    Path(self._directory.name) / directory, country,
-                    *made[:1], memory=memory)
+                directory = Path(self._directory.name) / (
+                    country + (f"-{memory}" if memory else ""))
+                with self._first:
+                    if self._setup is None:
+                        bench = Bench(directory, country, memory=memory)
+                        self._setup = bench.setup
+                    else:
+                        bench = None
+                if bench is None:
+                    bench = Bench(directory, country, self._setup,
+                                  memory=memory)
+                self._benches[key] = bench
             return self._benches[key]

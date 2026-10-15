@@ -33,6 +33,7 @@ machine was reset. The others are run all the same.
 Exits with status 0 if the build is indistinguishable and 1 if it differs.
 """
 import argparse
+import json
 import os
 import re
 import sys
@@ -172,10 +173,22 @@ def compare(names, program, trace=False, together=None, stack=False,
 
     failed = False
     outcomes = []
+    # The scenarios that took longest the last time are started first,
+    # so that none of them is left to run by itself at the end; what is
+    # printed is in the order of `names` all the same. What each took is
+    # of the host, and only orders the work.
+    times = _times(program.tree)
+    took_now = {}
     with setups.Benches() as benches, \
             ThreadPoolExecutor(together or TOGETHER) as pool:
+        started = {name: pool.submit(one, name)
+                   for name in sorted(names,
+                                      key=lambda name: -times.get(name, 0))}
         # In the order of `names`, as each is done.
-        for name, (outcome, took) in zip(names, pool.map(one, names)):
+        for name in names:
+            outcome, took = started[name].result()
+            if took is not None:
+                took_now[name] = took
             outcomes.append(outcome)
             golden = expected[name]
             # The line says what a scenario was held against: the
@@ -218,7 +231,31 @@ def compare(names, program, trace=False, together=None, stack=False,
                 print(f"{name}: as {measure}, {screens} screen"
                       f"{'s' if screens > 1 else ''} and the disks "
                       f"({took:.1f} s)")
+    _times(program.tree, {**times, **took_now})
     return failed, outcomes
+
+
+# Where the seconds that each scenario took the last time are kept, for
+# a tree: in the build's directory, since they are of this host.
+TIMES = Path(__file__).resolve().parent.parent / "build" / "times"
+
+
+def _times(tree, new=None):
+    """The seconds that each scenario took when `tree` was last taken
+    through it, name -> seconds, as far as they are known; with `new`,
+    write those instead."""
+    path = TIMES / f"{tree}.json"
+    if new is not None:
+        try:
+            TIMES.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(new, indent=0, sort_keys=True))
+        except OSError:
+            pass
+        return new
+    try:
+        return json.loads(path.read_text())
+    except (OSError, ValueError):
+        return {}
 
 
 def main():
