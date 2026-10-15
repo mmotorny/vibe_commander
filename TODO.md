@@ -19372,6 +19372,43 @@ program again. A command typed at its prompt fails for now (L6), and a
 Ctrl key that the terminal or the desktop takes (Ctrl-S without `IXON`
 is the program's; Ctrl-Alt-F keys are the desktop's) does not come.
 
+### SAN, what the sanitizers found in the scenarios: done
+
+What `posix-asan` stopped at when L3b took the program for Linux
+through the scenarios, each the original's behaviour, mended in the
+common code so that C says what the original does; the scenarios for
+DOS pass, and `VC.EXE` is other bytes for it.
+
+- `copy.c`, `PerCent`, the cells of the copy's progress: a number of
+  48 bits, a `u32` and a `u16` with the carry and the borrow between
+  them, which the loop counts on wrapping (0 - 64 at the first step,
+  13 scenarios). Of 32 bits a cast cannot say a wrap, there being no
+  wider type, and `-fsanitize=integer` stops at any unsigned one: the
+  sum and the difference are `Plus32` and `Minus32` there, which ask
+  before they reckon and give the number round 2^32 without wrapping
+  in C. The high word wraps by casts with `wraps`; `twice` is made
+  of the size with its high bit masked off before the shift, the bit
+  being `twice_high`, so that no bit is shifted out. L4 wrote the like
+  in `V25_00` of `view.c` in line; either form is the rule's, and a
+  third place may take the functions into `vc.h`.
+- `read.c`, `DiSi10`, the sum of sizes (`sizes`): the original adds and
+  takes the carry for a sum past 32 bits, which it keeps at 0FFFFFFFFh;
+  it is asked before the sum now.
+- `copy.c`, the path of the tree's panel in Copy's dialog
+  (`copy-tree`): 81 bytes of `CrnPath`, which has 68, the original
+  copying on into `ViewFil`: read as `MD_BYTES[MD_AT(CrnPath) + i]`.
+- `help.c` and `sthelp.c`, a scroll by one line: `place += key << 8`
+  with the BIOS's call, 6 or 7, in the high byte of `key`, which goes
+  off the top of 16 bits: the cut written, with `wraps`.
+- `view.c`, `Status`, and `stcolor.c`, the grid of colours, were mended
+  by L4 in the same way before this landed.
+
+Held afterwards with L3b's commits on a scratch branch, not landed:
+all 95 scenarios that L3b runs get to their end under `posix-asan/vc`
+and are compared, where 27 were stopped; no sanitizer says anything
+more in any of them. What they still differ in is L3b's: the order of
+the files and the setup file.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes
