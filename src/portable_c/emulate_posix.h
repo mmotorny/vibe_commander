@@ -12,9 +12,13 @@
  *
  * Nothing here reads or writes a file, the terminal or the environment:
  * what the host has, a directory's names, the mode of a file, a time, the
- * text of the file of settings, the locale's variables, is handed in. So
- * all of it is tried by itself on the host, by harness/posixcheck.c, the
- * test portable_c-posix-unit.
+ * variables of the environment, is handed in. So all of it is tried by
+ * itself on the host, by harness/posixcheck.c, the test
+ * portable_c-posix-unit.
+ *
+ * On Linux there is one drive, C:, the root of the host's file system,
+ * and one code page, 437, always, and nothing of either is a setting, on
+ * the user's word of 14 October 2026 (CLAUDE.md, step 6).
  *
  * Host names and paths are `char`, as the host's functions take them,
  * bytes in UTF-8 by custom and not by rule. DOS's names and paths are
@@ -32,38 +36,27 @@
 /*
  * The code page.
  *
- * The program writes names and texts in one code page of DOS's: 437, of
- * the United States, or 866, of Russia, the two that the scenarios test.
- * Every byte of either is a character of Unicode, by Unicode's mapping
- * files of the code pages (VENDORS/MICSFT/PC/CP437.TXT and CP866.TXT);
+ * The program writes names and texts in the code page of DOS's of the
+ * United States, 437. Every byte of it is a character of Unicode, by
+ * Unicode's mapping file of the code page (VENDORS/MICSFT/PC/CP437.TXT);
  * below 80h a byte is ASCII.
  */
-#define CODE_PAGE_US 437
-#define CODE_PAGE_RUSSIA 866
-
-/* Which code page the program uses: `setting` where the file of
-   settings names one, which is 0 where it names none; else 866 where
-   the locale is Russian and 437 otherwise. The locale is the first of
-   LC_ALL, LC_CTYPE and LANG that is set and not empty, as POSIX has it
-   for the type of characters; it is Russian where its language is "ru".
-   Each of the three is handed in as the environment has it, or NULL. */
-u16 CodePageChosen(u16 setting, const char *lc_all, const char *lc_ctype,
-                   const char *lang);
+#define CODE_PAGE 437
 
 /* The character of Unicode that a byte of the code page is. */
-u32 CodePageToUnicode(u16 code_page, u8 byte);
+u32 CodePageToUnicode(u8 byte);
 
 /* The byte of the code page that a character of Unicode is, or -1 where
    the code page has no such character. */
-i32 CodePageFromUnicode(u16 code_page, u32 character);
+i32 CodePageFromUnicode(u32 character);
 
 /* The capital of a byte as DOS has it for a name of a file: DOS's table
-   of capitals for names of the country and code page, as the bench's
-   DOS, FreeDOS 1.4, has it in COUNTRY.SYS. Below 80h it is ASCII's.
-   Of 437 most accented small letters become a plain capital, é E and
+   of capitals for names of the country 1 and the code page 437, as the
+   bench's DOS, FreeDOS 1.4, has it in COUNTRY.SYS. Below 80h it is
+   ASCII's. Most accented small letters become a plain capital, é E and
    â A, and only ä, å, æ, ç, ñ, ö and ü their own: that is DOS's, and a
    name that DOS is handed is made so. */
-u8 CodePageUpper(u16 code_page, u8 byte);
+u8 CodePageUpper(u8 byte);
 
 /* The character that the UTF-8 at `text` begins with, of the `length`
    bytes there, at `character`. Answers how many bytes it is, 1 to 4; or
@@ -77,8 +70,8 @@ i32 Utf8Decode(const char *text, i32 length, u32 *character);
 i32 Utf8Encode(u32 character, char *to);
 
 /* The small letter of a character of Unicode, by Unicode's simple
-   mappings to lower case, UnicodeData.txt, for the capitals that 437
-   and 866 have: Latin, Greek and Cyrillic. Any other character is
+   mappings to lower case, UnicodeData.txt, for the capitals of Latin-1
+   and of Greek, which are those that 437 has. Any other character is
    itself. */
 u32 UnicodeSmall(u32 character);
 
@@ -87,8 +80,8 @@ u32 UnicodeSmall(u32 character);
    every letter small where `small` says so. Answers how many bytes it
    wrote, the zero not counted, or -1 where the room is not enough.
    Every byte of the code page has a character. */
-i32 CodePageToUtf8(u16 code_page, const u8 *from, i32 length, bool small,
-                   char *to, i32 room);
+i32 CodePageToUtf8(const u8 *from, i32 length, bool small, char *to,
+                   i32 room);
 
 /*
  * Names.
@@ -108,7 +101,7 @@ bool DosNameByte(u8 byte);
 
 /* Whether `name` is a name of DOS's form, in capitals: what a name of a
    host is shown as where it has its own, and what an alias is. */
-bool DosNameValid(u16 code_page, const u8 *name);
+bool DosNameValid(const u8 *name);
 
 /* The attributes of DOS. */
 #define DOS_READ_ONLY 0x01
@@ -158,7 +151,7 @@ void DirectoryNamesEnd(struct DirectoryNames *table);
    no longer has is kept and is not found, and keeps its name of DOS's
    from every other name, for the run. Answers false where the memory
    ran out: the names that it had not come to then are not there. */
-bool DirectoryNamesUpdate(struct DirectoryNames *table, u16 code_page,
+bool DirectoryNamesUpdate(struct DirectoryNames *table,
                           const char *const *names, i32 count);
 
 /* The name of DOS's form of a name of the host that the directory has
@@ -181,70 +174,47 @@ const char *DirectoryNamesHost(const struct DirectoryNames *table,
    as leaves 8 characters at the most, LONGNA~1. A first part that
    nothing is left of is `_`. */
 typedef bool DosNameTaken(const void *context, const u8 *name);
-void DosNameMake(u16 code_page, const char *host, DosNameTaken *taken,
-                 const void *context, u8 *to);
+void DosNameMake(const char *host, DosNameTaken *taken, const void *context,
+                 u8 *to);
 
 /*
  * Drives and paths.
  *
- * A drive of DOS is a directory of the host, as DOSBox's `mount` has it:
- * C: is the root of the host's file system, unless the file of settings
- * says otherwise, and the file of settings may name other letters.
+ * A drive of DOS is a directory of the host, as DOSBox's `mount` has it,
+ * and there is one: C:, the root of the host's file system. A path that
+ * DOS's 67 characters do not hold is reached through the aliases.
  */
-#define DOS_DRIVES 26
+#define DOS_DRIVE 'C'                   /* the one drive there is */
 #define DOS_PATH_ROOM 128               /* a full path, with its zero, as
                                            sys.h's FileTrueName has it */
 #define DOS_PATH_LONGEST 67             /* what the program holds, its
                                            characters, the zero not
                                            counted */
 
-/* Where the file of settings is: the file that the variable of the
-   environment VC_SETTINGS names, where it is set and not empty, for the
-   tests; else vc/settings in $XDG_CONFIG_HOME, where that is set and is
-   a path from the root, and in $HOME/.config otherwise, as the XDG Base
-   Directory Specification has it, on the user's word of 14 October 2026
-   (CLAUDE.md, step 6). The three are handed in as the environment has
-   them, or NULL. At `to`, which has room for `room` bytes: answers false
-   where there is no $HOME to go by or the room is not enough. */
-#define SETTINGS_VARIABLE "VC_SETTINGS"
-bool SettingsFile(const char *named, const char *config_home,
-                  const char *home, char *to, i32 room);
-
-/* What the file of settings says. */
-struct Settings {
-    char *drive[DOS_DRIVES];            /* the directory of each letter,
-                                           A: first, or NULL for none */
-    u16 code_page;                      /* 437 or 866, or 0 for none */
-};
-
-/* The settings that there are where the file says nothing: C: the root. */
-bool SettingsBegin(struct Settings *settings);
-void SettingsEnd(struct Settings *settings);
-
-/* Read the text of the file of settings into `settings`, which
-   SettingsBegin has made. A line is empty, or a comment behind #, or
-   one of
-       mount <letter> <directory>     the drive is that directory, a path
-                                      that begins with /
-       codepage <437 or 866>
-   with the words apart by blanks; a directory is the rest of its line,
-   its blanks at the ends left out. Answers 0, or the number of the first
-   line that is none of these, counted from 1, with the settings as the
-   lines before it made them; or -1 where the memory ran out. */
-i32 SettingsRead(struct Settings *settings, const char *text);
+/* Where the program's setup file is, the original's VC.INI: vc/vc.ini in
+   $XDG_CONFIG_HOME, where that is set and is a path from the root, and
+   in $HOME/.config otherwise, as the XDG Base Directory Specification
+   has it, on the user's word of 14 October 2026 (CLAUDE.md, step 6).
+   The two are handed in as the environment has them, or NULL. At `to`,
+   which has room for `room` bytes: answers false where there is no $HOME
+   to go by or the room is not enough. Reading and writing the file is
+   not done here. */
+bool SetupFile(const char *config_home, const char *home, char *to,
+               i32 room);
 
 /* A path of DOS's that the program hands over made a full one, as DOS
    does with it, to `to`, which has room for DOS_PATH_ROOM bytes: with its
    drive and from the root of the drive, / taken for \, . and .. worked
    out, and each name in capitals and cut to 8.3, as DOSBox's DOS_MakeName
-   does. `drive` is the current drive, 0 for A:, and `current` the
-   current directory of each, as DirCurrent of sys.h has it, without the
-   drive and the first backslash, or NULL for the root. Answers whether
-   it failed, with DOS's error 3 where a name has a character that a name
-   may not have or a second dot, 0Fh for a drive that is no letter, and
-   3 where the full path is too long. */
-struct Answer DosPathFull(u16 code_page, const u8 *path, u16 drive,
-                          const u8 *const *current, u8 *to);
+   does. The current drive is C:, the one that there is, and `current` is
+   its current directory, as DirCurrent of sys.h has it, without the drive
+   and the first backslash, or NULL for the root; a path that names
+   another drive goes from that drive's root, and HostPathOfDos says that
+   there is no such drive. Answers whether it failed, with DOS's error 3
+   where a name has a character that a name may not have or a second dot,
+   0Fh for a drive that is no letter, and 3 where the full path is too
+   long. */
+struct Answer DosPathFull(const u8 *path, const u8 *current, u8 *to);
 
 /* Every directory of the host that the program has named, with its
    names; and how a directory of the host is read, which is handed in:
@@ -256,43 +226,40 @@ struct Directory {
     struct DirectoryNames names;
 };
 typedef bool DirectoryRead(void *context, const char *path,
-                           struct DirectoryNames *table, u16 code_page);
+                           struct DirectoryNames *table);
 struct Directories {
     struct Directory *directories;
     i32 count;
     i32 room;
-    u16 code_page;
     DirectoryRead *read;
     void *context;
 };
 
-void DirectoriesBegin(struct Directories *directories, u16 code_page,
-                      DirectoryRead *read, void *context);
+void DirectoriesBegin(struct Directories *directories, DirectoryRead *read,
+                      void *context);
 void DirectoriesEnd(struct Directories *directories);
 
 /* The path of the host that a full path of DOS's leads to, at `to`,
-   which has room for `room` bytes: the directory of its drive, and for
-   each name the name of the host that it leads to in the directory
-   before it; a name that the host has not, the last only, is the name
-   that the program makes there, in UTF-8 and in small letters, as the
-   user decided on 14 October 2026 (CLAUDE.md, step 6). Answers whether it failed, with DOS's
-   error 0Fh for a drive that is none, 3 for a directory on the way that
-   the host has not or cannot be read and where the room is not enough,
-   and 8 where the memory ran out; else `value` is 1 where the last name
-   was found and 0 where it was not. */
+   which has room for `room` bytes: the root, which is C:, and for each
+   name the name of the host that it leads to in the directory before it;
+   a name that the host has not, the last only, is the name that the
+   program makes there, in UTF-8 and in small letters, as the user
+   decided on 14 October 2026 (CLAUDE.md, step 6). Answers whether it
+   failed, with DOS's error 0Fh for a drive other than C:, 3 for a
+   directory on the way that the host has not or cannot be read and
+   where the room is not enough, and 8 where the memory ran out; else
+   `value` is 1 where the last name was found and 0 where it was not. */
 struct Answer HostPathOfDos(struct Directories *directories,
-                            const struct Settings *settings,
                             const u8 *path, char *to, i32 room);
 
 /* The full path of DOS's that a path of the host, from its root, is
-   shown as, at `to`, which has room for DOS_PATH_ROOM bytes: on the drive
-   whose directory holds it with the most of its path, and each name the
-   name of DOS's form that it has in the directory before it. Answers
-   whether it failed: DOS's error 3 where no drive holds it, a directory
-   on the way cannot be read, a name is not there, or the path is longer
-   than DOS_PATH_LONGEST characters; 8 where the memory ran out. */
+   shown as, at `to`, which has room for DOS_PATH_ROOM bytes: on C:, and
+   each name the name of DOS's form that it has in the directory before
+   it. Answers whether it failed: DOS's error 3 where the path is not from
+   the root or has . or .. in it, a directory on the way cannot be read, a
+   name is not there, or the path is longer than DOS_PATH_LONGEST
+   characters; 8 where the memory ran out. */
 struct Answer DosPathOfHost(struct Directories *directories,
-                            const struct Settings *settings,
                             const char *path, u8 *to);
 
 /*

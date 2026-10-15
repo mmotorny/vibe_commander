@@ -11,8 +11,7 @@
 
 /* What DOS does not let a name have beside the bytes 00h to 20h: the
    bytes of FreeDOS 1.4's table of what ends a name, "FCHAR" of its
-   COUNTRY.SYS, the same for the code pages 437 and 866, and the two that
-   match. The dot is among them, and is a name's own where it parts the
+   COUNTRY.SYS, for the code page 437, and the two that match. The dot is among them, and is a name's own where it parts the
    extension from the rest. */
 static const char NotInName[] = ".\"/\\[]:|<>+=;,*?";
 
@@ -22,30 +21,29 @@ bool DosNameByte(u8 byte)
 }
 
 /* Whether `count` bytes at `name` are a part of a name in capitals. */
-static bool Capitals(u16 code_page, const u8 *name, i32 count)
+static bool Capitals(const u8 *name, i32 count)
 {
     i32 i;
 
     for (i = 0; i < count; i++)
         if (!DosNameByte(name[i])
-            || CodePageUpper(code_page, name[i]) != name[i])
+            || CodePageUpper(name[i]) != name[i])
             return false;
     return true;
 }
 
-bool DosNameValid(u16 code_page, const u8 *name)
+bool DosNameValid(const u8 *name)
 {
     const u8 *dot = (const u8 *)strchr((const char *)name, '.');
     i32 length = (i32)strlen((const char *)name);
     i32 base;
 
     if (dot == NULL)
-        return length >= 1 && length <= 8
-            && Capitals(code_page, name, length);
+        return length >= 1 && length <= 8 && Capitals(name, length);
     base = (i32)(dot - name);
     return base >= 1 && base <= 8 && length - base - 1 >= 1
-        && length - base - 1 <= 3 && Capitals(code_page, name, base)
-        && Capitals(code_page, dot + 1, length - base - 1);
+        && length - base - 1 <= 3 && Capitals(name, base)
+        && Capitals(dot + 1, length - base - 1);
 }
 
 u8 DosAttributes(const struct stat *status, const char *name, uid_t user,
@@ -81,8 +79,8 @@ u8 DosAttributes(const struct stat *status, const char *name, uid_t user,
    <limits.h>); and so the most characters that a name can be. */
 #define HOST_NAME_LONGEST 255
 
-void DosNameMake(u16 code_page, const char *host, DosNameTaken *taken,
-                 const void *context, u8 *to)
+void DosNameMake(const char *host, DosNameTaken *taken, const void *context,
+                 u8 *to)
 {
     u8 characters[HOST_NAME_LONGEST + 1];
     i32 count = 0;                      /* of characters */
@@ -113,13 +111,13 @@ void DosNameMake(u16 code_page, const char *host, DosNameTaken *taken,
             step = 1;                   /* no UTF-8: one byte is `_` */
             byte = -1;
         } else
-            byte = CodePageFromUnicode(code_page, character);
+            byte = CodePageFromUnicode(character);
         if (byte < 0) {
             characters[count++] = '_';
             lossy = true;
             continue;
         }
-        byte = CodePageUpper(code_page, (u8)byte);
+        byte = CodePageUpper((u8)byte);
         if (byte == ' ') {
             lossy = true;
             continue;
@@ -320,8 +318,7 @@ static bool Dots(const char *name)
 
 /* A name of the host that the table has not, added with its name of
    DOS's form. */
-static bool Add(struct DirectoryNames *table, u16 code_page,
-                const char *host)
+static bool Add(struct DirectoryNames *table, const char *host)
 {
     struct DirectoryName *name;
     size_t length = strlen(host) + 1;
@@ -334,7 +331,7 @@ static bool Add(struct DirectoryNames *table, u16 code_page,
     if (name->host == NULL)
         return false;
     memcpy(name->host, host, length);
-    DosNameMake(code_page, name->host, Taken, table, name->dos);
+    DosNameMake(name->host, Taken, table, name->dos);
     name->present = true;
     table->count++;
     table->by_host[PlaceOfHost(table, name->host)] = table->count;
@@ -342,7 +339,7 @@ static bool Add(struct DirectoryNames *table, u16 code_page,
     return true;
 }
 
-bool DirectoryNamesUpdate(struct DirectoryNames *table, u16 code_page,
+bool DirectoryNamesUpdate(struct DirectoryNames *table,
                           const char *const *names, i32 count)
 {
     struct HostName *sorted;
@@ -368,7 +365,7 @@ bool DirectoryNamesUpdate(struct DirectoryNames *table, u16 code_page,
         if (found != 0)
             table->names[found - 1].present = true;
         else
-            added = Add(table, code_page, sorted[i].name);
+            added = Add(table, sorted[i].name);
     }
     free(sorted);
     return added;

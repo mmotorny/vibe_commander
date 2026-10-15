@@ -1,16 +1,15 @@
 /*
- * The code page of the program for Linux: which one, the characters of
- * Unicode that its bytes are, DOS's capitals of its bytes, and UTF-8.
- * See emulate_posix.h.
+ * The code page of the program for Linux, 437: the characters of Unicode
+ * that its bytes are, DOS's capitals of its bytes, and UTF-8. See
+ * emulate_posix.h.
  */
 #include <string.h>
 
 #include "emulate_posix.h"
 
-/* The characters of Unicode of the bytes 80h to FFh of each code page,
-   by Unicode's mapping files, VENDORS/MICSFT/PC/CP437.TXT and CP866.TXT,
-   which are what Python's codecs cp437 and cp866 are made of: the
-   tables were written from those codecs. */
+/* The characters of Unicode of the bytes 80h to FFh, by Unicode's
+   mapping file, VENDORS/MICSFT/PC/CP437.TXT, which is what Python's codec
+   cp437 is made of: the table was written from that codec. */
 static const u16 Unicode437[128] = {
     0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7,   /* 80h */
     0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x00EE, 0x00EC, 0x00C4, 0x00C5,   /* 88h */
@@ -29,31 +28,11 @@ static const u16 Unicode437[128] = {
     0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248,   /* F0h */
     0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0,   /* F8h */
 };
-static const u16 Unicode866[128] = {
-    0x0410, 0x0411, 0x0412, 0x0413, 0x0414, 0x0415, 0x0416, 0x0417,   /* 80h */
-    0x0418, 0x0419, 0x041A, 0x041B, 0x041C, 0x041D, 0x041E, 0x041F,   /* 88h */
-    0x0420, 0x0421, 0x0422, 0x0423, 0x0424, 0x0425, 0x0426, 0x0427,   /* 90h */
-    0x0428, 0x0429, 0x042A, 0x042B, 0x042C, 0x042D, 0x042E, 0x042F,   /* 98h */
-    0x0430, 0x0431, 0x0432, 0x0433, 0x0434, 0x0435, 0x0436, 0x0437,   /* A0h */
-    0x0438, 0x0439, 0x043A, 0x043B, 0x043C, 0x043D, 0x043E, 0x043F,   /* A8h */
-    0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556,   /* B0h */
-    0x2555, 0x2563, 0x2551, 0x2557, 0x255D, 0x255C, 0x255B, 0x2510,   /* B8h */
-    0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F,   /* C0h */
-    0x255A, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256C, 0x2567,   /* C8h */
-    0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B,   /* D0h */
-    0x256A, 0x2518, 0x250C, 0x2588, 0x2584, 0x258C, 0x2590, 0x2580,   /* D8h */
-    0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447,   /* E0h */
-    0x0448, 0x0449, 0x044A, 0x044B, 0x044C, 0x044D, 0x044E, 0x044F,   /* E8h */
-    0x0401, 0x0451, 0x0404, 0x0454, 0x0407, 0x0457, 0x040E, 0x045E,   /* F0h */
-    0x00B0, 0x2219, 0x00B7, 0x221A, 0x2116, 0x00A4, 0x25A0, 0x00A0,   /* F8h */
-};
-
 /* DOS's capitals of the bytes 80h to FFh for the names of files, the
    table that DOS answers INT 21h 6504h with: of FreeDOS 1.4's COUNTRY.SYS,
-   the bench's, for the country 1 with the code page 437 and the country
-   7 with 866, its tables "FUCASE" there. The bench of the United States
-   names no country, and its DOS then has the table of the country 1 in
-   itself. */
+   the bench's, for the country 1 with the code page 437, its table
+   "FUCASE" there. The bench of the United States names no country, and
+   its DOS then has the table of the country 1 in itself. */
 static const u8 Upper437[128] = {
     0x80, 0x9A, 0x45, 0x41, 0x8E, 0x41, 0x8F, 0x80,   /* 80h */
     0x45, 0x45, 0x45, 0x49, 0x49, 0x49, 0x8E, 0x8F,   /* 88h */
@@ -72,84 +51,31 @@ static const u8 Upper437[128] = {
     0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,   /* F0h */
     0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF,   /* F8h */
 };
-static const u8 Upper866[128] = {
-    0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,   /* 80h */
-    0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F,   /* 88h */
-    0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,   /* 90h */
-    0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F,   /* 98h */
-    0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,   /* A0h */
-    0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F,   /* A8h */
-    0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7,   /* B0h */
-    0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF,   /* B8h */
-    0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,   /* C0h */
-    0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF,   /* C8h */
-    0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7,   /* D0h */
-    0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF,   /* D8h */
-    0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,   /* E0h */
-    0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F,   /* E8h */
-    0xF0, 0xF0, 0xF2, 0xF2, 0xF4, 0xF4, 0xF6, 0xF6,   /* F0h */
-    0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF,   /* F8h */
-};
-
-/* Whether a value of the locale's variables is of the Russian language:
-   "ru", or "ru" with a territory, a code set or a modifier behind it, as
-   POSIX writes a locale, language_territory.codeset@modifier. */
-static bool Russian(const char *locale)
-{
-    return locale[0] == 'r' && locale[1] == 'u'
-        && (locale[2] == '\0' || locale[2] == '_' || locale[2] == '.'
-            || locale[2] == '@');
-}
-
-u16 CodePageChosen(u16 setting, const char *lc_all, const char *lc_ctype,
-                   const char *lang)
-{
-    const char *locale;
-
-    if (setting != 0)
-        return setting;
-    if (lc_all != NULL && lc_all[0] != '\0')
-        locale = lc_all;
-    else if (lc_ctype != NULL && lc_ctype[0] != '\0')
-        locale = lc_ctype;
-    else if (lang != NULL && lang[0] != '\0')
-        locale = lang;
-    else
-        return CODE_PAGE_US;
-    return Russian(locale) ? CODE_PAGE_RUSSIA : CODE_PAGE_US;
-}
-
-u32 CodePageToUnicode(u16 code_page, u8 byte)
+u32 CodePageToUnicode(u8 byte)
 {
     if (byte < 0x80)
         return byte;
-    if (code_page == CODE_PAGE_RUSSIA)
-        return Unicode866[byte - 0x80];
     return Unicode437[byte - 0x80];
 }
 
-i32 CodePageFromUnicode(u16 code_page, u32 character)
+i32 CodePageFromUnicode(u32 character)
 {
-    const u16 *table;
     i32 i;
 
     if (character < 0x80)
         return (i32)character;
-    table = code_page == CODE_PAGE_RUSSIA ? Unicode866 : Unicode437;
     for (i = 0; i < 128; i++)
-        if (table[i] == character)
+        if (Unicode437[i] == character)
             return 0x80 + i;
     return -1;
 }
 
-u8 CodePageUpper(u16 code_page, u8 byte)
+u8 CodePageUpper(u8 byte)
 {
     if (byte >= 'a' && byte <= 'z')
         return (u8)(byte - ('a' - 'A'));
     if (byte < 0x80)
         return byte;
-    if (code_page == CODE_PAGE_RUSSIA)
-        return Upper866[byte - 0x80];
     return Upper437[byte - 0x80];
 }
 
@@ -238,16 +164,13 @@ u32 UnicodeSmall(u32 character)
         || (character >= 0x00C0 && character <= 0x00DE
             && character != 0x00D7)
         || (character >= 0x0391 && character <= 0x03A9
-            && character != 0x03A2)
-        || (character >= 0x0410 && character <= 0x042F))
+            && character != 0x03A2))
         return character + 0x20;
-    if (character >= 0x0400 && character <= 0x040F)
-        return character + 0x50;
     return character;
 }
 
-i32 CodePageToUtf8(u16 code_page, const u8 *from, i32 length, bool small,
-                   char *to, i32 room)
+i32 CodePageToUtf8(const u8 *from, i32 length, bool small, char *to,
+                   i32 room)
 {
     u32 character;
     char bytes[4];
@@ -256,7 +179,7 @@ i32 CodePageToUtf8(u16 code_page, const u8 *from, i32 length, bool small,
     i32 i;
 
     for (i = 0; i < length; i++) {
-        character = CodePageToUnicode(code_page, from[i]);
+        character = CodePageToUnicode(from[i]);
         count = Utf8Encode(small ? UnicodeSmall(character) : character,
                            bytes);
         if (written + count >= room)

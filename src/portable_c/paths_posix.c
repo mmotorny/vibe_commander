@@ -1,5 +1,5 @@
 /*
- * Drives and paths of the program for Linux: the file of settings, a
+ * Drives and paths of the program for Linux: where the setup file is, a
  * path of DOS's made a full one, and a full path of DOS's to a path of
  * the host and back. See emulate_posix.h.
  */
@@ -46,26 +46,23 @@ static char *Copy(const char *text, size_t length)
 }
 
 /*
- * The file of settings.
+ * The setup file.
  */
 
-bool SettingsFile(const char *named, const char *config_home,
-                  const char *home, char *to, i32 room)
+bool SetupFile(const char *config_home, const char *home, char *to,
+               i32 room)
 {
     const char *base;
     const char *behind;
     size_t length;
     size_t more;
 
-    if (named != NULL && named[0] != '\0') {
-        base = named;
-        behind = "";
-    } else if (config_home != NULL && config_home[0] == '/') {
+    if (config_home != NULL && config_home[0] == '/') {
         base = config_home;
-        behind = "/vc/settings";
+        behind = "/vc/vc.ini";
     } else if (home != NULL && home[0] != '\0') {
         base = home;
-        behind = "/.config/vc/settings";
+        behind = "/.config/vc/vc.ini";
     } else
         return false;
     length = strlen(base);
@@ -75,113 +72,6 @@ bool SettingsFile(const char *named, const char *config_home,
     memcpy(to, base, length);
     memcpy(to + length, behind, more + 1);
     return true;
-}
-
-bool SettingsBegin(struct Settings *settings)
-{
-    i32 i;
-
-    for (i = 0; i < DOS_DRIVES; i++)
-        settings->drive[i] = NULL;
-    settings->code_page = 0;
-    settings->drive['C' - 'A'] = Copy("/", 1);
-    return settings->drive['C' - 'A'] != NULL;
-}
-
-void SettingsEnd(struct Settings *settings)
-{
-    i32 i;
-
-    for (i = 0; i < DOS_DRIVES; i++) {
-        free(settings->drive[i]);
-        settings->drive[i] = NULL;
-    }
-}
-
-static bool Spacing(char c)
-{
-    return c == ' ' || c == '\t' || c == '\r';
-}
-
-/* The word of `length` bytes at `text` is `word`. */
-static bool Is(const char *text, size_t length, const char *word)
-{
-    return length == strlen(word) && memcmp(text, word, length) == 0;
-}
-
-/* One line of the file, of `length` bytes at `line`: 1 where it is
-   understood, 0 where it is not, -1 where the memory ran out. */
-static i32 Setting(struct Settings *settings, const char *line,
-                   size_t length)
-{
-    const char *end = line + length;
-    const char *word;
-    size_t size;
-    char letter;
-    char *directory;
-
-    while (line < end && Spacing(*line))
-        line++;
-    while (end > line && Spacing(end[-1]))
-        end--;
-    if (line == end || *line == '#')
-        return 1;
-    for (word = line; line < end && !Spacing(*line); line++)
-        ;
-    size = (size_t)(line - word);
-    while (line < end && Spacing(*line))
-        line++;
-    if (Is(word, size, "codepage")) {
-        if (Is(line, (size_t)(end - line), "437"))
-            settings->code_page = CODE_PAGE_US;
-        else if (Is(line, (size_t)(end - line), "866"))
-            settings->code_page = CODE_PAGE_RUSSIA;
-        else
-            return 0;
-        return 1;
-    }
-    if (!Is(word, size, "mount") || line == end)
-        return 0;
-    letter = *line++;
-    if (letter >= 'a' && letter <= 'z')
-        letter = (char)(letter - ('a' - 'A'));
-    if (letter < 'A' || letter > 'Z')
-        return 0;
-    if (line < end && *line == ':')
-        line++;
-    if (line == end || !Spacing(*line))
-        return 0;
-    while (line < end && Spacing(*line))
-        line++;
-    if (line == end || *line != '/')
-        return 0;
-    while (end - line > 1 && end[-1] == '/')
-        end--;
-    directory = Copy(line, (size_t)(end - line));
-    if (directory == NULL)
-        return -1;
-    free(settings->drive[letter - 'A']);
-    settings->drive[letter - 'A'] = directory;
-    return 1;
-}
-
-i32 SettingsRead(struct Settings *settings, const char *text)
-{
-    const char *end;
-    i32 number;
-    i32 understood;
-
-    for (number = 1;; number++) {
-        end = strchr(text, '\n');
-        if (end == NULL)
-            end = text + strlen(text);
-        understood = Setting(settings, text, (size_t)(end - text));
-        if (understood <= 0)
-            return understood < 0 ? -1 : number;
-        if (*end == '\0')
-            return 0;
-        text = end + 1;
-    }
 }
 
 /*
@@ -197,8 +87,7 @@ static bool Separator(u8 byte)
    8.3, behind what `to` has, `at` bytes, with a backslash in front:
    answers how many bytes `to` has then, or -1 for a name that DOS does
    not take. * and ? are taken, since a path may be one to look for. */
-static i32 PathName(u16 code_page, const u8 *name, i32 length, u8 *to,
-                    i32 at)
+static i32 PathName(const u8 *name, i32 length, u8 *to, i32 at)
 {
     u8 base[8];
     i32 based = 0;
@@ -209,7 +98,7 @@ static i32 PathName(u16 code_page, const u8 *name, i32 length, u8 *to,
     i32 i;
 
     for (i = 0; i < length; i++) {
-        byte = CodePageUpper(code_page, name[i]);
+        byte = CodePageUpper(name[i]);
         if (byte == '.') {
             if (dot)
                 return -1;              /* DOSBox: a second dot */
@@ -241,8 +130,7 @@ static i32 PathName(u16 code_page, const u8 *name, i32 length, u8 *to,
    with . and .. worked out: answers how many bytes `to` has then, or -1
    for a name that DOS does not take or a path that is too long. `root`
    is how many bytes of `to` are the drive and are never gone back over. */
-static i32 PathNames(u16 code_page, const u8 *path, u8 *to, i32 at,
-                     i32 root)
+static i32 PathNames(const u8 *path, u8 *to, i32 at, i32 root)
 {
     const u8 *name;
     i32 length;
@@ -263,22 +151,20 @@ static i32 PathNames(u16 code_page, const u8 *path, u8 *to, i32 at,
                 at--;
             continue;
         }
-        at = PathName(code_page, name, length, to, at);
+        at = PathName(name, length, to, at);
         if (at < 0)
             return -1;
     }
     return at;
 }
 
-struct Answer DosPathFull(u16 code_page, const u8 *path, u16 drive,
-                          const u8 *const *current, u8 *to)
+struct Answer DosPathFull(const u8 *path, const u8 *current, u8 *to)
 {
-    u8 letter;
+    u8 letter = DOS_DRIVE;
     i32 at;
 
-    letter = (u8)('A' + (drive & 0xFF));
     if (path[0] != '\0' && path[1] == ':') {
-        letter = CodePageUpper(code_page, path[0]);
+        letter = CodePageUpper(path[0]);
         path += 2;
     }
     if (letter < 'A' || letter > 'Z')
@@ -286,13 +172,12 @@ struct Answer DosPathFull(u16 code_page, const u8 *path, u16 drive,
     to[0] = letter;
     to[1] = ':';
     at = 2;
-    if (!Separator(path[0]) && current != NULL
-        && current[letter - 'A'] != NULL) {
-        at = PathNames(code_page, current[letter - 'A'], to, at, 2);
+    if (!Separator(path[0]) && letter == DOS_DRIVE && current != NULL) {
+        at = PathNames(current, to, at, 2);
         if (at < 0)
             return Fails(PATH_NOT_FOUND);
     }
-    at = PathNames(code_page, path, to, at, 2);
+    at = PathNames(path, to, at, 2);
     if (at < 0)
         return Fails(PATH_NOT_FOUND);
     if (at == 2)
@@ -305,13 +190,12 @@ struct Answer DosPathFull(u16 code_page, const u8 *path, u16 drive,
  * The directories of the host and their names.
  */
 
-void DirectoriesBegin(struct Directories *directories, u16 code_page,
-                      DirectoryRead *read, void *context)
+void DirectoriesBegin(struct Directories *directories, DirectoryRead *read,
+                      void *context)
 {
     directories->directories = NULL;
     directories->count = 0;
     directories->room = 0;
-    directories->code_page = code_page;
     directories->read = read;
     directories->context = context;
 }
@@ -368,7 +252,7 @@ static struct DirectoryNames *Names(struct Directories *directories,
         }
         DirectoryNamesBegin(&directory->names);
         if (!directories->read(directories->context, path,
-                               &directory->names, directories->code_page)) {
+                               &directory->names)) {
             DirectoryNamesEnd(&directory->names);
             free(directory->path);
             return NULL;
@@ -377,8 +261,7 @@ static struct DirectoryNames *Names(struct Directories *directories,
         return &directory->names;
     }
     if (again && !directories->read(directories->context, path,
-                                    &directory->names,
-                                    directories->code_page))
+                                    &directory->names))
         return NULL;
     return &directory->names;
 }
@@ -403,10 +286,8 @@ static i32 HostJoin(char *to, i32 at, i32 room, const char *name,
 }
 
 struct Answer HostPathOfDos(struct Directories *directories,
-                            const struct Settings *settings,
                             const u8 *path, char *to, i32 room)
 {
-    const char *drive;
     struct DirectoryNames *names;
     u8 name[DOS_NAME_ROOM];
     char written[4 * DOS_NAME_ROOM];
@@ -416,12 +297,9 @@ struct Answer HostPathOfDos(struct Directories *directories,
     i32 at;
     bool found = true;
 
-    if (path[0] < 'A' || path[0] > 'Z' || path[1] != ':' || path[2] != '\\')
+    if (path[0] != DOS_DRIVE || path[1] != ':' || path[2] != '\\')
         return Fails(INVALID_DRIVE);
-    drive = settings->drive[path[0] - 'A'];
-    if (drive == NULL)
-        return Fails(INVALID_DRIVE);
-    at = HostJoin(to, 0, room, drive, (i32)strlen(drive));
+    at = HostJoin(to, 0, room, "/", 1);
     if (at < 0)
         return Fails(PATH_NOT_FOUND);
     for (path += 3; *path != '\0'; path = *end == '\0' ? end : end + 1) {
@@ -446,8 +324,8 @@ struct Answer HostPathOfDos(struct Directories *directories,
         if (host == NULL) {
             /* Not there: the name that the program makes, small. */
             found = false;
-            if (CodePageToUtf8(directories->code_page, name, length, true,
-                               written, (i32)sizeof written) < 0)
+            if (CodePageToUtf8(name, length, true, written,
+                               (i32)sizeof written) < 0)
                 return Fails(PATH_NOT_FOUND);
             host = written;
         }
@@ -458,28 +336,9 @@ struct Answer HostPathOfDos(struct Directories *directories,
     return Does(found ? 1 : 0);
 }
 
-/* Whether the directory of a drive holds a path of the host: answers
-   how many bytes of the path it is, or -1 where it does not hold it. */
-static i32 Holds(const char *drive, const char *path)
-{
-    size_t length = strlen(drive);
-
-    if (strcmp(drive, "/") == 0)
-        return path[0] == '/' ? 1 : -1;
-    if (strncmp(drive, path, length) != 0
-        || (path[length] != '\0' && path[length] != '/'))
-        return -1;
-    return (i32)length;
-}
-
 struct Answer DosPathOfHost(struct Directories *directories,
-                            const struct Settings *settings,
                             const char *path, u8 *to)
 {
-    i32 best = -1;
-    i32 letter = 0;
-    i32 held;
-    i32 i;
     char directory[4096];
     i32 at;
     i32 written;
@@ -490,27 +349,14 @@ struct Answer DosPathOfHost(struct Directories *directories,
     i32 length;
     char *part;
 
-    for (i = 0; i < DOS_DRIVES; i++) {
-        if (settings->drive[i] == NULL)
-            continue;
-        held = Holds(settings->drive[i], path);
-        if (held > best) {
-            best = held;
-            letter = i;
-        }
-    }
-    if (best < 0)
+    if (path[0] != '/')
         return Fails(PATH_NOT_FOUND);
-    at = HostJoin(directory, 0, (i32)sizeof directory,
-                  settings->drive[letter],
-                  (i32)strlen(settings->drive[letter]));
-    if (at < 0)
-        return Fails(PATH_NOT_FOUND);
-    to[0] = (u8)('A' + letter);
+    at = HostJoin(directory, 0, (i32)sizeof directory, "/", 1);
+    to[0] = DOS_DRIVE;
     to[1] = ':';
     to[2] = '\\';
     written = 3;
-    for (name = path + best; *name != '\0'; name = end) {
+    for (name = path + 1; *name != '\0'; name = end) {
         while (*name == '/')
             name++;
         for (end = name; *end != '\0' && *end != '/'; end++)

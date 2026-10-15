@@ -18078,7 +18078,9 @@ then, nothing tried:
   `LC_ALL`; a locale that is not installed leaves "C". glibc's ru_RU
   has `%d.%m.%Y`, `%T`, and U+202F, three bytes of UTF-8, for the
   thousands; en_US `%m/%d/%Y` and `%r`. DOS's record, 38h, has one order
-  of three and a byte for each separator.
+  of three and a byte for each separator. None of it is read for now: the
+  code page is 437 and the country with it, always, on the user's word of
+  14 October 2026 (`CLAUDE.md`, step 6).
 - **Names.** Bytes, any but `/` and NUL, UTF-8 by custom and not by
   rule; 255 bytes, a path up to 4,096 and no hard limit. ext4 tells
   case apart, so two names of DOS's form may be one; two forms of
@@ -18110,9 +18112,10 @@ then, nothing tried:
   end it, the terminal to be put back first. The program's own file is
   `/proc/self/exe`; `xdg-open` answers 0, or 1 to 4 for an error, and
   does not wait for the program that it starts; a user's settings are
-  in `$XDG_CONFIG_HOME`,
-  `~/.config`, the state and a command history in `$XDG_STATE_HOME`;
-  temporary files in `TMPDIR` or `/tmp`.
+  in `$XDG_CONFIG_HOME`, `~/.config`, where the program's setup file,
+  the original's `VC.INI`, is `vc/vc.ini` (`SetupFile` of
+  `paths_posix.c`); the state and a command history in
+  `$XDG_STATE_HOME`; temporary files in `TMPDIR` or `/tmp`.
 - **Waiting and time.** `poll` on the terminal with a timeout, where DOS
   has INT 28h. `clock_gettime` with `CLOCK_REALTIME` and `localtime_r`
   for the time of day; `CLOCK_MONOTONIC`, which stops while the machine
@@ -18134,19 +18137,17 @@ in DOS's terms; and the test `portable_c-posix-unit`,
 `harness/posixcheck.c`. Nothing of it is compiled into `VC.EXE`, which
 is the same bytes, `2b6cc9b5...`.
 
-- `codepage_posix.c`: the code page, 437 or 866, by the setting or by
-  the first of `LC_ALL`, `LC_CTYPE` and `LANG` that is set and not
-  empty, as POSIX has them for the type of characters (XBD 8.2), Russian
-  where its language is `ru`; the character of Unicode of each byte, by
-  Unicode's mapping files `CP437.TXT` and `CP866.TXT`, as Python's
-  codecs have them, from which the tables were written; DOS's capitals
-  of a byte of a name; UTF-8, strict as RFC 3629 has it.
+- `codepage_posix.c`: the code page, 437: the character of Unicode of
+  each byte, by Unicode's mapping file `CP437.TXT`, as Python's codec
+  has it, from which the table was written; DOS's capitals of a byte of
+  a name; a capital of Unicode made small; UTF-8, strict as RFC 3629 has
+  it.
 - `names_posix.c`: what a name of DOS's form is; the alias of a name of
   the host; a directory's table of names for the run; DOS's attributes
   of a file of the host.
-- `paths_posix.c`: the file of settings, read from its text; a path of
-  DOS's made a full one, as `DOS_MakeName` of DOSBox makes it; a full
-  path of DOS's to one of the host, and back.
+- `paths_posix.c`: where the setup file is; a path of DOS's made a full
+  one, as `DOS_MakeName` of DOSBox makes it; a full path of DOS's on C:
+  to one of the host, and back.
 - `time_posix.c`: DOS's packed date and time of a time of the host, and
   DOS's error of an `errno`.
 
@@ -18157,7 +18158,7 @@ The sources, each named in the test at its checks:
   `FD14-FloppyEdition.zip` (`mcopy -i x86BOOT.img
   ::/FREEDOS/BIN/COUNTRY.SYS`), read by its format: the table `FUCASE`,
   DOS's capitals for names (INT 21h 6504h), and `FCHAR`, what ends a
-  name, of the country 1 with 437 and 7 with 866. Of 437 most accented
+  name, of the country 1 with 437. Of 437 most accented
   small letters become a plain capital, é `E` and â `A`: a check written
   from memory had é `É`, and the table said otherwise. The bench of the
   United States names no country, and its kernel has its own table,
@@ -18189,7 +18190,9 @@ The sources, each named in the test at its checks:
   worked out, `..` at the root staying there, each name in capitals and
   cut to 8 and 3, a second dot or a character that a name may not have
   error 3, a drive that is no letter 0Fh. `*` and `?` are taken, as a
-  path to look for may have them.
+  path to look for may have them. A drive other than C: is made full
+  from its root, and is 0Fh, invalid, when its path of the host is
+  asked for (RBIL, INT 21h 0Eh and 47h).
 - **A date and a time**: DOS's packing (RBIL, INT 21h 5700h), in the
   local time; before 1980 the first that DOS has, 1 January 1980 at
   midnight, after 2107 the last, 31 December 2107 at 23:59:58, as Linux
@@ -18227,23 +18230,43 @@ entry at the count, where the analyser takes a count that could be
 below 0 (an `assert` says that it is not); `strcpy`, which the analyser
 calls insecure (`memcpy` with the length).
 
-**Decided by the user**, on 14 October 2026, when L1 asked (`CLAUDE.md`,
-step 6): the program for Linux is called `vc`, and its file of settings
-is `$XDG_CONFIG_HOME/vc/settings`, or `~/.config/vc/settings` where that
-is not set, in the lines that L1 reads, `mount D /path` and `codepage
-866`, and the variable `VC_SETTINGS` names another file for the tests:
-`SettingsFile` of `paths_posix.c` says which file, from the three
-variables handed in, by the XDG Base Directory Specification (a
-`$XDG_CONFIG_HOME` that is empty or not a path from the root is not
-taken); reading it is L2's. A character that the code page lacks, or a
-byte that is no UTF-8, is `_`, as built. What the program makes on the
-host is named in small letters: `HostPathOfDos` writes a name that the
-host has not so, by `UnicodeSmall` of `codepage_posix.c`, Unicode's
-simple mappings to lower case for the Latin, Greek and Cyrillic
-capitals that 437 and 866 have (held against Python's `str.lower` for
-every byte of both); `NEW.TXT` is made as `new.txt`, `ПРИВЕТ.TXT` as
-`привет.txt`. The aliases' order, the locale read as POSIX has it and
-a directory never read-only stay as built.
+**Decided by the user**, on 14 October 2026, when L1 asked, and later
+the same day (`CLAUDE.md`, step 6): on Linux there is one drive, C:, the
+root of the file system, always; the code page, and the country with
+it, is 437, always; nothing of either is a setting, for now, where L1
+had built a file of settings, `mount` of other letters and 866 by the
+locale; the program for Linux is called `vc`, and keeps its setup file,
+the original's `VC.INI`, at `$XDG_CONFIG_HOME/vc/vc.ini`, or
+`~/.config/vc/vc.ini` where that is not set: `SetupFile` of
+`paths_posix.c` says which file, from the two variables handed in, by
+the XDG Base Directory Specification (a `$XDG_CONFIG_HOME` that is
+empty or not a path from the root is not taken); reading and writing it
+is a later piece's. A character that the code page lacks, or a byte
+that is no UTF-8, is `_`, as built. What the program makes on the host
+is named in small letters: `HostPathOfDos` writes a name that the host
+has not so, by `UnicodeSmall` of `codepage_posix.c`, Unicode's simple
+mappings to lower case for the capitals of Latin-1 and Greek, which
+are those that 437 has (held against Python's `str.lower` for every
+byte of 437); `NEW.TXT` is made as `new.txt`, `ÜÇ.TXT` as `üç.txt`. The
+aliases' order and a directory never read-only stay as built.
+
+**L1b, brought to that: done.** One commit; `VC.EXE` the same bytes,
+`2b6cc9b5...`, nothing of this being compiled into it. What went, which
+git keeps in the commits of L1 (`21eb4d9`, `5529af4`): the file of
+settings, its parser and its structure (`SettingsFile`, `SettingsBegin`,
+`SettingsRead`, `SettingsEnd`, `struct Settings`) and the variable
+`VC_SETTINGS`; `CodePageChosen`, the code page by the locale; the
+tables of 866, `Unicode866` and `Upper866`, and the Cyrillic mappings of
+`UnicodeSmall`, which only 866 has letters for; the argument
+`code_page` of every function, of `struct Directories` and of a
+`DirectoryRead`, there being one; and their checks in
+`harness/posixcheck.c`, whose source POSIX 8.2 went with them. What
+changed: `DosPathFull` takes the current directory of C: alone, C:
+being the current drive always; `HostPathOfDos` answers 0Fh for any
+drive but C:, and C: is `/`; `DosPathOfHost` has every path from the
+root on C:. What came: `SetupFile`, checked by XDG's rule. Each check
+that stayed keeps its named source; the checks of 437 that had a text of
+866 have one of 437 (`café`, `CP437.TXT`).
 
 **What L2 should know:**
 
@@ -18268,6 +18291,11 @@ a directory never read-only stay as built.
   opened, a link that leads nowhere has no status); `EINTR`, which is to
   be tried again and not reported; the table of directories is searched
   one by one.
+- The code page is 437 in every function, with no argument for it: one
+  that comes back is an argument again, and the commits of L1 have
+  the version with 866. The tests of the program for Linux put its
+  setup file where they want it by `XDG_CONFIG_HOME` or `HOME`, there
+  being no variable of the program's own for that.
 - The build of the test takes every `*_posix.c`. When `sys_posix.c`
   comes, with the common code behind it, the test's build is to name
   the files of L1 and its own, or the program for Linux is to be built
