@@ -16396,6 +16396,96 @@ stub, `sys_stub.c`, with its test.
    the words. `CMakeLists.txt` has `compiler.h` among the headers that
    every object follows.
 
+3. The parentheses (one commit): clang's `-Wparentheses`, of `-Wall`,
+   named 136 places where an operator stands beside one that C takes
+   first with nothing to say so: `&` within `|` (117), a sum or a
+   difference that is shifted (12), `&&` within `||` (7). Each has its
+   parentheses round what C took first already, in 27 files and in
+   `ADD_LOW` of `vc.h`; 125 were written by clang's fix-its
+   (`-fdiagnostics-parseable-fixits`, which `-fno-caret-diagnostics`
+   switches off), the eleven in or beside a macro by hand. Same bytes.
+   The records of `int16.py` and `width.py` have the ten lines that were
+   only written otherwise: `--record` drops the reason of a line whose
+   text changed, and a script of `build/` carried each from the old
+   record to the line that is the same without its parentheses and
+   blanks. A record whose last entry is changed so wants a look by hand:
+   the script took the empty line behind it for a reason.
+4. The differences of two pointers (one commit): eighteen places of the
+   common code keep one in an `i32`, which clang names for a host of 64
+   bits (`-Wshorten-64-to-32`, of `-Wconversion`), in `copy.c` (5),
+   `edit.c` (6), `drive.c`, `setup.c`, `window.c`, and the two macros
+   that make the number of an entry of the tree, `TREE_NUMBER` of
+   `place.c` and `NUMBER` of `treebox.c`. Each is `(i32)(a - b)`: both
+   pointers are into one buffer that the place names, and the comment
+   at the two macros says that the tree's list is in `TreeBuf`. Same
+   bytes: a difference of two pointers is an `int` to `wcc386`.
+5. `MenuLn` of `menu.c` (one commit), the 37th `NONSTRING`, which gcc
+   names and clang does not: the array is made of a macro of texts.
+
+Every commit of the piece is the same bytes of `VC.EXE`, `2f2fc833...`,
+and of `debug/VC.EXE`, `f6b4a06c...`.
+
+The whole suite passed on the last of them, fourteen tests with the
+158 scenarios, and no golden or patch changed. The rule of the build
+was tried with a file `zz_stub.c` that does not compile, put into the
+tree and taken out again: the build for DOS did not compile it.
+
+**What 5b's test is to run.** For every file of `src/portable_c/` that
+the stub's build takes, the common code and `sys_stub.c`, from the
+checkout's top:
+
+    clang --target=x86_64-linux-gnu -std=c99 -fsyntax-only -Werror \
+        -Wall -Wextra -Wpedantic -Wconversion -Wsign-compare \
+        -Wtautological-constant-out-of-range-compare \
+        -Wint-in-bool-context -I src/portable_c FILE
+
+No `-D` is wanted: no common file has a word of Open Watcom's that
+`compiler.h` does not take out of clang's sight (the host check's
+`-D__interrupt=` and `-D__declspec(x)=` were tried and make no
+difference). clang 23 says nothing of the common code so. With
+`-funsigned-char`, which `int16.py` gives clang since `wcc386`'s `char`
+has no sign, it says nothing either.
+
+**Left, for the layer or a later piece, not changed here:**
+
+- Reads and writes of a word or a double word through a cast pointer,
+  which C does not promise for an address that is not aligned or for
+  memory of another type (strict aliasing): 128 casts to `(u16 *)`,
+  `(const u16 *)` and `(u32 *)` in 23 common files (`view.c` 23,
+  `edit.c` 16, `copy.c` 15, `dirfunc.c` 13, `find.c` 9, `read.c` 7,
+  `treebox.c` 6, `sthelp.c`, `main.c` and `dialog.c` 5 each, `help.c`
+  4, `usermenu.c`, `input.c` and `extfile.c` 3, `start.c` and
+  `cmdline.c` 2, one each in `vc.h`, `tree.c`, `system.c`, `stmain.c`,
+  `setup.c`, `info.c`, `commands.c`), `PUT16` of `vc.h` (9 uses, all in
+  `format.c`), and 33 casts that lay a structure over bytes (`struct
+  DIRTREE` 8, `struct WCBdef` 6, `struct StData` 3, `struct MainDat`
+  3, and others). clang's `-Wcast-align`, which is not in the command
+  above, names 346 places, by every use of a macro (`copy.c` 74,
+  `view.c` 65, `stcolor.c` 53, `stmain.c` 33, `edit.c` and `dirfunc.c`
+  21, `usermenu.c` 12, the rest fewer). x86-64 reads such a word as
+  DOS does; the program for Linux is built with `-fno-strict-aliasing`
+  or reads them by `memcpy`, which is the layer's to decide.
+- The little-endian check of `vc.h`: clang for x86-64 passes it by
+  `__BYTE_ORDER__`. A host that is not so is not a target.
+- `NO_RETURN` is nothing to clang: `__attribute__((noreturn))` on
+  `AlocEr`, `Exit00` and `Main` would have it ask, under
+  `-Winvalid-noreturn`, for the same on `ProgramEnd` of `sys.h`, which
+  a stub declares and the layer says.
+- gcc says more than clang of the same files with the same options: 56
+  of `-Wparentheses` of the kinds clang leaves alone (`+` or `-` within
+  `&`, 39; arithmetic within `|`, 16; an assignment taken for a truth,
+  1), 38 of `-Wconversion` and 4 of `-Wsign-conversion`, and 2 of
+  `-Wbool-operation`: `ed.EdHxCur++` in `edit.c`, a `bool` stepped,
+  which `wcc386` makes `inc byte ptr`, where C makes it 1 whatever it
+  was; it is right at both places only because both have it 0 just
+  before (`T14_11` and the line above the other). Clang is the
+  compiler of the road, so none of it is mended.
+- The tools of the harness that read the tree take every `*.c` of it:
+  see 1 above.
+- `harness/hostcheck.py` gives gcc `-D__interrupt=` and
+  `-D__declspec(x)=`: no file has `__interrupt` any more, and only
+  `sys_dos.c` has `__declspec`, for its two naked functions.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on
