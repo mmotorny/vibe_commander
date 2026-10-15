@@ -294,9 +294,12 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   with the colours of DOS in spans, not on a canvas. The font is VileR's
   Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned, put into the page and
   credited there.
-- One drive, C:, which starts as a small tree of sample files written for
-  the project and served with the page, nothing proprietary, and which
-  the user may change, what is changed being kept in the browser. The
+- Two drives. C:, labelled VIBE, is where the program lives, its own
+  files in C:\VC as the bench has them in D:\VC. D:, labelled DEMO,
+  starts as a small tree of sample files written for the project and
+  served with the page, nothing proprietary, and the user may change it.
+  What is changed on either drive, the setup file too, is kept in the
+  browser. The tests map the letters as the bench has them. The
   user's own files come in by a button and by dragging them onto the
   page, into the current directory.
 - A command says on DOS's screen that commands cannot be run in a web
