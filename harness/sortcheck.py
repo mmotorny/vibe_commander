@@ -54,11 +54,15 @@ import setups
 BEFORE = "f8bf7584b3da0e3596e06eb3f92a1dede24808ff"
 
 # The instructions that only a list that is not sorted runs, by the
-# original's listing: the comparison of CmpPar for the unsorted order. Every
-# scenario that showed a panel ran them on the old bench; on the new one
-# only a scenario that picks Unsorted does, `sort`, which has to go on
-# doing so. They are said apart and do not fail a scenario.
-UNSORTED = {0xAB62, 0xAB65}
+# original's listing: the comparison of CmpPar for the unsorted order, and
+# in the Left and the Right menu the tick on Unsorted for an order of 5 or
+# more, the distribution's 8, which no item sets. Every scenario that
+# showed a panel ran the first on the old bench, and every one that opened
+# such a menu the second; on the new one only a scenario that picks
+# Unsorted runs the first, `sort`, and one that opens the menu with the
+# defaults the second, `start-setup`, which have to go on doing so. They
+# are said apart and do not fail a scenario.
+UNSORTED = {0xAB5F, 0xAB62, 0xAB65, 0x2ED8}
 
 TOP, SEPARATOR = "╔", "╟"
 
@@ -109,10 +113,12 @@ def seen(rows):
 
 
 def offsets(text):
+    """The offsets of a `.ran`: a run is its first byte and the one behind
+    its last, as goldens.read_ran() reads it."""
     found = set()
     for run in text.split():
         first, last = run.split("-")
-        found.update(range(int(first, 16), int(last, 16) + 1))
+        found.update(range(int(first, 16), int(last, 16)))
     return found
 
 
