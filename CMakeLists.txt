@@ -469,6 +469,95 @@ function(add_portable_c target directory)
     add_custom_target(${target} ALL DEPENDS ${directory}/VC.EXE)
 endfunction()
 
+# --- clang --------------------------------------------------------------------
+# The builds of src/portable_c/ for this computer, with clang: step 5 of
+# the portable C's road, the stub, and what step 6 builds for Linux. clang
+# is the one that the path has; without it they are not made, and their
+# test is skipped. Every warning of the list below is an error, on the
+# user's word of 14 October 2026: a list written out, close to curl's,
+# and not -Weverything.
+#   -std=c99 -Wpedantic   the C that the tree is written in, and no more
+#   -Wall -Wextra         clang's usual sets
+#   -Wconversion -Wsign-compare   a number put into fewer bits or met by
+#                         one of another sign, which CLAUDE.md has the code
+#                         say with a cast
+#   -Wshadow -Wundef -Wcast-qual -Wpointer-arith -Wwrite-strings -Wvla
+#   -Wstrict-prototypes -Wmissing-prototypes -Wmissing-variable-declarations
+#   -Wformat=2 -Wconditional-uninitialized -Wcomma -Wassign-enum
+#   -Wshift-sign-overflow -Wextra-semi-stmt -Wimplicit-fallthrough
+#   -Wbad-function-cast -Wcast-function-type-strict -Wunreachable-code
+#                         what curl and its like add; a fall-through of a
+#                         switch is said by FALLTHROUGH of compiler.h
+# Left out, each named in the survey the user decided from: -Wcast-align,
+# since the common code reads words out of bytes as DOS does, which is
+# the layer's (TODO.md, "5a, the split"); -Wpadded, -Wswitch-default and
+# -Wswitch-enum, -Wdeclaration-after-statement, -Wdouble-promotion and
+# -Wunsafe-buffer-usage, which say how C is to be written and not what is
+# wrong in it.
+set(clang_warnings -std=c99 -Werror -Wall -Wextra -Wpedantic -Wconversion
+    -Wsign-compare -Wshadow -Wundef -Wcast-qual -Wpointer-arith
+    -Wwrite-strings -Wvla -Wstrict-prototypes -Wmissing-prototypes
+    -Wmissing-variable-declarations -Wformat=2 -Wconditional-uninitialized
+    -Wcomma -Wassign-enum -Wshift-sign-overflow -Wextra-semi-stmt
+    -Wimplicit-fallthrough -Wbad-function-cast -Wcast-function-type-strict
+    -Wunreachable-code)
+find_program(clang NAMES clang)
+find_program(clang_tidy NAMES clang-tidy)
+if(NOT clang)
+    message(STATUS "No clang: the stub of the portable C is not built, and "
+                   "the test portable_c-stub is skipped")
+endif()
+
+# add_portable_c_host(<target> <directory> <implementation>
+#                     [COMPILE <option>...] [LINK <option>...])
+# builds src/portable_c/ for this computer with clang, as
+# <directory>/vc, of the common code and the files of <implementation>
+# (stub, posix), with the warnings above and the options given: those of
+# COMPILE to the compiler and the linker alike, those of LINK to the
+# linker alone. -fno-strict-aliasing is every such build's: the common
+# code reads a word of 16 or 32 bits out of bytes through a cast pointer,
+# as DOS does, which C promises nothing of without it (TODO.md, "5a, the
+# split"). The command of the compiler is written into
+# <directory>/compiled.txt, which every object follows, as add_portable_c
+# has it, and which the test portable_c-stub reads.
+function(add_portable_c_host target directory implementation)
+    cmake_parse_arguments(PARSE_ARGV 3 host "" "" "COMPILE;LINK")
+    set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
+    file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
+         ${source_dir}/*.c)
+    foreach(other dos stub posix)
+        if(NOT other STREQUAL implementation)
+            list(FILTER c_files EXCLUDE REGEX "_${other}\\.c$")
+        endif()
+    endforeach()
+    set(compile ${clang} ${clang_warnings} -fno-strict-aliasing
+        ${host_COMPILE} -I${source_dir})
+    file(MAKE_DIRECTORY ${directory})
+    file(GENERATE OUTPUT ${directory}/compiled.txt
+         CONTENT "${compile}\n")
+    set(objects "")
+    foreach(source ${c_files})
+        string(REGEX REPLACE "\\.c$" ".o" object ${source})
+        add_custom_command(
+            OUTPUT ${directory}/${object}
+            COMMAND ${compile} -c -o ${directory}/${object}
+                    ${source_dir}/${source}
+            DEPENDS ${source_dir}/${source} ${source_dir}/vc.h
+                    ${source_dir}/tables.h ${source_dir}/sys.h
+                    ${source_dir}/compiler.h ${directory}/compiled.txt
+            COMMENT "Compiling portable_c/${source} (${target})"
+            VERBATIM)
+        list(APPEND objects ${directory}/${object})
+    endforeach()
+    add_custom_command(
+        OUTPUT ${directory}/vc
+        COMMAND ${compile} ${host_LINK} -o ${directory}/vc ${objects}
+        DEPENDS ${objects}
+        COMMENT "Linking the portable C (${target})"
+        VERBATIM)
+    add_custom_target(${target} ALL DEPENDS ${directory}/vc)
+endfunction()
+
 # The trees.
 #
 # The C translation is compiled in the small model: its functions are far
@@ -497,6 +586,32 @@ add_c_tree(c "the C translation" s
 add_portable_c(portable_c ${CMAKE_BINARY_DIR}/portable_c -os)
 add_portable_c(portable_c-debug ${CMAKE_BINARY_DIR}/portable_c/debug
     -od -d2 -dCHECKED)
+# The stub, step 5 of the road: src/portable_c/sys_stub.c for sys.h, a
+# program for this computer that builds and is not meant to run
+# (TODO.md, "5b, the stub"). Three builds, each its own directory of
+# build/portable_c/:
+#   stub/vc        with the usual hardening of a program of Linux, the
+#                  options that the distributions build with
+#   stub-asan/vc   with the sanitizers of addresses, of undefined
+#                  behaviour (the alignment of what is read among it),
+#                  of integers and of implicit conversions, each fatal
+#   stub-msan/vc   with the sanitizer of memory, which goes with no other
+if(clang)
+    add_portable_c_host(portable_c-stub ${CMAKE_BINARY_DIR}/portable_c/stub
+        stub
+        COMPILE -O2 -D_FORTIFY_SOURCE=3 -fstack-protector-strong
+                -fstack-clash-protection -fcf-protection=full -fPIE
+        LINK -pie -Wl,-z,relro,-z,now,-z,noexecstack)
+    add_portable_c_host(portable_c-stub-asan
+        ${CMAKE_BINARY_DIR}/portable_c/stub-asan stub
+        COMPILE -O1 -g -fno-omit-frame-pointer
+                -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
+                -fno-sanitize-recover=all)
+    add_portable_c_host(portable_c-stub-msan
+        ${CMAKE_BINARY_DIR}/portable_c/stub-msan stub
+        COMPILE -O1 -g -fno-omit-frame-pointer -fsanitize=memory
+                -fsanitize-memory-track-origins -fno-sanitize-recover=all)
+endif()
 
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS

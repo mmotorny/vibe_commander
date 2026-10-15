@@ -559,7 +559,7 @@ class Tree:
     """What was found in every file."""
 
     def __init__(self, command, source):
-        self.names = sorted(path.name for path in source.glob("*.c"))
+        self.names = int16.dos_files(source)
         with ThreadPoolExecutor() as pool:
             finders = list(pool.map(
                 lambda name: read(command, source, name), self.names))

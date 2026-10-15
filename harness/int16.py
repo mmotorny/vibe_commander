@@ -99,7 +99,8 @@ and is read again.
 out what is gone, and writes what is new without a reason: that is then
 written into the file by whoever has read the place, under its line.
 
-What is read: every file of code and of tables. sys_dos.c, the system's
+What is read: every file of code and of tables that the build for DOS
+takes, which is all but sys_stub.c (OTHER_SYSTEMS). sys_dos.c, the system's
 functions, was written for an int of 32 bits and never compiled for
 another, so a place there has nothing to be the same as: its reason
 says that the number is meant as it is. What a macro makes is a place
@@ -170,6 +171,22 @@ SOURCE = ROOT / "src" / "portable_c"
 RECORD = Path(__file__).resolve().parent / "int16.txt"
 CHECK = Path(__file__).resolve().parent / "int16check.c"
 SKIPPED = 77
+
+# The files of an implementation of sys.h for another system than DOS,
+# by the ending of their names, as add_portable_c of CMakeLists.txt
+# knows them: sys_stub.c, and sys_posix.c to come. They were never
+# compiled by Open Watcom nor for an int of 16 bits, and include the C
+# library of this computer, which clang for the 386 has no headers of.
+OTHER_SYSTEMS = ("_stub.c", "_posix.c")
+
+
+def dos_files(source):
+    """The names of the files of `source` that the build for DOS takes:
+    the common code and the files of _dos.c, in the order of their
+    names. This test, harness/width.py and harness/cut.py read these,
+    which are what they judge."""
+    return sorted(path.name for path in source.glob("*.c")
+                  if not path.name.endswith(OTHER_SYSTEMS))
 
 # How clang is asked: for the 386, whose int has 32 bits and whose long
 # has too, as C of 1999, with a char that has no sign, as Open Watcom's
@@ -997,7 +1014,7 @@ def read(command, source, name, text=None):
 def survey(command, source):
     """Every place of the tree, as (file, line, kind, function), and the
     names of the files that were read."""
-    names = sorted(path.name for path in source.glob("*.c"))
+    names = dos_files(source)
     with ThreadPoolExecutor() as pool:
         results = list(pool.map(lambda name: read(command, source, name),
                                 names))

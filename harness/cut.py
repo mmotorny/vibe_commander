@@ -450,7 +450,7 @@ def main():
         print("cut: the finder does not find what it is to find.")
         print("\n".join("  " + line for line in wrong))
         return 1
-    names = sorted(path.name for path in args.source.glob("*.c"))
+    names = int16.dos_files(args.source)
     with ThreadPoolExecutor() as pool:
         found = set().union(*pool.map(
             lambda name: read(command, args.source, name), names))
