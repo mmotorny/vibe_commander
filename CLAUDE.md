@@ -200,23 +200,26 @@ These held while `src/c/` was made, and they say what it is.
      one `CMakeLists.txt` builds every implementation, and finds clang
      for those that want it; the files are `sys_dos.c` (which
      `dos32.c` becomes), `stack_dos.c` (`stack.c`), `sys_stub.c` and
-     `sys_posix.c`. On Linux there is one drive by default, C:, the
-     root of the file system, and a path that DOS's 67 characters do
-     not hold is reached through the aliases; a file of settings may
-     map other letters. The code page, and the country with it, is
-     866 where `LANG` is Russian and 437 otherwise, and a setting
-     overrides it. The terminal is driven by the program's own escape
+     `sys_posix.c`. On Linux there is one drive, C:, the root of the
+     file system, always, and a path that DOS's 67 characters do not
+     hold is reached through the aliases; the code page, and the
+     country with it, is 437, always; nothing of it is a setting, for
+     now (the user, later the same day, taking back a file of settings
+     and the code page by `LANG`). The terminal is driven by the program's own escape
      sequences and termios, no library, with the kitty protocol of
      the keyboard where the terminal offers it. A command runs on the
      terminal's own screen, which Ctrl-O shows, as on DOS. The program
-     for Linux is judged by the same scenarios and goldens where they
-     can be compared: told so by a variable of the environment, it
+     for Linux is judged by scenarios driven as those of DOS are, with
+     C: the root of the file system in its tests too, so that what it
+     shows is held to expectations of its own, recorded from its build
+     and read row by row, not to the goldens of the original (the user,
+     later the same day): told so by a variable of the environment, it
      writes its grid of cells whenever it waits for a key, a harness
      drives it in a pseudo-terminal with the scenarios' keys, and what
      it draws in the terminal is held to that grid by replaying it
      through pyte, a terminal emulator in Python, pinned, which is
-     the download that this allows; a setting gives a test the clock
-     to start from. Of what the abandoned design had decided for other
+     the download that this allows; a test may give it the clock to
+     start from. Of what the abandoned design had decided for other
      systems, the user named three again for Linux on 14 October 2026:
      Enter on a file that the program cannot run hands it to
      `xdg-open`; the PC's sixteen colours are drawn as DOS has them,
@@ -224,16 +227,14 @@ These held while `src/c/` was made, and they say what it is.
      is 80 columns by 25 rows and no other size, whatever the
      terminal's. The rest of that design is dropped. Of what the first
      piece of step 6 asked, decided the same day: the program for Linux
-     is called `vc`, and keeps its settings where XDG says,
-     `$XDG_CONFIG_HOME/vc/` or `~/.config/vc/`, in lines like DOSBox's
-     (`mount D /path`, `codepage 866`), a variable of the environment
-     naming another file for the tests; a character that the code page
+     is called `vc`, and keeps its setup file, the original's `VC.INI`,
+     at `~/.config/vc/vc.ini` (`$XDG_CONFIG_HOME/vc/vc.ini` where that
+     is set); a character that the code page
      lacks, or a byte that is no UTF-8, shows as `_`, as Windows makes
      a short name, the alias leading back to the name as it is; what
      the program makes on the host is named in lower case; aliases are
      numbered in the order of the host's names by their bytes and kept
-     for the run; the locale is read as POSIX has it, `LC_ALL`, then
-     `LC_CTYPE`, then `LANG`; and a directory is never shown read-only. Once the stub compiles on Linux, on the user's
+     for the run; and a directory is never shown read-only. Once the stub compiles on Linux, on the user's
      word of 14 October 2026, every build with clang has the
      sanitizers that fit it, a high level of warnings and clang-tidy,
      and a warning of any of them stops the build; which warnings and
