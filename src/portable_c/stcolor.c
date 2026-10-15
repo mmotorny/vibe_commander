@@ -706,7 +706,7 @@ static void StF07_01(const u8 *name, i32 palette)
     for (rows = 16; rows != 0; rows--) {
         for (i = 0; i < 16; i++) {
             screen[i] = cell;
-            cell += 0x0100;
+            cell = (u16)(cell + 0x0100);        /* wraps behind the last */
         }
         screen += 80;
     }

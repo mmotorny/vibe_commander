@@ -441,14 +441,20 @@ static void V25_00(void)
 
     /* A hundred times the place, in 48 bits, and how often the length of
        the file goes into that: by adding and subtracting, as the assembly
-       does. */
+       does. The low word wraps at a carry and at a borrow, as the
+       assembly's ADD and SUB do, and each is written so that no number
+       goes beyond 32 bits on the way, which the sanitizer of integers of
+       the program for Linux would stop: low + position less 2^32, and
+       low - length plus 2^32, which ~(length - low - 1) is. */
     position = VI->ViOffset + (u32)ViFirst;
     low = 0;
     high = 0;
     for (count = 100; count; count--) {
-        low += position;
-        if (low < position)
+        if (position > 0xFFFFFFFFu - low) {
+            low = position - (0xFFFFFFFFu - low) - 1;   /* wraps */
             high++;
+        } else
+            low += position;
     }
     length = VI->ViLen;
     percent = 0;
@@ -458,7 +464,7 @@ static void V25_00(void)
         for (;;) {
             percent++;
             if (low < length) {
-                low -= length;
+                low = ~(length - low - 1);      /* wraps: low - length */
                 if (high == 0)
                     break;
                 high--;
@@ -829,8 +835,10 @@ static void Status(void)
     screen = MvsBw(md.ScrBuf, ViFl_S + 1, 4, cell);
     *screen = (cell & 0xFF00) | ':';
     MvsBw(md.ScrBuf + 40, Col_S, 3, cell);
+    /* 81 bytes of the 65 of ViewFil, as the original copies them: the
+       bytes of the main data behind it too. */
     for (count = 0; count != LenPath + 13; count++)
-        md.TmpBuf[count] = md.ViewFil[count];
+        md.TmpBuf[count] = MD_BYTES[MD_AT(ViewFil) + count];
     LetLin(md.TmpBuf);
     ShrtLin(md.TmpBuf, 33);
     MovDz0(md.ScrBuf + 6, md.TmpBuf);
