@@ -16980,6 +16980,77 @@ hand wants `build/tools/stub` run on it after the linker, as the build
 does: without it the extender writes its banner, which is in the
 images as the screen behind the program.
 
+### G2, the jumps of usermenu.c, drive.c and find.c: done
+
+The piece G2 of the sweep of jumps (`CLAUDE.md`, "The portable C", the
+bullet on `goto`), a commit for each file. 61 `goto` went, 117 stay,
+all in `usermenu.c`:
+
+- `find.c`, 16 went, none stays: `FndMove` 2, `FindFil` 7, `F67_00` 7.
+  `FndMove` passes `FnMv24` by with one test; `FindFil` is a loop from
+  `FnFl40`; `F67_00` is a loop from `F67_01` to `F67_23`, the search on
+  the drives, which left two loops for three places, being a function
+  that says which.
+- `drive.c`, 37 went, none stays: all of `F62_01`. A loop from
+  `F62_15`, the cursor; the mouse a loop of its own from `F62_21`,
+  which a button that moves the cursor leaves with the button still
+  down, and that is how the code after it knows to go back to `F62_15`;
+  the keys a `switch` on what `Drive_T` says a key asks; asking again
+  for a drive that is not ready a loop from `F62_41`. Of the mouse, a
+  place beyond the 27th letter, which jumped to `F62_26`, leaves the
+  loop and goes there by the test behind it, beyond the last drive,
+  since there are 26 drives at the most.
+- `usermenu.c`, 8 went: `F32_70`, a loop from `F32_71`. Stay: `F32_00`,
+  65, and `Run_00`, 35, as the bullet says; and `FileLst`, 17, whose
+  loop over the files, `FiLs12`, is entered in the middle, at `FiLs13`,
+  for the one file under the cursor when none is selected. Writing it
+  without would take the write of a line out into a function of its
+  own, called before the loop and in it: a loop with two ways in, which
+  the user's word leaves, as G3 left `V82_00`.
+
+Four static helpers, each named for its label in the assembly or its
+table, and each said at its head: `FnFl48` (the file that `FindFil`
+reads closed, and the search stopped), `F67_25` (the box of the search
+off the screen), `F67_08` (the search on the drives, `F67_08` to
+`F67_17`, which answers where `F67_00` goes on) in `find.c`; `Drive_T`
+(what a key asks of the box of the drives) in `drive.c`. A label's
+name stands in a comment where the label was.
+
+What ran was asked of the build itself, instruction for instruction:
+the file compiled again with `-d1`, which is the same code with the
+lines of the source besides (its listing by `wdis` the same as the
+build's object), `wdis -s` of that, and the trace of the scenarios
+that reach the functions, `compare.compare(..., trace=True)` and
+`outcome.run.executed`, held against the places that the map gives
+(`build/g2/cov.py` of the checkout, not kept). Not run, of what
+changed: in `FindFil` the three places that go to `FnFl48`, out of
+reach in the original by `harness/ported.py`; in `F67_08` a drive whose
+current directory DOS will not tell, which goes to `F67_19`; in
+`F62_01` the drive that is not ready, the loop of `F62_41`, out of
+reach in the original. Each was read side by side with the old code
+once more. Every instruction of `FndMove`, `F67_25` and `F32_70` ran.
+That an instruction ran says nothing of which way a jump went, and a
+`break` is a jump: those were read so too.
+
+The record of `harness/width.py` has the helpers' numbers, and the
+reasons of `drive`, `first` and `letter` of `F67_00`, which went to
+`F67_08`; `answer` of `F67_00` no longer holds what `FindFil` answers,
+and its reason says so. The records of `int16.py`, `hostcheck.py` and
+`words.py` did not move.
+
+**What judged it.** The whole suite, fourteen tests, 158 scenarios,
+no golden and no patch changed. The code is 265 bytes longer (132 of
+`find.c`, 121 of `drive.c`, 12 of `usermenu.c`), so against `main`'s
+build every scenario differs in all of the room. Against `main`'s
+build padded to the same length of code, a function of 65 stores to a
+`volatile` pointer behind the last of `sys_dos.c`, not kept (`_TEXT`
+1CA5Eh in both): 152 of 158 scenarios with nothing that differs, and
+the six that S, N22 and G3 met, `comspec`, `ended`, `second-copy`,
+`start-screen`, `start-setup`, whose second copy of the program lives
+in the room with code of another layout, and `start-memory`,
+`ViewSeg` and `FreMem2` naming nothing known. Nothing is declared as
+changed.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on
