@@ -9,6 +9,21 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 Vers_S[];
+extern const u8 Err_S[];
+extern const u8 OnDr_S[];
+extern const u8 OnDv_S[];
+extern const u8 Errs_S[];
+extern const u8 FatEr_S[];
+extern const u8 Ok_S[];
+extern const u8 Inc_S[];
+extern const DIALOG(1) FtEr1_B;
+extern const DIALOG(1) FtEr2_B;
+extern const BOX1(4) NoRd_P;
+
 /* What is not static here, others name: the code of main.c, start.c,
    exec.c and of those that show the title, and the boxes of other
    files. */

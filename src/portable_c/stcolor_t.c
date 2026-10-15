@@ -22,6 +22,31 @@
  */
 #include "tables.h"
 
+/* A picture of StPagTab, below: what it is made of, as stcolor.c has
+   it. */
+struct Picture {
+    const u8 *page;
+    const u8 *colors;
+};
+
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 StColor_S[];
+extern const u8 StMode_S[];
+extern const u8 StPalet_S[];
+extern const u8 StBwPal_S[];
+extern const u8 StLapTp_S[];
+extern const u8 StColMd_S[];
+extern const u8 StMonMd_S[];
+extern const u8 StColrs_S[];
+extern const u8 StOn_S[];
+extern const u8 StColNm_S[];
+extern const u8 StColNm_P[];
+extern const DIALOG(1) StDfCol_B;
+extern const u8 StColPage[];
+extern const struct Picture StPagTab[];
+
 /* Of keys_t.c: the buttons Yes and No, their text and where they are.
    The setup program has its own, of the same bytes. */
 extern const u8 YesNo_S[];
@@ -477,10 +502,7 @@ const u8 StColPage[39] = {
 };
 
 /* The pictures, each with its colours. */
-const struct {
-    const u8 *page;
-    const u8 *colors;
-} StPagTab[4] = {
+const struct Picture StPagTab[4] = {
     { StPage1_S, StColr1_T },
     { StPage2_S, StColr2_T },
     { StPage3_S, StColr3_T },

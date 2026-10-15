@@ -179,8 +179,11 @@ static const u8 Byts_S[6] NONSTRING = " Bytes";
    original, so a place that has wrapped round, two before 0, is the word
    that it is on DOS, at the segment's end, and not one in front of the
    text. One place reads so: a line that begins at 1, which NextLin does
-   not ask about before it looks at the two bytes in front of it. */
-#define WORD_AT(text, at) (*(u16 *)((text) + (u16)(at)))
+   not ask about before it looks at the two bytes in front of it.
+   WORD_AT reads, of a text that may be const, and WORD_TO is the same
+   word to be written. */
+#define WORD_AT(text, at) (*(const u16 *)((text) + (u16)(at)))
+#define WORD_TO(text, at) (*(u16 *)((text) + (u16)(at)))
 
 /* Whether two bytes end a line: CR LF, or LF CR. */
 #define IS_CRLF(word) ((word) == 0x0A0D || (word) == 0x0D0A)
@@ -679,14 +682,14 @@ void V50_00(u8 *text)
     VI->ViOffset += (u32)half;
     ViFirst -= half;
     from = to = ViSpace - 2;
-    WORD_AT(text, to) = 0;
+    WORD_TO(text, to) = 0;
     while (from >= ViEndTab) {
         at = WORD_AT(text, from);
         from -= 2;
         if (at <= half)
             continue;
         to -= 2;
-        WORD_AT(text, to) = (u16)(at - half);
+        WORD_TO(text, to) = (u16)(at - half);
     }
     ViEndTab = to;
     rest = VI->ViLen - VI->ViOffset;
@@ -784,7 +787,7 @@ void V60_00(u8 *text, i32 at, i32 table)
         column = 0;
         if (at < table) {
             table -= 2;
-            WORD_AT(text, table) = (u16)at;
+            WORD_TO(text, table) = (u16)at;
             if (table < loaded)
                 loaded = table;
         } else {
@@ -1670,7 +1673,7 @@ static struct Next Next(bool none, const u8 *at)
     struct Next next;
 
     next.none = none;
-    next.at = (u8 *)at;                 /* in MenuBuf, which is written */
+    next.at = PLACE_IN(md.MenuBuf, at);
     return next;
 }
 
@@ -1779,7 +1782,7 @@ struct Named F34_40(u8 *text, bool view)
         return F34_45(text);
     to = md.TmpBuf;
     if (CutPath(text) == text)
-        to = (u8 *)CutPath(md.TmpBuf);
+        to = CUT_PATH(md.TmpBuf);
     from = text;
     for (count = LenPath + 13; count != 0; count--)
         *to++ = *from++;

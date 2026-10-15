@@ -1023,12 +1023,18 @@ def declared_shapes(path):
             r"(?:const\s+)?(?:\w+\s+)*?(\w+)\s*\[[^\]]*\]\s*[=;]", text,
             flags=re.M):
         shapes[match[1]] = ("pointers", None)
-    # A structure that is declared with the object, or an array of such:
-    # StPagTab of stcolor_t.c. One of nothing but pointers is known.
+    # A structure that the file declares, or an array of such: StPagTab
+    # of stcolor_t.c, a struct Picture, which the file has with a tag so
+    # that it can declare the object before it defines it. One of nothing
+    # but pointers is known.
+    tags = {match[1]: match[2] for match in re.finditer(
+        r"^struct\s+(\w+)\s*{([^{}]*)}\s*;", text, flags=re.M)}
     for match in re.finditer(
-            r"^(?:static\s+)?const\s+struct\s*{([^{}]*)}\s*(\w+)\s*"
+            r"^(?:static\s+)?const\s+struct\s+(\w+)\s+(\w+)\s*"
             r"(?:\[[^\]]*\])?\s*=", text, flags=re.M):
-        members = [member for member in match[1].split(";")
+        if match[1] not in tags:
+            continue
+        members = [member for member in tags[match[1]].split(";")
                    if member.strip()]
         if all("*" in member for member in members):
             shapes[match[2]] = ("pointers", None)

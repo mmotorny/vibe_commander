@@ -697,6 +697,9 @@ NO_RETURN void Main(void);
 #define CmnIni  OFFSET_IN(struct MainDat, LoadRes)
 #define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
+/* The setup as the main loop last found it, of setup.c: see there. */
+extern u8 IniSave[INI_LEN];
+
 /*
  * The setup program.
  *
@@ -836,6 +839,14 @@ u8 *AddFile(u8 *end);                                   /* string.c */
 u8 *MvzLine(u8 *to, const u8 *from, i32 length);
 u16 LowCase(u16 letter);
 const u8 *CutPath(const u8 *path);
+/* The place `at` of a buffer that may be written, where `at` was found
+   by something that only reads and answers with a pointer to const, as
+   CutPath does: the same place, reckoned from the buffer, so that it is
+   the buffer's own pointer. A cast would say the same and drop the
+   const. `buffer` is named twice. */
+#define PLACE_IN(buffer, at) ((buffer) + ((at) - (buffer)))
+/* CutPath of a path that may be written. */
+#define CUT_PATH(path) PLACE_IN(path, CutPath(path))
 void PathLin(u8 *text);
 void LetLin(u8 *text);
 void ShrtLin(u8 *text, i32 limit);

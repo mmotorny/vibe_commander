@@ -27,6 +27,24 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const DIALOG(16) StConf_B;
+extern const DIALOG(6) StScrn_B;
+extern const u8 StOkMn_S[];
+extern const DIALOG(9) StPanOp_B;
+extern const DIALOG(1) StNoTim_B;
+extern u8 StInf02_S[];
+extern const u8 StInf05_S[];
+extern u8 StInf06_S[];
+extern u8 StInf07_S[];
+extern const u8 StInf09_S[];
+extern u8 StInf10_S[];
+extern u8 StInf11_S[];
+extern const u8 StOk_S[];
+extern const DIALOG(1) StInfo_B;
+
 /* What is not static here, others name: stopts.c the dialogs and the
    lines that it reads and writes; and the help of the setup the two
    texts of a button Ok, StOkMn_S and StOk_S. */

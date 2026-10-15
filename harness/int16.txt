@@ -34,11 +34,6 @@ copy.c, C00_01: widen
     to is where UnConv has written the name into CpDest, behind its
     path: within the LenName bytes of CpDest.
 
-copy.c, C40_00: widen
-    | count = (i32)(C00_End(target, &count) - target);
-    C00_End looked for the zero byte in LenName bytes of target, just
-    above, and answers behind it: 1 to LenName.
-
 copy.c, C40_05: widen
     | for (count = LenName - (i32)(to - buffer); count; count--)
     to is buffer, buffer + 2, or behind the path of LenPath bytes that

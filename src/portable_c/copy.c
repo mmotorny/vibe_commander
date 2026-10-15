@@ -162,20 +162,21 @@ static const u8 *F35_40(void)
     return Ren0_S;
 }
 
-/* Where the text at `text` ends, looked for in `count` bytes: the address
-   behind its zero byte, or behind the bytes if there is none. `count` is
-   then what was left to look at. */
-static const u8 *C00_End(const u8 *text, i32 *count)
+/* Where the text at `text` ends, looked for in `count` bytes: how far
+   from `text` it is to behind its zero byte, or to behind the bytes if
+   there is none. `count` is then what was left to look at. */
+static i32 C00_End(const u8 *text, i32 *count)
 {
     i32 left = *count;
+    i32 at = 0;
     u8 c;
 
     do {
-        c = *text++;
+        c = text[at++];
         left--;
     } while (left && c != 0);
     *count = left;
-    return text;
+    return at;
 }
 
 /* The drive that a path is on, as a capital letter, or 0 for a path that
@@ -221,7 +222,7 @@ copy:
     NormStr(buffer);
     PathLin(buffer);
     count = LenName;
-    to = (u8 *)C00_End(buffer, &count) - 2;
+    to = buffer + C00_End(buffer, &count) - 2;
     if (*to == '.')
         *to = 0;
 }
@@ -237,7 +238,7 @@ static bool C40_00(i32 *left)
     C40_05(CpSrc, md.TmpErr);
     C40_05(CpDest, md.TmpErr + 100);
     count = LenName;
-    count = (i32)(C00_End(target, &count) - target);
+    count = C00_End(target, &count);
     do {
         count--;
         if (*source++ != *target++) {
@@ -344,7 +345,7 @@ static bool C00_01(void)
     PathLin(CpDest);
     if (CopyMov == 3)
         return true;
-    name = (u8 *)CutPath(CpDest);
+    name = CUT_PATH(CpDest);
     to = name;
     if (*name == 0)
         goto source;
@@ -359,8 +360,8 @@ static bool C00_01(void)
             goto mask;
     } while (c != 0);
     count = LenName;
-    end = C00_End(CpDest, &count);
-    to = (u8 *)end;
+    to = CpDest + C00_End(CpDest, &count);
+    end = to;
     other = OtherPanel;
     count = (i32)(end - CpDest);
     for (i = 0; other->WinPath[i] == CpDest[i]; )
@@ -995,7 +996,7 @@ full:
         SplitFl = 1;
     for (i = 0; i < LenName; i++)
         md.TmpErr[i] = CpDest[i];
-    part = (u8 *)CutPath(md.TmpErr);
+    part = CUT_PATH(md.TmpErr);
     if (part <= md.TmpErr)
         goto open;
     part--;
@@ -1021,7 +1022,7 @@ full:
         if (asked.failed && asked.value == ERR_NOT_READY)
             goto forget;
         count = LenName;
-        end = (u8 *)C00_End(md.TmpErr, &count);
+        end = md.TmpErr + C00_End(md.TmpErr, &count);
         if (*end == 0)
             goto open;
         end[-1] = '\\';
@@ -1327,7 +1328,7 @@ static void F35_70(void)
    has not: after Shift-F6, or F6 with the panel switched off. */
 static u8 *F35_50(struct WCBdef *panel, i32 directories, i32 files)
 {
-    const struct WCBdef *wcb;
+    struct WCBdef *wcb;
     const u8 *from;
     u8 *to;
     const u8 *title;
@@ -1397,7 +1398,7 @@ struct Copied F45_01(struct WCBdef *panel, i32 command, i32 directories,
         CpSrc[i] = md.ViewFil[i];
     if (md.ViewFil[0] == 0 || md.ToFile[0] == 0)
         return Go(GO_PANELS);
-    CpBgNam = (u8 *)CutPath(CpSrc);
+    CpBgNam = CUT_PATH(CpSrc);
     F35_70();
     return Masked(F35_40());
 }
@@ -1419,7 +1420,7 @@ static void F36_04(void)
 
     for (i = 0; i < LenPath; i++)
         CpSrc[i] = md.CrnPath[i];
-    CpBgNam = (u8 *)CutPath(CpSrc);
+    CpBgNam = CUT_PATH(CpSrc);
     F35_70();
     md.ZoomOne = 0;
     if ((u8)C00_00(ATTR_DIRECTORY) == 0 || CopyMov == 0)
@@ -1451,7 +1452,8 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
                      i32 files)
 {
     const u8 *from;
-    const u8 *name, *typed;
+    const u8 *typed;
+    u8 *name;
     u8 *to, *end;
     struct Selected selected;
     i32 length, i;
@@ -1531,9 +1533,9 @@ F36_03:
         goto F36_01;
     for (i = 0; i < LenPath; i++)
         CpInpt[i] = md.CrnPath[i];
-    name = CutPath(CpInpt);
+    name = CUT_PATH(CpInpt);
     for (i = 0; i < 13; i++)
-        ((u8 *)name)[i] = typed[i];
+        name[i] = typed[i];
     for (i = 0; CpInpt[i] != 0; i++)
         if (i == LenStr)
             goto F36_01;                /* too long */

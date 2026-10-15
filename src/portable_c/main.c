@@ -107,14 +107,14 @@ const u8 *FndLet(const u8 *text);
 
 /* What this reads or names of other files: the scan codes of Alt with a
    digit or a letter, which begin the speed search; of main_t.c the box
-   that says a drive is not ready, which DialBox takes a pointer to;
-   and of setup.c the setup as it was last saved or found. Menu_T, of
+   that says a drive is not ready, which DialBox takes a pointer to.
+   IniSave, of setup.c, the setup as it was last saved or found, is
+   declared in vc.h. Menu_T, of
    commands_t.c, is a word for each table of a menu's commands that
    names it, a pointer there: see NAMED of vc.h. */
 extern const u8 AltSr_T[];
 extern const u16 * const Menu_T[];
 extern const struct BOXTOP NoRd_P;
-extern u8 IniSave[];
 
 /* The main data: one structure, which is all that the original has in
    the block of memory that it asks DOS for and has DS on. Here it is an

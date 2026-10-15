@@ -6,6 +6,21 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 Line_S[];
+extern const u8 EdtH_S[];
+extern const u8 EdtH1_S[];
+extern const u8 EdtH2_S[];
+extern const u8 EdtH_P[];
+extern const BOX1(3) SavFi_P;
+extern const DIALOG(1) SavAs_B;
+extern const DIALOG(1) SavCn_B;
+extern const DIALOG(1) BigFi_B;
+extern const DIALOG(1) NewFi_B;
+extern const DIALOG(1) SavEr_B;
+
 /* What is not static here, edit.c names. */
 
 /* Of other files: the title " Edit "; the empty line that an input is

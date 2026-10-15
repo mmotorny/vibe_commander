@@ -336,7 +336,7 @@ Run_04:                                 /* a command */
     left = LenCmd - 1;
     if (to <= md.DosBuf && (u8)pair == '@') {
         md.LoadFl |= 0x80;
-        *(u8 *)from = ' ';
+        *PLACE_IN(text, from) = ' ';
     }
 Run_05:
     pair = WORD_AT(from);

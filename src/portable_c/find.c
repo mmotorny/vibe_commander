@@ -607,7 +607,7 @@ next:
         if (entry.value == ERR_NOT_READY)
             return 0x100;
         /* FnFl50: no more files here. On to the directories. */
-        *(u8 *)CutPath(md.TmpBuf) = 0;
+        *CUT_PATH(md.TmpBuf) = 0;
         return DirFunc();
     }
     /* FnFl44 */
@@ -618,7 +618,7 @@ next:
            list, and the text looked for in each; a part begins 80 bytes
            before the end of the one before. */
         V81_00();
-        name = (u8 *)CutPath(md.TmpBuf);
+        name = CUT_PATH(md.TmpBuf);
         for (i = 0; i < 13; i++)
             name[i] = md.DTA.FilName[i];
         FndStat();
@@ -685,7 +685,7 @@ next:
         }
         for (i = 0; i < LenPath + 13; i++)
             md.TmpErr[i] = md.TmpBuf[i];
-        name = (u8 *)CutPath(md.TmpErr);
+        name = CUT_PATH(md.TmpErr);
         if ((u16)(name - md.TmpErr) > 3)
             name--;
         *name = 0;
@@ -909,7 +909,7 @@ again:
         NormStr(md.TmpErr);
         if (md.TmpErr[0] == 0)
             goto close;
-        *(u16 *)CutPath(md.TmpErr) = 'A';
+        *(u16 *)CUT_PATH(md.TmpErr) = 'A';
         first = *(u16 *)md.TmpErr;
         if (first == ALL_DRIVES) {
             for (;;) {
@@ -960,7 +960,7 @@ again:
         for (; count != 0; count--)
             *end++ = *rest++;
         *end = 0;
-        *(u8 *)CutPath(md.TmpBuf) = 0;
+        *CUT_PATH(md.TmpBuf) = 0;
         md.FncAddr = FNC_FINDFIL;
         answer = FindFil(ATTR_DIRECTORY);
         if ((answer >> 8) != 0 || first != ALL_DRIVES || FND->FndDrv > 'Z')

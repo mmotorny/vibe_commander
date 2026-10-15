@@ -562,7 +562,9 @@ bool T54_00(struct Where *where)
     i32 from, next;
     i32 at;
     bool found = false;
-    u16 pair, word;
+    u16 pair = 0;                       /* read only once found is set,
+                                           with it */
+    u16 word;
 
     if (where->line == 0)
         return true;

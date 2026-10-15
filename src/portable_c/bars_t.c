@@ -7,6 +7,11 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 PtMnu_S[];
+
 
 /* The names of the five menus, each behind four spaces, and spaces to
    the end of the row: FFh and a number are that many spaces. */

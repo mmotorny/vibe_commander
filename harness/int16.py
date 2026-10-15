@@ -188,9 +188,13 @@ OFFSETOF = ("-Doffsetof(type,field)="
 
 # The words of the addresses, of vc.h: what is written in one is no
 # place. PLACE is of harness/int16check.c, which has it written as one
-# of them, to hold this to.
+# of them, to hold this to. PLACE_IN and CUT_PATH make a pointer to
+# const the buffer's own pointer to the same place, by the difference of
+# two pointers into one buffer added back to it: no number of the
+# program's is in that.
 WORDS = {"MAIN_AS_PANEL", "PANEL_AS_MAIN", "NUMBER_OF", "NEAR", "MD_PLACE",
-         "MD_POINTER", "TREE_OFFSET", "TREE_ENTRY", "PLACE"}
+         "MD_POINTER", "TREE_OFFSET", "TREE_ENTRY", "PLACE", "PLACE_IN",
+         "CUT_PATH"}
 
 # The kinds, in the order of the summary: the name that the record has
 # for each, and what is done there with a number that the two builds may

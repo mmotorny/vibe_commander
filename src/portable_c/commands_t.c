@@ -14,6 +14,24 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u16 * const Menu_T[];
+extern const DIALOG(4) Filt_B;
+extern const BOX1(3) DiSiz_P;
+extern const DIALOG(1) CmpDi_B;
+extern const u8 Chk1_S[];
+extern const u8 Chk2_S[];
+extern const DIALOG(10) Conf_B;
+extern const DIALOG(6) Sets_B;
+extern const u8 ExFl_S[];
+extern const u8 UsMnu_S[];
+extern const u8 ExtFl_S[];
+extern const DIALOG(1) MnLoc_B;
+extern const DIALOG(1) SvSt_B;
+extern const DIALOG(1) SetEr_B;
+
 /* What is not static here, others name: commands.c, and for Menu_T
    main.c. */
 

@@ -18,6 +18,17 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 StPalets[];
+extern const u8 StNoFnd_S[];
+extern const u8 StNoIni_S[];
+extern const DIALOG(1) StIniEr_B;
+extern const BOX(10) StMain_P;
+extern const DIALOG(1) StDeflt_B;
+extern const DIALOG(1) StSvSt_B;
+
 /* What is not static here, others name: stmain.c, and for StPalets the
    palettes too, stcolor.c. */
 

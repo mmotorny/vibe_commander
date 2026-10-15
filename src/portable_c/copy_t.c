@@ -7,6 +7,31 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 Copy0_S[];
+extern const u8 Move0_S[];
+extern const u8 Ren0_S[];
+extern const u8 RnMv_S[];
+extern const u8 CopTo_S[];
+extern const u8 CopFi_S[];
+extern const DIALOG(2) Copy1_B;
+extern const DIALOG(3) Copy2_B;
+extern const DIALOG(1) Renam_B;
+extern const BOX2(6) CopFi_P;
+extern const BOX2(6) MovFi_P;
+extern const BOX2(4) RenFi_P;
+extern const BOX2(5) CopDi_P;
+extern const BOX2(5) MovDi_P;
+extern const DIALOG(1) OvrCo_B;
+extern const DIALOG(1) Cont_B;
+extern const DIALOG(1) OpnEr_B;
+extern const DIALOG(1) Itslf_B;
+extern const DIALOG(1) RenEr_B;
+extern const DIALOG(1) Prot_B;
+extern const u8 OvrSk_D[];
+
 /* What is not static here, others name: copy.c, and for Prot_B edit.c
    too. */
 

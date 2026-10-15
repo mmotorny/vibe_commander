@@ -8,6 +8,16 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 Mask_S[];
+extern const u8 Ext_F[];
+extern const u8 DrIn_F[];
+extern const u8 Init_F[];
+extern const u8 OkCan_S[];
+extern const DIALOG(1) Fant_B;
+
 /* What is not static here, others name: the code, and the boxes of other
    files, which have Ok and Cancel from here. */
 

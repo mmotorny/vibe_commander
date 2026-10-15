@@ -8,6 +8,45 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 MkDir_S[];
+extern const u8 CrDir_S[];
+extern const DIALOG(1) MkDi1_B;
+extern const DIALOG(1) MkDi2_B;
+extern const DIALOG(1) MkErr_B;
+extern const u8 Del_S[];
+extern const u8 DelFs_S[];
+extern const u8 Subdi_S[];
+extern const u8 DlWr4_S[];
+extern const u8 Var2_S[];
+extern const BOX1(3) DelFl_P;
+extern const BOX1(3) DelDr_P;
+extern const DIALOG(1) DlMas_B;
+extern const DIALOG(1) DelSe_B;
+extern const DIALOG(1) DelCo_B;
+extern const DIALOG(1) DelFi_B;
+extern const DIALOG(1) DelDi_B;
+extern const DIALOG(1) RdOnl_B;
+extern const DIALOG(1) NoEmp_B;
+extern const DIALOG(1) DlWrn_B;
+extern const DIALOG(1) DelEr_B;
+extern const DIALOG(1) CntDi_B;
+extern const u8 Attr8_S[];
+extern const u8 NoFnd_S[];
+extern const u8 NoAtr_S[];
+extern const DIALOG(7) StAt1_B;
+extern const DIALOG(11) StAt2_B;
+extern const BOX1(3) StAtr_P;
+extern const DIALOG(1) NoDat_B;
+extern const DIALOG(1) AtrEr_B;
+extern const DIALOG(1) Label_B;
+extern const DIALOG(1) DelVo_B;
+extern const DIALOG(1) ErVol_B;
+extern const DIALOG(1) PthEr_B;
+extern const DIALOG(1) NoFnc_B;
+
 /* What is not static here, others name: copy.c names MkErr_B, boxes of
    other files Var2_S and NoFnd_S, and dirfunc.c the rest. */
 

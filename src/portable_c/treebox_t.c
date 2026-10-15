@@ -7,6 +7,13 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 Tree_F[];
+extern const BOX1(4) Tree_P;
+extern const BOX(3) TrSav_P;
+
 /* What is not static here, others name: the code of treebox.c, dirfunc.c
    and panel.c, and the boxes of other files. */
 

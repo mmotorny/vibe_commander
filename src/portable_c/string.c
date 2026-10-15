@@ -137,7 +137,7 @@ void LetLin(u8 *text)
     u8 c;
 
     PathLin(text);
-    text = (u8 *)CutPath(text);
+    text = CUT_PATH(text);
     do {
         c = (u8)LowCase(*text);
         *text++ = c;

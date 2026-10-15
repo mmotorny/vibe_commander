@@ -6,6 +6,15 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 Help_S[];
+extern const u8 HlpMn_P[];
+extern const u8 HlMn1_D[];
+extern const u8 HlMn2_D[];
+extern const DIALOG(1) HlpEr_B;
+
 /* What is not static here, help.c names. */
 
 /* Of another file: the text of the button Ok, and the button. */

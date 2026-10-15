@@ -392,7 +392,7 @@ static u16 F38_70(void)
     if (md.TmpBuf[1] == ':')
         letter = md.TmpBuf[0];
     fcb[7] = (u8)(letter - ('A' - 1));
-    name = (u8 *)CutPath(md.TmpBuf);
+    name = CUT_PATH(md.TmpBuf);
     if ((u8)FcbParse(name, fcb + 7, 2) != 1)
         return NOT_DONE;
     OncZoom(BOX_PLACE, &DelFl_P, DelFs_S, &box);
@@ -759,7 +759,7 @@ u16 DirFunc(void)
         }
         /* DiFu03 */
         if (md.DTA.FilName[0] != '.') {
-            name = (u8 *)CutPath(md.TmpBuf);
+            name = CUT_PATH(md.TmpBuf);
             for (count = 0; count < 13; count++)
                 name[count] = md.DTA.FilName[count];
             if (TstBrk())
@@ -774,7 +774,7 @@ u16 DirFunc(void)
     }
 
     /* DiFu07: the directory itself, in the one above */
-    name = (u8 *)CutPath(md.TmpBuf);
+    name = CUT_PATH(md.TmpBuf);
     if (name <= md.TmpBuf)
         return STOP;
     c = name[-1];
@@ -787,7 +787,7 @@ u16 DirFunc(void)
     }
     if (c == ':')
         return all;
-    name = (u8 *)CutPath(md.TmpBuf);
+    name = CUT_PATH(md.TmpBuf);
     for (count = 0; count < 13; count++)
         md.MenuBuf[count] = name[count];
     for (count = 0; count < 4; count++)
@@ -815,7 +815,7 @@ u16 DirFunc(void)
         }
     }
     /* DiFu12 */
-    name = (u8 *)CutPath(md.TmpBuf);
+    name = CUT_PATH(md.TmpBuf);
     for (count = 0; count < 13; count++)
         name[count] = md.MenuBuf[count];
     return all;
@@ -906,7 +906,7 @@ static i32 F47_01(const struct BOXHD *box)
         return TO_FUNC04;
     if (md.TmpBuf[0] == 0)
         return TO_FUNC04;
-    name = (u8 *)CutPath(md.TmpBuf);
+    name = CUT_PATH(md.TmpBuf);
     Convert(name, md.TmpBuf + 100);
     UnConv(name, md.TmpBuf + 100);
     if (box == &MkDi2_B) {
@@ -1003,7 +1003,7 @@ i32 F38_00(struct WCBdef *panel)
             return TO_FUNC04;
         md.ZoomOne = 0;
         if ((u8)F38_40(ATTR_DIRECTORY) != 0) {
-            end = (u8 *)CutPath(md.CrnPath);
+            end = CUT_PATH(md.CrnPath);
             if (end > md.CrnPath + 3)
                 end--;
             *end = 0;
@@ -1066,7 +1066,7 @@ i32 F48_00(void)
     LetLin(md.TmpBuf);
     if (md.TmpBuf[0] == 0)
         return TO_FUNC04;
-    name = (u8 *)CutPath(md.TmpBuf);
+    name = CUT_PATH(md.TmpBuf);
     if (*(u16 *)name != '.') {
         /* Every file, if DOS makes eleven question marks of it. */
         if ((u8)FcbParse(name, md.TmpBuf + 100, 0) != 1)
@@ -1295,7 +1295,7 @@ static i32 FncMs1(const u8 *include)
         /* FncMs2 */
         if (!(md.DTA.FilAttr & (ATTR_DIRECTORY | ATTR_SYSTEM | ATTR_HIDDEN))) {
             include = 0;
-            name = (u8 *)CutPath(md.TmpBuf);
+            name = CUT_PATH(md.TmpBuf);
             for (i = 0; i < 13; i++)
                 name[i] = md.DTA.FilName[i];
             if (TstBrk())

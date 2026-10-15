@@ -113,12 +113,39 @@ struct BOXTX {
    texts stand behind it, and the lines behind those. */
 #define BOX_HEAD u8 colors[4]; u8 lines; u8 texts; u16 saved
 struct BOXTOP { BOX_HEAD; };
-#define BOX(count) \
-    struct { BOX_HEAD; const u8 *line[count]; }
-#define BOX1(count) \
-    struct { BOX_HEAD; struct BOXTX text[1]; const u8 *line[count]; }
-#define BOX2(count) \
-    struct { BOX_HEAD; struct BOXTX text[2]; const u8 *line[count]; }
+
+/* Each shape is a type of its own with a tag, Box4 for BOX(4), so that
+   a file of tables can declare a box in front of where it defines it,
+   with the type that it defines it with, which clang asks of every
+   object that other files name (-Wmissing-variable-declarations of
+   CMakeLists.txt): two structures without a tag are two types. So each
+   count that a table has is made here, BOX_SHAPE and the like, and a
+   count that is not is a structure that the compiler does not know. */
+#define BOX(count)  struct Box##count
+#define BOX1(count) struct Box1_##count
+#define BOX2(count) struct Box2_##count
+#define BOX_SHAPE(count) \
+    BOX(count) { BOX_HEAD; const u8 *line[count]; }
+#define BOX1_SHAPE(count) \
+    BOX1(count) { BOX_HEAD; struct BOXTX text[1]; const u8 *line[count]; }
+#define BOX2_SHAPE(count) \
+    BOX2(count) { BOX_HEAD; struct BOXTX text[2]; const u8 *line[count]; }
+BOX_SHAPE(3);
+BOX_SHAPE(4);
+BOX_SHAPE(7);
+BOX_SHAPE(9);
+BOX_SHAPE(10);
+BOX_SHAPE(14);
+BOX_SHAPE(17);
+BOX_SHAPE(18);
+BOX1_SHAPE(3);
+BOX1_SHAPE(4);
+BOX1_SHAPE(5);
+BOX1_SHAPE(9);
+BOX2_SHAPE(4);
+BOX2_SHAPE(5);
+BOX2_SHAPE(6);
+BOX2_SHAPE(7);
 
 /* The routine that a dialog names, for Dialog to call when the dialog is
    answered with Enter or F10. The assembly has the address of the
@@ -167,9 +194,21 @@ struct BOXMN {
                                            or a NUMBER */
 };
 
-/* A dialog of n fields: the header, the fields and a byte 0. */
-#define DIALOG(count) \
-    struct { struct BOXHD head; struct BOXMN field[count]; u8 end; }
+/* A dialog of n fields: the header, the fields and a byte 0. A type of
+   its own for each count, as a box is. */
+#define DIALOG(count) struct Dialog##count
+#define DIALOG_SHAPE(count) \
+    DIALOG(count) { struct BOXHD head; struct BOXMN field[count]; u8 end; }
+DIALOG_SHAPE(1);
+DIALOG_SHAPE(2);
+DIALOG_SHAPE(3);
+DIALOG_SHAPE(4);
+DIALOG_SHAPE(6);
+DIALOG_SHAPE(7);
+DIALOG_SHAPE(9);
+DIALOG_SHAPE(10);
+DIALOG_SHAPE(11);
+DIALOG_SHAPE(16);
 
 #pragma pack(pop)
 

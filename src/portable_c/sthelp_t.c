@@ -8,6 +8,12 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 StHlpMn_D[];
+extern const DIALOG(1) StHlpEr_B;
+
 /* What is not static here, sthelp.c names. */
 
 /* Of the main program, and the same bytes in the setup program: the

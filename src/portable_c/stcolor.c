@@ -485,7 +485,9 @@ static void StCol00(void)
     u16 *screen;
     u16 size, place, item, paint;
     i32 rows, count, i;
-    u16 color, key;
+    u16 color;
+    u16 key = 0;                        /* read only where Input has
+                                           set it: no mouse */
     bool mouse;
     struct Chosen chosen;
 
@@ -678,7 +680,9 @@ static void StF07_01(const u8 *name, i32 palette)
     const u8 *mode;
     const u8 *text;
     u16 *screen;
-    u16 size, cell, shape, key;
+    u16 size, cell, shape;
+    u16 key = 0;                        /* read only where Input has
+                                           set it: no mouse */
     i32 rows, i, what;
     bool mouse;
 

@@ -6,6 +6,16 @@
  */
 #include "tables.h"
 
+/* What this file defines that other files may name, declared as it
+   is defined: clang asks for a declaration in front of each such
+   object (-Wmissing-variable-declarations). */
+extern const u8 FnFl6_S[];
+extern const u8 FnFl7_S[];
+extern const u8 FnFl_P[];
+extern const DIALOG(2) Find_B;
+extern const u8 Find5_D[];
+extern const u8 Find6_D[];
+
 /* What is not static here, find.c names. */
 
 /* "N files found." is put together of these two, and the command copies

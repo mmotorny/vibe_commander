@@ -253,7 +253,7 @@ ended:
 
     /* The extension file of the directory, or else the main one. */
     if (panel->ChgFlg == 0) {
-        to = (u8 *)CutPath(md.TmpBuf);
+        to = CUT_PATH(md.TmpBuf);
         MvzLine(to, Ext_F, LenPath);
         opened = OpenFil(md.TmpBuf, 0x40);
         answer = opened.value;
@@ -527,7 +527,7 @@ void DirSize(struct WCBdef *panel)
             continue;
         *(u16 *)(md.TmpBuf + 90) = 0;
         *(u16 *)(md.TmpBuf + 92) = 0;
-        to = (u8 *)CutPath(md.TmpBuf);
+        to = CUT_PATH(md.TmpBuf);
         for (i = 0; i < 13; i++)
             to[i] = entry->NameF[i];
         if (FncCall(ATTR_DIRECTORY) >> 8)

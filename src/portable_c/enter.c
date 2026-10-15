@@ -314,7 +314,7 @@ static struct Onward F23_02(struct WCBdef *panel, u16 address)
         panel->First = DSKBUF + sizeof(struct FILENT);
         panel->EndBuf = DSKBUF + sizeof(struct FILENT);
         ENTRY(panel, DSKBUF + sizeof(struct FILENT))->NameF[0] = 0;
-        name = (u8 *)CutPath(panel->WinPath);
+        name = CUT_PATH(panel->WinPath);
         file = ENTRY(panel, DSKBUF);
         for (i = 0; i < 12; i++)
             file->NameF[i] = name[i];

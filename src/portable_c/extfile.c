@@ -132,7 +132,7 @@ u8 *FindExt(const u8 *name)
             if ((pair & 0xFF) == EOF_CHAR)
                 return 0;
             if ((pair & 0xFF) == ':')
-                return (u8 *)file;      /* in MenuBuf, which is written */
+                return PLACE_IN(md.MenuBuf, file);
         }
         continue;
 FnEx12:

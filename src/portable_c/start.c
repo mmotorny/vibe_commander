@@ -33,11 +33,10 @@
 
 /* What this reads of other files: in the segment of the tables, the
    names of the setup file and of the main extension file, 13 bytes each
-   with what follows them; and the setup as it was last saved or found,
-   of setup.c. */
+   with what follows them. The setup as it was last saved or found, of
+   setup.c, is declared in vc.h. */
 extern const u8 Init_F[];
 extern const u8 Ext_F[];
-extern u8 IniSave[];
 
 
 /* Where Init00 has the setup file as it read it, or the defaults of the
@@ -222,7 +221,7 @@ static u8 *MnPth0(u8 *to, const u8 *env,
                 from = other;
             for (i = 0; i < LenPath; i++)       /* MnPth9 */
                 to[i] = from[i];
-            end = (u8 *)CutPath(to);
+            end = CUT_PATH(to);
             break;
         }
         for (i = 0; i < length && env[at + i] == name[i]; i++)
