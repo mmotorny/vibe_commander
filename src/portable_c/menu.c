@@ -273,7 +273,7 @@ static void F40_10(u16 color, u16 letter, i32 item, u16 begin, u16 size)
 
     if (item == 0xFF)
         return;
-    place = (u16)((item + 1) << 8 | (begin + 1) & 0xFF);
+    place = (u16)((item + 1) << 8 | ((begin + 1) & 0xFF));
     width = (size - 4) & 0xFF;
     color = Color(color);
     screen = BasAdr(place);
@@ -372,7 +372,7 @@ static void F39_52(u16 *top, u16 size, i32 lines)
     *cell++ = box | BOTTOM >> 8;
     for (count = inner; count != 0; count--)
         *cell++ = box | LINE;
-    *cell++ = box | BOTTOM & 0xFF;
+    *cell++ = box | (BOTTOM & 0xFF);
     Shadow(Shadow(cell));
     cell = line + 82;
     count = inner + 2;

@@ -215,7 +215,7 @@ void PutPath(struct WCBdef *panel)
             if (length >= least) {
                 if (length > limit)
                     length = limit;
-                place = ADD_LOW(place, -((length - least >> 1) + 1));
+                place = ADD_LOW(place, -(((length - least) >> 1) + 1));
             }
         }
         ShrtLin(md.TmpErr + 2, limit - 1);

@@ -49,7 +49,7 @@ copy.c, F35_50: widen
     Two places of TmpBuf, 20 bytes apart.
 
 dialog.c, DialBox: widen
-    | size = (u16)((head->lines << 8 | width & 0xFF) + 0x40C);
+    | size = (u16)((head->lines << 8 | (width & 0xFF)) + 0x40C);
     Cut to 16 bits by the cast on the line itself; a box has fewer
     lines than the screen has rows, so nothing reaches above them.
 
@@ -74,11 +74,11 @@ dialog.c, InpStr: widen
     1 or more: the number is 0 to the length less 1.
 
 dialog.c, MnMn11: shift
-    | chosen = (u16)(button - table >> 1);
+    | chosen = (u16)((button - table) >> 1);
     button steps up from table, two at a time, in the loop above.
 
 dialog.c, MnMn11: shift
-    | key = (u16)(button - table >> 1);
+    | key = (u16)((button - table) >> 1);
     button steps up from table, two at a time, in the loop above.
 
 drive.c, F62_01: widen
@@ -87,7 +87,7 @@ drive.c, F62_01: widen
     MaxLins * 80 cells of ScrBuf, 0 or more and below 64K.
 
 drive.c, F62_01: widen
-    | place = (u16)((begin & 0xFF00 | BegBX(panel) & 0xFF) + 0x314
+    | place = (u16)(((begin & 0xFF00) | (BegBX(panel) & 0xFF)) + 0x314
     Cut to 16 bits by the cast on the line itself; the letters are in
     the box, which is on the screen.
 
@@ -97,12 +97,12 @@ edit.c, T00_00: widen
     most to TmpBuf, and `end` is behind them, a byte further on.
 
 edit.c, T01_10: widen
-    | EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst + 0x10);
+    | EdOffst = (EdOffst & ~0xFFFF) | (u16)(EdOffst + 0x10);
     wraps: written so. The low word of the place alone is stepped by a
     line of hex and back, as the assembly steps it, and the cast is that.
 
 edit.c, T01_10: widen
-    | EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst - 0x10);
+    | EdOffst = (EdOffst & ~0xFFFF) | (u16)(EdOffst - 0x10);
     wraps: written so. The low word of the place alone is stepped by a
     line of hex and back, as the assembly steps it, and the cast is that.
 
@@ -275,7 +275,7 @@ treebox.c, ChTree: widen
     screen.
 
 treebox.c, ChTree: widen
-    | color = (u16)(Color(ChTr_P[0]) << 8 | column & 0xFF);
+    | color = (u16)(Color(ChTr_P[0]) << 8 | (column & 0xFF));
     Color answers a colour in a byte, and the column is its low byte:
     the number is of 16 bits, and the cast cuts nothing.
 

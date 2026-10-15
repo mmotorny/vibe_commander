@@ -180,7 +180,7 @@ void Blank(void)
                 goto wake;
             }
             now = KeysHeld();
-            i = held & 0xF0 ^ now;
+            i = (held & 0xF0) ^ now;
             held = now;
             if (i != 0)
                 goto wake;

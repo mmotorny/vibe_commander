@@ -354,7 +354,7 @@ Help10:                                 /* the text from the line `first` */
         text = lines;
         count = entry->HlpFrst + 1;
         do {
-            left = 0xFF00 | count & 0xFF;
+            left = 0xFF00 | (count & 0xFF);
             do
                 left--;
             while (*text++ != 0 && left != 0);
@@ -373,7 +373,7 @@ Help10:                                 /* the text from the line `first` */
         where = BEGIN + AT_TEXT;
         count = (u8)(md.Lines - 12);
         if (moved == 1 || moved == 0xFFFF) {
-            how = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
+            how = moved == 1 ? 0x600 | (count - 1 & 0xFF) : 0x700;
             Scroll(how >> 8 == 7, Color(Help_C), where,
                    (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1) + where));
             where += how << 8;

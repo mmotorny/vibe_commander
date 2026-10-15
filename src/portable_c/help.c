@@ -353,9 +353,9 @@ Help10:                                 /* the cursor within the window */
     shown = hd.HlpFrst;
     hd.HlpFrst = (u16)first;
     moved = first - shown;
-    if (moved != 0 || hd.HlpMode == 0 && was != hd.HlpCur) {
+    if (moved != 0 || (hd.HlpMode == 0 && was != hd.HlpCur)) {
         if (shown != 0xFFF0) {          /* the line that had the cursor */
-            place = (u16)(BEGIN + (was - shown << 8) + AT_TEXT);
+            place = (u16)(BEGIN + ((was - shown) << 8) + AT_TEXT);
             Help77(place, Help72(was));
             Window(place, 0x100 | WIDTH);
         }
@@ -380,7 +380,7 @@ Help10:                                 /* the cursor within the window */
             place = BEGIN + AT_TEXT;
             count = SHOWN();
             if (moved == 1 || moved == -1) {
-                key = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
+                key = moved == 1 ? 0x600 | (count - 1 & 0xFF) : 0x700;
                 Scroll(key >> 8 == 7, Color(Help_C), place,
                        (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1) + place));
                 place += key << 8;
@@ -389,7 +389,7 @@ Help10:                                 /* the cursor within the window */
             Window(place, (u16)(count << 8 | WIDTH));
         }
         if (hd.HlpMode == 0) {          /* the cursor */
-            place = (u16)(BEGIN + (hd.HlpCur - hd.HlpFrst << 8) + AT_TEXT);
+            place = (u16)(BEGIN + ((hd.HlpCur - hd.HlpFrst) << 8) + AT_TEXT);
             MvsColr(BasAdr(place), WIDTH, Color(HlpRe_C));
             Window(place, 0x100 | WIDTH);
         }
@@ -497,7 +497,7 @@ Help31:
                 cursor = count;
                 goto Help10;
             }
-            clicked = DoublMo(mouse & 0xFF00 | (u8)(BEGIN + 4),
+            clicked = DoublMo((mouse & 0xFF00) | (u8)(BEGIN + 4),
                               0x100 | (u8)(size - 10), cursor);
             if (clicked == 2)
                 goto Help10;

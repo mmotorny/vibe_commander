@@ -40,7 +40,7 @@ static u16 *BoxLn0(u16 *screen, u16 cell, u16 ends, i32 margin, i32 width)
     *screen++ = color | ends >> 8;
     for (count = width; count != 0; count--)
         *screen++ = cell;
-    *screen++ = color | ends & 0xFF;
+    *screen++ = color | (ends & 0xFF);
     for (count = margin; count != 0; count--)
         *screen++ = color | SPACE;
     return screen;
@@ -156,11 +156,11 @@ void MinBox(u16 begin, u16 size, u16 color)
             down = MinBx5(size >> 8, begin >> 8, step, 5);
             /* The sizes: the cast cuts off the beginning that `down` has
                in its high byte. */
-            ShadBox(down & 0xFF00 | across >> 8,
-                    (u16)(down << 8 | across & 0xFF), color);
+            ShadBox((down & 0xFF00) | across >> 8,
+                    (u16)(down << 8 | (across & 0xFF)), color);
             tick = MinBx3(tick);
-            Window(down & 0xFF00 | across >> 8,
-                   (u16)(down << 8 | across & 0xFF));
+            Window((down & 0xFF00) | across >> 8,
+                   (u16)(down << 8 | (across & 0xFF)));
         }
         MinBx3(tick);
         *shadow = shadows;

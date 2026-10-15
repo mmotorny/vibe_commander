@@ -185,7 +185,7 @@ F32_77:
                            | (u8)(((begin + 0x204) >> 8) + line) << 8),
                      0x100 | (u8)(size - 10), line);
     if (answer == 2)
-        return 0x100 | line & 0xFF;
+        return 0x100 | (line & 0xFF);
     if (answer == 0)
         return line & 0xFF;             /* F32_76, with the line in AL */
     TypMous(0);
@@ -642,7 +642,7 @@ F32_18:                                 /* the box */
     begin -= (u8)(((size >> 8) + 1 & 0xFF) >> 1) << 8
         | (u8)((size - 1 & 0xFF) >> 1);
     if (begin >> 8 > limit)
-        begin = (u16)(limit << 8 | begin & 0xFF);
+        begin = (u16)(limit << 8 | (begin & 0xFF));
     SavWin(begin, size, md.WinBuf);
     color = (u16)(Color(Hist_C) << 8);
     MinBox(begin, size, color);
@@ -693,7 +693,7 @@ F32_28:
 F32_29:
     Window(begin, size);
     row = 0;
-    md.MousTim = md.MousTim & 0xFFFF | 0xFFFF0000UL;
+    md.MousTim = (md.MousTim & 0xFFFF) | 0xFFFF0000UL;
     md.MousEnt = 0;
 
 F32_30:                                 /* the cursor */

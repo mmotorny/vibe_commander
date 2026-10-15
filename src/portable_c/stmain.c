@@ -277,7 +277,7 @@ static void StMain40(u16 color, i32 item, u16 begin, u16 size)
     u16 place = begin + 0x209;
     i32 width = (u8)(size - 16);
 
-    place = (u16)((u8)((place >> 8) + item) << 8 | place & 0xFF);
+    place = (u16)((u8)((place >> 8) + item) << 8 | (place & 0xFF));
     MvsColr(BasAdr(place), (u16)width, Color(color));
     Window(place, (u16)(0x100 | width));
 }

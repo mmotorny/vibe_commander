@@ -85,14 +85,14 @@ i32 LnStr(const struct LineArgs *args)
                it, which is then counted like any other. It wraps: a
                count of 0 less one is 0FFFFh, of which the low byte and
                the highest bit are read. */
-            more = (u16)((second << 8 | second & 0x7F) - 1);
+            more = (u16)((second << 8 | (second & 0x7F)) - 1);
             more = (more & 0xFF) + (more & 0x8000 ? 0 : 1);
         } else {
             line--;
             length++;
             continue;
         }
-        length = length & ~0xFF | length + more & 0xFF;
+        length = (length & ~0xFF) | (length + more & 0xFF);
     }
     return length;
 }
@@ -185,7 +185,7 @@ void CntLine(struct LineArgs *args)
     struct LineArgs line = *args;
     i32 length = LnStr(args);
 
-    line.screen = BasAdr(args->value) - (length + 1 >> 1);
+    line.screen = BasAdr(args->value) - ((length + 1) >> 1);
     /* NgLine reads the low byte of it and no more, the cells that it
        may write in. */
     line.value = (u16)length;

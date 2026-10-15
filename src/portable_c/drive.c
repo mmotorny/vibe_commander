@@ -122,8 +122,8 @@ F62_06:
         size = (u16)wide;
     size = ADD_LOW(size, 10 + 2);
     begin = ADD_LOW(begin, -((size + 1 & 0xFF) >> 1));
-    begin = 5 << 8 | begin & 0xFF;
-    size = (6 + 1) << 8 | size & 0xFF;
+    begin = 5 << 8 | (begin & 0xFF);
+    size = (6 + 1) << 8 | (size & 0xFF);
     begin = SftEGA(begin);
     SavWin(begin, size, md.WinBuf);
     color = (u16)(Color(Box_C) << 8);
@@ -142,8 +142,8 @@ F62_06:
     MvsBw(next, Driv_S, 7, color);
 
     /* The letters. */
-    place = (u16)((begin & 0xFF00 | BegBX(panel) & 0xFF) + 0x314
-                  - (wide + 1 >> 1));
+    place = (u16)(((begin & 0xFF00) | (BegBX(panel) & 0xFF)) + 0x314
+                  - ((wide + 1) >> 1));
     if (apart >= 2)
         place++;
     first = BasAdr(place);
@@ -182,7 +182,7 @@ F62_15:                                 /* the cursor */
     state = 0;
     look = 0;
 F62_21:
-    state = state & 0x80 | pointer.buttons & 0xFF;
+    state = (state & 0x80) | (pointer.buttons & 0xFF);
     mouse = pointer.place;
     shape = 'x';
     if (state & 4)

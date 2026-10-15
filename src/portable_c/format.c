@@ -53,7 +53,7 @@ u16 HexDec(i32 number)
 
     number &= 0xFF;
     tens = number / 10;
-    return (u16)(tens + '0' + (number - tens * 10 + '0' << 8));
+    return (u16)(tens + '0' + ((number - tens * 10 + '0') << 8));
 }
 
 /* Write a zero or a separator of a number. Before the first digit there is
@@ -201,7 +201,7 @@ u8 *BufTime(const struct TimeText *text, u8 *buffer)
 static u16 *PutPair(u16 *screen, u16 pair, u16 color)
 {
     color &= 0xFF00;
-    *screen++ = color | pair & 0xFF;
+    *screen++ = color | (pair & 0xFF);
     *screen++ = color | pair >> 8;
     return screen;
 }
@@ -238,7 +238,7 @@ static u16 *PutSize(const struct WCBdef *wcb,
 static u16 *PutDat0(const struct FILENT *file, u16 *screen, u16 color)
 {
     struct DateText text;
-    u16 separator = color & 0xFF00 | md.Country.DateSep[0];
+    u16 separator = (color & 0xFF00) | md.Country.DateSep[0];
 
     PutDate(file->DateF, &text);
     screen = PutPair(screen, text.first, color);

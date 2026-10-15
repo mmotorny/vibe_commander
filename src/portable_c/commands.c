@@ -404,8 +404,8 @@ static bool M49_10(struct WCBdef *panel, bool marked)
         if (found < other->EndBuf
             && !(its->AttrF & ATTR_DIRECTORY)
             && (its->DateF > file->DateF
-                || its->DateF == file->DateF
-                   && its->TimeF >= file->TimeF))
+                || (its->DateF == file->DateF
+                   && its->TimeF >= file->TimeF)))
             continue;
         file->AttrF |= ATTR_SELECTED;   /* M49_12 */
         marked = true;
@@ -546,7 +546,7 @@ i32 M67_00(struct WCBdef *panel)        /* Path prompt */
    put back where the two are. */
 i32 M69_00(struct WCBdef *panel)
 {
-    ResUser(BegBX(panel) & 0xFF00, SizDX() & 0xFF00 | 80);
+    ResUser(BegBX(panel) & 0xFF00, (SizDX() & 0xFF00) | 80);
     return M66_01(panel, &md.FulScr);
 }
 

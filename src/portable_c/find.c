@@ -290,8 +290,8 @@ static i32 FnMv00(u16 at, u16 place, u16 size, i32 *line)
         return ASK_LINE;
     }
     *line = target;
-    clicks = DoublMo(at & 0xFF00 | (place + 2) & 0xFF,
-                     0x100 | (size - 10) & 0xFF, target);
+    clicks = DoublMo((at & 0xFF00) | ((place + 2) & 0xFF),
+                     0x100 | ((size - 10) & 0xFF), target);
     if (clicks == 2)
         return ASK_LINE;
     if (clicks == 0)
@@ -416,7 +416,7 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
         at = place + 0x205;
         rows = ROWS(size);
         if (moved == 1 || moved == -1) {
-            scroll = 0x600 | (rows - 1) & 0xFF;
+            scroll = 0x600 | ((rows - 1) & 0xFF);
             if (moved != 1)
                 scroll = 0x700;
             Scroll(scroll >> 8 == 7, Color(Conf_C), at,
@@ -498,7 +498,7 @@ static bool FndBack(void)
         key = pointer.buttons;
         mode = pointer.place;
         if (key != 0) {
-            key = KEY_MOUSE << 8 | key & 0xFF;
+            key = KEY_MOUSE << 8 | (key & 0xFF);
         } else {
             if (KeyWaiting().none) {
                 go = true;
@@ -527,7 +527,7 @@ static bool FndBack(void)
                 key = MnMn40(Conf_C << 8 | CnfRe_C, menu, (u16)item, 0x11F,
                              Find5_D);
         }
-        answer = FndMove(key, mode & 0xFF00 | MODE_CURSOR, place, size);
+        answer = FndMove(key, (mode & 0xFF00) | MODE_CURSOR, place, size);
         if ((answer >> 8) == 0)
             continue;
         FND->FndMode |= MODE_ANSWER;
@@ -833,7 +833,7 @@ struct Searched F67_00(void)
     /* No line of the box has ^I: the include line is any text. */
     line.colors = FindColors;
     line.include = Find0_S;
-    line.value = place + 0x100 & 0xFF00 | 40;
+    line.value = (place + 0x100 & 0xFF00) | 40;
     line.line = Find0_S;
     CntLine(&line);
 
@@ -856,7 +856,7 @@ again:
     Window(place, size);
     /* The dialog has its box there already: its nine lines. */
     answer = Dialog(&Find_B, 0, place + (size & 0xFF00) - 0x900,
-                    9 << 8 | size & 0xFF, &md);
+                    9 << 8 | (size & 0xFF), &md);
     if ((u8)answer != 0)
         goto close;
 
@@ -874,7 +874,7 @@ again:
     line.screen = BasAdr(row);
     line.line = Find3_S;
     NgLine(&line);
-    line.value = row + 0x100 & 0xFF00 | 40;
+    line.value = (row + 0x100 & 0xFF00) | 40;
     line.line = Find5_S;
     CntLine(&line);
     Window(place, size);
@@ -995,7 +995,7 @@ found:
     line.line = md.TmpBuf;
     NgLine(&line);
     Window(row, (u16)(0x100 | count));
-    line.value = MOVED(place, (size >> 8) - 4, 0) & 0xFF00 | 40;
+    line.value = (MOVED(place, (size >> 8) - 4, 0) & 0xFF00) | 40;
     line.line = Find6_S;
     CntLine(&line);
     FND->FndMenu = 1;
@@ -1008,7 +1008,7 @@ found:
         key = pointer.buttons;
         mode = pointer.place;
         if (key != 0) {
-            key = KEY_MOUSE << 8 | key & 0xFF;
+            key = KEY_MOUSE << 8 | (key & 0xFF);
         } else {
             md.WinMous = 0;
             md.MousEnt = 0;
@@ -1020,7 +1020,7 @@ found:
             mode = chosen.chosen;
             FND->FndMenu = (u8)mode;
         }
-        answer = FndMove(key, mode & 0xFF00 | MODE_CURSOR, place, size);
+        answer = FndMove(key, (mode & 0xFF00) | MODE_CURSOR, place, size);
     } while ((answer >> 8) == 0);
 
 answered:

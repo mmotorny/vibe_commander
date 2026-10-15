@@ -1580,6 +1580,6 @@ struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
 
 /* Add to the low byte of a word, as the assembly does to a column or a
    count that it keeps in half a register: nothing is carried over. */
-#define ADD_LOW(word, more) ((word) & 0xFF00 | (word) + (more) & 0xFF)
+#define ADD_LOW(word, more) (((word) & 0xFF00) | (((word) + (more)) & 0xFF))
 
 #endif

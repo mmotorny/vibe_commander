@@ -159,7 +159,7 @@ Inpt10:
         /* Past midnight an hour of 24 or more is the hour 0. */
         if (time >> 8 == 0 && BlHigh >> 8 >= 24)
             BlHigh &= 0xFF;
-        if (time > BlHigh || time == BlHigh && moment.seconds >= BlLow) {
+        if (time > BlHigh || (time == BlHigh && moment.seconds >= BlLow)) {
 Inpt12:
             Blank();
             Window(0, (u16)(md.Lines << 8 | 80));
@@ -192,7 +192,7 @@ Inpt12:
                                  ? ' ' : hour_digits & 0xFF);
             *screen++ = color | hour_digits >> 8;
             *screen++ = color | separator;
-            *screen++ = color | minute_digits & 0xFF;
+            *screen++ = color | (minute_digits & 0xFF);
             *screen++ = color | minute_digits >> 8;
             if (md.Country.TimeFmt == 0)
                 *screen++ = color | suffix;
@@ -205,8 +205,8 @@ Inpt12:
         moment = TimeOfDay();
         time = moment.clock;
         if (time > (u16)md.AutoTim
-            || time == (u16)md.AutoTim
-               && moment.seconds >= (u16)(md.AutoTim >> 16))
+            || (time == (u16)md.AutoTim
+               && moment.seconds >= (u16)(md.AutoTim >> 16)))
             goto Inpt40;
     }
     Rnd();                              /* Inpt31 */

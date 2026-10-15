@@ -396,7 +396,7 @@ static void StCol30(u16 color)
                     screen += count;
                     continue;
                 }
-                paint = item & BLINKS | color;
+                paint = (item & BLINKS) | color;
                 if (item & SHADED)
                     paint = ShadCol(paint, Color(ShadFl));
             }
@@ -461,7 +461,7 @@ static struct Chosen StCol11(u16 color)
     }
     if ((mouse.buttons & 1) && !InWind(mouse.place, 0x043D, 0x1010)) {
         at = mouse.place - 0x043D;
-        chosen.color = (u8)(at >> 8 << 4 | at & 0xFF);
+        chosen.color = (u8)(at >> 8 << 4 | (at & 0xFF));
     }
     return chosen;
 }
@@ -523,7 +523,7 @@ static void StCol00(void)
             if (item == GREY)
                 paint = 7;
             else {
-                paint = item & BLINKS | Color(item & 0x3F);
+                paint = (item & BLINKS) | Color(item & 0x3F);
                 if (item & SHADED)
                     paint = ShadCol(paint, Color(ShadFl));
             }
@@ -652,7 +652,7 @@ static i32 StF07_30(void)
         StF07_10(sd.ColNum - 1, sd.ColFrst);
         return WHAT_STAY;
     }
-    click = DoublMo(mouse.place & 0xFF00 | (u8)(list.begin + 4),
+    click = DoublMo((mouse.place & 0xFF00) | (u8)(list.begin + 4),
                     0x0100 | (u8)(list.size - 10), item);
     if (click == 2) {
         StF07_10(item, sd.ColFrst);

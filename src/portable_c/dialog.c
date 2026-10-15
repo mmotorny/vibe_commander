@@ -198,7 +198,7 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
         line++;
     } while (--count);
     /* A box has fewer lines than the screen has rows. */
-    size = (u16)((head->lines << 8 | width & 0xFF) + 0x40C);
+    size = (u16)((head->lines << 8 | (width & 0xFF)) + 0x40C);
     begin = ADD_LOW(place, -((((size & 0xFF) - 1) & 0xFF) >> 1));
     where->begin = begin;
     where->size = size;
@@ -249,7 +249,7 @@ void InSt10(u16 place, const u8 *text, i32 length, u16 color)
         *screen++ = cell | ' ';
         count--;
     }
-    Window(place, 0x100 | length & 0xFF);
+    Window(place, 0x100 | (length & 0xFF));
 }
 
 /* How many cells a field takes at `place`: up to two spaces, one after
@@ -298,10 +298,10 @@ static u16 MnMn41(u16 number, u16 item, const u8 *table, u16 *screen)
 
     count += count;
     button = table + count;
-    count = count & 0xFF00 | button[1];
+    count = (count & 0xFF00) | button[1];
     count += count;
     screen = (u16 *)((u8 *)screen + count);
-    count = count & 0xFF00 | button[0];
+    count = (count & 0xFF00) | button[0];
     MvsColr(screen, (u16)count, color);     /* a button's width, a byte */
     return (u16)(color << 8 | color);       /* Color answers a byte */
 }
@@ -365,9 +365,9 @@ static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
             }
         }
 MnMn13:
-        key = (u16)(button - table >> 1);
+        key = (u16)((button - table) >> 1);
         if ((key & 0xFF) != (chosen & 0xFF)) {
-            chosen = chosen & 0xFF00 | key & 0xFF;
+            chosen = (chosen & 0xFF00) | (key & 0xFF);
             goto MnMn16;
         }
         /* The button chosen: pressed, if the mouse is let go on it. */
@@ -441,7 +441,7 @@ MnMn13:
         while (--count);
     }
 MnMn22:
-    chosen = (u16)(button - table >> 1);
+    chosen = (u16)((button - table) >> 1);
     key = KEY_ENTER;
 MnMn23:
     taken = false;
@@ -481,7 +481,7 @@ struct Buttons MinMnu(const u8 *control, u16 begin, u16 size,
                       const u8 *color, u16 keys, u16 item)
 {
     struct Buttons buttons;
-    u16 state = (u16)((keys & 0xFF) << 8 | item & 0xFF);
+    u16 state = (u16)((keys & 0xFF) << 8 | (item & 0xFF));
     u16 key;
     struct ButtonKey pressed;
 
@@ -551,7 +551,7 @@ static struct Typed InpStr(u16 place, u8 *text, i32 cursor, i32 length,
                 ClrKbd();
                 if (buttons != 1)
                     goto InSt08;
-                if (InWind(mouse, place, 0x100 | length & 0xFF))
+                if (InWind(mouse, place, 0x100 | (length & 0xFF)))
                     goto InSt08;
                 text[-1] = 1;
                 column = mouse - place;
@@ -647,7 +647,7 @@ Slct03:
                        (u16)(total << 8 | Slct20(place - 1))))
                 goto Slct13;
             row = (mouse >> 8) - (place >> 8) & 0xFF;
-            key = (u16)(row << 8 | mouse & 0xFF);
+            key = (u16)(row << 8 | (mouse & 0xFF));
             if (row == cursor)
                 continue;
             cursor = row;
@@ -705,7 +705,7 @@ Slct07:                                 /* choose the line of the cursor */
     *(u8 *)BasAdr((u16)(place + (cursor << 8))) = BULLET;
     Window((u16)(place + (cursor << 8)), 0x101);
     chosen = cursor;
-    key = (u16)(cursor << 8 | key & 0xFF);
+    key = (u16)(cursor << 8 | (key & 0xFF));
     goto Slct01;
 
 Slct13:
@@ -1025,12 +1025,12 @@ Dial40:                                 /* the mouse */
                     break;
                 place = begin + field->mBase;
                 if (type == FIELD_INPUT) {
-                    window = 0x100 | NUMBER_OF(field->mCtrl) & 0xFF;
+                    window = 0x100 | (NUMBER_OF(field->mCtrl) & 0xFF);
                 } else if (type <= FIELD_FLIP) {
                     window = (u16)((NUMBER_OF(field->mCtrl) & 0xFF) << 8
                                    | Slct20(place));    /* a byte */
                     if (type != FIELD_SELECT)
-                        window = 0x100 | window & 0xFF;
+                        window = 0x100 | (window & 0xFF);
                 } else {
                     place = Dial18(place, begin & 0xFF);
                     window = MnMn60(field->mCtrl);

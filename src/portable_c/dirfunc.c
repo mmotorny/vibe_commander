@@ -503,8 +503,8 @@ u16 M30_50(u16 attributes)
             goto failed;
     }
     /* M30_54 */
-    asked = FileSetAttributes(md.TmpBuf,
-                              old & 0xFF00 | (u8)old & ATTR_KEEP | ATTR_SET);
+    asked = FileSetAttributes(md.TmpBuf, (old & 0xFF00)
+                              | ((u8)old & ATTR_KEEP) | ATTR_SET);
     error = asked.value;
     if (!asked.failed) {
         answer = DONE;
@@ -765,7 +765,7 @@ u16 DirFunc(void)
             if (TstBrk())
                 return STOP;
             /* The high byte goes as DOS left it: C00_00 keeps all of AX. */
-            answer = FncCall(found.value & 0xFF00 | md.DTA.FilAttr);
+            answer = FncCall((found.value & 0xFF00) | md.DTA.FilAttr);
             if (answer >> 8)
                 return STOP;
             if ((u8)answer == 0)
@@ -1400,7 +1400,7 @@ one:
             break;
         file = ENTRY(wcb, address);
         if ((u8)answer != 0 && file->AttrF & ATTR_SELECTED) {
-            file->AttrF = file->AttrF & 0x3F | 0x80;
+            file->AttrF = (file->AttrF & 0x3F) | 0x80;
             if (md.UnSlct != 0) {
                 if (wcb->WinTyp == 0)
                     PutFls(panel);

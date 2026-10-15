@@ -193,12 +193,12 @@ struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first)
             bottom -= 0x100;
         } else if (md.MiniSta != 0)
             bottom -= 0x200;
-        bottom = (bottom & 0xFF00 | 38 - 1) + corner;
+        bottom = ((bottom & 0xFF00) | 38 - 1) + corner;
         Scroll(how == 7, Color(Back_C), corner, bottom);
         /* The line that has come in, the first or the last of the
            window. */
         if (how != 7)
-            corner = bottom & 0xFF00 | corner & 0xFF;
+            corner = (bottom & 0xFF00) | (corner & 0xFF);
         Window(corner, 0x126);
         left = Leaves(corner, 0x126);
     }
@@ -579,7 +579,7 @@ struct Onward F11_00(struct WCBdef *panel)
         second->Visible = 0;
         panel->Visible = 0;
         begin = BegBX(panel) & 0xFF00;
-        size = SizDX() & 0xFF00 | 80;
+        size = (SizDX() & 0xFF00) | 80;
         ResUser(begin, size);
         Window(begin, size);            /* Func03 */
         return To(NEXT_FUNC04);
@@ -588,7 +588,7 @@ struct Onward F11_00(struct WCBdef *panel)
     second->Visible = was;
     changed = second->ChgFlg;
     panel->Visible = 1;
-    if (panel->ChgFlg != 0 || was != 0 && changed != 0)
+    if (panel->ChgFlg != 0 || (was != 0 && changed != 0))
         PutMnu(3);                      /* PutMnu3 */
     return To(NEXT_INIT50);
 }
@@ -623,7 +623,7 @@ struct Onward F15_00(struct WCBdef *panel)
     LeftPanel = RightPanel;
     RightPanel = left;
     InvVar(&md.Active);
-    ResUser(BegBX(panel) & 0xFF00, SizDX() & 0xFF00 | 80);
+    ResUser(BegBX(panel) & 0xFF00, (SizDX() & 0xFF00) | 80);
     return To(NEXT_INIT50);
 }
 
@@ -648,7 +648,7 @@ struct Onward F16_00(void)
     if (last >> 8 != md.DosLin)
         return To(NEXT_FUNC04);
     begin = BegBX(MAIN_AS_PANEL) & 0xFF00;
-    size = SizDX() & 0xFF00 | 80;
+    size = (SizDX() & 0xFF00) | 80;
     ResUser(begin, size);
     Window(begin, size);
     Cursor1();

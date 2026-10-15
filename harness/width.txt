@@ -2051,7 +2051,7 @@ drive.c, F62_01: variable state, u16
     pointer has been on a letter.
 
 drive.c, F62_01: sign
-    | - (wide + 1 >> 1));
+    | - ((wide + 1) >> 1));
     wide is a count of columns, 0 or more: it is counted up from count.
 
 drive.c, F62_01: sign
@@ -3290,7 +3290,7 @@ line.c, NgLine: variable code, u16
     the colour that the two say, a byte.
 
 line.c, CntLine: sign
-    | line.screen = BasAdr(args->value) - (length + 1 >> 1);
+    | line.screen = BasAdr(args->value) - ((length + 1) >> 1);
     length is what LnStr has counted, from 0 up.
 
 main.c, (): variable AltSr_T, u8[]
@@ -3643,7 +3643,7 @@ panel.c, PutPath: variable place, u16
     place
 
 panel.c, PutPath: sign
-    | place = ADD_LOW(place, -((length - least >> 1) + 1));
+    | place = ADD_LOW(place, -(((length - least) >> 1) + 1));
     Two lines above ask that length is least or more.
 
 panel.c, PutFls: variable size, u32

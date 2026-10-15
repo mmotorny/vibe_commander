@@ -739,7 +739,7 @@ void T71_00(u16 function, u16 place, i32 step)
     do {
         /* As many cells as the window has columns; the high byte of
            the count of lines is on top of that, which is 0. */
-        cells = count & 0xFF00 | ed.EdSizeX;
+        cells = (count & 0xFF00) | ed.EdSizeX;
         for (column = 0; column != cells; column++)
             to[column] = from[column];
         from += stride;
@@ -895,7 +895,7 @@ void T74_00(void)
         name[count] = md.ViewFil[count];
     ShrtLin(name, 31);
     LetLin(name);
-    blank = *screen & 0xFF00 | ' ';
+    blank = (*screen & 0xFF00) | ' ';
     for (count = 0; count < 31; count++)
         screen[count] = blank;
     MovDz0(screen, name);
@@ -976,7 +976,7 @@ static struct Answer T80_01(void)
         return Failed(asked.value);
     /* A file that is not there has none: 0, which FileAttributes answers
        with where it failed. */
-    return Done(asked.attributes & 0x3F | 0x20);
+    return Done((asked.attributes & 0x3F) | 0x20);
 }
 
 /* The name of the file, as the box about a read-only file shows it. */
@@ -1100,7 +1100,7 @@ static void T80_14(void)
     if (letter >> 8 == ':')
         name += 2;
     else
-        letter = letter & 0xFF00 | md.DosPth[0];
+        letter = (letter & 0xFF00) | md.DosPth[0];
     letter = UpCase(letter);
     md.TmpBuf[0] = (u8)letter;
     md.TmpBuf[1] = ':';
@@ -1379,9 +1379,9 @@ static void T01_10(u16 key)
         if (digit > 0xFF)
             return;
         if (ed.EdHxCur == 0)
-            value = (u8)(digit << 4 | *byte & 0x0F);
+            value = (u8)(digit << 4 | (*byte & 0x0F));
         else
-            value = (u8)(digit | *byte & 0xF0);
+            value = (u8)(digit | (*byte & 0xF0));
     }
     *byte = value;                      /* T01_12 */
     if (T63_01(place) != 0) {
@@ -1400,9 +1400,9 @@ static void T01_10(u16 key)
                    of a line within 16 bytes of a multiple of 64K wraps
                    64K back, and the line drawn is that one. */
                 EdLine++;
-                EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst + 0x10);
+                EdOffst = (EdOffst & ~0xFFFF) | (u16)(EdOffst + 0x10);
                 T73_00();
-                EdOffst = EdOffst & ~0xFFFF | (u16)(EdOffst - 0x10);
+                EdOffst = (EdOffst & ~0xFFFF) | (u16)(EdOffst - 0x10);
                 EdLine--;
             }
         }
@@ -2235,7 +2235,7 @@ static void T00_20(void)
     first_line = EdLin0;
     if (ed.EdTxHex == 0) {
         if (column < first_column
-            || column == first_column && first_column != 0) {
+            || (column == first_column && first_column != 0)) {
             first_column = column;      /* T00_22 */
             if (column != 0)
                 first_column--;
@@ -2388,12 +2388,12 @@ shown:
            behind the column is blank to the end of the line, where a
            longer line had the column before. */
         cell = md.ScrBuf + 46 + T75_00(EdLine, md.ScrBuf + 46, color);
-        *cell++ = color & 0xFF00 | ' ';
+        *cell++ = (color & 0xFF00) | ' ';
         cell = MvsBw(cell, Col_S, 3, color);
-        *cell++ = color & 0xFF00 | ' ';
+        *cell++ = (color & 0xFF00) | ' ';
         cell += T75_00(EdCol, cell, color);
         while (cell < md.ScrBuf + 80)
-            *cell++ = color & 0xFF00 | ' ';
+            *cell++ = (color & 0xFF00) | ' ';
         /* The assembly writes here, T00_54, what is free of the room
            in seven cells from 62 on, behind "Free" at 70: a figure of
            free memory, which goes (src/portable_c/DEVIATIONS.md, 24). */

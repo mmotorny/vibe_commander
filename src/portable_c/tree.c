@@ -255,7 +255,7 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
             }
             color = (u16)(Color(colors[which]) << 8);
             cell[-1] = color | ends >> 8;
-            cell[width] = color | ends & 0xFF;
+            cell[width] = color | (ends & 0xFF);
             for (i = 0; i < LenPath + 13; i++)
                 SHOWN[i] = PATH[i];
             /* Without the backslash at its end, unless it is the root:

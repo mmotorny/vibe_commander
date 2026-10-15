@@ -217,12 +217,12 @@ RdTr11:                                 /* one more: with five, a box that
         }
         Number(md.MenuBuf, 0, (u16)count, NUM_SEPARATED);  /* at most the
                                                    list's length */
-        line.value = box.begin + 0x400 & 0xFF00 | 0x28;
+        line.value = (box.begin + 0x400 & 0xFF00) | 0x28;
         line.line = md.MenuBuf;
         line.colors = Scan_P;
         line.include = Empty_S;
         CntLine(&line);
-        Window(box.begin + 0x400, 0x100 | box.size & 0xFF);
+        Window(box.begin + 0x400, 0x100 | (box.size & 0xFF));
     }
     if (TREE->TreeLen == 1)
         goto RdTr15;
@@ -414,7 +414,7 @@ static void ChTr50(u16 begin, i32 offset)
 bool ChTree(i32 column)
 {
     struct LineArgs line;
-    u16 begin = 0x200 | column & 0xFF;                  /* BX */
+    u16 begin = 0x200 | (column & 0xFF);                  /* BX */
     u16 size = (u16)((u8)(md.Lines - 3) << 8 | 50);     /* DX */
     u16 color;                          /* AX: the colour in the high byte */
     i32 cursor, first;                  /* BP and DI: where to go, as
@@ -435,7 +435,7 @@ bool ChTree(i32 column)
 
     HidCur();
     SavWin(begin, size, md.WinBuf);
-    color = (u16)(Color(ChTr_P[0]) << 8 | column & 0xFF);
+    color = (u16)(Color(ChTr_P[0]) << 8 | (column & 0xFF));
     MinBox(begin, size, color);
     if (LeftPanel->WinTyp == 1)
         LeftPanel->ChgFlg = 1;
@@ -451,7 +451,7 @@ ChTr59:                                 /* the box, and the tree read */
     line.include = Empty_S;
     CntLine(&line);
     screen = BoxLine(BasAdr(begin + (size & 0xFF00) - 0x600),
-                     color & 0xFF00 | LINE, LEFT_RIGHT, 3,
+                     (color & 0xFF00) | LINE, LEFT_RIGHT, 3,
                      (u8)(size - 10));
     line.value = 38;
     line.screen = screen + 5;

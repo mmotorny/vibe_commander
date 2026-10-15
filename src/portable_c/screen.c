@@ -31,8 +31,8 @@ u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color);
    is short: a function shared by the two, or a register saved around a
    multiplication, costs bytes of it. */
 #define IN_TABLE(number, palette) \
-    (md.ColTab + ((((number) & 0xFF) << 1) + ((number) & 0xFF) + (palette) \
-                  << 1) + (md.ScrMod == 7 ? 1 : 0))
+    (md.ColTab + (((((number) & 0xFF) << 1) + ((number) & 0xFF) \
+                   + (palette)) << 1) + (md.ScrMod == 7 ? 1 : 0))
 
 u8 *ColAddr(u16 number)
 {
@@ -64,7 +64,7 @@ u16 Color(u16 number)
 u16 ShadCol(u16 color, u16 how)
 {
     if (how == 1)
-        return color & 0x8F ^ 8;
+        return (color & 0x8F) ^ 8;
     if (how != 0)
         return 7;
     return color;

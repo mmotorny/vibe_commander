@@ -380,7 +380,7 @@ Init53:
                 if (drive == 0)
                     drive = letter;
                 letter = (u8)(letter - 'A');    /* Init61 */
-                size = size & 0xFF00 | letter;
+                size = (size & 0xFF00) | letter;
                 DriveSelect(letter);
                 goto Init52;
             }
@@ -426,7 +426,7 @@ Init70:
         drive = letter;
         wcb->WinPath[0] = (u8)letter;
         letter = (u8)(letter - ('A' - 1));
-        size = size & 0xFF00 | letter;
+        size = (size & 0xFF00) | letter;
         if (!Fantom(letter)) {
             md.BlocEr = 1;
             failed = DirCurrent(letter, wcb->WinPath + 3).failed;
@@ -512,10 +512,10 @@ static struct Asked Func21(struct Regs *r)
             if (r->ax == look)
                 continue;
             look = r->ax;
-            r->bx = r->bx & 0xFF00 | look;
+            r->bx = (r->bx & 0xFF00) | look;
             TypMous(look);
         }
-        r->bx = r->bx & 0xFF00 | look;  /* Func24 */
+        r->bx = (r->bx & 0xFF00) | look;  /* Func24 */
         TypMous(0);
         if (look == 0)
             return Nothing(FUNC07);
@@ -525,7 +525,7 @@ static struct Asked Func21(struct Regs *r)
         return Asks(CMD_F39_00);
     r->bx = BegBX(r->ds);               /* Func26 */
     r->dx = SizDX();
-    r->dx = (u16)(r->dx & 0xFF | (u8)((r->dx >> 8) + (r->bx >> 8)) << 8);
+    r->dx = (u16)((r->dx & 0xFF) | (u8)((r->dx >> 8) + (r->bx >> 8)) << 8);
     if ((r->cx >> 8) >= (r->dx >> 8))
         return Nothing(FUNC07);
     if ((r->cx & 0xFF) < 40) {          /* Change panel */
@@ -574,7 +574,7 @@ Func40:                                 /* Move the cursor */
     if (wcb->WinTyp == 0)
         r->bx += 0x100;
     rows = r->cx >> 8;                  /* Func41 */
-    r->cx = (u16)(r->cx & 0xFF | (u8)(rows - (r->bx >> 8)) << 8);
+    r->cx = (u16)((r->cx & 0xFF) | (u8)(rows - (r->bx >> 8)) << 8);
     if (rows < r->bx >> 8) {            /* Func50: scroll up */
         r->si = r->di;
         return Asks(CMD_F00_05);
@@ -582,7 +582,7 @@ Func40:                                 /* Move the cursor */
     rows = r->cx >> 8;
     kind = wcb->WinTyp | wcb->BrfFul;
     if (rows >= (lines & 0xFF)) {       /* Func55: scroll down */
-        r->bx = r->bx & 0xFF00 | kind;
+        r->bx = (r->bx & 0xFF00) | kind;
         if (kind == 0)
             r->ax = (lines & 0xFF) * 3;
         r->ax--;                        /* Func56 */
@@ -592,12 +592,12 @@ Func40:                                 /* Move the cursor */
         return Asks(CMD_F01_05);
     }
     column = (u8)(column - (r->bx & 0xFF));     /* Set cursor position */
-    r->cx = (u16)(r->cx & 0xFF00 | column);
+    r->cx = (u16)((r->cx & 0xFF00) | column);
     if (column >= 39)
         return Nothing(FUNC07);
-    r->bx = r->bx & 0xFF00 | kind;
+    r->bx = (r->bx & 0xFF00) | kind;
     if (kind == 0) {                    /* three columns of names */
-        r->bx = r->bx & 0xFF00 | 13;
+        r->bx = (r->bx & 0xFF00) | 13;
         r->ax = (u16)((column / 13) * (lines & 0xFF));
         column %= 13;
         rows = (u8)(rows + r->ax);
@@ -623,16 +623,16 @@ Func40:                                 /* Move the cursor */
 
     r->cx = *(u16 *)md.TmpBuf;          /* Func60: double click */
     r->bx = BegBX(r->ds) + 1;
-    r->bx = r->bx & 0xFF | r->cx & 0xFF00;
+    r->bx = (r->bx & 0xFF) | (r->cx & 0xFF00);
     r->dx = 0x126;
     r->cx &= 0xFF;
-    r->ax = r->ax & 0xFF00 | kind;
+    r->ax = (r->ax & 0xFF00) | kind;
     if (kind == 0) {
         column = (u8)(r->cx - (r->bx & 0xFF));
         column = column / 13 * 13;
         r->ax = (u16)column;
         r->cx = 13;
-        r->bx = r->bx & 0xFF00 | (u8)(r->bx + column);
+        r->bx = (r->bx & 0xFF00) | (u8)(r->bx + column);
         r->dx = 0x10C;
     }
     answer = DoublMo(r->bx, r->dx, r->si);      /* Func61 */
@@ -1131,7 +1131,7 @@ static i32 F39_01(bool again, struct Regs *r)
     if (table == 0)
         return FUNC04;
     r->ax = (u16)(item << 8 | table);
-    r->bx = (item - 1) & 0xFF00 | (item - 1) << 1 & 0xFF;
+    r->bx = ((item - 1) & 0xFF00) | ((item - 1) << 1 & 0xFF);
     r->dx = 0x100 | picked.held;
     if (table == 1)
         panel = menu == 5 ? RightPanel : LeftPanel;
@@ -1425,7 +1425,7 @@ ErRdy7:
     ResWin(where.begin, where.size, where.saved);
     Window(where.begin, where.size);
     DriveSetLetter(drive - ('A' - 1));
-    return letter & 0xFF00 | drive;
+    return (letter & 0xFF00) | drive;
 }
 
 /* Take the key bar off the screen buffer, if there is one, and put there

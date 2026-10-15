@@ -89,10 +89,10 @@ struct Mouse GetMous(u16 place)
         at = MouseWhere();
         /* The mouse is kept to the rows of the screen, so the row is a
            byte, as the original has it in a register of 8 bits. */
-        place = (u16)((at.y >> 3) << 8 | (at.x >> 3) & 0xFF);
+        place = (u16)((at.y >> 3) << 8 | ((at.x >> 3) & 0xFF));
         buttons = at.buttons;
         if (md.LftMous != 0)
-            buttons = buttons & 4 | buttons >> 1 & 1 | buttons << 1 & 2;
+            buttons = (buttons & 4) | (buttons >> 1 & 1) | (buttons << 1 & 2);
     }
     mouse.buttons = buttons & 7;
     mouse.place = place;
@@ -130,8 +130,8 @@ i32 DoublMo(u16 begin, u16 size, i32 cursor)
        high word and its low one are each taken by a cast. */
     if ((u16)(md.MousTim >> 16) != 0xFFFF && cursor == ClickLine
         && (hours < (u16)(md.MousTim >> 16)
-            || hours == (u16)(md.MousTim >> 16)
-               && seconds <= (u16)md.MousTim)) {
+            || (hours == (u16)(md.MousTim >> 16)
+               && seconds <= (u16)md.MousTim))) {
         /* The pointer is kept in the high byte of the hours, as the
            assembly has it in CH, and the minutes below it go to GetMous
            with it as the place for a mouse that is not there. */
@@ -140,7 +140,7 @@ i32 DoublMo(u16 begin, u16 size, i32 cursor)
             click = GetMous(hours);
             pointer = InWind(click.place, begin, size) ? 0 : TICK;
             if (pointer != hours >> 8) {
-                hours = (u16)(hours & 0xFF | pointer << 8);
+                hours = (u16)((hours & 0xFF) | pointer << 8);
                 TypMous(pointer);
             }
         } while (click.buttons & 7);

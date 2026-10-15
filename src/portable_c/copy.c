@@ -306,7 +306,7 @@ static void PerCent(void)
             cells = CpCntSz;
     }
     screen = BasAdr(CpCntBg);
-    cell = *screen & 0xFF00 | 0xDB;
+    cell = (*screen & 0xFF00) | 0xDB;
     for (; cells; cells--)
         *screen++ = cell;
     Window(CpCntBg, 0x100 | CpCntSz);
@@ -673,7 +673,7 @@ static u16 C20_00(i32 fits)
             error = attr.value;
             goto unopened;
         }
-        CpAttr = attr.attributes & 0x27 | 0x20;
+        CpAttr = (attr.attributes & 0x27) | 0x20;
         CpSize = FileStep(CpHndl1, 2, 0).place;
         FileSeek(CpHndl1, 0);
     }
@@ -824,7 +824,7 @@ append:
         error = attr.value;
         goto no_target;
     }
-    CpAttr = attr.attributes & 0x27 | 0x20;
+    CpAttr = (attr.attributes & 0x27) | 0x20;
     attributes = CpAttr;
     opened = OpenFil(CpDest, 0x12);
     if (opened.failed) {

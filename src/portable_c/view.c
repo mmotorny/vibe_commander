@@ -434,7 +434,7 @@ void V25_00(void)
        tabs (V00_10): some 524,000 at the most, seven cells. */
     Number(md.TmpBuf, (u16)(column >> 16), (u16)column, NUM_SEPARATED);
     screen = md.ScrBuf + 44;
-    cell = *screen & 0xFF00 | ' ';
+    cell = (*screen & 0xFF00) | ' ';
     for (count = 7; count; count--)
         *screen++ = cell;
     MovDz0(md.ScrBuf + 44, md.TmpBuf);
@@ -819,7 +819,7 @@ static void Status(void)
     for (count = 0; count != 80; count++)
         md.ScrBuf[count] = cell;
     screen = MvsBw(md.ScrBuf, ViFl_S + 1, 4, cell);
-    *screen = cell & 0xFF00 | ':';
+    *screen = (cell & 0xFF00) | ':';
     MvsBw(md.ScrBuf + 40, Col_S, 3, cell);
     for (count = 0; count != LenPath + 13; count++)
         md.TmpBuf[count] = md.ViewFil[count];
@@ -1070,7 +1070,7 @@ V05_02:                                 /* the window a line down, and the
     ViPoint = line.entry;
     V25_00();
     begin = VI->ViBase;
-    T71_00(0x700, (u16)(begin + ((VI->ViSize >> 8) - 1 << 8)), -(2 * 80));
+    T71_00(0x700, (u16)(begin + (((VI->ViSize >> 8) - 1) << 8)), -(2 * 80));
     V31_00(begin);
     FIRST();
     at = line.at;
@@ -1106,7 +1106,7 @@ V06_00:                                 /* Down */
     /* The window a line up, and the new line in its last row. */
     begin = VI->ViBase;
     T71_00(0x600, begin, 2 * 80);
-    V31_00((u16)(begin + ((VI->ViSize >> 8) - 1 << 8)));
+    V31_00((u16)(begin + (((VI->ViSize >> 8) - 1) << 8)));
     number = (VI->ViSize >> 8) - 1;
     count = number;
     FIRST();

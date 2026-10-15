@@ -252,9 +252,9 @@ F68_01:                                 /* how many and how wide */
     while (length < 256);
     text += length;
     if ((u8)length > (u8)size) {
-        size = size & 0xFF00 | (u8)length;
+        size = (size & 0xFF00) | (u8)length;
         if ((u8)size > 65 + 1)
-            size = size & 0xFF00 | 65 + 1;
+            size = (size & 0xFF00) | 65 + 1;
     }
     size += 0x100;
     if ((u8)(size >> 8) >= limit)
@@ -298,7 +298,7 @@ F68_04:
     Window(begin, size);
     md.HlpPage = 33;
     row = (u8)((begin >> 8) + (size >> 8) - 3 - at);
-    md.MousTim = md.MousTim & 0xFFFF | 0xFFFF0000UL;
+    md.MousTim = (md.MousTim & 0xFFFF) | 0xFFFF0000UL;
     md.MousEnt = 0;
 
 F68_07:                                 /* the cursor */
@@ -353,7 +353,7 @@ F68_11:                                 /* the mouse */
     if (answer >> 8 < 1)
         goto F68_08;
     if (answer >> 8 > 1) {
-        key = answer & 0xFF00 | 0x0D;
+        key = (answer & 0xFF00) | 0x0D;
         goto F68_20;
     }
     to = (u8)(answer + (begin >> 8) + 2);
@@ -512,7 +512,7 @@ F77_02:
             break;
     if (i == (i32)sizeof AltSr_T)
         goto F77_20;
-    key = key & 0xFF00 | Ascii_T[i];
+    key = (key & 0xFF00) | Ascii_T[i];
     goto F77_11;
 F77_03:
     if ((key & 0xFF) < ' ')
