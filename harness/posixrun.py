@@ -34,9 +34,9 @@ file (TODO.md, L3a).
 
 The environment has TZ=UTC, under which the host's times of the files
 are the bench's, PATH, and the channel's two variables: VC_TEST and
-VC_TEST_CLOCK, the bench's clock at the start (setups.CLOCK), from which
-the program's clock goes on only while the test waits, as the machine's
-does on the bench.
+VC_TEST_CLOCK, the bench's clock when the program starts (CLOCK), from
+which the program's clock goes on only while the test waits, as the
+machine's does on the bench.
 
 A key is made the word that the bench's BIOS makes of it, the scan code
 above the character, as INT 16h 00h answers it: the table of the IBM
@@ -46,8 +46,9 @@ presses (driver.EXTENDED), as 00h answers them, the character E0h made
 0. Shift, Ctrl and Alt are `held=` around the key, as the bench has them
 held while it is pressed: 02h for Shift, the left one, 01h for the right
 one, 04h for Ctrl, 08h for Alt, as the BIOS keeps them at 40:17h. The
-mouse has no event in the channel yet (L5): a scenario with a step of it
-is not run.
+keys of one chord, "Enter+F10", are put into the buffer at once, as the
+driver puts them. A step of the mouse is the channel's mouse= and asks=,
+as driver.py has its packets (pointer()).
 """
 import dataclasses
 import hashlib
@@ -70,6 +71,15 @@ PROGRAM = ROOT / "build" / "portable_c" / "posix-asan" / "vc"
 # The time and the date of a directory that the run has written into:
 # none of DOS's, whose date has no month 15 (see goldens.disk_lines).
 WRITTEN_INTO = 0xFFFF
+
+# The bench's clock when the program starts: the machine's starts at
+# setups.CLOCK, and DOS has booted and the program drawn its first screen
+# some five seconds later (CLAUDE.md, "Scenarios"). A file that the
+# program writes is stamped by this clock, and the goldens have such a
+# stamp as "during the run" only where it is after setups.CLOCK, as it
+# always is on the bench: from setups.CLOCK itself, a file written at
+# once had the bench's time of the files laid out.
+CLOCK = "2000-06-16T12:00:05"
 
 # A record of the channel's `screens`.
 RECORD = 4 + 4 + COLUMNS * ROWS * 2 + 8
@@ -363,7 +373,7 @@ def run(scenario, program, setup=..., limit=60):
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "TZ": "UTC", "HOME": str(bench / "home"),
             "XDG_CONFIG_HOME": str(bench),
-            "VC_TEST": str(channel), "VC_TEST_CLOCK": setups.CLOCK,
+            "VC_TEST": str(channel), "VC_TEST_CLOCK": CLOCK,
         }
         try:
             done = subprocess.run(
