@@ -304,6 +304,15 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   browser, where the user may view it or save it.
 - The keys that a browser keeps for itself are declared, and a button for
   the full screen locks the keyboard where the browser allows it.
+- It opens on an iPhone: the grid is scaled to fit the screen and fitted
+  again when the screen turns or changes size, pinch-zoom allowed; a tap
+  is a click on the cell under the finger; where there is no keyboard, a
+  row of keys that a phone lacks, F1 to F10, Esc, Tab, the arrows, PgUp
+  and PgDn, and Ctrl and Alt that stay held for the next key, stands
+  with a button that brings up the phone's keyboard.
+- While it is built, it is served to the user's devices by Tailscale
+  Serve from the workstation, over HTTPS and to the user's tailnet
+  alone; publishing it anywhere else is asked first.
 - It comes before iOS as a rehearsal of what iOS has too: no shell, a file
   system of the program's own, an event loop. On iOS the room of the
   editor and the viewer gets a cap, since the system ends a program that
