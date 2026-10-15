@@ -4,7 +4,8 @@ QEMU translates the guest's code a block at a time, just before running the
 block for the first time, and with `-d in_asm` logs each block as it does:
 the address and the bytes of every instruction. A block runs from where it
 is entered to the next jump, so with rare exceptions (an interrupt taken in
-the middle of one) what was logged is what was executed.
+the middle of one) what was logged is what was executed. A block that QEMU
+cuts short, and logs again in pieces, counts as the whole: see _pieces().
 
 Volkov Commander moves itself about in memory, but its code can be told
 from everything else by its bytes: a block whose bytes occur in the program
@@ -238,7 +239,11 @@ def executed(trace_path, contents, linked=None, others=()):
     found = []
     # A block that was logged again, at the same place with the same
     # bytes, says nothing more.
-    for block in dict.fromkeys(tuple(block) for block in logged):
+    unique = list(dict.fromkeys(tuple(block) for block in logged))
+    pieces = _pieces(unique)
+    for block in unique:
+        if block in pieces:
+            continue
         for base in there:
             if any(all(_matches(image, address - base, code, far=not flat)
                        for address, code in block)
@@ -250,6 +255,35 @@ def executed(trace_path, contents, linked=None, others=()):
                 break
     result.at = tuple(found)
     return result
+
+
+def _pieces(blocks):
+    """Of `blocks`, each a tuple of (address, bytes) instructions, those
+    that are a piece of a longer one: the same instructions at the same
+    addresses, found within it. QEMU, with the machine's clock counted in
+    instructions, cuts a block where the time that it may run without
+    looking at its timers ends, and translates the rest as a block of its
+    own, so that a block of six instructions is logged once whole and
+    once as two pieces. Where it cuts follows the host's load wherever
+    the machine waits on the host. A piece says nothing that the whole
+    does not, but alone it may be one short instruction that the
+    program's file has at the place by chance, where the whole does not
+    match: JA of the editor counted as run in `mouse-history` that way,
+    cut out of a routine of the shell's, under load only. So a piece
+    counts as run where a block that it is a piece of does, and not by
+    itself."""
+    inside = {}           # instruction -> [(block, place in it)]
+    for block in blocks:
+        for number, instruction in enumerate(block):
+            inside.setdefault(instruction, []).append((block, number))
+    found = set()
+    for block in blocks:
+        for whole, number in inside[block[0]]:
+            if len(whole) > len(block) \
+                    and whole[number:number + len(block)] == block:
+                found.add(block)
+                break
+    return found
 
 
 def _matches(contents, offset, code, far=True):
