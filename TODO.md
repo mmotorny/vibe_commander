@@ -19409,6 +19409,176 @@ and are compared, where 27 were stopped; no sanitizer says anything
 more in any of them. What they still differ in is L3b's: the order of
 the files and the setup file.
 
+## SORT, the bench sorted by name: the plan
+
+On the user's word of 15 October 2026 the panels of the bench sort
+their files by name (`CLAUDE.md`, "Scenarios"), and the portable C has
+no unsorted order. The scenarios moved the cursor by places in lists
+that were in the order of the disk. On a sorted bench the same keys go
+to other files, so the user chose, the same day, to rewrite the steps
+so that each scenario goes to the files it meant. The other option was
+to mend only enough scenarios to get the lost instructions back, and
+leave the others to do something else than their comments say. This
+section is the plan for that work. It is done on the branch `sort` of
+the remote, not on `main`, which stays green until the end.
+
+### What the original does, and what the bench does now
+
+- The original lists both panels unsorted as it is distributed:
+  SortTyp, byte 5 of each panel's part of `VC.INI`, is 8 for both
+  panels in the distribution's file, as it is in `DefWCB` of `start.c`
+  and in the panel of `stmain.c`. `CmpPar` of `files.c` takes any type
+  of 4 or more for unsorted.
+- VC 4.05 has no keys for the order. It is in the Left and the Right
+  menu only: Name, eXtension, tiMe, Size, Unsorted, items 7 to 11, all
+  of which go to `M08_00`. Ctrl+F3 does nothing, and Ctrl+F4 is the
+  volume label.
+- The bench's setup file is made with `BY_NAME_KEYS` of
+  `harness/setups.py`, "F9 l n" and "F9 r n", behind the keys of the
+  clock and of the right panel. The file then has SortTyp 0 for both
+  panels, and nothing else of it changes.
+- The orders, then and now:
+  - `C:\WORK`: `..`, DOCS, SRC, readme.txt, hello.txt, notes.doc,
+    data.bin, run.bat, empty.dat; now `..`, DOCS, SRC, data.bin,
+    empty.dat, hello.txt, notes.doc, readme.txt, run.bat.
+  - `C:\`: WORK, STAMPS; now STAMPS, WORK. The panel on the right
+    starts there with its cursor on STAMPS.
+  - `C:\STAMPS`: SUB, first, night, morning, noon, evening, last,
+    huge; now SUB, evening, first, huge, last, morning, night, noon.
+  - A file that a scenario makes goes to its place by name, not to the
+    end of the list. The header of `harness/scenarios.py` says the
+    opposite ("A new file comes last in an unsorted panel, so End goes
+    to it"), as do other lines of it that rest on the old order.
+
+### What the change does, measured
+
+All goldens were derived with the new bench and not committed. All
+170 `.txt` changed and so did the 137 `.ran` of the main program. The
+33 of the setup program ran what they ran before. What the original
+ran in the main program, over all scenarios, fell from 51,577 bytes
+of `VC.COM` to 50,814, and nothing was gained. 314 instructions of the
+batches of `harness/ported.py` were no longer run by any scenario, and
+the scenarios' tests of both C trees fail for that.
+
+By `harness/sortcheck.py`, 74 scenarios are affected and 96 are as
+before. Of the scenarios of the setup program, `setup-left-handed` is
+the one affected, which clicks on a panel.
+
+The two instructions of `CmpPar` that only an unsorted list runs,
+AB62h and AB65h, were run by every scenario that showed a panel. Now
+only `sort` reaches them, by "F9 l u", and has to go on doing so.
+
+### The tool
+
+`harness/sortcheck.py` reads the golden of a scenario as it is
+derived now and the golden at the last commit of `main` before the
+change (`BEFORE` there). It runs nothing and takes a fraction of a
+second for one scenario.
+
+- For each screen, by number, it holds two things for each panel that
+  the screen shows: its directory, and the line under its files, the
+  mini status, which names the file under the cursor. A cursor on the
+  first entry shown counts as where it was in both goldens, so the
+  panel of the root of C: that has not been touched passes. A screen
+  without a panel is held by its first row, which names the file in
+  the viewer and the editor.
+- It names every instruction of the batches that the scenario ran
+  before and does not now. The two of the unsorted order are said
+  apart and do not fail the scenario.
+- `python3 harness/sortcheck.py` gives one line for each scenario.
+  `python3 harness/sortcheck.py NAME...` also gives what differs.
+- The lists themselves are not held, since they are in another order
+  on purpose.
+
+### The groups
+
+Each group is the work of one agent, by area, about equally long. The
+figures are the screens that differ out of all the screens, and the
+instructions of the batches lost, as the tool counted them with the
+steps as they are at the commit `BEFORE`.
+
+| Group | Scenarios |
+|---|---|
+| S1, copy, move, delete, names (10) | `copy` 63/69, 110; `copy-ask` 33/45; `copy-big` 24/30, 6; `copy-dirs` 26/49, 41; `copy-full` 72/77, 127; `move` 72/90, 60; `delete` 20/65; `delete-mask` 5/27; `rename-keys` 12/19; `names` 4/18 |
+| S2, the editor and the viewer (14) | `editor` 3/5, 4; `editor-big` 13/42, 533; `editor-hex` 8/16, 23; `editor-hex-keys` 40/45, 110; `editor-save` 9/30, 185; `editor-search` 23/25, 187; `emptied` 7/9, 223; `keys-waiting` 11/13, 4; `view` 24/26, 377; `view-commands` 11/53, 47; `view-keys` 55/70, 339; `view-window` 14/17, 707; `hex` 19/21, 53; `columns` 14/21, 24 |
+| S3, the panels and their keys (15) | `panels` 9/13; `cursor` 25/52, 24; `panel-keys` 31/51; `filter` 23/34, 22; `sort` 18/22, 22; `scroll` 12/25, 22; `stamps` 17/21, 23; `stamps-russia` 17/21, 23; `reread` 23/27, 611; `sizes` 18/25, 484; `compare` 14/20, 86; `tree-choose` 10/22; `attributes` 19/21; `attributes-directory` 13/25; `attributes-russia` 5/7 |
+| S4, Enter, the command line, the user menu, the drives (18) | `enter` 47/67, 21; `enter-many` 1/28; `enter-many-selected` 3/28; `command` 1/11; `command-edit` 23/41, 134; `command-line` 8/55; `second-copy` 1/12; `user-menu` 14/85; `user-menu-run` 21/70, 1189; `device` 6/9; `russian` 11/13; `clock-path` 21/23; `clock-path-russia` 21/23, 20; `laptop` 8/13; `diskette-command` 0/8, 90; `history-drives` 0/72, 17; `phantom` 0/15, 17; `asked` 0/26, 14 |
+| S5, the menus, the dialogs, the mouse, the setup program (17) | `menu` 11/54; `menu-panel` 0/20, 17; `menu-items` 10/45, 10; `menu-held` 30/32, 4; `dialog-keys` 8/38; `mouse-panel` 5/7; `mouse-list` 2/15; `mouse-dialog` 5/7; `mouse-left-hand` 3/8; `mouse-select` 7/11, 75; `mouse-line` 4/14; `mouse-menu` 7/23; `mouse-drive` 0/11, 90; `mouse-middle` 13/16; `mouse-drag-dialog` 9/18; `mouse-drag-lists` 9/17; `setup-left-handed` 2/17 |
+
+A scenario with no screen that differs but with instructions lost goes
+to another file, drive or directory where no panel shows it, or on
+the panel that is not the current one. The tool's lost instructions
+say where to look.
+
+### How a group agent works
+
+- Start from the branch `sort`: `git fetch`, then `git checkout -B
+  sort origin/sort`, and build. Change the steps of your group's
+  scenarios in `harness/scenarios.py`, and their comments, and nothing
+  else of that file but lines of its header that only your scenarios
+  rest on. Never touch another group's scenarios.
+- Keep each scenario's number of steps: put other keys into the step
+  that is there, "Down Down Down Down" becoming "Down Down", so that
+  the screens stand against the old ones by number. Where a step has
+  to be added or taken out, the tool holds the screens by number only
+  as far as both go, and says so. Hold the rest by reading, and say so
+  in the scenario's comment and here.
+- Derive your scenarios' goldens on the new bench: `python3
+  harness/goldens.py derive NAME...`, side by side, `--together 4` at
+  most. Then run `python3 harness/sortcheck.py NAME`. Go on until no
+  screen differs and no instruction is lost, or until what differs is
+  meant and is written down here under your group, with the reason. A
+  difference that is meant: the right panel at the root of C: on
+  STAMPS where a scenario never moves it, or a list's order on the
+  screen.
+- Where the old steps went somewhere by chance of the order, write
+  them so that they say where they go: to a file by its place in the
+  sorted list, with the comment naming the file.
+- Commit your scenarios' changes and their goldens, one commit for the
+  group or one for each few scenarios. Do not push to `main`. Push to
+  `sort` at your turn in the session's queue, after `git pull --rebase`
+  onto it. The goldens of two groups are other files, and
+  `harness/scenarios.py` is in other lines.
+- The tests of the C trees do not pass on `sort` until the end. Judge
+  your group by the tool. A run of `harness/compare.py` for the C
+  translation on one of your scenarios, `python3 harness/compare.py
+  build/c/VC.EXE NAME`, shows that the translation still does what the
+  original does: it has to pass, as the translation is frozen.
+
+### How the end is put together
+
+One agent, after all five groups are on `sort`:
+
+1. It reads the header of `harness/scenarios.py` whole and mends what
+   rests on the unsorted order.
+2. It derives every golden again, `python3 harness/goldens.py derive`,
+   and runs `python3 harness/sortcheck.py`: every scenario as before,
+   or explained here.
+3. It holds the batches to what all the scenarios ran, the check that
+   the scenarios' tests make first: `python3 -c "import sys;
+   sys.path.insert(0, 'harness'); import ported, coverage, goldens,
+   setups; print(ported.check_original(coverage.Listing(setups.LISTING),
+   goldens.ran(), ported.BATCHES))"`. That has to print True, with
+   AB62h and AB65h run by `sort`.
+4. It remakes every patch of `harness/goldens/portable_c/` that no
+   longer fits, with `goldens.py patch`, and reads each against the
+   one before, as `CLAUDE.md`'s notes on remaking a patch have it.
+5. The whole suite passes: the C translation unchanged, and the
+   portable C as it was. Then `sort` lands on `main`.
+6. Then the second part of the piece, on `main`: Unsorted goes from
+   the portable C. That is its menu line, the setup's byte read as by
+   name, and a new panel sorting by name. It is declared in
+   `DEVIATIONS.md` as a thing that only made sense on DOS, and the
+   steps that pick Unsorted, "F9 l u" of `sort`, are left out for the
+   tree.
+
+### What the others meet
+
+L3b, the scenarios of Linux, moves the layout of some scenarios to a
+directory of the bench and derives their goldens again. It and `sort`
+change the same goldens and `harness/scenarios.py`. Whichever lands
+second derives the goldens again on top of the other.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes
