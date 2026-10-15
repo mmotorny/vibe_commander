@@ -290,6 +290,71 @@ static void StF08_00(void)
         StDefault();
 }
 
+/* A key or the mouse at the menu, Main02 of the assembly, until one of
+   them moves the cursor or chooses an item: answers the item that the
+   cursor is to go to, or CHOSEN where the item in `item` is chosen, as
+   at Main32. A key or the mouse that chooses Exit, Main31 of the
+   assembly, and F2 to F9, Main20, make `item` that item first. The
+   menu's box is `where`, and its last item, Exit, is `last`. */
+#define CHOSEN (-1)
+
+static i32 StMain02(i32 *item, i32 last, const struct Box *where)
+{
+    u16 key, mouse;
+
+    for (;;) {                          /* Main02 */
+        key = KEY_MOUSE << 8;           /* the mouse, as Input answers it */
+        if (GetMous(0).buttons == 0) {
+            md.MousEnt = 0;
+            key = Input(0);
+        }
+        if (key >> 8 == KEY_MOUSE) {    /* Main30: Mouse */
+            mouse = F32_70(where->begin, where->size);  /* Main50 */
+            if (mouse >> 8 < 1)
+                continue;
+            if (mouse >> 8 == 1)        /* a line: its number */
+                return mouse & 0xFF;
+            if (mouse >> 8 != 0x1C)     /* not the second click on a line: */
+                *item = 0x40;           /* Main31, Exit */
+            return CHOSEN;
+        }
+        if (key >> 8 == 0)
+            continue;
+        switch (key & 0xFF) {
+        case 0x0D:                      /* Enter */
+            return CHOSEN;
+        case 0x1B:                      /* Esc: Main31, Exit */
+            *item = 0x40;
+            return CHOSEN;
+        }
+        switch (key) {
+        case 0x4800:                    /* Main10: Up */
+            return *item == 0 ? last : *item - 1;
+        case 0x5000:                    /* Main11: Down */
+            return *item >= last ? 0 : *item + 1;
+        case 0x4700:                    /* Main12: Home, */
+        case 0x4900:                    /* PgUp */
+            return 0;
+        case 0x4F00:                    /* Main13: End, */
+        case 0x5100:                    /* PgDn */
+            return last;
+        case 0x4400:                    /* F10: Main31, Exit */
+            *item = 0x40;
+            return CHOSEN;
+        case 0x3C00:                    /* Main20: F2, Configuration */
+        case 0x3D00:                    /* F3, Screen and Mouse */
+        case 0x3E00:                    /* F4, Panel options */
+        case 0x3F00:                    /* F5, Set Black & White palette */
+        case 0x4000:                    /* F6, Set Color palette */
+        case 0x4100:                    /* F7, Set Laptop palette */
+        case 0x4200:                    /* F8, Set default configuration */
+        case 0x4300:                    /* F9, Country info */
+            *item = (key >> 8) - 0x3C;
+            return CHOSEN;
+        }
+    }
+}
+
 /* The menu of the setup: Main00 of the original. Up and Down move the
    cursor, round at the ends; Home and PgUp go to the first item, End and
    PgDn to the last; Enter is the item under the cursor, and F2 to F9
@@ -316,96 +381,41 @@ static void StMain00(void)
 {
     struct Box where;
     i32 item, to, last;
-    u16 key, mouse;
 
-Main00:
-    PutKey(0);
-    DialBox(0x528, &StMain_P, 0, &md, &where);
-    Window(where.begin, where.size);
-    item = sd.MnItem;
-    last = (u8)((where.size >> 8) - 6); /* the item Exit */
-    md.MousTim |= 0xFFFF0000UL;
-    md.MousEnt = 0;
-Main01:                                 /* Set cursor */
-    StMain40(HstCu_C, item, where.begin, where.size);
-    md.HlpPage = StMainHlp[item];
-Main02:
-    if (GetMous(0).buttons != 0)
-        goto Main30;
-    md.MousEnt = 0;
-    key = Input(0);
-    if (key >> 8 == KEY_MOUSE)
-        goto Main30;
-    if (key >> 8 == 0)
-        goto Main02;
-    switch (key & 0xFF) {
-    case 0x0D:                          /* Enter */
-        goto Main32;
-    case 0x1B:                          /* Esc */
-        goto Main31;
-    }
-    switch (key) {
-    case 0x4800:                        /* Main10: Up */
-        to = item == 0 ? last : item - 1;
-        break;
-    case 0x5000:                        /* Main11: Down */
-        to = item >= last ? 0 : item + 1;
-        break;
-    case 0x4700:                        /* Main12: Home, */
-    case 0x4900:                        /* PgUp */
-        to = 0;
-        break;
-    case 0x4F00:                        /* Main13: End, */
-    case 0x5100:                        /* PgDn */
-        to = last;
-        break;
-    case 0x4400:                        /* F10 */
-        goto Main31;
-    case 0x3C00:                        /* Main20: F2, Configuration */
-    case 0x3D00:                        /* F3, Screen and Mouse */
-    case 0x3E00:                        /* F4, Panel options */
-    case 0x3F00:                        /* F5, Set Black & White palette */
-    case 0x4000:                        /* F6, Set Color palette */
-    case 0x4100:                        /* F7, Set Laptop palette */
-    case 0x4200:                        /* F8, Set default configuration */
-    case 0x4300:                        /* F9, Country info */
-        item = (key >> 8) - 0x3C;
-        goto Main32;
-    default:
-        goto Main02;
-    }
-Main14:
-    if (to == item)
-        goto Main02;
-    StMain40(Hist_C, item, where.begin, where.size);
-    item = to;
-    goto Main01;
-
-Main30:                                 /* Mouse */
-    mouse = F32_70(where.begin, where.size);    /* Main50 */
-    if (mouse >> 8 < 1)
-        goto Main02;
-    if (mouse >> 8 == 1) {              /* a line: its number */
-        to = mouse & 0xFF;
-        goto Main14;
-    }
-    if (mouse >> 8 == 0x1C)             /* the second click on a line */
-        goto Main32;
-Main31:
-    item = 0x40;                        /* Exit */
-Main32:                                 /* Enter */
-    ResWin(where.begin, where.size, where.saved);
-    Window(where.begin, where.size);
-    sd.MnItem = item;
-    switch (item) {
-    case 0: StF02_00(); goto Main00;
-    case 1: StF03_00(); goto Main00;
-    case 2: StF04_00(); goto Main00;
-    case 3: StF05_00(); goto Main00;
-    case 4: StF06_00(); goto Main00;
-    case 5: StF07_00(); goto Main00;
-    case 6: StF08_00(); goto Main00;
-    case 7: StF09_00(); goto Main00;
+    for (;;) {                          /* Main00 */
+        PutKey(0);
+        DialBox(0x528, &StMain_P, 0, &md, &where);
+        Window(where.begin, where.size);
+        item = sd.MnItem;
+        last = (u8)((where.size >> 8) - 6);     /* the item Exit */
+        md.MousTim |= 0xFFFF0000UL;
+        md.MousEnt = 0;
+        for (;;) {                      /* Main01: Set cursor */
+            StMain40(HstCu_C, item, where.begin, where.size);
+            md.HlpPage = StMainHlp[item];
+            do
+                to = StMain02(&item, last, &where);
+            while (to == item);         /* Main14: where it is, Main02 */
+            if (to == CHOSEN)
+                break;
+            StMain40(Hist_C, item, where.begin, where.size);
+            item = to;
+        }
+        /* Main32: Enter */
+        ResWin(where.begin, where.size, where.saved);
+        Window(where.begin, where.size);
+        sd.MnItem = item;
+        switch (item) {
+        case 0: StF02_00(); break;
+        case 1: StF03_00(); break;
+        case 2: StF04_00(); break;
+        case 3: StF05_00(); break;
+        case 4: StF06_00(); break;
+        case 5: StF07_00(); break;
+        case 6: StF08_00(); break;
+        case 7: StF09_00(); break;
+        default: return;
+        }
     }
 }
 

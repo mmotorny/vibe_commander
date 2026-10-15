@@ -88,10 +88,10 @@ N18             75          0     1              0      55     1     0     7    
 N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
 N19b            21          0     0              0      20     1     2     1    18  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
-N21             60          0     3              0      46     7     0     5    32  stmain.c sthelp.c
+N21             60          0     3              0      46     7     0     5    34  stmain.c sthelp.c
 as a whole     647          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
 headers        333         94    15              0     203     5     0     0     0  vc.h sys.h tables.h
-all           2083         94   116              0    1257    66    54   191   983
+all           2083         94   116              0    1257    66    54   191   985
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               213          0    11              0     173     5     0     0     0
@@ -132,7 +132,7 @@ setup.c              3          0     0              0       3     0     0     0
 start.c             21          0     0              0      20     1     2     1    18
 stcolor.c           43          0     0              0      43     0     0     3    39
 sthelp.c            43          0     3              0      30     6     0     2    16
-stmain.c            17          0     0              0      16     1     0     3    16
+stmain.c            17          0     0              0      16     1     0     3    18
 stopts.c            18          0     0              0      15     3     0     0    10
 string.c             6          0     0              0       6     0     0     0     8
 system.c             8          0     1              0       9     0     0     6     7
@@ -4232,10 +4232,10 @@ stmain.c, StMain40: parameter size, u16
 stmain.c, StMain40: variable place, u16
     place
 
-stmain.c, StMain00: variable key, u16
+stmain.c, StMain02: variable key, u16
     key
 
-stmain.c, StMain00: variable mouse, u16
+stmain.c, StMain02: variable mouse, u16
     What F32_70 of usermenu.c answers, what the mouse did in the high
     byte and the line in the low one, which are taken apart here.
 

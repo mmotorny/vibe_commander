@@ -243,8 +243,8 @@ sthelp.c, StPage: back
     at begins two behind HELPBUF and goes up: the loop is left where the
     next would have wrapped round.
 
-stmain.c, StMain00: widen
-    | item = (key >> 8) - 0x3C;
+stmain.c, StMain02: widen
+    | *item = (key >> 8) - 0x3C;
     The case above it has the scan code from 3Ch to 43h, F2 to F9: item
     is 0 to 7 in either width.
 
