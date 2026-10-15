@@ -9165,8 +9165,10 @@ beyond 32 bits; and all of the shape of `sys.h`. "Left for the layer's design", 
   says of the result, `-Wtautological-constant-out-of-range-compare`,
   `-Wconstant-conversion`, `-Wint-in-bool-context`, each of which
   names such a place.
-- `failed` and its like in `sys.h` are the layer's shape and are left
-  to step 3: `Refused` of the system's file answers 0FFFFh in one.
+- `failed` and its like in `sys.h` were left to the layer's shape,
+  `Refused` of the system's file answering 0FFFFh in one. With step 3
+  decided as DOS's own shape, N22 made them `bool`, with the other
+  answers and arguments of `sys.h` that are true or false: "N22", below.
 - The flags of the setup stay bytes, taken by the session: question
   6.
 
@@ -9405,6 +9407,7 @@ for.
 | N19b | `start.c`, which has the lines that ask for memory | Its lines, which F1 and F9 change; in the record's table | F8 and F9 | **Done**: "N19b, `start.c`: done, and what a later cluster should know" below |
 | N20 | `stcolor.c`, `stopts.c` | 1,133; 158 | F8 | **Done**: "N20, `stcolor.c`, `stopts.c`: done, and what a later cluster should know" below |
 | N21 | `stmain.c`, `sthelp.c` | 1,086; 121 | F8 | **Done**: "N21, `stmain.c`, `sthelp.c`: done, and what a later cluster should know" below, with `struct StData` of `vc.h` |
+| N22 | `sys.h`, its declarations and structures, and the lines of `dos32.c` that implement what changes | 35 numbers and 4 `u32` of its structures; its parameters and returns | S, M | **Done**: "N22, `sys.h`: done, and what a later cluster should know" below |
 
 A cluster and a piece of the addresses never have the same lines: a
 cluster starts when the piece that has its files has landed, and of
@@ -16203,6 +16206,136 @@ address, as N19b found. Nothing is declared as changed.
 The program: `VC.EXE` e2c14915... from 8e4931e3... of `main` at
 b98f2b3; brought onto M, `main` at c238b02, a9421c89.... The tests of
 the portable C pass on both.
+
+### N22, `sys.h`: done, and what a later cluster should know
+
+The widths and the booleans of `sys.h`, its structures and its
+declarations, with the lines of `dos32.c` that implement what changed
+and of the callers that went with them. Made from `main` at 96e8039.
+
+**How it was sorted.** By the road's step 3, `sys.h` is in DOS's terms
+and values. So a number that DOS, the BIOS or the mouse driver takes or
+answers in keeps the width that it has there, with its word; a count
+that the program reckons with is an `i32`, also where the system takes
+it in a register, which `dos32.c` fills; and what is true or false is a
+`bool`. The top of `sys.h` says so now, in a paragraph of its own.
+
+**The structures**, 35 numbers and 4 `u32`, all of the record's:
+
+- `bool`: 9. `failed` of `struct Answer`, `Moved`, `FilePlace`,
+  `FileAttr`, `FileStamp`, `Device`, `Space` and `Block`, and `none` of
+  `struct Keys`.
+- Kept by word: 26, by sentence: 0. `system` 17: AX as DOS leaves it in
+  each `value` and `error`, the version, the mode, the columns and the
+  page of the screen, the shape of the cursor, the font's two figures,
+  the mouse's dots; `time` 4, `attributes` 1, `key` 1, `place` 1, `bits`
+  2, `kind` of `struct Device` and the mouse's buttons.
+- The 4 `u32` kept by word, `size`: `place` of `struct FilePlace`, and
+  `free`, `sector` and `total` of `struct Space`, the factors of the
+  size of a disk, as S left them and for its reason.
+- Widened: none. Screen's columns, the font's height and last row and
+  the mouse's x and y are counts or places by what they say, and were
+  looked at for an `i32`: each is a register of the BIOS's or the
+  driver's as it answers, and each caller keeps it in a field of the
+  main data or a byte at once (`MouseX`, `MouseY`; the last row with
+  the original's cut written, in `start.c`), so an `i32` would have
+  been a cast at every caller and two places of a sign in `mouse.c`
+  for nothing.
+
+**The declarations.** A parameter or a return of `sys.h` is counted
+where its function is written, in `dos32.c`, which is in the record as
+a whole: its count went from 151 numbers to 133, which is these 18.
+
+- `bool`, 12: `flagged` of `FcbDelete` and `DriveSpace`; `on` of
+  `MemSetUpper`, `SetBreakCheck` and `ProgramEndedBreakCheck`; `down` of
+  `ScreenScroll`; what `DriveCd`, `ScreenEga` and `BreakCheck` answer;
+  and in `dos32.c` itself what `Call` answers and what `Answered` and
+  `Ask` take for it, where `Call` and the functions of the memory said
+  0FFFFh.
+- `i32`, 6: `lines` of `ScreenScroll`, `count` of `ScreenFill`, `cell`
+  and `count` of `ScreenPut` and of `ScreenGet`. The two of the BIOS go
+  into AL and CX as before; the two copies count down while the count is
+  above 0, where they counted to 0.
+- Kept, with the reason of the paragraph at the top of `sys.h`: drives,
+  handles, modes, attributes, times and dates, a page, a place, a
+  colour, a character, a shape; `from` of `FileStep`, DOS's AL; `how` of
+  `MemSetSearch`; `code` of `ProgramEnd`; what `DeviceErrorFn` takes
+  and answers; `MouseFind` and `MouseReset`, FFFFh for a mouse; the
+  mouse's dots in `MouseTo` and `MouseRows`, as the driver takes them,
+  for which `mouse.c` and `stmain.c` keep the cast of the last row;
+  `ScreenPageStart` and `start` of `ScreenMemory`, the BIOS's word at
+  44Eh; and `Ticks`, a `u32`, the BIOS's count as it keeps it.
+
+**The callers.** Casts: none written, 9 taken out by the types, 8 of
+`(u16)` at the calls of `ScreenPut` and `ScreenGet` in `window.c`, with
+the comment that said the numbers fit the system's 16 bits, and the
+`(u8)` of `BreakCheck` in `exec.c`. And what reads a `bool` as a number
+reads it as what it is, 25 lines: `.failed != 0` is `.failed` and `==
+0` is `!`, `KeyWaiting().none == 0` is `!KeyWaiting().none`, 0 and 1 put
+into a `failed` of the program's own answers are `false` and `true`, and
+the literal 0 handed to a parameter that is a `bool` is `false`, in
+`blank.c`, `commands.c`, `copy.c`, `dirfunc.c`, `edit.c`, `exec.c`,
+`input.c`, `setup.c`, `start.c`, `system.c` and `view.c`. Not in the
+files that P had at the same time, where they compile and mean the
+same: `keys.c` (`marked.failed != 0`), `read.c` (`opened.failed == 0`
+and `!= 0`, and `DriveSpace((u16)drive, 0)`). Whoever has those files
+next may write them so. clang named nothing in a sorted file, before or
+after: a `bool` that is compared with 0, or given a `u16`, is no place
+of its warnings.
+
+**What DOS is asked.** A `bool` that is handed to DOS goes as 1 or 0:
+DL of 3301h, `on ? 1 : 0` where it was `on & 0xFF`; BX of 5803h; the
+byte that the routine of real mode tells DOS when the program has been
+ended. The program hands `SetBreakCheck` and `ProgramEndedBreakCheck`
+what `BreakCheck` answered, `BreakFl` of the main data, which is DL of
+3300h, 0 or 1 as DOS answers it; so the same. `BreakCheck` answers
+whether DL is not 0. `harness/trial32/calls.asm` over the program of
+`main` and over this one, with S's steps, F3, Esc, Shift+F9, Enter, F4,
+Esc, Alt+F1, Esc and F10 Enter: 229 lines each, the same calls in the
+same order with the same AX and BX, 3300h, 3301h twice, 5801h and 5803h
+among them. What differs is S's: ES at two calls of 4300h, which do not
+take it, and the extender's own reading of the program's file, which is
+of another length. The list has no DL, so that 3301h is handed the
+same is by the reading above. The script was `build/n22/calls.sh` of the
+checkout, not kept.
+
+**The toy** of `harness/trial32/sys.c` compiles and runs: `asked.py`
+over `main`'s source and over this one prints the same screens but for
+`failed`, 1 where it was F or FFFF, and the line of `SetBreakCheck(0x0301)`,
+"the low byte counts", which a `bool` has no low byte for and which
+went.
+
+**The images.** The program is 272 bytes shorter, a byte tested where a
+word was, so the room begins 272 bytes earlier, and against `main`'s
+build every scenario differs, in all of the room. Against this build
+padded to `main`'s length, 272 bytes of a constant behind the last of
+`dos32.c`, not kept: 145 of 158 scenarios with nothing that differs, 7
+with nothing but what may differ, and the six that S met, `comspec`,
+`ended`, `second-copy`, `start-screen`, `start-setup`, whose second copy
+of the program lives in the room with code of another layout, and
+`start-memory`, `ViewSeg` and `FreMem2` naming nothing known. Nothing is
+declared as changed.
+
+**For a later piece:**
+
+- `struct Answer` is a `u16` and a `bool`, four bytes with the pad, and
+  comes back in EAX as it did; `struct Moved` and `struct FilePlace`
+  are eight, through a pointer to room in the caller's frame as before.
+  The listings of 24 files differ, by a byte where a word of `failed`
+  was tested: the scenarios judge it.
+- A `bool` of `sys.h` that another system answers has to be 0 or 1 in
+  the structure, which C makes of any value put into it: `dos32.c`
+  writes `true` and `false`, and `Call`'s answer.
+- What stays 16 bits in `sys.h` is the system's width, and a count that
+  meets it is cut where it is handed, in the caller, by a cast that a
+  sorted file already has: `mouse.c` and `stmain.c`, the last row of
+  dots.
+
+This piece took some 85 tool calls, the images and the calls of DOS
+half of the time.
+
+The program: `VC.EXE` a9421c89... of `main` at 96e8039; 2f2fc833...
+with N22.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 
