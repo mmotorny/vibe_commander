@@ -222,7 +222,18 @@ These held while `src/c/` was made, and they say what it is.
      `xdg-open`; the PC's sixteen colours are drawn as DOS has them,
      exactly, in 24 bits where the terminal allows it; and the screen
      is 80 columns by 25 rows and no other size, whatever the
-     terminal's. The rest of that design is dropped. Once the stub compiles on Linux, on the user's
+     terminal's. The rest of that design is dropped. Of what the first
+     piece of step 6 asked, decided the same day: the program for Linux
+     is called `vc`, and keeps its settings where XDG says,
+     `$XDG_CONFIG_HOME/vc/` or `~/.config/vc/`, in lines like DOSBox's
+     (`mount D /path`, `codepage 866`), a variable of the environment
+     naming another file for the tests; a character that the code page
+     lacks, or a byte that is no UTF-8, shows as `_`, as Windows makes
+     a short name, the alias leading back to the name as it is; what
+     the program makes on the host is named in lower case; aliases are
+     numbered in the order of the host's names by their bytes and kept
+     for the run; the locale is read as POSIX has it, `LC_ALL`, then
+     `LC_CTYPE`, then `LANG`; and a directory is never shown read-only. Once the stub compiles on Linux, on the user's
      word of 14 October 2026, every build with clang has the
      sanitizers that fit it, a high level of warnings and clang-tidy,
      and a warning of any of them stops the build; which warnings and
