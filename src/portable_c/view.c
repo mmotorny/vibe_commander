@@ -185,6 +185,14 @@ static const u8 Byts_S[6] NONSTRING = " Bytes";
 /* Whether two bytes end a line: CR LF, or LF CR. */
 #define IS_CRLF(word) ((word) == 0x0A0D || (word) == 0x0D0A)
 
+/* V00_05: the box off the screen, and nothing opened. */
+static i32 V00_05(struct Open *open)
+{
+    ResWin(open->box.begin, open->box.size, open->box.saved);
+    Window(open->box.begin, open->box.size);
+    return 0;
+}
+
 /* Open the file ViewFil for the viewer or, if `edit` is not 0, for the
    editor, with the box "Reading the file" on the screen: `menu` is the
    item of the menu bar to mark, and `whole` is not 0 for a window that
@@ -221,26 +229,24 @@ i32 V00_02(i32 menu, bool edit, bool whole, struct Open *open)
     DialBox(0x528, &RdFil_P, include, &md, &open->box);
     Window(open->box.begin, open->box.size);
     if (ChgDisk(md.ViewFil))
-        goto none;
+        return V00_05(open);
     file = OpenFil(md.ViewFil, 0x40);
     handle = file.value;
     if (file.failed) {
         if (handle == ERR_NOT_READY)
-            goto none;
+            return V00_05(open);
         include = ViFl_S;
-        if (VI->ViewEdit) {
-            if (handle == ERR_NO_FILE) {
-                handle = 0xFFFF;
-                goto opened;
-            }
-            include = EdFl_S;
+        if (VI->ViewEdit && handle == ERR_NO_FILE) {
+            handle = 0xFFFF;            /* a new file to the editor */
+        } else {
+            if (VI->ViewEdit)
+                include = EdFl_S;
+            Dialog(&FndEr_B, include, 0, 0, &md);   /* V00_04 */
+            return V00_05(open);
         }
-        Dialog(&FndEr_B, include, 0, 0, &md);
-        goto none;
     }
-opened:
-    if (TstBrk())
-        goto none;
+    if (TstBrk())                       /* V00_06 */
+        return V00_05(open);
     VI->ViHandle = handle;
     length = 0;
     if (handle != 0xFFFF) {
@@ -255,10 +261,14 @@ opened:
     if (VI->ViewEdit)
         return 1;
     return 2;
-none:
-    ResWin(open->box.begin, open->box.size, open->box.saved);
-    Window(open->box.begin, open->box.size);
-    return 0;
+}
+
+/* NxLin4 of NextLin and PrLin7 of PrevLin: no line there, and the entry
+   the first of the table. Returns true. */
+static bool NoLine(struct Line *line)
+{
+    line->entry = ViSpace - 2;
+    return true;
 }
 
 /* Find where the line behind the one at `line` begins. Returns false and
@@ -274,7 +284,7 @@ bool NextLin(const u8 *text, struct Line *line)
     if (VI->ViTxHex != 0) {
         at = (at & 0xFFF0) + 0x10;
         if (ViLoaded <= at)
-            goto none;
+            return NoLine(line);
         line->at = at;
         return false;
     }
@@ -283,7 +293,7 @@ bool NextLin(const u8 *text, struct Line *line)
         entry = ViSpace;
     do {
         if (entry <= ViEndTab)
-            goto none;
+            return NoLine(line);
         entry -= 2;
     } while (at >= WORD_AT(text, entry));
     at = WORD_AT(text, entry);
@@ -295,17 +305,14 @@ bool NextLin(const u8 *text, struct Line *line)
                 break;
             entry -= 2;
             if (entry < ViEndTab)
-                goto none;
+                return NoLine(line);
         }
     }
     if (ViLoaded < at)
-        goto none;
+        return NoLine(line);
     line->at = at;
     line->entry = entry;
     return false;
-none:
-    line->entry = ViSpace - 2;
-    return true;
 }
 
 /* Find where the line before the one at `line` begins. Returns as
@@ -319,7 +326,7 @@ bool PrevLin(const u8 *text, struct Line *line)
     if (VI->ViTxHex != 0) {
         at &= 0xFFF0;
         if (at == 0)
-            goto none;
+            return NoLine(line);
         line->at = at - 0x10;
         return false;
     }
@@ -328,7 +335,7 @@ bool PrevLin(const u8 *text, struct Line *line)
         entry = ViSpace;
     for (;;) {
         if (entry <= ViEndTab)
-            goto none;
+            return NoLine(line);
         entry -= 2;
         word = WORD_AT(text, entry);
         if (at == word)
@@ -339,39 +346,36 @@ bool PrevLin(const u8 *text, struct Line *line)
         }
     }
     if (WORD_AT(text, entry) == 0)
-        goto none;
+        return NoLine(line);
     entry += 2;
     at = WORD_AT(text, entry);
     if (VI->ViWrap == 0) {
         /* Up to where the line that ends here begins: past the entries
            that do not follow the end of a line, twice. */
         entry -= 2;
-        for (;;) {
-            at = WORD_AT(text, entry);
-            if (at == 0)
-                goto found;
-            word = WORD_AT(text, at - 2);
-            if (IS_CRLF(word))
-                break;
-            entry += 2;
-        }
-        for (;;) {
-            entry += 2;
+        for (;;) {                      /* PrLin4 */
             at = WORD_AT(text, entry);
             if (at == 0)
                 break;
             word = WORD_AT(text, at - 2);
-            if (IS_CRLF(word))
+            if (IS_CRLF(word)) {
+                for (;;) {              /* PrLin5 */
+                    entry += 2;
+                    at = WORD_AT(text, entry);
+                    if (at == 0)
+                        break;
+                    word = WORD_AT(text, at - 2);
+                    if (IS_CRLF(word))
+                        break;
+                }
                 break;
+            }
+            entry += 2;
         }
     }
-found:
-    line->at = at;
+    line->at = at;                      /* PrLin8 */
     line->entry = entry;
     return false;
-none:
-    line->entry = ViSpace - 2;
-    return true;
 }
 
 /* Find the first line of the screen: where the line begins that ViFirst
@@ -493,29 +497,29 @@ bool V30_00(const u8 *text)
     count = VI->ViSize >> 8;
     line.at = V20_00(text);
     line.entry = ViPoint;
+    result = false;
     for (;;) {
         at = line.at;
-        if (NextLin(text, &line))
+        if (NextLin(text, &line)) {
+            /* V30_03. The last line there is: without the first byte of
+               a pair that ends it, where the second may be in the part
+               still to be read. */
+            end = ViLoaded;
+            if (V40_00() && at < end) {
+                last = text[end - 1];
+                if (last == 0x0D || last == 0x0A)
+                    end--;
+            }
+            V32_00(text, number, at, end);
+            result = true;
             break;
+        }
         V32_00(text, number, at, line.at);
         number++;
-        if (--count == 0) {
-            result = false;
-            goto show;
-        }
+        if (--count == 0)
+            break;
     }
-    /* The last line there is: without the first byte of a pair that ends
-       it, where the second may be in the part still to be read. */
-    end = ViLoaded;
-    if (V40_00() && at < end) {
-        last = text[end - 1];
-        if (last == 0x0D || last == 0x0A)
-            end--;
-    }
-    V32_00(text, number, at, end);
-    result = true;
-show:
-    Window(VI->ViBase, VI->ViSize);
+    Window(VI->ViBase, VI->ViSize);     /* V30_05 */
     return result;
 }
 
@@ -758,6 +762,15 @@ void V55_00(u8 *text, i32 to, i32 count, u16 handle)
     FileRead(handle, part, count);      /* ViSpace at the most */
 }
 
+/* V60_06, the end of V60_00: where the part in the memory and the table
+   end, and the first line of the table. */
+static void V60_06(i32 loaded, i32 table)
+{
+    ViLoaded = loaded;
+    ViEndTab = table;
+    ViPoint = ViSpace - 2;
+}
+
 /* Make the table of lines for the text from `at` on: `table` is the
    entry above the one that the line at `at` gets. Where the table meets
    the text, the part that is in the memory ends. */
@@ -778,8 +791,10 @@ void V60_00(u8 *text, i32 at, i32 table)
             loaded = table;
         }
         for (;;) {
-            if (at >= loaded)
-                goto done;
+            if (at >= loaded) {
+                V60_06(loaded, table);
+                return;
+            }
             word = WORD_AT(text, at);
             at += 2;
             if (at <= loaded && IS_CRLF(word))
@@ -799,13 +814,10 @@ void V60_00(u8 *text, i32 at, i32 table)
                 continue;
             if (at < loaded)
                 break;
-            goto done;
+            V60_06(loaded, table);
+            return;
         }
     }
-done:
-    ViLoaded = loaded;
-    ViEndTab = table;
-    ViPoint = ViSpace - 2;
 }
 
 /* Write the status line of the viewer but for the column and the per
@@ -1698,6 +1710,16 @@ struct Next F34_30(const u8 *text)
     return Next(true, at);
 }
 
+/* F34_45 of F34_40: no file, and the place before the command. */
+static struct Named F34_45(u8 *text)
+{
+    struct Named named;
+
+    named.file = false;
+    named.at = text - 1;
+    return named;
+}
+
 /* Is the command at `text` in MenuBuf nothing but the name of a file,
    and the last of its line: F34_40. For a viewer or an editor, `view`
    true, that is a name with an extension of three characters, and for a
@@ -1726,7 +1748,7 @@ struct Named F34_40(u8 *text, bool view)
     if (word >> 8 == ':') {
         c = (u8)UpCase(word & 0xFF);
         if (c < 'A' || c > 'Z')
-            goto command;
+            return F34_45(text);
         at += 2;
     }
     for (;;) {
@@ -1734,7 +1756,7 @@ struct Named F34_40(u8 *text, bool view)
         at++;
         c = (u8)word;
         if (c == '!')
-            goto command;
+            return F34_45(text);
         if (IS_CRLF(word) || c == EOF_CHAR || c == ' ' || c == '\t')
             break;
     }
@@ -1748,13 +1770,13 @@ struct Named F34_40(u8 *text, bool view)
         c = (u8)UpCase(*at++);
         suffix++;
         if (c != *suffix)
-            goto command;
+            return F34_45(text);
     } while (--count);
     if (F34_30(end).none == 0)
-        goto command;
+        return F34_45(text);
     *end = 0;
     if (end - text >= LenPath + 12)
-        goto command;
+        return F34_45(text);
     to = md.TmpBuf;
     if (CutPath(text) == text)
         to = (u8 *)CutPath(md.TmpBuf);
@@ -1763,10 +1785,6 @@ struct Named F34_40(u8 *text, bool view)
         *to++ = *from++;
     named.file = true;
     named.at = text + LenPath + 13;
-    return named;
-command:
-    named.file = false;
-    named.at = text - 1;
     return named;
 }
 
