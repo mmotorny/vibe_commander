@@ -19939,6 +19939,122 @@ and the sanitizers. What the user left open there stays as `DEVIATIONS.md`
 says it (the tree's order, NUL, the panels off without what the
 commands wrote, the wheel). Step 7, the web page, is next.
 
+## Step 7, the web page
+
+The plan, approved by the user on 15 October 2026.
+
+CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind them. The piece W1 copies this file into `TODO.md` as the section "Step 7, the web page", and every piece keeps its own part current there.
+
+### Architecture
+- **Reuse of the Linux emulation.** Emscripten's POSIX layer covers what the emulation calls: opendir/readdir, lstat, statvfs, futimens, chmod, rename, unlink and realpath. So `files_posix.c`, `paths_posix.c`, `names_posix.c`, `codepage_posix.c` and `time_posix.c` build unchanged.
+  - Under Emscripten, geteuid() is 0, and `DosAttributes` treats user 0 as having any w bit.
+  - `term_posix.c` and the fork/termios part of `sys_posix.c` do not build for the web.
+- **The split (W1).**
+  - About 1,500 of the 2,212 lines of `sys_posix.c` are free of the platform: the BIOS screen grid, the console, the mouse driver, memory, time, the test channel, the environment, and the wrappers of DOS's files. They move into a shared `machine_posix.c`, declared in `emulate_posix.h`.
+  - `sys_posix.c` keeps the terminal, the shell, xdg-open and main().
+  - The key decoder of `term_posix.c` (Scan, Named, Hold, KittyKey, Pad…) moves into `keyboard_posix.c`.
+  - `TermGlyph` moves into `codepage_posix.c` as `CodePageGlyph`.
+  - The suffix filter of CMake becomes a list per implementation. For the web: the common code, plus `*_posix.c` but `sys_posix.c` and `term_posix.c`, plus `*_web.c`.
+- **`sys_web.c` (W2)** has:
+  - KeyRead, KeyWaiting, Idle, Ticks, KeysHeld and MouseWhere;
+  - ProgramRun, ProgramEnd, ProgramOfFile and ProgramOpenFile;
+  - main(), and the file system's mount.
+- **Where the program yields (Asyncify).**
+  - `KeyRead` waits by `emscripten_sleep`, and `Idle` yields.
+  - `KeyWaiting` yields once 50 ms have passed since the last yield, so that TstBrk sees Esc in a copy or a search.
+  - `Ticks` yields at its second read with no yield between, so that the zooming boxes and the blanker are drawn.
+  - `ProgramEnd` awaits the sync of the store.
+  - JS never calls into the wasm while it is suspended: keys, the mouse and uploads are queued in JS, and C drains the queues at each yield.
+- **The cost of Asyncify.**
+  - Most of the program is instrumented, since the tables call through function pointers. Expect the code to grow by 50–100% and to run 20–50% slower; loops that never yield stay fast.
+  - `ASYNCIFY_STACK_SIZE` is 64 KB, for Input → Help → Input and Dialog → Input → Help.
+  - Build at -O2 or -Os.
+  - JSPI comes later, when every browser has it.
+- **The JS (W3a and W3b).**
+  - Pure modules `web/render.js`, `web/keys.js` and `web/mouse.js`, testable in Node.
+  - A glue of `--js-library`/`--pre-js`, and a shell HTML.
+- **Drawing the grid in the DOM.** A `<pre>` of 25 spans, one per row.
+  - At each yield C calls `web_draw(cells, cursor, shape)`. JS holds each row's 80 u16 against a cached Uint16Array and rebuilds only the rows that changed, with one span per run of one attribute.
+  - 256 generated CSS classes give the exact VGA colours (AA and 55, brown AA5500), and bit 7 blinks at the VGA's rate.
+  - The cursor is an overlay, a block or a line by the BIOS's shape. The mouse's pointer is the emulation's cell with its colours exchanged.
+- **The code page.** JS builds its table of 256 characters from the exported `CodePageGlyph`, so there is one source.
+- **Keys.** keydown and keyup become tuples of kitty's shape for the shared C decoder:
+  - the US key from `event.code`;
+  - the text from `event.key`, with AltGraph taken as text;
+  - what is held, from the modifiers and getModifierState;
+  - press, repeat or release.
+  - preventDefault is called on every key that is mapped.
+  - Ctrl-W, Ctrl-T and Ctrl-N with their Shift forms, Ctrl-Tab, Ctrl-PgUp and PgDn, Ctrl-F4 and Alt-F4 cannot be taken in a normal tab, and F11 and F12 are unreliable. They are declared. A full-screen button calls `navigator.keyboard.lock()`, Chromium only, and holding Esc leaves the full screen. The list of the keys is checked by hand in a browser.
+- **The mouse.** Pointer events on the `<pre>`.
+  - The cell is worked out from the measured cell box and clamped to 80×25.
+  - Buttons 1, 2 and 4. The context menu is suppressed, and the wheel does nothing (L11).
+- **The clock.** Emscripten's clock_gettime uses the browser's Date and time zone. The test clock is shared from `machine_posix.c`.
+- **The drive (the user's decision).** One drive, C:.
+  - It starts as a small tree of sample files written for the project, nothing proprietary, served with the page: preloaded or fetched by a manifest.
+  - The user may change it, and the changes are kept in the browser in IndexedDB (IDBFS), surviving a reload. A way to reset to the served content is offered.
+  - The store is synced at the first idle after a write and at pagehide. `navigator.storage.persist()` is asked for.
+  - Where IndexedDB is missing (a sandbox without same-origin), the page falls back to memory and says so.
+  - With C: as the drive, the Linux masks of the drive's letter may not be needed on the web: look at that in W2.
+- **Files in and out.**
+  - An upload button and drag-and-drop write into the host directory of DOS's current directory, which C publishes to JS at each yield. Overwriting asks confirm(). Then Ctrl-R (1312h) is queued, so that the panel reads the directory anew.
+  - `ProgramOpenFile` opens the file in a NEW TAB, as a blob URL with a MIME type from the extension (the user's decision, not a download): the user views or saves it from there.
+  - `ProgramOfFile` answers 0: nothing on the page is a program.
+- **The setup file.** `$HOME/.config/vc/vc.ini`, where HOME is on the persistent store.
+
+### Deviations (W entries of DEVIATIONS.md, a part of their own, "The web page")
+- **A command.** ProgramRun writes the prompt and the command, then "Commands cannot be run in a web page." on DOS's screen, and answers that it ran with code 1. This covers the user menu, VC.EXT, and the external viewer and editor.
+- **Ctrl-O.** It is the program's own key, as on DOS: the panels go off and DOS's screen shows.
+- **Enter on a file.** It opens a new tab.
+- **The keys.** The browser's reserved keys, as above.
+- **F10, leaving.** It shows the last screen and "Reload to start again", after the sync.
+- **Memory.** Capped at 2 GB (`MAXIMUM_MEMORY`).
+- **The screen.** It is scaled by whole multiples of the font.
+- **Help and menus.** The shareware's files are not shipped: F1 shows the original's message for help that is missing. A user may upload their own.
+
+### The font
+- VileR's Web437 IBM VGA 8x16, from the Ultimate Oldschool PC Font Pack (int10h.org), CC BY-SA 4.0, about 20 KB.
+- Fetched pinned by SHA-256 and inlined as a base64 @font-face, with `font-display: block`, and credited on the page.
+- 16px × n with line-height 1 gives a cell of exactly 8×16·n.
+
+### Testing
+- **The program under Node.** A second link, `web-node`: `-sNODERAWFS -sENVIRONMENT=node -sEXIT_RUNTIME`, with a pre-js that copies VC_TEST, VC_TEST_CLOCK, HOME, XDG_CONFIG_HOME, TZ and VC_TRACE into ENV.
+  - The program writes its screens through VC_TEST as on Linux.
+  - Reused: posixrun's bench, keys, `_screens`, read_tree, compare.py, goldens.py and the masks.
+  - `setups.Program.load` takes `*.js` as the tree "web", and posixrun runs `[node, vc.js]`.
+  - `TREES["web"] = _on_top(TREES["posix"], ON_WEB)`, and the patches are in `harness/goldens/web/`.
+  - The test is `portable_c-web-scenarios`. Try ASan and UBSan with Asyncify; UBSan alone if they do not go together.
+- **The limits of that.** NODERAWFS is not MEMFS/IDBFS: the sparse files of 4 GB in STAMPS cannot be held in MEMFS. So the page's file system is not what the scenarios exercise. That is declared.
+- **The render test,** `portable_c-web-render`, needs no download. render.js is fed screens recorded by the channel, the HTML is decoded back and held to the cells. keys.js is held the same way, with synthetic KeyboardEvent-shaped objects against the BIOS words of terminal.py.
+- **No new download for tests** (no jsdom, no Playwright). The browser is a manual pass by the user in Chrome and Firefox.
+
+### Downloads and the build
+- **Emscripten.** The release archive that emsdk fetches, `storage.googleapis.com/webassembly/emscripten-releases-builds/linux/<commit>/wasm-binaries.tar.xz`, the commit taken from emsdk's `emscripten-releases-tags.json`. It is pinned by CMake FetchContent with URL_HASH SHA256, without running emsdk's scripts.
+  - A generated `.emscripten` points at its LLVM and Binaryen and at the system's Node. EM_CACHE is in build/.
+  - The version is the newest release on the day W0 runs.
+  - Licences: MIT/NCSA, Apache-2.0 with the LLVM exception, Apache-2.0, and MIT for musl.
+- **When it is fetched (the user's decision).** Only with `-DVC_WEB=ON`; the web's tests exist only there.
+- **Open Watcom** likewise behind an option, `VC_DOS`, default ON, since every test of DOS needs it. A checkout or a CI job for the web alone can switch it off. Make that so where it makes sense, and say what does not.
+
+### Deployment
+- `SINGLE_FILE` with a shell HTML gives one `build/portable_c/web/vc.html`, with the wasm, the JS, the CSS and the font inline: an estimated 1–3 MB, with no CDN.
+- The demo tree is preloaded into it (`--preload-file` bundled) or embedded.
+- The targets are `portable_c-web` and `portable_c-web-node`.
+- Publishing, by GitHub Pages or otherwise, is asked of the user in W4. Nothing is published before that.
+
+### Pieces
+- **W0, the toolchain.**
+  - The `VC_WEB` option and the pinned Emscripten download, the `VC_DOS` option, the config, and the test `portable_c-web-probe`.
+  - The probe compiles every common file with emcc, with the project's warnings and -Werror: new warnings of clang and wasm32 (ILP32) issues are found early. Mend what it finds in the common code (DOS and Linux scenarios still pass).
+  - Heavy (the download). It runs beside W1 and W3a.
+- **W1, the split.** `machine_posix.c`, `keyboard_posix.c`, `CodePageGlyph`, and the lists of CMake.
+  - Linux behaves as it did, and VC.EXE is the same bytes.
+  - The tests: posix-scenarios, terminal, posix-unit and tidy.
+  - Heavy. It also copies this plan into `TODO.md`.
+- **W3a, the pure JS.** render.js, keys.js, mouse.js and the test `portable_c-web-render`. Medium.
+- **W2, the program under Node.** `sys_web.c`, the web-node link, the harness's tree "web", ON_WEB, and `portable_c-web-scenarios`. After W0 and W1.
+- **W3b, the page.** The glue, the shell HTML, the IDBFS sync, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, and the target `portable_c-web`. After W2 and W3a. The user tries it in a browser.
+- **W4.** DEVIATIONS "The web page", the README, TODO and CLAUDE notes, the licences, and the question of publishing to the user.
+
 ## SORT, the bench sorted by name: the plan
 
 On the user's word of 15 October 2026 the panels of the bench sort
