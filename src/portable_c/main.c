@@ -764,7 +764,7 @@ static i32 Loop(i32 entry, struct Regs *r)
                 return CMD_F21_31;
             PutMnu(0);                  /* Init49 */
             PutKey(0xFF);
-            /* fall through */
+            FALLTHROUGH;
         case INIT50:
             Init50();
             r->ds = CurrentPanel;       /* Init80 */
@@ -773,20 +773,20 @@ static i32 Loop(i32 entry, struct Regs *r)
             Panel(r->ds);
             PutPath(r->ds);
             PtFs00(r->ds);
-            /* fall through */
+            FALLTHROUGH;
         case FUNC02:
         Func02:
             r->bx = 0;
             r->dx = (u16)(md.Lines << 8 | 80);
             Window(r->bx, r->dx);       /* Func03 */
-            /* fall through */
+            FALLTHROUGH;
         case FUNC04:
             PutMnu(0);
             md.OneFile = 0;
             md.FlagCD = 0;
             md.MousEnt = 0;
             md.MousTim |= 0xFFFF0000UL;
-            /* fall through */
+            FALLTHROUGH;
         case FUNC05:
             /* The setup as it is now, held against the one that was
                saved last. The directories of the panels, which panel is
@@ -824,7 +824,7 @@ static i32 Loop(i32 entry, struct Regs *r)
                and copied, in MenuBuf and in IniSave: those are
                pointers, `r->si` and `r->di` are not set to them, and
                nothing reads SI or DI as this leaves them. */
-            /* fall through */
+            FALLTHROUGH;
         case FUNC07:
             Cursor1();
             r->ds = CurrentPanel;
@@ -911,7 +911,7 @@ static i32 Loop(i32 entry, struct Regs *r)
                         return CMD_F77_00;
                 }
             }
-            /* fall through */
+            FALLTHROUGH;
         case FUNC12:
             if (r->ax >> 8 == KEY_MOUSE)
                 goto Func20;
@@ -1077,7 +1077,7 @@ static i32 F35_90(struct Copied copied)
         return FncSel() ? INIT50 : FUNC04;
     case GO_MASKED:
         FncMas(copied.title);
-        /* fall through */
+        FALLTHROUGH;
     default:                            /* GO_DONE */
         return FncExt() ? INIT50 : FUNC04;
     }

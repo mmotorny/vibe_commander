@@ -52,4 +52,16 @@
 #define NONSTRING
 #endif
 
+/* A case of a switch that goes on into the next one on purpose, as the
+   original runs on from one label into the next: written as a statement,
+   `FALLTHROUGH;`, the last thing in front of the next label. gcc and
+   clang then know that it was meant, and say nothing of it
+   (-Wimplicit-fallthrough). Open Watcom says nothing of it in any case,
+   and has an empty statement there, which is no code. */
+#ifdef __GNUC__
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH
+#endif
+
 #endif

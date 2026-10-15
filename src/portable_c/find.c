@@ -358,6 +358,7 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
     case ASK_END:
         line = FND->FndNumb;
         /* and one up */
+        FALLTHROUGH;
     case ASK_UP:
         if (line != 0)
             line--;

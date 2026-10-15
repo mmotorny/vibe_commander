@@ -688,6 +688,7 @@ Slct03:
         if (cursor < total)
             goto Slct01;
         /* past the last line */
+        FALLTHROUGH;
     case 0x4F00:                        /* End */
     case 0x5100:                        /* PgDn */
         cursor = total - 1 & 0xFF;
@@ -975,6 +976,7 @@ Dial31:                                 /* the field of the cursor has the keys 
         if (field->mType == FIELD_BUTTONS)
             MD(field->mPoint) = 0;
         /* and as PgDn */
+        FALLTHROUGH;
     case 0x5100:                        /* PgDn */
         cursor = Dial85(cursor);
         goto Dial31;
