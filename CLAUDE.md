@@ -2280,6 +2280,13 @@ in "The portable C".
     `build/portable_c/images`, anew at every run; then `python3
     harness/dataimage.py compare build/before build/portable_c/images`,
     and its last lines go into the commit.
+  - Where the scenarios' test has just been run on the build before the
+    change, its images are the "before" already, and `save` is a second
+    run of every scenario for the same bytes, some two and a half
+    minutes: `cp -r build/portable_c/images build/before` before the
+    change is built does the same. The test runs with the stack looked
+    at, as `save` does, and the piece T2 found the two alike in all 159
+    scenarios (`TODO.md`, "T2, the time of the suite").
   - It names what differs: a field of the main data, by the original's
     listing, a field of a panel or an entry of its list, a place behind
     the panels, a variable by its file and its name. Read each. What a

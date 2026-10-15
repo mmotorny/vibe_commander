@@ -7687,6 +7687,206 @@ For whoever goes on:
   program of 32 bits in 128 seconds on a host by itself, and derive
   every golden in 140.
 
+### T2, the time of the suite: what was measured
+
+Asked on the user's word of 14 October 2026: what the suite spends its
+time on, and what would make it faster without changing what any test
+judges; measurement first, and any change comes back to the user. This
+piece measured, tried the changes below in its own checkout, and
+handed them back; the user took all five of the harness and the labels
+on 14 October 2026, `-dfilter` included, and they landed with this
+section. What is left is under "Recommended", at its end.
+
+**How it was measured.** On this computer, four processors of an AMD
+EPYC under QEMU 11.1.2, shared with other agents, so every figure has
+the load beside it. A wrapper of the harness that times each phase of
+every scenario in its thread (`time.thread_time`), and reads the QEMU
+process's processor time from `/proc` before it is ended: start (the
+disks copied, QEMU started, the saved state loaded), the steps, the
+image, reading the disks, reading QEMU's log of what ran
+(`coverage.executed`), the comparison, and the checks behind the run.
+And, since the load moved under every run, the two harnesses were run
+side by side or one right behind the other, the two scenarios' tests
+together as a suite has them, in turns, so that each saw the same host.
+
+**Where the time goes.** The suite as it was, `ctest -j4`, 337 s on a
+host that was otherwise quiet (a load of 0.7 at the start; my own run
+took it to 8), 1,130 s of processor time; 13 tests are done within the
+first 45 s, and the two scenarios' tests are the rest: `c-scenarios`
+243 s and `portable_c-scenarios` 337 s, side by side, each with four
+machines, eight on four processors. Alone on the host,
+`portable_c-scenarios` takes 229 s and `c-scenarios` 126 s.
+
+Of `portable_c-scenarios` alone (159 scenarios, 684 s of the four
+workers' time):
+
+| Phase | Seconds, summed over the scenarios | Of which on a processor |
+|---|---|---|
+| The steps, QEMU executing | 505 | QEMU's 495 |
+| Reading QEMU's log of what ran (`-d in_asm`), 518 MB of it | 81 | 66 |
+| The start: two disks of 32 MB copied, QEMU started, the state loaded | 41 (0.26 a scenario) | |
+| The image, reading the disks, quitting QEMU | 57 | |
+
+And besides the scenarios, in one thread, before the first and behind
+the last: 12 s reading every golden with its rules and its patch before
+anything runs, three benches booted at 3 s each, with every worker
+waiting on the one lock while each boots, 20 s of `check_declared`
+behind the last scenario, which makes the rules to every golden once
+more, and a tail of 20 s in which `blank-timed`, started 125th of 159,
+runs while three workers have nothing. The Python of the harness was
+145 s of processor time, all of it under one interpreter lock, against
+498 s of QEMU's.
+
+`c-scenarios` alone (137 scenarios, 422 s of the workers' time): the
+steps 241 s, reading the log 96 s (336 MB), Python 91 s of processor
+time in a run of 126 s, which is the interpreter lock held 72 % of the
+time: the four workers wait on one another to read their logs. Its tail
+is `copy-full`, started 104th, alone for the last 12 s.
+
+The ten slowest scenarios, of the suite as it was (seconds, side by side
+with the other tree):
+
+| `portable_c-scenarios` | | `c-scenarios` | |
+|---|---|---|---|
+| `blank-timed` | 68 | `copy-full` | 84 |
+| `copy-full` | 61 | `user-menu-run` | 28 |
+| `editor-huge` | 42 | `blank-timed` | 22 |
+| `cursor` | 29 | `comspec` | 20 |
+| `editor-lines` | 25 | `enter` | 19 |
+| `enter-many` | 22 | `enter-many` | 18 |
+| `enter-many-selected` | 20 | `enter-many-selected` | 17 |
+| `help-keys` | 19 | `passed-on` | 14 |
+| `user-menu-run` | 16 | `handed-on` | 12 |
+| `view-search` | 16 | `stay` | 12 |
+
+The middle one is 4.5 s and 3.9 s; 3 and 1 scenarios take over 30 s,
+19 and 14 from 10 to 30, the rest under 10. Alone on the host the
+middle one is 2.9 s and 2.2 s, and `blank-timed` 66 s of which 62 are
+its steps: the wait of 1,300 ticks ("T, the time of a wait").
+
+Booting DOS is not in a scenario's time at all: the bench boots it once
+for each country and memory, 2.7 to 3.9 s, saves the machine's state
+where the driver of the tests waits for its script, and every scenario
+starts from that state, which QEMU loads in 0.19 s (`setups.Bench`).
+So the third idea of the brief, a snapshot of DOS booted, is what the
+harness has done since before this piece; what it could still save is
+the three boots of a run, by keeping the states between runs, some 10
+s of the workers' time and 3 to 8 s of a run's.
+
+**What was tried**, each in the checkout and each judged by the same
+goldens: every output line of both scenarios' tests, but for the
+seconds, the same for the harness as it was and as it was changed, and
+what ran of each program, scenario by scenario (a hash of
+`coverage.executed`'s answer), the same in all 296.
+
+1. *What is read of a screen and of a golden.* `Screen.line` made a
+   string of a row a glyph at a time, by decoding each byte alone, 14.6
+   million calls in `check_declared`: a table of the 256 glyphs of a
+   code page and `str.translate` give the same text (held over 50,000
+   random rows in both code pages). `goldens.cells_of` built a row a
+   cell at a time: by slices it is the same bytes. Reading every golden
+   of every tree, held by a hash of all of them, 24.4 s became 6.8;
+   the reading before the first scenario of the portable C 11.5 s
+   became 4.5, and `check_declared` 19.6 s became 7.3.
+2. *The log of what ran, of a flat program.* QEMU logs every block that
+   it translates, and DOS/32A writes into its own code at every
+   interrupt, so the one block that QEMU translates anew each time was
+   most of the log: 87 MB in `blank-timed`, 15 MB in `cursor`. QEMU's
+   `-dfilter` logs only the blocks that begin in a range, and from the
+   megabyte up is where the extender loads the program and every copy
+   of it, which is all that `coverage.executed` looks for in such a
+   program. The log of all scenarios is 104 MB where it was 518, and
+   reading it 36 s of the workers' time where it was 147, side by
+   side with the other tree. What ran is the same in every scenario.
+   The C translation runs in the low memory with DOS and gains nothing
+   from a range: 80 % of its log is of the program.
+3. *Reading the log.* `coverage.executed` looked for the bytes of every
+   block in the program twice, and most blocks were logged several
+   times: a block's place is looked for once now, and a block logged
+   again at the same place is held once. 1.0 s became 0.6 for `stay`
+   of the C translation, with the same answer.
+4. *The slowest first.* The scenarios are started in the order of what
+   each took the last time on this host, in `build/times/TREE.json`,
+   and printed in their order as before. The tail went from 38 s to 2
+   in `c-scenarios` and from 24 to 1 in `portable_c-scenarios`.
+5. *A lock for each bench*, so that the scenarios of a bench that is
+   there do not wait while another boots. A few seconds; not measured
+   apart.
+6. *Labels*, `frozen`, `portable_c`, `machine` and `harness`, so that
+   `ctest -L portable_c` is the rule of "Work by several agents" (the
+   same eleven tests as `-R portable_c`), `-L frozen` the four of the
+   frozen trees, and `-LE machine` the fourteen that start no machine.
+   No time is saved by the label itself; it makes the rule a word of
+   the build instead of a pattern of names.
+
+Together, 1 to 5, the two scenarios' tests side by side, in turns with
+the harness as it was:
+
+| Run | Load at its start | As it was | Changed |
+|---|---|---|---|
+| 1, the old first | 9.1 and 3.8 | 355 s | 241 s |
+| 2, the new first | 4.7 and 6.0 | 298 s | 237 s |
+| 3 and 4, the new alone | 4.4 | | 238 s |
+
+The processor time of the pair was 990 s and 852; QEMU's alone did not
+change, 722 s of it, which is the floor: four processors cannot do the
+pair in less than 180 s. The Python of the portable C's test went from
+163 s to 63, of the C translation's from 105 to 71.
+
+A fault planted on purpose, `PullDn` of the key bar made `PullUp` in
+a copy of each program's file, fails every scenario with the harness
+as changed, 137 of 137 and 159 of 159, each with the two cells named,
+and both tests end with 1. And the images of the data that the
+changed test wrote are those that `dataimage.py save` writes, which
+runs with no log: 159 scenarios with nothing that differs, so the range
+of the log has not changed what the program did.
+
+The whole suite with all of it, `ctest -j4`, took 263 s at a load of
+5 to 6, where it took 337 s at a load of 0.7 to 8 as it was: the pair
+of scenarios' tests is all but the whole of it.
+
+**What did not help, or is not to be had.**
+
+- Two machines for each test where there are four: 261 s for 238;
+  three, 240. Eight machines on four processors is right for the
+  pair, since a machine waits on Python for part of its time.
+- `ctest -j`, of the suite as changed: 260 s at `-j2`, 263 at `-j4`
+  and at `-j8`, loads of 5 to 7. The two scenarios' tests take two
+  slots from the start, since CTest starts the costliest first, and
+  the other thirteen fit beside them in any. Those thirteen alone,
+  `-LE machine`: 35 s at `-j1`, 27.5 at `-j2`, `-j4` and `-j8`, where
+  `portable_c-stub`, 15 s, is the floor.
+- QEMU's options. The clock counted in instructions is what makes the
+  goldens hold, and it forces QEMU to translate on one thread; KVM
+  cannot count so. What costs in the program of 32 bits is a change of
+  the processor's mode at each interrupt, at which QEMU throws away what
+  it has worked out of the addresses ("T, the time of a wait"), and no
+  option of QEMU's changes that without changing what the guest does.
+  The one option that helps is `-dfilter`, above.
+- The image of the data with the test's result. The scenarios' test of
+  the portable C writes the images already, into
+  `build/portable_c/images`; what costs a second run is `dataimage.py
+  save` of the build before a change: 153 s at a load of 5, all
+  scenarios again without the log. Keeping the images that
+  the last test of the build before wrote, `cp -r
+  build/portable_c/images build/before` before the change is built,
+  is the same images for nothing, where that test was run: it runs
+  with the stack looked at, as `save` does.
+
+**Recommended, in order, and taken.** (1) and (3), the reading of screens,
+goldens and the log: no risk to what is judged, the same answers,
+small. (2), `-dfilter` for a flat program: the same coverage in all
+159 scenarios, and the most saved of one thing in the portable C's
+test; its risk is a copy of the program that a later extender or
+layout loaded below the megabyte, which `coverage.executed` would then
+not see and the test of the batches would say as "not executed". (4),
+the slowest first: no risk, since the order of the output is the same;
+the file of times is of the host. (6), the labels. (5) last. Then, if
+more is wanted: the Python of `check_declared`, which makes every rule
+to every golden a second time, could be run beside the scenarios or
+use what the reading before them made; and the bench's states could be
+kept between runs.
+
 ### L, a program that has stayed in the memory, when the program is left: tried, dropped on the user's word, and declared as it is
 
 For 2 of "The program of 32 bits: what differs from the original, for
