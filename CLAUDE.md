@@ -321,9 +321,14 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   with Node's own modules and nothing from npm: the page, and the drives' directories with their
   writes, and nothing outside them. It listens on the workstation alone,
   and Tailscale Serve hands it to the user's tailnet over HTTPS: anyone
-  on the tailnet may write, the tailnet being the access. The page needs
-  that server and is not published as a static page; publishing it
-  anywhere else is asked first.
+  on the tailnet may write, the tailnet being the access.
+- Beside that, the same page has a second way to be served: as a static
+  page, from GitHub Pages, with no server, its two drives then starting
+  from what is served with it and what the user changes kept in the
+  browser of the user's own. It is an addition: the page served by the
+  server writes to the server, and only a page with no server keeps its
+  changes in the browser. Switching GitHub Pages on, or publishing the
+  page anywhere, is asked first.
 - It comes before iOS as a rehearsal of what iOS has too: no shell, a file
   system of the program's own, an event loop. On iOS the room of the
   editor and the viewer gets a cap, since the system ends a program that
