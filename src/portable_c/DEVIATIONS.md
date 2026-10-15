@@ -47,6 +47,10 @@ names the entries here that it is of, and each of those entries has to name
 the scenario: the test `portable_c-scenarios` fails otherwise. It fails too
 for a scenario that is not run and that no entry here names.
 
+What the program for Linux, of the same source, does otherwise besides
+is at the end, under "The program for Linux", in entries of its own,
+L1 and on.
+
 ## The deviations
 
 ### 1. The program stays in the memory whole while a command runs
@@ -2540,3 +2544,328 @@ out:
 | `menu` | The Left and the Right menu on seven screens, a row shorter, beside the Options and the Commands menu of other entries: the same seven rows each time, in its patch |
 | `start-setup` | The program started without a setup file, and with one that is not correct, has its panel on C:\WORK sorted by name, where the original's lists the files as the directory has them: the rows of the list and of the line under it on four screens. The Right menu that the last start opens is a row shorter, with Name ticked where the original ticks Unsorted. And the setup file that that start leaves in C:\WORK has 0 for the order of both panels where the original's has 8: another sum, in the patch's line of the disks |
 | `setup-defaults` | The setup's Set default configuration writes a setup file whose panels are sorted by name, so the program started on it shows C:\WORK sorted, and the root of C: on the left with STAMPS first and under the cursor, where the original's are unsorted; and the file on D:\VC has 0 for both orders, where the original's has 8 |
+
+## The program for Linux
+
+The portable C is also a program for Linux, `vc` (`CLAUDE.md`, the
+road, step 6; the README, "The program for Linux"). It is of the same
+source, so every entry above holds for it as well. What follows is what
+it does otherwise than the original besides, because it runs on Linux
+and emulates DOS there behind `sys.h`, and what a user sees of that.
+None of it is in the program for DOS, which is as the entries above
+have it.
+
+These entries are numbered apart, L1 and on: the patches of the
+program for DOS name the entries above by their numbers, and a patch
+of the program for Linux, in `harness/goldens/posix/`, names no entry
+but the decision that it is by, "Decided: CLAUDE.md, step 6". Each
+entry rests on a decision of the user's of 14 or 15 October 2026, which
+`CLAUDE.md` has under step 6, or says that it is still open with the
+user. What the harness goes by is `ON_LINUX` of
+`harness/deviations.py`: the masks, the scenarios that are not run on
+Linux and those that are cut, each with its reason; the scenarios named
+below are held so by the test `portable_c-posix-scenarios`, and the
+emulation by `portable_c-posix-unit` and `portable_c-terminal`.
+
+### L1. Two drives, R: and H:, and no other
+
+**What the original does.** It has the drives that DOS has: on the
+bench of the tests the diskettes A: and B:, C: and D:.
+
+**What the program for Linux does.** It has two: R:, the root of the
+host's file system, and H:, the user's home directory, `$HOME`; where
+there is no home directory, R: alone. A path of the host under the home
+directory is shown on H:, any other on R:. The program starts on H:
+where it is started under the home directory and on R: otherwise, in
+the directory that it was started in. Paths keep DOS's 67 characters:
+a directory whose path does not fit even through the aliases (L3) is
+not reached, and where the program is started in one, it starts in the
+deepest directory above it that fits. The drive box has H and R, and
+both are fixed drives: there is no diskette, no B: that shares the
+drive of A:, and no CD.
+
+**Why.** The user's decision of 15 October 2026, in place of one drive
+C: at the root, as a way round DOS's 67 characters; a plan to let paths
+grow on Linux was made and dropped as deeper than wanted.
+
+**Which scenarios show it.** The drive's letter is masked wherever the
+golden has C:, and so are the drive box's letters. Not run on Linux:
+`drive-b`, `not-ready`, `phantom` and `diskette-command`, which are of
+the diskette, and `find-drives`, which would search the host's whole
+file system from R:. Cut: `move` at step 4, a move to D:;
+`attributes-directory` at 19 and `history-drives` at 60, the diskette
+in A:; `delete-mask` at 19, B:; `mouse-drive` at 5, A: chosen in the
+drive box by the mouse. The scenarios that went to A: or to `D:\VC`
+only for files to work on go to C:\FILES, which is H:\FILES on Linux.
+
+### L2. The labels are ROOT and HOME, and no label is made
+
+**What the original does.** It shows the label that the disk has, and
+Ctrl-F4 makes, changes or deletes it.
+
+**What the program for Linux does.** The label of R: is ROOT and that
+of H: is HOME, always. Making a label is refused with DOS's access
+denied, and the program shows the error that the original shows when
+DOS refuses it.
+
+**Why.** The user's decision of 14 October 2026: the host has nowhere
+for a label.
+
+**Which scenarios show it.** The label is masked where the golden has
+the bench's WORK. `label`, which makes and deletes one, is not run on
+Linux: from its first label on, every screen is another.
+
+### L3. A name of the host is shown under a name of DOS's form
+
+**What the original does.** It shows the names that DOS has, of the
+form 8.3, in capitals.
+
+**What the program for Linux does.** A name of the host that is of
+DOS's form once it is in capitals is shown so: `readme.txt` is
+README.TXT. Any other gets an alias of DOS's form, by the rule of
+Microsoft's specification of FAT for a short name, `LONGNA~1`, which
+leads back to it and stays the same for the run; aliases are numbered
+in the order of the host's names by their bytes. A character that the
+code page lacks, or a byte that is no UTF-8, is `_` in the alias, as
+Windows makes a short name. What the program makes on the host, a
+file, a directory, its setup file, is named in small letters.
+
+**Why.** The user's decision of 14 October 2026 (step 3 of the road,
+and the first piece of step 6): the program goes on asking in DOS's
+terms, and Linux emulates DOS behind them.
+
+**Which scenarios show it.** None: the bench's names are of DOS's form
+already, and those that the scenarios make are made in small letters
+and shown as the original shows them. `harness/posixcheck.c` holds the
+names, the aliases and the paths, by the test `portable_c-posix-unit`.
+
+### L4. The code page is 437, always
+
+**What the original does.** It goes by the code page and the country
+that DOS has: 437 and the United States, or 866 and Russia, on the
+benches of the tests.
+
+**What the program for Linux does.** The code page is 437 and the
+country with it, always, and nothing of it is a setting. Names cross
+between the code page and UTF-8 where they meet the host. A key of a
+layout whose letters 437 lacks, as a Russian one, types nothing; Alt or
+Ctrl with such a key is the key of a US keyboard in its place (L10).
+
+**Why.** The user's decision of 15 October 2026, which took back a
+file of settings and the code page by `LANG`.
+
+**Which scenarios show it.** The seven of Russia are not run on Linux:
+`stamps-russia`, `russian`, `clock-russia`, `clock-path-russia`,
+`clock-night-russia`, `attributes-russia` and `setup-options-russia`.
+`harness/posixcheck.c` holds the code page and UTF-8.
+
+### L5. Hidden, system and archive are not kept
+
+**What the original does.** DOS keeps the four attributes of a file,
+and the program shows a hidden or a system file with its mark, ░, and
+lists it in front of the others.
+
+**What the program for Linux does.** Read-only is the one attribute
+that the host keeps, by the bits of the file's mode. Hidden, system and
+archive are taken when they are set and not kept: a file that the user
+makes hidden or system stays as it was, without the mark, and is
+listed by its name among the others. A name that begins with a dot is
+hidden; a file whose name begins with a dot may be overwritten all the
+same; every file is archive, as DOSBox has every file of a directory of
+the host; and a directory is never shown read-only.
+
+**Why.** The user's decision of 14 October 2026: the host has nowhere
+for them.
+
+**Which scenarios show it.** `sort` and `filter`, by patches of their
+own in `harness/goldens/posix/`, where a file made system or hidden is
+listed among the others and the cursor goes with it; and a rule of the
+comparison for every other screen, which expects no mark where the
+golden has one. The attributes hidden, system and archive are left out
+on both sides where the disks are compared.
+
+### L6. A device of the host, and DOS's devices by their names
+
+**What the original does.** DOS knows its devices by their names, NUL,
+CON, PRN and the others, in any directory, and a copy to NUL is a copy
+to nothing.
+
+**What the program for Linux does.** A pipe, a socket or a device of
+the host is listed as an empty file that cannot be opened. DOS's
+devices are not known by their names: NUL is a file of the directory,
+as on the host, which a copy to NUL makes.
+
+**Why.** The first is the user's decision of 14 October 2026. Whether
+the emulation knows DOS's devices by their names, NUL above all, is
+**open** with the user (`TODO.md`, "L3b, the scenarios on Linux").
+
+**Which scenarios show it.** `device` is not run on Linux: it is about
+a device of DOS's and DOS's critical error, which the program for Linux
+is never entered for. Cut at NUL, until the question is answered:
+`copy` at step 7, `copy-dirs` at 15, `editor-save` at 20.
+
+### L7. A file of four gigabytes or more, and the room of a disk
+
+**What the original does.** DOS has no file of four gigabytes or more,
+and says the room of a disk in 16 bits of clusters.
+
+**What the program for Linux does.** A file of four gigabytes or more
+shows the most that DOS can say, and is never copied or moved cut
+short: the program refuses it with an error. The free room of a disk
+shows at most four gigabytes less 64K, in clusters of up to 64K. The
+room of the editor and the viewer is as much as the machine has. An
+error of the host's that DOS has no number for is DOS's general
+failure.
+
+**Why.** The user's decisions of 14 October 2026; the room of the
+editor, of 15 October 2026, until iOS asks for a cap.
+
+**Which scenarios show it.** None can: the original has no such file.
+The room of the drive and what the files of a directory use, of the
+host's file system, are masked in the Info panel. `find` is not run on
+Linux and `view-window` is cut at step 6, because the bench's files of
+STAMPS, which have only their sizes there, are as long as they say on
+the host. `editor-full` and `copy-big`, which take the original to the
+end of its memory, are not run. `harness/posixcheck.c` holds what the
+emulation answers for a large file and a full disk.
+
+### L8. A command is run by the host's shell
+
+**What the original does.** It runs a command by COMMAND.COM, `/C` and
+the command, on DOS's screen, and Enter on a file that DOS runs by its
+name, `.COM`, `.EXE` or `.BAT`, runs it.
+
+**What the program for Linux does.** COMSPEC names the host's shell,
+`$SHELL` where it is a path from the root and `/bin/sh` otherwise, and a
+command runs as `$SHELL -c` with the command made one of the host's: in
+UTF-8, a path of DOS's that begins with R: or H: made the host's path
+that it leads to, quoted, and in the host's directory that DOS's
+current one leads to. DOS's own commands, DEL, RD, ATTRIB, TIME, CLS
+and their like, are not the shell's. A command has the
+terminal while it runs, Ctrl-C and Ctrl-Z being its own, and writes on
+the terminal's own screen (L9). The external viewer and editor of the
+setup are run by the shell as well.
+
+**Why.** The user's decisions of 14 October 2026: a command runs
+through `$SHELL -c`, on the terminal's own screen.
+
+Three things are **open** with the user (`TODO.md`, "L6, commands"):
+Enter on a file, which on Linux runs only what the original runs, so
+that an executable without such an extension does nothing and
+`xdg-open`, which the user decided for a file that the program cannot
+run, is never reached; a name of DOS's form without a drive in a
+command, as Enter types it and the user menu's `!.!` makes it, which
+the shell does not find where the host's name is in small letters or
+has an alias; and a shell that cannot be run, for which the program
+asks as the original asks for a COMSPEC that names no file.
+
+**Which scenarios show it.** What DOS showed behind the panels after a
+command is masked. Not run on Linux, being about a program or a command
+of DOS's: `command`, `comspec`, `ended`, `stay-left`, `start-screen`,
+`start-memory`, `second-copy`, `lost`, `enter-many`,
+`enter-many-selected`, `start-setup` and `setup-defaults`; and those
+whose value is the command or comes behind one that the shell has not:
+`enter`, `user-menu-run`, `menu-panel`, `setup-missing`,
+`setup-missing-saved`, `setup-save-fails`, `setup-new` and
+`clock-morning`. Cut at such a command: `help-broken`, `menu-files`,
+`setup-help-file`, `setup-damaged`, `user-menu` and `view-commands`.
+The test `portable_c-terminal` runs three commands and holds the
+terminal's own screen to what they wrote.
+
+### L9. The terminal's own screen, and Ctrl-O
+
+**What the original does.** A command writes on DOS's screen, and the
+panels switched off, by Ctrl-O or by the menu, show that screen with
+what the commands wrote.
+
+**What the program for Linux does.** The program draws on the
+terminal's alternate screen, and a command runs on the terminal's own,
+where the program first writes its prompt and the command as DOS would
+show them. Ctrl-O typed at a terminal shows the terminal's own screen
+until a key, which is dropped. The panels switched off by the menu, or
+by Esc where the setup has it, show the program's copy of DOS's screen,
+which has the prompts and the commands but not what the commands wrote.
+The screen is 80 columns by 25 rows whatever the terminal's size, at
+its top left; a smaller terminal shows a line that asks for more. When
+the program is left, the terminal is as it was before.
+
+**Why.** The user's decisions of 14 October 2026: a command runs on the
+terminal's own screen, which Ctrl-O shows, as on DOS; and the screen is
+80 by 25 and no other size. That the panels switched off otherwise than
+by Ctrl-O show a screen without what the commands wrote is how it
+stands, and is **open** with the user.
+
+**Which scenarios show it.** The scenarios drive the program through
+its test channel, where commands run with nothing to write on and
+Ctrl-O is the program's key as on DOS: what DOS showed behind the
+panels is masked there. The test `portable_c-terminal` holds Ctrl-O,
+the terminal's own screen and a terminal that is too small.
+
+### L10. The keys are what the terminal gives
+
+**What the original does.** It reads the keys from the BIOS, with what
+is held, Shift, Ctrl and Alt, as the BIOS says it.
+
+**What the program for Linux does.** It makes of what the terminal
+sends the words that the bench's BIOS gives for the same keys. Where
+the terminal has the kitty protocol of the keyboard, every key comes
+with what is held, so Alt by itself opens the menu bar and the key bar
+follows Shift, Ctrl and Alt as on DOS. Without it nothing is known to be
+held: Alt by itself does nothing, the key bar does not change, ESC in
+front of a key is Alt with that key, and the keys that such a terminal
+does not tell apart are one key. A key that the terminal or the desktop
+keeps for itself, Alt-F1 on some desktops, Ctrl-Alt with an F key, does
+not come; nor Alt-Del, which the bench's BIOS does not give either.
+Ctrl-Z is the program's key for the tree and does not stop it. Alt or
+Ctrl with a letter is the letter of a US keyboard, whatever the layout.
+
+**Why.** The user's decision of 14 October 2026: the terminal is driven
+by the program's own escape sequences and termios, with the kitty
+protocol where the terminal offers it, and a key is made a word of the
+BIOS.
+
+**Which scenarios show it.** The scenarios give the program the
+BIOS's words through the test channel, as the bench does. The test
+`portable_c-terminal` holds the keys that terminals send, with the
+protocol and without, to the bench's words.
+
+### L11. The mouse's wheel does nothing
+
+**What the original does.** A mouse driver of DOS has no wheel, and the
+pointer is in the middle of the screen until the mouse first moves.
+
+**What the program for Linux does.** The same: a turn of the wheel, and
+the buttons beyond the third, do nothing, and the pointer is in the
+middle of the screen until the mouse first moves, also on a terminal
+that reports no mouse, where it stays there. The mouse comes from the
+terminal's reports, and the terminal's own pointer is left as it is.
+
+**Why.** No deviation yet: kept as the original has it, and to be put
+to the user as a possible one (`TODO.md`, "L5, keys and mouse"): a turn
+could be Up and Down, or scroll the list under the pointer.
+
+**Which scenarios show it.** The scenarios of the mouse are run on
+Linux, but for those that the entries above cut. The
+test `portable_c-terminal` turns the wheel and holds that nothing
+happens.
+
+### L12. The order of a directory's entries
+
+**What the original does.** The tree of directories, and the file
+search, list a directory's entries in the order of the disk, which on
+the bench is the order in which they were made.
+
+**What the program for Linux does.** It lists them in the order of
+their names' bytes. The panels are sorted by name on both (entry 29).
+
+**Why.** It is **open** with the user (`TODO.md`, "L3b, the scenarios
+on Linux"): the bench laid out in the order of the names, the emulation
+listing a directory in the order in which it was made, or this
+declared.
+
+**Which scenarios show it.** `tree` is not run on Linux. Cut at the
+first screen where the order shows: `command-line`, `stamps`, `menu`,
+`menu-items`, `tree-deep`, `tree-box`, `tree-choose`, `delete`,
+`make-directory`, `dialog-keys`, `copy-ask`, `copy-tree`,
+`mouse-dialog`, `mouse-tree`, `mouse-find`, `cursor` and `panel-keys`,
+each at the step that `harness/deviations.py` has.

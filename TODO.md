@@ -19655,6 +19655,40 @@ the program waits for a key on a terminal calls `OwnScreen` as
 channel, where commands run with `/dev/null` and Ctrl-O is the
 program's.
 
+### L7a, the documents of the program for Linux: done
+
+The README has a section "The program for Linux", under "The portable
+C": what the program is, how it is built (`posix/vc`, `posix-asan/vc`,
+`posix-msan/vc` by its name, the stub), how it is run by hand, with
+`~/.config/vc` and the distribution's files that the user copies there
+for F1 and the menus, and how it is judged, the four tests of clang in
+a table of their own and the masks and cuts in a paragraph. "Building"
+points to it, and "Testing" counts the eighteen tests with their labels.
+`src/portable_c/DEVIATIONS.md` has a part "The program for Linux" at its
+end, entries L1 to L12 in the form of the others, each with the
+decision of `CLAUDE.md`, step 6, that it rests on and the scenarios and
+tests that show it; what is still open with the user is written as open
+there (NUL, L6; Enter on a file, names of DOS's form in a command and
+the shell that cannot be run, L8; the panels off without what the
+commands wrote, L9; the wheel, L11, kept as the original has it; the
+tree's order, L12). Nothing of the program changed: `VC.EXE` the same
+bytes. The figures table was behind the build of `main` and was written
+anew.
+
+What the next piece should know:
+
+- The entries of Linux are numbered L1 and on so that no patch of the
+  program for DOS, "Deviation: N", can name one, and the posix tree's
+  patches name "Decided: CLAUDE.md, step 6". But `deviation_entries` of
+  `harness/ported.py` cuts the file at `### N. ` alone, so entry 29 runs
+  on to the end and takes in all of the part for Linux: a scenario that
+  is not run for the portable C passes `check_declared` if only an entry
+  of Linux names it. None does today that the entries for DOS do not
+  name too. Cutting an entry at a heading of `## ` would mend it, a
+  change of the harness that wants the whole suite.
+- When a question of the user's is answered, its entry here and its
+  cut or not-run in `ON_LINUX` change together.
+
 ### SAN, what the sanitizers found in the scenarios: done
 
 What `posix-asan` stopped at when L3b took the program for Linux

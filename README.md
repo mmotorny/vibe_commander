@@ -283,6 +283,10 @@ hand in it. Its files are compiled a second time, into the same program
 for finding a fault, `build/portable_c/debug/VC.EXE`. [The portable
 C](#the-portable-c) says what the two are.
 
+Where it finds clang, the build also compiles the portable C for Linux,
+`build/portable_c/posix/vc` with its sanitized builds beside it, and the
+stub: see [The program for Linux](#the-program-for-linux).
+
 ### Changes to the source
 
 Everything changed since the source was imported can be listed with
@@ -675,17 +679,17 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 294,299 bytes, of which the extender's stub is 27,536 |
+| `VC.EXE` | 294,327 bytes, of which the extender's stub is 27,536 |
 | as a multiple of the original's 65,090 bytes | 4.52 |
-| more than the C translation's 133,056 bytes | 161,243 bytes |
-| Its code, and what the file has of its data | 124,571 and 104,495 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 229,815 bytes |
-| The addresses in it that the extender sets when it loads it | 4,644 |
-| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, as long as each is when it holds the original's 64K, `PANEL_LEAST`, each block with the extender's 16 bytes in front | 15,236,528 bytes |
-| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 369,040 bytes |
+| more than the C translation's 133,056 bytes | 161,271 bytes |
+| Its code, and what the file has of its data | 124,637 and 104,495 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 229,881 bytes |
+| The addresses in it that the extender sets when it loads it | 4,645 |
+| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, as long as each is when it holds the original's 64K, `PANEL_LEAST`, each block with the extender's 16 bytes in front | 15,236,464 bytes |
+| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 369,104 bytes |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
-| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 396,303 bytes, 228,288 of them code |
+| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 396,295 bytes, 228,760 of them code |
 | Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `sys_dos.c` |
 | Lines of `#pragma aux` | 12 |
 | Intrinsic functions | 2: `_disable`, `_enable` |
@@ -1197,28 +1201,139 @@ QEMU's (`TODO.md`, "The portable C in 32 bits: what a trial on the
 bench showed"); DOS/4GW and PMODE/W are not free, and are neither
 linked nor run here.
 
+### The program for Linux
+
+The same source is also a program for Linux of 64 bits, `vc`, built
+with clang: step 6 of the road in `CLAUDE.md`, which has every decision
+of the user's that it rests on, and `TODO.md`, "Step 6: the program for
+Linux", what each piece of it built and met. Nothing of the common code
+knows that it is on Linux. It asks the system what it asked DOS and the
+BIOS, through `src/portable_c/sys.h`, and for Linux the files
+`src/portable_c/*_posix.c` answer as DOS would, at the level of DOS's
+services, where DOSBox emulates the processor:
+
+- Two drives, R:, the root of the file system, labelled ROOT, and H:,
+  the home directory, labelled HOME. The program starts on H: where it
+  is started under the home directory, on R: otherwise. Paths keep
+  DOS's 67 characters; a name of the host that is not of DOS's form, 8.3
+  in capitals, is shown under an alias of DOS's form, `LONGNA~1`, which
+  leads back to it for the run.
+- The code page 437, always, and the country with it: names cross
+  between it and UTF-8, and a character that the code page lacks shows
+  as `_`.
+- The screen, 80 columns by 25 rows whatever the terminal's size, drawn
+  in the terminal by the program's own escape sequences and termios,
+  with no library: the VGA's sixteen colours exactly where `COLORTERM`
+  says that the terminal has 24 bits, the theme's sixteen elsewhere.
+- The keys, made the words that the BIOS of the machine of the tests
+  gives, with the kitty protocol of the keyboard where the terminal has
+  it, so that Alt by itself and the key bar's Shift, Ctrl and Alt work
+  as on DOS; and the mouse from the terminal's reports, with its
+  pointer drawn as DOS's mouse driver draws it.
+- A command, run by `$SHELL -c` (`/bin/sh` where that is not set) on
+  the terminal's own screen, with the paths of DOS's in it made the
+  host's; Ctrl-O shows that screen until a key.
+
+What it does otherwise than the original for all that is declared in
+`src/portable_c/DEVIATIONS.md`, under "The program for Linux".
+
+**Building it.** The one build, `cmake -B build` and `cmake --build
+build`, makes it where it finds clang, beside the program for DOS, with
+a list of clang's warnings written out, each an error:
+
+| Program | What it is |
+|---|---|
+| `build/portable_c/posix/vc` | The program, with the usual hardening of a program for Linux |
+| `build/portable_c/posix-asan/vc` | The same with the sanitizers of addresses, of undefined behaviour, of integers and of implicit conversions, each fatal: the one that the tests run |
+| `build/portable_c/posix-msan/vc` | The same with the sanitizer of memory, which goes with no other: built only by its name, `cmake --build build --target portable_c-posix-msan`, run by no test, and kept for audits (`TODO.md`, "L3b, the scenarios on Linux", says how) |
+
+The stub of step 5, `build/portable_c/stub/vc` with its sanitized
+builds beside it, is `sys.h` answered by nothing: it builds, and is not
+meant to run.
+
+**Running it by hand.** In a terminal of 80 columns by 25 rows or more:
+
+```sh
+cd ~ && /path/to/the/checkout/build/portable_c/posix/vc
+```
+
+It takes the terminal's alternate screen and shows its banner, "Vibe
+Commander 0.1, based on Volkov Commander 4.05", in the first two rows,
+its panels on H:\, the prompt and the key bar, at the top left of a
+larger terminal; a smaller one shows only the lines that ask for 80 by
+25, until it is made larger. F10 leaves it, and gives the terminal back
+as it was. Its own directory, where the original has the files that it
+reads beside its own, is `~/.config/vc` (`$XDG_CONFIG_HOME/vc` where
+that is set), made when it is not there: the setup is saved there as
+`vc.ini`, and the help file and the files of the menus and the
+extensions are read there. The program does not bring them, being the
+original's: F1 shows no help and F2 no user menu until they are copied
+there from the shareware distribution, which the harness keeps in
+`downloads/vc405sw.zip` once it has fetched it (`python3
+harness/deps.py` does). Of its files the program reads `VC.HLP`,
+`VC.MNU`, `VC.EXT`, `VCVIEW.EXT`, `VCEDIT.EXT`, `ARCHIVES.MNU` and
+`FORMAT.MNU`, their names in capitals or not. Its standard input and
+output have to be a terminal. Ctrl-Z is the program's key for the tree
+and does not stop it; `kill -TSTP` does, and `fg` draws it again. The
+sanitized build writes a report on the alternate screen, which goes
+with it: run that one with `2>file`.
+
+**How it is judged.** By the same scenarios and goldens as the program
+for DOS, and by tests of its own, each of which is skipped where there
+is no clang:
+
+| Test | What it checks |
+|---|---|
+| `portable_c-posix-unit` | What the program emulates of DOS without input or output of its own, the files `*_posix.c` but `sys_posix.c`: names and aliases, the code page and UTF-8, drives and paths, dates, DOS's errors, and the services on files and directories of the host's, by `harness/posixcheck.c`, built with the sanitizers |
+| `portable_c-terminal` | What `posix-asan/vc` draws in a pseudo-terminal, replayed through pyte, a terminal emulator in Python that the harness fetches pinned, held cell by cell to the grid that the program writes for the same keys through its test channel, in 24 bits and in 16 colours; a terminal too small, SIGTSTP and SIGCONT, the kitty protocol and the keys that the program reads held to the BIOS's words, the mouse, and commands with Ctrl-O. `harness/terminal.py` |
+| `portable_c-posix-scenarios` | `posix-asan/vc` through the scenarios, by `harness/posixrun.py`: on a bench of the host's in `/tmp`, its home directory laid out as the machine's C:, driven through the test channel, `VC_TEST`, which takes the scenarios' keys as the BIOS's words and writes the grid whenever the program waits for a key, on the clock of the machine of the tests, `VC_TEST_CLOCK`. Its screens and its files are held to the original's goldens with what is declared for the portable C and, on top of that, for Linux. It starts a machine of DOS once, for the bench's setup file, and keeps that in `build/posix-bench` |
+| `portable_c-stub` | The stub, the files of Linux and their test held to clang's warnings, with the commands that the build compiles them with, and to clang-tidy by `.clang-tidy`. `harness/stubcheck.py` |
+
+What is declared for Linux is `ON_LINUX` of `harness/deviations.py`,
+each part with its reason there. Masks: what the comparison leaves out
+where the golden has the original's, because it is the host's and no
+golden can expect it, found on the screen by a rule and not written as
+cells: the drive's letter and its label, the drive menu's letters, the
+room of the drive in the Info panel, the time of a directory that the
+run wrote into, the place of the program's own files, and what DOS
+showed behind the panels after a command. Every other cell is
+compared. The scenarios that rest on what only DOS has, Russia, the
+diskette, a program or a command of DOS's, are not run, each with its
+reason; others are cut, taken only as far as a step, where what follows
+is DOS's alone or waits on a question of the user's, the order of the
+tree's directories and NUL above all. Where a mask cannot do, a patch
+of its own, in `harness/goldens/posix/`, says what the program for
+Linux is expected to show, by what the user decided. `TODO.md`, "L3b,
+the scenarios on Linux", has every cut with its step.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
-One test, `portable_c-host`, asks `gcc`, and one, `portable_c-int16`,
-asks `clang`: each is skipped where there is none.
+One test, `portable_c-host`, asks `gcc`, and those of the source's
+numbers and of the program for Linux ask `clang`: each is skipped where
+there is none.
 
 ```sh
 ctest --test-dir build --output-on-failure
 ```
 
-There are twelve tests: one of the assembly, `asm-bytes`; three of the C
-translation, `c-data`, `c-arith` and `c-scenarios`; seven of the portable
-C, of which `portable_c-data` and `portable_c-scenarios` are the C
-translation's checks made of it, `portable_c-host`,
-`portable_c-int16` and `portable_c-words` are of its source, and
-`portable_c-layout` and
-`portable_c-debug-layout` of its two programs as the linker wrote them;
-and one of the harness itself, `harness-le`. The two trees are held
-against the same goldens. Ten of the tests run no machine and take a
-few seconds at the most; `c-scenarios` and `portable_c-scenarios` each
-run every scenario, so all twelve take four to five minutes on a machine
-that does nothing else.
+There are eighteen tests: one of the assembly, `asm-bytes`; three of the
+C translation, `c-data`, `c-arith` and `c-scenarios`; thirteen of the
+portable C, of which `portable_c-data` and `portable_c-scenarios` are the
+C translation's checks made of it, `portable_c-host`, `portable_c-int16`,
+`portable_c-words`, `portable_c-width` and `portable_c-cut` are of its
+source, `portable_c-layout` and `portable_c-debug-layout` of its two
+programs for DOS as the linker wrote them, and `portable_c-stub`,
+`portable_c-posix-unit`, `portable_c-terminal` and
+`portable_c-posix-scenarios` of the stub and [the program for
+Linux](#the-program-for-linux), which that section has; and one of the
+harness itself, `harness-le`. The two trees are held against the same
+goldens. The tests that run no machine take seconds, the terminal's
+some forty; `c-scenarios` and `portable_c-scenarios` each run every
+scenario on the machine, so all of them take four to eight minutes on a
+machine that does nothing else. Every test of the portable C has the
+label `portable_c`, and those that start a machine the label `machine`
+too: `ctest --test-dir build -L portable_c -LE machine` runs the rest.
 
 | Test | What it checks |
 |---|---|
