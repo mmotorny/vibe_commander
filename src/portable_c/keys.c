@@ -745,6 +745,7 @@ void F20_02(struct WCBdef *panel)
     struct Answer changed;
     u16 whole = (u16)(md.Lines << 8 | 80);
     i32 length, i;
+    bool same = false;                  /* DOS is on the other's directory */
 
     if (panel->WinTyp == 0 && other->WinTyp == 0) {
         if (md.PathEr == 0) {
@@ -753,32 +754,34 @@ void F20_02(struct WCBdef *panel)
             for (i = 0; i != length; i++)
                 if (other->WinPath[i] != current->WinPath[i])
                     break;
-            if (i == length)
-                goto same;
+            same = i == length;
         }
-        HidCur();
-        Window(0, whole);
-        if (Fantom((u8)(other->WinPath[0] - ('A' - 1))) == 0) {
-            changed = DirChange(other->WinPath);
-            if (!changed.failed || changed.value == ERR_PATH) {
+        if (!same) {
+            HidCur();
+            Window(0, whole);
+            if (Fantom((u8)(other->WinPath[0] - ('A' - 1))) == 0) {
+                changed = DirChange(other->WinPath);
+                same = !changed.failed || changed.value == ERR_PATH;
+            }
+            if (same) {
                 DriveSelect((u8)(other->WinPath[0] - 'A'));
                 SetPth();
-                goto same;
+            } else {
+                md.DosPth[0] = other->WinPath[0];
+                md.DosPth[1] = other->WinPath[1];
+                md.DosPth[2] = other->WinPath[2];
+                md.DosPth[3] = 0;
+                md.PathEr = 1;
+                other->ChgFlg = 1;
+                DriveSelect((u8)(other->WinPath[0] - 'A'));
             }
         }
-        md.DosPth[0] = other->WinPath[0];
-        md.DosPth[1] = other->WinPath[1];
-        md.DosPth[2] = other->WinPath[2];
-        md.DosPth[3] = 0;
-        md.PathEr = 1;
-        other->ChgFlg = 1;
-        DriveSelect((u8)(other->WinPath[0] - 'A'));
     } else if (md.PathEr != 0) {
         HidCur();
         Window(0, whole);
         SetPth();
     }
-same:
+    /* F20_08 */
     PutPrm(other);
     OtherPanel = CurrentPanel;
     CurrentPanel = other;
