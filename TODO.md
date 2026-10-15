@@ -16553,6 +16553,125 @@ whose second copy of the program lives in the room with code of
 another layout, and `start-memory`, `ViewSeg` and `FreMem2` naming
 nothing known. Nothing is declared as changed.
 
+### 5b, the stub: the first half landed, and what is left
+
+Done, a commit each:
+
+1. `FALLTHROUGH` of `compiler.h`, beside `NONSTRING`:
+   `__attribute__((fallthrough))` to gcc and clang, nothing to Open
+   Watcom. clang's `-Wimplicit-fallthrough` named 10 places: 7 in
+   `main.c` (which had `/* fall through */`, a comment that gcc reads
+   and clang does not), 2 in `dialog.c`, 1 in `find.c`. Same bytes.
+2. What the rest of the full list of warnings named in the common code,
+   each mended in the code; the list is the one the user decided,
+   written out in `CMakeLists.txt` above `add_portable_c_host`:
+   - `-Wmissing-variable-declarations`, 184: 183 objects of the 16 files
+     of tables, and `IniSave` of `setup.c`, which `vc.h` declares now in
+     place of `main.c` and `start.c`. Each file of tables declares below
+     its `#include` what it defines that others may name, as it defines
+     it. For that `BOX(n)`, `BOX1(n)`, `BOX2(n)` and `DIALOG(n)` of
+     `tables.h` are tagged types, `struct Box4`, `struct Dialog9`, each
+     count that a table has made once there (`BOX_SHAPE` and the like:
+     a new count is a line there). `StPagTab` is a `struct Picture`;
+     `harness/datacheck.py` knows a structure of the file by its tag.
+   - `-Wcast-qual`, 52: `PLACE_IN(buffer, at)` and `CUT_PATH(path)` of
+     `vc.h`, the place that a reader answers as the buffer's own pointer
+     (23 of `CutPath`, 2 in `MenuBuf`, 1 in `usermenu.c`); `C00_End` of
+     `copy.c` answers how far, 3; `WORD_AT` of `view.c` reads a const
+     word and `WORD_TO` is written, 19; `F35_50` and `F35_01` of `copy.c`
+     keep a pointer without const, 3. `harness/int16.py` takes the two
+     words for words of the addresses.
+   - `-Wconditional-uninitialized`, 3: a value from the start, `pair` in
+     `T54_00` of `edit.c`, `key` twice in `stcolor.c`.
+   Not the same bytes: `PLACE_IN`, `C00_End` and the three values are
+   code, and the tags moved the variables without a value of `view.c`
+   and `edit.c` (the listings differ there in `_BSS` alone).
+3. `sys_stub.c` and the three builds with clang, `add_portable_c_host`
+   of `CMakeLists.txt`: `build/portable_c/stub/vc` hardened (-O2,
+   `_FORTIFY_SOURCE=3`, `-fstack-protector-strong`,
+   `-fstack-clash-protection`, `-fcf-protection=full`, PIE, full RELRO,
+   a stack not run; `readelf` shows each), `stub-asan/vc` (address,
+   undefined, integer, implicit-conversion, float-divide-by-zero,
+   `-fno-sanitize-recover=all`) and `stub-msan/vc`. All have the list,
+   `-Werror` and `-fno-strict-aliasing`. clang is found on the path,
+   `find_program`; without it nothing is made, with a message.
+   `-ftrivial-auto-var-init=pattern` was left out: it would hide from a
+   build what it should show. Each runs to its first `ProgramEnd`, the
+   stub saying DOS 5.0 and no memory: `Main`, `Alloc3`, `Init00`,
+   `Init11`, `AlocEr`, exit 1, the sanitizers silent. To see more they
+   need what step 6 gives: memory from `MemTake`, keys, a screen.
+   Then UBSan's alignment is to name the reads of a word through a cast
+   pointer at an odd place (5a's list), and the integer sanitizer every
+   step or sum of 8 or 16 bits that wraps where a run reaches it, which
+   gets its cast by CLAUDE.md, "The portable C".
+   The harness: `hostcheck.py` and `words.py` read `sys_stub.c`, which
+   is clean and has no word, a line in each record; `int16.py`,
+   `width.py` and `cut.py` judge what the build for DOS takes,
+   `int16.dos_files`, and leave out `_stub.c` and `_posix.c`, which
+   Open Watcom never compiled, and which include the C library of this
+   computer that clang for the 386 has no headers of. `reads.py`,
+   `tools/figures.py` and `tools/calls.py` were not changed, and their
+   tests pass with the stub there.
+4. `ed.EdHxCur++` of `edit.c` is `= true` at both places, `T14_11` and
+   `T06_00`: the flag is 0 just before each.
+
+Left, for the next agent of 5b:
+
+- `.clang-tidy` at the top and the test `portable_c-stub`, which is to
+  build the stub with the full strictness (the command is in
+  `build/portable_c/stub/compiled.txt`, which the build writes) and run
+  clang-tidy 23 over the common code and `sys_stub.c`, skipped (77)
+  without clang. The survey below was made with clang-tidy 23.1.3 and
+  the broad set, every check on: `build/try/` of the checkout that made
+  it had the scripts; `clang-tidy --quiet --config-file=FILE SOURCE --
+  FLAGS` over the 64 files took two and a half minutes on four
+  processors. `Checks:` as a YAML list takes a `#` comment above each
+  entry, which is where a reason goes.
+- What it named, by place once, and what the recommendation the user
+  accepted says of it:
+  - off by the recommendation: `misc-include-cleaner` 464 (every file
+    has `vc.h` whole, by design), `bugprone-easily-swappable-parameters`
+    56, `bugprone-switch-missing-default-case` 28,
+    `bugprone-implicit-widening-of-multiplication-result` 27,
+    `misc-no-recursion` 4 (the help enters itself, the main loop's
+    commands), `bugprone-branch-clone` 2 (the original's own branches),
+    `bugprone-narrowing-conversions` 1 (what `-Wconversion` holds).
+  - not in the recommendation: `bugprone-signed-bitwise` 1,697, a mask
+    or a shift of a `u8` or a `u16`, which C makes an `int`, goes off in
+    `.clang-tidy` with that reason, on the user's word (`CLAUDE.md`, the
+    item on the strictness); `bugprone-unhandled-code-paths` 13, "add a
+    default label", the same as the check of a missing default, is noise
+    of the same kind, to be turned off with its reason.
+  - to mend in the code: `misc-use-internal-linkage` 77 (a function or
+    an object that only its file names and is not static: `edit.c` 20,
+    `view.c` 14, then fewer; read each against wcc386's W202, an object
+    that nothing names cannot be static), `bugprone-macro-parentheses`
+    44 (`tree.c` 34, `place.c` 10), `readability-redundant-declaration`
+    3 (`HexByt` and `PathLin` in `edit.c`, `ErrRdy` in `main.c`),
+    `readability-inconsistent-declaration-parameter-name` 1 (`OncZoom`),
+    `readability-suspicious-call-argument` 1 (`edit.c`, `T56_00(EdOffst,
+    EdLine, place)` in `T32_06`, whose parameters are `place` and
+    `target`: read whether the names or the call are wrong),
+    `bugprone-assignment-in-if-condition` 2 (`keys.c`),
+    `bugprone-too-small-loop-variable` 1 (`drive.c`),
+    `clang-analyzer-deadcode.DeadStores` 2 (`usermenu.c` `include`,
+    `view.c` `count`).
+  - the analyser on the layout of the main data:
+    `clang-analyzer-security.ArrayBound` 13, a read in front of a field
+    or behind it, `md.TmpBuf`, `md.TmpErr`, `md.TreeBuf[0].TreSum2` (the
+    tree's list behind its header, `TreList`), `md.DTA.FilAttr`,
+    `md.HelpBuf[0].HlpMode`, `MnuTab`, `StMainHlp`; and
+    `clang-analyzer-security.PointerSub` 10, a difference of two
+    pointers into two fields (`copy.c` 4, `exec.c` 4, `dirfunc.c`,
+    `edit.c`). Each is the original reading its main data as one block,
+    which C promises nothing of. On the user's word (`CLAUDE.md`, the
+    item on the strictness) these are mended, not turned off, by a
+    piece of their own that reads the main data as bytes at an offset;
+    until that piece has landed, the test cannot be clean of them.
+- `bugprone-*` of clang-tidy 23 has `signed-bitwise` and
+  `unhandled-code-paths`, which the survey of 14 October did not name:
+  the version is pinned for that reason.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

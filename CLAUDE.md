@@ -2135,8 +2135,10 @@ in "The portable C".
   differs, in the order of two variables of `_BSS` and nothing else,
   it is this, and the program is as right as it was. `HOLDS` of `vc.h`
   is a tag for that reason. (The two variables went with the watch on
-  DOS, and the compiler was `wcc`: of `wcc386` this has not been seen,
-  nor looked for.)
+  DOS, and the compiler was `wcc`. `wcc386` does it too: the 26 tags
+  of the boxes and the dialogs that the piece 5b put into `tables.h`
+  moved the variables without a value of `view.c` and `edit.c`, and
+  their listings differed in the list of `_BSS` and nowhere else.)
 - The test `portable_c-host` has gcc read the tree for a machine of 64
   bits and holds every file to its counts in `harness/hostcheck.txt`,
   by kind: the top of `harness/hostcheck.py` says what is counted, and
