@@ -330,6 +330,51 @@ function(add_c_tree tree description model)
     add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
 endfunction()
 
+# The files of src/portable_c/ that a build of each implementation of
+# sys.h takes. The tree has the program's common code, which every
+# implementation is built with, and the files of the implementations: a
+# file whose name ends in _<implementation>.c, of one of those named in
+# portable_c_implementations, is of that implementation, and every other
+# file is common (a file of tables ends in _t.c, which is common code and
+# no implementation). A build of an implementation takes the common code
+# and the files of the implementations that portable_c_takes_<it> names,
+# but those that portable_c_leaves_<it> names: the web page's (step 7,
+# TODO.md, "Step 7, the web page") takes the emulation of DOS of the
+# program for Linux, *_posix.c, but the two files that have a terminal
+# and a shell, sys_posix.c and term_posix.c, and has its own, *_web.c. A
+# file of a new implementation is named here when it is added, or it is
+# taken for common code.
+set(portable_c_implementations dos posix web)
+set(portable_c_takes_dos dos)
+set(portable_c_takes_posix posix)
+set(portable_c_takes_web posix web)
+set(portable_c_leaves_web sys_posix.c term_posix.c)
+
+# portable_c_sources(<variable> <implementation>) sets <variable> to the
+# files that a build of <implementation> takes, by the lists above, by
+# their names relative to src/portable_c/ and in the order of the names.
+function(portable_c_sources variable implementation)
+    set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
+    file(GLOB all CONFIGURE_DEPENDS RELATIVE ${source_dir}
+         ${source_dir}/*.c)
+    set(files "")
+    foreach(file ${all})
+        set(of "")
+        foreach(other ${portable_c_implementations})
+            if(file MATCHES "_${other}\\.c$")
+                set(of ${other})
+            endif()
+        endforeach()
+        if(of STREQUAL "")
+            list(APPEND files ${file})
+        elseif(of IN_LIST portable_c_takes_${implementation}
+               AND NOT file IN_LIST portable_c_leaves_${implementation})
+            list(APPEND files ${file})
+        endif()
+    endforeach()
+    set(${variable} ${files} PARENT_SCOPE)
+endfunction()
+
 # add_portable_c(<target> <directory> <option>...) builds src/portable_c/
 # as a flat program of 32 bits that the extender DOS/32A starts: step 1
 # of the portable C's road (TODO.md, "The portable C in 32 bits: the
@@ -341,25 +386,10 @@ endfunction()
 # of this function with a target and a directory of its own.
 function(add_portable_c target directory)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
-    file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
-         ${source_dir}/*.c)
-    # Which files are of this build. The tree has the program's common
-    # code, which every implementation of sys.h is built with, and the
-    # files of each implementation, which only its own build takes: a
-    # file whose name ends in _<implementation>.c is that
-    # implementation's, and every other file is common. This build is
-    # the implementation for DOS, _dos.c: sys_dos.c, the system's
-    # functions, and stack_dos.c, the stack in a segment of its own. A
-    # file of another implementation, one of those named here, is left
-    # out; a file of a new implementation is named here when it is
-    # added, or it is taken for common code. (A file of tables ends in
-    # _t.c, which is common code and no implementation.)
-    set(implementations dos posix)
-    foreach(implementation ${implementations})
-        if(NOT implementation STREQUAL "dos")
-            list(FILTER c_files EXCLUDE REGEX "_${implementation}\\.c$")
-        endif()
-    endforeach()
+    # The files of this build, the implementation for DOS, _dos.c:
+    # sys_dos.c, the system's functions, and stack_dos.c, the stack in a
+    # segment of its own, with the common code (portable_c_sources).
+    portable_c_sources(c_files dos)
     # The files in the order of their names, and sys_dos.c, the file of
     # the system's functions, behind them all: the linker's command,
     # below, says why it was, and that nothing rests on it now.
@@ -544,13 +574,7 @@ endif()
 function(add_portable_c_host target directory implementation)
     cmake_parse_arguments(PARSE_ARGV 3 host "BY_NAME" "" "COMPILE;LINK")
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
-    file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
-         ${source_dir}/*.c)
-    foreach(other dos posix)
-        if(NOT other STREQUAL implementation)
-            list(FILTER c_files EXCLUDE REGEX "_${other}\\.c$")
-        endif()
-    endforeach()
+    portable_c_sources(c_files ${implementation})
     set(compile ${clang} ${clang_warnings} -fno-strict-aliasing
         ${host_COMPILE} -I${source_dir})
     file(MAKE_DIRECTORY ${directory})
@@ -665,9 +689,10 @@ if(clang)
     set(unit_source ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB unit_files CONFIGURE_DEPENDS ${unit_source}/*_posix.c)
     # Of the files of Linux, those of the emulation: sys_posix.c is the
-    # program's, with its main, and the program's two builds above have
-    # it.
-    list(FILTER unit_files EXCLUDE REGEX "/sys_posix\\.c$")
+    # program's, with its main, and machine_posix.c the part of it that
+    # the web page shares, which reads the program's main data; the
+    # program's two builds above have them.
+    list(FILTER unit_files EXCLUDE REGEX "/(sys|machine)_posix\\.c$")
     list(APPEND unit_files ${CMAKE_SOURCE_DIR}/harness/posixcheck.c)
     set(unit_compile ${clang} ${clang_warnings} -fno-strict-aliasing
         -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer

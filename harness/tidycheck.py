@@ -18,8 +18,9 @@ does not:
      user decided, each check that is turned off with its reason there.
      Every place that it names fails the test, but those of EXPECTED.
 
-The common code and `sys_posix.c`, the program's binding of sys.h, are
-read with the command of the program's build, `compiled.txt` of
+The common code, `sys_posix.c`, the program's binding of sys.h, and
+`machine_posix.c`, the part of it that the web page shares, are read
+with the command of the program's build, `compiled.txt` of
 `build/portable_c/posix`, which `--compiled` names: its sanitized builds
 differ in what they make and not in what clang is to say. The files of
 the emulation, the other `*_posix.c`, are read with their test,
@@ -91,22 +92,27 @@ PLACE = re.compile(r"^(?P<path>[^:\n]+):(?P<line>\d+):(?P<column>\d+): "
                    r"(?: \[(?P<checks>[^\]]+)\])?$")
 
 
+# The files of Linux that are the program's and not the emulation's: they
+# read what the common code has, and are read with it.
+PROGRAM_POSIX = ("sys_posix.c", "machine_posix.c")
+
+
 def files():
     """The files that are read with the program's command: the common
     code, every C file of the tree but those of an implementation, and
-    sys_posix.c, as add_portable_c_host of CMakeLists.txt takes them for
-    posix/vc."""
+    sys_posix.c and machine_posix.c, as add_portable_c_host of
+    CMakeLists.txt takes them for posix/vc."""
     return sorted(path for path in SOURCE.glob("*.c")
-                  if not re.search(r"_(dos|posix)\.c$", path.name)
-                  or path.name == "sys_posix.c")
+                  if not re.search(r"_(dos|posix|web)\.c$", path.name)
+                  or path.name in PROGRAM_POSIX)
 
 
 def posix_files():
     """The files of the emulation and their test: those that the build of
     portable_c-posix-unit in CMakeLists.txt takes, which leaves out
-    sys_posix.c for its main."""
+    sys_posix.c for its main and machine_posix.c for the main data."""
     return sorted(path for path in SOURCE.glob("*_posix.c")
-                  if path.name != "sys_posix.c") + [ROOT / "harness" /
+                  if path.name not in PROGRAM_POSIX) + [ROOT / "harness" /
                                                     "posixcheck.c"]
 
 

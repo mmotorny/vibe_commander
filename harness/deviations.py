@@ -1491,7 +1491,8 @@ LINUX_NOT_RUN = {
 # from 1 as the golden counts them, which is not taken; what is held
 # before it). Most stop at a command that the host's shell has not, the
 # step at which the program asks for a program to be run (ProgramRun of
-# sys_posix.c, which says so on standard error).
+# sys_posix.c, which says so on standard error by TestProgramRun of
+# machine_posix.c).
 # DOS's names of devices are ordinary names of files on Linux, and the
 # steps that use them as devices are not run there (CLAUDE.md, step 6,
 # the user's word of 15 October 2026).

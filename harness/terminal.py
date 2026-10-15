@@ -85,7 +85,7 @@ STAMP = 1760443200              # the time of the test's files: 14 October
                                 # 2025, 12:00 UTC
 
 # The steps: the events of the test channel for each, the BIOS's words and
-# the mouse (see sys_posix.c, "The test channel"), and what a terminal
+# the mouse (see machine_posix.c, "The test channel"), and what a terminal
 # sends for it. A terminal of these has no kitty protocol: it sends the
 # keys as xterm does, and the mouse in SGR's form.
 ESC = b"\x1b"
@@ -140,7 +140,7 @@ KEYS = [
 # Ctrl and Alt pressed and let go as keys of their own, the key of a US
 # layout behind a key and the text that it types.
 # The scan codes of a US keyboard for printable ASCII, from 20h, as the
-# program makes them of what a terminal types (Scan of term_posix.c).
+# program makes them of what a terminal types (Scan of keyboard_posix.c).
 US_SCAN = bytes.fromhex(
     "39 02 28 04 05 06 08 28 0A 0B 09 0D 33 0C 34 35"
     "0B 02 03 04 05 06 07 08 09 0A 27 27 33 0D 34 35"
@@ -250,7 +250,7 @@ KITTY = [
 # in a terminal with the kitty protocol, and in one without, followed by
 # Esc twice, and what the program reads is held to the words. The words
 # are the bench's BIOS's, SeaBIOS's, as INT 16h 00h answers them (see
-# term_posix.c, "The keys, and the mouse"); [] where it answers nothing.
+# keyboard_posix.c, "The keys, and the mouse"); [] where it answers nothing.
 DECODE_KITTY = [
     (CSI + b"97;;97u", ["1E61"]),
     (CSI + b"97:65;2;65u", ["1E41"]),                   # Shift-A

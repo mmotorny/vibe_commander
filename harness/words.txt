@@ -37,9 +37,11 @@ help.c            none
 help_t.c          MD_AT 2
 info.c            ENTRY 1, DSKBUF 1
 input.c           none
+keyboard_posix.c  none
 keys.c            MD_PLACE 2, TREE_OFFSET 2, ENTRY 6, DSKBUF 3, MAIN_AS_PANEL 1
 keys_t.c          MD_AT 10, NUMBER 1
 line.c            none
+machine_posix.c   none
 main.c            TRELIST 3, DSKBUF 4, MAIN_AS_PANEL 1
 main_t.c          MD_AT 8
 mask.c            none

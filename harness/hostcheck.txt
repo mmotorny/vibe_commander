@@ -37,9 +37,11 @@ help.c            clean
 help_t.c          clean
 info.c            clean
 input.c           clean
+keyboard_posix.c  clean
 keys.c            clean
 keys_t.c          clean
 line.c            clean
+machine_posix.c   clean
 main.c            clean
 main_t.c          clean
 mask.c            clean

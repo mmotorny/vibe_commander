@@ -6,7 +6,7 @@ The program for Linux, build/portable_c/posix-asan/vc (or posix/vc), is
 judged by the scenarios as the program for DOS is (CLAUDE.md, "The
 portable C", step 6), but runs on the host, not in a machine: it is
 started as a process of its own with its test channel (the top of the
-test channel in src/portable_c/sys_posix.c), which does from inside what
+test channel in src/portable_c/machine_posix.c), which does from inside what
 the driver of the tests does from outside on the bench. This module lays
 out the bench of a run, makes a scenario's steps into the channel's
 `keys`, runs the program, and makes of what it wrote and left a

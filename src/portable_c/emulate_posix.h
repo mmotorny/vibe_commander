@@ -58,6 +58,13 @@ u32 CodePageToUnicode(u8 byte);
    the code page has no such character. */
 i32 CodePageFromUnicode(u32 character);
 
+/* The character of Unicode that the VGA's font shows for a byte of the
+   code page: the code page's above 7Fh and for the letters, and for the
+   bytes below 20h and for 7Fh the glyphs that the font has there, where
+   Unicode's mapping has controls (TermGlyph of term_posix.c until the
+   piece W1 of step 7). */
+u32 CodePageGlyph(u8 byte);
+
 /* The capital of a byte as DOS has it for a name of a file: DOS's table
    of capitals for names of the country 1 and the code page 437, as the
    bench's DOS, FreeDOS 1.4, has it in COUNTRY.SYS. Below 80h it is
@@ -376,7 +383,7 @@ u16 DosErrorOf(int error, bool path);
  *
  *     struct Answer FileOpen(const u8 *name, u16 mode)
  *     {
- *         return DosFileOpen(&Emulated, name, mode);
+ *         return DosFileOpen(&MachineDos, name, mode);
  *     }
  *
  * and the Bare functions of sys.h call the same function as the others:
@@ -571,6 +578,87 @@ bool DosDriveCd(struct Dos *dos, u16 drive);
 struct Space DosSpaceOf(u32 block, uint64_t blocks, uint64_t free);
 
 /*
+ * The machine, machine_posix.c: the part of the functions of sys.h that
+ * has nothing of a platform in it, which every implementation that
+ * emulates DOS on a host shares, the program for Linux's and the web
+ * page's (the piece W1 of step 7, TODO.md, "Step 7, the web page"). The
+ * top of machine_posix.c says what it is. An implementation has of its
+ * own KeyRead, KeyWaiting, KeysHeld, Idle, Ticks, MouseWhere,
+ * ProgramRun, ProgramEnd, ProgramOfFile, ProgramOpenFile and main(), and
+ * asks the machine for what they need of it, below.
+ */
+
+/* The one DOS that the program has. */
+extern struct Dos MachineDos;
+
+/* The start: the test channel begun, from the directory that VC_TEST
+   names, where it does, else false; then the machine itself, its DOS
+   and where the program starts; then, once the implementation knows the
+   DOS's name of its shell, which COMSPEC is, the environment, the tail
+   of `arguments`, which are main()'s, and the screen in mode 3. */
+bool TestBegin(void);
+void MachineBegin(void);
+void MachineEnvironment(const u8 *shell, int count, char **arguments);
+
+/* The end: the last screen recorded for the test channel, the memory
+   given back, the files closed, and the host's process ended with the
+   low byte of `code`. */
+void MachineEnd(u16 code);
+
+/* The timer, as Ticks answers it. */
+u32 MachineTicks(void);
+
+/* What the screen shows, for the implementation to draw: the 2,000
+   cells of the page that is shown, a character and its colour each, the
+   cursor's place, the row above the column, and the BIOS's shape of it. */
+struct ScreenShows {
+    const u16 *cells;
+    u16 place, shape;
+};
+struct ScreenShows ScreenShown(void);
+
+/* What the program has typed by the BIOS since the screen was last
+   drawn, which DOS would show where a command runs: forgotten, or
+   written at `text` in UTF-8, as many bytes as answered, at most
+   TYPED_TEXT_ROOM, and forgotten. With `first`, in front of it the row
+   that the typing began in, as far as it began, or all of it where the
+   typing began with a new line, which is the prompt and the command
+   that the program drew there. */
+#define TYPED_TEXT_ROOM (1024 * 4 + 80 * 4)
+void TypedForget(void);
+i32 TypedText(bool first, char *text);
+
+/* The mouse moved to the cell at `column` and `row`, from 0, with the
+   `buttons` held, as the driver takes a mouse's motion; and what
+   MouseWhere answers then. */
+void MouseMoved(u16 buttons, i32 column, i32 row);
+struct MouseAt MouseAnswer(void);
+
+/* What the implementation asks of the test channel where it has no
+   input of its own: the program idle with no key waiting; the key that
+   waits, and the key read, which waits until one is due; what is held;
+   the program asking where the mouse is, which counts its asks=; and a
+   program run, which the channel says on standard error. */
+void TestIdle(void);
+struct Keys TestKeyWaiting(void);
+u16 TestKeyRead(void);
+u16 TestKeysHeld(void);
+void TestMouseAsked(void);
+void TestProgramRun(void);
+
+/* The trace, which VC_TRACE names: a key read, and what is held where
+   it is otherwise than last time; and what is written of it handed to
+   the host, as before a fork. */
+void TraceKey(u16 key);
+void TraceHeld(u16 held);
+void TraceFlush(void);
+
+/* The path of the host that the name of DOS's leads to from the current
+   directory, with what the host says of it, or false where it leads to
+   nothing. */
+bool HostFileOf(const u8 *name, char *host, i32 room, struct stat *status);
+
+/*
  * The terminal, term_posix.c, the piece L4 (TODO.md, "L4, the
  * terminal"): the screen of 80 by 25 cells drawn in the terminal that the
  * program is started in, and its keys made the BIOS's words. The top of
@@ -610,29 +698,56 @@ void TermDraw(const u16 *cells, u16 place, u16 shape);
    most for it, -1 for as long as it takes, and make it keys. */
 void TermInput(i32 wait);
 
+/*
+ * The keys and the mouse, keyboard_posix.c, of the piece L4 and a file
+ * of its own since the piece W1 of step 7 (TODO.md, "Step 7, the web
+ * page"): the bytes that a terminal sends, or that a page hands on in
+ * the same form, made the words of the BIOS, with what is held and the
+ * mouse's reports. The top of the "The keys, and the mouse" part of that
+ * file says how.
+ */
+
+/* Whether keys are dropped from now on, as they are while the screen
+   cannot be shown: a terminal that is too small. */
+void KeyboardRefuse(bool refused);
+
+/* Whether the terminal has answered the question for the kitty protocol
+   since this was last asked: the flags are then to be pushed. */
+bool KeyboardKittyAnswered(void);
+
+/* Before more bytes are read: what has waited made keys as far as it
+   may be, and `wait`, in milliseconds or -1 for as long as it takes,
+   made no longer than what has waited may wait, and 0 where a key is
+   there. False where the room for bytes is full and none is to be read
+   now. */
+bool KeyboardBefore(i32 *wait);
+
+/* Where the bytes that are read go, at `*to`, and how many fit; asked
+   just before they are read, which is when they come. */
+i32 KeyboardRoom(char **to);
+
+/* `count` bytes put there, made keys as far as they are whole. */
+void KeyboardAfter(i32 count);
+
 /* The key that waits, as KeyWaiting answers it, and the key taken. */
-struct Keys TermKeyWaiting(void);
-u16 TermKeyTake(void);
+struct Keys KeyboardWaiting(void);
+u16 KeyboardTake(void);
 
 /* What is held, as the BIOS keeps it at 40:17h, as far as the kitty
    protocol of the keyboard has said: 0 where the terminal has none. The
    program has seen it by this, and the next change may come. */
-u16 TermKeysHeld(void);
+u16 KeyboardHeld(void);
 
 /* The mouse as the terminal last reported it: the cell, from 0, which
    the terminal may have larger than 80 by 25; the buttons, the left one
    1, the right one 2 and the middle one 4; and how many reports have
    come, 0 before the first. `looked` where the program asks where the
    mouse is, which lets the next change of the buttons come. */
-struct TermPointer {
+struct ReportedMouse {
     i32 column, row;
     u16 buttons;
     u32 count;
 };
-struct TermPointer TermMouse(bool looked);
-
-/* The character of Unicode that the VGA's font shows for a byte of the
-   code page. */
-u32 TermGlyph(u8 byte);
+struct ReportedMouse KeyboardMouse(bool looked);
 
 #endif

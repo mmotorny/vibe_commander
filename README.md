@@ -968,11 +968,15 @@ no other file of the portable C has a structure of registers, the number
 of a service, or an interrupt that it calls. The same functions for
 another system are other files beside it, and the build picks the files
 of an implementation by the end of their names, beside the common code,
-every file that ends in no implementation's name. Those of DOS end in
+every file that ends in no implementation's name, by the lists of
+`portable_c_sources` in `CMakeLists.txt`. Those of DOS end in
 `_dos.c`: `sys_dos.c` and the stack, `stack_dos.c`. And `sys_posix.c`
 is the program for Linux, with the files that emulate DOS there beside
 it, each ending in `_posix.c`, and their own header, `emulate_posix.h`:
-see [The program for Linux](#the-program-for-linux).
+`machine_posix.c` the part of the functions that has nothing of a
+platform in it, and `keyboard_posix.c` the keys made the BIOS's words,
+which the web page of step 7 is to share; see [The program for
+Linux](#the-program-for-linux).
 
 | What | Functions |
 |---|---|
@@ -1328,7 +1332,7 @@ is no clang:
 
 | Test | What it checks |
 |---|---|
-| `portable_c-posix-unit` | What the program emulates of DOS without input or output of its own, the files `*_posix.c` but `sys_posix.c`: names and aliases, the code page and UTF-8, drives and paths, dates, DOS's errors, and the services on files and directories of the host's, by `harness/posixcheck.c`, built with the sanitizers |
+| `portable_c-posix-unit` | What the program emulates of DOS without input or output of its own, the files `*_posix.c` but `sys_posix.c` and `machine_posix.c`: names and aliases, the code page and UTF-8, drives and paths, dates, DOS's errors, and the services on files and directories of the host's, by `harness/posixcheck.c`, built with the sanitizers |
 | `portable_c-terminal` | What `posix-asan/vc` draws in a pseudo-terminal, replayed through pyte, a terminal emulator in Python that the harness fetches pinned, held cell by cell to the grid that the program writes for the same keys through its test channel, in 24 bits and in 16 colours; a terminal too small, SIGTSTP and SIGCONT, the kitty protocol and the keys that the program reads held to the BIOS's words, the mouse, and commands with Ctrl-O. `harness/terminal.py` |
 | `portable_c-posix-scenarios` | `posix-asan/vc` through the scenarios, by `harness/posixrun.py`: on a bench of the host's in `/tmp`, its home directory laid out as the machine's C:, driven through the test channel, `VC_TEST`, which takes the scenarios' keys as the BIOS's words and writes the grid whenever the program waits for a key, on the clock of the machine of the tests, `VC_TEST_CLOCK`. Its screens and its files are held to the original's goldens with what is declared for the portable C and, on top of that, for Linux, each scenario that is not run on Linux or is cut there named by an entry of Linux of `DEVIATIONS.md`. It starts a machine of DOS once, for the bench's setup file, and keeps that in `build/posix-bench` |
 | `portable_c-web-probe` | Only with `-DVC_WEB=ON`: every file that the build for the web is to compile, the common code, the files of the emulation of DOS that the web shares with Linux and the web's own, compiled by Emscripten's emcc for wasm32 with the warnings of the program for Linux and `-Werror`, each failure printed. `harness/webprobe.py` |
