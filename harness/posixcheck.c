@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <ftw.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -330,69 +331,115 @@ static void Attributes(void)
  * Paths.
  */
 
+/* The drives of the checks of paths: H: at /home/user, R: the current
+   one, with R:\A\B its current directory and H:\DOCS that of H:. */
+static struct Drives Checked;
+
+static void DrivesChecked(const char *home)
+{
+    DrivesBegin(&Checked, home);
+    memcpy(Checked.drive[DriveIndex(&Checked, 'R')].current, "A\\B", 4);
+    if (home != NULL)
+        memcpy(Checked.drive[DriveIndex(&Checked, 'H')].current, "DOCS", 5);
+}
+
 static void Full(void)
 {
     u8 to[DOS_PATH_ROOM];
     struct Answer answer;
-    const u8 *current = (const u8 *)"A\\B";
     u8 deep[200];
     i32 i;
 
+    /* CLAUDE.md, step 6 of the road: R: and H:, and R: alone where there
+       is no home directory to be H:. */
+    DrivesChecked("/home/user");
+    CHECK(DriveIndex(&Checked, 'R') >= 0 && DriveIndex(&Checked, 'H') >= 0);
+    CHECK(DriveIndex(&Checked, 'C') < 0 && DriveIndex(&Checked, 'r') < 0);
+    CHECK(Checked.drive[Checked.current].letter == 'R');
+    SAME(Checked.drive[DriveIndex(&Checked, 'R')].root, "/");
+    SAME(Checked.drive[DriveIndex(&Checked, 'R')].label, "ROOT");
+    SAME(Checked.drive[DriveIndex(&Checked, 'H')].root, "/home/user");
+    SAME(Checked.drive[DriveIndex(&Checked, 'H')].label, "HOME");
+
     /* DOS_MakeName of DOSBox */
-    answer = DosPathFull((const u8 *)"c:/foo/bar", current, to);
+    answer = DosPathFull((const u8 *)"r:/foo/bar", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\FOO\\BAR");
-    answer = DosPathFull((const u8 *)"..\\x", current, to);
+    SAME(to, "R:\\FOO\\BAR");
+    answer = DosPathFull((const u8 *)"..\\x", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\A\\X");
-    answer = DosPathFull((const u8 *)"LONGFILENAME.TEXT", current, to);
+    SAME(to, "R:\\A\\X");
+    answer = DosPathFull((const u8 *)"LONGFILENAME.TEXT", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\A\\B\\LONGFILE.TEX");
-    answer = DosPathFull((const u8 *)".\\file", current, to);
+    SAME(to, "R:\\A\\B\\LONGFILE.TEX");
+    answer = DosPathFull((const u8 *)".\\file", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\A\\B\\FILE");
-    answer = DosPathFull((const u8 *)"C:\\..", current, to);
+    SAME(to, "R:\\A\\B\\FILE");
+    answer = DosPathFull((const u8 *)"R:\\..", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\");
-    answer = DosPathFull((const u8 *)"\\..\\..\\x", current, to);
+    SAME(to, "R:\\");
+    answer = DosPathFull((const u8 *)"\\..\\..\\x", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\X");
-    answer = DosPathFull((const u8 *)"\\", current, to);
+    SAME(to, "R:\\X");
+    answer = DosPathFull((const u8 *)"\\", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\");
-    answer = DosPathFull((const u8 *)"C:", current, to);
+    SAME(to, "R:\\");
+    answer = DosPathFull((const u8 *)"R:", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\A\\B");
-    /* CLAUDE.md, step 6 of the road: C: is the one drive, and the
-       current one; another goes from its root, and is found to be none
-       when it is used. */
-    answer = DosPathFull((const u8 *)"d:", current, to);
+    SAME(to, "R:\\A\\B");
+    /* DOS_MakeName of DOSBox: a drive that is named goes from its own
+       current directory, and .. at its root stays there; one that there
+       is not goes from its root, and is found to be none when it is
+       used. */
+    answer = DosPathFull((const u8 *)"h:", &Checked, to);
+    CHECK(!answer.failed);
+    SAME(to, "H:\\DOCS");
+    answer = DosPathFull((const u8 *)"h:name", &Checked, to);
+    CHECK(!answer.failed);
+    SAME(to, "H:\\DOCS\\NAME");
+    answer = DosPathFull((const u8 *)"H:\\..\\..\\x", &Checked, to);
+    CHECK(!answer.failed);
+    SAME(to, "H:\\X");
+    answer = DosPathFull((const u8 *)"d:", &Checked, to);
     CHECK(!answer.failed);
     SAME(to, "D:\\");
-    answer = DosPathFull((const u8 *)"d:name", current, to);
+    answer = DosPathFull((const u8 *)"d:name", &Checked, to);
     CHECK(!answer.failed);
     SAME(to, "D:\\NAME");
-    answer = DosPathFull((const u8 *)"name", current, to);
+    answer = DosPathFull((const u8 *)"name", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\A\\B\\NAME");
-    answer = DosPathFull((const u8 *)"*.*", current, to);
+    SAME(to, "R:\\A\\B\\NAME");
+    answer = DosPathFull((const u8 *)"*.*", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\A\\B\\*.*");
-    answer = DosPathFull((const u8 *)"c:\\caf\x82.txt", current, to);
+    SAME(to, "R:\\A\\B\\*.*");
+    answer = DosPathFull((const u8 *)"r:\\caf\x82.txt", &Checked, to);
     CHECK(!answer.failed);
-    SAME(to, "C:\\CAFE.TXT");
-    answer = DosPathFull((const u8 *)"a.b.c", current, to);
+    SAME(to, "R:\\CAFE.TXT");
+    answer = DosPathFull((const u8 *)"a.b.c", &Checked, to);
     CHECK(answer.failed && answer.value == 3);
-    answer = DosPathFull((const u8 *)"a+b", current, to);
+    answer = DosPathFull((const u8 *)"a+b", &Checked, to);
     CHECK(answer.failed && answer.value == 3);
-    answer = DosPathFull((const u8 *)"1:\\x", current, to);
+    answer = DosPathFull((const u8 *)"1:\\x", &Checked, to);
     CHECK(answer.failed && answer.value == 0x0F);
     /* A path longer than DOS's 128 bytes */
     for (i = 0; i < 20; i++)
         memcpy(deep + 9 * i, "\\ABCDEFGH", 9);
     deep[180] = '\0';
-    answer = DosPathFull(deep, current, to);
+    answer = DosPathFull(deep, &Checked, to);
     CHECK(answer.failed && answer.value == 3);
+    /* A path without a drive is on the current drive. */
+    Checked.current = DriveIndex(&Checked, 'H');
+    answer = DosPathFull((const u8 *)"name", &Checked, to);
+    CHECK(!answer.failed);
+    SAME(to, "H:\\DOCS\\NAME");
+    answer = DosPathFull((const u8 *)"\\", &Checked, to);
+    CHECK(!answer.failed);
+    SAME(to, "H:\\");
+
+    DrivesChecked(NULL);
+    CHECK(DriveIndex(&Checked, 'H') < 0 && DriveIndex(&Checked, 'R') >= 0);
+    answer = DosPathFull((const u8 *)"h:name", &Checked, to);
+    CHECK(!answer.failed);
+    SAME(to, "H:\\NAME");
 }
 
 static void SetupFileChecked(void)
@@ -488,94 +535,134 @@ static void Paths(void)
     i32 reads = 0;
 
     DirectoriesBegin(&directories, FakeRead, &reads);
+    DrivesChecked("/home/user");
 
     /* CLAUDE.md, step 3 of the road: a drive letter is a directory of
-       the host, as DOSBox's mount; step 6: C: is the root of the file
-       system, and there is no other; an alias leads back. */
-    answer = HostPathOfDos(&directories,
-                           (const u8 *)"C:\\HOME\\USER\\NOTES.TXT", host,
+       the host, as DOSBox's mount; step 6: R: is the root of the file
+       system and H: the home directory, and there is no other; an alias
+       leads back. */
+    answer = HostPathOfDos(&directories, &Checked,
+                           (const u8 *)"R:\\HOME\\USER\\NOTES.TXT", host,
                            (i32)sizeof host);
     CHECK(!answer.failed && answer.value == 1);
     SAME(host, "/home/user/notes.txt");
-    answer = HostPathOfDos(&directories,
-                           (const u8 *)"C:\\HOME\\USER\\LONGFI~1.TXT", host,
+    answer = HostPathOfDos(&directories, &Checked,
+                           (const u8 *)"H:\\NOTES.TXT", host,
+                           (i32)sizeof host);
+    CHECK(!answer.failed && answer.value == 1);
+    SAME(host, "/home/user/notes.txt");
+    answer = HostPathOfDos(&directories, &Checked,
+                           (const u8 *)"H:\\LONGFI~1.TXT", host,
                            (i32)sizeof host);
     CHECK(!answer.failed && answer.value == 1);
     SAME(host, "/home/user/LongFileName.txt");
-    answer = HostPathOfDos(&directories, (const u8 *)"C:\\", host,
+    answer = HostPathOfDos(&directories, &Checked, (const u8 *)"R:\\", host,
                            (i32)sizeof host);
     CHECK(!answer.failed && answer.value == 1);
     SAME(host, "/");
-    answer = HostPathOfDos(&directories,
-                           (const u8 *)"C:\\HOME\\USER\\NEW.TXT", host,
+    answer = HostPathOfDos(&directories, &Checked, (const u8 *)"H:\\", host,
+                           (i32)sizeof host);
+    CHECK(!answer.failed && answer.value == 1);
+    SAME(host, "/home/user");
+    answer = HostPathOfDos(&directories, &Checked,
+                           (const u8 *)"H:\\NEW.TXT", host,
                            (i32)sizeof host);
     CHECK(!answer.failed && answer.value == 0);
     SAME(host, "/home/user/new.txt");
     /* RBIL, INT 21h 3Dh: 3 where a directory on the way is not there,
        0Fh for a drive that there is not (INT 21h 0Eh and 47h) */
-    answer = HostPathOfDos(&directories,
-                           (const u8 *)"C:\\HOME\\USER\\NOPE\\X.TXT", host,
+    answer = HostPathOfDos(&directories, &Checked,
+                           (const u8 *)"R:\\HOME\\USER\\NOPE\\X.TXT", host,
                            (i32)sizeof host);
     CHECK(answer.failed && answer.value == 3);
-    answer = HostPathOfDos(&directories, (const u8 *)"D:\\X", host,
+    answer = HostPathOfDos(&directories, &Checked, (const u8 *)"C:\\X", host,
                            (i32)sizeof host);
     CHECK(answer.failed && answer.value == 0x0F);
-    answer = HostPathOfDos(&directories, (const u8 *)"A:\\", host,
+    answer = HostPathOfDos(&directories, &Checked, (const u8 *)"A:\\", host,
                            (i32)sizeof host);
     CHECK(answer.failed && answer.value == 0x0F);
-    answer = HostPathOfDos(&directories, (const u8 *)"C:\\ROOT\\X", host,
-                           (i32)sizeof host);
+    answer = HostPathOfDos(&directories, &Checked, (const u8 *)"R:\\ROOT\\X",
+                           host, (i32)sizeof host);
     CHECK(answer.failed && answer.value == 3);
-    answer = HostPathOfDos(&directories, (const u8 *)"C:\\HOME\\USER", host,
+    answer = HostPathOfDos(&directories, &Checked,
+                           (const u8 *)"R:\\HOME\\USER", host, 10);
+    CHECK(answer.failed && answer.value == 3);
+    answer = HostPathOfDos(&directories, &Checked, (const u8 *)"H:\\", host,
                            10);
     CHECK(answer.failed && answer.value == 3);
 
     /* A name that the host has since it was read is found: the directory
        is read again for a name that it has not. */
     Fake[2].names[5] = "added.txt";
-    answer = HostPathOfDos(&directories,
-                           (const u8 *)"C:\\HOME\\USER\\ADDED.TXT", host,
+    answer = HostPathOfDos(&directories, &Checked,
+                           (const u8 *)"H:\\ADDED.TXT", host,
                            (i32)sizeof host);
     CHECK(!answer.failed && answer.value == 1);
     SAME(host, "/home/user/added.txt");
     Fake[2].names[5] = NULL;
 
-    /* CLAUDE.md, step 6 of the road: every path of the host is on C:. */
-    answer = DosPathOfHost(&directories,
+    /* CLAUDE.md, step 6 of the road: a path of the host under the home
+       directory is on H:, from the home directory, and any other on R:,
+       name by name, so that /home/users is not under /home/user. */
+    answer = DosPathOfHost(&directories, &Checked,
                            "/home/user/Projects/vibe-commander", dos);
     CHECK(!answer.failed);
-    SAME(dos, "C:\\HOME\\USER\\PROJECTS\\VIBE-C~1");
-    answer = DosPathOfHost(&directories, "/home/user", dos);
+    SAME(dos, "H:\\PROJECTS\\VIBE-C~1");
+    answer = DosPathOfHost(&directories, &Checked, "/home/user", dos);
     CHECK(!answer.failed);
-    SAME(dos, "C:\\HOME\\USER");
-    answer = DosPathOfHost(&directories, "/etc", dos);
+    SAME(dos, "H:\\");
+    answer = DosPathOfHost(&directories, &Checked, "/home//user/", dos);
     CHECK(!answer.failed);
-    SAME(dos, "C:\\ETC");
-    answer = DosPathOfHost(&directories, "/", dos);
+    SAME(dos, "H:\\");
+    answer = DosPathOfHost(&directories, &Checked, "/home", dos);
     CHECK(!answer.failed);
-    SAME(dos, "C:\\");
-    answer = DosPathOfHost(&directories, "/home//user/", dos);
+    SAME(dos, "R:\\HOME");
+    answer = DosPathOfHost(&directories, &Checked, "/etc", dos);
     CHECK(!answer.failed);
-    SAME(dos, "C:\\HOME\\USER");
-    answer = DosPathOfHost(&directories, "/home/users", dos);
+    SAME(dos, "R:\\ETC");
+    answer = DosPathOfHost(&directories, &Checked, "/", dos);
+    CHECK(!answer.failed);
+    SAME(dos, "R:\\");
+    answer = DosPathOfHost(&directories, &Checked, "/home/users", dos);
     CHECK(answer.failed && answer.value == 3);
-    answer = DosPathOfHost(&directories, "/home/../etc", dos);
+    answer = DosPathOfHost(&directories, &Checked, "/home/../etc", dos);
     CHECK(answer.failed && answer.value == 3);
-    answer = DosPathOfHost(&directories, "relative", dos);
+    answer = DosPathOfHost(&directories, &Checked, "/home/user/../etc", dos);
     CHECK(answer.failed && answer.value == 3);
+    answer = DosPathOfHost(&directories, &Checked, "relative", dos);
+    CHECK(answer.failed && answer.value == 3);
+
+    /* With no H:, everything is on R:, and H: is a drive that there is
+       not. */
+    DrivesChecked(NULL);
+    answer = DosPathOfHost(&directories, &Checked, "/home/user", dos);
+    CHECK(!answer.failed);
+    SAME(dos, "R:\\HOME\\USER");
+    answer = HostPathOfDos(&directories, &Checked, (const u8 *)"H:\\", host,
+                           (i32)sizeof host);
+    CHECK(answer.failed && answer.value == 0x0F);
     DirectoriesEnd(&directories);
 
-    /* sys.h: a path holds 67 characters. C:\ and seven names of eight
-       with the backslashes between are 65, and an eighth makes 74. */
+    /* sys.h: a path holds 67 characters. R:\ and seven names of eight
+       with the backslashes between are 65, and an eighth makes 74; on H:
+       a path goes from the home directory, and holds more of the host's
+       (CLAUDE.md, step 6 of the road: H: as a way round DOS's 67
+       characters). */
     DirectoriesBegin(&directories, DeepRead, NULL);
-    answer = DosPathOfHost(&directories,
+    answer = DosPathOfHost(&directories, &Checked,
                            "/DIRNAME1/DIRNAME2/DIRNAME3/DIRNAME4/DIRNAME5/"
                            "DIRNAME6/DIRNAME7", dos);
     CHECK(!answer.failed && strlen((const char *)dos) == 65);
-    answer = DosPathOfHost(&directories,
+    answer = DosPathOfHost(&directories, &Checked,
                            "/DIRNAME1/DIRNAME2/DIRNAME3/DIRNAME4/DIRNAME5/"
                            "DIRNAME6/DIRNAME7/DIRNAME8", dos);
     CHECK(answer.failed && answer.value == 3);
+    DrivesChecked("/DIRNAME1/DIRNAME2/DIRNAME3/DIRNAME4/DIRNAME5/DIRNAME6");
+    answer = DosPathOfHost(&directories, &Checked,
+                           "/DIRNAME1/DIRNAME2/DIRNAME3/DIRNAME4/DIRNAME5/"
+                           "DIRNAME6/DIRNAME7/DIRNAME8", dos);
+    CHECK(!answer.failed);
+    SAME(dos, "H:\\DIRNAME7\\DIRNAME8");
     DirectoriesEnd(&directories);
 }
 
@@ -838,9 +925,10 @@ static void ServiceFiles(void)
           && stamp.date == 0);
     asked = DosFileSetTime(dos, 99, 0x6000, 0x28D0);
     CHECK(asked.failed && asked.value == 6);
-    /* The bench: written, its time set, on C:. */
+    /* The bench: written, its time set, on C:, 2 in the low bits (RBIL,
+       INT 21h 4400h: the drive); here on R:, 11h. */
     device = DosFileDevice(dos, handle);
-    CHECK(!device.failed && device.kind == 0x4002 && device.value == 0x4002);
+    CHECK(!device.failed && device.kind == 0x4011 && device.value == 0x4011);
     asked = DosFileClose(dos, handle);
     CHECK(!asked.failed && asked.value == 0x3E00);
     asked = DosFileClose(dos, handle);
@@ -850,7 +938,7 @@ static void ServiceFiles(void)
     CHECK(!asked.failed && asked.value == 5);
     handle = asked.value;
     device = DosFileDevice(dos, handle);
-    CHECK(!device.failed && device.kind == 0x0042);
+    CHECK(!device.failed && device.kind == 0x0051);
     memset(Big, 0, sizeof Big);
     moved = DosFileRead(dos, handle, Big, BIG_SIZE);
     CHECK(!moved.failed && moved.count == 20000);
@@ -959,6 +1047,12 @@ static void ServiceFiles(void)
     DosFileClose(dos, asked.value);
 }
 
+/* The current directory of a drive of the emulation. */
+static const u8 *Current(u8 letter)
+{
+    return Emulated.drives.drive[DriveIndex(&Emulated.drives, letter)].current;
+}
+
 /* The bench, the end of Files: DOS's own five handles. RBIL, INT 21h
    3Dh: 4 where the program's table of handles is full, 20 with DOS's. */
 static void ServiceHandles(void)
@@ -1008,7 +1102,7 @@ static void ServiceOthers(void)
     CHECK(asked.failed && asked.value == 5);
     asked = DosFileCreate(dos, NAME("PIPE"), 0);
     CHECK(asked.failed && asked.value == 5);
-    asked = DosFileOpen(dos, NAME("C:\\DEV\\NULL"), 0);
+    asked = DosFileOpen(dos, NAME("R:\\DEV\\NULL"), 0);
     CHECK(asked.failed && asked.value == 5);
     InTree("dangling", path);
     InTree("nowhere", target);
@@ -1077,9 +1171,9 @@ static void ServiceOlder(void)
     char expected[DOS_PATH_ROOM + 16];
     size_t length;
 
-    memcpy(start, "C:\\", 4);
-    length = strlen((const char *)Emulated.current);
-    memcpy(start + 3, Emulated.current, length + 1);
+    memcpy(start, "R:\\", 4);
+    length = strlen((const char *)Current('R'));
+    memcpy(start + 3, Current('R'), length + 1);
     memset(to, '#', sizeof to);
     asked = DosFileTrueName(dos, NAME("HELLO.TXT"), to);
     CHECK(!asked.failed && asked.value == 0);
@@ -1091,9 +1185,9 @@ static void ServiceOlder(void)
     asked = DosFileTrueName(dos, NAME("DOCS\\..\\.\\hello.txt"), to);
     CHECK(!asked.failed);
     SAME(to, expected);
-    asked = DosFileTrueName(dos, NAME("C:\\NODIR\\X.DAT"), to);
+    asked = DosFileTrueName(dos, NAME("R:\\NODIR\\X.DAT"), to);
     CHECK(!asked.failed);
-    SAME(to, "C:\\NODIR\\X.DAT");
+    SAME(to, "R:\\NODIR\\X.DAT");
     memset(to, '#', sizeof to);
     asked = DosFileTrueName(dos, NAME("Q:X.DAT"), to);
     CHECK(asked.failed && asked.value == 3 && to[0] == '#' && to[127] == '#');
@@ -1104,10 +1198,12 @@ static void ServiceOlder(void)
     CHECK(memcmp(fcb + 12, "\0\0\0\0####", 8) == 0);
     CHECK(DosFcbParse(dos, NAME("HELLO.TXT"), fcb, 1) == 0x2900);
     CHECK(fcb[0] == 0 && memcmp(fcb + 1, "HELLO   TXT", 11) == 0);
-    CHECK(DosFcbParse(dos, NAME("C:TOY?.DAT"), fcb, 1) == 0x2901);
-    CHECK(fcb[0] == 3 && memcmp(fcb + 1, "TOY?    DAT", 11) == 0);
+    CHECK(DosFcbParse(dos, NAME("R:TOY?.DAT"), fcb, 1) == 0x2901);
+    CHECK(fcb[0] == 18 && memcmp(fcb + 1, "TOY?    DAT", 11) == 0);
     CHECK(DosFcbParse(dos, NAME("Q:X.DAT"), fcb, 1) == 0x29FF);
-    CHECK(fcb[0] == 3 && memcmp(fcb + 1, "TOY?    DAT", 11) == 0);
+    CHECK(fcb[0] == 18 && memcmp(fcb + 1, "TOY?    DAT", 11) == 0);
+    CHECK(DosFcbParse(dos, NAME("h:X.DAT"), fcb, 1) == 0x2900);
+    CHECK(fcb[0] == 8 && memcmp(fcb + 1, "X       DAT", 11) == 0);
     fcb[0] = 2;
     CHECK(DosFcbParse(dos, NAME("*.*"), fcb, 2) == 0x2901);
     CHECK(fcb[0] == 2 && memcmp(fcb + 1, "???????????", 11) == 0);
@@ -1160,10 +1256,10 @@ static void ServiceDirectories(void)
     memset(to, 0, sizeof to);
     asked = DosDirCurrent(dos, 0, here);
     CHECK(!asked.failed && asked.value == 0x0100);
-    SAME(here, Emulated.current);
+    SAME(here, Current('R'));
     asked = DosDirCurrent(dos, 4, to);
     CHECK(asked.failed && asked.value == 0x0F);
-    asked = DosDirCurrent(dos, 0x0303, to);
+    asked = DosDirCurrent(dos, 0x0312, to);
     CHECK(!asked.failed);
     SAME(to, here);
     asked = DosDirCurrent(dos, 26, to);
@@ -1181,7 +1277,7 @@ static void ServiceDirectories(void)
     CHECK(!asked.failed);
     snprintf(expected, sizeof expected, "%s\\NEWDIR", (const char *)here);
     SAME(to, expected);
-    snprintf(expected, sizeof expected, "C:\\%s\\NEWDIR",
+    snprintf(expected, sizeof expected, "R:\\%s\\NEWDIR",
              (const char *)here);
     asked = DosDirRemove(dos, NAME(expected));
     CHECK(asked.failed && asked.value == 0x10);
@@ -1265,14 +1361,15 @@ static void ServiceFinds(void)
     CHECK(Listed("*", 0x37, list, sizeof list) == 0x12);
     SAME(list, "./10 ../10 DANGLING/20 DATA/20 DOCS/10 ");
     /* The bench: nothing found, a directory that is not there, and no
-       label. */
+       label but in the root (fatgen103), which a search for anything else
+       does not find (RBIL, INT 21h 4Eh). */
     CHECK(Listed("NONE.*", 0x37, list, sizeof list) == 0x12);
     SAME(list, "");
-    CHECK(Listed("C:\\NODIR\\*.*", 0x37, list, sizeof list) == 3);
-    CHECK(Listed("C:\\*.*", 8, list, sizeof list) == 0x12);
+    CHECK(Listed("R:\\NODIR\\*.*", 0x37, list, sizeof list) == 3);
+    CHECK(Listed("*.*", 8, list, sizeof list) == 0x12);
     SAME(list, "");
     /* The root has no . and no .. (RBIL, INT 21h 4Eh). */
-    asked = DosFindFirst(dos, NAME("C:\\*.*"), 0x37);
+    asked = DosFindFirst(dos, NAME("R:\\*.*"), 0x37);
     CHECK(!asked.failed && Emulated.record->FilName[0] != '.');
     /* What a search found, of the record: the size, and a name that is
        ended by zeros. */
@@ -1296,7 +1393,7 @@ static void ServiceFinds(void)
        back. */
     DosFindFirst(dos, NAME("*.TXT"), 0);
     kept = *Emulated.record;
-    asked = DosFindFirst(dos, NAME("C:\\*.*"), 0x37);
+    asked = DosFindFirst(dos, NAME("R:\\*.*"), 0x37);
     CHECK(!asked.failed);
     *Emulated.record = kept;
     asked = DosFindNext(dos);
@@ -1325,9 +1422,19 @@ static void ServiceDrives(void)
     struct Answer asked;
     struct Device device;
 
-    CHECK(DosDriveCurrent(dos) == 2);
-    DosDriveSelect(dos, 3);
-    CHECK(DosDriveCurrent(dos) == 2);
+    /* CLAUDE.md, step 6 of the road: R:, 17, the current drive where
+       the program is not started under the home directory, and H:, 7;
+       RBIL, INT 21h 0Eh: a letter that is no drive leaves the current
+       one as it was. */
+    CHECK(DosDriveCurrent(dos) == 17);
+    DosDriveSelect(dos, 2);
+    CHECK(DosDriveCurrent(dos) == 17);
+    DosDriveSelect(dos, 7);
+    CHECK(DosDriveCurrent(dos) == 7);
+    DosDriveSelect(dos, 0x1A);
+    CHECK(DosDriveCurrent(dos) == 7);
+    DosDriveSelect(dos, 0x0311);
+    CHECK(DosDriveCurrent(dos) == 17);
     space = DosSpaceOf(4096, 10000, 5000);
     CHECK(space.value == 8 && space.sector == 512 && space.total == 10000
           && space.free == 5000 && !space.failed);
@@ -1345,7 +1452,11 @@ static void ServiceDrives(void)
           && (space.value & (space.value - 1)) == 0 && space.sector == 512
           && space.total >= 1 && space.total <= 0xFFFF
           && space.free <= space.total);
-    space = DosDriveSpace(dos, 3, true);
+    space = DosDriveSpace(dos, 8, false);
+    CHECK(!space.failed && space.sector == 512 && space.total >= 1);
+    space = DosDriveSpace(dos, 3, false);
+    CHECK(!space.failed && space.value == 0xFFFF && space.total == 3);
+    space = DosDriveSpace(dos, 18, true);
     CHECK(space.failed && space.value == Emulated.error
           && space.sector == 512);
     space = DosDriveSpace(dos, 26, false);
@@ -1353,29 +1464,182 @@ static void ServiceDrives(void)
           && space.sector == 0 && space.total == 0x1A);
     space = DosDriveSpace(dos, 26, true);
     CHECK(space.failed && space.total == 0x1A);
-    asked = DosDriveLetter(dos, 3);
+    asked = DosDriveLetter(dos, 18);
     CHECK(!asked.failed && asked.value == 0x4400);
+    asked = DosDriveLetter(dos, 8);
+    CHECK(!asked.failed && asked.value == 0x4400);
+    asked = DosDriveLetter(dos, 3);
+    CHECK(asked.failed && asked.value == 0x0F);
     asked = DosDriveLetter(dos, 26);
     CHECK(asked.failed && asked.value == 0x0F);
-    asked = DosDriveSetLetter(dos, 3);
+    asked = DosDriveSetLetter(dos, 18);
     CHECK(!asked.failed && asked.value == 0x4400);
     asked = DosDriveSetLetter(dos, 1);
     CHECK(asked.failed && asked.value == 0x0F);
-    device = DosDriveRemote(dos, 3);
+    device = DosDriveRemote(dos, 8);
     CHECK(!device.failed && device.value == 0x0300 && device.kind == 0x08C2);
     device = DosDriveRemote(dos, 26);
     CHECK(device.failed && device.value == 0x0F && device.kind == 0);
-    asked = DosDriveFixed(dos, 3);
+    asked = DosDriveFixed(dos, 18);
     CHECK(!asked.failed && asked.value == 1);
     asked = DosDriveFixed(dos, 26);
     CHECK(asked.failed && asked.value == 0x0F);
-    CHECK(!DosDriveCd(dos, 2) && !DosDriveCd(dos, 0));
+    CHECK(!DosDriveCd(dos, 17) && !DosDriveCd(dos, 7));
+}
+
+/* What a DosBegin makes of $HOME: H: at `root`, or no H: for NULL. */
+static void HomeChecked(const char *home, const char *root)
+{
+    static struct Dos other;
+    i32 drive;
+
+    DosBegin(&other, home);
+    drive = DriveIndex(&other.drives, 'H');
+    CHECK(DriveIndex(&other.drives, 'R') >= 0);
+    CHECK(other.drives.drive[other.drives.current].letter == 'R');
+    if (root == NULL)
+        CHECK(drive < 0);
+    else {
+        CHECK(drive >= 0);
+        if (drive >= 0)
+            SAME(other.drives.drive[drive].root, root);
+    }
+    DosEnd(&other);
+}
+
+/* A file of the host's in the home directory of the tree. */
+static void InHome(const char *name, char *to)
+{
+    char path[600];
+
+    snprintf(path, sizeof path, "home/%s", name);
+    InTree(path, to);
+}
+
+/* H:, the home directory of the tree, beside R:, the root of the host,
+   by what the user decided on 15 October 2026 (CLAUDE.md, step 6 of the
+   road), and by RBIL and fatgen103 for what DOS does with two drives. */
+static void ServiceHome(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Answer asked;
+    struct Device device;
+    char list[1024];
+    char path[600];
+    char real[PATH_MAX];
+    u8 to[DOS_PATH_ROOM];
+    u8 fcb[48];
+    u8 here[DOS_CURRENT_ROOM];
+
+    /* The labels, each found by a search for a label alone in the root
+       of its drive, and nowhere else (fatgen103: the label's entry is in
+       the root; RBIL, INT 21h 4Eh: with 08h only the label). */
+    CHECK(Listed("H:\\*.*", 8, list, sizeof list) == 0x12);
+    SAME(list, "HOME/08 ");
+    CHECK(Emulated.record->FilSize == 0);
+    CHECK(Listed("R:\\*.*", 8, list, sizeof list) == 0x12);
+    SAME(list, "ROOT/08 ");
+    CHECK(Listed("\\ROOT", 8, list, sizeof list) == 0x12);
+    SAME(list, "ROOT/08 ");
+    CHECK(Listed("\\HOME", 8, list, sizeof list) == 0x12);
+    SAME(list, "");
+    CHECK(Listed("H:\\SUB\\*.*", 8, list, sizeof list) == 3);
+    /* The root of H: has no . and no .., and no label but for 08h. */
+    HostFile("home/inhome.txt", "in the home directory");
+    CHECK(Listed("H:\\*.*", 0x3F, list, sizeof list) == 0x12);
+    SAME(list, "INHOME.TXT/20 ");
+    /* RBIL, INT 21h 3Ch: no label is made (TODO.md, L2, 6). */
+    asked = DosFileCreate(dos, NAME("H:\\LABEL"), DOS_LABEL);
+    CHECK(asked.failed && asked.value == 5);
+
+    /* RBIL, INT 21h 3Bh and 47h: each drive has its current directory,
+       and a change of directory on another drive does not make that the
+       current drive; 3Ah: the current directory of a drive is not
+       removed, 10h. */
+    memcpy(here, Current('R'), strlen((const char *)Current('R')) + 1);
+    CHECK(!DosDirMake(dos, NAME("H:\\SUB")).failed);
+    CHECK(Listed("H:\\SUB\\*.*", 8, list, sizeof list) == 0x12);
+    SAME(list, "");
+    CHECK(!DosDirChange(dos, NAME("H:SUB")).failed);
+    CHECK(DosDriveCurrent(dos) == 17);
+    asked = DosDirCurrent(dos, 8, to);
+    CHECK(!asked.failed && asked.value == 0x0100);
+    SAME(to, "SUB");
+    asked = DosDirCurrent(dos, 0, to);
+    CHECK(!asked.failed);
+    SAME(to, here);
+    asked = DosFileTrueName(dos, NAME("h:x.dat"), to);
+    CHECK(!asked.failed);
+    SAME(to, "H:\\SUB\\X.DAT");
+    asked = DosDirRemove(dos, NAME("H:\\SUB"));
+    CHECK(asked.failed && asked.value == 0x10);
+
+    /* A file made on H: is the host's in the home directory; its drive
+       is H:'s, 7, in what FileDevice answers (RBIL, INT 21h 4400h). */
+    asked = DosFileCreate(dos, NAME("H:MADE.TXT"), 0);
+    CHECK(!asked.failed);
+    device = DosFileDevice(dos, asked.value);
+    CHECK(!device.failed && device.kind == 0x0047);
+    DosFileClose(dos, asked.value);
+    InHome("sub/made.txt", path);
+    CHECK(access(path, F_OK) == 0);
+    /* RBIL, INT 21h 56h: not from one drive to another, 11h, on which
+       the program copies and deletes, though both are of one file system
+       here; within H: a rename. */
+    asked = DosFileRename(dos, NAME("H:MADE.TXT"), NAME("R:MADE.TXT"));
+    CHECK(asked.failed && asked.value == 0x11);
+    asked = DosFileRename(dos, NAME("H:MADE.TXT"), NAME("H:\\MOVED.TXT"));
+    CHECK(!asked.failed);
+    CHECK(HostHas("home/moved.txt"));
+    /* RBIL, INT 21h 13h: the block's drive, its current directory. */
+    HostFile("home/sub/gone.txt", "gone");
+    memset(fcb, 0, sizeof fcb);
+    DosFcbParse(dos, NAME("H:GONE.TXT"), fcb, 1);
+    asked = DosFcbDelete(dos, fcb, false);
+    CHECK(!asked.failed && asked.value == 0x1300);
+    CHECK(!HostHas("home/sub/gone.txt"));
+    CHECK(!DosDirChange(dos, NAME("H:\\")).failed);
+    CHECK(!DosDirRemove(dos, NAME("H:\\SUB")).failed);
+
+    /* Started under the home directory, on H:; elsewhere on R:. */
+    CHECK(!DosDirMake(dos, NAME("H:\\SUB")).failed);
+    InHome("sub", path);
+    CHECK(!DosStartIn(dos, path).failed);
+    CHECK(DosDriveCurrent(dos) == 7);
+    SAME(Current('H'), "SUB");
+    CHECK(!DosStartIn(dos, Tree).failed);
+    CHECK(DosDriveCurrent(dos) == 17);
+    SAME(Current('R'), here);
+    CHECK(!DosDirChange(dos, NAME("H:\\")).failed);
+    CHECK(!DosDirRemove(dos, NAME("H:\\SUB")).failed);
+
+    /* No H: where $HOME is not set, is no path from the root, names no
+       directory or the root itself; one that is a link is the directory
+       that it leads to. */
+    InTree("home", path);
+    CHECK(realpath(path, real) != NULL);
+    SAME(Emulated.drives.drive[DriveIndex(&Emulated.drives, 'H')].root,
+         real);
+    HomeChecked(NULL, NULL);
+    HomeChecked("", NULL);
+    HomeChecked("/", NULL);
+    HomeChecked("home", NULL);
+    InTree("hello.txt", path);
+    HomeChecked(path, NULL);
+    InTree("nowhere", path);
+    HomeChecked(path, NULL);
+    InTree("homelink", path);
+    CHECK(symlink(real, path) == 0);
+    HomeChecked(path, real);
+    InTree("home/", path);
+    HomeChecked(path, real);
 }
 
 static void Services(void)
 {
     const char *base = getenv("TMPDIR");
     struct Answer started = { 3, true };
+    char home[600];
     i32 tries;
 
     /* The tree where the environment keeps temporary files, or in /tmp
@@ -1386,10 +1650,16 @@ static void Services(void)
         snprintf(Tree, sizeof Tree, "%s/vcXXXXXX", base);
         if (mkdtemp(Tree) == NULL)
             continue;
-        DosBegin(&Emulated);
+        snprintf(home, sizeof home, "%s/home", Tree);
+        if (mkdir(home, 0700) != 0) {
+            rmdir(Tree);
+            continue;
+        }
+        DosBegin(&Emulated, home);
         started = DosStartIn(&Emulated, Tree);
         if (started.failed) {
             DosEnd(&Emulated);
+            rmdir(home);
             rmdir(Tree);
         }
     }
@@ -1408,6 +1678,7 @@ static void Services(void)
     ServiceDirectories();
     ServiceFinds();
     ServiceDrives();
+    ServiceHome();
     DosEnd(&Emulated);
     nftw(Tree, Removed, 16, FTW_DEPTH | FTW_PHYS);
 }

@@ -3,6 +3,7 @@
  * the piece L2 of step 6. See emulate_posix.h, which says what they are
  * and where what each answers comes from.
  */
+#include <assert.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -29,14 +30,8 @@
 #define NOT_SAME_DEVICE 0x11
 #define NO_MORE_FILES 0x12
 
-/* C: by its number counted from A: as 0, as DOS answers the current
-   drive, and from A: as 1, as a call that takes 0 for the current drive
-   has it. */
-#define DRIVE_NUMBER (DOS_DRIVE - 'A')
-#define DRIVE_ONE (DRIVE_NUMBER + 1)
-
 /* A path of the host. */
-#define HOST_ROOM 4096
+#define HOST_ROOM HOST_PATH_ROOM
 
 /* The most bytes that a file of DOS has, and the furthest place in one:
    its size is 32 bits. */
@@ -210,8 +205,34 @@ static bool ReadHost(void *context, const char *path,
  * The state.
  */
 
-void DosBegin(struct Dos *dos)
+/* The home directory that $HOME names, at `to`, which has HOST_ROOM
+   bytes, with its links followed: false where $HOME is not set, is not a
+   path from the root, names nothing or no directory, or names the root,
+   which is R:. */
+static bool Home(const char *home, char *to)
 {
+    char *real;
+    struct stat status;
+    size_t length;
+    bool taken;
+
+    if (home == NULL || home[0] != '/')
+        return false;
+    real = realpath(home, NULL);
+    if (real == NULL)
+        return false;
+    length = strlen(real);
+    taken = length < HOST_ROOM && strcmp(real, "/") != 0
+        && stat(real, &status) == 0 && S_ISDIR(status.st_mode);
+    if (taken)
+        memcpy(to, real, length + 1);
+    free(real);
+    return taken;
+}
+
+void DosBegin(struct Dos *dos, const char *home)
+{
+    char directory[HOST_ROOM];
     /* What DOS answers of its own five handles to INT 21h 4400h: the
        console, as the bench's FreeDOS answers of 0 and 1, the serial port,
        and the printer, as it answers of 4 (harness/trial32/asked.py). */
@@ -222,6 +243,7 @@ void DosBegin(struct Dos *dos)
 
     memset(dos, 0, sizeof *dos);
     DirectoriesBegin(&dos->directories, ReadHost, NULL);
+    DrivesBegin(&dos->drives, Home(home, directory) ? directory : NULL);
     for (i = 0; i < DOS_HANDLES; i++) {
         dos->handles[i].fd = -1;
         dos->handles[i].open = i < DOS_STANDARD;
@@ -272,15 +294,17 @@ static void Reread(struct Dos *dos, const char *host)
 static struct Answer Lead(struct Dos *dos, const u8 *name, u8 *full,
                           char *host)
 {
-    struct Answer led = DosPathFull(name, dos->current, full);
+    struct Answer led = DosPathFull(name, &dos->drives, full);
     struct stat status;
 
     if (!led.failed)
-        led = HostPathOfDos(&dos->directories, full, host, HOST_ROOM);
+        led = HostPathOfDos(&dos->directories, &dos->drives, full, host,
+                            HOST_ROOM);
     if (!led.failed && led.value == 1 && lstat(host, &status) != 0
         && errno == ENOENT) {
         Reread(dos, host);
-        led = HostPathOfDos(&dos->directories, full, host, HOST_ROOM);
+        led = HostPathOfDos(&dos->directories, &dos->drives, full, host,
+                            HOST_ROOM);
     }
     if (led.failed)
         return Failed(dos, led.value == INVALID_DRIVE ? PATH_NOT_FOUND
@@ -295,15 +319,41 @@ static bool Wild(const u8 *full)
         || strchr((const char *)full, '?') != NULL;
 }
 
-/* The full path of DOS's of the current directory of C:. */
-static void Current(const struct Dos *dos, u8 *full)
+/* The full path of DOS's of the current directory of a drive, by its
+   index. */
+static void Current(const struct Dos *dos, i32 drive, u8 *full)
 {
-    size_t length = strlen((const char *)dos->current);
+    const struct DosDrive *of = &dos->drives.drive[drive];
+    size_t length = strlen((const char *)of->current);
 
-    full[0] = DOS_DRIVE;
+    full[0] = of->letter;
     full[1] = ':';
     full[2] = '\\';
-    memcpy(full + 3, dos->current, length + 1);
+    memcpy(full + 3, of->current, length + 1);
+}
+
+/* The index of the drive of a full path of DOS's, which HostPathOfDos
+   has led to the host, so that there is such a drive. */
+static i32 DriveOfPath(const struct Dos *dos, const u8 *full)
+{
+    i32 drive = DriveIndex(&dos->drives, full[0]);
+
+    assert(drive >= 0);
+    return drive;
+}
+
+/* The index of the drive that DOS's number of a drive names, the low
+   byte of `drive`, counted from A: as 1, or 0 for the current one: -1
+   where there is no such drive. */
+static i32 DriveNumbered(const struct Dos *dos, u16 drive)
+{
+    u16 number = drive & 0xFF;
+
+    if (number == 0)
+        return dos->drives.current;
+    if (number > 'Z' - 'A' + 1)
+        return -1;
+    return DriveIndex(&dos->drives, (u8)('A' - 1 + number));
 }
 
 /*
@@ -363,9 +413,11 @@ static u16 OpenError(int error)
    that reaches 4 GB, a copy would have read and written that much first
    and then stopped with no box, and the viewer failed at the file's
    end. To write alone it is opened, as the program does to set its date
-   and time, and a write goes no further than DOS's last place. */
+   and time, and a write goes no further than DOS's last place. `letter`
+   is the drive's, which FileDevice answers of the handle. */
 static struct Answer Opened(struct Dos *dos, i32 slot, int fd,
-                            const char *host, u16 access, bool held)
+                            const char *host, u16 access, bool held,
+                            u8 letter)
 {
     struct DosHandle *handle = &dos->handles[slot];
     struct stat status;
@@ -390,7 +442,7 @@ static struct Answer Opened(struct Dos *dos, i32 slot, int fd,
         fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
     handle->fd = fd;
     handle->access = access;
-    handle->kind = 0;
+    handle->kind = (u16)(letter - 'A');
     handle->open = true;
     handle->written = false;
     handle->stamped = false;
@@ -428,7 +480,7 @@ struct Answer DosFileCreate(struct Dos *dos, const u8 *name,
                   (attributes & DOS_READ_ONLY) != 0 ? 0444 : 0666);
     if (fd < 0)
         return Failed(dos, OpenError(errno));
-    return Opened(dos, slot, fd, host, 2, false);
+    return Opened(dos, slot, fd, host, 2, false, full[0]);
 }
 
 struct Answer DosFileOpen(struct Dos *dos, const u8 *name, u16 mode)
@@ -455,7 +507,7 @@ struct Answer DosFileOpen(struct Dos *dos, const u8 *name, u16 mode)
     fd = OpenHost(host, Flags[access], 0);
     if (fd < 0)
         return Failed(dos, OpenError(errno));
-    return Opened(dos, slot, fd, host, access, true);
+    return Opened(dos, slot, fd, host, access, true, full[0]);
 }
 
 /* Set the time that a file was last written at, of DOS's stamp, leaving
@@ -714,7 +766,7 @@ struct Answer DosFileRename(struct Dos *dos, const u8 *from, const u8 *to)
         return led;
     if (led.value == 0 || Wild(full))
         return Failed(dos, FILE_NOT_FOUND);
-    led = DosPathFull(to, dos->current, target);
+    led = DosPathFull(to, &dos->drives, target);
     if (led.failed)
         return Failed(dos, led.value == INVALID_DRIVE ? PATH_NOT_FOUND
                                                        : led.value);
@@ -865,7 +917,7 @@ struct Device DosFileDevice(struct Dos *dos, u16 handle)
     if (open->fd < 0)
         device.kind = open->kind;
     else
-        device.kind = (u16)(DRIVE_NUMBER | (open->written ? 0 : NOT_WRITTEN)
+        device.kind = (u16)(open->kind | (open->written ? 0 : NOT_WRITTEN)
                             | (open->stamped ? STAMP_KEPT : 0));
     device.value = device.kind;         /* as FreeDOS leaves AX */
     return device;
@@ -877,9 +929,9 @@ struct Device DosFileDevice(struct Dos *dos, u16 handle)
 struct Answer DosFileTrueName(struct Dos *dos, const u8 *name, u8 *to)
 {
     u8 full[DOS_PATH_ROOM];
-    struct Answer made = DosPathFull(name, dos->current, full);
+    struct Answer made = DosPathFull(name, &dos->drives, full);
 
-    if (made.failed || full[0] != DOS_DRIVE)
+    if (made.failed || DriveIndex(&dos->drives, full[0]) < 0)
         return Failed(dos, PATH_NOT_FOUND);
     memcpy(to, full, strlen((const char *)full) + 1);
     return Done(0);
@@ -965,16 +1017,15 @@ u16 DosFcbParse(struct Dos *dos, const u8 *name, u8 *fcb, u16 how)
     bool wild = false;
     u8 letter;
 
-    (void)dos;
     while (*name == ' ' || *name == '\t'
            || ((how & 1) != 0 && *name != '\0'
                && strchr((const char *)Separators, *name) != NULL))
         name++;
     if (name[0] != '\0' && name[1] == ':') {
         letter = CodePageUpper(name[0]);
-        if (letter != DOS_DRIVE)
+        if (DriveIndex(&dos->drives, letter) < 0)
             return AX_PARSE | 0xFF;
-        fcb[0] = DRIVE_ONE;
+        fcb[0] = (u8)(letter - 'A' + 1);
         name += 2;
     } else if ((how & 2) == 0)
         fcb[0] = 0;
@@ -991,9 +1042,10 @@ u16 DosFcbParse(struct Dos *dos, const u8 *name, u8 *fcb, u16 how)
     return AX_PARSE | (wild ? 1 : 0);
 }
 
-/* INT 21h 13h: every file of the current directory that the block names,
-   which is not read-only (RBIL) and has no attribute but those that an
-   extended block allows, hidden and system. A label there is none of.
+/* INT 21h 13h: every file of the current directory of the block's drive
+   that the block names, which is not read-only (RBIL) and has no
+   attribute but those that an extended block allows, hidden and system.
+   A label there is none of.
    The low byte of `value` is 0 where a file was deleted, FFh where none
    was. DOS's search for them ends with its error 12h, which a program
    that asks for the last error is told (FreeDOS 1.4, harness/trial32/
@@ -1008,6 +1060,7 @@ struct Answer DosFcbDelete(struct Dos *dos, const u8 *fcb, bool flagged)
     struct stat status;
     u16 allowed = 0;
     bool deleted = false;
+    i32 drive;
     i32 number;
     i32 i;
 
@@ -1015,9 +1068,11 @@ struct Answer DosFcbDelete(struct Dos *dos, const u8 *fcb, bool flagged)
         allowed = fcb[6];
         fcb += 7;
     }
-    if ((fcb[0] == 0 || fcb[0] == DRIVE_ONE) && (allowed & DOS_LABEL) == 0) {
-        Current(dos, full);
-        led = HostPathOfDos(&dos->directories, full, host, HOST_ROOM);
+    drive = DriveNumbered(dos, fcb[0]);
+    if (drive >= 0 && (allowed & DOS_LABEL) == 0) {
+        Current(dos, drive, full);
+        led = HostPathOfDos(&dos->directories, &dos->drives, full, host,
+                            HOST_ROOM);
         number = led.failed ? -1
             : DirectoryNumber(&dos->directories, host, true);
         names = number < 0 ? NULL
@@ -1083,18 +1138,56 @@ static void PutEntry(u8 *state, i32 entry)
     PutWord(state + AT_ENTRY_HIGH, (u32)entry >> 16);
 }
 
+/* What a search finds, in its record: DOS's attributes, the time of
+   the host, the size and the name. */
+static void Found(struct DTAs *record, u8 attributes, time_t time, u32 size,
+                  const u8 *name)
+{
+    struct DosStamp stamp = DosStampOfTime(time);
+
+    record->FilAttr = attributes;
+    record->FilTime = stamp.time;
+    record->FilDate = stamp.date;
+    record->FilSize = size;
+    memset(record->FilName, 0, sizeof record->FilName);
+    memcpy(record->FilName, name, strlen((const char *)name));
+}
+
+/* The label of a drive, which a search for a label alone finds in the
+   drive's root and nowhere else, if the template names it, once:
+   emulate_posix.h says where that comes from. Its time is that of the
+   directory of the host that the drive is, as a label's entry has the
+   time that it was written. */
+static struct Answer Label(struct Dos *dos, const struct DosDrive *drive,
+                           const struct Directory *directory, i32 entry)
+{
+    struct DTAs *record = dos->record;
+    u8 *state = record->Reserved;
+    struct stat status;
+
+    if (entry != 0 || strcmp(directory->path, drive->root) != 0
+        || !Matches(state + AT_TEMPLATE, (const u8 *)drive->label)
+        || stat(drive->root, &status) != 0)
+        return Failed(dos, NO_MORE_FILES);
+    Found(record, DOS_LABEL, status.st_mtime, 0, (const u8 *)drive->label);
+    PutEntry(state, 1);
+    return Done(0);
+}
+
 /* The next of a search, from where its record says. */
 static struct Answer Next(struct Dos *dos)
 {
     struct DTAs *record = dos->record;
     u8 *state = record->Reserved;
     const struct Directory *directory;
+    const struct DosDrive *drive;
     const u8 *name;
     const char *host;
     char path[HOST_ROOM];
     struct stat status;
     bool dangling;
     bool root;
+    i32 at;
     i32 number;
     i32 entry;
     i32 dots;
@@ -1104,12 +1197,15 @@ static struct Answer Next(struct Dos *dos)
     number = (i32)(Word(state + AT_DIRECTORY)
                    | Word(state + AT_DIRECTORY + 2) << 16);
     entry = (i32)(Word(state + AT_ENTRY) | Word(state + AT_ENTRY_HIGH) << 16);
-    /* A label is searched for alone by 8, and the drive has none. */
+    at = DriveIndex(&dos->drives, (u8)('A' + state[AT_DRIVE]));
     if (number < 0 || number >= dos->directories.count || entry < 0
-        || searched == DOS_LABEL)
+        || at < 0)
         return Failed(dos, NO_MORE_FILES);
     directory = &dos->directories.directories[number];
-    root = strcmp(directory->path, "/") == 0;
+    drive = &dos->drives.drive[at];
+    if (searched == DOS_LABEL)
+        return Label(dos, drive, directory, entry);
+    root = strcmp(directory->path, drive->root) == 0;
     dots = root ? 0 : 2;
     for (; entry < dots + directory->names.count; entry++) {
         if (entry < dots) {
@@ -1129,20 +1225,11 @@ static struct Answer Next(struct Dos *dos)
         if ((attributes & ~searched
              & (DOS_HIDDEN | DOS_SYSTEM | DOS_DIRECTORY)) != 0)
             continue;
-        record->FilAttr = attributes;
-        {
-            struct DosStamp stamp = DosStampOfTime(status.st_mtime);
-
-            record->FilTime = stamp.time;
-            record->FilDate = stamp.date;
-        }
-        if (dangling || S_ISDIR(status.st_mode))
-            record->FilSize = 0;
-        else
-            record->FilSize = (uint64_t)status.st_size > LARGEST
-                ? LARGEST : (u32)status.st_size;
-        memset(record->FilName, 0, sizeof record->FilName);
-        memcpy(record->FilName, name, strlen((const char *)name));
+        Found(record, attributes, status.st_mtime,
+              dangling || S_ISDIR(status.st_mode) ? 0
+              : (uint64_t)status.st_size > LARGEST ? LARGEST
+              : (u32)status.st_size,
+              name);
         PutEntry(state, entry + 1);
         return Done(0);
     }
@@ -1165,7 +1252,7 @@ struct Answer DosFindFirst(struct Dos *dos, const u8 *pattern,
     u8 *state = dos->record->Reserved;
     u8 *last;
     const u8 *after;
-    struct Answer led = DosPathFull(pattern, dos->current, full);
+    struct Answer led = DosPathFull(pattern, &dos->drives, full);
     struct stat status;
     bool wild = false;
     i32 number;
@@ -1175,7 +1262,7 @@ struct Answer DosFindFirst(struct Dos *dos, const u8 *pattern,
                                                        : led.value);
     last = (u8 *)strrchr((const char *)full, '\\');
     memset(state, 0, sizeof dos->record->Reserved);
-    state[AT_DRIVE] = DRIVE_NUMBER;
+    state[AT_DRIVE] = (u8)(full[0] - 'A');
     after = Part(last + 1, state + AT_TEMPLATE, 8, &wild);
     if (*after == '.')
         Part(after + 1, state + AT_TEMPLATE + 8, 3, &wild);
@@ -1183,7 +1270,8 @@ struct Answer DosFindFirst(struct Dos *dos, const u8 *pattern,
         memset(state + AT_TEMPLATE + 8, ' ', 3);
     state[AT_ATTRIBUTES] = (u8)(attributes & 0xFF);
     last[last == full + 2 ? 1 : 0] = '\0';
-    led = HostPathOfDos(&dos->directories, full, host, HOST_ROOM);
+    led = HostPathOfDos(&dos->directories, &dos->drives, full, host,
+                        HOST_ROOM);
     if (led.failed)
         return Failed(dos, led.value == INVALID_DRIVE ? PATH_NOT_FOUND
                                                        : led.value);
@@ -1230,7 +1318,10 @@ struct Answer DosDirRemove(struct Dos *dos, const u8 *name)
         return led;
     if (led.value == 0 || Wild(full))
         return Failed(dos, PATH_NOT_FOUND);
-    if (strcmp((const char *)full + 3, (const char *)dos->current) == 0)
+    if (strcmp((const char *)full + 3,
+               (const char *)dos->drives.drive[DriveOfPath(dos, full)]
+                   .current)
+        == 0)
         return Failed(dos, full[3] == '\0' ? ACCESS_DENIED : REMOVE_CURRENT);
     if (rmdir(host) != 0)
         return Failed(dos, DosErrorOf(errno, true));
@@ -1254,30 +1345,41 @@ struct Answer DosDirChange(struct Dos *dos, const u8 *name)
     length = strlen((const char *)full + 3);
     if (length >= DOS_CURRENT_ROOM)
         return Failed(dos, PATH_NOT_FOUND);
-    memcpy(dos->current, full + 3, length + 1);
+    /* The current directory of the drive that the path names, which is
+       not made the current drive (RBIL, INT 21h 3Bh). */
+    memcpy(dos->drives.drive[DriveOfPath(dos, full)].current, full + 3,
+           length + 1);
     return Done(AX_DIR_CHANGE);
 }
 
 struct Answer DosDirCurrent(struct Dos *dos, u16 drive, u8 *to)
 {
-    if ((drive & 0xFF) != 0 && (drive & 0xFF) != DRIVE_ONE)
+    i32 at = DriveNumbered(dos, drive);
+    const u8 *current;
+
+    if (at < 0)
         return Failed(dos, INVALID_DRIVE);
-    memcpy(to, dos->current, strlen((const char *)dos->current) + 1);
+    current = dos->drives.drive[at].current;
+    memcpy(to, current, strlen((const char *)current) + 1);
     return Done(AX_DIR_CURRENT);
 }
 
 struct Answer DosStartIn(struct Dos *dos, const char *path)
 {
     u8 full[DOS_PATH_ROOM];
-    struct Answer made = DosPathOfHost(&dos->directories, path, full);
+    struct Answer made = DosPathOfHost(&dos->directories, &dos->drives,
+                                       path, full);
     size_t length;
+    i32 drive;
 
     if (made.failed)
         return Failed(dos, made.value);
     length = strlen((const char *)full + 3);
     if (length >= DOS_CURRENT_ROOM)
         return Failed(dos, PATH_NOT_FOUND);
-    memcpy(dos->current, full + 3, length + 1);
+    drive = DriveOfPath(dos, full);
+    memcpy(dos->drives.drive[drive].current, full + 3, length + 1);
+    dos->drives.current = drive;
     return Done(0);
 }
 
@@ -1285,23 +1387,28 @@ struct Answer DosStartIn(struct Dos *dos, const char *path)
  * Drives.
  */
 
-/* Whether a drive counted from A: as 1, or 0 for the current one, is C:. */
-static bool IsC(u16 drive)
+/* Whether DOS's number of a drive, counted from A: as 1, or 0 for the
+   current one, names a drive that there is. */
+static bool IsDrive(const struct Dos *dos, u16 drive)
 {
-    return (drive & 0xFF) == 0 || (drive & 0xFF) == DRIVE_ONE;
+    return DriveNumbered(dos, drive) >= 0;
 }
 
 u16 DosDriveCurrent(struct Dos *dos)
 {
-    (void)dos;
-    return DRIVE_NUMBER;
+    return (u16)(dos->drives.drive[dos->drives.current].letter - 'A');
 }
 
-/* C: is the current drive, and stays so: there is no other to select. */
+/* INT 21h 0Eh, with the drive counted from A: as 0: a drive that there
+   is becomes the current one, and a letter that is no drive leaves the
+   current one as it was (RBIL). */
 void DosDriveSelect(struct Dos *dos, u16 drive)
 {
-    (void)dos;
-    (void)drive;
+    i32 at = (drive & 0xFF) < 'Z' - 'A' + 1
+        ? DriveIndex(&dos->drives, (u8)('A' + (drive & 0xFF))) : -1;
+
+    if (at >= 0)
+        dos->drives.current = at;
 }
 
 struct Space DosSpaceOf(u32 block, uint64_t blocks, uint64_t free)
@@ -1346,9 +1453,10 @@ struct Space DosDriveSpace(struct Dos *dos, u16 drive, bool flagged)
     space.free = 0;
     space.sector = 0;
     space.total = drive & 0xFF;
-    if (IsC(drive)) {
-        Current(dos, full);
-        led = HostPathOfDos(&dos->directories, full, host, HOST_ROOM);
+    if (IsDrive(dos, drive)) {
+        Current(dos, DriveNumbered(dos, drive), full);
+        led = HostPathOfDos(&dos->directories, &dos->drives, full, host,
+                            HOST_ROOM);
         if (!led.failed && statvfs(host, &system) == 0)
             space = DosSpaceOf((u32)system.f_frsize, system.f_blocks,
                                system.f_bavail);
@@ -1360,24 +1468,24 @@ struct Space DosDriveSpace(struct Dos *dos, u16 drive, bool flagged)
     return space;
 }
 
-/* No drive shares its unit with another: C: answers as FreeDOS answers
+/* No drive shares its unit with another: each answers as FreeDOS answers
    of a drive that shares none, AL 0 with AH as it was handed (harness/
    trial32/asked.py), and a drive that there is not DOS's 0Fh. */
 struct Answer DosDriveLetter(struct Dos *dos, u16 drive)
 {
-    return IsC(drive) ? Done(AX_LETTER) : Failed(dos, INVALID_DRIVE);
+    return IsDrive(dos, drive) ? Done(AX_LETTER) : Failed(dos, INVALID_DRIVE);
 }
 
 struct Answer DosDriveSetLetter(struct Dos *dos, u16 drive)
 {
-    return IsC(drive) ? Done(AX_LETTER) : Failed(dos, INVALID_DRIVE);
+    return IsDrive(dos, drive) ? Done(AX_LETTER) : Failed(dos, INVALID_DRIVE);
 }
 
 struct Device DosDriveRemote(struct Dos *dos, u16 drive)
 {
     struct Device device;
 
-    device.failed = !IsC(drive);
+    device.failed = !IsDrive(dos, drive);
     device.value = device.failed ? INVALID_DRIVE : AX_REMOTE;
     device.kind = device.failed ? 0 : LOCAL_DRIVE;
     if (device.failed)
@@ -1388,7 +1496,7 @@ struct Device DosDriveRemote(struct Dos *dos, u16 drive)
 /* 1 for a disk that cannot be taken out (RBIL, INT 21h 4408h). */
 struct Answer DosDriveFixed(struct Dos *dos, u16 drive)
 {
-    return IsC(drive) ? Done(1) : Failed(dos, INVALID_DRIVE);
+    return IsDrive(dos, drive) ? Done(1) : Failed(dos, INVALID_DRIVE);
 }
 
 bool DosDriveCd(struct Dos *dos, u16 drive)

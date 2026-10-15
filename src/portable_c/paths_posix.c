@@ -75,6 +75,46 @@ bool SetupFile(const char *config_home, const char *home, char *to,
 }
 
 /*
+ * The drives.
+ */
+
+/* Where each is in the table, by its letter: R: is always there. */
+#define HOME 0
+#define ROOT 1
+
+/* One drive, its current directory the root. */
+static void DriveMake(struct DosDrive *drive, u8 letter, const char *label,
+                      const char *root)
+{
+    size_t length = strlen(root);
+
+    assert(length < sizeof drive->root);
+    drive->letter = letter;
+    drive->label = label;
+    memcpy(drive->root, root, length + 1);
+    drive->current[0] = '\0';
+}
+
+void DrivesBegin(struct Drives *drives, const char *home)
+{
+    memset(drives, 0, sizeof *drives);
+    if (home != NULL && strlen(home) < sizeof drives->drive[0].root)
+        DriveMake(&drives->drive[HOME], DOS_HOME_DRIVE, "HOME", home);
+    DriveMake(&drives->drive[ROOT], DOS_ROOT_DRIVE, "ROOT", "/");
+    drives->current = ROOT;
+}
+
+i32 DriveIndex(const struct Drives *drives, u8 letter)
+{
+    i32 i;
+
+    for (i = 0; i < DOS_DRIVES; i++)
+        if (drives->drive[i].letter != 0 && drives->drive[i].letter == letter)
+            return i;
+    return -1;
+}
+
+/*
  * A path of DOS's made a full one.
  */
 
@@ -158,9 +198,11 @@ static i32 PathNames(const u8 *path, u8 *to, i32 at, i32 root)
     return at;
 }
 
-struct Answer DosPathFull(const u8 *path, const u8 *current, u8 *to)
+struct Answer DosPathFull(const u8 *path, const struct Drives *drives,
+                          u8 *to)
 {
-    u8 letter = DOS_DRIVE;
+    u8 letter = drives->drive[drives->current].letter;
+    i32 drive;
     i32 at;
 
     if (path[0] != '\0' && path[1] == ':') {
@@ -172,8 +214,9 @@ struct Answer DosPathFull(const u8 *path, const u8 *current, u8 *to)
     to[0] = letter;
     to[1] = ':';
     at = 2;
-    if (!Separator(path[0]) && letter == DOS_DRIVE && current != NULL) {
-        at = PathNames(current, to, at, 2);
+    drive = DriveIndex(drives, letter);
+    if (!Separator(path[0]) && drive >= 0) {
+        at = PathNames(drives->drive[drive].current, to, at, 2);
         if (at < 0)
             return Fails(PATH_NOT_FOUND);
     }
@@ -288,7 +331,8 @@ static i32 HostJoin(char *to, i32 at, i32 room, const char *name,
 }
 
 struct Answer HostPathOfDos(struct Directories *directories,
-                            const u8 *path, char *to, i32 room)
+                            const struct Drives *drives, const u8 *path,
+                            char *to, i32 room)
 {
     struct DirectoryNames *names;
     u8 name[DOS_NAME_ROOM];
@@ -298,10 +342,13 @@ struct Answer HostPathOfDos(struct Directories *directories,
     i32 length;
     i32 at;
     bool found = true;
+    i32 drive = DriveIndex(drives, path[0]);
+    const char *root;
 
-    if (path[0] != DOS_DRIVE || path[1] != ':' || path[2] != '\\')
+    if (drive < 0 || path[1] != ':' || path[2] != '\\')
         return Fails(INVALID_DRIVE);
-    at = HostJoin(to, 0, room, "/", 1);
+    root = drives->drive[drive].root;
+    at = HostJoin(to, 0, room, root, (i32)strlen(root));
     if (at < 0)
         return Fails(PATH_NOT_FOUND);
     for (path += 3; *path != '\0'; path = *end == '\0' ? end : end + 1) {
@@ -338,10 +385,35 @@ struct Answer HostPathOfDos(struct Directories *directories,
     return Does(found ? 1 : 0);
 }
 
-struct Answer DosPathOfHost(struct Directories *directories,
-                            const char *path, u8 *to)
+/* Where a path of the host goes on behind `root`, both from the host's
+   root, name by name, so that a slash more or less makes no difference:
+   the rest of the path, or NULL where it is neither `root` nor a path
+   under it. */
+static const char *Behind(const char *root, const char *path)
 {
-    char directory[4096];
+    size_t length;
+
+    for (;;) {
+        while (*root == '/')
+            root++;
+        while (*path == '/')
+            path++;
+        if (*root == '\0')
+            return path;
+        length = strcspn(root, "/");
+        if (strncmp(root, path, length) != 0
+            || (path[length] != '\0' && path[length] != '/'))
+            return NULL;
+        root += length;
+        path += length;
+    }
+}
+
+struct Answer DosPathOfHost(struct Directories *directories,
+                            const struct Drives *drives, const char *path,
+                            u8 *to)
+{
+    char directory[HOST_PATH_ROOM];
     i32 at;
     i32 written;
     const char *name;
@@ -350,15 +422,29 @@ struct Answer DosPathOfHost(struct Directories *directories,
     const u8 *dos;
     i32 length;
     char *part;
+    const struct DosDrive *drive;
+    i32 home = DriveIndex(drives, DOS_HOME_DRIVE);
+    const char *rest = NULL;
 
     if (path[0] != '/')
         return Fails(PATH_NOT_FOUND);
-    at = HostJoin(directory, 0, (i32)sizeof directory, "/", 1);
-    to[0] = DOS_DRIVE;
+    if (home >= 0)
+        rest = Behind(drives->drive[home].root, path);
+    if (rest != NULL)
+        drive = &drives->drive[home];
+    else {
+        drive = &drives->drive[ROOT];
+        rest = path;
+    }
+    at = HostJoin(directory, 0, (i32)sizeof directory, drive->root,
+                  (i32)strlen(drive->root));
+    if (at < 0)
+        return Fails(PATH_NOT_FOUND);
+    to[0] = drive->letter;
     to[1] = ':';
     to[2] = '\\';
     written = 3;
-    for (name = path + 1; *name != '\0'; name = end) {
+    for (name = rest; *name != '\0'; name = end) {
         while (*name == '/')
             name++;
         for (end = name; *end != '\0' && *end != '/'; end++)

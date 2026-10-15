@@ -18908,6 +18908,132 @@ that reads a word of bytes, a piece of its own across the 23 files.
   with the command of `posix-unit` (its top says why), and the build of
   `posix-unit` leaves it out, for its `main`.
 
+### L3c, the drives R: and H:: done
+
+What the user decided on 15 October 2026 (`CLAUDE.md`, step 6), in
+place of the one drive C: at the root that L1, L1b, L2 and L3a built:
+two drives, R:, the root of the file system, labelled ROOT, and H:, the
+home directory, labelled HOME; the program starts on H: where it is
+started under the home directory and on R: otherwise; a directory whose
+path does not fit DOS's 67 characters even so starts it in the deepest
+one above it that fits; making a label stays refused. `VC.EXE` is the
+same bytes, `5831c98b...`: nothing of this is compiled into it.
+
+What changed:
+
+- `emulate_posix.h` and `paths_posix.c`: `struct Drives`, the drives
+  with the directory of the host that each is, its label and its
+  current directory, and the current drive, made by `DrivesBegin` and
+  asked by `DriveIndex`. `DosPathFull` takes the drives: a path with no
+  drive is on the current drive, and one that does not begin at the
+  root goes from the current directory of its own drive, as DOSBox's
+  `DOS_MakeName` has it (`H:NAME` with H:'s current directory). Of the
+  host's paths, `HostPathOfDos` goes from the drive's directory, and
+  `DosPathOfHost` gives a path on H: where it is the home directory or
+  under it, name by name (`/home/users` is not under `/home/user`, and a
+  slash more or less is none), and on R: otherwise. `DOS_DRIVE` is gone.
+- `files_posix.c`: `struct Dos` has the drives where it had C:'s current
+  directory. `DosBegin` takes `$HOME` as the environment has it and
+  makes it H:, its links followed (`realpath`). Each service goes by the
+  drive that it is named or the current one: DriveSelect makes a drive
+  that there is the current one and leaves it for a letter that is
+  none (RBIL 0Eh), DriveCurrent answers it, DirChange changes the
+  current directory of the drive that the path names without making it
+  the current drive (RBIL 3Bh), DirCurrent answers each drive's,
+  DirRemove refuses the current directory of the path's drive (10h),
+  FcbParse and FcbDelete take a block's drive, FileDevice answers the
+  drive of a file in its low bits (RBIL 4400h, 7 for H:, 11h for R:),
+  FileRename from one drive to the other is 11h, not the same device,
+  though both are of one file system (the program copies and deletes
+  then, as between any two drives), DriveSpace is of the file system of
+  the drive's current directory, and DriveLetter, DriveSetLetter,
+  DriveRemote and DriveFixed answer for both. The root of H: has no `.`
+  and no `..`, as any drive's root.
+- The labels: a search for a label alone, the attributes 08h, in the
+  root of a drive finds the label, `HOME` or `ROOT`, with the attribute
+  08h, no bytes and the time of the drive's directory on the host, if
+  the template names it, and then 12h; in any other directory, and with
+  any other attributes, no label (fatgen103: the label's entry is in the
+  root; RBIL, INT 21h 4Eh: with 08h DOS 3 and later find the label and
+  nothing else). Where L2 had no label and 12h. Making one is 5, as
+  before.
+- `sys_posix.c`: `DosBegin` with `getenv("HOME")`; `StartIn` as it was,
+  the drive coming from `DosStartIn`, which makes the drive of the
+  host's directory the current one: on H: the climb for a path that is
+  too long stops at the home directory, H:\, at the latest. The
+  directory of the setup file, `~/.config/vc`, is on H:,
+  `H:\CONFIG~1\VC`, by the same rule, and where `$XDG_CONFIG_HOME` is
+  elsewhere, on R:.
+- `harness/posixcheck.c`, each check with its source: the drives and
+  their labels; `DosPathFull` on two drives, with H:'s own current
+  directory; the host's paths both ways on both, and a path that does
+  not fit on R: and does on H:; every service of L2 on R: where it was
+  on C: (the drive numbers and letters with it: the bench's 2 in the
+  low bits of FileDevice is 11h here); and a section of its own,
+  `ServiceHome`, with H: at a directory `home` of the test's tree: the
+  labels, the current directories of two drives, a file made on H:, a
+  rename between the two, FcbDelete on H:, the start under the home
+  directory and elsewhere, and what `DosBegin` makes of a `$HOME` that
+  is not set, empty, `/`, not from the root, a file, nothing, a link
+  and with a slash behind it.
+
+**Where `$HOME` is not to be had: R: alone, as built.** Where `$HOME`
+is not set, is empty, is not a path from the root (a home directory is
+one by POSIX's account of `HOME`, and the XDG Base Directory
+Specification takes no other for its variables), names nothing or no
+directory, or is the root itself, there is no H:, and the program
+starts on R: wherever it is started; Alt-F1 offers R: alone. The root
+as H: would be R: under a second letter, with a second label for the
+same directory. (Set aside: H: at the root then, or the program
+refusing to start.) The setup file follows its own rule as before
+(`SetupFile`): with no `$HOME` and no `$XDG_CONFIG_HOME` the program
+says so on standard error and ends with 1; with `$HOME` a file, the
+directory of the setup file cannot be made and the program ends with 1
+too. Neither is new.
+
+**The first run**, as L3a's, under `posix-asan/vc`, in a temporary
+directory under `/tmp` with `HOME` there, started once in a directory
+under the home directory and once elsewhere, with keys that show the
+drives and the Info panel (Ctrl-F1, Alt-F1 and Esc, Ctrl-L, Alt-F1 and
+R, Tab, Alt-F1 and R, F10 and Enter): both end with 0 and no sanitizer
+finding, and leave `vc.ini` in `$HOME/.config/vc`. What the screens
+show:
+
+- Started under the home directory: the panels' titles and the prompt
+  `H:\HERE`; Alt-F1 "Choose left drive:" with `H   R`, the two letters
+  spaced as the original spaces a list of up to seven; the Info panel
+  "Volume in drive H: is HOME", the room "on drive H:", and `H:\HERE`
+  as the directory; R chosen in Alt-F1, the panel at `R:\` with the
+  host's root listed, no `..`, and the prompt `R:\>` once that panel is
+  the active one.
+- Started elsewhere: `R:\TMP\VCL3C~1.XXX\ELSEWH~1`, and the Info
+  panel "Volume in drive R: is ROOT".
+- With `HOME` not set (and `XDG_CONFIG_HOME` for the setup file):
+  Alt-F1 offers `R` alone.
+- Started nine directories of eight letters deep under the home
+  directory: on `H:\DIRNAME1\...\DIRNAME7`, the deepest that DOS's 63
+  characters of a current directory hold; eight deep under `/tmp`, on
+  `R:\TMP\...\DIRNAME4`.
+
+**What the next piece should know:**
+
+- A run of the program for Linux has its drives by `HOME`: a scenario
+  that is to show H: sets `HOME` to a directory of its own and starts in
+  it or under it; one that starts elsewhere is on R:, with the host's
+  root in the Alt-F1 list and on R:\. The path in a panel's title and on
+  the prompt is masked (`CLAUDE.md`, step 6), and so is, by the same
+  rule, what follows from the drive: the bench has C: and "Volume in
+  drive C: is WORK" where the program for Linux has H: or R:, HOME or
+  ROOT, and the drive menu has its letters elsewhere: those want masks
+  of L3b, or scenarios that do not show them.
+- `struct Dos` is large, with two paths of the host of 4,096 bytes in
+  it: it is a static object in `sys_posix.c` and in the test, and is not
+  for the stack.
+- `CLAUDE.md`, step 6, still says among the decisions of the second
+  piece "there is no volume label, and making one is refused": the first
+  half is what L2 built and the user's word of 15 October 2026 has
+  replaced, labels ROOT and HOME; the second stands.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes

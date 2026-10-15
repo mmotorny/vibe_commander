@@ -41,10 +41,12 @@
  *     critical error, and Ctrl-Break and Ctrl-C are keys of a terminal,
  *     L5. Another program run fails for now: that is L6.
  *
- * Where the program starts is the host's current directory, as the
- * current directory of C:, the one drive; where DOS's path of it is
- * longer than DOS holds, the deepest directory above it whose path is
- * not (StartIn).
+ * The drives are R:, the root of the host's file system, and H:, the
+ * home directory, as $HOME names it, where that is a directory other
+ * than the root (DosBegin of files_posix.c). Where the program starts is
+ * the host's current directory, on H: where that is under the home
+ * directory and on R: otherwise; where DOS's path of it is longer than
+ * DOS holds, the deepest directory above it whose path is not (StartIn).
  */
 #include <errno.h>
 #include <limits.h>
@@ -1332,7 +1334,7 @@ static void ProgramPath(u8 *to)
     MakeDirectories(file);
     if (realpath(file, real) == 0)
         Fail(file);
-    made = DosPathOfHost(&Emulated.directories, real, to);
+    made = DosPathOfHost(&Emulated.directories, &Emulated.drives, real, to);
     if (made.failed) {
         fprintf(stderr, "vc: the directory of the setup file, %s, is not "
                         "one that DOS can name\n", real);
@@ -1396,10 +1398,12 @@ void ProgramEndedGive(void)
  * Where the host starts the program.
  */
 
-/* The host's current directory made C:'s, or where DOS cannot name that,
-   for a path that is longer than DOS holds, the deepest directory above
-   it that DOS can, the root at the least. That is a limit of the paths
-   of DOS's, which a later piece lifts (TODO.md, "L3a"). */
+/* The host's current directory made the current drive's, H: under the
+   home directory and R: elsewhere, or where DOS cannot name that, for a
+   path that is longer than DOS holds, the deepest directory above it
+   that DOS can: the home directory at the least on H:, which is H:\,
+   and the root on R:. DOS's 67 characters of a path stay, on the user's
+   word of 15 October 2026 (CLAUDE.md, step 6). */
 static void StartIn(char *here)
 {
     char *slash;
@@ -1428,7 +1432,7 @@ int main(int count, char **arguments)
     MemoryAll = pages > 0 && page > 0 ? (int64_t)pages * page : BYTES_MOST;
     StartMs = TodayMs();
     clock_gettime(CLOCK_MONOTONIC, &StartedAt);
-    DosBegin(&Emulated);
+    DosBegin(&Emulated, getenv("HOME"));
     if (getcwd(here, sizeof here) == 0)
         Fail("the current directory");
     StartIn(here);

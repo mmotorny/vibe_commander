@@ -22,9 +22,10 @@
  * files_posix.c. The same test tries them on a tree of its own that it
  * makes in a temporary directory.
  *
- * On Linux there is one drive, C:, the root of the host's file system,
- * and one code page, 437, always, and nothing of either is a setting, on
- * the user's word of 14 October 2026 (CLAUDE.md, step 6).
+ * On Linux there are two drives, R:, the root of the host's file system,
+ * and H:, the user's home directory, on the user's word of 15 October
+ * 2026, and one code page, 437, always, on the user's word of 14 October
+ * 2026; nothing of either is a setting (CLAUDE.md, step 6).
  *
  * Host names and paths are `char`, as the host's functions take them,
  * bytes in UTF-8 by custom and not by rule. DOS's names and paths are
@@ -188,15 +189,61 @@ void DosNameMake(const char *host, DosNameTaken *taken, const void *context,
  * Drives and paths.
  *
  * A drive of DOS is a directory of the host, as DOSBox's `mount` has it,
- * and there is one: C:, the root of the host's file system. A path that
- * DOS's 67 characters do not hold is reached through the aliases.
+ * and there are two, on the user's word of 15 October 2026 (CLAUDE.md,
+ * step 6): R:, the root of the host's file system, labelled ROOT, and H:,
+ * the user's home directory, $HOME, labelled HOME. A path of the host
+ * under the home directory is shown on H:, any other on R:. A path that
+ * DOS's 67 characters do not hold is reached through the aliases, and on
+ * H: from the home directory down.
+ *
+ * Where $HOME is not set, is not a path from the root, is no directory
+ * or is the root itself, there is no H:, and R: alone: the home directory
+ * that a drive would be is not there, or is R:.
  */
-#define DOS_DRIVE 'C'                   /* the one drive there is */
+#define DOS_ROOT_DRIVE 'R'              /* the root of the file system */
+#define DOS_HOME_DRIVE 'H'              /* the home directory */
+#define DOS_DRIVES 2
 #define DOS_PATH_ROOM 128               /* a full path, with its zero, as
                                            sys.h's FileTrueName has it */
 #define DOS_PATH_LONGEST 67             /* what the program holds, its
                                            characters, the zero not
                                            counted */
+
+/* The current directory of a drive as DirCurrent answers it, 63
+   characters at the most and the zero: a path that DOS's 64 bytes do not
+   hold is not made the current one. */
+#define DOS_CURRENT_ROOM 64
+
+/* A path of the host, from its root, with its zero. */
+#define HOST_PATH_ROOM 4096
+
+/* The drives, and which is the current one: as DOS keeps a current
+   directory for each drive, and one current drive. */
+struct DosDrive {
+    u8 letter;                          /* in capitals, 0 where the drive is
+                                           not there */
+    const char *label;                  /* its label, of DOS's form */
+    char root[HOST_PATH_ROOM];          /* the directory of the host that it
+                                           is, from the host's root */
+    u8 current[DOS_CURRENT_ROOM];       /* its current directory, without
+                                           the drive and the first
+                                           backslash */
+};
+struct Drives {
+    struct DosDrive drive[DOS_DRIVES];  /* H: and R:, by their letters */
+    i32 current;                        /* the current one, its index */
+};
+
+/* The drives that there are: R:, the root, and H: where `home` is not
+   NULL, the home directory of the host as a path from its root that is
+   no link, a directory and not the root, which the caller has made sure
+   of. R: is the current drive, and the root of each its current
+   directory. */
+void DrivesBegin(struct Drives *drives, const char *home);
+
+/* The index of the drive of a letter, in capitals, or -1 where there is
+   no such drive. */
+i32 DriveIndex(const struct Drives *drives, u8 letter);
 
 /* Where the program's setup file is, the original's VC.INI: vc/vc.ini in
    $XDG_CONFIG_HOME, where that is set and is a path from the root, and
@@ -213,15 +260,15 @@ bool SetupFile(const char *config_home, const char *home, char *to,
    does with it, to `to`, which has room for DOS_PATH_ROOM bytes: with its
    drive and from the root of the drive, / taken for \, . and .. worked
    out, and each name in capitals and cut to 8.3, as DOSBox's DOS_MakeName
-   does. The current drive is C:, the one that there is, and `current` is
-   its current directory, as DirCurrent of sys.h has it, without the drive
-   and the first backslash, or NULL for the root; a path that names
-   another drive goes from that drive's root, and HostPathOfDos says that
-   there is no such drive. Answers whether it failed, with DOS's error 3
-   where a name has a character that a name may not have or a second dot,
-   0Fh for a drive that is no letter, and 3 where the full path is too
-   long. */
-struct Answer DosPathFull(const u8 *path, const u8 *current, u8 *to);
+   does. A path without a drive is on the current drive of `drives`, and
+   one that does not begin at the root goes from the current directory of
+   its drive; a path that names a drive that there is not goes from that
+   drive's root, and HostPathOfDos says that there is no such drive.
+   Answers whether it failed, with DOS's error 3 where a name has a
+   character that a name may not have or a second dot, 0Fh for a drive
+   that is no letter, and 3 where the full path is too long. */
+struct Answer DosPathFull(const u8 *path, const struct Drives *drives,
+                          u8 *to);
 
 /* Every directory of the host that the program has named, with its
    names; and how a directory of the host is read, which is handed in:
@@ -255,27 +302,33 @@ i32 DirectoryNumber(struct Directories *directories, const char *path,
                     bool again);
 
 /* The path of the host that a full path of DOS's leads to, at `to`,
-   which has room for `room` bytes: the root, which is C:, and for each
-   name the name of the host that it leads to in the directory before it;
-   a name that the host has not, the last only, is the name that the
-   program makes there, in UTF-8 and in small letters, as the user
-   decided on 14 October 2026 (CLAUDE.md, step 6). Answers whether it
-   failed, with DOS's error 0Fh for a drive other than C:, 3 for a
-   directory on the way that the host has not or cannot be read and
-   where the room is not enough, and 8 where the memory ran out; else
-   `value` is 1 where the last name was found and 0 where it was not. */
+   which has room for `room` bytes: the directory of the host that the
+   drive is, and for each name the name of the host that it leads to in
+   the directory before it; a name that the host has not, the last only,
+   is the name that the program makes there, in UTF-8 and in small
+   letters, as the user decided on 14 October 2026 (CLAUDE.md, step 6).
+   Answers whether it failed, with DOS's error 0Fh for a drive that there
+   is not, 3 for a directory on the way that the host has not or cannot
+   be read and where the room is not enough, and 8 where the memory ran
+   out; else `value` is 1 where the last name was found and 0 where it
+   was not. */
 struct Answer HostPathOfDos(struct Directories *directories,
-                            const u8 *path, char *to, i32 room);
+                            const struct Drives *drives, const u8 *path,
+                            char *to, i32 room);
 
 /* The full path of DOS's that a path of the host, from its root, is
-   shown as, at `to`, which has room for DOS_PATH_ROOM bytes: on C:, and
-   each name the name of DOS's form that it has in the directory before
-   it. Answers whether it failed: DOS's error 3 where the path is not from
-   the root or has . or .. in it, a directory on the way cannot be read, a
-   name is not there, or the path is longer than DOS_PATH_LONGEST
-   characters; 8 where the memory ran out. */
+   shown as, at `to`, which has room for DOS_PATH_ROOM bytes: on H: where
+   the path is the home directory or one under it, name by name, and on
+   R: otherwise, as the user decided on 15 October 2026 (CLAUDE.md, step
+   6); each name behind the drive's directory the name of DOS's form that
+   it has in the directory before it. Answers whether it failed: DOS's
+   error 3 where the path is not from the root or has . or .. in it, a
+   directory on the way cannot be read, a name is not there, or the path
+   is longer than DOS_PATH_LONGEST characters; 8 where the memory ran
+   out. */
 struct Answer DosPathOfHost(struct Directories *directories,
-                            const char *path, u8 *to);
+                            const struct Drives *drives, const char *path,
+                            u8 *to);
 
 /*
  * Dates and times.
@@ -370,7 +423,8 @@ struct DosHandle {
                                            DOS's own */
     u16 access;                         /* 0 to read, 1 to write, 2 both */
     u16 kind;                           /* of a device, what FileDevice
-                                           answers */
+                                           answers; of a file, its drive,
+                                           from A: as 0 */
     bool open;
     bool written;                       /* since it was opened */
     bool stamped;                       /* a time was set for it: it is
@@ -379,15 +433,9 @@ struct DosHandle {
     struct DosStamp stamp;
 };
 
-/* The current directory of C: as DirCurrent answers it, 63 characters at
-   the most and the zero: a path that DOS's 64 bytes do not hold is not
-   made the current one. */
-#define DOS_CURRENT_ROOM 64
-
 struct Dos {
     struct Directories directories;
-    u8 current[DOS_CURRENT_ROOM];       /* without the drive and the first
-                                           backslash */
+    struct Drives drives;
     struct DosHandle handles[DOS_HANDLES];
     struct DTAs *record;                /* of FindRecord, or `own` */
     struct DTAs own;                    /* the record before FindRecord
@@ -398,16 +446,22 @@ struct Dos {
                                            program that asks for it */
 };
 
-/* The state that the emulation begins with: C: the current drive, its
-   root the current directory, DOS's five handles open, no record. And
-   what it holds given back, every handle that is still open closed. */
-void DosBegin(struct Dos *dos);
+/* The state that the emulation begins with: the drives, R: the current
+   one and the root of each its current directory, DOS's five handles
+   open, no record. `home` is $HOME as the environment has it, or NULL:
+   H: is the directory that it names, with its links followed, where it
+   is a path from the root and names a directory that is not the root;
+   else there is no H:. And what it holds given back, every handle that
+   is still open closed. */
+void DosBegin(struct Dos *dos, const char *home);
 void DosEnd(struct Dos *dos);
 
 /* The directory of the host that the program is started in, from its
-   root, made the current directory of C:, as the program's path of it
-   is (DosPathOfHost). Answers DOS's error 3 where that path is longer
-   than DOS holds, and the current directory is not changed then. */
+   root, made the current drive and its current directory, as the
+   program's path of it is (DosPathOfHost): H: and a directory of it
+   where the path is under the home directory, R: otherwise. Answers DOS's
+   error 3 where that path is longer than DOS holds, and nothing is
+   changed then. */
 struct Answer DosStartIn(struct Dos *dos, const char *path);
 
 /* Files. */
@@ -446,11 +500,20 @@ struct Answer DosDirRemove(struct Dos *dos, const u8 *name);
 struct Answer DosDirChange(struct Dos *dos, const u8 *name);
 struct Answer DosDirCurrent(struct Dos *dos, u16 drive, u8 *to);
 
-/* Drives. C: is the one there is; it is fixed, of no network and no
-   CD-ROM, and shares its unit with no other letter.
+/* Drives. H: and R:, or R: alone (DosBegin); each is fixed, of no
+   network and no CD-ROM, and shares its unit with no other letter. A
+   drive is selected as DOS selects one, and a letter that is no drive is
+   not: the current drive stays what it was then.
 
-   How much room it has is that of the host's file system of its current
-   directory, by statvfs: what is free to the program, in DOS's shape,
+   The label of a drive, ROOT or HOME, is found by a search for a label
+   alone, with the attributes 08h, in the root of the drive, as DOS has
+   a label in the root alone (fatgen103, the volume label's entry; RBIL,
+   INT 21h 4Eh: with 08h DOS 3 and later find the label and nothing
+   else); a search with other attributes finds no label. Making a label
+   is refused, DOS's 5, as the user decided (TODO.md, L2).
+
+   How much room a drive has is that of the host's file system of its
+   current directory, by statvfs: what is free to the program, in DOS's shape,
    which has no more than 16 bits for a count, as DOS answers INT 21h 36h.
    A sector is 512 bytes; a cluster is as many sectors as the host's
    block has, a power of two, and twice as many for as long as the
