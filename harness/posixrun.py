@@ -403,6 +403,15 @@ def run(scenario, program, setup=..., limit=60):
                  "D": {"VC": fat.Entry("VC", fat.DIRECTORY,
                                        *_dos_stamp(setups.EPOCH), 0, ""),
                        **read_tree(bench / "vc", "VC\\", laid)}}
+        # The directories of the bench that the run removed: a directory
+        # is emptied before it is removed, and the host moves its time for
+        # that, which a screen may show in between. One that the run made
+        # and removed is not seen.
+        removed = {"C:\\" + "\\".join(part.upper() for part in
+                                       path.relative_to(bench / "home").parts)
+                   for path in laid
+                   if path.is_relative_to(bench / "home") and
+                   not path.exists() and laid[path][2] is None}
         root_written = int((bench / "home").stat().st_mtime) \
             != laid[bench / "home"][0]
         # The setup file that the program for Linux started from stands
@@ -438,6 +447,7 @@ def run(scenario, program, setup=..., limit=60):
                    if entry.time == WRITTEN_INTO}
     if root_written:
         ran.written.add("C:\\")
+    ran.written |= removed
     # What the program said on standard error, for whoever looks.
     ran.said = said
     ran.saved = saved

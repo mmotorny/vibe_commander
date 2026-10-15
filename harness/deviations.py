@@ -1263,6 +1263,10 @@ LINUX_MASKS = (
     # home directory, in a title, on the prompt, in a dialog's line and
     # in the Info panel.
     (re.compile(r"(?<![A-Za-z0-9])([Cc]):(?=\\|[ >]|$)"), None, None),
+    # And in front of a name, where a step has typed a path of the
+    # drive's current directory, "c:hello.txt", or has typed into one
+    # behind the colon.
+    (re.compile(r"(?<![A-Za-z0-9])([Cc]):(?=[A-Za-z0-9_.])"), None, None),
     # And on a prompt of the drive alone, $N$G, "C>".
     (re.compile(r"^(C)>"), None, None),
     # And where the rest of the prompt is written over, as a panel's
@@ -1273,6 +1277,10 @@ LINUX_MASKS = (
     # Its label: the bench's C: is WORK, and H: is HOME; behind the
     # drive's letter also where a box covers "Volume in drive".
     (re.compile(r": is (WORK)\b"), None, None),
+    # And in the box of Ctrl+F4, in its question and its line, which is
+    # as wide as the question.
+    (re.compile(r'Change volume label "(WORK)" to'), None, None),
+    (re.compile(r"║ (WORK) {26}║"), None, re.compile(r"╚═{31}╝")),
     # And where no more of the line shows than its end, in the Info
     # panel, where it is centred: the label six cells from the frame.
     (re.compile(r"(WORK)(?= {6}║)"), None, None),
@@ -1375,8 +1383,35 @@ LINUX_CUT = {
     "editor-keys": (33, "the editor's keys"),
 }
 
-ON_LINUX = Declared(not_run=LINUX_NOT_RUN, rules=LINUX_MASKS,
-                    cut=LINUX_CUT)
+# What the program for Linux is expected to show otherwise than the
+# original where no mask can do, by what the user has decided of Linux:
+# the hidden and the system attribute are taken when they are set and
+# not kept (CLAUDE.md, step 6), so the mark of a hidden file between
+# its name and its extension in a panel, ░, is none, and that of a
+# hidden file that is selected, █, the mark of a selected one, ▐. The
+# name is eight cells from the frame, the extension three; a text is
+# written as the bytes of the code page, ▐ DEh.
+LINUX_RULES = (
+    (re.compile(r"(?<=[║│][^║│]{8})(░)(?=[^║│]{3}[║│])"), " ", None),
+    (re.compile(r"(?<=[║│][^║│]{8})(█)(?=[^║│]{3}[║│])"), "\xDE", None),
+)
+
+# The steps that the program for Linux is taken through in place of
+# others: a drive of the bench's that Linux has under another letter,
+# typed (the design of L3b, which the user decided on 15 October 2026).
+_ON_H = "the bench's C: is H: on Linux, the home directory"
+LINUX_IN_PLACE_IN = {
+    "names": {
+        ('Space Space "c:hello.txt" Space',):
+            (('Space Space "h:hello.txt" Space',), _ON_H),
+        ('"c:\\work\\..\\work\\..\\work\\..\\work\\readme.txt"',):
+            (('"h:\\work\\..\\work\\..\\work\\..\\work\\readme.txt"',),
+             _ON_H),
+    },
+}
+
+ON_LINUX = Declared(not_run=LINUX_NOT_RUN, rules=LINUX_MASKS + LINUX_RULES,
+                    cut=LINUX_CUT, in_place_in=LINUX_IN_PLACE_IN)
 
 TREES["posix"] = _on_top(TREES["portable_c"], ON_LINUX)
 
