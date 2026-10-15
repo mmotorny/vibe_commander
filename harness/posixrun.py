@@ -419,6 +419,12 @@ def run(scenario, program, setup=..., limit=60):
                 sha256=hashlib.sha256(bench_file).hexdigest())
         saved = bench / "vc" / setups.SETUP_FILE.lower()
         saved = saved.read_bytes() if saved.exists() else None
+        if left is not None and saved is not None and \
+                left.sha256 != hashlib.sha256(setup).hexdigest():
+            # A setup file that the run has saved is held by the sum of
+            # what the bench's would be: its drives made the bench's.
+            disks["D"][ini] = dataclasses.replace(
+                left, sha256=hashlib.sha256(on_the_bench(saved)).hexdigest())
         # Where the bench has the program under test, which the goldens
         # say no more of.
         disks["D"]["VC\\" + program.filename] = fat.Entry(
@@ -436,6 +442,30 @@ def run(scenario, program, setup=..., limit=60):
     ran.said = said
     ran.saved = saved
     return ran
+
+
+# Where the setup file has the paths of the two panels, 88 bytes each
+# from the panel's place in it, the bench's C:\WORK and C:\; and where it
+# has its sum, a word of its bytes before it.
+SETUP_PATHS = (0x17, 0x6F)
+SETUP_SUM = 0x1FD
+
+
+def on_the_bench(saved):
+    """The setup file `saved` of the program for Linux as the bench's
+    would be (CLAUDE.md, step 6: the design's rule, made backwards): a
+    panel's path on H:, the home directory, which is the bench's C:, made
+    one on C:, and the sum made again. A path of another drive, R:, is
+    left as it is, and the file does not hold."""
+    out = bytearray(saved)
+    if len(out) < SETUP_SUM + 2:
+        return saved
+    for at in SETUP_PATHS:
+        if out[at:at + 3] == b"H:\\":
+            out[at] = ord("C")
+    total = sum(out[:SETUP_SUM]) & 0xFFFF
+    out[SETUP_SUM:SETUP_SUM + 2] = total.to_bytes(2, "little")
+    return bytes(out)
 
 
 # The bench's setup file, the one that the original saves once its
