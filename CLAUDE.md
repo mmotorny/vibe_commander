@@ -232,7 +232,18 @@ These held while `src/c/` was made, and they say what it is.
      run has written into; and while a test drives the program for
      Linux its clock starts at the bench's time and goes on only by the
      steps' waits, as the machine's clock does on the bench, a user
-     always having the real one): told so by a variable of the environment, it
+     always having the real one; and, the same day: a scenario
+     that went to the original's directory, `D:\VC`, or to the
+     diskette in A: only for files to work on works in a directory of
+     the bench's laid out alike on every platform instead, its golden
+     derived again from the original, and only one about the program's
+     own files has their place masked; the Linux program reads the
+     bench's setup file of the original as it is, and goes where the
+     original goes when a directory that it names is not there; a
+     scenario that rests on what only DOS has is not run on Linux,
+     with its reason, as a tree's scenarios are declared not run; and
+     the tests run the build with the sanitizers that go together, the
+     sanitizer of memory a build and a run of its own): told so by a variable of the environment, it
      writes its grid of cells whenever it waits for a key, a harness
      drives it in a pseudo-terminal with the scenarios' keys, and what
      it draws in the terminal is held to that grid by replaying it
