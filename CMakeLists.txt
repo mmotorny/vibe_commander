@@ -613,6 +613,52 @@ if(clang)
                 -fsanitize-memory-track-origins -fno-sanitize-recover=all)
 endif()
 
+# What the program for Linux emulates of DOS without input or output of
+# its own, the files src/portable_c/*_posix.c of the piece L1 of step 6
+# (TODO.md, "L1, drives, names, code page, dates, errors"), and its test,
+# harness/posixcheck.c, built together as build/portable_c/posix-unit/
+# check: with the warnings above, the sanitizers of addresses, of
+# undefined behaviour, of integers and of implicit conversions, each
+# fatal, and -D_XOPEN_SOURCE=700, which gives the files of Linux the
+# functions of POSIX and X/Open beside C's (a #define in a file is a name
+# that C reserves, which clang-tidy names). Its compiled.txt is what the
+# test portable_c-stub reads these files with.
+if(clang)
+    set(unit_dir ${CMAKE_BINARY_DIR}/portable_c/posix-unit)
+    set(unit_source ${CMAKE_SOURCE_DIR}/src/portable_c)
+    file(GLOB unit_files CONFIGURE_DEPENDS ${unit_source}/*_posix.c)
+    list(APPEND unit_files ${CMAKE_SOURCE_DIR}/harness/posixcheck.c)
+    set(unit_compile ${clang} ${clang_warnings} -fno-strict-aliasing
+        -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer
+        -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
+        -fno-sanitize-recover=all -I${unit_source})
+    file(MAKE_DIRECTORY ${unit_dir})
+    file(GENERATE OUTPUT ${unit_dir}/compiled.txt
+         CONTENT "${unit_compile}\n")
+    set(unit_objects "")
+    foreach(source ${unit_files})
+        get_filename_component(name ${source} NAME_WE)
+        add_custom_command(
+            OUTPUT ${unit_dir}/${name}.o
+            COMMAND ${unit_compile} -c -o ${unit_dir}/${name}.o ${source}
+            DEPENDS ${source} ${unit_source}/emulate_posix.h
+                    ${unit_source}/vc.h ${unit_source}/tables.h
+                    ${unit_source}/sys.h ${unit_source}/compiler.h
+                    ${unit_dir}/compiled.txt
+            COMMENT "Compiling ${name}.c (portable_c-posix-unit)"
+            VERBATIM)
+        list(APPEND unit_objects ${unit_dir}/${name}.o)
+    endforeach()
+    add_custom_command(
+        OUTPUT ${unit_dir}/check
+        COMMAND ${unit_compile} -o ${unit_dir}/check ${unit_objects}
+        DEPENDS ${unit_objects}
+        COMMENT "Linking the test of the emulation of DOS for Linux"
+        VERBATIM)
+    add_custom_target(portable_c-posix-unit-check ALL
+        DEPENDS ${unit_dir}/check)
+endif()
+
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS
 # in QEMU (see harness/) and also need qemu-system-i386 and mtools. The
@@ -727,8 +773,10 @@ set_tests_properties(portable_c-cut PROPERTIES SKIP_RETURN_CODE 77)
 # that the build compiles it with, and to clang-tidy, by .clang-tidy at
 # the top of the checkout, with clang-tidy 23: every place that it names
 # fails the test, but those that a piece of their own is to mend, which
-# the test lists. See harness/stubcheck.py. It runs no machine, and is
-# skipped where there is no clang.
+# the test lists. The files of Linux, *_posix.c, and their test,
+# harness/posixcheck.c, are held so too, with the command of the build of
+# that test. See harness/stubcheck.py. It runs no machine, and is skipped
+# where there is no clang.
 if(clang_tidy)
     set(stub_tidy ${clang_tidy})
 else()
@@ -737,8 +785,23 @@ endif()
 add_test(NAME portable_c-stub
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/stubcheck.py
             --compiled ${CMAKE_BINARY_DIR}/portable_c/stub/compiled.txt
+            --posix-compiled
+            ${CMAKE_BINARY_DIR}/portable_c/posix-unit/compiled.txt
             --clang-tidy ${stub_tidy})
 set_tests_properties(portable_c-stub PROPERTIES SKIP_RETURN_CODE 77)
+# What the program for Linux emulates of DOS without input or output, the
+# piece L1 of step 6, held by harness/posixcheck.c, built above with the
+# sanitizers: it prints every check that fails. It runs no machine, and is
+# skipped where there is no clang.
+if(clang)
+    add_test(NAME portable_c-posix-unit
+        COMMAND ${CMAKE_BINARY_DIR}/portable_c/posix-unit/check)
+else()
+    add_test(NAME portable_c-posix-unit
+        COMMAND Python3::Interpreter -c
+                "print('No clang: the test of the emulation of DOS for Linux is skipped.'); raise SystemExit(77)")
+endif()
+set_tests_properties(portable_c-posix-unit PROPERTIES SKIP_RETURN_CODE 77)
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see

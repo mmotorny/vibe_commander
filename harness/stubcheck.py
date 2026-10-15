@@ -19,6 +19,12 @@ build is not looked at, and runs clang-tidy, which the build does not:
      user decided, each check that is turned off with its reason there.
      Every place that it names fails the test, but those of EXPECTED.
 
+The files of Linux, `*_posix.c`, are held so too, and with them their
+test, `harness/posixcheck.c`, by the command of the build of that test,
+`compiled.txt` of `build/portable_c/posix-unit` (CMakeLists.txt, the
+piece L1 of step 6), which `--posix-compiled` names: the common code is
+not among them until the program for Linux is built of it.
+
 EXPECTED is the analyser's places where the program reads its main data
 as one block across its fields, as the original does: a read in front of
 a field or behind it, `clang-analyzer-security.ArrayBound`, and a
@@ -86,6 +92,13 @@ def files():
                   if not re.search(r"_(dos|posix)\.c$", path.name))
 
 
+def posix_files():
+    """The files of Linux and their test, as the build of
+    portable_c-posix-unit in CMakeLists.txt takes them."""
+    return sorted(SOURCE.glob("*_posix.c")) + [ROOT / "harness" /
+                                                "posixcheck.c"]
+
+
 def compiled(path):
     """The command that the build compiles the stub's files with: the
     compiler, then its options."""
@@ -134,6 +147,9 @@ def main():
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("--compiled", type=pathlib.Path, required=True,
                         help="compiled.txt of the stub's build")
+    parser.add_argument("--posix-compiled", type=pathlib.Path,
+                        help="compiled.txt of the build of the test of the "
+                             "files of Linux")
     parser.add_argument("--clang-tidy", default="clang-tidy",
                         help="the clang-tidy to run")
     parser.add_argument("--jobs", type=int,
@@ -158,10 +174,24 @@ def main():
         sys.exit(1)
 
     passed = True
-    sources = files()
+    # Each file with the options of the build that takes it.
+    sources = [(path, options) for path in files()]
+    if args.posix_compiled is not None:
+        if not args.posix_compiled.exists():
+            print(f"{args.posix_compiled} is not there, where the stub's "
+                  "build is: the build of the test of the files of Linux "
+                  "is missing.")
+            sys.exit(1)
+        posix_compiler, posix_options = compiled(args.posix_compiled)
+        if posix_compiler != compiler:
+            print(f"{args.posix_compiled} has another compiler than the "
+                  f"stub's, {posix_compiler}.")
+            sys.exit(1)
+        sources += [(path, posix_options) for path in posix_files()]
     with concurrent.futures.ThreadPoolExecutor(args.jobs) as pool:
         for path, code, said in pool.map(
-                lambda path: compile_again(compiler, options, path), sources):
+                lambda source: compile_again(compiler, source[1], source[0]),
+                sources):
             if code != 0 or said.strip():
                 passed = False
                 print(f"clang on {path.name}, with the build's options:")
@@ -170,7 +200,8 @@ def main():
 
         named = set()
         for path, code, said in pool.map(
-                lambda path: tidy(clang_tidy, options, path), sources):
+                lambda source: tidy(clang_tidy, source[1], source[0]),
+                sources):
             listed = list(places(said))
             named.update(listed)
             if code != 0 and not listed:

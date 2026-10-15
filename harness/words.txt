@@ -5,70 +5,75 @@ to have each at nothing. Not to be edited: the test portable_c-words
 holds the tree to it, and `python3 harness/words.py --record` writes it
 anew.
 
-bars.c        none
-bars_t.c      none
-blank.c       none
-box.c         none
-cmdline.c     TRELIST 1, TREE_OFFSET 2, ENTRY 4, DSKBUF 3
-commands.c    ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
-commands_t.c  MD_AT 45, WCB_AT 3, NUMBER 17
-compiler.h    none
-copy.c        MD_BYTES 2, TRELIST 1, ENTRY 4, MD_AT 4
-copy_t.c      MD_AT 22, NUMBER 4
-dialog.c      NUMBER_OF 9
-digits.c      none
-dirfunc.c     ENTRY 7, DSKBUF 2, MD_AT 1
-dirfunc_t.c   MD_AT 75, NUMBER 9
-drive.c       DSKBUF 2
-edit.c        MD_BYTES 2, MD_AT 1
-edit_t.c      MD_AT 15, NUMBER 1
-enter.c       ENTRY 10, DSKBUF 10, MAIN_AS_PANEL 1
-exec.c        MD_PLACE 1, MD_AT 1
-extfile.c     none
-files.c       ENTRY 7, DSKBUF 7
-find.c        MD_BYTES 1, DSKBUF 3, MD_AT 1
-find_t.c      MD_AT 2, NUMBER 2
-format.c      none
-help.c        none
-help_t.c      MD_AT 2
-info.c        ENTRY 1, DSKBUF 1
-input.c       none
-keys.c        MD_PLACE 2, TREE_OFFSET 2, ENTRY 6, DSKBUF 3, MAIN_AS_PANEL 1
-keys_t.c      MD_AT 10, NUMBER 1
-line.c        none
-main.c        TRELIST 3, DSKBUF 4, MAIN_AS_PANEL 1
-main_t.c      MD_AT 8
-mask.c        none
-menu.c        MD_BYTES 1, MD_AT 1
-misc.c        none
-mouse.c       none
-panel.c       TRELIST 1, ENTRY 4, DSKBUF 1
-place.c       TRELIST 2, TREE_OFFSET 2, TREE_ENTRY 2, DSKBUF 2
-read.c        MD_BYTES 1, ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1, MD_AT 1
-screen.c      none
-setup.c       none
-stack_dos.c   none
-start.c       DSKBUF 3
-stcolor.c     none
-stcolor_t.c   MD_AT 2
-sthelp.c      none
-sthelp_t.c    MD_AT 2
-stmain.c      none
-stmain_t.c    MD_AT 8
-stopts.c      none
-stopts_t.c    MD_AT 62, NUMBER 28
-string.c      none
-sys.h         none
-sys_dos.c     none
-sys_stub.c    none
-system.c      none
-system_t.c    MD_AT 3
-tables.h      none
-tree.c        TRELIST 8
-treebox.c     MD_POINTER 1, TRELIST 7, TREE_OFFSET 11, TREE_ENTRY 3, NUMBER 2
-treebox_t.c   MD_AT 3
-usermenu.c    ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
-vc.h          MD_BYTES 1, TRELIST 2, MD_AT 1
-view.c        ENTRY 1
-view_t.c      MD_AT 21, NUMBER 2
-window.c      none
+bars.c            none
+bars_t.c          none
+blank.c           none
+box.c             none
+cmdline.c         TRELIST 1, TREE_OFFSET 2, ENTRY 4, DSKBUF 3
+codepage_posix.c  none
+commands.c        ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
+commands_t.c      MD_AT 45, WCB_AT 3, NUMBER 17
+compiler.h        none
+copy.c            MD_BYTES 2, TRELIST 1, ENTRY 4, MD_AT 4
+copy_t.c          MD_AT 22, NUMBER 4
+dialog.c          NUMBER_OF 9
+digits.c          none
+dirfunc.c         ENTRY 7, DSKBUF 2, MD_AT 1
+dirfunc_t.c       MD_AT 75, NUMBER 9
+drive.c           DSKBUF 2
+edit.c            MD_BYTES 2, MD_AT 1
+edit_t.c          MD_AT 15, NUMBER 1
+emulate_posix.h   none
+enter.c           ENTRY 10, DSKBUF 10, MAIN_AS_PANEL 1
+exec.c            MD_PLACE 1, MD_AT 1
+extfile.c         none
+files.c           ENTRY 7, DSKBUF 7
+find.c            MD_BYTES 1, DSKBUF 3, MD_AT 1
+find_t.c          MD_AT 2, NUMBER 2
+format.c          none
+help.c            none
+help_t.c          MD_AT 2
+info.c            ENTRY 1, DSKBUF 1
+input.c           none
+keys.c            MD_PLACE 2, TREE_OFFSET 2, ENTRY 6, DSKBUF 3, MAIN_AS_PANEL 1
+keys_t.c          MD_AT 10, NUMBER 1
+line.c            none
+main.c            TRELIST 3, DSKBUF 4, MAIN_AS_PANEL 1
+main_t.c          MD_AT 8
+mask.c            none
+menu.c            MD_BYTES 1, MD_AT 1
+misc.c            none
+mouse.c           none
+names_posix.c     none
+panel.c           TRELIST 1, ENTRY 4, DSKBUF 1
+paths_posix.c     none
+place.c           TRELIST 2, TREE_OFFSET 2, TREE_ENTRY 2, DSKBUF 2
+read.c            MD_BYTES 1, ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1, MD_AT 1
+screen.c          none
+setup.c           none
+stack_dos.c       none
+start.c           DSKBUF 3
+stcolor.c         none
+stcolor_t.c       MD_AT 2
+sthelp.c          none
+sthelp_t.c        MD_AT 2
+stmain.c          none
+stmain_t.c        MD_AT 8
+stopts.c          none
+stopts_t.c        MD_AT 62, NUMBER 28
+string.c          none
+sys.h             none
+sys_dos.c         none
+sys_stub.c        none
+system.c          none
+system_t.c        MD_AT 3
+tables.h          none
+time_posix.c      none
+tree.c            TRELIST 8
+treebox.c         MD_POINTER 1, TRELIST 7, TREE_OFFSET 11, TREE_ENTRY 3, NUMBER 2
+treebox_t.c       MD_AT 3
+usermenu.c        ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
+vc.h              MD_BYTES 1, TRELIST 2, MD_AT 1
+view.c            ENTRY 1
+view_t.c          MD_AT 21, NUMBER 2
+window.c          none
