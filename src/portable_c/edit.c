@@ -1239,7 +1239,7 @@ static void T14_11(void)
     cursor = end.at & 0x0F;
     if (!end.none && cursor == 0) {
         cursor = 0x0F;
-        ed.EdHxCur++;
+        ed.EdHxCur = true;              /* INC of the 0 just above */
     }
     EdCursr = cursor;
 }
@@ -1321,7 +1321,7 @@ static void T06_00(void)
     if (T63_01(place) != 0)
         return;
     if (ed.EdHexAs == 0 && ed.EdHxCur == 0) {
-        ed.EdHxCur++;
+        ed.EdHxCur = true;              /* INC of the 0 just tested */
         return;
     }
     ed.EdHxCur = 0;                     /* T06_01 */
