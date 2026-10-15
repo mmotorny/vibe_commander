@@ -825,3 +825,17 @@ foreach(tree portable_c portable_c-debug)
                 --stub ${open_watcom_SOURCE_DIR}/binw/dos32a.exe
                 ${c_dir}/VC.EXE ${c_dir}/VC.MAP)
 endforeach()
+# What each test judges, as a label, so that a run can pick by it: `ctest
+# -L portable_c` for a change to the portable C alone, which cannot
+# change what the frozen trees are judged by ("Work by several agents"
+# in CLAUDE.md); `-LE machine` for the tests that start no machine.
+set_tests_properties(asm-bytes c-data c-arith
+    PROPERTIES LABELS frozen)
+set_tests_properties(portable_c-data portable_c-host portable_c-int16
+    portable_c-words portable_c-width portable_c-cut portable_c-stub
+    portable_c-posix-unit
+    portable_c-layout portable_c-debug-layout
+    PROPERTIES LABELS portable_c)
+set_tests_properties(portable_c-scenarios PROPERTIES LABELS "portable_c;machine")
+set_tests_properties(c-scenarios PROPERTIES LABELS "frozen;machine")
+set_tests_properties(harness-le PROPERTIES LABELS harness)
