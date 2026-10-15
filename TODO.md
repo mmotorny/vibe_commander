@@ -17266,7 +17266,13 @@ and `MD_AT` in the code.
 
 The analyser names what its paths reach and no more: a read across
 fields that goes through a function it cannot see into, as `ReadDsk`
-was, is not named, and is found by reading.
+was, is not named, and is found by reading. And the two checks run
+alone do not name all that `portable_c-stub` names with `.clang-tidy`:
+`RdTr18` of `treebox.c`, which steps from `DirRecu` of the root to the
+end of `TreeBuf`, an entry at a time, was named by the test alone after
+the rebase onto 5b's second half, and is the root's bytes at
+`offsetof` now. Hold a mend to the test, not to a run of the checks by
+hand. EXPECTED of `harness/stubcheck.py` is empty since.
 
 ## The compiler's lost cut: what Open Watcom does, and where
 

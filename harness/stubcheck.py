@@ -23,13 +23,13 @@ EXPECTED is the analyser's places where the program reads its main data
 as one block across its fields, as the original does: a read in front of
 a field or behind it, `clang-analyzer-security.ArrayBound`, and a
 difference of two pointers into two fields,
-`clang-analyzer-security.PointerSub`. They are mended by a piece of
-their own, which has the main data read as bytes at an offset (CLAUDE.md,
-the same item); until then each is listed here, by its file, its check,
-what clang-tidy says and how many times, so that one more of them fails
-the test as any other place does, and one fewer does too: the piece
-that mends them takes them out of the list. Nothing is turned off for
-them.
+`clang-analyzer-security.PointerSub`. The piece MD mended them, with
+the main data read as bytes at an offset (CLAUDE.md, the same item;
+TODO.md, "MD, the main data read as bytes"), and the list is empty. It
+stays for a place of that kind that is not mended at once, by its file,
+its check, what clang-tidy says and how many times, so that one more of
+them fails the test as any other place does, and one fewer does too.
+Nothing is turned off for them.
 
 clang-tidy is pinned to its version 23, which the survey of the checks
 was made with (TODO.md, "5b, the stub"): another version has other
@@ -61,30 +61,15 @@ CONFIG = ROOT / ".clang-tidy"
 
 # What the analyser names where the program reads the main data across
 # its fields: (file, check, what clang-tidy says) -> how many places.
-# The piece that reads the main data as bytes at an offset takes them
-# out (TODO.md, "5b, the stub").
+# The piece MD read the main data as bytes at an offset and took them
+# out (TODO.md, "MD, the main data read as bytes"): none is left.
 BOUND = "clang-analyzer-security.ArrayBound"
 BEFORE = "Out of bound access to memory preceding "
 BEHIND = "Out of bound access to memory after the end of "
 SUB = "clang-analyzer-security.PointerSub"
 APART = ("Subtraction of two pointers that do not point into the same "
          "array is undefined behavior")
-EXPECTED = {
-    ("copy.c", SUB, APART): 4,
-    ("dirfunc.c", SUB, APART): 1,
-    ("edit.c", SUB, APART): 1,
-    ("exec.c", SUB, APART): 4,
-    ("find.c", BOUND, BEFORE + "'md.TmpBuf'"): 1,
-    ("main.c", BOUND, BEHIND + "'md.TreeBuf[0].TreSum2'"): 1,
-    ("menu.c", BOUND, BEHIND + "'MnuTab'"): 1,
-    ("menu.c", BOUND, BEFORE + "'MnuTab'"): 1,
-    ("menu.c", BOUND, BEFORE + "'md.TmpBuf'"): 2,
-    ("read.c", BOUND, BEHIND + "'md.DTA.FilAttr'"): 1,
-    ("stmain.c", BOUND, BEFORE + "'StMainHlp'"): 1,
-    ("tree.c", BOUND, BEHIND + "'md.TreeBuf[0].TreSum2'"): 2,
-    ("treebox.c", BOUND, BEHIND + "'md.TreeBuf[0].TreSum2'"): 1,
-    ("treebox.c", BOUND, BEHIND + "'md.TreeBuf[0].TreSum2.DirName'"): 1,
-}
+EXPECTED = {}
 
 # A place that clang or clang-tidy names: file:line:column: kind: text,
 # with the checks behind it in brackets for clang-tidy.

@@ -170,7 +170,9 @@ static void RdTr18(i32 error)
     u8 *text;
 
     TREE->TreeErr = (u8)error;
-    text = &LIST->DirRecu;
+    /* The byte of every entry from the root to the end of TreeBuf: the
+       main data as bytes. */
+    text = (u8 *)LIST + offsetof(struct DIRENT, DirRecu);
     do {
         *text = 0;
         text += sizeof(struct DIRENT);
