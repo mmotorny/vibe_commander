@@ -77,6 +77,7 @@ u8 *FindExt(const u8 *name)
     u16 pair;
     struct Entry item;
     u8 c;
+    bool matched;                       /* the extension is this entry's */
 
     do
         c = *name++;
@@ -98,6 +99,7 @@ u8 *FindExt(const u8 *name)
         file = item.at;
         wanted = md.TmpErr;             /* FnEx05 */
         count = 3;
+        matched = true;
         for (;;) {
             c = *file++;
             if (c == ':' || c == '\t') {
@@ -109,17 +111,22 @@ u8 *FindExt(const u8 *name)
                     wanted++;
                     count--;
                 }
-                if (count != 0)
-                    goto FnEx12;
+                matched = count == 0;
                 break;
             }
             if (c == '*')
                 break;
-            if (c != '?' && (u8)LowCase(c) != *wanted)
-                goto FnEx12;
+            if (c != '?' && (u8)LowCase(c) != *wanted) {
+                matched = false;
+                break;
+            }
             wanted++;
             if (--count == 0)
                 break;
+        }
+        if (!matched) {                 /* FnEx12 */
+            item = Item(file, true);
+            continue;
         }
         for (;;) {                      /* FnEx09: it is this entry */
             pair = *(const u16 *)file;
@@ -134,8 +141,5 @@ u8 *FindExt(const u8 *name)
             if ((pair & 0xFF) == ':')
                 return PLACE_IN(md.MenuBuf, file);
         }
-        continue;
-FnEx12:
-        item = Item(file, true);
     }
 }
