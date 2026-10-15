@@ -6246,6 +6246,11 @@ SCENARIOS = {
             '"s" Enter',                  # the defaults again
             "Ctrl+o",                     # "VC.INI is not correct."
             "Ctrl+o",
+            "F9 r",                       # the Right menu: the panel is
+                                          # unsorted, SortTyp 8, which no
+                                          # item sets and only the
+                                          # defaults have
+            "Esc",
             "F10",
             "Enter",                      # and the setup file that it
                                           # leaves is that of the
