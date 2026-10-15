@@ -882,7 +882,7 @@ void V00_10(u16 handle)
     i32 result;
     u16 found;
     bool in_file, ended;
-    u8 *starts;
+    i32 starts;                         /* a place in the main data */
     u16 mouse = 0;
     i32 third, quarter;
 
@@ -1178,13 +1178,16 @@ V08_00:                                 /* PgDn */
     FIRST();
     /* Where the lines below begin goes to TmpBuf, a word for each: the
        last of them is the first line of the next screen. */
-    starts = md.TmpBuf - 2;
+    /* A place in the main data and not a pointer: the first is in front
+       of TmpBuf, where C has no pointer, and is stepped over before it
+       is written to. */
+    starts = MD_AT(TmpBuf) - 2;
     count = (VI->ViSize >> 8) - 2;
     do {
         if (NEXT())
             goto V08_06;
         starts += 2;
-        PUT16(starts, (u16)line.at);
+        PUT16(MD_BYTES + starts, (u16)line.at);
     } while (--count);
     /* And a screen from there: where it is not full and the file ends,
        back by as many lines as it lacks. */
@@ -1202,10 +1205,10 @@ V08_03:
        at the least, and the count that of a window's rows, doubled. */
     count += count;
     starts -= count;
-    if (starts < md.TmpBuf)
+    if (starts < MD_AT(TmpBuf))
         goto V00_30;
 V08_05:
-    ViFirst = GET16(starts);
+    ViFirst = GET16(MD_BYTES + starts);
     goto V00_20;
 V08_06:                                 /* the part ends: the next one */
     V50_00(text);

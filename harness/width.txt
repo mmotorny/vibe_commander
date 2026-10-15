@@ -71,10 +71,10 @@ cluster    8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i
 N0              35          0     1              0      36     0     3     4    28  digits.c mask.c line.c mouse.c blank.c
 N1              72          0     2              0      68     6     5     4    45  string.c format.c box.c screen.c misc.c
 N2              89          0     0              0      76    13     0     4    33  dialog.c
-N3, N4          56          0    13              0      67     2     7    23    91  view.c
+N3, N4          56          0    13              0      67     2     7    23    92  view.c
 N5              71          0     0              0      64     7     3     4    48  find.c
 N6 to N8        69          0     4              0      73     0    13    38   152  edit.c
-N9              50          0    12              0      48    14     2     9    47  copy.c
+N9              50          0     6              0      48     8     2     9    47  copy.c
 N10             55          0     0              0      50     5     4    10    42  dirfunc.c
 N11             24          0     1              0      23     2     4    12    60  files.c read.c place.c
 N12             47          0     4              0      51     0     9     3    35  panel.c info.c drive.c
@@ -91,7 +91,7 @@ N20             61          0     0              0      58     3     0     3    
 N21             60          0     3              0      46     7     0     5    34  stmain.c sthelp.c
 as a whole     647          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
 headers        340         94    15              0     212     5     0     0     0  vc.h sys.h tables.h
-all           2060         94   122              0    1234    74    62   213  1096
+all           2060         94   116              0    1234    68    62   213  1097
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               220          0    11              0     182     5     0     0     0
@@ -102,7 +102,7 @@ blank.c             12          0     0              0      12     0     2     1
 box.c               30          0     0              0      29     1     1     0    18
 cmdline.c           29          0     0              0      29     0     0     8    30
 commands.c          22          0     0              0      22     0     0     5    47
-copy.c              50          0    12              0      48    14     2     9    47
+copy.c              50          0     6              0      48     8     2     9    47
 dialog.c            89          0     0              0      76    13     0     4    33
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           55          0     0              0      50     5     4    10    42
@@ -139,7 +139,7 @@ system.c             8          0     1              0       9     0     0     6
 tree.c               5          0     0              0       5     0     0     4    14
 treebox.c           36          0     0              0      36     0     1     9    36
 usermenu.c          27          0     0              0      25     2     0     8    20
-view.c              56          0    13              0      67     2     7    23    91
+view.c              56          0    13              0      67     2     7    23    92
 window.c            24          0     0              0      21     3     0     4    11
 
 ----
@@ -1312,32 +1312,6 @@ copy.c, C40_05: variable pair, u16
 
 copy.c, SetDate: parameter handle, u16
     handle
-
-copy.c, Plus32: parameter a, u32
-    A number of 32 bits that is added to or taken from round 2^32, as
-    the original's registers: the low 32 bits of the number of 48 of
-    PerCent, which counts on the wrapping.
-
-copy.c, Plus32: parameter b, u32
-    What is added to or taken from that number: the low 32 bits of
-    what was read and written, or of twice the size of the file.
-
-copy.c, Plus32: returns, u32
-    The low 32 bits of the number of 48 of PerCent, wrapped round as
-    the original's registers wrap.
-
-copy.c, Minus32: parameter a, u32
-    A number of 32 bits that is added to or taken from round 2^32, as
-    the original's registers: the low 32 bits of the number of 48 of
-    PerCent, which counts on the wrapping.
-
-copy.c, Minus32: parameter b, u32
-    What is added to or taken from that number: the low 32 bits of
-    what was read and written, or of twice the size of the file.
-
-copy.c, Minus32: returns, u32
-    The low 32 bits of the number of 48 of PerCent, wrapped round as
-    the original's registers wrap.
 
 copy.c, PerCent: variable before, u32
     The low 32 bits of the number of 48 that PerCent works out, or the

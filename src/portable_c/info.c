@@ -124,8 +124,8 @@ void PutInf(struct WCBdef *panel)
                clusters less: a bug of the original, fixed on the user's
                word of 14 October 2026 (DEVIATIONS.md, 19). */
             if (cluster > 1 && size % cluster != 0)
-                size += cluster - size % cluster;
-            total += size;
+                size = Plus32(size, cluster - size % cluster);  /* wraps */
+            total = Plus32(total, size);                        /* wraps */
         }
         /* The count in its two words: a panel holds more than 65,535
            entries where there is the memory, ReDr00. */

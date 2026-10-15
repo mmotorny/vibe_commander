@@ -151,6 +151,21 @@ static inline void PUT32(u8 *at, u32 value)
     PUT16(at + 2, (u16)(value >> 16));  /* and the high one */
 }
 
+/* a + b and a - b in 32 bits, round 2^32, as the original's ADD and SUB
+   in a pair of registers, where the program counts on that, wraps. They
+   are written so that C does not wrap for it, by the test in front: the
+   build for Linux stops at an unsigned number that wraps, and of 32 bits
+   a cast cannot say it, there being no wider type. */
+static inline u32 Plus32(u32 a, u32 b)
+{
+    return b <= 0xFFFFFFFFU - a ? a + b : b - (0xFFFFFFFFU - a) - 1;
+}
+
+static inline u32 Minus32(u32 a, u32 b)
+{
+    return a >= b ? a - b : a + (0xFFFFFFFFU - b) + 1;
+}
+
 /* Fails to compile when a structure is not laid out as in the assembly. */
 #define LAID_OUT(type, size) typedef char type##_size[sizeof(struct type) == (size) ? 1 : -1]
 

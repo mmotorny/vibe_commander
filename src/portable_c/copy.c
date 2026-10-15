@@ -270,27 +270,13 @@ static void SetDate(u16 handle)
     FileSetTime(handle, GET16(CpTime), GET16(CpDate));
 }
 
-/* a + b and a - b in 32 bits, round 2^32, as the original's ADD and SUB
-   in a pair of registers: the number of 48 bits of PerCent counts on
-   that, wraps. Written so that C does not wrap for it, by the test in
-   front: the build for Linux stops at an unsigned number that wraps,
-   and of 32 bits a cast cannot say it, there being no wider type. */
-static u32 Plus32(u32 a, u32 b)
-{
-    return b <= 0xFFFFFFFFU - a ? a + b : b - (0xFFFFFFFFU - a) - 1;
-}
-
-static u32 Minus32(u32 a, u32 b)
-{
-    return a >= b ? a - b : a + (0xFFFFFFFFU - b) + 1;
-}
-
 /* Show how far the copying has got: of the row of cells that C20_00 has
    drawn, as many are filled as what has been read and written is of
    twice the size of the file. A file of no size has them all filled.
 
    The numbers are 48 bits long: what was read and written, counted once
-   for every cell, less twice the size as often as that goes. */
+   for every cell, less twice the size as often as that goes. The low
+   words are reckoned by Plus32 and Minus32 of vc.h, wraps. */
 static void PerCent(void)
 {
     u32 sum, low = 0, twice, before;

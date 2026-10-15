@@ -329,7 +329,8 @@ void PutFls(struct WCBdef *panel)
         file = ENTRY(wcb, address);
         if ((file->AttrF & ATTR_SELECTED)
             && (wcb->SizDir != 0 || !(file->AttrF & ATTR_DIRECTORY))) {
-            size += file->SizeF;
+            size = Plus32(size, file->SizeF);   /* wraps at 4 GB, as
+                                                   the original's sum */
             count++;
         }
         address += sizeof(struct FILENT);

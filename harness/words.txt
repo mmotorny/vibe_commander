@@ -78,6 +78,6 @@ treebox.c         MD_POINTER 1, TRELIST 7, TREE_OFFSET 11, TREE_ENTRY 3, NUMBER 
 treebox_t.c       MD_AT 3
 usermenu.c        ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
 vc.h              MD_BYTES 1, TRELIST 2, MD_AT 1
-view.c            MD_BYTES 1, ENTRY 1, MD_AT 1
+view.c            MD_BYTES 3, ENTRY 1, MD_AT 3
 view_t.c          MD_AT 21, NUMBER 2
 window.c          none
