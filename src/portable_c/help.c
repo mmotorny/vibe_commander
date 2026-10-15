@@ -583,7 +583,10 @@ static void Help05(void)
                         Scroll(key >> 8 == 7, Color(Help_C), place,
                                (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1)
                                      + place));
-                        place += key << 8;
+                        /* wraps: the BIOS's call, 6 or 7, goes off the
+                           top, and the rows less one, or 0, are added to
+                           the row. */
+                        place = (u16)(place + (key << 8));
                         count = 1;
                     }
                     Window(place, (u16)(count << 8 | WIDTH));

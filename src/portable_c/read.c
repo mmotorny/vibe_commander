@@ -624,9 +624,13 @@ u16 DiSi10(u16 attributes)
     if (attributes & ATTR_DIRECTORY)
         return DirFunc();
     size = md.DTA.FilSize;
-    PUT32(sum, GET32(sum) + size);
-    if (GET32(sum) < size)
+    /* The original adds, and takes the carry for a sum that has gone
+       beyond 32 bits; here that is asked before the sum is made, so
+       that nothing wraps. */
+    if (size > 0xFFFFFFFFU - GET32(sum))
         PUT32(sum, 0xFFFFFFFFUL);
+    else
+        PUT32(sum, GET32(sum) + size);
     return 0;
 }
 

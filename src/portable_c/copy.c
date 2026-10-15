@@ -270,6 +270,21 @@ static void SetDate(u16 handle)
     FileSetTime(handle, GET16(CpTime), GET16(CpDate));
 }
 
+/* a + b and a - b in 32 bits, round 2^32, as the original's ADD and SUB
+   in a pair of registers: the number of 48 bits of PerCent counts on
+   that, wraps. Written so that C does not wrap for it, by the test in
+   front: the build for Linux stops at an unsigned number that wraps,
+   and of 32 bits a cast cannot say it, there being no wider type. */
+static u32 Plus32(u32 a, u32 b)
+{
+    return b <= 0xFFFFFFFFU - a ? a + b : b - (0xFFFFFFFFU - a) - 1;
+}
+
+static u32 Minus32(u32 a, u32 b)
+{
+    return a >= b ? a - b : a + (0xFFFFFFFFU - b) + 1;
+}
+
 /* Show how far the copying has got: of the row of cells that C20_00 has
    drawn, as many are filled as what has been read and written is of
    twice the size of the file. A file of no size has them all filled.
@@ -284,25 +299,27 @@ static void PerCent(void)
     u16 *screen;
     u16 cell;
 
-    sum = GET32(CpRead) + GET32(CpWrite);
+    sum = Plus32(GET32(CpRead), GET32(CpWrite));
     carry = sum < GET32(CpRead);
     count = CpCntSz;
     do {
         before = low;
-        low += sum;
-        high += carry + (low < before);
+        low = Plus32(low, sum);
+        high = (u16)(high + carry + (low < before));  /* wraps, as low */
     } while (--count);
     cells = CpCntSz;
     if (GET32(CpSize) != 0) {
-        twice = GET32(CpSize) << 1;
+        twice = (GET32(CpSize) & 0x7FFFFFFFU) << 1;  /* the high bit
+                                                   is twice_high */
         twice_high = HIGH(GET32(CpSize)) >> 15;
         cells = -1;
         do {
             cells++;
             borrow = twice_high + (low < twice);
-            low -= twice;
+            low = Minus32(low, twice);
             before = high;
-            high -= borrow;
+            high = (u16)(high - borrow);    /* wraps below 0, which ends
+                                               the loop */
         } while (LOW(before) >= borrow);
         if (cells > CpCntSz)
             cells = CpCntSz;
@@ -1588,8 +1605,10 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
         to = FilDir(to, directories, files) - 1;
     else {
         if (panel->WinTyp == 1) {
+            /* As many bytes as a path and a name, 81, where CrnPath
+               has 68: the original copies on into ViewFil. */
             for (i = 0; i < LenName; i++)
-                md.TmpErr[i] = md.CrnPath[i];
+                md.TmpErr[i] = MD_BYTES[MD_AT(CrnPath) + i];
             ShrtLin(md.TmpErr, LenStr - 10);
             from = md.TmpErr;
             length = LenStr;

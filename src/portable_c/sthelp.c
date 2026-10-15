@@ -503,7 +503,9 @@ static void StHelp04(struct StHlpData *entry, u16 size)
                 how = moved == 1 ? 0x600 | (count - 1 & 0xFF) : 0x700;
                 Scroll(how >> 8 == 7, Color(Help_C), where,
                        (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1) + where));
-                where += how << 8;
+                /* wraps: the BIOS's call, 6 or 7, goes off the top, and
+                   the rows less one, or 0, are added to the row. */
+                where = (u16)(where + (how << 8));
                 count = 1;
             }
             Window(where, (u16)(count << 8 | WIDTH));
