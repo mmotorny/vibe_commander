@@ -237,7 +237,11 @@ These held while `src/c/` was made, and they say what it is.
      memory, apart; the usual hardening in the build that is not
      sanitized; and a fall-through of a `switch` and a table of bytes
      without its zero said by words of `compiler.h`, not by turning
-     the warnings off.
+     the warnings off. Where the analyser names the program reading
+     the main data as one block across its fields, as the original
+     does, that read goes through the main data as bytes at an offset,
+     by a piece of its own, so that nothing is turned off for it, on
+     the user's word of the same day.
   7. iOS, when Linux is done. Windows and macOS are not targets for now,
      on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
@@ -354,7 +358,10 @@ These held while `src/c/` was made, and they say what it is.
   its directory needs, with no ceiling of entries and nothing
   reserved for it beforehand, and that a scenario of it is kept only
   if it runs in reasonable time, the one that took ten minutes being
-  dropped. And
+  dropped; and that a panel stops at 65,536 entries for good, the
+  most that a directory of DOS holds, since an entry keeps the
+  original's number of 16 bits: a system that is not DOS shows at
+  most so many entries of a directory, declared. And
   a copy from a device that answers a piece in several reads counts
   the room down by every read, where the original counts it down by
   the last one only and reads past the room's end: a bug of the
