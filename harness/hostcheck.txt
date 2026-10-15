@@ -70,6 +70,7 @@ sys_stub.c        clean
 system.c          clean
 system_t.c        clean
 tables.h          clean
+term_posix.c      clean
 time_posix.c      clean
 tree.c            clean
 treebox.c         clean

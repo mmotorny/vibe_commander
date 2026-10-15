@@ -536,4 +536,38 @@ bool DosDriveCd(struct Dos *dos, u16 drive);
    with file systems that the host where it is tried has not. */
 struct Space DosSpaceOf(u32 block, uint64_t blocks, uint64_t free);
 
+/*
+ * The terminal, term_posix.c, the piece L4 (TODO.md, "L4, the
+ * terminal"): the screen of 80 by 25 cells drawn in the terminal that the
+ * program is started in, and its keys made the BIOS's words. The top of
+ * term_posix.c says how.
+ */
+
+/* Take the terminal of standard input and output: false where either is
+   no terminal. From then on it is given back as it was however the
+   program ends. */
+bool TermBegin(void);
+
+/* Give it back for a while, as for a command (L6), and take it again,
+   which draws the screen whole at the next frame. */
+void TermGive(void);
+void TermTake(void);
+
+/* Draw what has changed of the 2,000 cells at `cells`, a character and
+   its colour each, and the cursor at `place`, the row above the column,
+   in the BIOS's `shape`. */
+void TermDraw(const u16 *cells, u16 place, u16 shape);
+
+/* Take what the terminal has typed, waiting `wait` milliseconds at the
+   most for it, -1 for as long as it takes, and make it keys. */
+void TermInput(i32 wait);
+
+/* The key that waits, as KeyWaiting answers it, and the key taken. */
+struct Keys TermKeyWaiting(void);
+u16 TermKeyTake(void);
+
+/* The character of Unicode that the VGA's font shows for a byte of the
+   code page. */
+u32 TermGlyph(u8 byte);
+
 #endif

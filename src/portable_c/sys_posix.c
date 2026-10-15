@@ -14,11 +14,13 @@
  *     memory of a PC is, 80 to a row and 25 rows shown, and the calls of
  *     the BIOS for it answer as the bench's BIOS does (harness/trial32/
  *     asked.py): mode 3, 80 columns, page 0, a VGA with a font of 16
- *     lines whose last row is 24. Nothing of it is drawn in a terminal
- *     yet: that is the piece L4. The console of DOS writes into the same
- *     grid, as DOS has the BIOS do.
- *   - The keys come from the test channel below, as the BIOS's words; a
- *     terminal is the piece L5. No mouse: L5 too.
+ *     lines whose last row is 24. The console of DOS writes into the
+ *     same grid, as DOS has the BIOS do. The grid is drawn in the
+ *     terminal that the program is started in, term_posix.c, the piece
+ *     L4, but where the test channel below is told to drive it.
+ *   - The keys come from the terminal, made the BIOS's words there, or
+ *     from the test channel. The kitty protocol of the keyboard, with
+ *     Shift, Ctrl and Alt held, is the piece L5; no mouse: L5 too.
  *   - The timer's ticks are the host's monotonic clock at DOS's 18.2 to
  *     the second, counted from the time of day when the program started;
  *     the time of day is the host's local time.
@@ -1077,20 +1079,45 @@ static void Due(void)
     Record("step", (u32)StepNow);
 }
 
+/*
+ * The terminal, where the program is not tested: term_posix.c, which
+ * draws the page that is shown, the first 2,000 cells, whenever the
+ * program asks for a key or is idle, and makes what is typed keys.
+ */
+
+#define IDLE_WAIT 50                    /* milliseconds, under a tick */
+
+static bool OnTerminal = false;
+
+static void Show(void)
+{
+    TermDraw(Display, CursorPlace, Shape);
+}
+
 void Idle(void)
 {
+    if (OnTerminal) {
+        Show();
+        TermInput(IDLE_WAIT);
+        return;
+    }
     Due();
 }
 
 /*
- * The keyboard: what the test channel has made due. KeyRead waits for a
- * key, which is idle as Idle is.
+ * The keyboard: what the test channel has made due, or the terminal.
+ * KeyRead waits for a key, which is idle as Idle is.
  */
 
 struct Keys KeyWaiting(void)
 {
     struct Keys keys;
 
+    if (OnTerminal) {
+        Show();
+        TermInput(0);
+        return TermKeyWaiting();
+    }
     keys.key = KeyThere ? KeyWord : 0;
     keys.none = !KeyThere;
     return keys;
@@ -1098,6 +1125,13 @@ struct Keys KeyWaiting(void)
 
 u16 KeyRead(void)
 {
+    if (OnTerminal) {
+        while (TermKeyWaiting().none) {
+            Show();
+            TermInput(-1);
+        }
+        return TermKeyTake();
+    }
     while (!KeyThere)
         Due();
     KeyThere = false;
@@ -1425,9 +1459,12 @@ int main(int count, char **arguments)
     long pages = sysconf(_SC_PHYS_PAGES), page = sysconf(_SC_PAGESIZE);
 
     if (!TestBegin()) {
-        fprintf(stderr, "vc: there is no terminal yet: the program runs "
-                        "with %s set, for its tests\n", TEST_VARIABLE);
-        return 1;
+        if (!TermBegin()) {
+            fprintf(stderr, "vc: standard input and output are to be a "
+                            "terminal\n");
+            return 1;
+        }
+        OnTerminal = true;
     }
     MemoryAll = pages > 0 && page > 0 ? (int64_t)pages * page : BYTES_MOST;
     StartMs = TodayMs();
