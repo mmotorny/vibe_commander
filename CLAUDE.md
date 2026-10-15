@@ -241,6 +241,17 @@ These held while `src/c/` was made, and they say what it is.
   line keeps the author's copyright and adds the user's, "(C) 2026
   Maksym Motorny". No line is added anywhere for it. The C translation
   keeps the original's name.
+- The jumps that the translation kept from the assembly, `goto`, go
+  where they are easy, on the user's word of 14 October 2026: in a
+  function that only jumps forward, or whose jumps back make a loop
+  with one way in, they become `if`, loops, `break`, `continue` and
+  `return`, by pieces of their own beside steps 5 and 6. The
+  functions where loops are entered in the middle or paths cross,
+  some fifteen, `V00_10` of `view.c`, `C20_00` of `copy.c`, `F32_00`
+  and `Run_00` of `usermenu.c`, `F39_00` of `menu.c` among them, keep
+  theirs until one is rewritten for another reason. A label that goes
+  leaves the assembly's name in a comment where it stood, so that the
+  code can still be held against `src/c` and `src/asm`.
 - Clang is where this is going, for the platforms it reaches and for its
   sanitizers and static checks. Open Watcom builds the program for DOS
   for as long as DOS is where it is judged. No other toolchain is taken
