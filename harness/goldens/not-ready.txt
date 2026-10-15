@@ -1182,11 +1182,11 @@ cursor 58 9 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
+|║data     bin│            │            ║║    ├──DOCS                           ║| 1Bx80
+|║empty    dat│            │            ║║    └──SRC                            ║| 1Bx80
 |║hello    txt│            │            ║║                                      ║| 1Bx80
 |║notes    doc│            │            ║║                                      ║| 1Bx30 6Cx1 1Bx49
 |║readme   txt│            │            ║║                                      ║| 1Bx80
@@ -1210,11 +1210,11 @@ cursor 8 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║data                                  ║║ └──STAMPS                            ║| 1Bx6 70x28 1Bx46
-|║empty   ╔═══ Drive letter ═══╗        ║║    └──SUB                            ║| 1Bx6 70x28 03x2 1Bx44
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
+|║data                                  ║║    ├──DOCS                           ║| 1Bx6 70x28 1Bx46
+|║empty   ╔═══ Drive letter ═══╗        ║║    └──SRC                            ║| 1Bx6 70x28 03x2 1Bx44
 |║hello   ║ Choose left drive: ║        ║║                                      ║| 1Bx6 70x12 7Ex4 70x12 03x2 1Bx44
 |║notes   ║     B   C   D      ║        ║║                                      ║| 1Bx6 70x12 30x3 70x9 07x1 70x3 03x2 1Bx44
 |║readm   ╚════════════════════╝        ║║                                      ║| 1Bx6 70x28 03x2 1Bx44
@@ -1608,7 +1608,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  107 bytes  43648e2f33537d9a
+C:\TREEINFO.NCD  A   during the run  107 bytes  912763060159ef14
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
 C:\WORK\DOCS  D   2000-06-16 12:00:00

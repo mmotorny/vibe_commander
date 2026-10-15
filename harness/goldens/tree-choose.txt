@@ -121,9 +121,9 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║data     bin│     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║empty    dat│     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
-|║notes    doc│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║     └──SUB                             ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║hello    txt│     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║readme   txt│     ║  └─ WORK                             ◄ ║     │            ║| 1Bx1 30x12 1Bx3 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -149,9 +149,9 @@ cursor 36 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║data     bin│     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║empty    dat│     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║notes    doc│     ║  └─ STAMPS                             ║     │            ║| 1Bx16 3Fx8 0Fx14 3Fx26 03x2 1Bx14
-|║readme   txt│     ║     └──SUB                             ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║hello    txt│     ║  ├─ STAMPS                             ║     │            ║| 1Bx16 3Fx8 0Fx14 3Fx26 03x2 1Bx14
+|║notes    doc│     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║readme   txt│     ║  └──WORK                             ◄ ║     │            ║| 1Bx1 30x12 1Bx3 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -177,9 +177,9 @@ cursor 36 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║data     bin│     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║empty    dat│     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║notes    doc│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║     └─ SUB                             ║     │            ║| 1Bx1 30x12 1Bx3 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║hello    txt│     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║  │  └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║readme   txt│     ║  └──WORK                             ◄ ║     │            ║| 1Bx1 30x12 1Bx3 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -205,9 +205,9 @@ cursor 36 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║data     bin│     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║empty    dat│     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║notes    doc│     ║  └─ STAMPS                             ║     │            ║| 1Bx16 3Fx8 0Fx14 3Fx26 03x2 1Bx14
-|║readme   txt│     ║     └──SUB                             ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║hello    txt│     ║  ├─ STAMPS                             ║     │            ║| 1Bx16 3Fx8 0Fx14 3Fx26 03x2 1Bx14
+|║notes    doc│     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║readme   txt│     ║  └──WORK                             ◄ ║     │            ║| 1Bx1 30x12 1Bx3 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -233,9 +233,9 @@ cursor 37 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║data     bin│     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║empty    dat│     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║notes    doc│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║     └─ SUB                             ║     │            ║| 1Bx1 30x12 1Bx3 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║hello    txt│     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║  │  └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║readme   txt│     ║  └──WORK                             ◄ ║     │            ║| 1Bx1 30x12 1Bx3 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -261,9 +261,9 @@ cursor 37 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║data     bin│     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║empty    dat│     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║notes    doc│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║     └─ SUB                             ║     │            ║| 1Bx1 30x12 1Bx3 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║hello    txt│     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║  │  └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║readme   txt│     ║  └──WORK                             ◄ ║     │            ║| 1Bx1 30x12 1Bx3 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -289,9 +289,9 @@ cursor 36 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║data     bin│     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║empty    dat│     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║notes    doc│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║     └─ SUB                             ║     │            ║| 1Bx1 30x12 1Bx3 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║hello    txt│     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║  │  └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║readme   txt│     ║  └──WORK                             ◄ ║     │            ║| 1Bx1 30x12 1Bx3 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -373,9 +373,9 @@ cursor 35 20 lines 6 7 mode 3
 |║            │     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  ├──WORK                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║  │  └─ SUB                           ◄ ║     │            ║| 1Bx16 3Fx11 0Ex14 3Fx17 3Ex1 3Fx5 03x2 1Bx14
+|║            │     ║  ├──WORK                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║  └──TREEINFO.NCD                       ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -510,9 +510,9 @@ cursor 11 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                   ◄║║    Name    │    Name    │    Name    ║| 1Bx1 3Ex3 1Bx34 1Ex1 1Bx6 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║ ├──WORK                              ║║STAMPS      │            │            ║| 1Bx80
-|║ ├──STAMPS                            ║║TREEINFO NCD│            │            ║| 1Bx80
-|║ │  └──SUB                            ║║WORK        │            │            ║| 1Bx80
+|║ ├──STAMPS                            ║║STAMPS      │            │            ║| 1Bx80
+|║ │  └──SUB                            ║║TREEINFO NCD│            │            ║| 1Bx80
+|║ ├──WORK                              ║║WORK        │            │            ║| 1Bx80
 |║ └──TREEINFO.NCD                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -537,13 +537,13 @@ cursor 4 23 lines 6 7 mode 3
 == 19: Alt+F10
 cursor 35 20 lines 6 7 mode 3
 |║ \                                   ◄║║    Name    │    Name    │    Name    ║| 1Bx1 3Ex3 1Bx34 1Ex1 1Bx6 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║ ├──WORK                                                         │            ║| 1Bx16 3Fx48 1Bx16
-|║ ├──STAMPS        ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║ │  └──SUB        ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║ │  └──SUB        ║  \                                   ◄ ║     │            ║| 1Bx16 3Fx5 0Ex3 3Fx34 3Ex1 3Fx5 03x2 1Bx14
-|║ └──TREEINFO.NC   ║  ├──WORK                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║                  ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║ ├──STAMPS                                                       │            ║| 1Bx16 3Fx48 1Bx16
+|║ │  └──SUB        ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║ ├──WORK          ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║ ├──WORK          ║  \                                   ◄ ║     │            ║| 1Bx16 3Fx5 0Ex3 3Fx34 3Ex1 3Fx5 03x2 1Bx14
+|║ └──TREEINFO.NC   ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║                  ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║                  ║  ├──WORK                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║                  ║  └──TREEINFO.NCD                       ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║                  ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║                  ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
@@ -566,9 +566,9 @@ cursor 35 20 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                   ◄║║    Name    │    Name    │    Name    ║| 1Bx1 3Ex3 1Bx34 1Ex1 1Bx6 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║ ├──WORK                              ║║STAMPS      │            │            ║| 1Bx80
-|║ ├──STAMPS                            ║║TREEINFO NCD│            │            ║| 1Bx80
-|║ │  └──SUB                            ║║WORK        │            │            ║| 1Bx80
+|║ ├──STAMPS                            ║║STAMPS      │            │            ║| 1Bx80
+|║ │  └──SUB                            ║║TREEINFO NCD│            │            ║| 1Bx80
+|║ ├──WORK                              ║║WORK        │            │            ║| 1Bx80
 |║ └──TREEINFO.NCD                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80

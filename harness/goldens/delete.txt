@@ -1070,10 +1070,10 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx1 30x12 1Bx67
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║SRC         │            │            ║║ │  └──SUB                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
+|║empty    dat│            │            ║║    └──SRC                            ║| 1Bx80
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1098,10 +1098,10 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║SRC         │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║data     bin│            │            ║║ └─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
+|║empty    dat│            │            ║║    └──SRC                            ║| 1Bx80
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1126,10 +1126,10 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║SRC         │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║data     bin│            │            ║║ └─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
+|║empty    dat│            │            ║║    └──SRC                            ║| 1Bx80
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1154,10 +1154,10 @@ cursor 8 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\SRC ╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├──WORK                              ║| 1Bx80
-|║run      bat│            │            ║║ │  └─ SRC                           ◄║| 1Bx47 3Ex14 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ └──STAMPS                            ║| 1Bx80
-|║            │            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║run      bat│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║            │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    └─ SRC                           ◄║| 1Bx47 3Ex14 1Bx17 1Ex1 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1182,10 +1182,10 @@ cursor 12 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════ C:\WORK\SRC ╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├──WORK                              ║| 1Bx80
-|║run      bat│            │            ║║ │  └─ SRC                           ◄║| 1Bx47 3Ex14 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ └──STAMPS                            ║| 1Bx80
-|║            │                                                                 ║| 1Bx17 70x45 1Bx18
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║run      bat│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║            │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │                                                                ◄║| 1Bx17 70x45 1Bx16 1Ex1 1Bx1
 |║            │      ╔═══════════════ Delete ══════════════╗                    ║| 1Bx17 70x45 03x2 1Bx16
 |║            │      ║ Do you wish to delete the directory ║                    ║| 1Bx17 70x45 03x2 1Bx16
 |║            │      ║            "C:\WORK\SRC"            ║                    ║| 1Bx17 70x45 03x2 1Bx16
@@ -1210,10 +1210,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════ C:\WORK\SRC ╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├──WORK                              ║| 1Bx80
-|║run      bat│            │            ║║ │  └─ SRC                           ◄║| 1Bx47 3Ex14 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ └──STAMPS                            ║| 1Bx80
-|║            │                                                                 ║| 1Bx22 70x35 1Bx23
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║run      bat│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║            │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │                                                                ◄║| 1Bx22 70x35 3Ex4 1Bx17 1Ex1 1Bx1
 |║            │           ╔══════════ Delete ═════════╗                         ║| 1Bx22 70x35 03x2 1Bx21
 |║            │           ║ Deleting the subdirectory ║                         ║| 1Bx22 70x35 03x2 1Bx21
 |║            │           ║        C:\WORK\SRC        ║                         ║| 1Bx22 70x35 03x2 1Bx21
@@ -1238,9 +1238,9 @@ cursor 0 127 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1266,9 +1266,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1294,9 +1294,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║no                                                                            ║| 1Bx3 70x74 1Bx3
 |║ru   ╔═════════════════════════════ Delete ═════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ Delete the file:                                                 ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1322,9 +1322,9 @@ cursor 8 8 lines 6 7 mode 3
 cursor 20 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║no                                                                            ║| 1Bx3 70x74 1Bx3
 |║ru   ╔═════════════════════════════ Delete ═════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ Delete the file:                                                 ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1349,9 +1349,9 @@ cursor 20 8 lines 6 7 mode 3
 == 48: Enter
 cursor 0 127 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1377,9 +1377,9 @@ cursor 0 127 lines 6 7 mode 3
 == 49: Esc
 cursor 8 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1405,9 +1405,9 @@ cursor 8 23 lines 6 7 mode 3
 == 50: Shift+F8
 cursor 8 8 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║no                                                                            ║| 1Bx3 70x74 1Bx3
 |║ru   ╔═════════════════════════════ Delete ═════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1433,9 +1433,9 @@ cursor 8 8 lines 6 7 mode 3
 == 51: "c:*.zzz"
 cursor 15 8 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║no                                                                            ║| 1Bx3 70x74 1Bx3
 |║ru   ╔═════════════════════════════ Delete ═════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1462,9 +1462,9 @@ cursor 15 8 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1490,9 +1490,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║no                                                                            ║| 1Bx3 70x74 1Bx3
 |║ru   ╔═════════════════════════════ Delete ═════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ Delete the file:                                                 ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1518,9 +1518,9 @@ cursor 8 8 lines 6 7 mode 3
 cursor 11 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║no                                                                            ║| 1Bx3 70x74 1Bx3
 |║ru   ╔═════════════════════════════ Delete ═════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ Delete the file:                                                 ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1545,9 +1545,9 @@ cursor 11 8 lines 6 7 mode 3
 == 55: Enter
 cursor 0 127 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│                                                                 ║| 1Bx26 70x27 1Bx27
 |║run      bat│               ╔══════ Delete ═════╗                             ║| 1Bx26 70x27 03x2 1Bx25
 |║            │               ║ Deleting the file ║                             ║| 1Bx26 70x27 03x2 1Bx25
@@ -1573,9 +1573,9 @@ cursor 0 127 lines 6 7 mode 3
 == 56: Esc
 cursor 8 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│                                                                 ║| 1Bx26 70x27 1Bx27
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
@@ -1602,9 +1602,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║ │  └──SUB                            ║| 1Bx80
+|║empty    dat│            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║notes    doc│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1630,9 +1630,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║STAMPS      │            │            ║║ ├──WORK                              ║| 1Bx80
-|║WORK        │            │            ║║ └──STAMPS                            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║    └──SUB                            ║| 1Bx80
+|║STAMPS      │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║WORK        │            │            ║║ │  └──SUB                            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║ └──WORK                              ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1658,9 +1658,9 @@ cursor 4 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║NEW         │            │            ║║ ├──WORK                              ║| 1Bx1 30x12 1Bx67
-|║STAMPS      │            │            ║║ ├──STAMPS                            ║| 1Bx80
-|║WORK        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║NEW         │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║STAMPS      │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║WORK        │            │            ║║ ├──WORK                              ║| 1Bx80
 |║            │            │            ║║ └──NEW                               ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1686,9 +1686,9 @@ cursor 4 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║NEW         │            │            ║║ ├──WORK                              ║| 1Bx1 30x12 1Bx67
-|║STAMPS      │            │            ║║ ├──STAMPS                            ║| 1Bx80
-|║WORK        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║NEW         │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║STAMPS      │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║WORK        │            │            ║║ ├──WORK                              ║| 1Bx80
 |║treeinfo ncd│            │            ║║ └──NEW                               ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1714,9 +1714,9 @@ cursor 4 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║NEW         │            │            ║║ ├──WORK                              ║| 1Bx80
-|║STAMPS      │            │            ║║ ├──STAMPS                            ║| 1Bx80
-|║WORK        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║NEW         │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║STAMPS      │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║WORK        │            │            ║║ ├──WORK                              ║| 1Bx80
 |║treeinfo ncd│            │            ║║ └──NEW                               ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1742,9 +1742,9 @@ cursor 4 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║NEW         │            │            ║║ ├──WORK                              ║| 1Bx80
-|║STAMPS      │            │            ║║ ├──STAMPS                            ║| 1Bx80
-|║WORK        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║NEW         │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║STAMPS      │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║WORK        │            │            ║║ ├──WORK                              ║| 1Bx80
 |║treeinfo ncd│            │            ║║ └──NEW                               ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1770,9 +1770,9 @@ cursor 4 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║MORE        │            │            ║║ ├──WORK                              ║| 1Bx1 30x12 1Bx67
-|║NEW         │            │            ║║ ├──STAMPS                            ║| 1Bx80
-|║STAMPS      │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║MORE        │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║NEW         │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║STAMPS      │            │            ║║ ├──WORK                              ║| 1Bx80
 |║WORK        │            │            ║║ └──NEW                               ║| 1Bx80
 |║treeinfo ncd│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1806,7 +1806,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  RA  during the run  91 bytes  c3b1f9ec26fd7879
+C:\TREEINFO.NCD  RA  during the run  91 bytes  e75006ba03d86a23
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
 C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14

@@ -454,8 +454,8 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═══ C:\ ════╤════════════╗╔════════════╤═ C:\WORK ══╤════════════╗| 1Bx55 30x9 1Bx16
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║WORK        │            │            ║║..          │            │            ║| 1Bx41 30x12 1Bx27
-|║STAMPS      │            │            ║║DOCS        │            │            ║| 1Bx80
+|║STAMPS      │            │            ║║..          │            │            ║| 1Bx41 30x12 1Bx27
+|║WORK        │            │            ║║DOCS        │            │            ║| 1Bx80
 |║            │            │            ║║SRC         │            │            ║| 1Bx80
 |║            │            │            ║║readme   txt│            │            ║| 1Bx80
 |║            │            │            ║║hello    txt│            │            ║| 1Bx80
@@ -473,7 +473,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║WORK         ►SUB-DIR◄  6-16-00 12:00p║║..           ►UP--DIR◄  6-16-00 12:00p║| 1Bx80
+|║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║║..           ►UP--DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6

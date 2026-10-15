@@ -818,11 +818,11 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
+|║data     bin│            │            ║║    ├──DOCS                           ║| 1Bx80
+|║empty    dat│            │            ║║    └──SRC                            ║| 1Bx80
 |║hello    txt│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
 |║notes    doc│            │            ║║                                      ║| 1Bx1 30x12 1Bx67
 |║one      txt│            │            ║║                                      ║| 1Bx80
@@ -846,9 +846,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║da                                                                            ║| 1Bx3 70x74 1Bx3
 |║em   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║he   ║ Copy 2 files to                                                  ║     ║| 1Bx1 1Ex2 70x74 03x2 1Bx1
@@ -874,9 +874,9 @@ cursor 8 8 lines 6 7 mode 3
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │                                                   ◄║| 1Bx28 3Fx48 1Bx2 1Ex1 1Bx1
+|║..          │            │                                                    ║| 1Bx28 3Fx48 1Bx4
 |║DOCS        │            │    ╔═══════════ Choose Directory ═══════════╗      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║SRC         │            │    ║  \                                   ◄ ║      ║| 1Bx28 3Fx5 0Ex3 3Fx34 3Ex1 3Fx5 03x2 1Bx2
+|║SRC         │            │    ║  \                                   ◄ ║     ◄║| 1Bx28 3Fx5 0Ex3 3Fx34 3Ex1 3Fx5 03x2 1Ex1 1Bx1
 |║da                            ║  └──VC                                 ║      ║| 1Bx3 70x25 3Fx48 08x1 03x1 1Bx2
 |║em   ╔═════════════════════   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║he   ║ Copy 2 files to        ║                                        ║      ║| 1Bx1 1Ex2 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
@@ -902,9 +902,9 @@ cursor 47 20 lines 6 7 mode 3
 cursor 11 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║da                                                                            ║| 1Bx3 70x74 1Bx3
 |║em   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║he   ║ Copy 2 files to                                                  ║     ║| 1Bx1 1Ex2 70x74 03x2 1Bx1
@@ -930,11 +930,11 @@ cursor 11 8 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
+|║data     bin│            │            ║║    ├──DOCS                           ║| 1Bx80
+|║empty    dat│            │            ║║    └──SRC                            ║| 1Bx80
 |║hello    txt│            │            ║║                                      ║| 1Bx80
 |║notes    doc│            │            ║║                                      ║| 1Bx1 30x12 1Bx67
 |║one      txt│            │            ║║                                      ║| 1Bx80
@@ -958,9 +958,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║da                                                                            ║| 1Bx3 70x74 1Bx3
 |║em   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║he   ║ Copy "notes.doc" to                                              ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -986,14 +986,14 @@ cursor 8 8 lines 6 7 mode 3
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │                                                   ◄║| 1Bx28 3Fx48 1Bx2 1Ex1 1Bx1
+|║..          │            │                                                    ║| 1Bx28 3Fx48 1Bx4
 |║DOCS        │            │    ╔═══════════ Choose Directory ═══════════╗      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║SRC         │            │    ║  \                                     ║      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║da                            ║  ├─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 03x1 1Bx2
-|║em   ╔═════════════════════   ║  │  ├──DOCS                            ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║he   ║ Copy "notes.doc" to    ║  │  └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║no   ║ C:\WORK                ║  └──STAMPS                             ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║on   ╟─────────────────────   ║     └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║SRC         │            │    ║  \                                     ║     ◄║| 1Bx28 3Fx48 03x2 1Ex1 1Bx1
+|║da                            ║  ├──STAMPS                             ║      ║| 1Bx3 70x25 3Fx48 08x1 03x1 1Bx2
+|║em   ╔═════════════════════   ║  │  └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║he   ║ Copy "notes.doc" to    ║  └─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 0Bx1 03x1 1Bx1
+|║no   ║ C:\WORK                ║     ├──DOCS                            ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║on   ╟─────────────────────   ║     └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║r    ║               [ Copy   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║ru   ╚═════════════════════   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║                              ║                                        ║      ║| 1Bx3 70x25 3Fx12 48x1 3Fx35 08x1 0Bx1 03x1 1Bx1
@@ -1014,9 +1014,9 @@ cursor 47 20 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║da                                                                            ║| 1Bx3 70x74 1Bx3
 |║em   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║he   ║ Copy "notes.doc" to                                              ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1042,14 +1042,14 @@ cursor 8 8 lines 6 7 mode 3
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │                                                   ◄║| 1Bx28 3Fx48 1Bx2 1Ex1 1Bx1
+|║..          │            │                                                    ║| 1Bx28 3Fx48 1Bx4
 |║DOCS        │            │    ╔═══════════ Choose Directory ═══════════╗      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║SRC         │            │    ║  \                                     ║      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║da                            ║  ├─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 03x1 1Bx2
-|║em   ╔═════════════════════   ║  │  ├──DOCS                            ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║he   ║ Copy "notes.doc" to    ║  │  └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║no   ║ C:\WORK                ║  └──STAMPS                             ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║on   ╟─────────────────────   ║     └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║SRC         │            │    ║  \                                     ║     ◄║| 1Bx28 3Fx48 03x2 1Ex1 1Bx1
+|║da                            ║  ├──STAMPS                             ║      ║| 1Bx3 70x25 3Fx48 08x1 03x1 1Bx2
+|║em   ╔═════════════════════   ║  │  └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║he   ║ Copy "notes.doc" to    ║  └─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 0Bx1 03x1 1Bx1
+|║no   ║ C:\WORK                ║     ├──DOCS                            ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║on   ╟─────────────────────   ║     └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║r    ║               [ Copy   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║ru   ╚═════════════════════   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║                              ║                                        ║      ║| 1Bx3 70x25 3Fx12 48x1 3Fx35 08x1 0Bx1 03x1 1Bx1
@@ -1070,9 +1070,9 @@ cursor 47 20 lines 6 7 mode 3
 cursor 21 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║da                                                                            ║| 1Bx3 70x74 1Bx3
 |║em   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║he   ║ Copy "notes.doc" to                                              ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1098,14 +1098,14 @@ cursor 21 8 lines 6 7 mode 3
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │                                                   ◄║| 1Bx28 3Fx48 1Bx2 1Ex1 1Bx1
+|║..          │            │                                                    ║| 1Bx28 3Fx48 1Bx4
 |║DOCS        │            │    ╔═══════════ Choose Directory ═══════════╗      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║SRC         │            │    ║  \                                     ║      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║da                            ║  ├─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 03x1 1Bx2
-|║em   ╔═════════════════════   ║  │  ├──DOCS                            ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║he   ║ Copy "notes.doc" to    ║  │  └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║no   ║ C:\WORK\DOCS\          ║  └──STAMPS                             ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║on   ╟─────────────────────   ║     └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║SRC         │            │    ║  \                                     ║     ◄║| 1Bx28 3Fx48 03x2 1Ex1 1Bx1
+|║da                            ║  ├──STAMPS                             ║      ║| 1Bx3 70x25 3Fx48 08x1 03x1 1Bx2
+|║em   ╔═════════════════════   ║  │  └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║he   ║ Copy "notes.doc" to    ║  └─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 0Bx1 03x1 1Bx1
+|║no   ║ C:\WORK\DOCS\          ║     ├──DOCS                            ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║on   ╟─────────────────────   ║     └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║r    ║               [ Copy   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║ru   ╚═════════════════════   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║                              ║                                        ║      ║| 1Bx3 70x25 3Fx12 48x1 3Fx35 08x1 0Bx1 03x1 1Bx1
@@ -1126,9 +1126,9 @@ cursor 47 20 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║da                                                                            ║| 1Bx3 70x74 1Bx3
 |║em   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║he   ║ Copy "notes.doc" to                                              ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1154,14 +1154,14 @@ cursor 0 127 lines 6 7 mode 3
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │                                                   ◄║| 1Bx28 3Fx48 1Bx2 1Ex1 1Bx1
+|║..          │            │                                                    ║| 1Bx28 3Fx48 1Bx4
 |║DOCS        │            │    ╔═══════════ Choose Directory ═══════════╗      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║SRC         │            │    ║  \                                     ║      ║| 1Bx28 3Fx48 03x2 1Bx2
-|║da                            ║  ├─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 03x1 1Bx2
-|║em   ╔═════════════════════   ║  │  ├──DOCS                            ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║he   ║ Copy "notes.doc" to    ║  │  └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║no   ║ z:                     ║  └──STAMPS                             ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
-|║on   ╟─────────────────────   ║     └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║SRC         │            │    ║  \                                     ║     ◄║| 1Bx28 3Fx48 03x2 1Ex1 1Bx1
+|║da                            ║  ├──STAMPS                             ║      ║| 1Bx3 70x25 3Fx48 08x1 03x1 1Bx2
+|║em   ╔═════════════════════   ║  │  └──SUB                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║he   ║ Copy "notes.doc" to    ║  └─ WORK                             ◄ ║      ║| 1Bx3 70x25 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 08x1 0Bx1 03x1 1Bx1
+|║no   ║ z:                     ║     ├──DOCS                            ║      ║| 1Bx1 30x2 70x5 30x20 3Fx48 08x1 0Bx1 03x1 1Bx1
+|║on   ╟─────────────────────   ║     └──SRC                             ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║r    ║               [ Copy   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║ru   ╚═════════════════════   ║                                        ║      ║| 1Bx3 70x25 3Fx48 08x1 0Bx1 03x1 1Bx1
 |║                              ║                                        ║      ║| 1Bx3 70x25 3Fx12 48x1 3Fx35 08x1 0Bx1 03x1 1Bx1
@@ -1182,9 +1182,9 @@ cursor 47 20 lines 6 7 mode 3
 cursor 10 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║da                                                                            ║| 1Bx3 70x74 1Bx3
 |║em   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║he   ║ Copy "notes.doc" to                                              ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -1210,11 +1210,11 @@ cursor 10 8 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
-|║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║DOCS        │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║SRC         │            │            ║║ └─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
+|║data     bin│            │            ║║    ├──DOCS                           ║| 1Bx80
+|║empty    dat│            │            ║║    └──SRC                            ║| 1Bx80
 |║hello    txt│            │            ║║                                      ║| 1Bx80
 |║notes    doc│            │            ║║                                      ║| 1Bx1 30x12 1Bx67
 |║one      txt│            │            ║║                                      ║| 1Bx80
@@ -1244,7 +1244,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  107 bytes  43648e2f33537d9a
+C:\TREEINFO.NCD  A   during the run  107 bytes  912763060159ef14
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
 C:\WORK\DOCS  D   2000-06-16 12:00:00

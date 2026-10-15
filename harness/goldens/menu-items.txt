@@ -681,11 +681,11 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │                                                    │            ║| 1Bx16 3Fx48 1Bx16
 |║DOCS        │     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
 |║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
-|║empty    dat│     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  │  └──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║     └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ║  └─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
+|║notes    doc│     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║readme   txt│     ║     └──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║run      bat│     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║                                        ║     │            ║| 1Bx16 3Fx24 48x1 3Fx23 03x2 1Bx14
@@ -1244,7 +1244,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  107 bytes  43648e2f33537d9a
+C:\TREEINFO.NCD  A   during the run  107 bytes  912763060159ef14
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
 C:\WORK\DOCS  D   2000-06-16 12:00:00

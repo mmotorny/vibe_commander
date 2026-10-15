@@ -2080,7 +2080,8 @@ SCENARIOS = {
                                           # files the tree would be on their
                                           # directory, the root
             "F9 l t",                     # the tree, eleven lines of it
-            "Down Down Down Down Down",
+            "Down",                       # DOCS, the seventh of them,
+                                          # behind FILES, STAMPS and theirs
             "Down Down Down Down Down",   # the tree moves a line up,
             "Down",                       # and another
             "Up Up Up Up Up Up",
@@ -2713,10 +2714,10 @@ SCENARIOS = {
             "Ctrl+PgUp",
             "F9 l t",                     # the tree
             "Ctrl+i",                     # has no files for the command line
-            "Alt+s",                      # SRC is the next from here
-            "Ctrl+Enter",                 # STAMPS
+            "Alt+s",                      # STAMPS is the next from here
             "Ctrl+Enter",                 # SUB
-            "t",                          # ST: STAMPS
+            "Ctrl+Enter",                 # SRC, in WORK behind them
+            "t",                          # ST: STAMPS, and round
             "Esc",
             "Ctrl+[",                     # the directory of the tree
             "Esc",
@@ -5364,7 +5365,8 @@ SCENARIOS = {
             "Home",                       # the root
             "F5",                         # is not copied
             "F6",                         # nor renamed
-            "Down Down",                  # DOCS
+            "Down Down Down Down",        # DOCS, behind STAMPS, SUB and
+                                          # WORK
             "F5",
             '"docs2" Enter',              # copied with what is in it
             "Down",                       # SRC
@@ -5382,7 +5384,7 @@ SCENARIOS = {
             "Up Up",                      # DOCS, whose path that of DOCS2
             "F6",                         # begins with
             '"x" Enter',                  # the current one is X2 now
-            "Home Down",                  # WORK
+            "Home Down Down Down",        # WORK, behind STAMPS and SUB
             "F6",
             '"work2" Enter',              # the current one follows
         )),

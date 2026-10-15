@@ -345,19 +345,19 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx24 48x1 3Fx23 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  └─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx24 48x1 3Fx23 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║notes    doc│     ║ C:\WORK                                ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
@@ -373,21 +373,21 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├─ A                               ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║ C:\WORK\A                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -401,21 +401,21 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├─ C                               ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├─ A                               ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║ C:\WORK\C                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\A                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -428,22 +428,22 @@ cursor 35 20 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║DOCS        │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──J                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  └──K                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║     └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║B           │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║C           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──H                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     └─ K                               ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║ C:\STAMPS\SUB                          ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\K                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx14 48x1 3Fx4 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -457,19 +457,19 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx14 48x1 3Fx33 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx5 0Fx3 3Fx40 03x2 1Bx14
-|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║notes    doc│     ║ C:\                                    ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
@@ -485,21 +485,21 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx4 6Cx1 1Bx9
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║DOCS        │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx4 6Cx1 1Bx9
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\STAMPS\SUB                          ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -513,21 +513,21 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx14 48x1 3Fx33 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║DOCS        │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\STAMPS\SUB                          ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -541,21 +541,21 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║DOCS        │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\STAMPS\SUB                          ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -569,21 +569,21 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├─ B                               ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx4 6Cx1 1Bx9
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  └──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├─ SRC                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx4 6Cx1 1Bx9
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║ C:\WORK\B                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\SRC                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -625,19 +625,19 @@ cursor 35 20 lines 6 7 mode 3
 |║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
 |║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
-|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx14 48x1 3Fx33 03x2 1Bx14
-|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  └─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
+|║E           │     ║     ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx14 48x1 3Fx33 03x2 1Bx14
+|║J           │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║     ├──E                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║notes    doc│     ║ C:\WORK                                ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
@@ -647,8 +647,8 @@ cursor 35 20 lines 6 7 mode 3
 |1Help   2Rescan 3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 23: RightClick@30,8 RightClick@30,8
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x11 1Bx55
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
 |║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║WORK        │            │            ║| 1Bx80
@@ -671,40 +671,40 @@ cursor 10 23 lines 6 7 mode 3
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
 |║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\A>                                                                      | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 24: Alt+F10
 cursor 35 20 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x11 1Bx55
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
 |║..          │                                                    │            ║| 1Bx1 30x12 1Bx3 3Fx48 1Bx16
 |║            │     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  ├──WORK                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├─ A                             ◄ ║     │            ║| 1Bx16 3Fx11 0Ex3 79x1 0Ex10 3Fx17 3Ex1 3Fx5 03x2 1Bx14
-|║            │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║  ├──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║  │  └──SUB                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║  └──WORK                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├─ DOCS                          ◄ ║     │            ║| 1Bx16 3Fx11 0Ex3 79x1 0Ex10 3Fx17 3Ex1 3Fx5 03x2 1Bx14
+|║            │     ║     ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║     ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |║            │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║            │     ║ C:\WORK\A                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║            │     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║..           ►U   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
-|C:\WORK\A>                                                                      | 07x18 0Fx48 07x14
+|C:\WORK\DOCS>                                                                   | 07x18 0Fx48 07x14
 |1Help   2Rescan 3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 25: Click@1,1
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x11 1Bx55
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx1 6Cx1 1Bx3 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
 |║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║WORK        │            │            ║| 1Bx80
@@ -727,12 +727,12 @@ cursor 10 23 lines 6 7 mode 3
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
 |║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK\A>                                                                      | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 26: F9 o f
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x11 1Bx55
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx1 6Cx1 1Bx3 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
 |║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║WORK        │            │            ║| 1Bx80
@@ -755,135 +755,23 @@ cursor 10 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|C:\WORK\A>                                                                      | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 27: F9 r t
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx14 30x11 1Bx55
-|║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx1 6Cx1 1Bx3 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├──WORK                              ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║            │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├─▌A           ▐                 ◄║| 1Bx47 1Ex14 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├──C                              ║| 1Bx80
-|║            │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\A                             ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|C:\WORK\A>                                                                      | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 28: Click@50,5
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├──WORK                              ║| 1Bx80
-|║            │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║            │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├─ A                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├──C                              ║| 1Bx80
-|║            │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\A                             ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|C:\WORK\A>                                                                      | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 29: Click@50,7 Click@50,7
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\C ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ ├──WORK                              ║| 1Bx80
-|║            │            │            ║║ │  ├──DOCS                           ║| 1Bx80
-|║            │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├──A                              ║| 1Bx80
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├─ C                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\C                             ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|C:\WORK\C>                                                                      | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 30: Click@50,4>50,14*6
-cursor 14 23 lines 6 7 mode 3
-|╔═══════════ C:\STAMPS\SUB ════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ │  ├──C                              ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|║            │            │            ║║ │  ├──H                              ║| 1Bx80
-|║            │            │            ║║ │  ├──I                              ║| 1Bx80
-|║            │            │            ║║ │  ├──J                              ║| 1Bx80
-|║            │            │            ║║ │  └──K                              ║| 1Bx80
-|║            │            │            ║║ └──STAMPS                            ║| 1Bx80
-|║            │            │            ║║    └─ SUB                           ◄║| 1Bx47 3Ex14 1Bx17 1Ex1 1Bx1
-|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\STAMPS\SUB                         ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx50 6Cx1 1Bx29
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|C:\STAMPS\SUB>                                                                  | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 31: Click@50,6>50,0*4
 cursor 13 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Tree ════════════════╗| 1Bx50 6Cx1 1Bx6 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ │  ├─ DOCS                          ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx12 3Ex14 1Bx17 1Ex1 1Bx1
-|║..          │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├──A                              ║| 1Bx80
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├──C                              ║| 1Bx80
-|║            │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|║            │            │            ║║ │  ├──H                              ║| 1Bx80
-|║            │            │            ║║ │  ├──I                              ║| 1Bx80
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Tree ════════════════╗| 1Bx13 30x14 1Bx53
+|║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx1 6Cx1 1Bx3 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║            │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├─▌DOCS        ▐                 ◄║| 1Bx47 1Ex14 1Bx17 1Ex1 1Bx1
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├──A                              ║| 1Bx80
+|║            │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
 |║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\DOCS                          ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
@@ -898,22 +786,22 @@ cursor 13 23 lines 6 7 mode 3
 |C:\WORK\DOCS>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 32: RightClick@50,8
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\F ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ │  ├──DOCS                           ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├──A                              ║| 1Bx80
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├──C                              ║| 1Bx80
-|║            │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├─ F                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|║            │            │            ║║ │  ├──H                              ║| 1Bx80
-|║            │            │            ║║ │  ├──I                              ║| 1Bx80
+== 28: Click@50,5
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║            │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║            │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├─ DOCS                          ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├──A                              ║| 1Bx80
+|║            │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\F                             ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\DOCS                          ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -923,107 +811,135 @@ cursor 10 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|C:\WORK\F>                                                                      | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 29: Click@50,7 Click@50,7
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ ├──STAMPS                            ║| 1Bx80
+|║            │            │            ║║ │  └──SUB                            ║| 1Bx80
+|║            │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├──DOCS                           ║| 1Bx80
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├─ A                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
+|║            │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\A                             ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\A>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 30: Click@50,4>50,14*6
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\WORK\K ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║    ├──A                              ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|║            │            │            ║║    ├──F                              ║| 1Bx80
+|║            │            │            ║║    ├──G                              ║| 1Bx80
+|║            │            │            ║║    ├──H                              ║| 1Bx80
+|║            │            │            ║║    ├──I                              ║| 1Bx80
+|║            │            │            ║║    ├──J                              ║| 1Bx80
+|║            │            │            ║║    └─ K                             ◄║| 1Bx47 3Ex14 1Bx17 1Ex1 1Bx1
+|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\K                             ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx50 6Cx1 1Bx29
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\K>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 31: Click@50,6>50,0*4
+cursor 14 23 lines 6 7 mode 3
+|╔═══════════ C:\STAMPS\SUB ════════════╗╔════════════════ Tree ════════════════╗| 1Bx50 6Cx1 1Bx6 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║ │  └─ SUB                           ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx12 3Ex14 1Bx17 1Ex1 1Bx1
+|║..          │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├──DOCS                           ║| 1Bx80
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├──A                              ║| 1Bx80
+|║            │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|║            │            │            ║║    ├──F                              ║| 1Bx80
+|║            │            │            ║║    ├──G                              ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\STAMPS\SUB                         ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\STAMPS\SUB>                                                                  | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 32: RightClick@50,8
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\WORK\D ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║ │  └──SUB                            ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├──DOCS                           ║| 1Bx80
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├──A                              ║| 1Bx80
+|║            │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├─ D                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|║            │            │            ║║    ├──F                              ║| 1Bx80
+|║            │            │            ║║    ├──G                              ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\D                             ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\D>                                                                      | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 33: Click@50,9>50,5>50,7
 cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\E ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ │  ├──DOCS                           ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├──A                              ║| 1Bx80
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├──C                              ║| 1Bx80
-|║            │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├─ E                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|║            │            │            ║║ │  ├──H                              ║| 1Bx80
-|║            │            │            ║║ │  ├──I                              ║| 1Bx80
-|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\E                             ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|C:\WORK\E>                                                                      | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 34: Click@70,6
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\D ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ │  ├──DOCS                           ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├──A                              ║| 1Bx80
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├──C                              ║| 1Bx80
-|║            │            │            ║║ │  ├─ D                             ◄║| 1Bx47 3Ex14 1Bx9 6Cx1 1Bx7 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|║            │            │            ║║ │  ├──H                              ║| 1Bx80
-|║            │            │            ║║ │  ├──I                              ║| 1Bx80
-|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\D                             ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|C:\WORK\D>                                                                      | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 35: Tab
-cursor 10 23 lines 6 7 mode 3
-|╔════════════╤ C:\WORK\D ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx14 30x11 1Bx55
-|║    Name    │    Name    │    Name    ║║ │  ├──DOCS                           ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ │  ├──SRC                            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║ │  ├──A                              ║| 1Bx80
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├──C                              ║| 1Bx80
-|║            │            │            ║║ │  ├─▌D           ▐                 ◄║| 1Bx47 1Ex14 1Bx9 6Cx1 1Bx7 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|║            │            │            ║║ │  ├──H                              ║| 1Bx80
-|║            │            │            ║║ │  ├──I                              ║| 1Bx80
-|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\D                             ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|                                                                                | 07x80
-|C:\WORK\D>                                                                      | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 36: Click@50,5
-cursor 10 23 lines 6 7 mode 3
 |╔════════════╤ C:\WORK\C ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
-|║    Name    │    Name    │    Name    ║║ │  ├──DOCS                           ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║║ │  ├──SRC                            ║| 1Bx80
-|║            │            │            ║║ │  ├──A                              ║| 1Bx80
-|║            │            │            ║║ │  ├──B                              ║| 1Bx80
-|║            │            │            ║║ │  ├─ C                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
-|║            │            │            ║║ │  ├──D                              ║| 1Bx80
-|║            │            │            ║║ │  ├──E                              ║| 1Bx80
-|║            │            │            ║║ │  ├──F                              ║| 1Bx80
-|║            │            │            ║║ │  ├──G                              ║| 1Bx80
-|║            │            │            ║║ │  ├──H                              ║| 1Bx80
-|║            │            │            ║║ │  ├──I                              ║| 1Bx80
+|║    Name    │    Name    │    Name    ║║ │  └──SUB                            ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├──DOCS                           ║| 1Bx80
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├──A                              ║| 1Bx80
+|║            │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├─ C                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|║            │            │            ║║    ├──F                              ║| 1Bx80
+|║            │            │            ║║    ├──G                              ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
 |║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\C                             ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
@@ -1038,6 +954,90 @@ cursor 10 23 lines 6 7 mode 3
 |C:\WORK\C>                                                                      | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
+== 34: Click@70,6
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\WORK\B ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║ │  └──SUB                            ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├──DOCS                           ║| 1Bx80
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├──A                              ║| 1Bx80
+|║            │            │            ║║    ├─ B                             ◄║| 1Bx47 3Ex14 1Bx9 6Cx1 1Bx7 1Ex1 1Bx1
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|║            │            │            ║║    ├──F                              ║| 1Bx80
+|║            │            │            ║║    ├──G                              ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\B                             ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\B>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 35: Tab
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\WORK\B ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx14 30x11 1Bx55
+|║    Name    │    Name    │    Name    ║║ │  └──SUB                            ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ └──WORK                              ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║    ├──DOCS                           ║| 1Bx80
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├──A                              ║| 1Bx80
+|║            │            │            ║║    ├─▌B           ▐                 ◄║| 1Bx47 1Ex14 1Bx9 6Cx1 1Bx7 1Ex1 1Bx1
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|║            │            │            ║║    ├──F                              ║| 1Bx80
+|║            │            │            ║║    ├──G                              ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\B                             ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\B>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 36: Click@50,5
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║ │  └──SUB                            ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║║ └──WORK                              ║| 1Bx80
+|║            │            │            ║║    ├──DOCS                           ║| 1Bx80
+|║            │            │            ║║    ├──SRC                            ║| 1Bx80
+|║            │            │            ║║    ├─ A                             ◄║| 1Bx47 3Ex3 49x1 3Ex10 1Bx17 1Ex1 1Bx1
+|║            │            │            ║║    ├──B                              ║| 1Bx80
+|║            │            │            ║║    ├──C                              ║| 1Bx80
+|║            │            │            ║║    ├──D                              ║| 1Bx80
+|║            │            │            ║║    ├──E                              ║| 1Bx80
+|║            │            │            ║║    ├──F                              ║| 1Bx80
+|║            │            │            ║║    ├──G                              ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║C:\WORK\A                             ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\A>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
 == disks
 C:\STAMPS  D   2000-06-16 12:00:00
 C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
@@ -1048,7 +1048,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  283 bytes  ee9b65f889a2979e
+C:\TREEINFO.NCD  A   during the run  283 bytes  8c16bd4b815e58c3
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\A  D   during the run
 C:\WORK\B  D   during the run

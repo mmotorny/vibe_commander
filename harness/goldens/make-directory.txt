@@ -90,11 +90,11 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├─ WORK                             ◄║╟──────────────────────────────────────╢| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx41
-|║ │  ├──DOCS                           ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ │  └──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║ └──STAMPS                            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║    └──SUB                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └─ WORK                             ◄║║          ####### Bytes Free          ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    └──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
 |║                                      ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -118,12 +118,12 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──WORK                             ◄║╟──────────────────────────────────────╢| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx41
-|║ │  ├──DOCS                           ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║ │  └─ NEW                            ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║ └──STAMPS                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    └──SUB                            ║║  32,718,336 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    └─ NEW                            ║║  32,718,336 bytes free on drive C:   ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx21 1Ex2 1Bx4
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
@@ -145,12 +145,12 @@ cursor 8 23 lines 6 7 mode 3
 == 5: F7 "a\b" Enter
 cursor 0 127 lines 6 7 mode 3
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──WORK                             ◄║╟──────────────────────────────────────╢| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx41
-|║ │  ├──DOCS                           ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║ │  └─ NEW                            ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║ └──STAMPS                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    └──SUB                            ║║  32,718,336 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    └─ NEW                            ║║  32,718,336 bytes free on drive C:   ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx21 1Ex2 1Bx4
 |║                                      ║║                                      ║| 1Bx80
 |║                                                                              ║| 1Bx22 4Fx36 1Bx22
 |║                        ╔══════ Make directory ══════╗   ─────────────────────╢| 1Bx22 4Fx36 03x2 1Bx20
@@ -173,12 +173,12 @@ cursor 0 127 lines 6 7 mode 3
 == 6: Esc
 cursor 8 23 lines 6 7 mode 3
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
-|║ ├──WORK                             ◄║╟──────────────────────────────────────╢| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx41
-|║ │  ├──DOCS                           ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║ │  └─ NEW                            ║║      Volume in drive C: is WORK      ║| 1Bx7 30x14 1Bx42 1Ex2 1Bx4 1Ex4 1Bx7
-|║ └──STAMPS                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║    └──SUB                            ║║  32,718,336 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ └──WORK                             ◄║║          ####### Bytes Free          ║| 1Bx5 1Ex12 1Bx21 1Ex1 1Bx12 1Ex7 1Bx22
+|║    ├──DOCS                           ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║    ├──SRC                            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║    └─ NEW                            ║║  32,718,336 bytes free on drive C:   ║| 1Bx7 30x14 1Bx22 1Ex10 1Bx21 1Ex2 1Bx4
 |║                                      ║║                                      ║| 1Bx80
 |║                                                                              ║| 1Bx22 4Fx36 1Bx22
 |║                                      ║║                                      ║| 1Bx80
@@ -461,7 +461,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  123 bytes  71b4c8910f35512d
+C:\TREEINFO.NCD  A   during the run  123 bytes  806ce9e4d5983aaf
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
 C:\WORK\DOCS  D   2000-06-16 12:00:00

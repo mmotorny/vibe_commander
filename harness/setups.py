@@ -541,17 +541,11 @@ def _work_disk(path, workdir, files=False):
     """Build drive C: of the test bench, with C:\\FILES if `files`."""
     work = FatImage.hard_disk(path, workdir, EPOCH,
                               label="WORK", serial="20000616")
-    work.mkdir("WORK")
-    for name in WORK_DIRECTORIES:
-        work.mkdir(f"WORK/{name}")
-    for name, data in WORK_FILES:
-        work.write(f"WORK/{name}", data, EPOCH)
-    work.mkdir("STAMPS")
-    for name in STAMPS_DIRECTORIES:
-        work.mkdir(f"STAMPS/{name}")
-    for name, size, time in STAMPS_FILES:
-        work.write(f"STAMPS/{name}", b"", time)
-        work.set_size(name, size)
+    # The directories are made in the order of their names within each
+    # directory, FILES, STAMPS, WORK in the root, so that the tree, which
+    # lists them as they stand on the disk, has them as a tree sorted by
+    # name would (CLAUDE.md, "Scenarios", the user's word of 15 October
+    # 2026). The files may stand in any order: the panels sort them.
     if files:
         work.mkdir(FILES_DIRECTORY)
         for name, data, time in files_layout():
@@ -559,6 +553,17 @@ def _work_disk(path, workdir, files=False):
                 work.mkdir(f"{FILES_DIRECTORY}/{name}")
             else:
                 work.write(f"{FILES_DIRECTORY}/{name}", data, time)
+    work.mkdir("STAMPS")
+    for name in STAMPS_DIRECTORIES:
+        work.mkdir(f"STAMPS/{name}")
+    for name, size, time in STAMPS_FILES:
+        work.write(f"STAMPS/{name}", b"", time)
+        work.set_size(name, size)
+    work.mkdir("WORK")
+    for name in WORK_DIRECTORIES:
+        work.mkdir(f"WORK/{name}")
+    for name, data in WORK_FILES:
+        work.write(f"WORK/{name}", data, EPOCH)
     return work
 
 

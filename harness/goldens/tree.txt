@@ -34,11 +34,11 @@ cursor 8 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                   ◄║║    Name    │    Name    │    Name    ║| 1Bx1 3Ex3 1Bx34 1Ex1 1Bx6 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║ ├──WORK                              ║║STAMPS      │            │            ║| 1Bx80
-|║ │  ├──DOCS                           ║║WORK        │            │            ║| 1Bx80
-|║ │  └──SRC                            ║║            │            │            ║| 1Bx80
-|║ └──STAMPS                            ║║            │            │            ║| 1Bx80
-|║    └──SUB                            ║║            │            │            ║| 1Bx80
+|║ ├──STAMPS                            ║║STAMPS      │            │            ║| 1Bx80
+|║ │  └──SUB                            ║║WORK        │            │            ║| 1Bx80
+|║ └──WORK                              ║║            │            │            ║| 1Bx80
+|║    ├──DOCS                           ║║            │            │            ║| 1Bx80
+|║    └──SRC                            ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -59,14 +59,42 @@ cursor 4 23 lines 6 7 mode 3
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 2: Down
+cursor 10 23 lines 6 7 mode 3
+|╔════════════════ Tree ════════════════╗╔════════════╤ C:\STAMPS ═╤════════════╗| 1Bx17 30x6 1Bx57
+|║ \                                    ║║    Name    │    Name    │    Name    ║| 1Bx45 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║ ├─ STAMPS                           ◄║║..          │            │            ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx41
+|║ │  └──SUB                            ║║SUB         │            │            ║| 1Bx80
+|║ └──WORK                              ║║evening  dat│            │            ║| 1Bx80
+|║    ├──DOCS                           ║║first    dat│            │            ║| 1Bx80
+|║    └──SRC                            ║║huge     dat│            │            ║| 1Bx80
+|║                                      ║║last     dat│            │            ║| 1Bx80
+|║                                      ║║morning  dat│            │            ║| 1Bx80
+|║                                      ║║night    dat│            │            ║| 1Bx80
+|║                                      ║║noon     dat│            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx80
+|╟──────────────────────────────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║C:\STAMPS                             ║║..           ►UP--DIR◄  6-16-00 12:00p║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: Down Down
 cursor 8 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════╤═ C:\WORK ══╤════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║    Name    │    Name    │    Name    ║| 1Bx45 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║ ├─ WORK                             ◄║║..          │            │            ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx41
-|║ │  ├──DOCS                           ║║DOCS        │            │            ║| 1Bx80
-|║ │  └──SRC                            ║║SRC         │            │            ║| 1Bx80
-|║ └──STAMPS                            ║║data     bin│            │            ║| 1Bx80
-|║    └──SUB                            ║║empty    dat│            │            ║| 1Bx80
+|║ ├──STAMPS                            ║║..          │            │            ║| 1Bx80
+|║ │  └──SUB                            ║║DOCS        │            │            ║| 1Bx80
+|║ └─ WORK                             ◄║║SRC         │            │            ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx41
+|║    ├──DOCS                           ║║data     bin│            │            ║| 1Bx80
+|║    └──SRC                            ║║empty    dat│            │            ║| 1Bx80
 |║                                      ║║hello    txt│            │            ║| 1Bx80
 |║                                      ║║notes    doc│            │            ║| 1Bx80
 |║                                      ║║readme   txt│            │            ║| 1Bx80
@@ -86,15 +114,15 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 3: Down Down
+== 4: End
 cursor 12 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════ C:\WORK\SRC ╤════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║    Name    │    Name    │    Name    ║| 1Bx45 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║ ├──WORK                              ║║..          │            │            ║| 1Bx80
-|║ │  ├──DOCS                           ║║            │            │            ║| 1Bx80
-|║ │  └─ SRC                           ◄║║            │            │            ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
-|║ └──STAMPS                            ║║            │            │            ║| 1Bx80
-|║    └──SUB                            ║║            │            │            ║| 1Bx80
+|║ ├──STAMPS                            ║║..          │            │            ║| 1Bx80
+|║ │  └──SUB                            ║║            │            │            ║| 1Bx80
+|║ └──WORK                              ║║            │            │            ║| 1Bx80
+|║    ├──DOCS                           ║║            │            │            ║| 1Bx80
+|║    └─ SRC                           ◄║║            │            │            ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -114,34 +142,6 @@ cursor 12 23 lines 6 7 mode 3
 |C:\WORK\SRC>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 4: End
-cursor 14 23 lines 6 7 mode 3
-|╔════════════════ Tree ════════════════╗╔═══════════ C:\STAMPS\SUB ════════════╗| 1Bx17 30x6 1Bx57
-|║ \                                    ║║    Name    │    Name    │    Name    ║| 1Bx45 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║ ├──WORK                              ║║..          │            │            ║| 1Bx80
-|║ │  ├──DOCS                           ║║            │            │            ║| 1Bx80
-|║ │  └──SRC                            ║║            │            │            ║| 1Bx80
-|║ └──STAMPS                            ║║            │            │            ║| 1Bx80
-|║    └─ SUB                           ◄║║            │            │            ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
-|╟──────────────────────────────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║C:\STAMPS\SUB                         ║║..           ►UP--DIR◄  6-16-00 12:00p║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\STAMPS\SUB>                                                                  | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
 == disks
 C:\STAMPS  D   2000-06-16 12:00:00
 C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
@@ -152,7 +152,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  107 bytes  43648e2f33537d9a
+C:\TREEINFO.NCD  A   during the run  107 bytes  912763060159ef14
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
 C:\WORK\DOCS  D   2000-06-16 12:00:00

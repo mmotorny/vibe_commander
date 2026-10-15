@@ -3,13 +3,13 @@ than the original. A patch of harness/goldens/move.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
 Deviation: 11 of src/portable_c/DEVIATIONS.md
-Why: an error beeps, and the BIOS moves the screen up a row for the beep,
-with the panels on it. What the program then puts back where its boxes were
-leaves the fifth row of the Info panel on two rows or three, one under the
-other, whole or beside what is left of a box. The rule of the Info's top
-knows the panel once, where most of it shows, and not one row of it by
-itself: the original has its count of free memory in that row, and the
-portable C has it empty
+Why: an error beeps, and the BIOS moves the screen up a row for the beep, with
+the panels on it. What the program then puts back where its boxes were leaves
+the fifth row of the Info panel on two rows or three, one under the other,
+whole or beside what is left of a box. The rule of the Info's top knows the
+panel once, where most of it shows, and not one row of it by itself: the
+original has its count of free memory in that row, and the portable C has it
+empty
 
 == 40: "*." Enter
 row 4
@@ -73,12 +73,12 @@ rows 3-4
 
 == 86: Enter
 row 3
--|║ └──STAMPS                                              # Bytes Free          ║| 1Bx23 70x34 1Ex1 1Bx22
-+|║ └──STAMPS                                                                    ║| 1Bx23 70x34 1Bx23
+-|║ └─ WORK                                                # Bytes Free          ║| 1Bx4 3Ex14 1Bx5 70x34 1Ex1 1Bx22
++|║ └─ WORK                                                                      ║| 1Bx4 3Ex14 1Bx5 70x34 1Bx23
 
 == 87: Enter
 rows 2-3
--|║ └──STAMPS                                              # Bytes Free          ║| 1Bx23 70x34 1Ex1 1Bx22
--|║ └──STAMPS                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-+|║ └──STAMPS                                                                    ║| 1Bx23 70x34 1Bx23
-+|║ └──STAMPS                            ║║                                      ║| 1Bx80
+-|║ └─ WORK                                                # Bytes Free          ║| 1Bx4 3Ex14 1Bx5 70x34 1Ex1 1Bx22
+-|║ └─ WORK                             ◄║║          ####### Bytes Free          ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx12 1Ex7 1Bx22
++|║ └─ WORK                                                                      ║| 1Bx4 3Ex14 1Bx5 70x34 1Bx23
++|║ └─ WORK                             ◄║║                                      ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx41

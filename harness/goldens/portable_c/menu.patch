@@ -200,7 +200,7 @@ rows 12-18
 
 == 34: Right
 rows 4-16
--|║SRC         │     │ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
+-|║SRC         │     │ memory Info           Alt-F5  │                          ◄║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 06x2 3Ex4 1Bx20 1Ex1 1Bx1
 -|║data     bin│     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
 -|║empty    dat│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 -|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
@@ -213,7 +213,7 @@ rows 4-16
 -|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 -|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
 -|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
-+|║SRC         │     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
++|║SRC         │     │-Directory sizes       Alt-F6  │                          ◄║| 1Bx19 30x1 33x1 30x31 06x2 3Ex4 1Bx20 1Ex1 1Bx1
 +|║data     bin│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 +|║empty    dat│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 +|║hello    txt│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
@@ -263,7 +263,7 @@ rows 12-18
 
 == 38: Tab F9 c
 rows 4-16
--|║SRC         │►SUB-│ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
+-|║SRC         │►SUB-│ memory Info           Alt-F5  │     ▐                    ◄║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 06x2 1Ex4 1Bx20 1Ex1 1Bx1
 -|║data     bin│     │ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 -|║empty    dat│     │ Find file             Alt-F7  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 -|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
@@ -276,7 +276,7 @@ rows 4-16
 -|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 -|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
 -|║            │         │        │      ║║                                      ║| 1Bx21 03x33 1Bx26
-+|║SRC         │►SUB-│ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║SRC         │►SUB-│ Directory sizes       Alt-F6  │     ▐                    ◄║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x2 1Ex4 1Bx20 1Ex1 1Bx1
 +|║data     bin│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 +|║empty    dat│     │ History               Alt-F8  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 +|║hello    txt│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
