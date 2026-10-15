@@ -18,7 +18,8 @@ Two setups share one clock and one source of files:
                   and the panel on the right lists files, where the
                   distribution has the Info panel: what that shows is
                   of the machine and of the system, and would be on
-                  nearly every screen (see Bench).
+                  nearly every screen (see Bench). Both panels sort
+                  their files by name.
                   DOS has loaded a mouse driver, for the PS/2 mouse of
                   three buttons that the machine has, and the driver of
                   the tests (see
@@ -64,11 +65,16 @@ SETUP_PROGRAM = "VCSETUP.COM"
 # The keys that switch the clock from on to off or back, in the Options
 # menu; those that make the panel on the right one of files, Brief in the
 # Right menu, which is the form that the left panel has as the program is
-# distributed, so that the two look alike; and those that save the setup.
+# distributed, so that the two look alike; those that have both panels
+# sort their files by name, Name in the Left and the Right menu, where
+# the distribution has them unsorted; and those that save the setup.
 CLOCK_KEYS = "F9 o l"
 RIGHT_PANEL_KEYS = "F9 r b"
+BY_NAME_KEYS = ["F9 l n", "F9 r n"]
 SAVE_SETUP_KEYS = "Shift+F9 Enter"
-# The contents of C:\WORK on the test bench, in directory order.
+# The contents of C:\WORK on the test bench, in the order of the
+# directory, which the panels do not show since the bench sorts them by
+# name.
 WORK_DIRECTORIES = ["DOCS", "SRC"]
 WORK_FILES = [
     ("README.TXT", b"Files for exercising Volkov Commander.\r\n"),
@@ -283,7 +289,7 @@ class Bench:
     machine has executed the same instructions by then every time it is
     booted, and its clock is counted in them (see CLOCK_SHIFT in dos.py).
 
-    The program is set up as its distribution sets it up, but for two
+    The program is set up as its distribution sets it up, but for three
     things ("Scenarios" in CLAUDE.md). The clock in the corner of the
     screen, which the distribution has on, is off. And the panel on the
     right lists files, in the form of the left one, where the distribution
@@ -291,10 +297,13 @@ class Bench:
     of the disk and what is free on it, things of the machine and of the
     system, and with it on nearly every screen of nearly every scenario a
     difference there was a difference everywhere. A scenario that is about
-    the Info panel switches it on, Ctrl+l. No setup file is prepared for
-    either: the original is started once, made to switch the clock off and
-    to make the right panel one of files in its menus, and to save its
-    setup, and what it then writes is the VC.INI of every machine. It
+    the Info panel switches it on, Ctrl+l. And both panels sort their
+    files by name, where the distribution has them unsorted, as the disk
+    has them, an order that means something on DOS alone and that the
+    portable C has not. No setup file is prepared for any of the three:
+    the original is started once, made to switch the clock off, to make
+    the right panel one of files and to sort both by name in its menus,
+    and to save its setup, and what it then writes is the VC.INI of every machine. It
     writes the same in every country, so a bench can be given the `setup`
     of another to use.
 
@@ -346,13 +355,14 @@ class Bench:
 
     def _setup_of_the_bench(self, shipped):
         """The setup file that the original writes in place of `shipped`,
-        the distribution's, once its clock has been switched off and its
-        right panel made one of files."""
+        the distribution's, once its clock has been switched off, its
+        right panel made one of files and both panels made to sort by
+        name."""
         workdir = self._workdir / "setup"
         workdir.mkdir()
         original = original_vc()
         disks = self._disks("setup", original, shipped)
-        script = driver.script([CLOCK_KEYS, RIGHT_PANEL_KEYS,
+        script = driver.script([CLOCK_KEYS, RIGHT_PANEL_KEYS, *BY_NAME_KEYS,
                                 SAVE_SETUP_KEYS], driver.facts(original))
         with self._machine(workdir, disks, script) as machine:
             machine.resume()
