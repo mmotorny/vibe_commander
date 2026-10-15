@@ -515,7 +515,10 @@ F39_02:
         menu = F40_50(mouse.place, names);
         if (menu == 0) {
             /* A button is down on the bar and on none of its names:
-               until it is on one, or let go. */
+               until it is on one, or let go. The menu is the one under
+               the pointer then, where the original keeps 0, the menu
+               that is none, for a round: a bug of the original, fixed
+               (DEVIATIONS.md, 28). */
             PtMnu1(0);
             item = 0;
             do {
@@ -525,7 +528,8 @@ F39_02:
                         goto F39_85;
                     ClrKbd();
                 } while (mouse.place >> 8 != 0);
-            } while (F40_50(mouse.place, names) == 0);
+                menu = F40_50(mouse.place, names);
+            } while (menu == 0);
         }
     }
     if (item != 0)                      /* F39_04 */

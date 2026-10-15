@@ -378,7 +378,9 @@ out again (show.py --changes is how):
     look after the one that found it on a name. Left, Down and Enter
     there open a menu that is none, from behind the table of the
     menus, and F1 a page of the help by a byte that is not the same
-    in the original and in the translation: do not press them.
+    in the original and in the translation: do not press them. The
+    portable C has the bar on the name's menu there, a bug of the
+    original fixed (its DEVIATIONS.md, 28).
   - "MiddleClick@40,12" is the middle button. The mouse driver takes a
     PS/2 mouse for one of two buttons and hands the third on only when
     it has been told, so the bench loads it with /3: that is in
@@ -5819,6 +5821,7 @@ SCENARIOS = {
                                           # none
             "Click@70,0*5>25,0*1",        # let go as soon as it is on a
                                           # name: the bar with no menu
+                                          # (the portable C: on Commands)
             "Right",                      # and the keys go by that: the
                                           # menu behind none is the first
             "Esc",

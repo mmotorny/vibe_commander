@@ -2430,3 +2430,37 @@ made this, by its steps (`TODO.md`, "P, the panel without its limit").
 Every scenario shows that a directory that the original's 64K hold is
 read as it was, in a panel's block of 64K and the places, and is held
 to the original's golden.
+
+### 28. A drag along the menu bar onto a name opens that name's menu
+
+**What the original does.** A button pressed on the menu bar beside the
+names, and moved onto one while it is held, is waited for in a loop,
+`F39_03` of `VCMENU.INC`, which asks at every look which name the
+pointer is on, `F40_50`, and leaves when it is on one. The answer is not
+kept: the loop lacks the `MOV CL,AL` that the look before it has, so
+the bar goes on with the menu 0, which is none, until its next look at
+the mouse. With the button still held there, that look takes the name
+under the pointer and opens its menu, so a drag looks as it should. But
+the help's page for the round is read by a word in front of the table
+of the menus, and a button let go at that look leaves the bar with no
+name lit and the keys working on menu 0: Right goes to the first menu,
+and Left, Down or Enter open a menu read from 2,040 bytes behind the
+table, and F1 shows a page by a byte of stray memory. `TODO.md`, "Known
+and not dealt with", had it.
+
+**What the portable C does.** The loop keeps the menu that the pointer
+is on, as the look before it does: the name is lit as soon as the
+pointer is on it, and a button let go then leaves the bar on that
+name's menu, as one pressed on the name and let go does. `F39_00` of
+`menu.c`.
+
+**Why.** The user's decision, on 14 October 2026: a bug of the
+original, fixed. The analyser of clang-tidy named the read in front of
+the table (`TODO.md`, "MD, the main data read as bytes").
+
+**Which scenarios show it.** `mouse-drag-menu`, whose sixth step lets
+the button go at that look, "Click@70,0*5>25,0*1": the original shows
+the bar with no name lit and goes to Left with Right, the portable C
+has Commands lit and goes to Options. Its patch has the two rows of
+the bar. The other drags of that scenario and of `mouse-menu` show
+every screen as the original does.
