@@ -20055,6 +20055,62 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **W3b, the page.** The glue, the shell HTML, the IDBFS sync, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, and the target `portable_c-web`. After W2 and W3a. The user tries it in a browser.
 - **W4.** DEVIATIONS "The web page", the README, TODO and CLAUDE notes, the licences, and the question of publishing to the user.
 
+
+### W0, the toolchain: done, and what a later piece should know
+
+- **Emscripten 6.0.12**, the newest release on 15 October 2026 by
+  emsdk's `emscripten-releases-tags.json` (commit
+  `6e9f6885cb17a3d6c8fd488a5cff730f50aba61d`), the archive
+  `wasm-binaries.tar.xz` for Linux on x86-64 that emsdk would fetch,
+  pinned in `CMakeLists.txt` ("Emscripten") by FetchContent with its
+  SHA-256, `7b073a10...a5e8fa7`. The archive's top directory, `install`,
+  is taken off: `build/_deps/emscripten-src` has `bin` (LLVM),
+  `emscripten` (emcc, with its `node_modules`) and `lib`. Its clang is
+  `24.0.0git`, where the path's clang is 23.
+- **The download:** 304 MB, 1.5 GB unpacked. On the bench's link the
+  download took about a second and the whole configure with the
+  unpacking 15 seconds. A second build directory can take the same
+  download by `-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=<build>/_deps/
+  emscripten-src`.
+- **The configuration** that emsdk would write is written by CMake,
+  `build/emscripten/config`: `LLVM_ROOT`, `BINARYEN_ROOT`, `NODE_JS` (the
+  `node` that the path has, found by `find_program`; the configure
+  stops without one) and `CACHE`, `build/emscripten/cache`. The command
+  is `${emcc}` of CMake: `emscripten/emcc --em-config build/emscripten/
+  config`. At its first use emcc fills the cache with the system's
+  headers and prints `shared:INFO:` and `cache:INFO:` lines; a link
+  will build musl and the rest there the first time, which takes
+  longer. Emscripten runs on the system's `python3`.
+- **`VC_DOS`**, on by default, guards Open Watcom: its download, the C
+  translation, the program for DOS of the portable C and its debug
+  build, and the tests that need any of them, `c-data`, `c-arith`,
+  `c-scenarios`, `portable_c-data`, `portable_c-scenarios`,
+  `portable_c-cut`, `harness-le` and the two of the layout. JWasm is
+  not guarded: it is small, and the driver of the tests that it
+  assembles is what `portable_c-posix-scenarios` runs once on a machine
+  of DOS for the bench's setup file, with the original; `asm-bytes`
+  stays with it. A configure with `-DVC_DOS=OFF -DVC_WEB=ON` was built,
+  and `asm-bytes`, `portable_c-posix-unit` and `portable_c-web-probe`
+  passed in it.
+- **`VC_WEB`**, off by default, guards the download and the web's
+  tests. Every target and test of the web goes inside `if(VC_WEB)`.
+- **The probe**, `portable_c-web-probe`, `harness/webprobe.py`:
+  compiles with `-c` (so wasm32's code is made, not only parsed), at
+  `-O2`, with `clang_warnings`, `-fno-strict-aliasing` and
+  `-D_XOPEN_SOURCE=700`, every file that the web is to have by the
+  plan's list: the common code, every `*_posix.c` but `sys_posix.c` and
+  `term_posix.c`, and `*_web.c` (`NOT_SHARED` and `IMPLEMENTATIONS`
+  there; W1's `machine_posix.c` and `keyboard_posix.c` come in by
+  themselves). 66 files, four seconds. What emcc says of itself at its
+  first use is not counted.
+- **What it found: nothing.** All 66 files compiled with nothing said
+  at the first try, so nothing in the common code was mended and
+  `build/portable_c/VC.EXE` is the same bytes (SHA-256 `f6538da4...
+  dc715abe` before and after; `debug/VC.EXE` the same too). A toy with
+  a `long` put into a `u16` and a `size_t` into an `int` was refused,
+  so the warnings are on. Of wasm32: `size_t` is `unsigned long` there,
+  32 bits.
+
 ## SORT, the bench sorted by name: the plan
 
 On the user's word of 15 October 2026 the panels of the bench sort

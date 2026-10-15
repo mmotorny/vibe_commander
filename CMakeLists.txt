@@ -28,31 +28,50 @@ set_target_properties(jwasm PROPERTIES
     C_EXTENSIONS ON
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
+# --- What is built ------------------------------------------------------------
+# Two options say which downloads the build takes, beside JWasm, which is
+# small and always built: the driver of the tests, which it assembles, is
+# what every test of a machine runs, the program for Linux's too, whose
+# bench's setup file is made once on a machine of DOS.
+#   VC_DOS   Open Watcom, which builds the C translation and the program
+#            for DOS of the portable C. ON by default. Every test of DOS
+#            and of the frozen trees needs it: off, those are not made,
+#            and what is left is the original assembled, the program for
+#            Linux and its tests, the tests that read the source, and the
+#            web's where VC_WEB is on.
+#   VC_WEB   Emscripten, which builds the portable C for the web page,
+#            step 7 of the road. OFF by default; on, it is fetched and
+#            the web's tests are made.
+option(VC_DOS "Fetch Open Watcom; build and test the programs for DOS" ON)
+option(VC_WEB "Fetch Emscripten; build and test the web page" OFF)
+
 # --- Open Watcom --------------------------------------------------------------
 # The C compiler and the linker that build the C trees: an open-source
 # compiler for 16-bit DOS, among other targets. It takes hours to build from
 # source, so the project's own snapshot of 1 October 2026 is fetched, pinned
 # by its SHA-256, and the tools that run on this computer are used from it.
 
-FetchContent_Declare(open_watcom
-    URL https://github.com/open-watcom/open-watcom-v2/releases/download/2026-10-01-Build/ow-snapshot.tar.xz
-    URL_HASH SHA256=e6aa1b1e40ac8bbf97658d2c70fff8a4242d6ca4a1c60806f2baa5317083d4fe
-    DOWNLOAD_NO_EXTRACT FALSE)
-FetchContent_MakeAvailable(open_watcom)
+if(VC_DOS)
+    FetchContent_Declare(open_watcom
+        URL https://github.com/open-watcom/open-watcom-v2/releases/download/2026-10-01-Build/ow-snapshot.tar.xz
+        URL_HASH SHA256=e6aa1b1e40ac8bbf97658d2c70fff8a4242d6ca4a1c60806f2baa5317083d4fe
+        DOWNLOAD_NO_EXTRACT FALSE)
+    FetchContent_MakeAvailable(open_watcom)
 
-set(watcom_hosts
-    Linux-x86_64 binl64  Linux-aarch64 arml64
-    Darwin-x86_64 bino64 Darwin-arm64 armo64
-    Windows-AMD64 binnt64)
-set(host ${CMAKE_HOST_SYSTEM_NAME}-${CMAKE_HOST_SYSTEM_PROCESSOR})
-list(FIND watcom_hosts ${host} index)
-if(index EQUAL -1)
-    message(FATAL_ERROR "Open Watcom has no tools for ${host}")
+    set(watcom_hosts
+        Linux-x86_64 binl64  Linux-aarch64 arml64
+        Darwin-x86_64 bino64 Darwin-arm64 armo64
+        Windows-AMD64 binnt64)
+    set(host ${CMAKE_HOST_SYSTEM_NAME}-${CMAKE_HOST_SYSTEM_PROCESSOR})
+    list(FIND watcom_hosts ${host} index)
+    if(index EQUAL -1)
+        message(FATAL_ERROR "Open Watcom has no tools for ${host}")
 endif()
 math(EXPR index "${index} + 1")
 list(GET watcom_hosts ${index} watcom_bin)
 set(watcom_bin ${open_watcom_SOURCE_DIR}/${watcom_bin})
 set(watcom ${CMAKE_COMMAND} -E env WATCOM=${open_watcom_SOURCE_DIR})
+endif()
 
 # --- Volkov Commander ---------------------------------------------------------
 
@@ -574,25 +593,27 @@ endfunction()
 #
 # The portable C is compiled for 32 bits, in the flat model, with no
 # file named but the one that is linked last: add_portable_c says which.
-add_c_tree(c "the C translation" s
-    blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
-    main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c
-    window.c)
-# Of the portable C, two programs of every build:
-#   portable_c/VC.EXE         the program: -os, small code, and nothing
-#                             for a debugger. It is what is shipped and
-#                             what a test judges.
-#   portable_c/debug/VC.EXE   the same source for finding a fault, run by
-#                             hand: -od, as it is written, with nothing
-#                             moved or left out; -d2, so that its listings
-#                             have the lines of the source; and CHECKED
-#                             defined, for the words of the addresses to
-#                             look at what they are handed. Nothing reads
-#                             CHECKED yet: see TODO.md, the piece B2 of
-#                             the plan for the 32 bits.
-add_portable_c(portable_c ${CMAKE_BINARY_DIR}/portable_c -os)
-add_portable_c(portable_c-debug ${CMAKE_BINARY_DIR}/portable_c/debug
-    -od -d2 -dCHECKED)
+if(VC_DOS)
+    add_c_tree(c "the C translation" s
+        blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
+        main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c
+        window.c)
+    # Of the portable C, two programs of every build:
+    #   portable_c/VC.EXE         the program: -os, small code, and nothing
+    #                             for a debugger. It is what is shipped and
+    #                             what a test judges.
+    #   portable_c/debug/VC.EXE   the same source for finding a fault, run by
+    #                             hand: -od, as it is written, with nothing
+    #                             moved or left out; -d2, so that its listings
+    #                             have the lines of the source; and CHECKED
+    #                             defined, for the words of the addresses to
+    #                             look at what they are handed. Nothing reads
+    #                             CHECKED yet: see TODO.md, the piece B2 of
+    #                             the plan for the 32 bits.
+    add_portable_c(portable_c ${CMAKE_BINARY_DIR}/portable_c -os)
+    add_portable_c(portable_c-debug ${CMAKE_BINARY_DIR}/portable_c/debug
+        -od -d2 -dCHECKED)
+endif()
 # The program for Linux, step 6 of the road: src/portable_c/*_posix.c for
 # sys.h, sys_posix.c with the emulation of DOS of the pieces L1 and L2
 # behind it (TODO.md, "L3a, the program runs on Linux"). Three builds,
@@ -679,6 +700,63 @@ if(clang)
         DEPENDS ${unit_dir}/check)
 endif()
 
+# --- Emscripten ---------------------------------------------------------------
+# The compiler of the web page, step 7 of the road, with VC_WEB alone: the
+# portable C built to WebAssembly by Emscripten, which CLAUDE.md allows as
+# that step's download. The release of 6.0.12, the newest on 15 October
+# 2026, as emsdk fetches it, the archive of its LLVM, Binaryen and
+# Emscripten for Linux on x86-64 at the commit that emsdk's
+# emscripten-releases-tags.json names for that version, pinned by its
+# SHA-256; none of emsdk's scripts is run. Its licences are MIT and the
+# University of Illinois/NCSA (Emscripten), Apache-2.0 with the LLVM
+# exception (LLVM), Apache-2.0 (Binaryen) and MIT (musl). The
+# configuration that emcc reads, which emsdk would write, is written here,
+# build/emscripten/config: its LLVM and Binaryen are the archive's, its
+# Node the one that the path has, and its cache, where emcc keeps the
+# libraries that it builds of its sources at first use, build/emscripten/
+# cache. `emcc` below is the command that runs it so.
+if(VC_WEB)
+    if(NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux"
+       OR NOT CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
+        message(FATAL_ERROR "The build for the web fetches Emscripten "
+                            "for Linux on x86-64 alone")
+    endif()
+    FetchContent_Declare(emscripten
+        URL https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/6e9f6885cb17a3d6c8fd488a5cff730f50aba61d/wasm-binaries.tar.xz
+        URL_HASH SHA256=7b073a102b07eca5a0fe344037681e53162639f3540432456874c0446a5e8fa7)
+    FetchContent_MakeAvailable(emscripten)
+    find_program(node NAMES node nodejs)
+    if(NOT node)
+        message(FATAL_ERROR "The build for the web needs Node.js, which "
+                            "Emscripten runs")
+    endif()
+    set(emscripten_dir ${CMAKE_BINARY_DIR}/emscripten)
+    file(MAKE_DIRECTORY ${emscripten_dir}/cache)
+    file(WRITE ${emscripten_dir}/config
+         "LLVM_ROOT = '${emscripten_SOURCE_DIR}/bin'\n"
+         "BINARYEN_ROOT = '${emscripten_SOURCE_DIR}'\n"
+         "NODE_JS = '${node}'\n"
+         "CACHE = '${emscripten_dir}/cache'\n")
+    set(emcc ${emscripten_SOURCE_DIR}/emscripten/emcc
+        --em-config ${emscripten_dir}/config)
+endif()
+
+# The web probe, the piece W0 of step 7: what the build for the web is to
+# compile, held to the warnings above with -Werror, by emcc, for wasm32,
+# where an int, a long and a pointer have 32 bits each and clang is
+# Emscripten's, of another version than the one of the path. It is the
+# common code and the files of the emulation that the web has of Linux's,
+# every *_posix.c but sys_posix.c and term_posix.c, which are the
+# terminal's and the shell's, and the web's own, *_web.c (TODO.md, "Step
+# 7, the web page"). Nothing is linked: the test portable_c-web-probe
+# compiles them by the command in compiled.txt, harness/webprobe.py.
+if(VC_WEB)
+    set(web_probe_dir ${CMAKE_BINARY_DIR}/portable_c/web-probe)
+    file(MAKE_DIRECTORY ${web_probe_dir})
+    file(GENERATE OUTPUT ${web_probe_dir}/compiled.txt
+         CONTENT "${emcc};${clang_warnings};-fno-strict-aliasing;-D_XOPEN_SOURCE=700;-O2;-I${CMAKE_SOURCE_DIR}/src/portable_c\n")
+endif()
+
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS
 # in QEMU (see harness/) and also need qemu-system-i386 and mtools. The
@@ -710,33 +788,35 @@ add_test(NAME asm-bytes
 # see harness/datacheck.py. Of the portable C, a flat program, field by
 # field where an object has a word that names something: that is a
 # pointer of four bytes there.
-foreach(tree c portable_c)
-    add_test(NAME ${tree}-data
-        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
-                --quiet --source ${CMAKE_SOURCE_DIR}/src/${tree}
-                ${layout_dir} ${CMAKE_BINARY_DIR}/${tree})
-endforeach()
-# The two routines that the compiler for 16 bits calls for arithmetic on
-# 32 bits, against Python's: see harness/arithcheck.py. No scenario
-# divides by more than 16 bits. The portable C has neither: its compiler
-# multiplies and divides such numbers by itself.
-add_test(NAME c-arith
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/arithcheck.py
-            ${CMAKE_BINARY_DIR}/c)
-# A tree through every scenario, against the goldens of the original with
-# what is declared for the tree made to them, and what ran of it: see
-# harness/ported.py. The program for finding a fault, in debug, is run by
-# hand and is in no test of the machine.
-foreach(tree c portable_c)
-    set(c_dir ${CMAKE_BINARY_DIR}/${tree})
-    add_test(NAME ${tree}-scenarios
-        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
-                ${c_dir}/VC.EXE ${c_dir}/VC.MAP ${layout_dir}/VC.LST)
-    # That test runs every scenario, and on a machine that other tests
-    # share it takes many times as long as by itself: it gets an hour
-    # before it counts as stuck, where CTest would give it 25 minutes.
-    set_tests_properties(${tree}-scenarios PROPERTIES TIMEOUT 3600)
-endforeach()
+if(VC_DOS)
+    foreach(tree c portable_c)
+        add_test(NAME ${tree}-data
+            COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
+                    --quiet --source ${CMAKE_SOURCE_DIR}/src/${tree}
+                    ${layout_dir} ${CMAKE_BINARY_DIR}/${tree})
+    endforeach()
+    # The two routines that the compiler for 16 bits calls for arithmetic on
+    # 32 bits, against Python's: see harness/arithcheck.py. No scenario
+    # divides by more than 16 bits. The portable C has neither: its compiler
+    # multiplies and divides such numbers by itself.
+    add_test(NAME c-arith
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/arithcheck.py
+                ${CMAKE_BINARY_DIR}/c)
+    # A tree through every scenario, against the goldens of the original with
+    # what is declared for the tree made to them, and what ran of it: see
+    # harness/ported.py. The program for finding a fault, in debug, is run by
+    # hand and is in no test of the machine.
+    foreach(tree c portable_c)
+        set(c_dir ${CMAKE_BINARY_DIR}/${tree})
+        add_test(NAME ${tree}-scenarios
+            COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
+                    ${c_dir}/VC.EXE ${c_dir}/VC.MAP ${layout_dir}/VC.LST)
+        # That test runs every scenario, and on a machine that other tests
+        # share it takes many times as long as by itself: it gets an hour
+        # before it counts as stuck, where CTest would give it 25 minutes.
+        set_tests_properties(${tree}-scenarios PROPERTIES TIMEOUT 3600)
+    endforeach()
+endif()
 # The source of the portable C against a compiler of this computer, gcc,
 # for a machine of 64 bits: what it refuses, counted by kind and held to
 # what was counted last. See harness/hostcheck.py. It builds nothing and
@@ -784,11 +864,13 @@ set_tests_properties(portable_c-width PROPERTIES SKIP_RETURN_CODE 77)
 # fault's and those of every cast that narrows. See harness/cut.py. It
 # runs no machine; without clang the tree is not read, and the test
 # counts as skipped if the compiler's half has passed.
-add_test(NAME portable_c-cut
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/cut.py
-            --compiled ${CMAKE_BINARY_DIR}/portable_c/compiled.txt
-            --out ${CMAKE_BINARY_DIR}/cutcheck)
-set_tests_properties(portable_c-cut PROPERTIES SKIP_RETURN_CODE 77)
+if(VC_DOS)
+    add_test(NAME portable_c-cut
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/cut.py
+                --compiled ${CMAKE_BINARY_DIR}/portable_c/compiled.txt
+                --out ${CMAKE_BINARY_DIR}/cutcheck)
+    set_tests_properties(portable_c-cut PROPERTIES SKIP_RETURN_CODE 77)
+endif()
 # The program for Linux held to clang's warnings, with the commands that
 # the build compiles it with, and to clang-tidy, by .clang-tidy at the top
 # of the checkout, with clang-tidy 23: every place that it names fails the
@@ -861,36 +943,54 @@ set_tests_properties(portable_c-posix-scenarios PROPERTIES
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see
 # harness/lecheck.py. It runs no machine.
-add_test(NAME harness-le
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/lecheck.py
-            --watcom ${open_watcom_SOURCE_DIR} --tools ${watcom_bin}
-            --out ${CMAKE_BINARY_DIR}/lecheck)
-# The two programs of the portable C, each against the layout that it
-# rests on: where the linker has put the tables, the main data, the stack
-# and what has no value, by the file and the linker's map of it, and that
-# its stub is DOS/32A's with the banner switched off. See
-# harness/layoutcheck.py. It runs no machine.
-foreach(tree portable_c portable_c-debug)
-    # Each under the name of its target, and the second in the directory
-    # debug of the first.
-    string(REPLACE "-" "/" c_dir ${tree})
-    set(c_dir ${CMAKE_BINARY_DIR}/${c_dir})
-    add_test(NAME ${tree}-layout
-        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/layoutcheck.py
-                --stub ${open_watcom_SOURCE_DIR}/binw/dos32a.exe
-                ${c_dir}/VC.EXE ${c_dir}/VC.MAP)
-endforeach()
+if(VC_DOS)
+    add_test(NAME harness-le
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/lecheck.py
+                --watcom ${open_watcom_SOURCE_DIR} --tools ${watcom_bin}
+                --out ${CMAKE_BINARY_DIR}/lecheck)
+    # The two programs of the portable C, each against the layout that it
+    # rests on: where the linker has put the tables, the main data, the stack
+    # and what has no value, by the file and the linker's map of it, and that
+    # its stub is DOS/32A's with the banner switched off. See
+    # harness/layoutcheck.py. It runs no machine.
+    foreach(tree portable_c portable_c-debug)
+        # Each under the name of its target, and the second in the directory
+        # debug of the first.
+        string(REPLACE "-" "/" c_dir ${tree})
+        set(c_dir ${CMAKE_BINARY_DIR}/${c_dir})
+        add_test(NAME ${tree}-layout
+            COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/layoutcheck.py
+                    --stub ${open_watcom_SOURCE_DIR}/binw/dos32a.exe
+                    ${c_dir}/VC.EXE ${c_dir}/VC.MAP)
+    endforeach()
+endif()
+# The web probe of the piece W0 of step 7, with VC_WEB alone: every file
+# that the build for the web is to compile, compiled by emcc with the
+# warnings of the program for Linux and -Werror, each failure printed.
+# See harness/webprobe.py. It runs no machine.
+if(VC_WEB)
+    add_test(NAME portable_c-web-probe
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webprobe.py
+                --compiled ${web_probe_dir}/compiled.txt
+                --out ${web_probe_dir})
+    set_tests_properties(portable_c-web-probe PROPERTIES LABELS portable_c)
+endif()
 # What each test judges, as a label, so that a run can pick by it: `ctest
 # -L portable_c` for a change to the portable C alone, which cannot
 # change what the frozen trees are judged by ("Work by several agents"
 # in CLAUDE.md); `-LE machine` for the tests that start no machine.
-set_tests_properties(asm-bytes c-data c-arith
-    PROPERTIES LABELS frozen)
-set_tests_properties(portable_c-data portable_c-host portable_c-int16
-    portable_c-words portable_c-width portable_c-cut portable_c-tidy
+set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
+set_tests_properties(portable_c-host portable_c-int16
+    portable_c-words portable_c-width portable_c-tidy
     portable_c-posix-unit portable_c-terminal
-    portable_c-layout portable_c-debug-layout
     PROPERTIES LABELS portable_c)
-set_tests_properties(portable_c-scenarios PROPERTIES LABELS "portable_c;machine")
-set_tests_properties(c-scenarios PROPERTIES LABELS "frozen;machine")
-set_tests_properties(harness-le PROPERTIES LABELS harness)
+if(VC_DOS)
+    set_tests_properties(c-data c-arith PROPERTIES LABELS frozen)
+    set_tests_properties(portable_c-data portable_c-cut
+        portable_c-layout portable_c-debug-layout
+        PROPERTIES LABELS portable_c)
+    set_tests_properties(portable_c-scenarios PROPERTIES
+        LABELS "portable_c;machine")
+    set_tests_properties(c-scenarios PROPERTIES LABELS "frozen;machine")
+    set_tests_properties(harness-le PROPERTIES LABELS harness)
+endif()
