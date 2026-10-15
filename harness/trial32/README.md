@@ -5,9 +5,9 @@ in the flat model, with a DOS extender and no C library, and run on the
 test bench through the harness as it is. They were made on 12 October
 2026, before the portable C was taken to 32 bits, to find out whether
 the bench can run and drive such a program and what the harness needs
-for it. What they showed is in `TODO.md`, "The portable C in 32 bits:
-what a trial on the bench showed"; they are kept so that it can be seen
-again, and asked further.
+for it. What they showed is in `DIARY.md`, "Write down what a trial of a
+32-bit program on the bench showed"; they are kept so that it can be
+seen again, and asked further.
 
 Since then one toy has been added that is of the work itself: `sys.c`,
 which asks the system's functions of the portable C,
@@ -80,7 +80,7 @@ the finding: see `csover.c`.
 | `timer.c` | What the extender has done to the timer's counter 0 |
 | `zero.c` | Is what the file does not hold zero at the entry, and where do the code and the data land |
 | `memory.c` | What memory there is, by DPMI 0500h, 0501h and 0100h and by INT 21h function 48h |
-| `blocks.c` | The extender's blocks, DPMI 0500h to 0503h, for the memory of the panels and the texts (`TODO.md`, "X, the extender's memory on the bench"): how much there is and the largest block that is given; where blocks are and what the extender keeps in front of each; a block made longer and shorter, in its place and not; one given back and taken again; what is in a block as it is given; a write behind the end of one. Steps of `f l a r x g z d h w q`, as its top has them. It asks DOS for its version in front of each and behind it, so that `calls.asm` shows whether DOS is asked anything between |
+| `blocks.c` | The extender's blocks, DPMI 0500h to 0503h, for the memory of the panels and the texts (`DIARY.md`, "Write down what the extender's memory does on the bench, the piece X"): how much there is and the largest block that is given; where blocks are and what the extender keeps in front of each; a block made longer and shorter, in its place and not; one given back and taken again; what is in a block as it is given; a write behind the end of one. Steps of `f l a r x g z d h w q`, as its top has them. It asks DOS for its version in front of each and behind it, so that `calls.asm` shows whether DOS is asked anything between |
 | `second.c` | What a program run from this one finds of the extender's memory, with the largest block kept, made shorter or given back: a copy of the toy, the program of the portable C (`--extra VC.EXE=build/portable_c/VC.EXE`), `mem`, `above.asm`, and a copy that `ended.asm` has DOS end with a block kept (`--extra VC/ENDED.COM=build/trial32/ended.com --extra VC/T.EXE=build/trial32/second-d32.exe`). Steps of `k t 1 s Shift+s b f c p m a e q`, as its top has them. With all but so much kept, it is a machine of so little memory for the program that it runs |
 | `keys.c` | The idle call, keys with the shift state, the mouse: steps `a F5 Shift+F6 Alt+F1 Click@3,5 q`; with `--stack 0,512`, how much of the extender's stack of real mode the driver's work uses; with `--driver` and `--debug`, where the idle call comes from |
 | `wait.c` | A key waited for inside the BIOS: steps `a q` |
@@ -109,17 +109,17 @@ VC.COM build/trial32/rmbench.com`.
 
 ## A script of the plan
 
-When the step was planned, on 13 October 2026 (`TODO.md`, "The portable
-C in 32 bits: the plan"), the tree itself was asked three things, by
-scripts that read and compile it and run nothing. One is here for the
-pieces of that plan to start from, and what each printed that day is in
-the plan. The second, `whole.py`, asked whether the tree links as a
-flat program and how long that is: the project's build links that
-program now, `build/portable_c/VC.EXE`, `python3 harness/le.py` with
-the file and its map prints what the script printed of it, but for how
-many bytes of the file its relocations take, and the script is gone.
-The third, which asked where the program can tell an
-int of 32 bits from one of 16, has become a test of the build,
+When the step was planned, on 13 October 2026 (`DIARY.md`, "Write down
+the plan for the 32 bits, with the scripts of its trials"), the tree
+itself was asked three things, by scripts that read and compile it and
+run nothing. One is here for the pieces of that plan to start from, and
+what each printed that day is in the plan. The second, `whole.py`, asked
+whether the tree links as a flat program and how long that is: the
+project's build links that program now, `build/portable_c/VC.EXE`,
+`python3 harness/le.py` with the file and its map prints what the script
+printed of it, but for how many bytes of the file its relocations take,
+and the script is gone. The third, which asked where the program can
+tell an int of 32 bits from one of 16, has become a test of the build,
 `portable_c-int16`, and is `harness/int16.py`.
 
 | File | What it asks |

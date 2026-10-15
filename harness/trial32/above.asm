@@ -2,7 +2,9 @@
 ; when it is run as a command: by the program of 16 bits, where it is told
 ; what the BIOS has, and by the program of 32 bits, whose extender has the
 ; memory then. DOS's MEM goes by these, and the scenario `command` shows
-; what it makes of them (TODO.md, "C2"). It writes by DOS, in hex:
+; what it makes of them (DIARY.md, "Write down what a command of the
+; program of 32 bits is told of the memory, and the piece"). It writes by
+; DOS, in hex:
 ;
 ;   88    AX behind INT 15h function 88h, the KB above the megabyte, and
 ;         the carry flag, NC or CY

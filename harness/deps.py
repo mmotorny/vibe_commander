@@ -55,9 +55,10 @@ FREEDOS_LITE = Download(
 # pyte 0.8.2, a terminal emulator in Python, the wheel from the Python
 # Package Index, as its authors publish it there (LGPL 3). The test
 # portable_c-terminal replays through it what the program for Linux draws
-# in a terminal, on the user's word of 14 October 2026 (CLAUDE.md, step
-# 6), which allowed this download. It wants wcwidth, which is not
-# fetched: harness/terminal.py says what stands in its place and why.
+# in a terminal, on the user's word of 14 October 2026 (CLAUDE.md, "The
+# scenarios of the program for Linux"), which allowed this download. It
+# wants wcwidth, which is not fetched: harness/terminal.py says what
+# stands in its place and why.
 PYTE = Download(
     "pyte-0.8.2-py3-none-any.whl",
     "https://files.pythonhosted.org/packages/59/d0/"

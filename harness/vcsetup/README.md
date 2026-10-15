@@ -3,13 +3,13 @@
 The original's setup program, `VCSETUP`, has much of the main program in
 it: routines that are the main program's word for word, routines of the
 same name with another text, and texts and tables of both kinds. It goes
-into the portable C as a part of the one program (`TODO.md`, "The setup
-program in the portable C: the plan"), and what is the main program's
-word for word is not translated twice. These three scripts say which is
-which, by the text of `src/asm` and by the listing of the build. They
-were made for the trial that the plan rests on, and are kept for the
-pieces of that work: a piece looks here before it translates a routine or
-writes a table.
+into the portable C as a part of the one program (`DIARY.md`, "Write down
+the plan for the setup program, with the scripts of its trial"), and what
+is the main program's word for word is not translated twice. These three
+scripts say which is which, by the text of `src/asm` and by the listing
+of the build. They were made for the trial that the plan rests on, and
+are kept for the pieces of that work: a piece looks here before it
+translates a routine or writes a table.
 
 Nothing here is built or tested by the project, and nothing of the
 harness or of the tests uses it. Each is run from the checkout, and the

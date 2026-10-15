@@ -3,12 +3,13 @@
 bench that did not sort.
 
 The bench's panels list files sorted by name since the piece SORT
-(TODO.md, "SORT, the bench sorted by name: the plan"), where they had
-them as the disk has them. Steps that went to a file by its place, Down
-four times onto hello.txt, go to another file on the new bench, and are
-rewritten so that each goes where it went. This says whether a scenario
-does, from its golden as derived on the new bench and the golden at a
-commit of the old one, BEFORE, without running anything:
+(DIARY.md, "Plan the rewriting of the scenarios for a bench that sorts
+by name"), where they had them as the disk has them. Steps that went to
+a file by its place, Down four times onto hello.txt, go to another file
+on the new bench, and are rewritten so that each goes where it went.
+This says whether a scenario does, from its golden as derived on the new
+bench and the golden at a commit of the old one, BEFORE, without running
+anything:
 
     sortcheck.py                    every scenario, a line each
     sortcheck.py copy view          those, with what differs

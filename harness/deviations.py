@@ -256,11 +256,12 @@ class WrittenTimes:
     shows them on a line of that directory, `..` or a subdirectory's, on
     the golden's screen. The host moves a directory's time whenever an
     entry is made or removed in it, and DOS does not (the user's word of
-    15 October 2026, CLAUDE.md, step 6). Which directory a line is of is
-    read from the panel's title above it, the path in its top frame: a
-    line whose panel has no title on the screen is left out wherever the
-    run has written into any directory. Where the run has written into
-    none, nothing is left out."""
+    15 October 2026, CLAUDE.md, "The scenarios of the program for
+    Linux"). Which directory a line is of is read from the panel's title
+    above it, the path in its top frame: a line whose panel has no title
+    on the screen is left out wherever the run has written into any
+    directory. Where the run has written into none, nothing is left
+    out."""
     what: str = "the time of a directory that the run wrote into"
 
     # A line of a directory in a panel, between its frames: in a brief
@@ -1035,8 +1036,9 @@ TREES = {
                           "original shows its box",
             # The scenarios of the setup program, until the tree has the
             # code that each shows: an entry goes with the commit that
-            # makes its scenario pass (TODO.md, "The setup program in the
-            # portable C: the plan"). None waits now.
+            # makes its scenario pass (DIARY.md, "Write down the plan for
+            # the setup program, with the scripts of its trial"). None
+            # waits now.
         },
         # On the user's word of 14 October 2026 (DEVIATIONS.md, 13):
         # its expectation is harness/goldens/portable_c/editor-huge.txt.
@@ -1367,8 +1369,8 @@ def _on_top(base, more):
 
 # What the program for Linux shows that nothing can expect, a thing of
 # the host's, each left out where the golden has the original's: masks
-# (CLAUDE.md, step 6; the user's word of 15 October 2026), rules with
-# None for their text (masked()).
+# (CLAUDE.md, "The scenarios of the program for Linux"; the user's word
+# of 15 October 2026), rules with None for their text (masked()).
 LINUX_MASKS = (
     # The drive's letter: the bench's C:, which is H: on Linux, the
     # home directory, in a title, on the prompt, in a dialog's line and
@@ -1386,9 +1388,10 @@ LINUX_MASKS = (
     # the command line's.
     (re.compile(r"^(C)(?![:>])"), None, re.compile(r"^1\D{6,7}2")),
     # And in the setup file's bytes, which the Linux program has saved
-    # with H: where the bench's has C: (CLAUDE.md, step 6), where the
-    # editor shows them in hex: the drive of the right panel's path, the
-    # last byte of the row of 60h (posixrun.SETUP_PATHS).
+    # with H: where the bench's has C: (CLAUDE.md, "The scenarios of the
+    # program for Linux"), where the editor shows them in hex: the drive
+    # of the right panel's path, the last byte of the row of 60h
+    # (posixrun.SETUP_PATHS).
     (re.compile(r"^ 00000060(?:  [0-9A-F]{2}(?: [0-9A-F]{2}){3}){3}"
                 r"  [0-9A-F]{2}(?: [0-9A-F]{2}){2} (43)  .{15}(C) $"),
      None, None),
@@ -1466,9 +1469,9 @@ LINUX_NOT_RUN = {
          "enter-many-selected", "start-setup", "setup-defaults"], _DOS),
     # Of those that run a command, those whose value is the command
     # itself or comes behind a command of DOS's that the host's shell has
-    # not, DEL, RD, TIME, ATTRIB (TODO.md, "L3b"): the others are run
-    # with what DOS has shown masked behind a command (DosShown), or as
-    # far as a step, LINUX_CUT.
+    # not, DEL, RD, TIME, ATTRIB (TODO.md, "Step 6, the program for
+    # Linux: what is left"): the others are run with what DOS has shown
+    # masked behind a command (DosShown), or as far as a step, LINUX_CUT.
     "enter": "Enter on a file that DOS runs, and the commands before and "
              "after it: what it holds is DOS running them",
     "user-menu-run": "the commands of the user menu, whose parameters "
@@ -1550,7 +1553,8 @@ LINUX_CUT = {
                    "29 only programs, and all files again behind it"),
     # Of those that went to A: or to D:\VC, the ones that went there for
     # more than files to work on, which the others find in C:\FILES,
-    # H:\FILES on Linux (CLAUDE.md, step 6).
+    # H:\FILES on Linux (CLAUDE.md, "The scenarios of the program for
+    # Linux").
     "move": (4, "a file or a directory moved to another drive, D:, which "
                 "Linux has not: its other drive is R:, the host's root"),
     "attributes-directory": (19, "the diskette in A:, write-protected, "
@@ -1563,10 +1567,11 @@ LINUX_CUT = {
 # The steps that the program for Linux is not taken through in one
 # scenario, where a scenario uses a name of DOS's devices as the device
 # on the way to something else, and leaves no trace of it on DOS: the
-# screens after them are the original's (CLAUDE.md, step 6, the user's
-# word of 15 October 2026). Where the original's screen is a row higher
-# after such a step, as when the BIOS beeps, the steps are not left out
-# but the scenario is cut there (LINUX_CUT).
+# screens after them are the original's (CLAUDE.md, "The scenarios of
+# the program for Linux", the user's word of 15 October 2026). Where the
+# original's screen is a row higher after such a step, as when the BIOS
+# beeps, the steps are not left out but the scenario is cut there
+# (LINUX_CUT).
 LINUX_LEFT_OUT_OF = {
     "copy": {
         ("F5", '"nul" Enter', "F5", '"con" Enter', "Enter"):

@@ -10,16 +10,17 @@ The portable C says where a thing is in the memory through a few words
 of vc.h, which stand for what a segment and an offset were on DOS: `AT`,
 `PANEL`, `OFFSET`, `MD_PLACE` and the others of WORDS below. Step 2 of
 the road takes them out, piece by piece, as a segment becomes a pointer
-(TODO.md, "The portable C in a flat memory: the plan"). This is the
-measure of that work: how often each word is written in each file of
-`src/portable_c`, in `harness/words.txt`. The test `portable_c-words`
-fails for a file that has another count than the record, fewer as well
-as more, so that a commit which changes a count carries the record's
-lines that say so: write the record anew with `--record`, read what its
-diff says, and commit it with the change. A count may go up: the pieces
-that came first wrote `SEG_OF` and `AT` where they met what another
-piece still had as a segment, and the last, F10, took those out with
-the megabyte that they counted in, and the words with them from vc.h.
+(DIARY.md, "Plan the portable C in a flat memory, step 2 of the road").
+This is the measure of that work: how often each word is written in each
+file of `src/portable_c`, in `harness/words.txt`. The test
+`portable_c-words` fails for a file that has another count than the
+record, fewer as well as more, so that a commit which changes a count
+carries the record's lines that say so: write the record anew with
+`--record`, read what its diff says, and commit it with the change. A
+count may go up: the pieces that came first wrote `SEG_OF` and `AT`
+where they met what another piece still had as a segment, and the last,
+F10, took those out with the megabyte that they counted in, and the
+words with them from vc.h.
 
 What is counted is the text, as hostcheck.py's words of the segments
 are: a word as a whole word, outside comments, strings and characters,

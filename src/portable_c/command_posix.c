@@ -1,13 +1,13 @@
 /*
  * A command of DOS's made one for the host's shell, the piece L6 of step
- * 6 (TODO.md, "L6, commands"). The program hands the shell what it hands
- * COMMAND.COM behind /C: a line of the code page, with paths of DOS's in
- * it. The shell is handed the same line in UTF-8, each path of DOS's that
- * begins with a drive that there is, R: or H:, made the path of the host
- * that it leads to (HostPathOfDos), and each name of the current
- * directory, as Enter types it and the user menu's !.! makes it, the
- * host's name (L6b), quoted for the shell. See
- * emulate_posix.h for what each answers.
+ * 6 (DIARY.md, "Run a command of the program for Linux in the host's
+ * shell"). The program hands the shell what it hands COMMAND.COM behind
+ * /C: a line of the code page, with paths of DOS's in it. The shell is
+ * handed the same line in UTF-8, each path of DOS's that begins with a
+ * drive that there is, R: or H:, made the path of the host that it leads
+ * to (HostPathOfDos), and each name of the current directory, as Enter
+ * types it and the user menu's !.! makes it, the host's name (L6b),
+ * quoted for the shell. See emulate_posix.h for what each answers.
  */
 #include <string.h>
 

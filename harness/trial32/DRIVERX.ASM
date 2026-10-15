@@ -1,7 +1,8 @@
 ; A copy of the driver of the tests, harness/DRIVER.ASM, for the trial of
-; a 32-bit program on the bench (see README.md here, and TODO.md, "The
-; portable C in 32 bits"). It is no part of the harness and nothing uses
-; it but run.py of this directory. What it has that the driver has not:
+; a 32-bit program on the bench (see README.md here, and DIARY.md, "Write
+; down what a trial of a 32-bit program on the bench showed"). It is no
+; part of the harness and nothing uses it but run.py of this directory.
+; What it has that the driver has not:
 ;
 ;   LAuto, LClock	where AutoTim and Clock are as linear addresses, which
 ;			the host writes into the file behind Pad, at its

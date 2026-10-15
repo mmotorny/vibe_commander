@@ -218,9 +218,9 @@ word of 13 October 2026:
   used follows the same and is left out of the comparison for following
   the size of the program. The extender can be told how much to take,
   by four bytes of its settings, which was seen on a copy of the file
-  and is not done: `TODO.md`, "C2, a second copy in the driver, and
-  `command`", has what a command is told, call by call, and what that
-  setting would cost.
+  and is not done: `DIARY.md`, "Write down what a command of the program
+  of 32 bits is told of the memory, and the piece", has what a command
+  is told, call by call, and what that setting would cost.
 - What it wants of the machine, where it cannot start. It is compiled
   for the 386 and started by an extender that needs one, and it wants
   memory above the megabyte for all of itself, for its two panels and
@@ -275,13 +275,13 @@ what still differs. And the same day: what follows from its running
 under an extender and shows on no screen is declared as it is, what it
 wants of the machine and what the extender is in the machine while it
 runs among it. The user's word, "declare all five", on a list of what
-differs in the program for its 32 bits (`TODO.md`, "The program of 32
-bits: what differs from the original, for the user", 6 to 10 there; the
-others of the five are in 6 and in 8). And the same day, when the last
-of that list had been put to them: that a command finds no memory above
-the megabyte while the extender holds it is declared as it is, with no
-change of the program (1 of that list, and `CLAUDE.md`, "The portable
-C").
+differs in the program for its 32 bits (`DIARY.md`, "Collect what
+differs in the program of 32 bits from the original, for the user", 6 to
+10 there; the others of the five are in 6 and in 8). And the same day,
+when the last of that list had been put to them: that a command finds no
+memory above the megabyte while the extender holds it is declared as it
+is, with no change of the program (1 of that list, and `CLAUDE.md`, "The
+program for DOS").
 
 **Which scenarios show it.** Each of these is held against the original's
 golden with what its row says made to it: by its patch, or, where the row
@@ -903,9 +903,9 @@ watch.
   back, with INT 15h where the extender has it. A mend was built and
   dropped on the user's word the same day: it left such a program at
   work but for INT 21h, which the extender has while the program runs
-  and which nothing of the program can keep for another. `TODO.md`, "L,
-  a program that has stayed in the memory, when the program is left",
-  has the mend in words and what was read of the extender.
+  and which nothing of the program can keep for another. `DIARY.md`,
+  "Write down a mend for a program that has stayed in the memory, which
+  was dropped", has the mend in words and what was read of the extender.
 - The program does not take INT 21h either, since. When the watch went
   the entry of that interrupt was kept for the program's own call, which
   the same entry takes, and handed every other call of DOS on untouched;
@@ -1182,11 +1182,12 @@ layout, which mean nothing in a file. That was made so before it was
 asked, and was decided on the user's word of 13 October 2026: a setup
 file made from the defaults has zeros there, and that stands. The
 program's own call goes by the decision of 12 October 2026 too, as the
-road of `CLAUDE.md` has it: "The call by which the setup program asked
-a running copy for its data goes then, with the last of the watch on
-DOS." Taking DOS's own interrupt, so that every call of every program
-passes the program, was for a second program that there is no more, and
-is a thing of DOS alone.
+road of `CLAUDE.md` had it then (`DIARY.md`, "Put the setup program on
+the road of the portable C, first"): "The call by which the setup
+program asked a running copy for its data goes then, with the last of
+the watch on DOS." Taking DOS's own interrupt, so that every call of
+every program passes the program, was for a second program that there is
+no more, and is a thing of DOS alone.
 
 **Which scenarios show it.** Every scenario of the setup program is held
 against the golden that the original's setup program left, with two
@@ -1671,18 +1672,18 @@ full when the memory is.
 the room that it has. The program of 16 bits that it was had what DOS
 had left, as the original. The program of 32 bits has its panels and
 its text in the extender's memory, above the megabyte, of which it asks
-for as much as there is, as the original asks DOS (`TODO.md`, "The
-portable C in a flat memory: the plan", "The memory from the
-extender"): its editor has all of that but its own objects and its two
-panels, 64K each unless a directory has needed more (27), whatever DOS
-has free. The README's figures have how much that is on the bench of
-the tests, some 15 MB: more than forty
-times the original's room there, 345,840 bytes. From when it was
-switched to 32 bits until the memory was the extender's, on 14 October
-2026, the program handed out 640 KB of its own instead, and its room
-was 641,824 bytes and then, with the panels in blocks of their own of
-64K from the start, 524,240 bytes on any machine; `TODO.md`, "C1, the
-editor", has the figures as they were measured then.
+for as much as there is, as the original asks DOS (`DIARY.md`, "Revise
+the plan for a flat memory by the user's two answers"): its editor has
+all of that but its own objects and its two panels, 64K each unless a
+directory has needed more (27), whatever DOS has free. The README's
+figures have how much that is on the bench of the tests, some 15 MB:
+more than forty times the original's room there, 345,840 bytes. From
+when it was switched to 32 bits until the memory was the extender's, on
+14 October 2026, the program handed out 640 KB of its own instead, and
+its room was 641,824 bytes and then, with the panels in blocks of their
+own of 64K from the start, 524,240 bytes on any machine; `DIARY.md`,
+"Move the rows of the editor's window by a place of 16 bits, not by a
+pointer", has the figures as they were measured then.
 
 So the program of 32 bits opens a file in the editor that the original
 refuses with its box, if the file is larger than the original's room
@@ -1836,14 +1837,15 @@ megabyte, with the stack kept by hand around it and put back, and the 48
 bytes of the block there that they stood in. The program has one way of
 running a command.
 
-**Why.** The user's decision, on 13 October 2026, as `CLAUDE.md` has it
-under "The portable C": Quick execute commands goes, the setting and the
-way through INT 2Eh. It was asked and not taken out as a thing of DOS's,
-since a feature is judged by what it gives a user and not by how DOS did
-it: the interrupt is one that only DOS's COMMAND.COM has, but commands
-run by the shell that the program was started from, sooner and with what
-they set kept, are not DOS's alone. No bench of the project could show a
-command run so: the shell there does not serve the interrupt.
+**Why.** The user's decision, on 13 October 2026, as `DIARY.md` has it
+under "Write down what the user decided of the features in doubt": Quick
+execute commands goes, the setting and the way through INT 2Eh. It was
+asked and not taken out as a thing of DOS's, since a feature is judged
+by what it gives a user and not by how DOS did it: the interrupt is one
+that only DOS's COMMAND.COM has, but commands run by the shell that the
+program was started from, sooner and with what they set kept, are not
+DOS's alone. No bench of the project could show a command run so: the
+shell there does not serve the interrupt.
 
 **Which scenarios show it.** Each of these is held against the
 original's golden with what its row says made to it, by its patch:
@@ -1919,11 +1921,12 @@ floppy drive and goes by another letter, and Cancel there leaves the
 list for the panels with nothing changed, as it does wherever the
 program shows that box.
 
-**Why.** The user's decision, on 13 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed. The work on the
-addresses met it: the program of 32 bits had done so since it was one,
-by a cast that dropped a segment in 16 bits and drops nothing in a flat
-memory, without anybody having decided it.
+**Why.** The user's decision, on 13 October 2026, as `DIARY.md` has it
+under "Write down three decisions of the user's: what clang does not
+name, Go to, and the capitals": a bug of the original, fixed. The work
+on the addresses met it: the program of 32 bits had done so since it was
+one, by a cast that dropped a segment in 16 bits and drops nothing in a
+flat memory, without anybody having decided it.
 
 **Which scenarios show it.** None. `find`, `find-drives` and
 `mouse-find` take Go to, each from the drive that the line is on or to
@@ -1932,7 +1935,8 @@ they are. A scenario that showed it would take Go to on a line of the
 drive that shares the floppy drive with another, B: while the drive
 goes by A:, from a third drive: the original then has DOS's prompt for
 the disk, and the portable C its box. It is to be written
-(`TODO.md`, "F4, the viewer and the file search").
+(`DIARY.md`, "Hand the viewer its text and the file search its list as
+pointers").
 
 ### 16. The file search reads no part of a file behind the end of its room
 
@@ -1960,12 +1964,14 @@ box says how many files were found and offers its menu, as for a list
 that is full. Before the list is within 8000h and 80 bytes of its end,
 nothing differs. `FindFil` of `find.c`.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed. The program of 32
-bits wrote into its own memory behind the room there, and from the
-memory of the extender on it would be ended by the extender for it. The
-cluster N5 met it where it counted the room in bytes (`TODO.md`, "N5,
-`find.c`", and question 10).
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down two limits of the original that the user decided: the
+file search's parts, and a panel's entries": a bug of the original,
+fixed. The program of 32 bits wrote into its own memory behind the room
+there, and from the memory of the extender on it would be ended by the
+extender for it. The cluster N5 met it where it counted the room in
+bytes (`DIARY.md`, "Write down the cluster N5, and the question of a
+part read behind the room", and question 10).
 
 **Which scenarios show it.** None. `find`, `find-drives`, `mouse-find`,
 `stamps` and `stamps-russia` search for a text with a list of a few
@@ -2000,12 +2006,14 @@ written and the copy goes on, as it does for a file that is larger than
 the room. A file, and a device that gives each piece in one read, are
 copied as before. `C20_00` of `copy.c`.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed. The program of 32
-bits wrote into its own memory behind the room there, and from the
-memory of the extender on it would be ended by the extender for it. The
-cluster N9 met it where it counted the room in bytes (`TODO.md`, "N9,
-`copy.c`").
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down two limits of the original that the user decided: the
+file search's parts, and a panel's entries": a bug of the original,
+fixed. The program of 32 bits wrote into its own memory behind the room
+there, and from the memory of the extender on it would be ended by the
+extender for it. The cluster N9 met it where it counted the room in
+bytes (`DIARY.md`, "Sort the numbers of copy.c, and count the copy's
+room in bytes").
 
 **Which scenarios show it.** None, and none can on the bench. The one
 device that a scenario copies from, `nul` in `copy`, gives nothing; the
@@ -2039,10 +2047,11 @@ it, some 524,000 at the most. The Right key still stops at column
 column beyond it. A line of fewer than 65,536 columns is shown as
 before. `V00_10`, `V25_00` and `V32_00` of `view.c`.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed. The cluster N4
-met it where it gave the viewer's numbers their widths (`TODO.md`,
-"N4, `view.c`, its second part", and question 11).
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": a bug of the original, fixed. The cluster N4 met it where it
+gave the viewer's numbers their widths (`DIARY.md`, "Sort the numbers of
+the second part of view.c", and question 11).
 
 **Which scenarios show it.** None. `view-search`, `view-keys` and the
 other scenarios of the viewer have lines of a few columns, and are held
@@ -2074,13 +2083,14 @@ whole clusters in 32 bits, so that such a file counts all its clusters.
 Every other file counts as in the original, and the sum wraps at 4 GB
 as the original's does. `PutInf` of `info.c`.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed. The cluster N12
-met it where it sorted the numbers of `info.c` (`TODO.md`, "N12,
-`panel.c`, `info.c`, `drive.c`", question B). Its other question there,
-a cluster of 64K, which the original keeps as 0 bytes, is fixed too,
-by the piece M, entry 26: it rests on this count, which divides in 32
-bits.
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": a bug of the original, fixed. The cluster N12 met it where it
+sorted the numbers of `info.c` (`DIARY.md`, "Sort the numbers of
+panel.c, info.c and drive.c, with two questions of the Info panel",
+question B). Its other question there, a cluster of 64K, which the
+original keeps as 0 bytes, is fixed too, by the piece M, entry 26: it
+rests on this count, which divides in 32 bits.
 
 **Which scenarios show it.** `enter` and `view-window`, by their
 patches, which have the line of the files of `C:\STAMPS` on the Info
@@ -2118,10 +2128,11 @@ again, the cursor's and the first one shown among them. The same when
 the setup is left. `F21_31` of `enter.c` and `StSetup` of `stmain.c`
 no longer cut; `F21_40` is gone.
 
-**Why.** The user's decision, on 13 October 2026, as `CLAUDE.md` has it
-under "The portable C": the cut was there because the original gives
-its memory up for a command, which the portable C does not (entry 1),
-so it is the removal of what only made sense on DOS.
+**Why.** The user's decision, on 13 October 2026, as `DIARY.md` has it
+under "Write down that the cut of a panel to 256 files for a command
+goes": the cut was there because the original gives its memory up for a
+command, which the portable C does not (entry 1), so it is the removal
+of what only made sense on DOS.
 
 **Which scenarios show it.** `enter-many-selected`, which selects all
 288 files of a directory, with the cursor on the last, and runs a
@@ -2156,12 +2167,13 @@ the file written anew. Every other file is taken as before. `ReadTre`
 of `treebox.c`, and the cursor of `ChTree`, which a list of no entry no
 longer reaches.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed. The program of 32
-bits counts the bytes of the list in 32 bits, which refuses a count of
-4,096 or more by itself; the cluster N13 met it where it widened that
-count, and had kept the cut of 16 bits until this was decided
-(`TODO.md`, "N13, `tree.c`, `treebox.c`, `extfile.c`").
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": a bug of the original, fixed. The program of 32 bits counts the
+bytes of the list in 32 bits, which refuses a count of 4,096 or more by
+itself; the cluster N13 met it where it widened that count, and had kept
+the cut of 16 bits until this was decided (`DIARY.md`, "Sort the numbers
+of tree.c, treebox.c and extfile.c").
 
 **Which scenarios show it.** None. A scenario sets up what it needs
 through the program's own menus, and such a file has bytes that are no
@@ -2196,8 +2208,9 @@ looking for the label failed with that error. `GetVol` of `read.c`
 answers whether it failed apart from the error, and `RdInfo` goes by
 that; `GetVol` gives no error for a label that it has found.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed.
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": a bug of the original, fixed.
 
 **Which scenarios show it.** None. Every disk of the bench has a label,
 `VOLKOV`, `PROGRAM` and `WORK`, which the bench makes and a scenario does
@@ -2235,8 +2248,9 @@ of the main data. What the help does with the numbers of the lines of a
 file that is not true to its text, which wrap at 65,535 as the
 original's do, is not changed: the user decided that it stays.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed.
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": a bug of the original, fixed.
 
 **Which scenarios show it.** None. Such a file can be made through the
 program: the editor types the bytes of the help file in hex, and a page
@@ -2266,16 +2280,17 @@ status line is empty from behind the number of the column to its end.
 `edit_t.c`. Nothing else of the editor changes: it still says when the
 room is full, as before.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": every figure of free memory goes, on DOS too,
-as a thing that only made sense on DOS, and this was the last of them
-(the Info panel's two lines on the memory went with entry 11, the map
-of the memory with entry 7). Where the room comes from the extender it
-is many megabytes, and the seven cells would show the last seven
-characters of the figure. The comparison left the figure out for
-every build, since it follows the size of the program; on the same
-word it leaves it out for the C translation alone now, and the portable
-C is held to what it shows there.
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": every figure of free memory goes, on DOS too, as a thing that
+only made sense on DOS, and this was the last of them (the Info panel's
+two lines on the memory went with entry 11, the map of the memory with
+entry 7). Where the room comes from the extender it is many megabytes,
+and the seven cells would show the last seven characters of the figure.
+The comparison left the figure out for every build, since it follows the
+size of the program; on the same word it leaves it out for the C
+translation alone now, and the portable C is held to what it shows
+there.
 
 **Which scenarios show it.** Every scenario that shows the editor with
 its status line, 42 of them, `editor`, `editor-full` and `editor-save`
@@ -2291,9 +2306,10 @@ in hex: Down, PgDn, Ctrl+End and Ctrl+PgDn stop there, and a search for
 a text further on, F7 or Shift+F7, says nothing and leaves the cursor at
 the end of that line, as if it had found it. The status line shows the
 line plus one in 16 bits, `Line 0` for the 65,536th. The text is not
-harmed: it is saved whole. That was seen on the bench (`TODO.md`, "N6",
-question 5), and the scenario `editor-lines` shows it: `T53_00` and
-`T75_00` of `VCEDIT.INC`.
+harmed: it is saved whole. That was seen on the bench (`DIARY.md`, "Sort
+the data of edit.c, and count the editor's room in bytes", question 5),
+and the scenario `editor-lines` shows it: `T53_00` and `T75_00` of
+`VCEDIT.INC`.
 
 **What the portable C does.** A line is counted in 32 bits, and every
 line of the text is reached by every key that goes from line to line,
@@ -2301,16 +2317,17 @@ and by a search; the status line shows the number of the line as it is.
 The number has five cells as in the original, and a number of more
 digits has as many cells as it has digits: `Col` and the column move on
 by the cells that it has more, `Line 105947 Col 6`, on the user's word
-of 14 October 2026 (`TODO.md`, "E, the editor's lines and its free
-bytes", has the ways that were offered). So a text of fewer than 100,000
-lines shows the line as the original does, and one of fewer than 65,536
-is as before in every way. `T53_00` and `T75_00` of `edit.c`, and the
-status line of `T00_20`.
+of 14 October 2026 (`DIARY.md`, "Count the editor's lines in 32 bits, so
+that every line of a text is reached", has the ways that were offered).
+So a text of fewer than 100,000 lines shows the line as the original
+does, and one of fewer than 65,536 is as before in every way. `T53_00`
+and `T75_00` of `edit.c`, and the status line of `T00_20`.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed, held by a
-scenario of both programs. The clusters N6 to N8 counted the lines in
-32 bits and kept the limit until this was carried out.
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": a bug of the original, fixed, held by a scenario of both
+programs. The clusters N6 to N8 counted the lines in 32 bits and kept
+the limit until this was carried out.
 
 **Which scenarios show it.** `editor-lines`, which makes a text of
 105,947 lines by appending two files to each other in turn, with
@@ -2345,12 +2362,14 @@ in whole clusters, by the count of entry 19. On a disk of any smaller
 cluster it says what the original says. `RdInfo` of `read.c`, `PutInf`
 of `info.c`.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a bug of the original, fixed. The cluster N12
-met it where it sorted the numbers of `info.c` (`TODO.md`, "N12,
-`panel.c`, `info.c`, `drive.c`", question A), and the piece M made it
-when it took the numbers of the main data out to widen them (`TODO.md`,
-"M, the numbers of the main data and of a panel").
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down what the user decided as the clusters of step 2 came
+to it": a bug of the original, fixed. The cluster N12 met it where it
+sorted the numbers of `info.c` (`DIARY.md`, "Sort the numbers of
+panel.c, info.c and drive.c, with two questions of the Info panel",
+question A), and the piece M made it when it took the numbers of the
+main data out to widen them (`DIARY.md`, "Write down the piece M, and
+the figures of the program it left").
 
 **Which scenarios show it.** None. Every scenario has the same two
 hard disks, which the harness makes with `mformat` before a machine
@@ -2414,12 +2433,13 @@ old list over its start in either case. `Init11`, `PanelGrow`,
 `read.c`, the main loop's numbers of entries in `main.c`, and the
 places of a panel wherever they are read.
 
-**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
-under "The portable C": a panel holds as many entries of a directory as
-the memory allows, where the original stops at 2,703, lifted by a piece
-of its own at the end of step 2, the piece P (`TODO.md`, "P, the panel
-without its limit"). It is the limit of 16 bits that a user of a file
-manager meets first.
+**Why.** The user's decision, on 14 October 2026, as `DIARY.md` has it
+under "Write down two limits of the original that the user decided: the
+file search's parts, and a panel's entries": a panel holds as many
+entries of a directory as the memory allows, where the original stops at
+2,703, lifted by a piece of its own at the end of step 2, the piece P
+(`DIARY.md`, "Let a panel's memory grow as its directory needs"). It is
+the limit of 16 bits that a user of a file manager meets first.
 
 **Which scenarios show it.** None. A directory of more than 2,703
 entries can be made on the bench only through the program's own keys,
@@ -2430,10 +2450,10 @@ program has to have it do as well. The scenario that did so, `panel-full`, was d
 of 14 October 2026, that such a scenario is kept only if it runs in
 reasonable time. What it showed, and that the panel's block grows and
 moves while it is read and shrinks again, was seen on the build that
-made this, by its steps (`TODO.md`, "P, the panel without its limit").
-Every scenario shows that a directory that the original's 64K hold is
-read as it was, in a panel's block of 64K and the places, and is held
-to the original's golden.
+made this, by its steps (`DIARY.md`, "Let a panel's memory grow as its
+directory needs"). Every scenario shows that a directory that the
+original's 64K hold is read as it was, in a panel's block of 64K and the
+places, and is held to the original's golden.
 
 ### 28. The menu bar never goes on with the menu that is none
 
@@ -2472,7 +2492,8 @@ a key. `F39_00` of `menu.c`.
 **Why.** The user's decisions, on 14 October 2026: two bugs of the
 original, fixed, the first way and then the second. The analyser of
 clang-tidy named the reads in front of the table and behind it
-(`TODO.md`, "MD, the main data read as bytes").
+(`DIARY.md`, "Read the main data as bytes where the program reads it
+across fields").
 
 **Which scenarios show it.** `mouse-drag-menu`, whose sixth step lets
 the button go at that look, "Click@70,0*5>25,0*1": the original shows
@@ -2560,8 +2581,8 @@ program for DOS name the entries above by their numbers, and a patch
 of the program for Linux, in `harness/goldens/posix/`, names no entry
 but the decision that it is by, "Decided: CLAUDE.md, step 6". Each
 entry rests on a decision of the user's of 14 or 15 October 2026, which
-`CLAUDE.md` has under step 6, or says that it is still open with the
-user. What the harness goes by is `ON_LINUX` of
+`CLAUDE.md` has under "The program for Linux", or says that it is still
+open with the user. What the harness goes by is `ON_LINUX` of
 `harness/deviations.py`: the masks, the scenarios that are not run on
 Linux and those that are cut, each with its reason; the scenarios named
 below are held so by the test `portable_c-posix-scenarios`, and the
@@ -2774,10 +2795,11 @@ names no file, "Can't find file" with its name.
 
 **Why.** The user's decisions of 14 October 2026: a command runs
 through `$SHELL -c`, on the terminal's own screen; and of 15 October
-2026, Enter on a file and a name of DOS's form in a command (`TODO.md`,
-"L6, commands", Q1 and Q2); the shell that cannot be run stays as it
-was built (Q3); and, the same day, that the panel's filter of programs
-shows what Enter would run.
+2026, Enter on a file and a name of DOS's form in a command (`DIARY.md`,
+"Run a file that the user may execute by Enter, hand others to xdg-open,
+and make names of DOS's in a command the host's (L6b)", Q1 and Q2); the
+shell that cannot be run stays as it was built (Q3); and, the same day,
+that the panel's filter of programs shows what Enter would run.
 
 **Which scenarios show it.** What DOS showed behind the panels after a
 command is masked. Not run on Linux, being about a program or a command
@@ -2822,7 +2844,8 @@ the program is left, the terminal is as it was before.
 terminal's own screen, which Ctrl-O shows, as on DOS; and the screen is
 80 by 25 and no other size. That the panels switched off otherwise than
 by Ctrl-O show a screen without what the commands wrote is how it
-stands, and is **open** with the user.
+stands, and is **open** with the user (`TODO.md`, "Step 6, the program
+for Linux: what is left").
 
 **Which scenarios show it.** The scenarios drive the program through
 its test channel, where commands run with nothing to write on and
@@ -2870,8 +2893,9 @@ that reports no mouse, where it stays there. The mouse comes from the
 terminal's reports, and the terminal's own pointer is left as it is.
 
 **Why.** No deviation yet: kept as the original has it, and to be put
-to the user as a possible one (`TODO.md`, "L5, keys and mouse"): a turn
-could be Up and Down, or scroll the list under the pointer.
+to the user as a possible one (`TODO.md`, "Step 6, the program for
+Linux: what is left"): a turn could be Up and Down, or scroll the list
+under the pointer.
 
 **Which scenarios show it.** The scenarios of the mouse are run on
 Linux, but for those that the entries above cut. The

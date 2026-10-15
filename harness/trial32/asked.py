@@ -16,10 +16,11 @@ dos.c of that program, ran both and said where the two did not write
 the same, line for line; they wrote the same on every one of the 28
 screens when it was last run, with both files as they were when that
 build went. That is how sys_dos.c was written, a function at a time
-(TODO.md, "The portable C in 32 bits: the plan", the pieces D1 and
-D2). What is left is the toy and its steps: for seeing
-what a function answers on the bench, and what a change to sys_dos.c does
-to that, by holding what this prints against what it printed before.
+(the pieces D1 and D2, DIARY.md, "The system's functions for a program of
+32 bits: dos32.c, with a toy that holds it against dos.c" and the entries
+behind it). What is left is the toy and its steps: for seeing what a
+function answers on the bench, and what a change to sys_dos.c does to
+that, by holding what this prints against what it printed before.
 
 It ends with 1 if the toy did not write a screen for every step.
 """

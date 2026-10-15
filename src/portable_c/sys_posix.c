@@ -1,9 +1,10 @@
 /*
  * The functions of sys.h for Linux: step 6 of the portable C's road
  * (CLAUDE.md, "The portable C", the road, steps 3 and 6), the piece L3a
- * (TODO.md, "L3a, the program runs on Linux"). The program goes on
- * asking what it asks DOS and the BIOS, and this answers as they would,
- * emulating them on the host at the level of their services.
+ * (DIARY.md, "Run the program on Linux, with a test channel and no
+ * terminal yet"). The program goes on asking what it asks DOS and the
+ * BIOS, and this answers as they would, emulating them on the host at
+ * the level of their services.
  *
  * Most of that is the machine, machine_posix.c, which the web page's
  * implementation shares (the piece W1 of step 7, TODO.md, "Step 7, the
@@ -70,7 +71,8 @@ static void Show(void)
 /* Ctrl-O typed at the terminal, as many times as it waits: the
    terminal's own screen, which has what the commands wrote, shown until
    the next key, which is dropped, and the program's again. The program
-   does not get the key (TODO.md, "L6, commands"). */
+   does not get the key (DIARY.md, "Run a command of the program for
+   Linux in the host's shell"). */
 #define CTRL_O 0x180F
 
 static void OwnScreen(void)
@@ -182,13 +184,13 @@ u32 Ticks(void)
  * Other programs, and the end of this one.
  */
 
-/* A command, the piece L6 (TODO.md, "L6, commands"). What the program
-   runs is COMMAND.COM, by the name that COMSPEC has in its environment,
-   with /C and the command for its tail: COMSPEC names the host's shell,
-   $SHELL or /bin/sh where that is not set (ShellOf), and the shell is
-   run with -c and the command made one of the host's
-   (DosCommandToHost). Any other program is run by the shell too, by its
-   path of the host and its tail.
+/* A command, the piece L6 (DIARY.md, "Run a command of the program for
+   Linux in the host's shell"). What the program runs is COMMAND.COM, by
+   the name that COMSPEC has in its environment, with /C and the command
+   for its tail: COMSPEC names the host's shell, $SHELL or /bin/sh where
+   that is not set (ShellOf), and the shell is run with -c and the
+   command made one of the host's (DosCommandToHost). Any other program
+   is run by the shell too, by its path of the host and its tail.
 
    On the terminal, the command has it as the user has it, with its
    own screen and its modes as they were before the program took it, in
@@ -378,13 +380,15 @@ struct Answer ProgramRun(const u8 *name, const u8 *tail)
     return answer;
 }
 
-/* Enter on a file, the piece L6b (TODO.md, "L6, commands"): a program is
-   a regular file of the host that the user may execute, whatever its
-   name, the extensions of DOS's meaning nothing here; it is run as
-   ./name, typed .\NAME, which the command made one of the host's has
-   as './name' (DosCommandToHost). Any other regular file is handed to
-   xdg-open, the desktop's opener, which is not waited for and has none
-   of the program's terminal: the panels stay. */
+/* Enter on a file, the piece L6b (DIARY.md, "Run a file that the user
+   may execute by Enter, hand others to xdg-open, and make names of DOS's
+   in a command the host's (L6b)"): a program is a regular file of the
+   host that the user may execute, whatever its name, the extensions of
+   DOS's meaning nothing here; it is run as ./name, typed .\NAME, which
+   the command made one of the host's has as './name'
+   (DosCommandToHost). Any other regular file is handed to xdg-open, the
+   desktop's opener, which is not waited for and has none of the
+   program's terminal: the panels stay. */
 static const u8 ProgramBefore[] = ".\\";
 
 const u8 *ProgramOfFile(const u8 *name)

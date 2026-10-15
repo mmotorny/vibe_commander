@@ -7,9 +7,10 @@ pointer, and where a number written below 0 is kept in 16 bits. What it
 cannot see is a variable of 16 bits that holds a number which has
 wrapped round, FF60h for 160 back, and is added to a pointer: on DOS
 the offset wraps round with it, and in a flat memory it goes 64K less
-that much on (TODO.md, "C1, the editor", which met one). No rule says
-of a variable what it holds, so this only lists the places: every
-`pointer + variable`, `pointer - variable`, `pointer += variable` and
+that much on (DIARY.md, "Move the rows of the editor's window by a place
+of 16 bits, not by a pointer", which met one). No rule says of a
+variable what it holds, so this only lists the places: every `pointer +
+variable`, `pointer - variable`, `pointer += variable` and
 `pointer[variable]` where the variable is a function's own or one that
 it is handed, of 16 bits without a sign, and not one that a loop counts
 with. With each, what the pointer is, as far as one word says it, and

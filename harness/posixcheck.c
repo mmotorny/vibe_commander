@@ -292,8 +292,9 @@ static void Attributes(void)
     struct stat status;
 
     /* RBIL, INT 21h 4300h: the bits; DOSBox localDrive: archive for a
-       file, directory for a directory; CLAUDE.md and TODO.md, the
-       surveys: read-only of the mode, hidden of the dot. */
+       file, directory for a directory; DIARY.md, "Take out the
+       documents of the layer that was set aside, and what rested on
+       them", the surveys: read-only of the mode, hidden of the dot. */
     memset(&status, 0, sizeof status);
     status.st_uid = 1000;
     status.st_mode = S_IFREG | 0644;
@@ -1084,7 +1085,8 @@ static void ServiceHandles(void)
 
 /* What is no file and no directory, and a file of 4 GB or more:
    emulate_posix.h says what is done with them, as the user decided
-   (TODO.md, L2). */
+   (DIARY.md, "Emulate DOS's files, directories and drives on the host's
+   files for Linux"). */
 static void ServiceOthers(void)
 {
     struct Dos *dos = &Emulated;
@@ -1548,7 +1550,8 @@ static void ServiceHome(void)
     HostFile("home/inhome.txt", "in the home directory");
     CHECK(Listed("H:\\*.*", 0x3F, list, sizeof list) == 0x12);
     SAME(list, "INHOME.TXT/20 ");
-    /* RBIL, INT 21h 3Ch: no label is made (TODO.md, L2, 6). */
+    /* RBIL, INT 21h 3Ch: no label is made (DIARY.md, "Emulate DOS's
+       files, directories and drives on the host's files for Linux", 6). */
     asked = DosFileCreate(dos, NAME("H:\\LABEL"), DOS_LABEL);
     CHECK(asked.failed && asked.value == 5);
 

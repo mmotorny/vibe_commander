@@ -405,7 +405,8 @@ static u16 OpenError(int error)
 
    A file that is longer than DOS can say, 4 GB or more, is not opened to
    be read, DOS's 5, access denied: on the user's word it is never copied
-   or moved cut short (CLAUDE.md, step 6; TODO.md, L2). Refused at the
+   or moved cut short (CLAUDE.md, step 6; DIARY.md, "Emulate DOS's files,
+   directories and drives on the host's files for Linux"). Refused at the
    open, the program says so at once, as of any file that it cannot
    open, by the boxes that it has: Copy and Move "Can't open the file",
    nothing made at the target and the source left as it was; the viewer

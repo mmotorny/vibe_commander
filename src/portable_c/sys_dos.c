@@ -12,8 +12,9 @@
  * DOS, the BIOS and the mouse driver are of real mode, and the program
  * is not: it calls them by the same software interrupts, and the
  * extender takes each call there and back. What it does on the way was
- * found out by toys on the test bench (TODO.md, "The portable C in 32
- * bits: what a trial on the bench showed", and harness/trial32/):
+ * found out by toys on the test bench (DIARY.md, "Write down what a
+ * trial of a 32-bit program on the bench showed", and
+ * harness/trial32/):
  *
  *   - A call that takes no address, or the BIOS's or the mouse
  *     driver's, goes over with its registers and comes back with them.
@@ -948,11 +949,12 @@ bool DriveCd(u16 drive)
    and is a pointer as it is: the program's segments begin at 0.
 
    What the extender was seen to do with its blocks on the bench is in
-   TODO.md, "X, the extender's memory on the bench": a block is given
-   with what the memory held there; it keeps 16 bytes of its own in front
-   of every block and ends the program, at its next call for memory,
-   where a write has gone into them; and refused a longer block it does
-   not say how long the block could be, where DOS does. */
+   DIARY.md, "Write down what the extender's memory does on the bench,
+   the piece X": a block is given with what the memory held there; it
+   keeps 16 bytes of its own in front of every block and ends the
+   program, at its next call for memory, where a write has gone into
+   them; and refused a longer block it does not say how long the block
+   could be, where DOS does. */
 
 #define BLOCKS_MOST 8                   /* as many as the table has room
                                            for: the program has three */

@@ -91,9 +91,9 @@ READERS = ("Dialog", "DialBox", "OncZoom", "MinMnu", "MnMn10", "MnMn40",
            "Ask")
 
 # The files of code of the setup program, in a tree that has it in itself
-# (TODO.md, "The setup program in the portable C: the plan"). An entry of
-# REVIEWED for one of them is none for a tree that is declared to have no
-# setup program, deviations.TREES.
+# (DIARY.md, "Write down the plan for the setup program, with the scripts
+# of its trial"). An entry of REVIEWED for one of them is none for a tree
+# that is declared to have no setup program, deviations.TREES.
 SETUP_FILES = ("stmain.c", "stopts.c", "stcolor.c", "sthelp.c")
 
 # And the constants of the setup program that a file of the main program
@@ -226,12 +226,16 @@ REVIEWED = {
                                  "PtMnu1 of bars.c does"),
     ("menu.c", "MenuLn"): (OWN, "the lines of a menu, by MnuTab; a menu "
                                 "that is none reads elsewhere, as the "
-                                "original does: see TODO.md"),
+                                "original does: see DIARY.md, \"Translate "
+                                "the menu bar and its pull-down menus\""),
     ("menu.c", "MnuHlp"): (OWN, "by MnuTab and the item; a menu that is "
-                                "none reads elsewhere: see TODO.md"),
+                                "none reads elsewhere: see DIARY.md, "
+                                "\"Translate the menu bar and its pull-down "
+                                "menus\""),
     ("menu.c", "MnuTab"): (OWN, "by the menu, one of five; a menu that "
                                 "is none reads in front of it: see "
-                                "TODO.md"),
+                                "DIARY.md, \"Translate the menu bar and its "
+                                "pull-down menus\""),
     ("menu.c", "KeyTab"): (OWN, "compared up to its size"),
     ("menu.c", "Ctrl_S"): (OWN, "as far as a hyphen: it has two"),
     ("misc.c", "Title_S"): (NONE, "AsmSeg takes its segment, which is "

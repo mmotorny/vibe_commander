@@ -156,14 +156,14 @@ The editor of the program of 32 bits has room for a file that the
 original's has none for (`src/portable_c/DEVIATIONS.md`, 13), and the
 scenario that has the editor refuse such a file, `editor-big`, is not
 run for that program, on the user's word of 13 October 2026
-(`CLAUDE.md`, "The portable C"): `TREES["portable_c32"]` of
-`harness/deviations.py`. The portable C of 16 bits and the C
-translation are taken through it as they were. This is what the
-scenario alone tested, and so what no test holds of the program of 32
-bits; what that program was seen to do with the scenario all the same;
-what two scenarios that it passes no longer get it to; and what would
-test all of it again. Made at `87291dc`, by reading the scenario and
-what ran of the original, and by three trials on the bench that were
+(`CLAUDE.md`, "Deviations"): `TREES["portable_c"]` of
+`harness/deviations.py`. The C translation is taken through it as it
+was, and so was the portable C of 16 bits until that build went. This is
+what the scenario alone tested, and so what no test holds of the program
+of 32 bits; what that program was seen to do with the scenario all the
+same; what two scenarios that it passes no longer get it to; and what
+would test all of it again. Made at `87291dc`, by reading the scenario
+and what ran of the original, and by three trials on the bench that were
 not kept. It stands behind the tall screen's section, which is of the
 same kind: what a scenario that is no longer run was alone in testing.
 

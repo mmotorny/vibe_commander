@@ -52,14 +52,14 @@ the tree has no more is not run, and a function that the tree has no
 more is listed in GONE, with what took it away.
 
 The original is two programs, and its setup program, VCSETUP.COM, goes
-into the portable C as a part of the one program (TODO.md, "The setup
-program in the portable C: the plan"). Its routines are listed below
-too, apart, in SETUP_BATCHES: they are held against the listing of the
-setup program, and against what ran of that program in the scenarios
-that are of it (scenarios.Scenario.setup), where the others are held
-against what ran of VC.COM in the scenarios of the main program. They
-are checked for a tree that has the setup program, which the C
-translation is declared not to have.
+into the portable C as a part of the one program (DIARY.md, "Write down
+the plan for the setup program, with the scripts of its trial"). Its
+routines are listed below too, apart, in SETUP_BATCHES: they are held
+against the listing of the setup program, and against what ran of that
+program in the scenarios that are of it (scenarios.Scenario.setup),
+where the others are held against what ran of VC.COM in the scenarios of
+the main program. They are checked for a tree that has the setup
+program, which the C translation is declared not to have.
 
 The build of the translation that is tested is the one that is shipped. What
 ran in the original was recorded with the goldens; what runs in the
@@ -69,10 +69,11 @@ laid out like the original, and the C functions by the translation's link
 map.
 
 The portable C is a flat program of 32 bits for DOS under an extender,
-where the C translation is a program of 16 bits (TODO.md, "The portable C
-in 32 bits: the plan"). Its file and the linker's map of it are read by
-le.py, and what ran of it is known by its objects as the extender loads
-them (coverage.py). Of such a program this holds besides:
+where the C translation is a program of 16 bits (DIARY.md, "Write down
+the plan for the 32 bits, with the scripts of its trials"). Its file and
+the linker's map of it are read by le.py, and what ran of it is known by
+its objects as the extender loads them (coverage.py). Of such a program
+this holds besides:
 
   - The layout that the words of its addresses and the machine of the
     tests rest on, which is harness/layoutcheck.py's to say: this asks it
@@ -1474,10 +1475,10 @@ def check_translation(link_map, executed, tree, place, batches):
     A function of a batch is looked for in the map among what is not
     static, and then among the static ones, where it has to be there
     once: in the portable C a function that only its file calls is
-    static, by clang-tidy's misc-use-internal-linkage (TODO.md, "5b, the
-    stub"). The function that a tree has in its place, under another
-    name, may be static in its file too, as an entry that only the
-    system comes to is."""
+    static, by clang-tidy's misc-use-internal-linkage (CLAUDE.md,
+    "Strictness"). The function that a tree has in its place, under
+    another name, may be static in its file too, as an entry that only
+    the system comes to is."""
     linked = le.Map(link_map)
     symbols = dict(linked.public)
     gone = GONE.get(tree, {})

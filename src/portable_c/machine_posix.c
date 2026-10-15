@@ -2,15 +2,15 @@
  * The machine that the program for Linux emulates, the part of the
  * functions of sys.h that has nothing of a platform in it: step 6 of the
  * portable C's road (CLAUDE.md, "The portable C", the road, steps 3 and
- * 6), the piece L3a (TODO.md, "L3a, the program runs on Linux"), and a
- * file of its own since the piece W1 of step 7 (TODO.md, "Step 7, the
- * web page"), so that the program for Linux, sys_posix.c, and the web
- * page's share it. The program goes on asking what it asks DOS and the
- * BIOS, and this answers as they would, emulating them on the host at
- * the level of their services. What an implementation has of its own is
- * where the keys and the mouse come from, how the screen is drawn, how
- * the program waits, a program run and main(): sys_posix.c says that of
- * Linux.
+ * 6), the piece L3a (DIARY.md, "Run the program on Linux, with a test
+ * channel and no terminal yet"), and a file of its own since the piece
+ * W1 of step 7 (TODO.md, "Step 7, the web page"), so that the program
+ * for Linux, sys_posix.c, and the web page's share it. The program goes
+ * on asking what it asks DOS and the BIOS, and this answers as they
+ * would, emulating them on the host at the level of their services. What
+ * an implementation has of its own is where the keys and the mouse come
+ * from, how the screen is drawn, how the program waits, a program run
+ * and main(): sys_posix.c says that of Linux.
  *
  * What files, directories and drives are is the emulation of the pieces
  * L1 and L2, files_posix.c with emulate_posix.h: each function of those

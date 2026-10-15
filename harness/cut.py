@@ -4,15 +4,16 @@
 The fault. Open Watcom's code generator extends a number with a sign
 that is converted to a wider type without a sign, and from there to a
 still wider type, with its sign both times, where C says that the
-second time fills with zeros. Its cause is in TODO.md, "The compiler's
-lost cut: what Open Watcom does, and where": the code generator folds
-two conversions that follow one another into one, from the first type
-to the third, and that is wrong exactly when the first type has a sign,
-the second is wider and has none, and the third is wider still or is a
-floating type. It takes three sizes, so a program of 32 bits that has
-no number of 64 and no floating one meets it in one shape: a byte with
-a sign that is converted to a number of 16 bits without a sign and from
-there goes on into 32 bits, as a number or added to a pointer. For
+second time fills with zeros. Its cause is in DIARY.md, "Write down
+where Open Watcom loses the cut, and a report for its project": the code
+generator folds two conversions that follow one another into one, from
+the first type to the third, and that is wrong exactly when the first
+type has a sign, the second is wider and has none, and the third is
+wider still or is a floating type. It takes three sizes, so a program of
+32 bits that has no number of 64 and no floating one meets it in one
+shape: a byte with a sign that is converted to a number of 16 bits
+without a sign and from there goes on into 32 bits, as a number or added
+to a pointer. For
 
     u16 line = (u16)(signed char)byte;
 

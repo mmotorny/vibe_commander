@@ -3,8 +3,8 @@
 (Not posix.py, which Python has a module of its own by.)
 
 The program for Linux, build/portable_c/posix-asan/vc (or posix/vc), is
-judged by the scenarios as the program for DOS is (CLAUDE.md, "The
-portable C", step 6), but runs on the host, not in a machine: it is
+judged by the scenarios as the program for DOS is (CLAUDE.md, "The scenarios
+of the program for Linux"), but runs on the host, not in a machine: it is
 started as a process of its own with its test channel (the top of the
 test channel in src/portable_c/machine_posix.c), which does from inside what
 the driver of the tests does from outside on the bench. This module lays
@@ -30,7 +30,8 @@ The bench of a run is a directory of /tmp of its own, removed behind it:
 The bench's directory is in /tmp, not in build/tmp, so that the path of
 `vc` holds in DOS's 63 characters on R: whatever the checkout's path
 is: the program ends where DOS cannot name the directory of its setup
-file (TODO.md, L3a).
+file (DIARY.md, "Run the program on Linux, with a test channel and no
+terminal yet").
 
 The environment has TZ=UTC, under which the host's times of the files
 are the bench's, PATH with a stub of xdg-open in front that does
@@ -564,11 +565,13 @@ SETUP = ROOT / "build" / "posix-bench" / "VC.INI"
 # The setup file that the program for Linux starts from in a scenario,
 # the one that it saves itself, once for a bench, after its own keys have
 # taken the panels from the bench's setup file to H:\WORK and H:\, where
-# that file has C:\WORK and C:\ (CLAUDE.md, step 6; the user, on 15
-# October 2026). Started on the bench's file, it finds no C: and has both
-# panels on H:\WORK, where it was started (TODO.md, L3b); the right panel
-# is taken to the root and the setup saved. Made again when the program
-# is newer than it, and kept beside the bench's.
+# that file has C:\WORK and C:\ (CLAUDE.md, "The scenarios of the program
+# for Linux"; the user, on 15 October 2026). Started on the bench's file,
+# it finds no C: and has both panels on H:\WORK, where it was started
+# (DIARY.md, "Take the program for Linux through the scenarios, with its
+# clock, masks and not-run list"); the right panel is taken to the root
+# and the setup saved. Made again when the program is newer than it, and
+# kept beside the bench's.
 LINUX_SETUP = ROOT / "build" / "posix-bench" / "vc.ini"
 LINUX_SETUP_STEPS = ("Tab", "Ctrl+\\", "Tab", "Shift+F9 Enter")
 

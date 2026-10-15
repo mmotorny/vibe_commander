@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Hold what the program for Linux draws in a terminal to its grid.
 
-The piece L4 of step 6 (TODO.md, "L4, the terminal"): the program for
-Linux draws its screen of 80 by 25 cells in the terminal that it is
-started in, by escape sequences of its own, and takes its keys there.
-What it draws is held, on the user's word of 14 October 2026 (CLAUDE.md,
-step 6), to the grid of cells that the test channel writes, by replaying
-it through pyte, a terminal emulator in Python, pinned (harness/deps.py).
+The piece L4 of step 6 (DIARY.md, "Write down the terminal of the program
+for Linux, and what L5 should know"): the program for Linux draws its
+screen of 80 by 25 cells in the terminal that it is started in, by escape
+sequences of its own, and takes its keys there. What it draws is held, on
+the user's word of 14 October 2026 (CLAUDE.md, "The scenarios of the
+program for Linux"), to the grid of cells that the test channel writes,
+by replaying it through pyte, a terminal emulator in Python, pinned
+(harness/deps.py).
 
 The program is run seven times, each in a directory of its own, with
 HOME there and no setup file, so that it takes its defaults, in which the

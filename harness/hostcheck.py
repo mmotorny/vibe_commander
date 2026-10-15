@@ -86,7 +86,8 @@ test `portable_c-int16`; a number that is written to the
 memory at an address that is not even; a pointer made of a number that
 is written out, an address of the BIOS's data, of which gcc says
 nothing; and anything that is right C and means something else without
-DOS under it. TODO.md has these with the kinds.
+DOS under it. DIARY.md, "Hold the source of the portable C against gcc:
+the test portable_c-host", has these with the kinds.
 
 Exits with status 0 if every file is as the record has it, 1 if not,
 and 77 if there is no gcc to ask, which the build takes for a test that
@@ -127,7 +128,8 @@ OWN = ["-D__interrupt=", "-D__declspec(x)="]
 POSIX = ["-D_XOPEN_SOURCE=700"]
 
 # The kinds, in the order of the summary: the name that the record has
-# for each, and what it is. TODO.md says what each waits for.
+# for each, and what it is. DIARY.md, "Hold the source of the portable C
+# against gcc: the test portable_c-host", says what each waited for.
 KINDS = [
     ("to-number", "a pointer cast to a number of 16 or 32 bits"),
     ("to-pointer", "a number of 16 or 32 bits made a pointer"),

@@ -78,7 +78,9 @@ KEPT = {"first": 0xF125F125, "second": 0x5EC0D5EC}
 STACK = 4096
 # Another place than the bench's, to load the program at.
 ELSEWHERE = 0x12345670
-# As the portable C is compiled for 32 bits: TODO.md, "The build".
+# As the portable C is compiled for 32 bits: DIARY.md, "Write down the
+# plan for the 32 bits, with the scripts of its trials", the entry from
+# "The build".
 COMPILE = ("-q", "-3r", "-mf", "-os", "-s", "-zl", "-zls", "-wx", "-we")
 
 

@@ -28,8 +28,9 @@ out: inline assembly, by its pieces and instructions, and the lines of
 #pragma aux and pack; and the
 calls that still hand registers to an interrupt, which tools/calls.py
 counts. The other things that only Open Watcom reads, by their kinds,
-are the host check's to count, harness/hostcheck.py, and its table is
-in TODO.md.
+are the host check's to count, harness/hostcheck.py, and its table is in
+DIARY.md, "Hold the source of the portable C against gcc: the test
+portable_c-host".
 
 The portable C was a program of 16 bits until the tests came to judge
 it as one of 32, and the table then had what such a program keeps of
@@ -62,8 +63,9 @@ BEGIN = ("<!-- The figures: written by `python3 tools/figures.py --write`, "
 END = "<!-- The end of the figures. -->"
 
 # Where the memory ends that DOS/32A hands out on the bench of the tests,
-# a machine of 16 MB, as was seen there (TODO.md, "X, the extender's
-# memory on the bench", row 1): the BIOS's 15,232K above the megabyte.
+# a machine of 16 MB, as was seen there (DIARY.md, "Write down what the
+# extender's memory does on the bench, the piece X", row 1): the BIOS's
+# 15,232K above the megabyte.
 BENCH_END = 0xFE0000
 # The least of the room, LEAST_ROOM of vc.h.
 LEAST_ROOM = 8000

@@ -1040,11 +1040,11 @@ The scenarios of the setup program
 
 The original is two programs: VC.COM, and its setup program, VCSETUP.COM.
 The portable C is to be one, with the setup an item of its Options menu
-(TODO.md, "The setup program in the portable C: the plan"). A scenario of
-the setup program is held as every other is: its golden is what the
-original showed, which here is the original's setup program, and a tree
-that has the setup in itself has to show the same. The scenario `setup`
-is the first, and the form of the others:
+(DIARY.md, "Write down the plan for the setup program, with the scripts
+of its trial"). A scenario of the setup program is held as every other
+is: its golden is what the original showed, which here is the original's
+setup program, and a tree that has the setup in itself has to show the
+same. The scenario `setup` is the first, and the form of the others:
 
     "setup": Scenario(
         "The setup program: started, its menu, ...",
@@ -1279,12 +1279,13 @@ with the original:
     prompt is on row 23 with the key bar off until a command has run.
   - On 50 lines the way back from the list to the menu shows the top
     left corner of what DOS had shown as a space: the key bar writes
-    81 cells (TODO.md, "The bugs of the original that stay"). The
-    banner of the main program is then no longer known as the banner,
-    and its "shareware" would be in the golden where a build says
-    "freeware": setup-colors-lines ends in the list for that, and
-    setup-lines, which shows the corner, first has the banner's first
-    line gone from the screen: see below.
+    81 cells (DIARY.md, "Write down the plan for the setup program, with
+    the scripts of its trial", the entry from "The bugs of the original
+    that stay"). The banner of the main program is then no longer known
+    as the banner, and its "shareware" would be in the golden where a
+    build says "freeware": setup-colors-lines ends in the list for that,
+    and setup-lines, which shows the corner, first has the banner's
+    first line gone from the screen: see below.
   - The help, F1, is a window with the title of a page, 13 of its lines
     on a screen of 25 lines, and Ok: Up and Down move the text by a
     line, PgUp and PgDn by a page less a line, Home and End go to its
@@ -1495,11 +1496,11 @@ four, of the editor and of the tree (`mouse-edit`, `editor-buffer`,
 `tree-box`, `editor-full`), and at twice in `view-search` and `find`,
 where the step that searches for a text takes three and a half times
 the instructions: 8.70 seconds against 2.60 in the viewer, 11.07
-against 3.01 in the file search. TODO.md has the table, "The machine's
-clock of the portable C against the original's". The C translation,
-counted in ten of them, is beyond a sixth as well: 1.58 in `enter`,
-1.47 in `editor-full`. Five scenarios go on past 45 seconds in the
-portable C, `mouse-edit`, `editor-full`, `enter-many`, `blank-timed`
+against 3.01 in the file search. DIARY.md, "Give the plan the table of
+the machine's clock, and F4 the search to count", has the table. The C
+translation, counted in ten of them, is beyond a sixth as well: 1.58 in
+`enter`, 1.47 in `editor-full`. Five scenarios go on past 45 seconds in
+the portable C, `mouse-edit`, `editor-full`, `enter-many`, `blank-timed`
 and `copy-full`, and none of them shows a time of day of its run
 there. The latest file that any scenario makes is `mouse-edit`'s, 54
 seconds past noon where the original makes it at 40, and its time is
@@ -1520,8 +1521,8 @@ bench's: if it does not, the scenario does not take the memory, since a
 golden of the original does not change. 2 MB leave the portable C a room
 of some 550 KB, behind its objects and its panels, where the original's
 is what DOS has, the same as on the bench. `view-window` has that, for
-its file of a megabyte by its entry: TODO.md, "F9, the memory from the
-extender", has what was tried.
+its file of a megabyte by its entry: DIARY.md, "Take the memory of the
+panels and the room from the extender", has what was tried.
 """
 import re
 from dataclasses import dataclass, field, replace
@@ -7729,8 +7730,8 @@ def run(scenario, program, bench, trace=False, blinking=False,
         # extender loads it and any copy of it: coverage.executed() looks
         # for nothing else there, and the extender's own code below,
         # which it writes into and QEMU translates anew at every
-        # interrupt (TODO.md, "T, the time of a wait"), made most of
-        # the log.
+        # interrupt (DIARY.md, "Write down why a wait costs the host so
+        # much for the program of 32 bits"), made most of the log.
         traced = (le.BENCH & ~0xFFFF, 0xFFFFFFFF) \
             if trace and not beside and le.linear(program.contents) else None
         with bench.start(workdir, program, script, log, beside,

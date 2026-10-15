@@ -377,9 +377,10 @@ endfunction()
 
 # add_portable_c(<target> <directory> <option>...) builds src/portable_c/
 # as a flat program of 32 bits that the extender DOS/32A starts: step 1
-# of the portable C's road (TODO.md, "The portable C in 32 bits: the
-# plan"). It is <directory>/VC.EXE, with the linker's map VC.MAP and the
-# objects and their listings next to it, as the target <target>.
+# of the portable C's road (DIARY.md, "Write down the plan for the 32
+# bits, with the scripts of its trials"). It is <directory>/VC.EXE, with
+# the linker's map VC.MAP and the objects and their listings next to it,
+# as the target <target>.
 #
 # The options are the caller's where the two programs of the plan differ,
 # the one that is shipped and the one for finding a fault: each is a call
@@ -478,14 +479,15 @@ function(add_portable_c target directory)
     #   of what has no value, which would otherwise be in the file as
     #   zeros in front of it. It is first, for the reason below.
     # - The program itself rests on no place of the linker's since the
-    #   piece F10 of TODO.md, "The portable C in a flat memory: the
-    #   plan": until then a segment and an offset were numbers of 16 bits
-    #   in it, counted from 64K below the main data, and the tables had
-    #   to lie within 32K of Title_S of main_t.c, IniSave of setup.c
-    #   within 64K of md, and the program within the megabyte that a
-    #   segment could name. sys_dos.c is linked last as it was for that, so
-    #   that its variables are behind everything else that has none:
-    #   nothing rests on it now, and it leaves the program as it was.
+    #   piece F10 (DIARY.md, "Take the megabyte down: its words out of
+    #   vc.h, its rules out of the test of the layout"): until then a
+    #   segment and an offset were numbers of 16 bits in it, counted from
+    #   64K below the main data, and the tables had to lie within 32K of
+    #   Title_S of main_t.c, IniSave of setup.c within 64K of md, and the
+    #   program within the megabyte that a segment could name. sys_dos.c is
+    #   linked last as it was for that, so that its variables are behind
+    #   everything else that has none: nothing rests on it now, and it
+    #   leaves the program as it was.
     # - The machine of the tests is many times slower at a write to a
     #   page of the memory that has code which it has run, and the
     #   extender packs the data right behind the code, in the same page
@@ -539,8 +541,9 @@ endfunction()
 #                         switch is said by FALLTHROUGH of compiler.h
 # Left out, each named in the survey the user decided from: -Wcast-align,
 # since the common code reads words out of bytes as DOS does, which is
-# the layer's (TODO.md, "5a, the split"); -Wpadded, -Wswitch-default and
-# -Wswitch-enum, -Wdeclaration-after-statement, -Wdouble-promotion and
+# the layer's (DIARY.md, "Write down the piece 5a, the split, and what 5b
+# should know"); -Wpadded, -Wswitch-default and -Wswitch-enum,
+# -Wdeclaration-after-statement, -Wdouble-promotion and
 # -Wunsafe-buffer-usage, which say how C is to be written and not what is
 # wrong in it.
 set(clang_warnings -std=c99 -Werror -Wall -Wextra -Wpedantic -Wconversion
@@ -565,11 +568,12 @@ endif()
 # COMPILE to the compiler and the linker alike, those of LINK to the
 # linker alone. -fno-strict-aliasing is every such build's: the common
 # code reads a word of 16 or 32 bits out of bytes through a cast pointer,
-# as DOS does, which C promises nothing of without it (TODO.md, "5a, the
-# split"). The command of the compiler is written into
-# <directory>/compiled.txt, which every object follows, as add_portable_c
-# has it, and which the test portable_c-tidy reads. With BY_NAME the
-# target is not of the default one: it is built when it is named,
+# as DOS does, which C promises nothing of without it (DIARY.md, "Write
+# down the piece 5a, the split, and what 5b should know"). The command of
+# the compiler is written into <directory>/compiled.txt, which every
+# object follows, as add_portable_c has it, and which the test
+# portable_c-tidy reads. With BY_NAME the target is not of the default
+# one: it is built when it is named,
 # `cmake --build build --target <target>`.
 function(add_portable_c_host target directory implementation)
     cmake_parse_arguments(PARSE_ARGV 3 host "BY_NAME" "" "COMPILE;LINK")
@@ -632,29 +636,33 @@ if(VC_DOS)
     #                             have the lines of the source; and CHECKED
     #                             defined, for the words of the addresses to
     #                             look at what they are handed. Nothing reads
-    #                             CHECKED yet: see TODO.md, the piece B2 of
-    #                             the plan for the 32 bits.
+    #                             CHECKED yet: see DIARY.md, "Write down what
+    #                             linking the program of 32 bits met, and
+    #                             where it stops".
     add_portable_c(portable_c ${CMAKE_BINARY_DIR}/portable_c -os)
     add_portable_c(portable_c-debug ${CMAKE_BINARY_DIR}/portable_c/debug
         -od -d2 -dCHECKED)
 endif()
 # The program for Linux, step 6 of the road: src/portable_c/*_posix.c for
 # sys.h, sys_posix.c with the emulation of DOS of the pieces L1 and L2
-# behind it (TODO.md, "L3a, the program runs on Linux"). Three builds,
-# each its own directory of build/portable_c/, all with
-# -D_XOPEN_SOURCE=700, as the test of the emulation below has it:
+# behind it (DIARY.md, "Run the program on Linux, with a test channel and
+# no terminal yet"). Three builds, each its own directory of
+# build/portable_c/, all with -D_XOPEN_SOURCE=700, as the test of the
+# emulation below has it:
 #   posix/vc        the program, with the usual hardening of a program of
 #                   Linux, the options that the distributions build with
 #   posix-asan/vc   with the sanitizers of addresses, of undefined
 #                   behaviour, of integers and of implicit conversions,
 #                   each fatal, the alignment of what is read among them: a word in
 #                   a buffer of bytes is made of its bytes, GET16 and its
-#                   like of vc.h (TODO.md, "AL, words made of their
-#                   bytes"); the one that the tests run
+#                   like of vc.h (DIARY.md, "Turn the sanitizer's check of
+#                   alignment on in the build for Linux"); the one that the
+#                   tests run
 #   posix-msan/vc   with the sanitizer of memory, which goes with no other,
 #                   for an audit by hand: not of the default target, built
-#                   by its name, and run by no test (TODO.md, "L3b, the
-#                   scenarios on Linux", says how)
+#                   by its name, and run by no test (DIARY.md, "Take the
+#                   program for Linux through the scenarios, with its
+#                   clock, masks and not-run list", says how)
 if(clang)
     add_portable_c_host(portable_c-posix ${CMAKE_BINARY_DIR}/portable_c/posix
         posix
@@ -676,14 +684,15 @@ endif()
 
 # What the program for Linux emulates of DOS without input or output of
 # its own, the files src/portable_c/*_posix.c of the piece L1 of step 6
-# (TODO.md, "L1, drives, names, code page, dates, errors"), and its test,
-# harness/posixcheck.c, built together as build/portable_c/posix-unit/
-# check: with the warnings above, the sanitizers of addresses, of
-# undefined behaviour, of integers and of implicit conversions, each
-# fatal, and -D_XOPEN_SOURCE=700, which gives the files of Linux the
-# functions of POSIX and X/Open beside C's (a #define in a file is a name
-# that C reserves, which clang-tidy names). Its compiled.txt is what the
-# test portable_c-tidy reads these files with.
+# (DIARY.md, "Write down the piece L1 of step 6, and what is open of
+# it"), and its test, harness/posixcheck.c, built together as
+# build/portable_c/posix-unit/check: with the warnings above, the
+# sanitizers of addresses, of undefined behaviour, of integers and of
+# implicit conversions, each fatal, and -D_XOPEN_SOURCE=700, which gives
+# the files of Linux the functions of POSIX and X/Open beside C's (a
+# #define in a file is a name that C reserves, which clang-tidy names).
+# Its compiled.txt is what the test portable_c-tidy reads these files
+# with.
 if(clang)
     set(unit_dir ${CMAKE_BINARY_DIR}/portable_c/posix-unit)
     set(unit_source ${CMAKE_SOURCE_DIR}/src/portable_c)
@@ -903,7 +912,8 @@ endif()
 # lists. The common code and sys_posix.c are read with the command of
 # posix/vc, the files of the emulation and their test,
 # harness/posixcheck.c, with that of the build of that test. It held the
-# stub of step 5 so until the stub went (TODO.md, "L7"). See
+# stub of step 5 so until the stub went (DIARY.md, "Take the stub out, and
+# hold the program for Linux to clang-tidy in its place (L7)"). See
 # harness/tidycheck.py. It runs no machine, and is skipped where there is
 # no clang.
 if(clang_tidy)

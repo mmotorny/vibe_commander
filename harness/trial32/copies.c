@@ -20,8 +20,9 @@
    tail and DOS's block in a block below the megabyte. The environment
    is named there, since the word of the PSP by which DOS would find it
    is a selector under the extender, and INT 22h is put back behind the
-   command, or the extender writes a warning when the copy ends (TODO.md,
-   "Piece D2"). */
+   command, or the extender writes a warning when the copy ends
+   (DIARY.md, "Run a program and hand the shell a command from the
+   program of 32 bits"). */
 #include "toy.h"
 
 #define ROWS 6                          /* of the screen, for a copy */

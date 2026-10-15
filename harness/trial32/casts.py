@@ -6,11 +6,12 @@ harness/hostcheck.py counts those places, with gcc, and says which
 macro makes each (`--macros`). This asks gcc the same way and sorts
 them by what the number is: a place of the main data, a table by its
 offset, a panel by its segment and so on, the classes of the plan of
-the 32 bits (TODO.md, "The portable C in 32 bits: the plan"), each with
-its files. It goes by the macros that a place is made through and by
-the words of its line, and a line that it takes for the wrong thing is
-counted wrongly: it is for seeing how much there is of each, and what
-is left of a class when work has been done on it.
+the 32 bits (DIARY.md, "Write down the plan for the 32 bits, with the
+scripts of its trials"), each with its files. It goes by the macros that
+a place is made through and by the words of its line, and a line that it
+takes for the wrong thing is counted wrongly: it is for seeing how much
+there is of each, and what is left of a class when work has been done on
+it.
 
     python3 harness/trial32/casts.py            the classes
     python3 harness/trial32/casts.py N view.c   the places of a class,

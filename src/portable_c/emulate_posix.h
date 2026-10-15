@@ -1,14 +1,14 @@
 /*
  * DOS as the program for Linux emulates it: the part that has no input
  * or output of its own, the piece L1 of step 6 of the portable C's road
- * (CLAUDE.md, "The portable C", the road, steps 3 and 6; TODO.md, "L1,
- * drives, names, code page, dates, errors"). The functions of sys.h for
- * Linux, sys_posix.c when it comes, ask these what a drive letter is on
- * the host, which name of the host a name of DOS's form leads to and the
- * other way round, how a name is written in the code page, what DOS's
- * attributes, date and time of a file are, and which of DOS's errors a
- * failure of the host's is. Each answers in DOS's terms, as sys.h has
- * them.
+ * (CLAUDE.md, "The portable C", the road, steps 3 and 6; DIARY.md,
+ * "Write down the piece L1 of step 6, and what is open of it"). The
+ * functions of sys.h for Linux, sys_posix.c when it comes, ask these
+ * what a drive letter is on the host, which name of the host a name of
+ * DOS's form leads to and the other way round, how a name is written in
+ * the code page, what DOS's attributes, date and time of a file are, and
+ * which of DOS's errors a failure of the host's is. Each answers in
+ * DOS's terms, as sys.h has them.
  *
  * Nothing of that reads or writes a file, the terminal or the
  * environment: what the host has, a directory's names, the mode of a
@@ -16,11 +16,12 @@
  * of it is tried by itself on the host, by harness/posixcheck.c, the
  * test portable_c-posix-unit.
  *
- * The last part, of the piece L2 (TODO.md, "L2, files, directories,
- * drives"), is DOS's services for files, directories and drives
- * themselves, which do ask the host: struct Dos and the functions of
- * files_posix.c. The same test tries them on a tree of its own that it
- * makes in a temporary directory.
+ * The last part, of the piece L2 (DIARY.md, "Emulate DOS's files,
+ * directories and drives on the host's files for Linux"), is DOS's
+ * services for files, directories and drives themselves, which do ask
+ * the host: struct Dos and the functions of files_posix.c. The same
+ * test tries them on a tree of its own that it makes in a temporary
+ * directory.
  *
  * On Linux there are two drives, R:, the root of the host's file system,
  * and H:, the user's home directory, on the user's word of 15 October
@@ -478,7 +479,8 @@ void DosEnd(struct Dos *dos);
 struct Answer DosStartIn(struct Dos *dos, const char *path);
 
 /*
- * Commands, command_posix.c, the piece L6 (TODO.md, "L6, commands").
+ * Commands, command_posix.c, the piece L6 (DIARY.md, "Run a command of
+ * the program for Linux in the host's shell").
  */
 
 /* A command of DOS's, `length` bytes of the code page at `command`, as
@@ -551,7 +553,8 @@ struct Answer DosDirCurrent(struct Dos *dos, u16 drive, u8 *to);
    a label in the root alone (fatgen103, the volume label's entry; RBIL,
    INT 21h 4Eh: with 08h DOS 3 and later find the label and nothing
    else); a search with other attributes finds no label. Making a label
-   is refused, DOS's 5, as the user decided (TODO.md, L2).
+   is refused, DOS's 5, as the user decided (DIARY.md, "Emulate DOS's
+   files, directories and drives on the host's files for Linux").
 
    How much room a drive has is that of the host's file system of its
    current directory, by statvfs: what is free to the program, in DOS's shape,
@@ -659,10 +662,11 @@ void TraceFlush(void);
 bool HostFileOf(const u8 *name, char *host, i32 room, struct stat *status);
 
 /*
- * The terminal, term_posix.c, the piece L4 (TODO.md, "L4, the
- * terminal"): the screen of 80 by 25 cells drawn in the terminal that the
- * program is started in, and its keys made the BIOS's words. The top of
- * term_posix.c says how.
+ * The terminal, term_posix.c, the piece L4 (DIARY.md, "Write down the
+ * terminal of the program for Linux, and what L5 should know"): the
+ * screen of 80 by 25 cells drawn in the terminal that the program is
+ * started in, and its keys made the BIOS's words. The top of term_posix.c
+ * says how.
  */
 
 /* Take the terminal of standard input and output: false where either is

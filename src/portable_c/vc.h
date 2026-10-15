@@ -1701,10 +1701,10 @@ struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
    Each counts from where its block, list or structure begins, and says
    at it what it takes for granted. None of them rests on where the
    linker or the system has put anything, as the program kept the
-   memory of the original inside its own until the piece F10 of
-   TODO.md, "The portable C in a flat memory: the plan": a megabyte
-   counted in paragraphs from 64K below the main data, in which a
-   segment and an offset were made a pointer. */
+   memory of the original inside its own until the piece F10 (DIARY.md,
+   "Take the megabyte down: its words out of vc.h, its rules out of the
+   test of the layout"): a megabyte counted in paragraphs from 64K below
+   the main data, in which a segment and an offset were made a pointer. */
 
 /* The number in a word of a table that holds one where it could name
    something, NUMBER of tables.h: the pointer's low 16 bits, by way of a

@@ -2,11 +2,12 @@
  * The keys and the mouse of the program for Linux, as a terminal sends
  * them: the decoder of the bytes that come, made the words of the BIOS,
  * with what is held and the mouse's reports. It was a part of
- * term_posix.c, the piece L4 of step 6 (TODO.md, "L4, the terminal"),
- * and is a file of its own since the piece W1 of step 7 (TODO.md, "Step
- * 7, the web page"), so that a build that has no terminal, the web
- * page's, can hand it the keys in the same form, the kitty protocol's,
- * and have them made the same words.
+ * term_posix.c, the piece L4 of step 6 (DIARY.md, "Write down the
+ * terminal of the program for Linux, and what L5 should know"), and is
+ * a file of its own since the piece W1 of step 7 (TODO.md, "Step 7, the
+ * web page"), so that a build that has no terminal, the web page's, can
+ * hand it the keys in the same form, the kitty protocol's, and have
+ * them made the same words.
  *
  * It reads and writes nothing of the host: the bytes are handed in
  * (KeyboardRoom, KeyboardAfter), and what it answers is asked of it

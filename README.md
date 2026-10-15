@@ -607,12 +607,13 @@ starts it. `cmake --build build` makes two programs of it:
 Each is a linear executable that Open Watcom's linker writes, with its
 map, `VC.MAP`, and a listing of every file next to it, and with the
 extender in front of it. [Staying in the memory
-whole](#staying-in-the-memory-whole) says how it is laid out. `TODO.md`
-has the plan by which it became such a program, "The portable C in 32
-bits: the plan", with what each piece of that met: while it was made,
-the same source was also built as a program of 16 bits, which the
-scenarios judged until the one of 32 bits passed them all, on 13
-October 2026, and that build is gone.
+whole](#staying-in-the-memory-whole) says how it is laid out. `DIARY.md`
+has the plan by which it became such a program, "Write down the plan for
+the 32 bits, with the scripts of its trials", with what each piece of
+that met in the entries behind it: while it was made, the same source
+was also built as a program of 16 bits, which the scenarios judged until
+the one of 32 bits passed them all, on 13 October 2026, and that build
+is gone.
 
 The registers are gone from its functions. In the C translation a
 function that another file calls takes its arguments and returns its
@@ -725,7 +726,8 @@ The rows of the file are what the harness's reader of a flat program
 of 32 bits finds in it, `harness/le.py`, and how much room the layout
 that it rests on has left, as the test `portable_c-layout` works it
 out. What the test `portable_c-host` counts of what only Open Watcom
-reads, by kinds, is in its own table, in `TODO.md`.
+reads, by kinds, is in its own table, in `DIARY.md`, "Hold the source of
+the portable C against gcc: the test portable_c-host".
 
 ### Staying in the memory whole
 
@@ -810,9 +812,10 @@ place of the main data where the original leaves it in a register for
 something else to read: the words of `src/portable_c/vc.h` that make
 pointers of those ("The words of the addresses" there) count from where
 their block or structure begins, and take nothing for granted of where
-the linker has put it. Until the piece F10 of the plan, `TODO.md`, "The
-portable C in a flat memory: the plan", the program kept the memory of
-a program of DOS inside its own, a megabyte counted from 64K below the
+the linker has put it. Until the piece F10 of the plan for a flat memory
+(`DIARY.md`, "Take the megabyte down: its words out of vc.h, its rules
+out of the test of the layout"), the program kept the memory of a
+program of DOS inside its own, a megabyte counted from 64K below the
 main data, in which a segment and an offset were made a pointer, and
 the test `portable_c-layout` held the linked file to where that put
 the tables and what followed the main data.
@@ -861,9 +864,10 @@ the test `portable_c-host` (see [Testing](#testing)): gcc reads every
 file for a machine of 64 bits, where a pointer does not fit a number of
 32 bits, and each place that it refuses is counted, with each that only
 Open Watcom reads, by kind and by file. `harness/hostcheck.txt` has the
-counts as they stand, and `TODO.md` what each kind waits for. The words
-by which the C translation says what segment a thing is in, `__far`,
-`STACK` and `CODE`, are in no file of the portable C.
+counts as they stand, and `DIARY.md`, "Hold the source of the portable C
+against gcc: the test portable_c-host", what each kind waited for. The
+words by which the C translation says what segment a thing is in,
+`__far`, `STACK` and `CODE`, are in no file of the portable C.
 
 What rests on Open Watcom, for the portable C. Of what the code is
 written in, the first table of [What rests on Open
@@ -878,10 +882,11 @@ for the main data and for the stack, which `SEGMENT_BEGIN` and
 compiler. It has no `__interrupt` and no
 `__loadds` function, and no routine for arithmetic on 32 bits, which
 the compiler for 32 bits does by itself. The test `portable_c-host`
-counts these by their kinds, and `TODO.md` has its table. Of what
-cannot be seen in the code, none of the seventeen places of the second
-table there is left: they are of a program of 16 bits in two parts.
-What this program rests on is where the linker puts things:
+counts these by their kinds, and `DIARY.md`, "Hold the source of the
+portable C against gcc: the test portable_c-host", has its table. Of
+what cannot be seen in the code, none of the seventeen places of the
+second table there is left: they are of a program of 16 bits in two
+parts. What this program rests on is where the linker puts things:
 
 | | What is relied on | Where it is done | What holds it |
 |---|---|---|---|
@@ -1223,9 +1228,9 @@ they are found (`src/portable_c/DEVIATIONS.md`, 1, 5, 7 and 14).
 All nine items of the menu do what the original's do, and F1 is the
 help. The mouse at the menu is the main program's routine for a list in
 a box, `F32_70` of `usermenu.c`, which the setup program has word for
-word under a name of its own. `TODO.md` has the plan, "The setup
-program in the portable C", with what each piece brings and what is
-declared for it.
+word under a name of its own. `DIARY.md` has the plan, "Write down the
+plan for the setup program, with the scripts of its trial", with what
+each piece brought and what is declared for it.
 
 ### The extender
 
@@ -1246,18 +1251,19 @@ when it starts, onto what is the program's first screen, and
 file that the linker wrote. That tool says where the bit is and how it
 was found. Open Watcom has other extenders too. CauseWay, which is
 free as well, does not run on the machine of the tests, for a fault of
-QEMU's (`TODO.md`, "The portable C in 32 bits: what a trial on the
-bench showed"); DOS/4GW and PMODE/W are not free, and are neither
-linked nor run here.
+QEMU's (`DIARY.md`, "Write down what a trial of a 32-bit program on the
+bench showed"); DOS/4GW and PMODE/W are not free, and are neither linked
+nor run here.
 
 ### The program for Linux
 
 The same source is also a program for Linux of 64 bits, `vc`, built
-with clang: step 6 of the road in `CLAUDE.md`, which has every decision
-of the user's that it rests on, and `TODO.md`, "Step 6: the program for
-Linux", what each piece of it built and met. Nothing of the common code
-knows that it is on Linux. It asks the system what it asked DOS and the
-BIOS, through `src/portable_c/sys.h`, and for Linux the files
+with clang: `CLAUDE.md`, "The program for Linux", which has every
+decision of the user's that it rests on; `DIARY.md`, what each piece of
+it, L1 to L7, built and met; and `TODO.md`, "Step 6, the program for
+Linux: what is left", what it left. Nothing of the common code knows
+that it is on Linux. It asks the system what it asked DOS and the BIOS,
+through `src/portable_c/sys.h`, and for Linux the files
 `src/portable_c/*_posix.c` answer as DOS would, at the level of DOS's
 services, where DOSBox emulates the processor:
 
@@ -1297,7 +1303,7 @@ a list of clang's warnings written out, each an error:
 |---|---|
 | `build/portable_c/posix/vc` | The program, with the usual hardening of a program for Linux |
 | `build/portable_c/posix-asan/vc` | The same with the sanitizers of addresses, of undefined behaviour, of integers and of implicit conversions, each fatal: the one that the tests run |
-| `build/portable_c/posix-msan/vc` | The same with the sanitizer of memory, which goes with no other: built only by its name, `cmake --build build --target portable_c-posix-msan`, run by no test, and kept for audits (`TODO.md`, "L3b, the scenarios on Linux", says how) |
+| `build/portable_c/posix-msan/vc` | The same with the sanitizer of memory, which goes with no other: built only by its name, `cmake --build build --target portable_c-posix-msan`, run by no test, and kept for audits (`DIARY.md`, "Take the program for Linux through the scenarios, with its clock, masks and not-run list", says how) |
 
 **Running it by hand.** In a terminal of 80 columns by 25 rows or more:
 
@@ -1359,8 +1365,10 @@ devices, NUL, CON and the like, are ordinary names of files on Linux:
 the steps of a scenario that use them as devices are left out there,
 or the scenario is cut where the original beeps for one. Where a mask cannot do, a patch
 of its own, in `harness/goldens/posix/`, says what the program for
-Linux is expected to show, by what the user decided. `TODO.md`, "L3b,
-the scenarios on Linux", has every cut with its step.
+Linux is expected to show, by what the user decided. `LINUX_NOT_RUN`,
+`LINUX_CUT` and `LINUX_LEFT_OUT_OF` of `harness/deviations.py` have
+every cut with its step, and each is named by an entry of "The program
+for Linux" in `src/portable_c/DEVIATIONS.md`.
 
 ## Testing
 

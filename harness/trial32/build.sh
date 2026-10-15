@@ -35,10 +35,12 @@ if [ "$kind" = com ]; then
 fi
 
 # The toy of the portable C's sys.h, which is built of the tree's own
-# files (see sys.c): they are compiled here, as the plan of TODO.md has
-# them compiled; the compiler's own headers are named for stddef.h, which
-# vc.h reads. It was built for 16 bits too, as sys-16.exe, with the dos.c
-# that the portable C had while it was a program of 16 bits.
+# files (see sys.c): they are compiled here, as the plan for the 32 bits
+# had them compiled (DIARY.md, "Write down the plan for the 32 bits, with
+# the scripts of its trials"); the compiler's own headers are named for
+# stddef.h, which vc.h reads. It was built for 16 bits too, as
+# sys-16.exe, with the dos.c that the portable C had while it was a
+# program of 16 bits.
 if [ "$name" = sys ]; then
     tree=$root/src/portable_c
     exe=$out/sys-$kind.exe

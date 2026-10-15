@@ -1,9 +1,10 @@
 /*
  * The terminal of the program for Linux: the piece L4 of step 6 of the
  * portable C's road (CLAUDE.md, "The portable C", the road, step 6;
- * TODO.md, "L4, the terminal"). The program draws its screen of 80 by 25
- * cells in the terminal that it is started in, and takes its keys there,
- * by the terminal's own escape sequences and termios, no library.
+ * DIARY.md, "Write down the terminal of the program for Linux, and what
+ * L5 should know"). The program draws its screen of 80 by 25 cells in
+ * the terminal that it is started in, and takes its keys there, by the
+ * terminal's own escape sequences and termios, no library.
  *
  *   - The terminal is taken when the program starts: raw mode by
  *     termios, the alternate screen (?1049h), no wrapping at the end of a

@@ -97,7 +97,8 @@ nothing wrong.
                                     name, .MAP or .map, as the
                                     scenarios are given it
 
-What this cannot hold is said in TODO.md, "Piece H2, the driver".
+What this cannot hold is said in DIARY.md, "Have the driver of the tests
+read a flat program above the megabyte".
 """
 import argparse
 import re

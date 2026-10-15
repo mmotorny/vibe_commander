@@ -468,10 +468,10 @@ static struct WCBdef *Moved(struct WCBdef *panel, struct Block made,
    into what it gives back. The block is made twice as long, or, where
    there is not that much, as long as the largest block that there is,
    if that is longer than it is. The extender moves a block that cannot
-   grow where it is to where it can, with what it holds (TODO.md, "X,
-   the extender's memory on the bench"): the room, which keeps its
-   start where it is made shorter, and the panel, which goes behind
-   what is taken.
+   grow where it is to where it can, with what it holds (DIARY.md, "Write
+   down what the extender's memory does on the bench, the piece X"): the
+   room, which keeps its start where it is made shorter, and the panel,
+   which goes behind what is taken.
 
    The original has no such thing: its panel stops at 64K. The room
    comes back whole when the directory has been read, RoomAgain. */

@@ -26,12 +26,12 @@ for each in turn, and a block of that has 16 bytes of the extender's in
 front: so an object begins 16 bytes behind the end of the one before,
 that end rounded up to 16. On the bench of the tests, where DOS/32A has
 the memory from the megabyte on for itself, the first begins at BENCH.
-Both were seen there, the same in every run (TODO.md, "The portable C in
-32 bits: what a trial on the bench showed"), and neither is promised by
-anything: with an XMS driver loaded the first object is elsewhere. So
-everything here is counted from where the first object begins, a
-*place*, and the address of that is given by whoever knows it, as
-coverage.py finds where a program is from a trace of what ran.
+Both were seen there, the same in every run (DIARY.md, "Write down what
+a trial of a 32-bit program on the bench showed"), and neither is
+promised by anything: with an XMS driver loaded the first object is
+elsewhere. So everything here is counted from where the first object
+begins, a *place*, and the address of that is given by whoever knows it,
+as coverage.py finds where a program is from a trace of what ran.
 
 A program that this one runs, with this one still in the memory. If it
 has DOS/32A for its extender too, that one takes no memory of its own:
@@ -46,8 +46,9 @@ command of the program is at behind(), a copy that that one starts is
 behind it by as much again, and copies() has them. Seen on the bench as
 the rest was, with the program in every scenario that starts it twice
 and with a toy three deep (harness/drivercheck.py), and promised by as
-little; the blocks kept in front of a copy, with toys (TODO.md, "X, the
-extender's memory on the bench", row 27).
+little; the blocks kept in front of a copy, with toys (DIARY.md, "Write
+down what the extender's memory does on the bench, the piece X", row
+27).
 
 The relocations. A flat program is linked for no address: every place
 where code or a table names something by its address has a relocation

@@ -3,10 +3,9 @@
 
 From step 5 of the portable C's road on, every build with clang has a
 high level of warnings and clang-tidy, a warning of either an error, on
-the user's word of 14 October 2026 (CLAUDE.md, "The portable C", the
-road, step 6). The builds stop for a warning already. This test says so
-where the build is not looked at, and runs clang-tidy, which the build
-does not:
+the user's word of 14 October 2026 (CLAUDE.md, "Strictness"). The builds
+stop for a warning already. This test says so where the build is not
+looked at, and runs clang-tidy, which the build does not:
 
   1. Every file of the program for Linux, the common code and the files
      of Linux, is compiled again by the command that the build compiles
@@ -31,24 +30,26 @@ piece L1 of step 6), which `--posix-compiled` names.
 The test was `portable_c-stub`, `harness/stubcheck.py`, which read the
 common code with the stub of step 5, `sys_stub.c`, until the stub went
 with the program for Linux done, on the user's word of 14 October 2026
-(TODO.md, "L7").
+(DIARY.md, "Take the stub out, and hold the program for Linux to
+clang-tidy in its place (L7)").
 
 EXPECTED is the analyser's places where the program reads its main data
 as one block across its fields, as the original does: a read in front of
 a field or behind it, `clang-analyzer-security.ArrayBound`, and a
 difference of two pointers into two fields,
 `clang-analyzer-security.PointerSub`. The piece MD mended them, with
-the main data read as bytes at an offset (CLAUDE.md, the same item;
-TODO.md, "MD, the main data read as bytes"), and the list is empty. It
-stays for a place of that kind that is not mended at once, by its file,
-its check, what clang-tidy says and how many times, so that one more of
-them fails the test as any other place does, and one fewer does too.
-Nothing is turned off for them.
+the main data read as bytes at an offset (CLAUDE.md, "Numbers";
+DIARY.md, "Read the main data as bytes where the program reads it across
+fields"), and the list is empty. It stays for a place of that kind that
+is not mended at once, by its file, its check, what clang-tidy says and
+how many times, so that one more of them fails the test as any other
+place does, and one fewer does too. Nothing is turned off for them.
 
 clang-tidy is pinned to its version 23, which the survey of the checks
-was made with (TODO.md, "5b, the stub"): another version has other
-checks under `bugprone-*` and `misc-*`, which are judged before they are
-taken, and the test fails for it.
+was made with (DIARY.md, "Hold the stub to clang-tidy: .clang-tidy and
+the test portable_c-stub"): another version has other checks under
+`bugprone-*` and `misc-*`, which are judged before they are taken, and
+the test fails for it.
 
 The test exits with 77, which the build takes for a test that is
 skipped, where there is no clang: the build makes no program for Linux
@@ -76,7 +77,8 @@ CONFIG = ROOT / ".clang-tidy"
 # What the analyser names where the program reads the main data across
 # its fields: (file, check, what clang-tidy says) -> how many places.
 # The piece MD read the main data as bytes at an offset and took them
-# out (TODO.md, "MD, the main data read as bytes"): none is left.
+# out (DIARY.md, "Read the main data as bytes where the program reads it
+# across fields"): none is left.
 BOUND = "clang-analyzer-security.ArrayBound"
 BEFORE = "Out of bound access to memory preceding "
 BEHIND = "Out of bound access to memory after the end of "

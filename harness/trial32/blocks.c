@@ -1,8 +1,9 @@
 /* The extender's blocks above the megabyte, DPMI's functions 0500h to
    0503h: how much there is, where a block is, whether one moves when it
    is made longer or shorter, what is in one when it is given, and what
-   becomes of it. TODO.md, "X, the extender's memory on the bench", has
-   what it showed. By keys, each of which writes a screen:
+   becomes of it. DIARY.md, "Write down what the extender's memory does
+   on the bench, the piece X", has what it showed. By keys, each of
+   which writes a screen:
 
    f  what 0500h says, all of its numbers
    l  the largest block that 0501h gives, found by halving, with its

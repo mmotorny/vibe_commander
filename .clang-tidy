@@ -1,12 +1,11 @@
 # clang-tidy for the portable C, on the user's word of 14 October 2026
-# (CLAUDE.md, "The portable C", the road, step 6): a broad set, the
-# analyser, bugprone-* and misc-* and a few of readability-*, every
-# check that is turned off with its reason above it, and every place
-# that a check names an error. The test portable_c-tidy runs it over the
-# common code and the files of Linux (harness/tidycheck.py). It is
-# written for clang-tidy 23, which the test holds the version to:
-# another version has other checks, which are judged before they are
-# taken.
+# (CLAUDE.md, "Strictness"): a broad set, the analyser, bugprone-* and
+# misc-* and a few of readability-*, every check that is turned off with
+# its reason above it, and every place that a check names an error. The
+# test portable_c-tidy runs it over the common code and the files of
+# Linux (harness/tidycheck.py). It is written for clang-tidy 23, which
+# the test holds the version to: another version has other checks, which
+# are judged before they are taken.
 Checks:
   - "-*"
   - "clang-analyzer-*"
@@ -19,9 +18,9 @@ Checks:
   - "readability-redundant-declaration"
   - "readability-suspicious-call-argument"
   # A mask or a shift of a u8 or a u16, which C makes an int: the program
-  # is written in such numbers by the rule of CLAUDE.md, "The portable C",
-  # and every one of its masks would want a cast that says nothing, on
-  # the user's word of 14 October 2026.
+  # is written in such numbers by the rule of CLAUDE.md, "Numbers", and
+  # every one of its masks would want a cast that says nothing, on the
+  # user's word of 14 October 2026.
   - "-bugprone-signed-bitwise"
   # A switch without a default label, said twice, by this check and by
   # the next: a switch of the program does nothing for a value that it

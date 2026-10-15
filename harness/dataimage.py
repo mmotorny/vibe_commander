@@ -256,10 +256,10 @@ POINTERS = {"{}.{}".format(one.variable[0], one.variable[1].lstrip("_"))
             for one in ADDRESSES if one.variable}
 
 # What two builds may have otherwise with no fault in either, each with
-# its reason. See "What differs by design" at the top; TODO.md, "F0,
-# the net and the record", has how each was found, and how another is.
-# Of the main data: the field, how far into it, how many bytes, None
-# for all of it.
+# its reason. See "What differs by design" at the top; DIARY.md, "Write
+# down the net and the record of step 2, and what a later piece should
+# know", has how each was found, and how another is. Of the main data:
+# the field, how far into it, how many bytes, None for all of it.
 TIME = "follows the time, which two builds reach a step at differently"
 UNSTEADY = (
     ("Rand1", 0, None, "a random number, stirred by the timer: " + TIME),
@@ -342,11 +342,11 @@ DTA_NAME = 30                   # where the name is in the DTA
 GUARD = bytes(0xF0 - at for at in range(16))   # Guard() of sys_dos.c
 
 # What DOS/32A keeps in front of a block that it has given, as was seen
-# on the bench (TODO.md, "X, the extender's memory on the bench", row
-# 5): four words of four bytes, 12345678h, the block's length rounded up
-# to 16 with the highest bit set while it is taken, 0, and 12345678h
-# again. The image has them as the first 16 bytes of the stretch that
-# it takes of a block.
+# on the bench (DIARY.md, "Write down what the extender's memory does on
+# the bench, the piece X", row 5): four words of four bytes, 12345678h,
+# the block's length rounded up to 16 with the highest bit set while it
+# is taken, 0, and 12345678h again. The image has them as the first 16
+# bytes of the stretch that it takes of a block.
 IN_FRONT = 16
 EXTENDER_MARK = 0x12345678
 TAKEN_BIT = 0x80000000

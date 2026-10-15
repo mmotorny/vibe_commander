@@ -111,15 +111,15 @@ STAMPS_FILES = [
 # C:\FILES: files to work on that are not the bench's own, for the
 # scenarios that ask for them (`files` of scenarios.Scenario), and on
 # their benches alone, since the bench's disks are on every golden. It
-# is laid out alike on every platform, H:\FILES on Linux (CLAUDE.md, step
-# 6, the user's word of 15 October 2026): where a scenario went to A:,
-# the diskette of FreeDOS, or to D:\VC, the original's directory, only
-# for a file to work on, it works here. So it holds what they went there
-# for, as FreeDOS's boot diskette and the distribution have it, with
-# their times: the files of the diskette's FREEDOS\BIN in BIN, of which
-# a panel shows 44 entries with `..`, and three files in front of it,
-# of other days, the first two from the diskette, the third from the
-# distribution.
+# is laid out alike on every platform, H:\FILES on Linux (CLAUDE.md, "The
+# scenarios of the program for Linux", the user's word of 15 October
+# 2026): where a scenario went to A:, the diskette of FreeDOS, or to
+# D:\VC, the original's directory, only for a file to work on, it works
+# here. So it holds what they went there for, as FreeDOS's boot diskette
+# and the distribution have it, with their times: the files of the
+# diskette's FREEDOS\BIN in BIN, of which a panel shows 44 entries with
+# `..`, and three files in front of it, of other days, the first two from
+# the diskette, the third from the distribution.
 FILES_DIRECTORY = "FILES"
 _FILES_OF_THE_DISKETTE = (("KERNEL.SYS", "KERNEL.SYS"),
                           ("SETUP.EN", "FREEDOS/NLS/SETUP.EN"))

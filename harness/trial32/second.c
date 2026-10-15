@@ -3,8 +3,8 @@
    DOS. The toy takes the largest block that the extender has, gives
    back as much of it as the keys say, and runs something by INT 21h
    function 4Bh in real mode, as the program of the portable C does.
-   TODO.md, "X, the extender's memory on the bench", has what it showed.
-   By keys:
+   DIARY.md, "Write down what the extender's memory does on the bench,
+   the piece X", has what it showed. By keys:
 
    k  take two blocks of 64 KB and keep them to the end, as the two
       panels of the program would be kept while a command runs

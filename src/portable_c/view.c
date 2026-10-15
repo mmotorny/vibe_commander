@@ -30,7 +30,8 @@
    it, as EdLen, EdBase, EdSizeX and EdSizeY; ViTxHex is its EdTxHex,
    which each sets for itself; and it leaves alone, as reserved bytes,
    ViewEdit, ViKeyBar and ViHandle, which this file reads after it
-   (TODO.md, "N3").
+   (DIARY.md, "Sort the numbers of the first part of view.c, and count
+   the viewer's room in bytes").
 
    A field that is a count or a place in the text is a variable of this
    file beside it, of 32 bits, since the structure has no room to grow:
@@ -1843,12 +1844,13 @@ static void Aexec0(bool edit)
     error = ran.value;
     /* All the memory that there is, again. The original makes its block
        as long as DOS will, which DOS says when it is asked for more; the
-       extender says nothing of that (TODO.md, "X, the extender's memory
-       on the bench"), so the room is given back and the largest block
-       that there is taken, as after a command, which on the bench is
-       where the room was. Nothing of what it held is read again. Should
-       there be too little, the program ends as it does where that is so
-       after a command, which the original cannot meet here. */
+       extender says nothing of that (DIARY.md, "Write down what the
+       extender's memory does on the bench, the piece X"), so the room is
+       given back and the largest block that there is taken, as after a
+       command, which on the bench is where the room was. Nothing of what
+       it held is read again. Should there be too little, the program
+       ends as it does where that is so after a command, which the
+       original cannot meet here. */
     GiveMem();
     taken = TakeMem();
     if (taken.failed)

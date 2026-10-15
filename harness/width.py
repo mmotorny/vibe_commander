@@ -5,11 +5,10 @@ Step 2 of the road has every number of the portable C, src/portable_c/,
 be as wide as what it counts, and signed unless there is a reason for
 it not to be: a number of 8 or 16 bits becomes an i32 or a boolean, or
 stays as it is with its reason written down, and a u32 becomes an i32
-or stays with its reason (TODO.md, "The portable C in a flat memory:
-the plan", "The rule for a number"). And where a number then meets one
-of another sign or is put into fewer bits, the code says so with a
-cast, which the compiler's warnings hold and no list beside the code
-(CLAUDE.md, "The portable C"). This finds the numbers, and the test
+or stays with its reason (CLAUDE.md, "Numbers"). And where a number then
+meets one of another sign or is put into fewer bits, the code says so
+with a cast, which the compiler's warnings hold and no list beside the
+code (CLAUDE.md, "The portable C"). This finds the numbers, and the test
 `portable_c-width` of the build holds the tree to a record of them,
 harness/width.txt, so that a number that is added later is sorted too,
 and so that a commit which widens shows in the record what it widened;
@@ -222,7 +221,8 @@ CUTS = ["store", "step", "handed", "returned"]
 SIGN = "sign"
 HEADERS = ("vc.h", "sys.h", "tables.h")
 
-# The clusters of step 2, as TODO.md has them, each with its files. A
+# The clusters of step 2, as DIARY.md, "Revise the plan for a flat
+# memory: the widening is of step 2", has them, each with its files. A
 # file of two or three clusters is in the row of them all.
 CLUSTERS = [
     ("N0", "digits.c mask.c line.c mouse.c blank.c"),
@@ -993,10 +993,11 @@ def main():
         print("\nA number that is put into fewer bits, or that meets one "
               "of another sign, wants\nthe type that holds it, which is "
               "tried first, or else a cast at the place: one\nthat the "
-              "compiler keeps (TODO.md, \"N0c\"), with a comment where the "
-              "program counts\non what is cut off. A boolean that is none "
-              "wants to be a number. No warning is\nswitched off for a "
-              "line, and nothing is asked beyond what clang names.")
+              "compiler keeps (CLAUDE.md, \"Open Watcom's `wcc386`\"), "
+              "with a comment\nwhere the program counts on what is cut "
+              "off. A boolean that is none wants to be\na number. No "
+              "warning is switched off for a line, and nothing is asked "
+              "beyond\nwhat clang names.")
     if failed:
         sys.exit(1)
 

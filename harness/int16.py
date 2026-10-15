@@ -3,20 +3,20 @@
 
 The portable C, src/portable_c/, was written for a compiler whose int
 has 16 bits, translated from assembly and judged so, and is built by
-one whose int has 32: the program of 16 bits is gone (TODO.md, "The
-portable C in 32 bits: the plan"). So "DOS" and "the two builds" below
-are the code as it was written and judged, with an int of 16 bits, and
-the code as it is compiled now. A place is where the program can do
-otherwise than what it was translated from by the int alone, and the
-record says of each why it does not.
+one whose int has 32: the program of 16 bits is gone (DIARY.md, "Write
+down the plan for the 32 bits, with the scripts of its trials"). So
+"DOS" and "the two builds" below are the code as it was written and
+judged, with an int of 16 bits, and the code as it is compiled now. A
+place is where the program can do otherwise than what it was translated
+from by the int alone, and the record says of each why it does not.
 
-That is also where step 2 of the road widens (TODO.md, "The portable C
-in a flat memory: the plan"): a variable is to become wider wherever
-wrapping round at 16 bits would be unexpected, and what is found here
-is every number of 16 bits that is looked at before it is cut, with
-the reason why it stays within. The plan makes this the finder of the
-widths, and its record the start of theirs; until then the test stays
-as it is and the record is kept up.
+That is also where step 2 of the road widens (DIARY.md, "Plan the
+portable C in a flat memory, step 2 of the road"): a variable is to
+become wider wherever wrapping round at 16 bits would be unexpected, and
+what is found here is every number of 16 bits that is looked at before
+it is cut, with the reason why it stays within. The plan makes this the
+finder of the widths, and its record the start of theirs; until then the
+test stays as it is and the record is kept up.
 
 The numbers of the code are u8, u16 and u32, as wide for the one int as
 for the other, so what it keeps is the same in both.
@@ -106,10 +106,10 @@ another, so a place there has nothing to be the same as: its reason
 says that the number is meant as it is. What a macro makes is a place
 where the macro is used. The words of the addresses in vc.h, WORDS
 below, hold a megabyte of segments and offsets in a memory without
-segments (TODO.md, "P1, the words in one place"): they are of the 32
-bits alone, and what is written in one is no place. What a word is
-handed is read like anything else, and it cuts every number that it is
-handed to 16 bits.
+segments (DIARY.md, "Have the words of the addresses in one place, each
+with a body for a flat memory"): they are of the 32 bits alone, and what
+is written in one is no place. What a word is handed is read like
+anything else, and it cuts every number that it is handed to 16 bits.
 
 What it cannot see:
 
@@ -142,7 +142,8 @@ What it cannot see:
   - Anything that clang does not take. The finder stops with clang's
     words then, since what clang refuses is not in its account.
   - What is right C and means another thing without the layout of DOS
-    under it: harness/hostcheck.py and TODO.md have those.
+    under it: harness/hostcheck.py and DIARY.md, "Hold the source of the
+    portable C against gcc: the test portable_c-host", have those.
 
 It is held against lines that were written for it, harness/int16check.c,
 each with the kinds that are to be found in it or with none, every time
@@ -175,9 +176,10 @@ SKIPPED = 77
 # The files of an implementation of sys.h for another system than DOS,
 # by the ending of their names, as add_portable_c of CMakeLists.txt
 # knows them: the *_posix.c of the program for Linux (sys_stub.c was one
-# until it went, TODO.md, "L7"). They were never
-# compiled by Open Watcom nor for an int of 16 bits, and include the C
-# library of this computer, which clang for the 386 has no headers of.
+# until it went, DIARY.md, "Take the stub out, and hold the program for
+# Linux to clang-tidy in its place (L7)"). They were never compiled by
+# Open Watcom nor for an int of 16 bits, and include the C library of
+# this computer, which clang for the 386 has no headers of.
 OTHER_SYSTEMS = ("_posix.c",)
 
 

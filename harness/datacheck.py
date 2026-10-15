@@ -32,16 +32,17 @@ addresses.
 
 The original is two programs, and a tree may have the second in itself:
 the setup program, VCSETUP.COM, which goes into the portable C as a part
-of the one program (TODO.md, "The setup program in the portable C: the
-plan"). It is laid out, listed and assembled as an object file next to
-the main program, build/shareware-layout/VCSETUP.COM, .LST and .OBJ, and
-is a second original here. Many of its things have the names of the main
-program's, with other contents, so a tree has every thing of the setup
-program under the name of the assembly with St in front: StConf_B is
-held against Conf_B of VCSETUP.COM, and a word of it that names Cnf01_S
-there against where the tree has StCnf01_S. The setup program has texts
-and tables that are the main program's byte for byte, too; a tree need
-not have those twice. A word of the setup program's may name the main
+of the one program (DIARY.md, "Write down the plan for the setup
+program, with the scripts of its trial"). It is laid out, listed and
+assembled as an object file next to the main program,
+build/shareware-layout/VCSETUP.COM, .LST and .OBJ, and is a second
+original here. Many of its things have the names of the main program's,
+with other contents, so a tree has every thing of the setup program
+under the name of the assembly with St in front: StConf_B is held
+against Conf_B of VCSETUP.COM, and a word of it that names Cnf01_S there
+against where the tree has StCnf01_S. The setup program has texts and
+tables that are the main program's byte for byte, too; a tree need not
+have those twice. A word of the setup program's may name the main
 program's thing of the same name, if the tree has none with St in front
 and that thing is, as long as the tree has it, what the setup program
 has there. For a tree that is declared to have no setup program, the C
@@ -59,9 +60,9 @@ SETUP_COUNTED for a thing of the setup program, says of the word that
 names it how many bytes are read of the text there.
 
 A tree may be built as a flat program of 32 bits, as the portable C is,
-build/portable_c/ (TODO.md, "The portable C in 32 bits: the plan"). A
-word that names something is a pointer in C,
-and a pointer is four bytes there, with whatever stands behind it that
+build/portable_c/ (DIARY.md, "Write down the plan for the 32 bits, with
+the scripts of its trials"). A word that names something is a pointer in
+C, and a pointer is four bytes there, with whatever stands behind it that
 much further on: a box, a dialog and a table of pointers are longer than
 the original's and cannot be held against it byte for byte. They are held
 field for field. Which fields of an object are pointers, its declaration
