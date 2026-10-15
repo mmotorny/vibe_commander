@@ -327,7 +327,12 @@ These held while `src/c/` was made, and they say what it is.
   goes past the room's end when the list is long, a bug of the
   original, fixed and declared; and a panel holds as many entries of a
   directory as the memory allows, where the original stops at 2,703,
-  lifted by a piece of its own at the end of step 2 and declared. And
+  lifted by a piece of its own at the end of step 2 and declared;
+  the user said of it, the same day, that a panel's memory grows as
+  its directory needs, with no ceiling of entries and nothing
+  reserved for it beforehand, and that a scenario of it is kept only
+  if it runs in reasonable time, the one that took ten minutes being
+  dropped. And
   a copy from a device that answers a piece in several reads counts
   the room down by every read, where the original counts it down by
   the last one only and reads past the room's end: a bug of the
