@@ -1,7 +1,10 @@
 # Instructions for Claude
 
-Standing instructions for working in this repository. Record new ones here,
-not in Claude's memory: memory does not travel between computers.
+Standing instructions for working in this repository: the rules, what
+the user has decided that still governs the work, and how the work is
+done. Record new ones here, not in Claude's memory: memory does not
+travel between computers. What is still to do goes into `TODO.md`, not
+here; what was done and how is in git's history.
 
 ## Working together
 
@@ -33,13 +36,20 @@ not in Claude's memory: memory does not travel between computers.
   shows and the files it leaves, recorded as goldens in `harness/goldens/`,
   are committed. They are derived by `harness/goldens.py` and never edited
   by hand. What a tree is declared to show otherwise is not written into
-  them: see "The portable C".
+  them: see "Deviations".
 - Naming such tools is fine. Documentation should say plainly what the
   original was built with and where a reference came from; the restriction
   is on fetching and running them, not on mentioning them.
 - Anything the work downloads is fetched at build or run time from its
   official source and pinned, by SHA-256 (see `harness/deps.py`) or by git
-  commit (see `CMakeLists.txt`).
+  commit (see `CMakeLists.txt`), and fetched only for a build that needs
+  it: Open Watcom for a build for DOS, Emscripten for the web page,
+  where that makes sense. Anything new to download is asked first.
+- DOS/32A, the extender of the program for DOS: its stub is linked from
+  the pinned Open Watcom download when the program is built and never
+  committed, its licence text is kept in the repository, and the README
+  says, as that licence asks, "This product uses DOS/32 Advanced DOS
+  Extender technology."
 
 ## Naming
 
@@ -50,8 +60,8 @@ not in Claude's memory: memory does not travel between computers.
 ## Committing and pushing
 
 - Show the result of a piece of work, then wait for confirmation before
-  committing it. Work that agents do in a run is the exception: see "Work by
-  several agents".
+  committing it. Work that agents do in a run is the exception: see "Work
+  by several agents".
 - Commit and push together. A commit is never left unpushed.
 
 ## History
@@ -71,12 +81,14 @@ The source is three trees, and they are a story in that order.
   first commit holds them exactly as published, in `src/` itself, so
   `git diff $(git rev-list --max-parents=0 HEAD):src HEAD:src/asm` shows
   every change made since. The test `asm-bytes` builds this tree and holds
-  it against the binaries its author shipped.
-- `src/c/` is that program translated to C for DOS, the C translation: it
-  behaves as the original does, bugs included, and every scenario holds
-  it against the original. It is finished and frozen. It changes only to
-  mend a place where it is found not to behave as the original, and then
-  toward the original.
+  it against the binaries its author shipped. To read a file, `iconv -f
+  cp866` it into a copy in `build/`.
+- `src/c/` is that program translated to C for DOS, the C translation, a
+  program of 16 bits built by Open Watcom's `wcc`: it behaves as the
+  original does, bugs included, and every scenario holds it against the
+  original. It is finished and frozen. It changes only to mend a place
+  where it is found not to behave as the original, and then toward the
+  original.
 - `src/portable_c/` is the portable C: the program on its way from DOS to
   modern operating systems. It began as a copy of `src/c/`. This is where
   work goes on.
@@ -89,498 +101,332 @@ in front.
 
 ## The C translation
 
-These held while `src/c/` was made, and they say what it is.
-
 - Fidelity means the same behaviour, bugs included. A bug of the original
-  was ported as it is and reported.
-- Its routines and data keep the names they have in the assembly.
-- It has no assembly file: its code and its data are C. Where C could be
-  written in more than one way, portable C came before C that is tied to
-  this compiler or this machine, that before the compiler's intrinsics,
-  and those before assembly, which is written inline in a C file and only
-  where nothing else works. That a thing would be smaller or faster was no
-  reason to go down that list. The README lists what rests on Open Watcom
-  and every piece of inline assembly.
-- The mouse is tested like the keys: the bench has one, and what the
-  program does with it is held against the original in scenarios. An
-  instruction that no scenario can reach is listed as out of reach with
-  its reason.
-- It is larger than the original and uses more memory, the part that
-  stays in memory while a command runs included. No effort went into
-  making it small.
+  was translated as it is and reported.
+- Its routines and data keep the names they have in the assembly, and its
+  data is laid out as the original's, held by `c-data`.
+- Where C could be written in more than one way, portable C came before C
+  that is tied to this compiler or this machine, that before the
+  compiler's intrinsics, and those before inline assembly. The README
+  lists what rests on Open Watcom and every piece of inline assembly.
+- The mouse is tested like the keys. An instruction of the original that
+  no scenario can reach is listed as out of reach in `harness/ported.py`
+  with its reason; a new scenario that reaches one fails `c-scenarios`
+  until the entry goes.
 - How it was made, a batch of routines at a time, and what the batches
   learnt of the assembly, of Open Watcom's 16-bit compiler and of QEMU,
   is in `DIARY.md`, under the days of the translation. Read it there
-  before mending the C translation.
+  before mending the C translation; its build stops by itself
+  (`tools/mkexe.c`) where a limit of its layout is crossed.
 
 ## The portable C
 
-- The translation of the program is complete and verified, on the user's
-  word of 12 October 2026, so work for other operating systems may go in.
-  It goes into `src/portable_c/` and nowhere else.
-- The road, on the user's word of 12 October 2026, in this order:
-  0. The setup program, `VCSETUP`, is ported into the portable C, so that
-     there is one program: setup is reached by an item of its Options
-     menu, and is judged by scenarios whose goldens are recorded from
-     the original setup program. The call by which the setup program
-     asked a running copy for its data goes then, with the last of the
-     watch on DOS. This comes before the 32 bits.
-  1. The portable C becomes a 32-bit program for DOS, built by Open
-     Watcom's 32-bit compiler with a DOS extender, and judged on the same
-     bench by the same scenarios. When it passes them all, its 16-bit
-     build goes: `src/c/` is the 16-bit program. The extender is
-     DOS/32A, the one that runs on the bench: its stub is linked from the
-     pinned Open Watcom download when the program is built and never
-     committed, its licence text is kept in the repository, and the
-     README says, as that licence asks, "This product uses DOS/32
-     Advanced DOS Extender technology." This step follows the setup
-     program without waiting for the user; the 16-bit build is not
-     deleted before the user has said so. The user said so on 13
-     October 2026, with the last two differences of the program of 32
-     bits declared: the tests then judge that program as the portable
-     C, and the 16-bit build goes with the switch, in one piece. That
-     is done, the same day: the portable C is the program of 32 bits
-     and has no other build, and steps 0 and 1 are behind it.
-  2. It uses what 32 bits give: one flat memory, with pointers where
-     there were segments and offsets, and numbers and values of 32 bits.
-     A variable is widened wherever wrapping round at 16 bits would be
-     unexpected behaviour, and stays 16 bits only where the program
-     counts on the wrapping. A number that is only ever true or false
-     becomes a boolean. On the user's word of 13 October 2026 the
-     memory for the panels and the texts comes from the extender from
-     this step on, as much as the machine has, where step 1 had 640 KB
-     of the program's own: what a user then sees otherwise, an editor
-     that opens whatever fits, is declared. The widening is of this
-     step and does not wait for the layer: the pointers first, then
-     the booleans and the widths together, with the reason written
-     down for every number that stays 16 bits. A limit
-     of the original that goes when a number is widened is a
-     deviation, and each is asked as the work comes to it. For an hour
-     of that day the widening was put behind the layer's design: the
-     reasons did not hold, since most of what is widened never crosses
-     to the system, and the memory from the extender makes the limits
-     of 16 bits reachable on DOS.
-  3. The abstraction layer is DOS, on the user's word of 14 October
-     2026. The program goes on asking the system what it asks DOS and
-     the BIOS, as `sys.h` has it: functions named for DOS's services,
-     in DOS's terms and values (drive letters, names of 8.3, paths of
-     67 characters, the code page, the BIOS's key words, cells of the
-     screen, packed dates, DOS's numbers of errors). Every other system
-     emulates DOS behind those functions as well as it can, as DOSBox
-     does but at the level of the services and not of the processor or
-     the interrupts: a drive letter is a directory of the system's, by
-     a setting, as DOSBox's `mount`; a name longer than 8.3 has an
-     alias of DOS's form, `LONGNA~1`, that stays the same and leads back
-     to it; names are converted between UTF-8 and the code page where
-     they cross; the screen is a grid of cells drawn in a terminal; a
-     key is made a word of the BIOS; a command runs through `$SHELL
-     -c`. A design from the user's screens and what they are used for,
-     made anew for modern systems, is the right way for a redesign and
-     was set aside as more than is wanted now: its surveys and what was
-     decided in that direction on 13 and 14 October 2026 are in git's
-     history only, and none of those decisions is on the road but
-     those that the user named again; what the surveys found of Linux
-     is in `TODO.md`, "What the surveys of the layer found that step 6
-     needs". That the program saves its preferences and its session by
-     itself, on every platform, DOS included, decided on 14 October
-     2026 with the rule of the harness for it (`TODO.md`, "The program
-     saves its setup and its session by itself"), is of the program and
-     not of the layer, and stands until the user says otherwise; the
-     setup file keeps the original's format, which works wherever DOS
-     is emulated.
-  4. The implementation for DOS is `sys_dos.c` (which was `dos32.c`)
-     behind `sys.h`, as it is.
-  5. A second implementation is made that builds and is not meant to
-     run: a stub. Done on 14 October 2026, `sys_stub.c` with the test
-     `portable_c-stub`; on the user's word of that day it goes once
-     `sys_posix.c` is done, its test's checks moving to the build for
-     Linux. It went on 15 October 2026, with Linux done, and those
-     checks are the test `portable_c-tidy`.
-  6. The implementation for Linux, of 64 bits, built with clang, a
-     program that runs in a terminal, emulating DOS as step 3 says;
-     whatever of the x86 is still in the common code goes behind
-     `sys.h`, as Chromium has it: files `_dos.c` and `_posix.c` beside
-     common headers, and macros that each platform defines in its own
-     way. What the user decided of steps 5 and 6 on 14 October 2026:
-     one `CMakeLists.txt` builds every implementation, and finds clang
-     for those that want it; the files are `sys_dos.c` (which
-     `dos32.c` becomes), `stack_dos.c` (`stack.c`), `sys_stub.c` (gone
-     since) and `sys_posix.c`. On Linux there are two drives, R:, the root of the
-     file system, labelled ROOT, and H:, the user's home directory,
-     labelled HOME, always, the program starting on H: where it is
-     started under the home directory and on R: otherwise (the user,
-     on 15 October 2026, in place of one drive C: at the root, as a
-     way round DOS's 67 characters of a path, which stay: a plan to
-     let paths grow on Linux was made and dropped as deeper than
-     wanted); a directory whose path does not fit even so is reached
-     through the aliases, or not, the program starting then in the
-     deepest one above it that fits; the code page, and the
-     country with it, is 437, always; nothing of it is a setting, for
-     now (the user, later the same day, taking back a file of settings
-     and the code page by `LANG`). The terminal is driven by the program's own escape
-     sequences and termios, no library, with the kitty protocol of
-     the keyboard where the terminal offers it. A command runs on the
-     terminal's own screen, which Ctrl-O shows, as on DOS. The program
-     for Linux is judged by scenarios driven as those of DOS are, with
-     its own drives in its tests too, and held to the
-     goldens of the original with masks: named elements of the screen
-     that the comparison leaves out for that tree, each declared with
-     its reason (the path in a panel's title, on the prompt and the
-     command line, what DOS had shown behind the panels), found by a
-     rule and not written as cells, every other cell compared, and an
-     element left out held whole in a scenario about it where one can
-     be; an expectation of the tree's own only where a mask cannot do
-     (the user, later the same day, in place of expectations of its
-     own; the masks are made with the harness for Linux; on 15 October
-     2026 the user named among them the drive's letter and its label,
-     but in a scenario about them, and the time of a directory that the
-     run has written into; and while a test drives the program for
-     Linux its clock starts at the bench's time and goes on only by the
-     steps' waits and where the program waits on the timer itself, as
-     the machine's clock goes by what it runs on the bench, a user
-     always having the real one; and, the same day: a scenario
-     that went to the original's directory, `D:\VC`, or to the
-     diskette in A: only for files to work on works in a directory of
-     the bench's laid out alike on every platform instead, its golden
-     derived again from the original, and only one about the program's
-     own files has their place masked; the Linux program starts
-     from a setup file that it saves itself, once for a bench, after
-     its own menus have taken the panels from the original's file to
-     H:\WORK and H:\, where the original's has C:; a
-     scenario that rests on what only DOS has is not run on Linux,
-     with its reason, as a tree's scenarios are declared not run; and
-     the tests run the build with the sanitizers that go together, the sanitizer of memory a build of its own, run once and
-     then kept for audits, not by every test (the user, the same day)): told so by a variable of the environment, it
-     writes its grid of cells whenever it waits for a key, a harness
-     drives it in a pseudo-terminal with the scenarios' keys, and what
-     it draws in the terminal is held to that grid by replaying it
-     through pyte, a terminal emulator in Python, pinned, which is
-     the download that this allows; a test may give it the clock to
-     start from. Of what the abandoned design had decided for other
-     systems, the user named three again for Linux on 14 October 2026:
-     Enter on a file that the program cannot run hands it to
-     `xdg-open`, the program asking `sys.h` whether a file runs where it
-     asked its extension, so that on Linux a file that the user may
-     execute runs whatever its name, the panel's filter of programs
-     showing then what Enter would run (the user, on 15 October 2026),
-     and a name of DOS's form in a
-     command, a word that names a file of the current directory, is
-     handed to the shell as the host's name (the user, on 15 October
-     2026); the PC's sixteen colours are drawn as DOS has them,
-     exactly, in 24 bits where the terminal allows it; and the screen
-     is 80 columns by 25 rows and no other size, whatever the
-     terminal's. The rest of that design is dropped. Of what the first
-     piece of step 6 asked, decided the same day: the program for Linux
-     is called `vc`, and keeps its setup file, the original's `VC.INI`,
-     at `~/.config/vc/vc.ini` (`$XDG_CONFIG_HOME/vc/vc.ini` where that
-     is set); a character that the code page
-     lacks, or a byte that is no UTF-8, shows as `_`, as Windows makes
-     a short name, the alias leading back to the name as it is; what
-     the program makes on the host is named in lower case; aliases are
-     numbered in the order of the host's names by their bytes and kept
-     for the run; and a directory is never shown read-only. Of what
-     the second piece asked, the same day: a file of four gigabytes or
-     more shows the most that DOS can say, and is never copied or moved
-     cut short, the program refusing it with an error instead; the free
-     room of a disk shows at most four gigabytes less 64K, in clusters
-     of up to 64K; a file whose name begins with a dot may be
-     overwritten; hidden, system and archive are taken when set and not
-     kept, the host having nowhere for them; a pipe, a socket or a
-     device is listed as an empty file that cannot be opened; the
-     drives' labels are ROOT and HOME, and making one is refused; DOS's names of devices, NUL, CON and the like, are
-     ordinary names of files on Linux, and the steps of scenarios that
-     use them as devices are not run there, declared (the user, on 15
-     October 2026); and an error of the
-     host's with no number of DOS's is DOS's general failure. Once the stub compiles on Linux, on the user's
-     word of 14 October 2026, every build with clang has the
-     sanitizers that fit it, a high level of warnings and clang-tidy,
-     and a warning of any of them stops the build; which warnings and
-     which checks of clang-tidy is recommended to the user from what
-     popular projects of open source use, and the user decides. The
-     user decided it the same day, from a survey of curl, systemd,
-     git, PostgreSQL, libuv, OpenSSL, LLVM and the guide of the
-     OpenSSF: a list of warnings of clang's, written out, close to
-     curl's, and not `-Weverything`, each an error; clang-tidy with a
-     broad set, the analyser, `bugprone-*` and `misc-*` and a few of
-     `readability-*`, where each check that is turned off has its
-     reason in `.clang-tidy`; a build with the sanitizers of
-     addresses and of undefined behaviour, and of integers and of
-     implicit conversions, all fatal, and one with the sanitizer of
-     memory, apart; the usual hardening in the build that is not
-     sanitized; and a fall-through of a `switch` and a table of bytes
-     without its zero said by words of `compiler.h`, not by turning
-     the warnings off. Where the analyser names the program reading
-     the main data as one block across its fields, as the original
-     does, that read goes through the main data as bytes at an offset,
-     by a piece of its own, so that nothing is turned off for it, on
-     the user's word of the same day. A word of 16 or 32 bits read from or
-     written into a buffer of bytes, which the program does at an
-     address that may be odd as the original does, is made of its
-     bytes, `p[0] | p[1] << 8`, by words of `vc.h` (`GET16`, `PUT16`,
-     `GET32`, `PUT32`), not read through a cast of the pointer, so that
-     the sanitizer's check of alignment stays on, fatal, and nothing
-     rests on the order of a processor's bytes, on the user's word of
-     15 October 2026. The room of the editor and the viewer on Linux
-     is as much as the machine has; a cap comes with iOS, where the
-     system ends a program that takes too much.
-  7. A static web page, when Linux is done, on the user's word of 15
-     October 2026: the program built to WebAssembly by Emscripten,
-     which is the download that this allows, fetched and pinned as any
-     other, its key loop made to wait by Emscripten's Asyncify so that
-     any static host serves it; behind `sys.h` a file of its own; the
-     screen drawn as text, the 80 by 25 cells as lines of a `<pre>`
-     with the colours of DOS in spans, not on a canvas. It comes before
-     iOS as a rehearsal of what iOS has too: no shell, a file system of
-     the program's own, an event loop. What the user decided of its
-     plan (`TODO.md`, "Step 7, the web page"), the same day: one
-     drive, C:, which starts as a small tree of sample files written
-     for the project and served with the page, nothing proprietary,
-     and which the user may change, what is changed being kept in the
-     browser; a command says on DOS's screen that commands cannot be
-     run in a web page; Enter on a file that is no program opens it in
-     a new tab of the browser, where the user may view it or save it;
-     the user's own files come in by a button and by dragging them onto
-     the page, into the current directory; the keys that a browser
-     keeps for itself are declared, and a button for the full screen
-     locks the keyboard where the browser allows it; the font is
-     VileR's Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned and put into
-     the page, and credited there; Emscripten is fetched only for a
-     build that asks for the web page, and Open Watcom likewise only
-     for one that asks for DOS, where that makes sense.
-  8. iOS, when the web page is done. Windows and macOS are not targets
-     for now, on the user's word of 14 October 2026.
-- The program in the portable C is Vibe Commander 0.1, on the user's word
-  of 13 October 2026, since it no longer is what the original is. Its
-  title and the first line of its banner are "Vibe Commander 0.1", the
-  short form, and where the original names itself without a version it
-  is "Vibe Commander". It says "based on Volkov Commander 4.05", in the
-  same short form, wherever the original named its version: behind the
-  name in the banner, and in the Info panel on a line of its own
-  between the title and the line under it, where the two lines on the
-  memory, which mean nothing off DOS, are gone. The banner's second
-  line keeps the author's copyright and adds the user's, "(C) 2026
-  Maksym Motorny". No line is added anywhere for it. The C translation
-  keeps the original's name.
-- The jumps that the translation kept from the assembly, `goto`, go
-  where they are easy, on the user's word of 14 October 2026: in a
-  function that only jumps forward, or whose jumps back make a loop
-  with one way in, they become `if`, loops, `break`, `continue` and
-  `return`, by pieces of their own beside steps 5 and 6. The
-  functions where loops are entered in the middle or paths cross,
-  some fifteen, `V00_10` of `view.c`, `C20_00` of `copy.c`, `F32_00`
-  and `Run_00` of `usermenu.c`, `F39_00` of `menu.c` among them, keep
-  theirs until one is rewritten for another reason. A label that goes
-  leaves the assembly's name in a comment where it stood, so that the
-  code can still be held against `src/c` and `src/asm`.
+### The road
+
+The portable C goes from DOS to other systems by a road that the user has
+laid out. Steps 0 to 6 are done; step 7 is under way.
+
+0. Done. The setup program, `VCSETUP`, is a part of the program: setup is
+   reached by an item of its Options menu, and is judged by scenarios
+   whose goldens are recorded from the original setup program.
+1. Done. The portable C is a program of 32 bits for DOS, built by Open
+   Watcom's `wcc386` in the flat model under the extender DOS/32A, and
+   has no other build for DOS: `src/c/` is the program of 16 bits.
+2. Done. It uses what 32 bits give: one flat memory, pointers where there
+   were segments and offsets, numbers widened where wrapping round at 16
+   bits would be unexpected, booleans for what is only true or false. The
+   memory for the panels and the texts comes from the system, as much as
+   the machine has. A limit of the original that goes when a number is
+   widened is a deviation, asked as the work comes to it; those that went
+   are entries of `src/portable_c/DEVIATIONS.md`.
+3. The abstraction layer is DOS. The program asks the system what it
+   asks DOS and the BIOS, as `sys.h` has it: functions named for DOS's
+   services, in DOS's terms and values (drive letters, names of 8.3,
+   paths of 67 characters, the code page, the BIOS's key words, cells of
+   the screen, packed dates, DOS's numbers of errors). Every other system
+   emulates DOS behind those functions as well as it can, as DOSBox does
+   but at the level of the services and not of the processor: a drive
+   letter is a directory of the system's, as DOSBox's `mount`; a name
+   longer than 8.3 has an alias of DOS's form, `LONGNA~1`, that stays the
+   same for the run and leads back to it; names are converted between
+   UTF-8 and the code page where they cross; the screen is a grid of
+   cells; a key is made a word of the BIOS. A redesign for modern systems
+   from the user's screens was set aside as more than is wanted now.
+   That the program saves its preferences and its session by itself, on
+   every platform, DOS included, is decided and not started (`TODO.md`,
+   "The program saves its setup and its session by itself"); it is of the
+   program, not of the layer. The setup file keeps the original's format.
+4. The implementation for DOS is `sys_dos.c` behind `sys.h`, with
+   `stack_dos.c`.
+5. Done, and gone: a stub that built and did not run. Its checks are the
+   test `portable_c-tidy`.
+6. Done. The program for Linux: see "The program for Linux".
+7. Under way. A static web page: see "The web page".
+8. iOS, when the web page is done. Windows and macOS are not targets.
+
+### One program, one place for the system
+
+- What the program asks of the system, it asks in one place, `sys.h`;
+  the rest of it does not know which system that is. Behind it is a file
+  of each implementation: `sys_dos.c`, `sys_posix.c` with the other
+  `*_posix.c` files of the emulation, and a file of the web page's.
+  Whatever of the x86 is still in the common code goes behind `sys.h` as
+  Chromium has it: files `_dos.c` and `_posix.c` beside common headers,
+  and macros that each platform defines in its own way (`compiler.h`).
+  A file whose name ends in no implementation's name is common code.
+- One `CMakeLists.txt` builds every implementation, and finds clang for
+  those that want it.
 - Clang is where this is going, for the platforms it reaches and for its
-  sanitizers and static checks. Open Watcom builds the program for DOS
-  for as long as DOS is where it is judged. No other toolchain is taken
-  on.
+  sanitizers and static checks. Open Watcom builds the program for DOS for
+  as long as DOS is where it is judged. No other toolchain is taken on.
+- DOS stays a target of the portable C for as long as DOS is where it is
+  judged: every piece of work builds for DOS and passes its scenarios
+  there before it lands.
+- The order of the translation holds, and is now the point of the work:
+  portable C first, then C tied to a compiler or a machine, then
+  intrinsics, then assembly inline in a C file. What the README lists as
+  resting on Open Watcom is to shrink, not grow.
+- The program is Vibe Commander 0.1. Its title and the first line of its
+  banner are "Vibe Commander 0.1", and where the original names itself
+  without a version it is "Vibe Commander". It says "based on Volkov
+  Commander 4.05" wherever the original named its version: behind the
+  name in the banner, and in the Info panel on a line of its own between
+  the title and the line under it, where the two lines on the memory are
+  gone. The banner's second line keeps the author's copyright and adds
+  "(C) 2026 Maksym Motorny". No line is added anywhere for it. The C
+  translation keeps the original's name.
+- Names may change here once a thing no longer is what its name in the
+  assembly says. A comment at the new name says what it was, so that the
+  code can still be held against `src/c` and `src/asm`.
+- The jumps that the translation kept from the assembly, `goto`, go where
+  they are easy: in a function that only jumps forward, or whose jumps
+  back make a loop with one way in. Those where loops are entered in the
+  middle or paths cross (`V00_10` of `view.c`, `C20_00` of `copy.c`,
+  `F32_00` and `Run_00` of `usermenu.c`, `F39_00` of `menu.c` among them)
+  keep theirs until one is rewritten for another reason. A label that
+  goes leaves the assembly's name in a comment where it stood.
+
+### The program for DOS
+
+- It is built by `wcc386` and linked with the stub of DOS/32A:
+  `build/portable_c/VC.EXE`, and a build with checks and debugging
+  information, `build/portable_c/debug/VC.EXE`.
+- It stays in the memory whole while a command runs, and takes the memory
+  for the panels and the texts from the extender, as much as there is.
+- The drive B: that shares the floppy drive with A: stays, with its prompt
+  and its setting, for as long as DOS is a target.
+- Alt with a letter names the letter of a US keyboard, as the BIOS gives
+  it.
+- A search for a text is three to four times slower than the original's on
+  the machine's clock, since every byte's capital is asked of DOS through
+  the extender (`CaseMap` of `sys_dos.c`, a round to real mode and back).
+  Remembering the answers was offered and not taken: it stays so.
+- What differs from the original in the program for DOS is decided by the
+  user one difference at a time. Decided and declared: what is inherent in
+  running under the extender and shows on no screen; that a command finds
+  no memory above the megabyte while the extender holds it; and that a
+  program of another's which has stayed in the memory, started from this
+  one, is cut off from its interrupts when this one is left, with the
+  extender's lines of warning on the screen. When DOS ends the program by
+  another's hand, the program is told, by a small routine of real mode
+  that `sys_dos.c` keeps for it.
+
+### The program for Linux
+
+Step 6, as the user decided it. The tests and `harness/goldens/posix/`
+name this section as "CLAUDE.md, step 6".
+
+- A program of 64 bits, built with clang, called `vc`, that runs in a
+  terminal and emulates DOS as step 3 says. It keeps its setup file, the
+  original's `VC.INI`, at `~/.config/vc/vc.ini`
+  (`$XDG_CONFIG_HOME/vc/vc.ini` where that is set).
+- There are two drives, always: R:, the root of the file system, labelled
+  ROOT, and H:, the user's home directory, labelled HOME. The program
+  starts on H: where it is started under the home directory and on R:
+  otherwise. DOS's 67 characters of a path stay; a directory whose path
+  does not fit even so is reached through the aliases, or not, the
+  program starting then in the deepest directory above it that fits.
+  Making a label is refused.
+- The code page is 437, and the country with it, always; nothing of it is
+  a setting. A character that the code page lacks, or a byte that is no
+  UTF-8, shows as `_`, as Windows makes a short name, the alias leading
+  back to the name as it is. Aliases are numbered in the order of the
+  host's names by their bytes and kept for the run. What the program
+  makes on the host is named in lower case.
+- A directory is never shown read-only. A file of four gigabytes or more
+  shows the most that DOS can say, and is never copied or moved cut
+  short: the program refuses it with an error. The free room of a disk
+  shows at most four gigabytes less 64K, in clusters of up to 64K. A file
+  whose name begins with a dot may be overwritten. Hidden, system and
+  archive are taken when set and not kept. A pipe, a socket or a device
+  is listed as an empty file that cannot be opened. DOS's names of
+  devices, NUL, CON and the like, are ordinary names of files. An error
+  of the host's with no number of DOS's is DOS's general failure.
+- The terminal is driven by the program's own escape sequences and
+  termios, no library, with the kitty protocol of the keyboard where the
+  terminal offers it. The screen is 80 columns by 25 rows and no other
+  size, whatever the terminal's. The PC's sixteen colours are drawn as
+  DOS has them, exactly, in 24 bits where the terminal allows it.
+- A command runs through `$SHELL -c` on the terminal's own screen, which
+  Ctrl-O shows, as on DOS. A name of DOS's form in a command, a word that
+  names a file of the current directory, is handed to the shell as the
+  host's name.
+- Enter on a file runs it if the user may execute it, whatever its name:
+  the program asks `sys.h` whether a file runs, where it asked its
+  extension, and the panel's filter of programs shows what Enter would
+  run. A file that does not run is handed to `xdg-open`.
+- The room of the editor and the viewer is as much as the machine has.
+- A file of the panel's size stays 32 bits on every platform: a file of
+  four gigabytes or more is shown and copied as DOS would.
+- How it is judged: see "The scenarios of the program for Linux" under
+  "How the portable C is judged". What the surveys of Linux found is in
+  `TODO.md`, "What the surveys of the layer found that step 6 needs".
+
+### The web page
+
+Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
+
+- The program built to WebAssembly by Emscripten, fetched and pinned as
+  any other download and only for a build that asks for the web page; its
+  key loop made to wait by Emscripten's Asyncify, so that any static host
+  serves it; behind `sys.h` a file of its own.
+- The screen is drawn as text: the 80 by 25 cells as lines of a `<pre>`
+  with the colours of DOS in spans, not on a canvas. The font is VileR's
+  Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned, put into the page and
+  credited there.
+- One drive, C:, which starts as a small tree of sample files written for
+  the project and served with the page, nothing proprietary, and which
+  the user may change, what is changed being kept in the browser. The
+  user's own files come in by a button and by dragging them onto the
+  page, into the current directory.
+- A command says on DOS's screen that commands cannot be run in a web
+  page. Enter on a file that is no program opens it in a new tab of the
+  browser, where the user may view it or save it.
+- The keys that a browser keeps for itself are declared, and a button for
+  the full screen locks the keyboard where the browser allows it.
+- It comes before iOS as a rehearsal of what iOS has too: no shell, a file
+  system of the program's own, an event loop. On iOS the room of the
+  editor and the viewer gets a cap, since the system ends a program that
+  takes too much.
+
+### Deviations
+
 - What judges the portable C is what judged the C translation: the
   scenarios, with goldens recorded from the original. Where the portable C
-  is to behave otherwise than the original, that is a deviation.
-- Every deviation is declared, in `src/portable_c/DEVIATIONS.md`: what
-  the original does, what the portable C does, why, and which scenarios
-  show it. What a scenario is then expected to show is the original's
-  golden with the declared difference applied to it, on the user's word
-  of 13 October 2026: a patch, a committed file of the rows that differ,
-  with its reason, kept apart from the goldens of the original and
-  applied to the golden as it is derived, so that deriving the golden
-  again gives the expectation again; or, where one difference is on many
-  screens, as the program's name is, a rule that the comparison applies.
-  A patch that no longer fits the golden it was made for is a failure to
-  look at, not to regenerate. The goldens of the original themselves are
-  never edited.
+  behaves otherwise than the original, that is a deviation.
+- Every deviation is declared in `src/portable_c/DEVIATIONS.md`: what the
+  original does, what the portable C does, why, and which scenarios show
+  it. What a scenario is then expected to show is the original's golden
+  with the declared difference applied to it: a patch, a committed file
+  of the rows that differ, with its reason, applied to the golden as it is
+  derived; or, where one difference is on many screens, as the program's
+  name is, a rule that the comparison applies; or, for the program for
+  Linux, a mask. A patch that no longer fits the golden it was made for is
+  a failure to look at, not to regenerate. The goldens of the original are
+  never edited. How each is made: "How the portable C is judged".
+- An expectation of a tree's own, in place of the original's golden, is
+  allowed only where the original cannot go: `editor-huge` (a file larger
+  than the original's room) and `menu-none` (the bar left by the way to
+  the menu that is none), and for Linux only where a mask cannot do.
 - A feature that only made sense on DOS is removed, not kept as a setting
-  that does nothing. The first is Memory allocation in the Options menu:
-  the portable C stays in memory whole while a command runs. A removal of
-  that kind is declared and made without asking. Whether a feature is of
-  that kind is judged by what it gives the user, not by how DOS did it:
-  Quick execute runs commands through an interrupt that only DOS has,
-  and what it gives, commands run by the shell the program was started
-  from, is not DOS's alone. Where that is in doubt, it is asked. Any
-  other deviation, a fix of a bug of the original included, is asked
-  first.
-- What the user has decided of the features that were in doubt, on 13
-  October 2026: Quick execute commands goes, the setting and the way
-  through INT 2Eh; EGA lines goes, the command that gives the screen 43
-  or 50 rows by a font of the BIOS, and the rows of the screen are to
-  come from the system later: until a system gives the program a screen
-  of another size, the scenarios that went to a tall screen by that
-  command are not run for the portable C, and what they alone tested is
-  listed as untested; the drive B: that shares the floppy drive
-  with A: stays, with its prompt and its setting, for as long as DOS is
-  a target. A setup file made from the defaults has zeros where the
-  original has 64 bytes of whatever lay behind its table: that stands.
-  Where the program of 32 bits does again what the original does and the
-  portable C of 16 bits could not, a second copy that has the memory to
-  run a command, it is held to the original's golden, and the deviation
-  says only what still differs. When DOS ends the program by another's
-  hand, the program of 32 bits is to be told as the 16-bit one is, by a
-  small routine of real mode that the system's functions keep for it.
-  The editor of the program of 32 bits has room for a file that the
-  original's has none for: that is declared, the memory is not made
-  short for it, and the scenario that has the editor refuse such a
-  file, `editor-big`, is not run for that program, with what it alone
-  tested listed as untested.
-- What differs in the program of 32 bits from the original is decided
-  by the user one difference at a time, on the user's word of 13
-  October 2026: nothing gives leave to remove or break a feature of
-  the original for that program without asking. Decided so far, each
-  declared as it is and with no change of the program: what is inherent
-  in running under the extender and shows on no screen; that a command
-  finds no memory above the megabyte while the extender holds it; and
-  that a program of another's which has stayed in the memory, started
-  from this one, is cut off from its interrupts when this one is left,
-  with the extender's lines of warning on the screen. A mend of the
-  last was built and dropped on the user's word: `TODO.md` has it.
-- Of the limits of the original that step 2 comes to, each asked as
-  the work reaches it, the user has decided, on 13 October 2026: the
-  cut of each panel to 256 files while a command runs goes, since a
-  panel keeps its memory through a command now, and what was selected
-  beyond the 256th file stays selected; that is the removal of what
-  only made sense on DOS, and the piece that has `enter.c` makes it
-  and declares it.
-- Two things that the work on the addresses met, decided by the user
-  on 13 October 2026. Go to of the file search asks DOS for the disk
-  of the drive that the chosen line is on, where the original, by
-  reading the drive's letter at the wrong place, asks for that of the
-  current drive: a bug of the original, fixed and declared. And a
-  search for a text stays as slow as it is in the program of 32 bits,
-  three to four times the original's time on the machine's clock,
-  since every byte's capital is asked of DOS through the extender as
-  the original asks it: remembering the answers was offered and not
-  taken.
-- Two more limits of the original that step 2 came to, decided by the
-  user on 14 October 2026: the file search that looks for a text reads
-  a file in parts no longer than what is left of the room behind its
-  list, where the original reads parts as long as the whole room and
-  goes past the room's end when the list is long, a bug of the
-  original, fixed and declared; and a panel holds as many entries of a
-  directory as the memory allows, where the original stops at 2,703,
-  lifted by a piece of its own at the end of step 2 and declared;
-  the user said of it, the same day, that a panel's memory grows as
-  its directory needs, with no ceiling of entries and nothing
-  reserved for it beforehand, and that a scenario of it is kept only
-  if it runs in reasonable time, the one that took ten minutes being
-  dropped; and that a panel stops at 65,536 entries for good, the
-  most that a directory of DOS holds, since an entry keeps the
-  original's number of 16 bits: a system that is not DOS shows at
-  most so many entries of a directory, declared. And
-  a copy from a device that answers a piece in several reads counts
-  the room down by every read, where the original counts it down by
-  the last one only and reads past the room's end: a bug of the
-  original, fixed and declared.
-- More of what the user decided on 14 October 2026, as the clusters of
-  step 2 came to it. Fixes of bugs of the original, each declared: the
-  viewer counts the columns in front of a found text in 32 bits (entry
-  18); the Info panel counts a file's clusters in 32 bits (entry 19),
-  and the size of a cluster becomes 32 bits with the piece M, so that a
-  disk of clusters of 64K shows its room; the editor counts its lines
-  in 32 bits, so that a text of more than 65,535 lines can be reached,
-  held by a scenario of both programs; a tree's file that claims 4,096
-  entries or more, or none, is refused as a broken one; and the Info
-  panel's test of a label that ends in "S" goes by whether reading the
-  label failed. Every figure of free memory goes, on DOS too, as a
-  thing that only made sense on DOS: the editor's free bytes are the
-  last of them, and the rule that leaves that figure out of the
-  comparison follows. One scenario may be held to an expectation of
-  the portable C's own, where the original cannot go: `editor-huge`,
-  a file larger than the original's room, when the memory comes from
-  the extender; and a second, `menu-none`, allowed the same day, where
-  the original never comes back to wait for a key: the bar left by
-  the way to the menu that is none. On DOS, Alt with a letter goes on naming the letter of
-  a US keyboard, as the BIOS gives it. The menu that is none, the
-  bar pressed beside the names of the menus and the mouse moved onto
-  one, which in the original makes the menu 0 and reads in front of
-  the table of the menus and behind it, opens the menu under the
-  pointer, as the original meant: a bug of the original fixed and
-  declared, decided the same day; and the other way to the menu 0, the
-  button held on the bar, the pointer moved off the names and the
-  button let go there or moved below the bar, leaves the bar, as
-  letting go elsewhere does. Of a help file that is broken,
-  decided the same day: where its numbers of lines run past 65,535,
-  the help wraps them as the original does; and an entry that says its
-  text has no bytes, for which the program of 32 bits would write 64K
-  behind the main data where the original went round its own segment,
-  is refused as a broken file, a bug of the original fixed and
-  declared. A scenario that makes such a file in the editor was
-  offered and not taken, since the C translation cannot pass it. The
-  editor's line number takes a sixth digit and more by moving Col to
-  the right only where it is needed, so that a text of fewer than
-  100,000 lines shows as the original's does; and the word Free goes
-  with the figure that it named. The rules of the test of the layout
-  that only held for the program of 16 bits, the tables within 64K of
-  `Title_S` among them, go with the piece F10.
+  that does nothing. Such a removal is declared and made without asking.
+  Whether a feature is of that kind is judged by what it gives the user,
+  not by how DOS did it: Quick execute ran commands through an interrupt
+  that only DOS has, and what it gave, commands run by the shell the
+  program was started from, is not DOS's alone. Where that is in doubt, it
+  is asked. Any other deviation, a fix of a bug of the original included,
+  is asked first: nothing gives leave to remove or break a feature of the
+  original without asking.
 - A bug of the original stays as it is until its fix has been decided.
-- DOS stays a target of the portable C for as long as DOS is where it is
-  judged: every step builds for DOS and passes its scenarios there before
-  it lands.
-- The order holds here as it did for the translation, and it is now the
-  point of the work: portable C first, then C tied to a compiler or a
-  machine, then intrinsics, then assembly inline in a C file. What the
-  README lists as resting on Open Watcom is to shrink, not grow.
-- What the program asks of the system it is on, it asks in one place; the
-  rest of it does not know which system that is. Today that place is
-  `sys.h`, with `sys_dos.c` behind it (`dos32.c` until the piece 5a),
-  the one file of the system's functions since the 16-bit build went,
-  and a file of each other implementation beside it.
-- A number is signed unless there is a reason for it not to be, on the
-  user's word of 13 October 2026: a size, a count, an index, a length,
-  a place in a text is an `i32` when it is widened, and one that is a
-  `u32` today is looked at with the same question. Keeping a size in a
-  type without a sign is widely held to have been a mistake: a
+- What has been decided is declared, each with its reason, in
+  `DEVIATIONS.md`: what was removed as of DOS alone (Memory allocation,
+  TSR manager, Screen output, the map of the memory, EGA lines, Quick
+  execute, the program's own call, every figure of free memory, the
+  unsorted order of a panel), the bugs of the original that are fixed,
+  the limits of the original that went with the widening, and the
+  entries of the program for Linux. Two decisions there constrain what
+  comes: a panel holds at most 65,536 entries, the most that a directory
+  of DOS holds, on every system; and a setup file made from the defaults
+  has zeros where the original has 64 bytes of whatever lay behind its
+  table.
+- The screen of more than 25 rows is untested in the portable C until a
+  system gives the program a screen of another size: the scenarios that
+  went to a tall screen by EGA lines are not run for it, and `TODO.md`,
+  "The tall screen", lists what they alone tested. The code that goes by
+  the rows stays. Likewise `editor-big`, which has the editor refuse a
+  file that the original has no room for, is not run for the portable C.
+
+### Numbers
+
+- A number is signed unless there is a reason for it not to be: a size, a
+  count, an index, a length, a place in a text is an `i32`. Keeping a size
+  in a type without a sign is widely held to have been a mistake: a
   difference that goes below nothing becomes a huge number without a
   word, where a signed one is negative and a sanitizer names a signed
-  overflow. Here it is also the conversion that changes least, since C
-  already reckons with a `u8` or a `u16` as a signed `int`. The reasons
-  for a type without a sign, each written down where it is used: bits,
-  a mask, a character, a colour, a cell of the screen; wrapping that
-  the program counts on, with its cast written out; a width that a
-  file, DOS or the BIOS has; and a quantity that can pass two
-  gigabytes while there is no signed type of 64 bits, the size of a
-  file, of a disk and of what is free on it, the sum of what is
-  selected, which the original shows up to four gigabytes: those stay
-  `u32`, the width that DOS has, which `sys.h` keeps by step 3: on the
-  user's word of 14 October 2026 the size of a file stays 32 bits on
-  every platform, Linux too, where a file of four gigabytes or more is
-  then shown and copied as DOS would.
-- Where a number meets one of another sign or is put into fewer bits,
-  the code says so with a cast, on the user's word of 13 October 2026:
-  a file of the portable C whose numbers have been sorted is held to
-  clang's warnings of a comparison and of a conversion between signed
-  and unsigned, and of a conversion into fewer bits, each switched on,
-  none switched off for a line. A warning goes by making the type
-  right, which is the first thing to try and is what moves numbers
-  toward a sign, or else by a cast written at the place, with a
-  comment where the program counts on what the cast cuts off. Writing
-  the cast is the point: it makes whoever writes it think what happens
-  at the edges. A list beside the code of the places and their reasons
-  is not kept in place of that. What clang does not name stays as it
-  is written, by the same word: a step or a sum that is kept at its
-  own width, `word++` or `byte = a - b` of numbers of 8 or 16 bits,
-  wraps in that width, which is what C says of it; no rule of the
-  project's own is put on top of the compiler's. That changed on the
-  user's word of 14 October 2026, with the build for Linux: its
-  sanitizers of integers are fatal, so a step or a sum that wraps at
-  its own width and that a run reaches gets its cast too, with the
-  word `wraps` in a comment where the program counts on it, as any
-  other cut.
-- An integer type gets a name of its own only where its width is not
-  the same everywhere, on the user's word of 13 October 2026: none is
-  made while `sys.h` keeps DOS's widths, by step 3, and the size of a
-  file, which was to be such a type, is DOS's `u32`. A name for what
-  a number merely means, a count of columns, a colour, is not made: C
-  holds such a name apart from nothing, a `Colour` that is a `u16` is
-  taken wherever a `u16` is, so it is a comment that looks like a
-  type. Such a number has the type of its width, `u8`, `u16`, `u32`,
-  `i32`, or is a `bool`, and its name and a comment say what it is.
-  What crosses to the system has the type of its width too, signed or not by the rule above: a count of
-  bytes an `i32`, the size of a file a `u32`. Where the compiler is to hold two things apart, they are
-  structures.
-- Names may change here once a thing no longer is what its name in the
-  assembly says. The C translation keeps the old names, and a comment at
-  the new name says what it was.
+  overflow. The reasons for a type without a sign, each written down where
+  it is used: bits, a mask, a character, a colour, a cell of the screen;
+  wrapping that the program counts on, with its cast written out; a width
+  that a file, DOS or the BIOS has; and a quantity that can pass two
+  gigabytes, the size of a file, of a disk and of what is free on it, the
+  sum of what is selected, which stay `u32`, the width that DOS has.
+- A number stays 8 or 16 bits only for a reason, written down for every
+  one in `harness/width.txt` (see "The records").
+- Where a number meets one of another sign or is put into fewer bits, the
+  code says so with a cast: the tree is held to clang's warnings of a
+  comparison and of a conversion between signed and unsigned and of a
+  conversion into fewer bits, none switched off for a line. A warning goes
+  by making the type right, which is the first thing to try, or else by a
+  cast written at the place. Writing the cast is the point: it makes
+  whoever writes it think what happens at the edges. A step or a sum that
+  wraps at its own width and that a run reaches gets its cast too, since
+  the sanitizers of integers are fatal, with the word `wraps` in a comment
+  where the program counts on it. A cast without such a comment says that
+  the number fits, by the lines just above; where it fits by something
+  further off, a comment says by what.
+- An integer type gets a name of its own only where its width is not the
+  same everywhere: none is made while `sys.h` keeps DOS's widths. A name
+  for what a number merely means, a count of columns, a colour, is not
+  made: C holds such a name apart from nothing. Such a number has the type
+  of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`, and its name
+  and a comment say what it is. What crosses to the system has the type of
+  its width too, signed or not by the rule above: a count of bytes an
+  `i32`, the size of a file a `u32`. Where the compiler is to hold two
+  things apart, they are structures.
+- A word of 16 or 32 bits read from or written into a buffer of bytes,
+  which the program does at an address that may be odd as the original
+  does, is made of its bytes by `GET16`, `PUT16`, `GET32` and `PUT32` of
+  `vc.h`, not read through a cast of the pointer: the sanitizer's check of
+  alignment stays on, and nothing rests on the order of a processor's
+  bytes. The packed structures of `vc.h` and of the tables lie at any
+  place: a member read as a member is right, a pointer taken of one and
+  read through its own type is not.
+- Where the analyser names the program reading the main data as one block
+  across its fields, as the original does, that read goes through the
+  main data as bytes at an offset, so that nothing is turned off for it.
+
+### Strictness
+
+Every build with clang has the sanitizers that fit it, a high level of
+warnings and clang-tidy, and a warning of any of them stops the build:
+
+- clang's warnings are a list written out in `CMakeLists.txt`, close to
+  curl's, not `-Weverything`, each an error.
+- clang-tidy runs a broad set, the analyser, `bugprone-*`, `misc-*` and a
+  few of `readability-*`; each check that is turned off has its reason in
+  `.clang-tidy`. The test `portable_c-tidy` runs it.
+- The tests run the build with the sanitizers of addresses, of undefined
+  behaviour, of integers and of implicit conversions, all fatal
+  (`build/portable_c/posix-asan/vc`). The sanitizer of memory is a build
+  of its own, `posix-msan`, built by its name, run once and then kept for
+  audits, not by every test.
+- The build that is not sanitized, `posix/vc`, has the usual hardening.
+- A fall-through of a `switch` and a table of bytes without its zero are
+  said by `FALLTHROUGH` and `NONSTRING` of `compiler.h`, not by turning the
+  warnings off. A function that does not return is `NO_RETURN` there.
+- A function that only its file calls is `static`, and one that other
+  files call is declared in `vc.h` (or `sys.h`), once: no file declares
+  another's function for itself. A macro that assigns to an argument has
+  it in brackets, `(i) = 0`.
 
 ## How the portable C is judged
 
@@ -1095,122 +941,113 @@ Work that can be divided is done by several agents at a time, without
 waiting for the user between its steps.
 
 - Work is run side by side wherever it can be, within what the machine
-  takes, on the user's word of 15 October 2026: a piece that need not
-  wait for another starts at once, in a checkout of its own, and a plan
-  or a reading that is cheap goes beside the heavy work.
+  takes: a piece that need not wait for another starts at once, in a
+  checkout of its own, and a plan or a reading that is cheap goes beside
+  the heavy work.
 - Each piece is the work of an agent of its own, started fresh, so that a
   run does not fill one context. The session that runs them does not do
-  the work: it starts each agent, checks what the agent left, which is
-  the commits, the push and `LastTest.log`, and keeps its report. Nor
-  does it run or read what prints much, on the user's word of 13
-  October 2026: the suite on `main`, a search through the documents, a
-  small correction of a text are an agent's too, and the session keeps
-  the conclusion. Its context is for the queue and for the user.
+  the work: it starts each agent, checks what the agent left, which is the
+  commits, the push and `LastTest.log`, and keeps its report. Nor does it
+  run or read what prints much: the suite on `main`, a search through the
+  documents, a small correction of a text are an agent's too, and the
+  session keeps the conclusion. Its context is for the queue and for the
+  user.
 - An agent is given no time limit for work that is going well. The
-  session watches what its agents are doing, and turns one round that is
-  spending its time on something of little use. It also looks for what
-  an agent has left running.
+  session watches what its agents are doing, turns one round that is
+  spending its time on something of little use, and looks for what an
+  agent has left running.
 - An agent knows only what the repository tells it. What one learns that
-  the next needs is written down before its work is committed: in the
-  notes here, at the top of `harness/scenarios.py`, in `TODO.md`.
+  the next needs is written down before its work is committed: a rule or a
+  how-to here, what is to do in `TODO.md`, what happened in `DIARY.md`, and
+  what is about scenarios at the top of `harness/scenarios.py`.
 - Agents that work at the same time each have a checkout of their own, a
   plain clone of the same origin with its own build, and a part of the
-  program that the others leave alone. The session names both.
+  program that the others leave alone. The session names both. Temporary
+  files go in the checkout's `build/`, not in a scratchpad that agents
+  share.
 - Work gets onto `main` one piece at a time, in a queue that the session
-  runs: an agent commits in its checkout when the tests pass and says
-  that it is ready; at its turn it does `git pull --rebase`, settles what
-  the others changed keeping what both sides added, builds, passes the
-  tests once more, and pushes. Nothing else lands meanwhile.
+  runs: an agent commits in its checkout when the tests pass and says that
+  it is ready; at its turn it does `git pull --rebase`, settles what the
+  others changed keeping what both sides added, builds, passes the tests
+  once more, and pushes. Nothing else lands meanwhile. After a rebase, look
+  at everything the others added that names what is yours: two agents
+  have made the same thing under one name, and git saw no conflict. A
+  count that both sides changed may merge without a word and be wrong.
 - An agent whose work changes only `src/portable_c/`, or what is the
   portable C's alone in the harness, runs the tests of the portable C,
-  `ctest --test-dir build -R portable_c`, and not those of the frozen
+  `ctest --test-dir build -R portable_c -j4`, and not those of the frozen
   trees, which cannot change by it. A change to what the trees share, the
-  harness, the build or a tool, wants the whole suite. The session runs
-  the whole suite on `main` itself, after what has landed.
-- Two agents have made the same thing under one name with different
-  arguments, and git saw no conflict in it. After a rebase, look at
-  everything the others added that names what is yours.
-- Nothing in the harness takes turns: recordings of the original and
-  tests run at the same time, in as many checkouts as there are, and
-  other machines only make them slower. Where a recording or a test does
-  come out different under load, that is a flaw to report, not something
-  to wait out.
-- The tools and the harness are improved as the work goes, without
-  waiting for confirmation, each improvement a commit of its own. What
-  decides is the total cost: an improvement is made when it saves more
-  time over the work still to come than it takes to make, counting time
-  that has actually been lost, not time one might lose.
-- Stop and ask, with the work at hand left unpushed, before any of
-  these. An agent that meets one hands its work back as it is, and the
-  session asks the user:
+  harness, the build or a tool, wants the whole suite. The session runs the
+  whole suite on `main` itself, after what has landed. The build may not
+  change while the scenarios' tests run; the tests that read the source
+  are done in their first seconds.
+- Nothing in the harness takes turns: recordings of the original and tests
+  run at the same time, in as many checkouts as there are, and other
+  machines only make them slower. Where a recording or a test does come out
+  different under load, that is a flaw to report, not something to wait
+  out.
+- The tools and the harness are improved as the work goes, without waiting
+  for confirmation, each improvement a commit of its own. What decides is
+  the total cost: an improvement is made when it saves more time over the
+  work still to come than it takes to make, counting time that has
+  actually been lost, not time one might lose.
+- Stop and ask, with the work at hand left unpushed, before any of these.
+  An agent that meets one hands its work back as it is, and the session
+  asks the user:
   - in the C translation, behaviour that differs from the original's;
   - in the portable C, a deviation that is not the removal of something
     that only made sense on DOS;
-  - a change to what the comparison leaves out, other than a figure of
-    the kind that "Scenarios" has left out, or to a limit that a test
-    holds the build to;
+  - a change to what the comparison leaves out, other than a figure of the
+    kind that "Scenarios" has left out, or to a limit that a test holds the
+    build to;
   - a golden of the original that comes out changed when it is derived
     again;
   - anything new to download;
-  - a change to these instructions, other than a note on what was
-    learned.
+  - a change to these instructions, other than a note on what was learned.
 
 ## Scenarios
 
 - A scenario starts from the program as its distribution configures it, on
   a machine of its own, and sets up whatever else it needs through the
   program's own menus. It does not rely on prepared configuration files.
-- The test bench changes two things, and gives every scenario the setup
-  file that the original saves after making them in its own menus. The
-  clock is off. And the panel on the right lists files, where the
-  distribution has the Info panel there, on the user's word of 13 October
-  2026: what the Info panel shows is of the machine and of the system,
-  and with it on every screen every difference there was a difference in
-  every scenario. A scenario that is about the Info panel switches it on.
+- The test bench changes three things, and gives every scenario the setup
+  file that the original saves after making them in its own menus: the
+  clock is off; the panel on the right lists files, where the distribution
+  has the Info panel there (a scenario that is about the Info panel
+  switches it on); and the panels list files sorted by name. The bench
+  makes its directories and files in the order of their names, so that
+  the disk's order is the names' on DOS too and the tree, which lists
+  directories as they stand, is alphabetical. Steps move the cursor by
+  places in a sorted list.
 - A scenario that shows the time of day, with the clock switched on or in
   the time stamp of a file it has made, does so within the first minute of
   its machine. The machine's clock is counted in the instructions it
   executes, and a C tree takes more of them than the original to get to
-  the same step: a tenth to a third more as a rule, and twice as many
-  where a step searches a text, as counted over every scenario on 13
-  October 2026 (the top of `harness/scenarios.py` and `TODO.md` have
-  the figures; the sixth that stood here was of two scenarios). The
-  first screen is at about five seconds past the minute. So such a
-  scenario is tried in every tree that it is run for, and is done
-  showing the time by about fifty seconds past in the slowest of them,
-  which for most scenarios is by about forty in the original. A scenario
-  that switches
-  the Info panel on takes some five seconds more, once, when the panel
-  is first drawn.
+  the same step: a tenth to a third more as a rule, and twice as many where
+  a step searches a text (the top of `harness/scenarios.py` has the
+  figures). The first screen is at about five seconds past the minute. So
+  such a scenario is tried in every tree that it is run for, and is done
+  showing the time by about fifty seconds past in the slowest of them. A
+  scenario that switches the Info panel on takes some five seconds more,
+  once, when the panel is first drawn.
 - A figure on the screen that follows the time of day or the size of the
-  program, such as the clock or a count of free memory, is left out of
-  the comparison, in `harness/deviations.py`. The exception is a scenario
-  that is made to test that figure.
-- The panels of the bench list files sorted by name, on the user's
-  word of 15 October 2026: the bench's setup file is the one that the
-  original saves with that set in its own menus, and the goldens are
-  derived again with it. In the portable C there is no unsorted order:
-  the order of a directory means something on DOS alone, so it goes,
-  as a thing that only made sense on DOS, declared, and a panel sorts
-  by name unless the user picks another order. Since the scenarios move the
-  cursor by places in a list, their steps are rewritten for it, each
-  to go to the files that it meant, the user choosing that on the
-  same day over keeping the bench unsorted (`TODO.md`, "SORT"). The
-  tree, which has no order of its own and lists directories as they
-  stand on the disk, is made alphabetical the same way: the bench makes
-  its directories in the order of their names, so that the disk's order
-  is the names' on DOS too, on the user's word of 15 October 2026.
+  program, such as the clock or a count of free memory, is left out of the
+  comparison, in `harness/deviations.py`. The exception is a scenario that
+  is made to test that figure.
 - The countries tested are the United States and Russia.
 - Russian text is typed on the Russian keyboard of the Russian bench. Its
   Cyrillic letters are selected in a step that types text into an input
   line, never at the panels: there Alt by itself brings up the menu.
-- The tests run the build of a C tree that is shipped; no build is made
-  for them. The original and the C trees are driven alike, by a program
-  of ours that stays resident in the machine, `harness/DRIVER.ASM`: it puts
-  the keys of a step in through the keyboard controller, so that the BIOS
-  makes of them what it makes of a keyboard's, and writes the screen out
-  when the program idles with none left. It watches and feeds, and
-  answers nothing in the program's place or the BIOS's.
+- The tests run the build of a tree that is shipped; no build is made for
+  them. The original and the programs for DOS are driven alike, by a
+  program of ours that stays resident in the machine, `harness/DRIVER.ASM`:
+  it puts the keys of a step in through the keyboard controller, so that
+  the BIOS makes of them what it makes of a keyboard's, and writes the
+  screen out when the program idles with none left. It watches and feeds,
+  and answers nothing in the program's place or the BIOS's. It knows the
+  program's idling by the program's call of INT 28h. The program for Linux
+  is driven through its own test channel, as "The scenarios of the program
+  for Linux" has it.
 - A test does not put a stand-in where something is that the project does
   not own: DOS, the BIOS, the machine. What a test knows of them it gets
   from the real ones. A part of the program itself may be replaced in a
