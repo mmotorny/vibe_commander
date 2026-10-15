@@ -19906,6 +19906,15 @@ The last piece of step 6, a commit for each part:
    in it and not a `prog.com` that the user may not execute, and all
    files again behind it (`FILTERED` of `harness/terminal.py`).
    Declared in L8 of `DEVIATIONS.md`.
+3. (below)
+4. **Ctrl-C and Ctrl-Z of a command, the program's state**:
+   `portable_c-terminal` read the program's state from `/proc` once,
+   right behind the key, and once under the load of `-j4` read R, the
+   program drawing what it had taken back. It waits for the state now,
+   `settled` of `harness/terminal.py`: S as soon as it is, or what it is
+   after five seconds, the program's output read meanwhile. What it
+   proves is the same: a program that Ctrl-C ended (Z, or gone) or
+   Ctrl-Z stopped (T) is never asleep again.
 
 ## SORT, the bench sorted by name: the plan
 

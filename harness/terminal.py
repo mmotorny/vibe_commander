@@ -655,6 +655,21 @@ class Terminal:
         text = Path(f"/proc/{self.pid}/stat").read_text()
         return text[text.rindex(")") + 2]
 
+    def settled(self, seconds=5):
+        """The program's state once it is asleep, S, or as it is when
+        `seconds` have gone by without that; "gone" for a program that
+        /proc no longer has. What it writes meanwhile is read."""
+        state = "gone"
+        for _ in range(int(seconds / 0.05)):
+            try:
+                state = self.state()
+            except OSError:
+                return "gone"
+            if state == "S":
+                return state
+            self.read(0.05)
+        return state
+
     def end(self):
         """SIGTERM, and how the program ended."""
         os.kill(self.pid, signal.SIGTERM)
@@ -880,9 +895,15 @@ def run_commands(pyte, program, home, here, work, channelled, failures):
         if not terminal.alternate:
             failures.append(f"{name}: the program does not come back "
                             f"behind {what}")
-        if terminal.state() != "S":
+        # The program is to be waiting for a key again, asleep: a
+        # program that Ctrl-C ended or Ctrl-Z stopped never is. It may be
+        # running for a moment still, drawing what it took back, so it is
+        # given a few seconds to get there (it was once read as R under
+        # the load of -j4).
+        now = terminal.settled()
+        if now != "S":
             failures.append(f"{name}: {what} reaches the program, which "
-                            f"is {terminal.state()}")
+                            f"is {now}")
         gone = not Path(f"/proc/{child[0]}").exists()
         have = None if gone else Path(f"/proc/{child[0]}/stat") \
             .read_text().rsplit(")", 1)[1].split()[0]
