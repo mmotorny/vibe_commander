@@ -303,6 +303,15 @@ static void Init90(struct WCBdef *panel)
    What the assembly leaves in the registers here is not kept: the loop
    goes on at Func02, and all of them are set again from there on
    before a command gets them, but BP, which this does not change. */
+/* Init52 of Init50: the path of DOS asked for again, SetPth, with a
+   drive that is not ready not asked about. */
+static void Init52(void)
+{
+    md.BlocEr = 1;
+    SetPth();
+    md.BlocEr = 0;
+}
+
 static void Init50(void)
 {
     struct WCBdef *wcb;
@@ -318,72 +327,72 @@ static void Init50(void)
     wcb = panel;
     size = (u16)(md.Lines << 8 | 80);   /* Init51 */
     drive = 0;
-    if (wcb->ChgFlg == 0)
-        goto Init53;
-Init52:
-    md.BlocEr = 1;
-    SetPth();
-    md.BlocEr = 0;
-Init53:
-    PutPrm(panel);
-    keep = false;
-    failed = false;
-    if (wcb->Visible == 0)
-        goto Init70;
-    Panel(panel);                       /* Init54 */
-    if (wcb->ChgFlg != 0) {
-        Window(0, size);
-        if (wcb->WinTyp == 0) {
-            /* The directory of DOS is the panel's now. Whether it was
-               before says whether the cursor and the marks are kept. */
-            length = StrLen(wcb->WinPath);
-            same = true;
-            for (i = 0; i < length; i++)
-                if (md.DosPth[i] != wcb->WinPath[i]) {
-                    same = false;
-                    break;
-                }
-            for (i = 0; i < LenPath; i++)
-                wcb->WinPath[i] = md.DosPth[i];
-            md.OldFlg = same;
-        }
-        if (md.PathEr != 0) {           /* Init55 */
-            Init90(panel);
-            failed = true;
-        } else {
-            if (drive == 0 && md.OldFlg != 0)   /* Init56 */
-                keep = true;
-            if (wcb->WinTyp == 0)       /* Init57 */
-                md.BlocEr = 1;
-            failed = ReDir(&panel, keep);  /* which may move it */
-            wcb = panel;
-            md.BlocEr = 0;
-        }
-        if (failed) {                   /* Init59 */
-            if (drive == 0)
-                drive = wcb->WinPath[0];
-        }
-    }
-    PutPath(panel);                     /* Init60 */
-    PtFs00(panel);
-    if (failed) {
-        Window(0, size);
-        if (wcb->WinTyp == 0) {
-            letter = ErrRdy(wcb->WinPath[0]) & 0xFF;
-            if (letter != 0) {
+    if (wcb->ChgFlg != 0)
+        Init52();
+    for (;;) {
+        /* Init53 */
+        PutPrm(panel);
+        keep = false;
+        failed = false;
+        if (wcb->Visible == 0)
+            break;
+        Panel(panel);                   /* Init54 */
+        if (wcb->ChgFlg != 0) {
+            Window(0, size);
+            if (wcb->WinTyp == 0) {
+                /* The directory of DOS is the panel's now. Whether it was
+                   before says whether the cursor and the marks are kept. */
+                length = StrLen(wcb->WinPath);
+                same = true;
+                for (i = 0; i < length; i++)
+                    if (md.DosPth[i] != wcb->WinPath[i]) {
+                        same = false;
+                        break;
+                    }
+                for (i = 0; i < LenPath; i++)
+                    wcb->WinPath[i] = md.DosPth[i];
+                md.OldFlg = same;
+            }
+            if (md.PathEr != 0) {       /* Init55 */
+                Init90(panel);
+                failed = true;
+            } else {
+                if (drive == 0 && md.OldFlg != 0)   /* Init56 */
+                    keep = true;
+                if (wcb->WinTyp == 0)   /* Init57 */
+                    md.BlocEr = 1;
+                failed = ReDir(&panel, keep);  /* which may move it */
+                wcb = panel;
+                md.BlocEr = 0;
+            }
+            if (failed) {               /* Init59 */
                 if (drive == 0)
-                    drive = letter;
-                letter = (u8)(letter - 'A');    /* Init61 */
-                size = (size & 0xFF00) | letter;
-                DriveSelect(letter);
-                goto Init52;
+                    drive = wcb->WinPath[0];
             }
         }
-    } else if (drive == wcb->WinPath[0]) {      /* Init62 */
-        drive = 0;
+        PutPath(panel);                 /* Init60 */
+        PtFs00(panel);
+        if (failed) {
+            Window(0, size);
+            if (wcb->WinTyp == 0) {
+                letter = ErrRdy(wcb->WinPath[0]) & 0xFF;
+                if (letter != 0) {
+                    if (drive == 0)
+                        drive = letter;
+                    letter = (u8)(letter - 'A');    /* Init61 */
+                    size = (size & 0xFF00) | letter;
+                    DriveSelect(letter);
+                    Init52();
+                    continue;
+                }
+            }
+        } else if (drive == wcb->WinPath[0]) {  /* Init62 */
+            drive = 0;
+        }
+        break;
     }
 
-Init70:
+    /* Init70 */
     panel = InvWCB(panel);
     wcb = panel;
     keep = true;
@@ -467,90 +476,15 @@ static struct Asked Nothing(i32 entry)
     return asked;
 }
 
-/* What the mouse does at the panels, with a button down: `r->ax` is the
-   buttons, `r->cx` where the mouse is, the row in the high byte, and
-   `r->ds` the current panel. Returns what the mouse asks for, struct
-   Asked above: a command, a CMD_ of vc.h, or nothing, with the place
-   where the loop goes round from.
-
-   A button in the top left corner switches the panels off and on when it
-   comes up there; one on the top row is the menu bar's; one below the
-   panels does nothing. A button in the other panel makes that the
-   current one. In the current one, the lower part of an Info edits
-   dirinfo, and in a list the cursor goes where the mouse is, the list
-   moves when the mouse is above or below it, and a second click on an
-   entry is Enter there. WinMous is not 0 while a button is held that
-   went down in the list.
-
-   Ported as they are: what DoublMo leaves in AX and CX is not handed on;
-   where the program goes on then, at F00_60, at Func04 and at F21_10,
-   both are set before they are read. */
-static struct Asked Func21(struct Regs *r)
+/* Func40 of Func21: the mouse in a panel that lists files or the tree,
+   `wcb`: the cursor moved, the list moved, or a double click, as Func21
+   says. */
+static struct Asked Func40(struct Regs *r, const struct WCBdef *wcb)
 {
-    struct WCBdef *wcb;
     struct Place place;
-    struct Mouse mouse;
-    u16 look, kind;
+    u16 kind;
     i32 lines, rows, column, answer;
 
-    ClrKbd();
-    if (md.WinMous != 0)
-        goto Func30;
-    if (r->cx < 2) {                    /* Panels on/off */
-        look = 0;
-        for (;;) {                      /* Func22 */
-            mouse = GetMous(r->cx);
-            r->ax = mouse.buttons;
-            r->cx = mouse.place;
-            if (r->ax == 0)
-                break;
-            r->ax = r->cx < 2 ? 0xFE : 0;
-            if (r->ax == look)
-                continue;
-            look = r->ax;
-            r->bx = (r->bx & 0xFF00) | look;
-            TypMous(look);
-        }
-        r->bx = (r->bx & 0xFF00) | look;  /* Func24 */
-        TypMous(0);
-        if (look == 0)
-            return Nothing(FUNC07);
-        return Asks(CMD_F11_00);
-    }
-    if ((r->cx >> 8) == 0)              /* Func25: pull down menu */
-        return Asks(CMD_F39_00);
-    r->bx = BegBX(r->ds);               /* Func26 */
-    r->dx = SizDX();
-    r->dx = (u16)((r->dx & 0xFF) | (u8)((r->dx >> 8) + (r->bx >> 8)) << 8);
-    if ((r->cx >> 8) >= (r->dx >> 8))
-        return Nothing(FUNC07);
-    if ((r->cx & 0xFF) < 40) {          /* Change panel */
-        r->ds = LeftPanel;
-        if (md.Active == 0)
-            goto Func30;
-    } else {                            /* Func27 */
-        r->ds = RightPanel;
-        if (md.Active != 0)
-            goto Func30;
-    }
-    r->ds = CurrentPanel;               /* Func28 */
-    return Asks(CMD_F20_00);
-
-Func30:
-    wcb = r->ds;
-    if ((r->ax & 3) == 0 || wcb->Visible == 0)
-        return Nothing(FUNC07);
-    if (wcb->WinTyp < 2)
-        goto Func40;
-    if (wcb->WinTyp != 2)
-        return Nothing(FUNC07);
-    r->bx = BegBX(r->ds) + 0x0B01;      /* Edit 'dirinfo' */
-    r->dx = SizDX() - 0x0C02;
-    if (InWind(r->cx, r->bx, r->dx))
-        return Nothing(FUNC07);
-    return Asks(CMD_F34_10);
-
-Func40:                                 /* Move the cursor */
     md.WinMous |= 1;
     *(u16 *)md.TmpBuf = r->cx;          /* TmpMous */
     r->bp = r->ax;
@@ -643,6 +577,92 @@ Func40:                                 /* Move the cursor */
     r->ax &= 0xFF00;                    /* Func62 */
     TypMous(0);
     return Asks(CMD_F21_10);
+}
+
+/* Func30 of Func21: a button in the current panel, `r->ds`. */
+static struct Asked Func30(struct Regs *r)
+{
+    const struct WCBdef *wcb;
+
+    wcb = r->ds;
+    if ((r->ax & 3) == 0 || wcb->Visible == 0)
+        return Nothing(FUNC07);
+    if (wcb->WinTyp < 2)
+        return Func40(r, wcb);
+    if (wcb->WinTyp != 2)
+        return Nothing(FUNC07);
+    r->bx = BegBX(r->ds) + 0x0B01;      /* Edit 'dirinfo' */
+    r->dx = SizDX() - 0x0C02;
+    if (InWind(r->cx, r->bx, r->dx))
+        return Nothing(FUNC07);
+    return Asks(CMD_F34_10);
+}
+
+/* What the mouse does at the panels, with a button down: `r->ax` is the
+   buttons, `r->cx` where the mouse is, the row in the high byte, and
+   `r->ds` the current panel. Returns what the mouse asks for, struct
+   Asked above: a command, a CMD_ of vc.h, or nothing, with the place
+   where the loop goes round from.
+
+   A button in the top left corner switches the panels off and on when it
+   comes up there; one on the top row is the menu bar's; one below the
+   panels does nothing. A button in the other panel makes that the
+   current one. In the current one, the lower part of an Info edits
+   dirinfo, and in a list the cursor goes where the mouse is, the list
+   moves when the mouse is above or below it, and a second click on an
+   entry is Enter there. WinMous is not 0 while a button is held that
+   went down in the list.
+
+   Ported as they are: what DoublMo leaves in AX and CX is not handed on;
+   where the program goes on then, at F00_60, at Func04 and at F21_10,
+   both are set before they are read. */
+static struct Asked Func21(struct Regs *r)
+{
+    struct Mouse mouse;
+    u16 look;
+
+    ClrKbd();
+    if (md.WinMous != 0)
+        return Func30(r);
+    if (r->cx < 2) {                    /* Panels on/off */
+        look = 0;
+        for (;;) {                      /* Func22 */
+            mouse = GetMous(r->cx);
+            r->ax = mouse.buttons;
+            r->cx = mouse.place;
+            if (r->ax == 0)
+                break;
+            r->ax = r->cx < 2 ? 0xFE : 0;
+            if (r->ax == look)
+                continue;
+            look = r->ax;
+            r->bx = (r->bx & 0xFF00) | look;
+            TypMous(look);
+        }
+        r->bx = (r->bx & 0xFF00) | look;  /* Func24 */
+        TypMous(0);
+        if (look == 0)
+            return Nothing(FUNC07);
+        return Asks(CMD_F11_00);
+    }
+    if ((r->cx >> 8) == 0)              /* Func25: pull down menu */
+        return Asks(CMD_F39_00);
+    r->bx = BegBX(r->ds);               /* Func26 */
+    r->dx = SizDX();
+    r->dx = (u16)((r->dx & 0xFF) | (u8)((r->dx >> 8) + (r->bx >> 8)) << 8);
+    if ((r->cx >> 8) >= (r->dx >> 8))
+        return Nothing(FUNC07);
+    if ((r->cx & 0xFF) < 40) {          /* Change panel */
+        r->ds = LeftPanel;
+        if (md.Active == 0)
+            return Func30(r);
+    } else {                            /* Func27 */
+        r->ds = RightPanel;
+        if (md.Active != 0)
+            return Func30(r);
+    }
+    r->ds = CurrentPanel;               /* Func28 */
+    return Asks(CMD_F20_00);
 }
 
 /* The command of a key, a CMD_ of vc.h: the command line for a key that
@@ -1379,10 +1399,12 @@ u16 ErrRdy(u16 letter)
         key = Input(2);
         if (key >> 8 != KEY_MOUSE) {
             if (key >> 8 != 0) {
-                if ((key & 0xFF) == 0x1B || key == 0x4400)
-                    goto ErRdy6;
+                if ((key & 0xFF) == 0x1B || key == 0x4400) {
+                    drive = 0;          /* ErRdy6 */
+                    break;
+                }
                 if ((key & 0xFF) == '\r')
-                    goto ErRdy7;
+                    break;              /* ErRdy7 */
             }
             c = key & 0xFF;
             if (c >= 0x80)
@@ -1413,15 +1435,14 @@ u16 ErrRdy(u16 letter)
         }
         TypMous(0);                     /* ErRdy5 */
         if ((last & 0xFF) == 2)
-            goto ErRdy7;
+            break;                      /* ErRdy7 */
         if ((last & 0xFF) == 1
             && !InWind(place, where.begin, where.size - 0x102))
             continue;
-        goto ErRdy6;
+        drive = 0;                      /* ErRdy6 */
+        break;
     }
-ErRdy6:
-    drive = 0;
-ErRdy7:
+    /* ErRdy7 */
     HidCur();
     ResWin(where.begin, where.size, where.saved);
     Window(where.begin, where.size);
@@ -1496,6 +1517,7 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
     i32 i;
     u8 clock, delay, page;
     bool setup;
+    bool fatal = false;                 /* a fatal error, of no device */
 
     if (md.ErrDat | md.BlocEr)
         return DEVICE_FAIL;
@@ -1510,7 +1532,7 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
         to[-2] += (u8)how;
         if (how & 0x8000) {
             text = FatEr_S;
-            goto FtErr5;
+            fatal = true;
         }
     } else {                            /* FtErr2: a device, by its name */
         from = OnDv_S;
@@ -1528,7 +1550,7 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
         *to++ = ':';
         *to = 0;
     }
-    if (code != 0) {                    /* FtErr3 */
+    if (!fatal && code != 0) {          /* FtErr3 */
         if (code >= 0x15)
             code = 0x15;
         do
@@ -1537,7 +1559,7 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
                     break;
         while (--code);
     }
-FtErr5:
+    /* FtErr5 */
     clock = md.Clock;
     md.Clock = 0;
     delay = md.BlDelay;
