@@ -19159,6 +19159,219 @@ written through a pointer of the word's type cast from the byte's.
   `copy-dirs` and `russian` with the byte of `DTA+41`, and the six that
   earlier pieces met. `VC.EXE` is `9450344b...`.
 
+### L4, the terminal: done, and what L5 should know
+
+What it made: `src/portable_c/term_posix.c`, the terminal of the
+program for Linux, with its functions declared at the end of
+`emulate_posix.h`; `sys_posix.c` drawing in it and taking its keys
+there wherever `VC_TEST` is not set; the test `portable_c-terminal`,
+`harness/terminal.py`, with pyte pinned in `harness/deps.py`; and three
+mends of the common code that the sanitizers named on the way. The
+test channel is as it was, and with `VC_TEST` set nothing of the
+terminal is touched.
+
+**The terminal.** Driven by its own escape sequences and termios, no
+library (`CLAUDE.md`, step 6). The top of `term_posix.c` says each thing
+where it is done; in short:
+
+- Taken at the start: raw mode by termios (no echo, no `ICANON`, no
+  `ISIG`, no `IXON`, no `OPOST`, 8 bits), the alternate screen `?1049h`,
+  no wrapping at a row's end `?7l`. Given back as it was, the alternate
+  screen left, the cursor shown in the terminal's own shape `CSI 0 SP
+  q`, wrapping on, the attributes reset, the termios as they were: at
+  exit (`atexit`, so `ProgramEnd` and every `exit` of the emulation), at
+  SIGTERM, SIGHUP, SIGINT and SIGQUIT, and at a crash, SIGSEGV, SIGBUS,
+  SIGFPE, SIGILL and SIGABRT, each signal then going on as it did before
+  (so the sanitizer's handler of SIGSEGV still reports); a signal that
+  the program was started with ignored, as `nohup` has SIGHUP, stays
+  ignored. A sanitizer that ends the program by `_exit` calls a death
+  callback, `__sanitizer_set_death_callback`, which gives the terminal
+  back too, in the sanitized build (`__has_feature(address_sanitizer)`);
+  but its report was written on the alternate screen and goes with it:
+  run `posix-asan/vc` with `2>file` by hand. The handlers call only
+  `write`, `tcsetattr`, `sigaction`, `sigprocmask` and `raise`, which
+  POSIX names async-signal-safe, and clang-tidy's
+  `bugprone-signal-handler` holds them to that.
+- Stopped: SIGTSTP gives the terminal back, stops the program, and when
+  it goes on takes the terminal again and has the next frame drawn
+  whole; SIGCONT after any stop, SIGSTOP too, sets the raw mode again
+  and redraws. **Ctrl-Z is not the stop**: with `ISIG` off it is byte
+  1Ah, which the program has as Ctrl-Z, the original's key for the tree
+  (`^Z: tree` of `main.c`), and that stays the program's. The stop is
+  SIGTSTP from elsewhere, `kill -TSTP`, and the shell's `fg` goes on.
+  (The brief named Ctrl-Z among the ways of leaving; the original's key
+  was kept, for the session to confirm with the user.)
+- The cells: the first 2,000 of the display's memory, the page shown,
+  drawn when the program is idle (`Idle`), asks whether a key waits
+  (`KeyWaiting`) or waits for one (`KeyRead`), which is where the
+  program on DOS has its screen as it is to be seen. Only the cells that
+  changed since the last frame, each run of them with the cursor placed
+  at its start; a frame is one update of synchronized output, `?2026h`
+  to `?2026l`, sent always, since a terminal ignores a mode of DEC's
+  that it does not know (xterm, kitty, foot, WezTerm, iTerm2, Windows
+  Terminal and others have it; st and the Linux console ignore it); a
+  frame where nothing changed sends nothing.
+- A character is the glyph of the VGA's font for the byte: the code
+  page 437's mapping above 7Fh (`CodePageToUnicode`, Unicode's
+  CP437.TXT), ASCII from 20h to 7Eh, and the font's glyphs where the
+  mapping has controls, 01h to 1Fh (☺ ☻ ♥ ... ▲ ▼) and 7Fh (⌂), with 00h
+  a blank: `TermGlyph`.
+- The colours: the VGA's 16 of mode 3 as its BIOS sets them up, the
+  DAC's 6-bit 00h, 15h, 2Ah and 3Fh made 8 bits, 00, 55, AA and FF, with
+  brown 6 at AA 55 00, in 24 bits (`SGR 38;2` and `48;2`) where
+  `COLORTERM` is `truecolor` or `24bit`; else ANSI's 16, the foreground
+  30 to 37 and 90 to 97 for 8 to 15, the background 40 to 47, with the
+  PC's order of blue and red turned round, in the colours of the
+  terminal's theme. Bit 7 of the attribute is blink, `SGR 5`, with the
+  background of bits 4 to 6: the BIOS starts mode 3 with blinking on,
+  the program never asks for the bright backgrounds (INT 10h 1003h is no
+  function of `sys.h`), so DOS's text mode shows such a cell blinking. A
+  terminal that does not blink shows it still.
+- The cursor is the BIOS's: hidden where its shape has 20h in its
+  first line, or begins below where it ends, or where it is placed off
+  the 80 by 25; a block, `DECSCUSR 1`, where it is more than three lines
+  tall, an underline, `DECSCUSR 3`, otherwise, both blinking as a VGA's
+  is.
+- The size: 80 by 25 and no other (`CLAUDE.md`, step 6). A larger
+  terminal has the screen at its top left and the rest blank in its
+  own colours (cleared by `CSI 2J` with the attributes reset at every
+  whole frame). A smaller one shows three lines at its top left, "Vibe
+  Commander needs a terminal / of 80 columns by 25 rows; / this one has
+  C by R.", anew at every SIGWINCH, and nothing of the program, until it
+  is large enough, when the screen is drawn whole; the keys typed
+  meanwhile are dropped, so that nothing is done blind. The size is
+  asked by `TIOCGWINSZ` at the start and at each SIGWINCH.
+- The keys, as the BIOS answers INT 16h with AH 0, since that is the
+  call that `KeyRead` and `KeyWaiting` are on DOS: printable ASCII with
+  the scan code of a US keyboard (`Scan`); a character of Unicode that
+  the code page has, with scan code 0; Enter 1C0Dh, Tab 0F09h,
+  Backspace (7Fh, and 08h, which some terminals send) 0E08h, Ctrl-Enter
+  as 0Ah 1C0Ah, Ctrl with a letter as its control character, Ctrl-\,
+  Ctrl-], Ctrl-^, Ctrl-_ and Ctrl-@; Esc as an ESC that nothing follows
+  within 25 ms (`ESC_WAIT`); Alt with a letter, a digit, - or = as ESC in
+  front of the key (Alt-F1 and its like come with xterm's modifier);
+  the arrows, Home, End, PgUp, PgDn, Ins, Del, Shift-Tab and F1 to F10 by
+  xterm's sequences, CSI and SS3, with the modifier `;m` (Shift, Alt,
+  Ctrl), rxvt's `~` numbers and the Linux console's `CSI [ A` to `E`;
+  the Ctrl forms that AH 0 answers (Ctrl-Left 7300h, Ctrl-PgUp 8400h
+  ...) and Shift-, Ctrl- and Alt-F1 to F10. What AH 0 does not answer is
+  dropped as that call drops it: F11, F12, Ctrl-Up, Alt with an arrow,
+  Alt with a sign. A buffer of 16 keys, as the BIOS's, drops the rest.
+  `KeysHeld` answers 0 on a terminal: what is held comes only with the
+  kitty protocol (L5).
+
+**What L5 and L6 should know.**
+
+- The kitty protocol: `Csi` of `term_posix.c` is where a sequence of
+  CSI is read, and it drops today what names no key, `CSI ... u` among
+  it. L5 asks the terminal for the protocol (`CSI ? u`, and `CSI > flags
+  u` to push its flags, which `Leave` then pops with `CSI < u`, in the
+  handlers as well, since they write `Leave` alone), reads `u` and the
+  release and repeat events there, keeps what is held for `KeysHeld`,
+  and has the speed search's scan code by flag 4. `Push` takes a BIOS
+  word; `KeyOfNamed` makes one of a named key and xterm's modifier.
+  Without the protocol Esc and Alt stay told apart by `ESC_WAIT`.
+- The mouse: SGR reports, `CSI < b;x;y M` and `m`, also come through
+  `Csi` today and are dropped (the final byte M with a `<` in front,
+  which the parser takes for a broken sequence and drops as far). L5
+  switches the reports on in `Enter` (`?1000h`, `?1002h`, `?1006h`) and
+  off in `Leave`, and answers `MouseWhere` of `sys_posix.c` from them.
+- Ctrl-O and a command (L6): `TermGive` gives the terminal back, the
+  terminal's own screen shown, and `TermTake` takes it again with the
+  next frame drawn whole. A command runs between the two. What the
+  program's `ScreenGet` reads after a command is its own grid, as
+  "What the surveys of the layer found" has it.
+- `TermDraw` is called with the grid, the cursor's place and its shape
+  of `sys_posix.c`; nothing of the drawing knows the program. A frame
+  could be limited in rate if a command or a copy makes too many, which
+  was not seen: a frame compares 2,000 cells.
+- L3b, at work beside this, changes the test channel and the clock of
+  `sys_posix.c`: what this piece changed there is `Idle`, `KeyWaiting`,
+  `KeyRead`, the top's comment and the start of `main`, a few lines
+  each.
+
+**Found by the sanitizers, and mended in the common code**, by the
+test's keys, the first two at the first F3 on any file:
+
+1. `Status` of `view.c` copies 81 bytes of `ViewFil`, which has 65, as
+   the original copies them, on into the fields behind it (UBSan, the
+   bounds of an array; AL had named it). It reads them as the main data's
+   bytes at the place of the field, `MD_BYTES[MD_AT(ViewFil) + count]`,
+   as `CLAUDE.md` has a read across fields made. `VC.EXE` the same bytes.
+2. `V25_00` of `view.c`, the viewer's per cent, reckons in 48 bits by a
+   word that wraps at a carry and at a borrow, as the assembly's `ADD`
+   and `SUB`: the sanitizer of integers stops `low -= length` below 0 at
+   the first file viewed. Each is written so that no number leaves 32
+   bits on the way, the borrow as `~(length - low - 1)`, which is `low -
+   length` and 2^32. `VC.EXE` changed, and `portable_c-scenarios`
+   judges it.
+3. The grid of the setup's colours, `stcolor.c`, steps a cell of 16
+   bits by 100h behind its last: the cast written, with `wraps`. The same
+   bytes.
+
+**The test**, `portable_c-terminal`, labelled `portable_c`, no machine,
+some 25 seconds: `harness/terminal.py` with the sanitized build. It runs
+the program three times, each in a directory of its own under the
+harness's `build/tmp` with `HOME` there and no setup file (the program's
+defaults have the clock off, so no screen follows the time), starting in
+`HOME/here` with three files of fixed times, one of them every byte
+0 to 255: once through the test channel with 23 steps of keys as BIOS
+words, and twice in a pseudo-terminal with the same keys as a terminal
+types them, in 24 bits and in 16 colours, each key typed when the
+program has written nothing for 0.4 s. pyte's screen is held to the
+channel's grid of the same step, cell by cell: the character as the
+VGA's font has it (Python's `cp437` and a table of its own for the
+glyphs below 20h), the foreground and the background, blink, the
+cursor's place and whether it is shown. The steps go through the
+panels, Alt-D's speed search, F3 on the file of every byte (255 of the
+256 characters on one screen), the menu bar and a menu, Alt-F1, typing
+and Backspace, Ctrl-F1, Tab, End, Ctrl-PgUp, and More setup's grid of
+colours, with 129 cells that blink. The run in 24 bits begins at 70 by
+20, which has to show the line that asks for 80 by 25, and is made 80
+by 25 by SIGWINCH; the run in 16 colours is stopped by SIGTSTP behind
+the keys, which has to give the terminal's modes back and leave the
+alternate screen, and goes on by SIGCONT, which has to draw the screen
+whole again. Each ends by SIGTERM, which has to end it by that signal
+with the modes as they were before it started. Anything on standard
+error fails it. The program runs in a group of its own that is the
+terminal's foreground, under a small leader that is the session's: a
+group whose parent is outside its session is orphaned, and the kernel
+does not stop it for SIGTSTP. Tried against itself: a brown made
+yellow in the palette and `SGR 5` made bold each fail it, at the steps
+that show them.
+
+- pyte 0.8.2 is the wheel from the Python Package Index, pinned by its
+  SHA-256 in `harness/deps.py` and imported from the wheel itself. It
+  wants `wcwidth`, which is not fetched: the user allowed pyte, and a
+  second download would be asked first. The test puts in its place a
+  function of Python's `unicodedata` that gives what wcwidth gives for
+  the width of a character, 1 for every glyph that the program draws.
+  That is the test's tool and not the system's: nothing of DOS, the
+  BIOS or the machine stands in for anything.
+- pyte has no alternate screen and no synchronized output: it ignores
+  both, as it ignores `DECSCUSR` (the shape is not held, only whether
+  the cursor shows). Its name for ANSI's 105 is misspelt,
+  `bfightmagenta`: the test takes the names from pyte's own tables.
+
+**How the user tries it by hand**: in a terminal of 80 by 25 or more,
+`cd ~ && ~/path/to/checkout/build/portable_c/posix/vc`. What should be
+there: the program's screen at the top left, the banner "Vibe Commander
+0.1, based on Volkov Commander 4.05" and the copyright in the first two
+rows, a panel of the home directory, `H:\`, the prompt and the key bar;
+blue panels in the VGA's own colours where `COLORTERM` is `truecolor`
+(gnome-terminal, kitty, Konsole, foot, WezTerm set it), the theme's
+colours elsewhere. Tab, the arrows, F3 on a file and Esc, F9 and the
+menus, Alt-F1 for the drives (where the desktop keeps Alt-F1 for
+itself, the key does not come), Ctrl-Z the tree, Alt with a letter the
+speed search; Ctrl-O does nothing yet (L6); F10 and Enter leave, with the shell's
+screen as it was and `~/.config/vc/vc.ini` saved. Made smaller than 80
+by 25, the window shows the three lines that ask for more, and the
+screen again when it is made larger. From another terminal, `kill -TSTP
+PID` gives the shell back with the job stopped, and `fg` draws the
+program again. A command typed at its prompt fails for now (L6), and a
+Ctrl key that the terminal or the desktop takes (Ctrl-S without `IXON`
+is the program's; Ctrl-Alt-F keys are the desktop's) does not come.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes
