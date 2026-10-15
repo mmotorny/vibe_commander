@@ -16672,6 +16672,68 @@ Left, for the next agent of 5b:
   `unhandled-code-paths`, which the survey of 14 October did not name:
   the version is pinned for that reason.
 
+### G5, the jumps of menu.c, help.c, sthelp.c and stmain.c: done
+
+The piece G5 of the sweep of jumps (`CLAUDE.md`, "The portable C", the
+bullet on `goto`). 106 `goto` went, of 155 in the four files, one
+commit a file; 49 stay, all of them in `F39_00` of `menu.c`, the menu
+bar, which keeps its jumps by the bullet and which is the only
+function of that file that has any.
+
+- `help.c`: 40 went, none stays. `Help05`, the window, 34: three loops,
+  Help06, Help10 and Help25, and a code of what comes next where the
+  keys and the mouse jump alike to Up, Down and Enter; `Help30` (the
+  mouse, with its loop Help31), `Help25` (the keys) and `Help60`
+  (Enter) are static functions under the assembly's names, and Up and
+  Down, Help50 and Help53, are cases of the window's loop. `HelpFil`,
+  6: its checks of the file are `HelpBad`, which answers where the
+  assembly jumps to Help01. Four helpers.
+- `sthelp.c`: 45 went, none stays. `StRdHelp`, 11: what it reads is
+  `StRdPages`, which returns where the assembly jumps to RdHlp1, and
+  the file is closed behind it. `StHelp`, 34: `StPage` looks for the
+  page and answers none for Help02, `StHelp04` is the window with the
+  loop Help10, `StHelp20` the keys, with Help34 and Help35 at the end
+  of its switch, and `StHelp22` the mouse with its loop. Five helpers.
+- `stmain.c`: 21 went, none stays. The assessment counted `StMain00`
+  among the functions whose loops are entered in the middle, by Main14
+  going back to Main02; read, that is a loop round the keys with one
+  way in, `do ... while (to == item)`. The keys and the mouse are
+  `StMain02`, which answers the item to go to or `CHOSEN`. Main31,
+  `item = 0x40`, is written at each of its three places, a line each.
+  One helper.
+
+The same order of every call of the system, of the screen and of the
+memory, each function read against the old one side by side. The
+whole suite passes. The images: the code is 517 bytes longer, and
+against `main`'s build padded to the same length of `_TEXT` (128 byte
+stores and a word store to a `volatile` pointer in a function behind
+the last of `sys_dos.c`, not kept; every other segment of the map is
+then where this build has it): 151 of 158 scenarios with nothing that
+differs, `cursor` with nothing but what may differ, and the six that S
+and N22 met, `comspec`, `ended`, `second-copy`, `start-screen`,
+`start-setup`, whose second copy of the program lives in the room with
+code of another layout, and `start-memory`, `ViewSeg` and `FreMem2`
+naming nothing known at the same address. Nothing is declared as
+changed.
+
+What no scenario runs: of the original's instructions in these
+routines, `harness/ported.py` lists as out of reach only the click
+below the last line of the index in the main program's help (0x7C17),
+which is the `at->cursor > count` branch of `Help30`: read again
+against the old `cursor = count; goto Help10;`, the same, the first
+line being HlpFrst in both. The setup's menu, Main00 to Main40, ran
+whole in the original. That every instruction ran says that each
+label's code ran, not that each jump to it was taken: the jumps to a
+shared end, RdHlp1, Help01, Help02 and Help40, were each read against
+the old code.
+
+The records: the variables and places that moved into a helper keep
+their reasons in `harness/width.txt` and `harness/int16.txt`, carried
+by a script from the old record by the function they came from, and
+said of one function where a reason named the uses of several.
+`StMain02`'s place of `*item = (key >> 8) - 0x3C` is a line whose
+text changed, and has the reason of the line it was.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on
