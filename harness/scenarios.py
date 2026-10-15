@@ -41,7 +41,9 @@ out again (show.py --changes is how):
     column to set and one to clear, and no date; and when a directory has
     been given attributes the panel is read without regard to where the
     cursor was.
-  - The order of a panel is in its menu only: "F9 l n", x, m, s and u for
+  - The bench's panels are sorted by name, as its setup file has them, and
+    a list of a directory is in the order of the names, directories first.
+    The order of a panel is in its menu only: "F9 l n", x, m, s and u for
     name, extension, time, size and unsorted. Ctrl+F3 does nothing and
     Ctrl+F4 asks for the volume label. "F9 l f" is Full and "F9 l l" the
     filter: a mask, then two Tabs to "Executable files". Ctrl+h switches
@@ -76,11 +78,11 @@ out again (show.py --changes is how):
     the laptop palette, in which a selected file has a mark.
   - Shift+F4, a name that is not there and Enter twice open the editor on
     a new file; a letter, F2 and Esc leave a file of one byte, which
-    comes last in its panel. It has the time of day. To give it another,
-    press Ctrl+a, the Tabs, the time and Enter in one step: the dialog
-    shows the seconds, and a step shows only what is there at its end.
-    Five Tabs go from the attributes past the date to the time, and
-    "12:00:00p" is the time of the bench's files.
+    stands in its panel where its name sorts. It has the time of day. To
+    give it another, press Ctrl+a, the Tabs, the time and Enter in one
+    step: the dialog shows the seconds, and a step shows only what is
+    there at its end. Five Tabs go from the attributes past the date to
+    the time, and "12:00:00p" is the time of the bench's files.
   - The editor empties the keyboard buffer after every key it takes, and
     once more before it draws: a key that arrives while it deals with the
     one before is lost, now and then, and more often in the translation,
@@ -159,9 +161,10 @@ out again (show.py --changes is how):
     word begins and Ctrl+Backspace deletes back to there.
   - "F9 o d" switches Auto directory sizes: the mini status then has the
     size of a directory, of all files in it and below, once its list has
-    been read. A new file comes last in an unsorted panel, so End goes to
-    it. F5, "src\\" and Enter copy the file under the cursor into the
-    directory SRC; F5, a name and Enter make a copy next to it.
+    been read. A new file stands where its name sorts, so End goes to it
+    only where its name sorts last. F5, "src\\" and Enter copy the file
+    under the cursor into the directory SRC; F5, a name and Enter make a
+    copy next to it.
   - Ctrl+r reads the directory again and puts the cursor at the top with
     nothing selected. What is selected stays so when the list is read
     again after F7 has made a directory. Ctrl+PgUp puts the cursor on the
