@@ -2,11 +2,13 @@ The portable C in the scenario menu: what it is expected to show otherwise
 than the original. A patch of harness/goldens/menu.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
-Deviation: 1, 7, 8, 12 of src/portable_c/DEVIATIONS.md
+Deviation: 1, 7, 8, 12, 29 of src/portable_c/DEVIATIONS.md
 Why: the Options menu, without Memory allocation and with More setup at its
 bottom, behind Save setup and a line across the menu: a row taller than the
 original's, with Save setup a row further up; and the Commands menu, two lines
-shorter, without Memory info and without EGA lines
+shorter, without Memory info and without EGA lines; and the Left and the Right
+menu, a row shorter, without Unsorted, the line across the menu and the three
+items below it a row further up
 
 == 9: Down
 rows 15-20
@@ -128,6 +130,74 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
+== 18: Right
+rows 12-18
+-|║            │            │            ║║ │  Unsorted             │s directory ║| 1Bx40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|║            │            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
+-|║            │            │            ║║ │  Re-read      Ctrl-R  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|║            │            │            ║║ │ -fiLter...    Ctrl-F  │            ║| 1Bx42 30x2 33x1 30x22 03x2 1Bx11
+-|║            │            │            ║║ │  Drive...     Alt-F2  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|║            │            │            ║║ └───────────────────────┘            ║| 1Bx42 30x25 03x2 1Bx11
+-|║            │            │            ║║                                      ║| 1Bx44 03x25 1Bx11
++|║            │            │            ║║ │ ───────────────────── │s directory ║| 1Bx40 6Cx1 1Bx1 30x25 03x2 1Bx11
++|║            │            │            ║║ │  Re-read      Ctrl-R  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|║            │            │            ║║ │ -fiLter...    Ctrl-F  │            ║| 1Bx42 30x2 33x1 30x22 03x2 1Bx11
++|║            │            │            ║║ │  Drive...     Alt-F2  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|║            │            │            ║║ └───────────────────────┘            ║| 1Bx42 30x25 03x2 1Bx11
++|║            │            │            ║║                                      ║| 1Bx44 03x25 1Bx11
++|║            │            │            ║║                                      ║| 1Bx80
+
+== 19: Right
+rows 12-18
+-|║ │  Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+-|║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+-|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
++|║ │ ───────────────────── │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x25 03x2 1Bx11 6Cx1 1Bx39
++|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
++|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
++|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
++|║            │            │            ║║                                      ║| 1Bx80
+
+== 20: Ctrl+F2 Ins z
+rows 12-18
+-|║ │  Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+-|║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+-|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
++|║ │ ───────────────────── │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x25 03x2 1Bx11 6Cx1 1Bx39
++|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
++|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
++|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
++|║            │            │            ║║                                      ║| 1Bx80
+
+== 22: Shift+F10 Enter
+rows 12-18
+-|║ │  Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+-|║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+-|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
++|║ │ ───────────────────── │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x25 03x2 1Bx11 6Cx1 1Bx39
++|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
++|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
++|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
++|║            │            │            ║║                                      ║| 1Bx80
+
 == 34: Right
 rows 4-16
 -|║SRC         │     │ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
@@ -155,6 +225,40 @@ rows 4-16
 +|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
 +|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
 +|║            │            │            ║║                                      ║| 1Bx80
++|║            │            │            ║║                                      ║| 1Bx80
+
+== 35: Right Right
+rows 12-18
+-|║            │            │            ║║ │  Unsorted             │            ║| 1Bx40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|║            │            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
+-|║            │            │            ║║ │  Re-read      Ctrl-R  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|║            │            │            ║║ │ -fiLter...    Ctrl-F  │            ║| 1Bx42 30x2 33x1 30x22 03x2 1Bx11
+-|║            │            │            ║║ │  Drive...     Alt-F2  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|║            │            │            ║║ └───────────────────────┘            ║| 1Bx42 30x25 03x2 1Bx11
+-|║            │            │            ║║                                      ║| 1Bx44 03x25 1Bx11
++|║            │            │            ║║ │ ───────────────────── │            ║| 1Bx40 6Cx1 1Bx1 30x25 03x2 1Bx11
++|║            │            │            ║║ │  Re-read      Ctrl-R  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|║            │            │            ║║ │ -fiLter...    Ctrl-F  │            ║| 1Bx42 30x2 33x1 30x22 03x2 1Bx11
++|║            │            │            ║║ │  Drive...     Alt-F2  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|║            │            │            ║║ └───────────────────────┘            ║| 1Bx42 30x25 03x2 1Bx11
++|║            │            │            ║║                                      ║| 1Bx44 03x25 1Bx11
++|║            │            │            ║║                                      ║| 1Bx80
+
+== 36: Right
+rows 12-18
+-|║ │  Unsorted             │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+-|║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+-|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+-|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
++|║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx11 6Cx1 1Bx39
++|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
++|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
++|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
 +|║            │            │            ║║                                      ║| 1Bx80
 
 == 38: Tab F9 c
@@ -213,6 +317,23 @@ rows 4-16
 +|                   └───────────────────────────────┘                            | 07x19 30x33 0Fx2 07x26
 +|                                                                                | 07x21 0Fx33 07x26
 +|                                                                                | 07x80
++|                                                                                | 07x80
+
+== 45: F9 l
+rows 12-18
+-|  │  Unsorted             │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x11 70x1 07x39
+-|  │ ───────────────────── │                                                     | 07x2 30x25 0Fx2 07x51
+-|  │  Re-read      Ctrl-R  │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x51
+-|  │ -fiLter...    Ctrl-F  │                                                     | 07x2 30x2 33x1 30x22 0Fx2 07x51
+-|  │  Drive...     Alt-F1  │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x51
+-|  └───────────────────────┘                                                     | 07x2 30x25 0Fx2 07x51
+-|                                                                                | 07x4 0Fx25 07x51
++|  │ ───────────────────── │                                                     | 07x2 30x25 0Fx2 07x11 70x1 07x39
++|  │  Re-read      Ctrl-R  │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x51
++|  │ -fiLter...    Ctrl-F  │                                                     | 07x2 30x2 33x1 30x22 0Fx2 07x51
++|  │  Drive...     Alt-F1  │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x51
++|  └───────────────────────┘                                                     | 07x2 30x25 0Fx2 07x51
++|                                                                                | 07x4 0Fx25 07x51
 +|                                                                                | 07x80
 
 == 49: F9 c

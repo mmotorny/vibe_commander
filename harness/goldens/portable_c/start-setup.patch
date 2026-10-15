@@ -2,7 +2,7 @@ The portable C in the scenario start-setup: what it is expected to show
 otherwise than the original. A patch of harness/goldens/start-setup.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
-Deviation: 10, 14 of src/portable_c/DEVIATIONS.md
+Deviation: 10, 14, 29 of src/portable_c/DEVIATIONS.md
 Why: the box of F10 names the program in its title and in its question, by a
 name that is two letters shorter: the box is two cells narrower, a cell on
 either side, and its shadow ends a cell further left. Where the box is over
@@ -12,7 +12,12 @@ has it, and the commands. And the Advanced options have no Quick execute
 commands: Clear keyboard buffer and what is below it in the box stand a row
 further up, the cursor with them where it is on that box, the box is a row
 shorter, and the two rows that its last row and the shadow below it were on
-show what is behind the box, the upper one in the shadow
+show what is behind the box, the upper one in the shadow. And the panel that
+the program has without a setup file, and with one that is not correct, is
+sorted by name where the original's is unsorted: the list on C:\WORK in the
+order of the names; the Right menu on it a row shorter, without Unsorted, with
+Name ticked; and the setup file that the defaults leave has 0 for the order of
+both panels where the original's has 8
 
 == 1: F9 o o
 rows 12-21
@@ -62,6 +67,36 @@ rows 12-21
 -cursor 25 13 lines 6 7 mode 3
 +cursor 25 12 lines 6 7 mode 3
 
+== 11: "s" Enter
+rows 5-10
+-|                                        ║readme   txt│            │            ║| 07x40 1Bx40
+-|                                        ║hello    txt│            │            ║| 07x40 1Bx40
+-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
+-|                                        ║data     bin│            │            ║| 07x40 1Bx40
+-|                                        ║run      bat│            │            ║| 07x40 1Bx40
+-|                                        ║empty    dat│            │            ║| 07x40 1Bx40
++|                                        ║data     bin│            │            ║| 07x40 1Bx40
++|                                        ║empty    dat│            │            ║| 07x40 1Bx40
++|                                        ║hello    txt│            │            ║| 07x40 1Bx40
++|                                        ║notes    doc│            │            ║| 07x40 1Bx40
++|                                        ║readme   txt│            │            ║| 07x40 1Bx40
++|                                        ║run      bat│            │            ║| 07x40 1Bx40
+
+== 13: Ctrl+o
+rows 5-10
+-|                                        ║readme   txt│            │            ║| 07x40 1Bx40
+-|                                        ║hello    txt│            │            ║| 07x40 1Bx40
+-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
+-|                                        ║data     bin│            │            ║| 07x40 1Bx40
+-|                                        ║run      bat│            │            ║| 07x40 1Bx40
+-|                                        ║empty    dat│            │            ║| 07x40 1Bx40
++|                                        ║data     bin│            │            ║| 07x40 1Bx40
++|                                        ║empty    dat│            │            ║| 07x40 1Bx40
++|                                        ║hello    txt│            │            ║| 07x40 1Bx40
++|                                        ║notes    doc│            │            ║| 07x40 1Bx40
++|                                        ║readme   txt│            │            ║| 07x40 1Bx40
++|                                        ║run      bat│            │            ║| 07x40 1Bx40
+
 == 14: F10
 rows 5-11
 -|                                                                  │            ║| 07x14 70x51 1Bx15
@@ -96,6 +131,80 @@ rows 5-11
 +|║run      bat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
 +|║s        bat│            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14
 
+== 36: "s" Enter
+rows 5-10
+-|Vibe Commander 0.1, based on Volkov Comm║readme   txt│            │            ║| 07x40 1Bx40
+-|Copyright (C) 1991-2000 Vsevolod V. Volk║hello    txt│            │            ║| 07x40 1Bx40
+-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
+-|C:\WORK>s                               ║data     bin│            │            ║| 07x40 1Bx40
+-|C:\WORK>set vc=c:\work                  ║run      bat│            │            ║| 07x40 1Bx40
+-|C:\WORK>set comspec=                    ║empty    dat│            │            ║| 07x40 1Bx40
++|Vibe Commander 0.1, based on Volkov Comm║data     bin│            │            ║| 07x40 1Bx40
++|Copyright (C) 1991-2000 Vsevolod V. Volk║empty    dat│            │            ║| 07x40 1Bx40
++|                                        ║hello    txt│            │            ║| 07x40 1Bx40
++|C:\WORK>s                               ║notes    doc│            │            ║| 07x40 1Bx40
++|C:\WORK>set vc=c:\work                  ║readme   txt│            │            ║| 07x40 1Bx40
++|C:\WORK>set comspec=                    ║run      bat│            │            ║| 07x40 1Bx40
+
+== 38: Ctrl+o
+rows 5-10
+-|Vibe Commander 0.1, based on Volkov Comm║readme   txt│            │            ║| 07x40 1Bx40
+-|Copyright (C) 1991-2000 Vsevolod V. Volk║hello    txt│            │            ║| 07x40 1Bx40
+-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
+-|C:\WORK>s                               ║data     bin│            │            ║| 07x40 1Bx40
+-|C:\WORK>set vc=c:\work                  ║run      bat│            │            ║| 07x40 1Bx40
+-|C:\WORK>set comspec=                    ║empty    dat│            │            ║| 07x40 1Bx40
++|Vibe Commander 0.1, based on Volkov Comm║data     bin│            │            ║| 07x40 1Bx40
++|Copyright (C) 1991-2000 Vsevolod V. Volk║empty    dat│            │            ║| 07x40 1Bx40
++|                                        ║hello    txt│            │            ║| 07x40 1Bx40
++|C:\WORK>s                               ║notes    doc│            │            ║| 07x40 1Bx40
++|C:\WORK>set vc=c:\work                  ║readme   txt│            │            ║| 07x40 1Bx40
++|C:\WORK>set comspec=                    ║run      bat│            │            ║| 07x40 1Bx40
+
+== 39: F9 r
+rows 5-8
+-|Vibe Commander 0.1, based on Volkov Comm║r│  Tree                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|Copyright (C) 1991-2000 Vsevolod V. Volk║h│  On/Off       Ctrl-F2 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|                                        ║n│ ───────────────────── │            ║| 07x40 1Bx2 30x25 03x2 1Bx11
+-|C:\WORK>s                               ║d│  Name                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|Vibe Commander 0.1, based on Volkov Comm║d│  Tree                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|Copyright (C) 1991-2000 Vsevolod V. Volk║e│  On/Off       Ctrl-F2 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|                                        ║h│ ───────────────────── │            ║| 07x40 1Bx2 30x25 03x2 1Bx11
++|C:\WORK>s                               ║n│√ Name                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+row 10
+-|C:\WORK>set comspec=                    ║e│  tiMe                 │            ║| 07x40 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
++|C:\WORK>set comspec=                    ║r│  tiMe                 │            ║| 07x40 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
+rows 12-18
+-|Vibe Commander 0.1, based on Volkov Comm║v│√ Unsorted             │            ║| 07x40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|Copyright (C) 1991-2000 Vsevolod V. Volk║ │ ───────────────────── │            ║| 07x40 1Bx2 30x25 03x2 1Bx11
+-|                                        ║ │  Re-read      Ctrl-R  │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|C:\WORK>s                               ║ │  fiLter...    Ctrl-F  │            ║| 07x40 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
+-|C:\WORK>set vc=c:\work                  ║ │  Drive...     Alt-F2  │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+-|C:\WORK>set comspec=                    ║ └───────────────────────┘            ║| 07x40 1Bx2 30x25 03x2 1Bx11
+-|C:\WORK>d:\vc\vc                        ║            │            │            ║| 07x40 1Bx4 03x25 1Bx11
++|Vibe Commander 0.1, based on Volkov Comm║v│ ───────────────────── │            ║| 07x40 6Cx1 1Bx1 30x25 03x2 1Bx11
++|Copyright (C) 1991-2000 Vsevolod V. Volk║ │  Re-read      Ctrl-R  │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|                                        ║ │  fiLter...    Ctrl-F  │            ║| 07x40 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
++|C:\WORK>s                               ║ │  Drive...     Alt-F2  │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
++|C:\WORK>set vc=c:\work                  ║ └───────────────────────┘            ║| 07x40 1Bx2 30x25 03x2 1Bx11
++|C:\WORK>set comspec=                    ║            │            │            ║| 07x40 1Bx4 03x25 1Bx11
++|C:\WORK>d:\vc\vc                        ║            │            │            ║| 07x40 1Bx40
+
+== 40: Esc
+rows 5-10
+-|Vibe Commander 0.1, based on Volkov Comm║readme   txt│            │            ║| 07x40 1Bx40
+-|Copyright (C) 1991-2000 Vsevolod V. Volk║hello    txt│            │            ║| 07x40 1Bx40
+-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
+-|C:\WORK>s                               ║data     bin│            │            ║| 07x40 1Bx40
+-|C:\WORK>set vc=c:\work                  ║run      bat│            │            ║| 07x40 1Bx40
+-|C:\WORK>set comspec=                    ║empty    dat│            │            ║| 07x40 1Bx40
++|Vibe Commander 0.1, based on Volkov Comm║data     bin│            │            ║| 07x40 1Bx40
++|Copyright (C) 1991-2000 Vsevolod V. Volk║empty    dat│            │            ║| 07x40 1Bx40
++|                                        ║hello    txt│            │            ║| 07x40 1Bx40
++|C:\WORK>s                               ║notes    doc│            │            ║| 07x40 1Bx40
++|C:\WORK>set vc=c:\work                  ║readme   txt│            │            ║| 07x40 1Bx40
++|C:\WORK>set comspec=                    ║run      bat│            │            ║| 07x40 1Bx40
+
 == 41: F10
 rows 5-11
 -|Vibe Commander                                                    │            ║| 07x14 70x51 1Bx15
@@ -112,3 +221,7 @@ rows 5-11
 +|C:\WORK>set vc=   ╚═════════════════════════════════════════╝     │            ║| 07x15 70x49 03x2 1Bx14
 +|C:\WORK>set com                                                   │            ║| 07x15 70x49 03x2 1Bx14
 +|C:\WORK>d:\vc\vc                        ║s        bat│            │            ║| 07x17 0Fx23 03x26 1Bx14
+
+== disks
+-C:\WORK\VC.INI  A   during the run  511 bytes  3c79f44cc669b6b1
++C:\WORK\VC.INI  A   during the run  511 bytes  9a7695e0f7412756

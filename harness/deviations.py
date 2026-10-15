@@ -791,6 +791,14 @@ TREES = {
                 ("Alt+F5", "Esc"):
                     "a look at the map of the memory, for what has stayed",
             },
+            # Unsorted of the Left and the Right menu is gone
+            # (DEVIATIONS.md, 29): its step is left out, and the menu
+            # has no line that U chooses.
+            "sort": {
+                ("F9 l u",):
+                    "Unsorted of the Left menu: the menu has no line that "
+                    "U chooses, and stays open",
+            },
             # EGA lines, Alt+F9, is gone (DEVIATIONS.md, 12), and with
             # it the one way that a scenario has to a screen of more
             # than 25 rows: where a scenario passes through such a

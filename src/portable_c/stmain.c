@@ -102,7 +102,8 @@ extern const struct BOXHD StSvSt_B;     /* "save the current setup?" */
 bool StOpen;
 
 /* The panel that the program has without a setup file: files in brief,
-   shown, hidden ones too, no filter, unsorted, no mask, and the root of
+   shown, hidden ones too, no filter, by name where the original's are
+   unsorted (DEVIATIONS.md, 29), no mask, and the root of
    the drive A:, whose letter StDefault makes that of the current drive.
    The original copies as much from here as the file has of a panel,
    WCBini bytes, which is 64 more than this is: see StDefault. */
@@ -112,7 +113,7 @@ static const u8 StDefWCB[24] = {
     1,                                  /* Visible */
     1,                                  /* Hidden */
     0,                                  /* MasTyp */
-    8,                                  /* SortTyp */
+    0,                                  /* SortTyp */
     0,                                  /* Ctrl_L */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,      /* DskMas */
     'A', ':', '\\', 0                   /* WinPath */

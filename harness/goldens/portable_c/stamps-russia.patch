@@ -1,0 +1,25 @@
+The portable C in the scenario stamps-russia: what it is expected to show
+otherwise than the original. A patch of harness/goldens/stamps-russia.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 29 of src/portable_c/DEVIATIONS.md
+Why: the Left menu has no Unsorted: the line across the menu, Re-read,
+fiLter... and Drive... stand a row further up, the box is a row shorter and its
+shadow with it, and the row below the shadow shows the panel as it is
+
+== 4: Enter
+rows 12-18
+-|║ │  Unsorted             │            ║║            │            │            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+-|║ │ ───────────────────── │            ║║            │            │            ║| 1Bx2 30x25 03x2 1Bx51
+-|║ │  Re-read      Ctrl-R  │            ║║            │            │            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ │  fiLter...    Ctrl-F  │            ║║            │            │            ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+-|║ │  Drive...     Alt-F1  │            ║║            │            │            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+-|║ └───────────────────────┘            ║║            │            │            ║| 1Bx2 30x25 03x2 1Bx51
+-|║            │            │            ║║            │            │            ║| 1Bx4 03x25 1Bx51
++|║ │ ───────────────────── │            ║║            │            │            ║| 1Bx2 30x25 03x2 1Bx11 6Cx1 1Bx39
++|║ │  Re-read      Ctrl-R  │            ║║            │            │            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ │  fiLter...    Ctrl-F  │            ║║            │            │            ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
++|║ │  Drive...     Alt-F1  │            ║║            │            │            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
++|║ └───────────────────────┘            ║║            │            │            ║| 1Bx2 30x25 03x2 1Bx51
++|║            │            │            ║║            │            │            ║| 1Bx4 03x25 1Bx51
++|║            │            │            ║║            │            │            ║| 1Bx80

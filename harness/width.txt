@@ -3389,13 +3389,13 @@ mask.c, UnConv: variable c, u8
 menu.c, (): variable PtMnu_S, u8[]
     text: of the tables, bars_t.c
 
-menu.c, (): variable MenuLn, u8[713]
+menu.c, (): variable MenuLn, u8[703]
     text
 
 menu.c, (): variable Ctrl_S, u8[9]
     text
 
-menu.c, (): variable MnuHlp, u8[64]
+menu.c, (): variable MnuHlp, u8[63]
     small: a page of the help, as HlpPage keeps it in a byte; the
     original's table, which the test of the data holds.
 

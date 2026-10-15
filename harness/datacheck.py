@@ -276,6 +276,9 @@ _NO_SETTINGS = ("the setup of the portable C has no setting for what the "
                 "were its Execute options, and Screen output of Screen "
                 "and Mouse, and what stood below them in the right half "
                 "of the box stands further up: ")
+_NO_UNSORTED = ("the portable C has no unsorted order, Unsorted of the Left "
+                "and the Right menu, and sorts by name where the original "
+                "has an order of 4 or more: ")
 _NO_QUICK = ("the portable C has no Quick execute commands, the first of "
              "the Other options of its Advanced options in the original: ")
 
@@ -349,6 +352,8 @@ DECLARED = {
                    "program can draw on, which stand behind the end of "
                    "the banner",
                    ((37, 6, b"Vibe"),)),
+        "Menu1_T": (_NO_UNSORTED + "the command of that item, the 11th, "
+                    "is left out, M08_00", ((20, 2, b""),)),
         "Menu3_T": (_NO_MAP + "the command of that item is left out, "
                     "F65_00; " + _NO_LINES + "the command of that item "
                     "is left out, F69_00", ((4, 2, b""), (12, 2, b""))),
@@ -358,22 +363,33 @@ DECLARED = {
                     "vc.h is, 99, the last of the commands, are put in "
                     "at the end",
                     ((26, 2, b""), (32, 0, b"\x00\x00\x63\x00"))),
-        "MenuLn": (_NO_MAP + "the line of that item is left out; "
+        "MenuLn": (_NO_UNSORTED + "the line of that item is left out; "
+                   + _NO_MAP + "the line of that item is left out; "
                    + _NO_LINES + "the line of that item is left out; "
                    + _NO_OPTION + "the line of that item is left out; "
                    + _SETUP + "the line across and the line of that item "
                    "are put in at the end",
-                   ((369, 17, b""), (435, 15, b""), (706, 19, b""),
+                   ((68, 10, b""), (369, 17, b""), (435, 15, b""),
+                    (706, 19, b""),
                     (748, 0, b"\0 More setup...\0"))),
-        "MnuHlp": (_NO_MAP + "the page of the help for that item is left "
+        "MnuHlp": (_NO_UNSORTED + "the page of the help for that item is "
+                   "left out, the fifth 12; "
+                   + _NO_MAP + "the page of the help for that item is left "
                    "out, 30; " + _NO_LINES + "the page of the help for "
                    "that item is left out, 34; " + _NO_OPTION + "the page "
                    "of the help for that item is left out, 52; " + _SETUP
                    + "the line across has no page of the help and neither "
                    "has the item, 0 and 0, which are put in at the end",
-                   ((37, 1, b""), (41, 1, b""), (62, 1, b""),
+                   ((11, 1, b""), (37, 1, b""), (41, 1, b""),
+                    (62, 1, b""),
                     (65, 0, b"\0\0"))),
-        "MnuTab": (_NO_MAP + "the Commands menu is a row shorter, and "
+        "MnuTab": (_NO_UNSORTED + "the Left and the Right menu are a row "
+                   "shorter, 11h rows with the frame and the shadow, and "
+                   "the lines and the pages of the help of the three menus "
+                   "between them begin 10 bytes and a byte further up, at "
+                   "70h and 0Fh for Files, 14Ah and 21h for Commands, and "
+                   "1E3h and 2Dh for Options; "
+                   + _NO_MAP + "the Commands menu is a row shorter, and "
                    "the lines of the Options menu and the pages of its "
                    "help begin 17 bytes and a byte further up; "
                    + _NO_LINES + "the Commands menu is one more row "
@@ -383,9 +399,16 @@ DECLARED = {
                    "1EDh and 2Eh; " + _NO_OPTION + "the Options menu is "
                    "a row shorter for that; " + _SETUP + "and two rows "
                    "taller for these, 14h rows in all",
-                   ((19, 1, b"\x0E"), (27, 1, b"\x14"),
-                    (28, 2, b"\xED\x01"), (30, 2, b"\x2E\x00"))),
-        "KeyTab": (_NO_MAP + "Alt+F5 chooses no item of the Commands "
+                   ((3, 1, b"\x11"), (12, 2, b"\x70\x00"),
+                    (14, 2, b"\x0F\x00"), (19, 1, b"\x0E"),
+                    (20, 2, b"\x4A\x01"), (22, 2, b"\x21\x00"),
+                    (27, 1, b"\x14"),
+                    (28, 2, b"\xE3\x01"), (30, 2, b"\x2D\x00"),
+                    (35, 1, b"\x11"))),
+        "KeyTab": (_NO_UNSORTED + "Ctrl-R, Ctrl-F and Alt-F1 in the Left "
+                   "menu, and Ctrl-R, Ctrl-F and Alt-F2 in the Right one, "
+                   "choose an item further up, 12 to 14; "
+                   + _NO_MAP + "Alt+F5 chooses no item of the Commands "
                    "menu, and the keys of that menu below it choose an "
                    "item further up; " + _NO_LINES + "Alt+F9 chooses no "
                    "item of that menu either, and the three keys below "
@@ -393,10 +416,19 @@ DECLARED = {
                    "three between the two, and 7 to 9; " + _NO_OPTION
                    + "Save setup, which Shift-F9 chooses in the menu, is "
                    "its item 15 and not 16",
-                   ((80, 4, b""), (87, 1, b"\x03"), (91, 1, b"\x04"),
+                   ((7, 1, b"\x0C"), (11, 1, b"\x0D"), (15, 1, b"\x0E"),
+                    (80, 4, b""), (87, 1, b"\x03"), (91, 1, b"\x04"),
                     (95, 1, b"\x05"), (96, 4, b""), (103, 1, b"\x07"),
                     (107, 1, b"\x08"), (111, 1, b"\x09"),
-                    (119, 1, b"\x0F"))),
+                    (119, 1, b"\x0F"), (127, 1, b"\x0C"),
+                    (131, 1, b"\x0D"), (135, 1, b"\x0E"))),
+        "DefWCB": (_NO_UNSORTED + "the panel that the program has without "
+                   "a setup file is sorted by name, 0, where the "
+                   "original's is unsorted, 8", ((5, 1, b"\x00"),)),
+        "StDefWCB": (_NO_UNSORTED + "the panel that the setup has without "
+                     "a setup file is sorted by name, 0, "
+                     "where the original's is unsorted, 8",
+                     ((5, 1, b"\x00"),)),
         "Key_S": (_NO_LINES + "the name of the key in the key bar, "
                   '"EGA Ln", the 20th, is left out; ' + _NO_MAP + "the "
                   'name of the key in the key bar, "Memory", the 30th, '

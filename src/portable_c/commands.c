@@ -222,8 +222,9 @@ i32 M01_00(struct WCBdef *panel, u16 item)
                                | panel->SortTyp));
 }
 
-/* The order of a panel, items 7 to 11 of its menu: by name, extension,
-   time, size, or as the disk has the files. */
+/* The order of a panel, items 7 to 10 of its menu: by name, extension,
+   time or size. The original has an 11th, Unsorted, as the disk has the
+   files, which the portable C has not (DEVIATIONS.md, 29). */
 i32 M08_00(struct WCBdef *panel, u16 item)
 {
     return M01_01(panel, (u16)(panel->BrfFul << 8

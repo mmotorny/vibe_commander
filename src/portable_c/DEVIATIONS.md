@@ -2488,3 +2488,55 @@ row by row, on the user's word of 14 October 2026
 "What a tree is expected to show where the original cannot go" at the
 top of `harness/goldens.py`). The original and the C translation are
 not taken through it.
+
+### 29. No unsorted order: a panel is sorted, by name where nothing else is said
+
+**What the original does.** The Left and the Right menu have five
+orders for a panel of files, items 7 to 11: Name, eXtension, tiMe, Size
+and Unsorted. The last keeps the files in the order in which DOS lists
+the directory, by the number that the program gives each as it reads
+it. The order is a byte of each panel in the setup file, 0 to 3 for the
+four sorts, and the original takes any of 4 or more for Unsorted: the
+item sets 4, and the program as it is distributed, without a setup
+file or with the one that it ships, has 8 for both panels, so its
+panels are unsorted until the user picks an order. The menu ticks
+Unsorted for any order of 4 or more. VC 4.05 has no key for an order;
+the menus are the one way to it.
+
+**What the portable C does.** It has no unsorted order. The Left and the
+Right menu have no line "Unsorted": the line across the menu, Re-read,
+fiLter... and Drive... stand a row further up than in the original, the
+box is a row shorter, U chooses nothing there, and Ctrl-R, Ctrl-F and
+Alt-F1 or Alt-F2 choose the item where it now is. A panel that the
+program has without a setup file is sorted by name, in the main program
+and in its setup alike, so a setup file that either makes from the
+defaults has 0 for both panels where the original's has 8. A setup file
+that says 4 or more for a panel, as the distribution's and any that the
+original has saved unsorted do, is read as by name: the panel is sorted
+by name, and the menu ticks Name. Nothing saves the setup for that
+alone; it is saved with 0 when it is next saved for anything else.
+
+`CmpPar` of `files.c` has no branch for the order in which the files
+were read, and `F40_00` of `menu.c` no tick for an order above 4. The
+number that `read.c` gives each entry, `NumbF`, is still written, the
+layout of an entry being the original's, and nothing reads it.
+
+**Why.** On the user's word of 15 October 2026 the bench sorts its
+panels by name (`CLAUDE.md`, "Scenarios") and the portable C has no
+unsorted order. The order in which DOS lists a directory is that of
+the entries of a FAT directory on the disk, which a user of DOS saw as
+the order in which files were made; on the systems that the program is
+carried to it is the order of a hash or a tree of the file system, and
+says nothing to a user. It is a removal of what only made sense on DOS.
+
+**Which scenarios show it.** Each is held against the original's
+golden with the difference made to it, by its patch or by the step left
+out:
+
+| Scenario | What changes in it |
+|---|---|
+| `sort` | Unsorted is not chosen from the Left menu: the last step, "F9 l u", is left out. Every screen before is as the original's |
+| `stamps`, `stamps-russia` | The Left menu, opened by F9 and Enter, a row shorter: the patch of each, the seven rows from the line across down to the row below the shadow |
+| `menu` | The Left and the Right menu on seven screens, a row shorter, beside the Options and the Commands menu of other entries: the same seven rows each time, in its patch |
+| `start-setup` | The program started without a setup file, and with one that is not correct, has its panel on C:\WORK sorted by name, where the original's lists the files as the directory has them: the rows of the list and of the line under it on four screens. The Right menu that the last start opens is a row shorter, with Name ticked where the original ticks Unsorted. And the setup file that that start leaves in C:\WORK has 0 for the order of both panels where the original's has 8: another sum, in the patch's line of the disks |
+| `setup-defaults` | The setup's Set default configuration writes a setup file whose panels are sorted by name, so the program started on it shows C:\WORK sorted, and the root of C: on the left with STAMPS first and under the cursor, where the original's are unsorted; and the file on D:\VC has 0 for both orders, where the original's has 8 |

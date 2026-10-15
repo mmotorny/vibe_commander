@@ -216,7 +216,11 @@ struct FILENT {
     u16 TimeF;
     u16 DateF;
     u32 SizeF;
-    u16 NumbF;
+    u16 NumbF;                          /* its place in the directory, by
+                                           which the original's unsorted
+                                           order went: written, and read
+                                           by nothing since that order
+                                           went (DEVIATIONS.md, 29) */
 };
 
 /* Subdirectory entry of NCD file. */

@@ -134,14 +134,15 @@ typedef char Palets_size[sizeof Palets
 
 /* The panel that the program has without a setup file, as far as its
    mask, which is empty: files in brief, shown, hidden ones too, no
-   filter, unsorted. */
+   filter, by name, where the original's are unsorted, 8
+   (DEVIATIONS.md, 29). */
 static const u8 DefWCB[] = {
     0,                                  /* WinTyp */
     0,                                  /* BrfFul */
     1,                                  /* Visible */
     1,                                  /* Hidden */
     0,                                  /* MasTyp */
-    8,                                  /* SortTyp */
+    0,                                  /* SortTyp */
     0,                                  /* Ctrl_L */
     0                                   /* DskMas */
 };
@@ -319,6 +320,15 @@ void Init00(void)
             && image[0] == 'V' && image[1] == 'V' && image[2] == 'V') {
             for (i = 0; i < CmnIni; i++)
                 ((u8 *)&md)[i] = image[3 + 2 * WCBini + i];
+            /* An order of 4 or more is the original's unsorted one,
+               which the portable C has not: such a panel is sorted by
+               name (DEVIATIONS.md, 29). That alone has the setup
+               saved by nothing: the main loop holds the setup against
+               what it was when the loop first came round (Func05). */
+            if (first->SortTyp >= 4)
+                first->SortTyp = 0;
+            if (second->SortTyp >= 4)
+                second->SortTyp = 0;
             taken = true;
         }
     }

@@ -99,18 +99,18 @@ void SetMask(struct WCBdef *panel)
    one that comes first now. Their names are in
    the form that Sort gives them, the extension at 9.
 
-   Unsorted is the order in which they were read. Otherwise directories
-   come before files, with . and .. before the others, and system files
+   Directories come before files, with . and .. before the others, and system files
    before other files; then it goes by the extension, by the time, the
    latest first, or by the size, the largest first; and with those the
-   same, or sorting by name, by the name and then the extension. */
+   same, or sorting by name, by the name and then the extension. The
+   original has a fifth order, 4 or more, the order in which they were
+   read; the portable C has none such (DEVIATIONS.md, 29), and an order
+   of 4 or more never comes here. */
 static bool CmpPar(const struct FILENT *first,
                    const struct FILENT *second, i32 type)
 {
     i32 i;
 
-    if (type >= 4)
-        return second->NumbF < first->NumbF;
     if (first->AttrF & ATTR_DIRECTORY) {
         if (!(second->AttrF & ATTR_DIRECTORY))
             return 0;

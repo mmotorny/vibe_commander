@@ -82,7 +82,12 @@ extern const u8 PtMnu_S[];
    and a line across the menu of its own: the setup program, which is a
    program of its own there. Every item above it is where it would be
    without it, the menu is two rows taller for it in MnuTab, and the
-   item has no page of the help: F1 on it shows the index. */
+   item has no page of the help: F1 on it shows the index. The Left and
+   the Right menu have no " Unsorted" behind " Size": the portable C has
+   no unsorted order (DEVIATIONS.md, 29). So they have a page of the help
+   less in MnuHlp, a row less in MnuTab, and in KeyTab the three keys of
+   the items below it, Ctrl-R, Ctrl-F and Alt-F1 or Alt-F2, choose an
+   item further up. */
 #define LEFT_S \
     " Brief\0" \
     " Full\0" \
@@ -94,7 +99,6 @@ extern const u8 PtMnu_S[];
     " eXtension\0" \
     " tiMe\0" \
     " Size\0" \
-    " Unsorted\0" \
     "\0" \
     " Re-read\377\006^R\0" \
     " fiLter...\377\004^F\0" \
@@ -163,15 +167,15 @@ static const u8 Ctrl_S[9] NONSTRING = "Ctrl-Alt-";
 /* The pages of the help: for each kind of menu one for the menu itself
    and one for each of its lines. */
 static const u8 MnuHlp[] = {
-     7,  8,  8,  9, 10, 11,  0, 12, 12, 12, 12, 12,  0, 13, 14, 15,
+     7,  8,  8,  9, 10, 11,  0, 12, 12, 12, 12,  0, 13, 14, 15,
     16,  0, 17, 18, 19, 20, 21, 22, 23,  0, 24,  0, 25, 25, 25, 25,  0, 26,
     27, 28, 29, 31, 32, 33,  0, 35, 36, 37,  0, 38,
     39, 40, 41, 42, 43, 44,  0, 45, 46, 47, 48, 49, 50, 51,  0, 53,  0,  0,
 };
 #define MnuHlp1 0                       /* where in it each kind begins */
-#define MnuHlp2 16
-#define MnuHlp3 34
-#define MnuHlp4 46
+#define MnuHlp2 15
+#define MnuHlp3 33
+#define MnuHlp4 45
 
 /* The five menus of the bar: where the box of each begins, the row in the
    high byte, its size likewise, with its frame and its shadow, where its
@@ -183,11 +187,11 @@ struct MnuTab {
     u16 help;
 };
 static const struct MnuTab MnuTab[] = {
-    { 0x102, 0x121B, MenuLn1, MnuHlp1 },        /* Left */
+    { 0x102, 0x111B, MenuLn1, MnuHlp1 },        /* Left */
     { 0x10A, 0x141E, MenuLn2, MnuHlp2 },        /* Files */
     { 0x113, 0x0E23, MenuLn3, MnuHlp3 },        /* Commands */
     { 0x11F, 0x1422, MenuLn4, MnuHlp4 },        /* Options */
-    { 0x12A, 0x121B, MenuLn1, MnuHlp1 },        /* Right */
+    { 0x12A, 0x111B, MenuLn1, MnuHlp1 },        /* Right */
 };
 
 /* The letters that open the menus from the bar. */
@@ -200,8 +204,8 @@ struct KeyTab {
     u16 item;
 };
 static const struct KeyTab KeyTab[] = {
-    { 0x5E00, 0x0501 }, { 0x1312, 0x0D01 }, { 0x2106, 0x0E01 },
-    { 0x6800, 0x0F01 }, { 0x3B00, 0x0102 }, { 0x3C00, 0x0202 },
+    { 0x5E00, 0x0501 }, { 0x1312, 0x0C01 }, { 0x2106, 0x0D01 },
+    { 0x6800, 0x0E01 }, { 0x3B00, 0x0102 }, { 0x3C00, 0x0202 },
     { 0x3D00, 0x0302 }, { 0x3E00, 0x0402 }, { 0x3F00, 0x0502 },
     { 0x4000, 0x0602 }, { 0x4100, 0x0702 }, { 0x4200, 0x0802 },
     { 0x1E01, 0x0A02 }, { 0x4E2B, 0x0C02 }, { 0x4A2D, 0x0D02 },
@@ -209,8 +213,8 @@ static const struct KeyTab KeyTab[] = {
     { 0x7100, 0x0103 }, { 0x6100, 0x0203 }, { 0x6D00, 0x0303 },
     { 0x6E00, 0x0403 }, { 0x6F00, 0x0503 }, { 0x1615, 0x0703 },
     { 0x180F, 0x0803 }, { 0x2E03, 0x0903 }, { 0x3002, 0x0904 },
-    { 0x5C00, 0x0F04 }, { 0x5F00, 0x0505 }, { 0x1312, 0x0D05 },
-    { 0x2106, 0x0E05 }, { 0x6900, 0x0F05 },
+    { 0x5C00, 0x0F04 }, { 0x5F00, 0x0505 }, { 0x1312, 0x0C05 },
+    { 0x2106, 0x0D05 }, { 0x6900, 0x0E05 },
 };
 #define KEYS ((i32)(sizeof KeyTab / sizeof KeyTab[0]))
 
@@ -440,7 +444,9 @@ static void F39_58(i32 menu, struct WCBdef *panel, u16 *top, u16 size)
         if (menu != 1) {
             panel = RightPanel;
             ++*(u8 *)(top + 422);       /* Ctrl-F2 */
-            ++*(u8 *)(top + 1221);      /* and Alt-F2 */
+            ++*(u8 *)(top + 1141);      /* and Alt-F2, a row further
+                                           up than in the original, which
+                                           has Unsorted above it */
         }
         wcb = panel;
         mark = top + 401;               /* On/Off */
@@ -460,12 +466,14 @@ static void F39_58(i32 menu, struct WCBdef *panel, u16 *top, u16 size)
         }
         *(u8 *)mark = TICK;
         if (wcb->Visible != 0 && wcb->WinTyp == 0) {
+            /* The order is 0 to 3: the original takes one of 5 or more
+               for Unsorted, 4, which the portable C has not, and reads
+               such an order in a setup file as by name (Init00). */
             order = wcb->SortTyp;
-            if (order > 4)
-                order = 4;
             *(u8 *)(top + order * 80 + 561) = TICK;
         } else
-            F40_30(14, menu, top, size);
+            F40_30(13, menu, top, size);  /* fiLter..., the 14th in the
+                                             original */
         other = InvWCB(panel);
         if (other->Visible != 0 && other->WinTyp == 1)
             F40_30(4, menu, top, size);
