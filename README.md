@@ -526,9 +526,9 @@ the first eleven does not hold; the others would show in the tests.
 | 16 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/c/resident.c`, `Alloc0` | every scenario |
 | 17 | A far call to a function of the same segment is made `push cs` and a near call by the linker, and needs no relocation: so the part that stays can call its own far functions before its relocations are applied | `src/c/resident.c`, `Alloc0` | every scenario |
 
-What else the notes of `CLAUDE.md` have under "C for the translation" is how
-to write for this compiler, not what the program rests on: a register
-that it ignores in a `#pragma aux`, a pointer that it truncates.
+What else the notes on the translation have, in `DIARY.md`, is how to
+write for this compiler, not what the program rests on: a register that
+it ignores in a `#pragma aux`, a pointer that it truncates.
 
 ### Inline assembly
 
