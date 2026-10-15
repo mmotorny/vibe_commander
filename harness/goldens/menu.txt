@@ -6,15 +6,15 @@ code page 437
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -25,7 +25,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -37,12 +37,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -58,19 +58,19 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 2: End
+== 2: End Up Up Up Up
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -93,12 +93,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -121,12 +121,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -149,12 +149,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -177,12 +177,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -205,12 +205,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                         ───╢| 1Bx4 30x72 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Options pull-down menu                                         ║      ║| 1Bx4 30x5 3Fx22 30x45 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  The items in this pull-down  menu  allow  you to set various  ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
-|║not   ║  parameters  of  Commander's  operation.  The  next  few help  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  screens describe them in more detail.                         ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║    Note:  All  these  settings (and some other ones, too) can  ║   ───╢| 1Bx1 30x11 3Fx5 30x59 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  The items in this pull-down  menu  allow  you to set various  ║   :  ║| 1Bx1 30x75 06x1 03x1 1Bx2
+|║hel   ║  parameters  of  Commander's  operation.  The  next  few help  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  screens describe them in more detail.                         ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║    Note:  All  these  settings (and some other ones, too) can  ║   ───╢| 1Bx4 30x8 3Fx5 30x59 03x2 1Bx2
 |║      ║           also be changed from the VCSETUP program.            ║      ║| 1Bx4 30x40 3Ex7 30x25 03x2 1Bx2
 |║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -233,12 +233,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -261,12 +261,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -289,12 +289,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -317,12 +317,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -345,12 +345,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -373,12 +373,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -401,12 +401,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -429,12 +429,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -457,12 +457,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                         ───╢| 1Bx4 30x72 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Auto menus                                                     ║      ║| 1Bx4 30x5 3Fx10 30x57 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  When   this   option  is  checked,  the  User  menus  appear  ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
-|║not   ║  automatically when  the  Commander  first  starts. The  User  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  menus will also reappear automatically after you  run a User  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  menu command.                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║                                                                ║   ───╢| 1Bx1 30x75 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  When   this   option  is  checked,  the  User  menus  appear  ║   :  ║| 1Bx1 30x75 06x1 03x1 1Bx2
+|║hel   ║  automatically when  the  Commander  first  starts. The  User  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  menus will also reappear automatically after you  run a User  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  menu command.                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║                                                                ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -485,12 +485,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │    │  Configuration...            │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║data     bin│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │    │  Editors...                  │es on drive C:  ║| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
+|║hello    txt│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
+|║notes    doc│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 06x1 03x1 1Bx15
+|║readme   txt│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
@@ -513,12 +513,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║╟─│  Brief                │────────────╢| 1Bx42 30x1 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx11
 |║DOCS        │            │            ║║ │  Full                 │ory         ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║SRC         │            │            ║║ │√ Info                 │ee          ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║readme   txt│            │            ║║ │  Tree                 │s WORK      ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Ex4 1Bx7
-|║hello    txt│            │            ║║ │  On/Off       Ctrl-F2 │n drive C:  ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx6 1Ex2 1Bx3
-|║notes    doc│            │            ║║ │ ───────────────────── │ drive C:   ║| 1Bx42 30x25 03x2 1Bx5 1Ex2 1Bx4
-|║data     bin│            │            ║║ │  Name                 │tes in      ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║run      bat│            │            ║║ │  eXtension            │            ║| 1Bx42 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx11
-|║empty    dat│            │            ║╟─│  tiMe                 │────────────╢| 1Bx1 30x12 1Bx29 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
+|║data     bin│            │            ║║ │  Tree                 │s WORK      ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Ex4 1Bx7
+|║empty    dat│            │            ║║ │  On/Off       Ctrl-F2 │n drive C:  ║| 1Bx1 30x12 1Bx29 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx6 1Ex2 1Bx3
+|║hello    txt│            │            ║║ │ ───────────────────── │ drive C:   ║| 1Bx42 30x25 03x2 1Bx5 1Ex2 1Bx4
+|║notes    doc│            │            ║║ │  Name                 │tes in      ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|║readme   txt│            │            ║║ │  eXtension            │            ║| 1Bx42 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx11
+|║run      bat│            │            ║╟─│  tiMe                 │────────────╢| 1Bx42 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
 |║            │            │            ║║ │  Size                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │  Unsorted             │s directory ║| 1Bx40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
@@ -541,14 +541,14 @@ cursor 0 127 lines 6 7 mode 3
 |║.│√ Brief                │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx51
 |║D│  Full                 │            ║║         653,296 Bytes Memory         ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx21 1Ex7 1Bx23
 |║S│  Info                 │            ║║          ####### Bytes Free          ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx22 1Ex7 1Bx22
-|║r│  Tree                 │            ║║      Volume in drive C: is WORK      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx34 1Ex2 1Bx4 1Ex4 1Bx7
-|║h│  On/Off       Ctrl-F1 │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex10 1Bx22 1Ex2 1Bx3
-|║n│ ───────────────────── │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx2 30x25 03x2 1Bx14 1Ex10 1Bx21 1Ex2 1Bx4
-|║d│  Name                 │            ║║      6 files use 3,072 bytes in      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx18 1Ex1 1Bx11 1Ex5 1Bx16
+|║d│  Tree                 │            ║║      Volume in drive C: is WORK      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx34 1Ex2 1Bx4 1Ex4 1Bx7
+|║e│  On/Off       Ctrl-F1 │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x2 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex10 1Bx22 1Ex2 1Bx3
+|║h│ ───────────────────── │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx2 30x25 03x2 1Bx14 1Ex10 1Bx21 1Ex2 1Bx4
+|║n│√ Name                 │            ║║      6 files use 3,072 bytes in      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx18 1Ex1 1Bx11 1Ex5 1Bx16
 |║r│  eXtension            │            ║║               C:\WORK                ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
-|║e│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx1 30x2 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+|║r│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+|║ │  Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -569,14 +569,14 @@ cursor 0 127 lines 6 7 mode 3
 |║.│√ Brief                │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx51
 |║D│  Full                 │            ║║         653,296 Bytes Memory         ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx21 1Ex7 1Bx23
 |║S│  Info                 │            ║║          ####### Bytes Free          ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx22 1Ex7 1Bx22
-|║r│  Tree                 │            ║║      Volume in drive C: is WORK      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx34 1Ex2 1Bx4 1Ex4 1Bx7
-|║h│  On/Off       Ctrl-F1 │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex10 1Bx22 1Ex2 1Bx3
-|║n│ ───────────────────── │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx2 30x25 03x2 1Bx14 1Ex10 1Bx21 1Ex2 1Bx4
-|║d│  Name                 │            ║║      6 files use 3,072 bytes in      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx18 1Ex1 1Bx11 1Ex5 1Bx16
+|║d│  Tree                 │            ║║      Volume in drive C: is WORK      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx34 1Ex2 1Bx4 1Ex4 1Bx7
+|║e│  On/Off       Ctrl-F1 │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x2 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex10 1Bx22 1Ex2 1Bx3
+|║h│ ───────────────────── │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx2 30x25 03x2 1Bx14 1Ex10 1Bx21 1Ex2 1Bx4
+|║n│√ Name                 │            ║║      6 files use 3,072 bytes in      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx18 1Ex1 1Bx11 1Ex5 1Bx16
 |║r│  eXtension            │            ║║               C:\WORK                ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
-|║e│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx1 30x2 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+|║r│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+|║ │  Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -597,12 +597,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -625,14 +625,14 @@ cursor 0 127 lines 6 7 mode 3
 |║.│√ Brief                │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx51
 |║D│  Full                 │            ║║         653,296 Bytes Memory         ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx21 1Ex7 1Bx23
 |║S│  Info                 │            ║║          ####### Bytes Free          ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx22 1Ex7 1Bx22
-|║r│  Tree                 │            ║║      Volume in drive C: is WORK      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx34 1Ex2 1Bx4 1Ex4 1Bx7
-|║h│  On/Off       Ctrl-F1 │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex10 1Bx22 1Ex2 1Bx3
-|║n│ ───────────────────── │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx2 30x25 03x2 1Bx14 1Ex10 1Bx21 1Ex2 1Bx4
-|║d│  Name                 │            ║║      6 files use 3,072 bytes in      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx18 1Ex1 1Bx11 1Ex5 1Bx16
+|║d│  Tree                 │            ║║      Volume in drive C: is WORK      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx34 1Ex2 1Bx4 1Ex4 1Bx7
+|║e│  On/Off       Ctrl-F1 │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x2 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex10 1Bx22 1Ex2 1Bx3
+|║h│ ───────────────────── │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx2 30x25 03x2 1Bx14 1Ex10 1Bx21 1Ex2 1Bx4
+|║n│√ Name                 │            ║║      6 files use 3,072 bytes in      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx18 1Ex1 1Bx11 1Ex5 1Bx16
 |║r│  eXtension            │            ║║               C:\WORK                ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
-|║e│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx1 30x2 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+|║r│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+|║ │  Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -653,12 +653,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -681,12 +681,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..       │ Help              F1     │ ║╟──────────────────────────────────────╢| 1Bx10 30x1 0Fx1 0Ex1 0Fx24 30x1 03x2 1Bx40
 |║DOCS     │ User menu         F2     │ ║║         653,296 Bytes Memory         ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx10 1Ex7 1Bx23
 |║SRC      │ View              F3     │ ║║          ####### Bytes Free          ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx11 1Ex7 1Bx22
-|║readme   │ Edit              F4     │ ║║      Volume in drive C: is WORK      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    │ Copy              F5     │ ║║  32,724,992 total bytes on drive C:  ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    │ Rename or move    F6     │ ║║  32,719,360 bytes free on drive C:   ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     │ Make directory    F7     │ ║║      6 files use 3,072 bytes in      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx7 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      │ Delete            F8     │ ║║               C:\WORK                ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║empty    │ ──────────────────────── │ ║╟──────────────────────────────────────╢| 1Bx1 30x37 03x2 1Bx40
+|║data     │ Edit              F4     │ ║║      Volume in drive C: is WORK      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    │ Copy              F5     │ ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x10 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    │ Rename or move    F6     │ ║║  32,719,360 bytes free on drive C:   ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    │ Make directory    F7     │ ║║      6 files use 3,072 bytes in      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx7 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   │ Delete            F8     │ ║║               C:\WORK                ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║run      │ ──────────────────────── │ ║╟──────────────────────────────────────╢| 1Bx10 30x28 03x2 1Bx40
 |║         │ file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 3Fx6 3Ex1 3Fx19 30x1 03x2 1Bx40
 |║         │ ──────────────────────── │ ║║  No `dirinfo' file in this directory ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │ select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 3Fx8 3Ex1 3Fx17 30x1 03x2 1Bx40
@@ -709,12 +709,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                         ───╢| 1Bx4 30x72 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx1 30x75 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║   :  ║| 1Bx1 30x8 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -737,12 +737,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -765,12 +765,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..       │ Help              F1     │ ║╟──────────────────────────────────────╢| 1Bx10 30x1 0Fx1 0Ex1 0Fx24 30x1 03x2 1Bx40
 |║DOCS     │ User menu         F2     │ ║║         653,296 Bytes Memory         ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx10 1Ex7 1Bx23
 |║SRC      │ View              F3     │ ║║          ####### Bytes Free          ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx11 1Ex7 1Bx22
-|║readme   │ Edit              F4     │ ║║      Volume in drive C: is WORK      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    │ Copy              F5     │ ║║  32,724,992 total bytes on drive C:  ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    │ Rename or move    F6     │ ║║  32,719,360 bytes free on drive C:   ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     │ Make directory    F7     │ ║║      6 files use 3,072 bytes in      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx7 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      │ Delete            F8     │ ║║               C:\WORK                ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║empty    │ ──────────────────────── │ ║╟──────────────────────────────────────╢| 1Bx1 30x37 03x2 1Bx40
+|║data     │ Edit              F4     │ ║║      Volume in drive C: is WORK      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    │ Copy              F5     │ ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x10 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    │ Rename or move    F6     │ ║║  32,719,360 bytes free on drive C:   ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    │ Make directory    F7     │ ║║      6 files use 3,072 bytes in      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx7 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   │ Delete            F8     │ ║║               C:\WORK                ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║run      │ ──────────────────────── │ ║╟──────────────────────────────────────╢| 1Bx10 30x28 03x2 1Bx40
 |║         │ file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 3Fx6 3Ex1 3Fx19 30x1 03x2 1Bx40
 |║         │ ──────────────────────── │ ║║  No `dirinfo' file in this directory ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │ select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 3Fx8 3Ex1 3Fx17 30x1 03x2 1Bx40
@@ -793,12 +793,12 @@ cursor 28 8 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │                                             Bytes Free          ║| 1Bx21 70x38 1Bx21
-|║readme   txt│          ╔═════════ Attributes ═════════╗   ive C: is WORK      ║| 1Bx21 70x38 03x2 1Bx2 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│          ║  Change file attributes for  ║    bytes on drive C:  ║| 1Bx21 70x38 03x2 1Bx14 1Ex2 1Bx3
-|║notes    doc│          ║         "empty.dat"          ║    free on drive C:   ║| 1Bx21 70x38 03x2 1Bx13 1Ex2 1Bx4
-|║data     bin│          ║  [ ] Read only    Date       ║   3,072 bytes in      ║| 1Bx21 70x38 06x2 1Ex3 1Bx16
-|║run      bat│          ║  [x] Archive      6-16-2000  ║   WORK                ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
-|║empty    dat│          ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx1 30x12 1Bx8 70x38 03x2 1Bx19
+|║data     bin│          ╔═════════ Attributes ═════════╗   ive C: is WORK      ║| 1Bx21 70x38 03x2 1Bx2 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│          ║  Change file attributes for  ║    bytes on drive C:  ║| 1Bx1 30x12 1Bx8 70x38 03x2 1Bx14 1Ex2 1Bx3
+|║hello    txt│          ║         "empty.dat"          ║    free on drive C:   ║| 1Bx21 70x38 03x2 1Bx13 1Ex2 1Bx4
+|║notes    doc│          ║  [ ] Read only    Date       ║   3,072 bytes in      ║| 1Bx21 70x38 06x2 1Ex3 1Bx16
+|║readme   txt│          ║  [x] Archive      6-16-2000  ║   WORK                ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+|║run      bat│          ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx21 70x38 03x2 1Bx19
 |║            │          ║  [ ] System       12:00:00p  ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
 |║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
 |║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
@@ -821,12 +821,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║data     bin│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║empty    dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
+|║hello    txt│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║notes    doc│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║readme   txt│            │            ║║               C:\WORK                ║| 1Bx80
+|║run      bat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -849,12 +849,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │            │            ║║ ├─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
 |║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║readme   txt│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║hello    txt│            │            ║║    └──SUB                            ║| 1Bx80
+|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
+|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║hello    txt│            │            ║║                                      ║| 1Bx80
 |║notes    doc│            │            ║║                                      ║| 1Bx80
-|║data     bin│            │            ║║                                      ║| 1Bx80
+|║readme   txt│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
-|║empty    dat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
@@ -877,12 +877,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..       │ Help              F1     │ ║║ ├─ WORK                             ◄║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx4 3Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS     │ User menu         F2     │ ║║ │  ├──DOCS                           ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
 |║SRC      │ View              F3     │ ║║ │  └──SRC                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║readme   │ Edit              F4     │ ║║ └──STAMPS                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║hello    │ Copy              F5     │ ║║    └──SUB                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║notes    │ Rename or move    F6     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║data     │ Make directory    F7     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║run      │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║empty    │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|║data     │ Edit              F4     │ ║║ └──STAMPS                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║empty    │ Copy              F5     │ ║║    └──SUB                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║hello    │ Rename or move    F6     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║notes    │ Make directory    F7     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║readme   │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║run      │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
 |║         │-file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │-select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
@@ -905,12 +905,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..       │ Help              F1     │ ║║ ├─ WORK                             ◄║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx4 3Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS     │ User menu         F2     │ ║║ │  ├──DOCS                           ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
 |║SRC      │ View              F3     │ ║║ │  └──SRC                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║readme   │ Edit              F4     │ ║║ └──STAMPS                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║hello    │ Copy              F5     │ ║║    └──SUB                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║notes    │ Rename or move    F6     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║data     │ Make directory    F7     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║run      │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║empty    │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|║data     │ Edit              F4     │ ║║ └──STAMPS                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║empty    │ Copy              F5     │ ║║    └──SUB                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║hello    │ Rename or move    F6     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║notes    │ Make directory    F7     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║readme   │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║run      │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
 |║         │-file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │-select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
@@ -933,12 +933,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..       │ Help              F1     │ ║║ ├─ WORK                             ◄║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx4 3Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS     │ User menu         F2     │ ║║ │  ├──DOCS                           ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
 |║SRC      │ View              F3     │ ║║ │  └──SRC                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║readme   │ Edit              F4     │ ║║ └──STAMPS                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║hello    │ Copy              F5     │ ║║    └──SUB                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║notes    │ Rename or move    F6     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║data     │ Make directory    F7     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
-|║run      │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 0Fx1 0Ex1 0Fx24 30x1 03x2 1Bx40
-|║empty    │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|║data     │ Edit              F4     │ ║║ └──STAMPS                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║empty    │ Copy              F5     │ ║║    └──SUB                            ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║hello    │ Rename or move    F6     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║notes    │ Make directory    F7     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║readme   │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 0Fx1 0Ex1 0Fx24 30x1 03x2 1Bx40
+|║run      │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
 |║         │-file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │-select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
@@ -961,12 +961,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │     │ Tree                  Alt-F10 │                          ◄║| 1Bx19 30x1 0Fx1 0Ex1 0Fx29 30x1 06x2 3Ex4 1Bx20 1Ex1 1Bx1
 |║DOCS        │     │ Volume label          Ctrl-F4 │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║SRC         │     │ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
-|║readme   txt│     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
-|║hello    txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║notes    doc│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║data     bin│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
-|║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║data     bin│     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+|║empty    dat│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║notes    doc│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║readme   txt│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+|║run      bat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
 |║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
@@ -989,12 +989,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║║ │  Brief                │           ◄║| 1Bx42 30x1 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx9 1Ex1 1Bx1
 |║DOCS        │            │            ║║ │  Full                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║SRC         │            │            ║║ │  Info                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║readme   txt│            │            ║║ │√ Tree                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║hello    txt│            │            ║║ │  On/Off       Ctrl-F2 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║notes    doc│            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
-|║data     bin│            │            ║║ │  Name                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║run      bat│            │            ║║ │  eXtension            │            ║| 1Bx42 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx11
-|║empty    dat│            │            ║║ │  tiMe                 │            ║| 1Bx42 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
+|║data     bin│            │            ║║ │√ Tree                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|║empty    dat│            │            ║║ │  On/Off       Ctrl-F2 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|║hello    txt│            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
+|║notes    doc│            │            ║║ │  Name                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|║readme   txt│            │            ║║ │  eXtension            │            ║| 1Bx42 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx11
+|║run      bat│            │            ║║ │  tiMe                 │            ║| 1Bx42 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
 |║            │            │            ║║ │  Size                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │  Unsorted             │            ║| 1Bx40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
@@ -1017,14 +1017,14 @@ cursor 0 127 lines 6 7 mode 3
 |║.│√ Brief                │            ║║ ├─ WORK                             ◄║| 1Bx2 30x1 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx15 3Ex14 1Bx20 1Ex1 1Bx1
 |║D│  Full                 │            ║║ │  ├──DOCS                           ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║S│  Info                 │            ║║ │  └──SRC                            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║r│ -Tree                 │            ║║ └──STAMPS                            ║| 1Bx2 30x2 33x1 30x22 03x2 1Bx51
-|║h│  On/Off       Ctrl-F1 │            ║║    └──SUB                            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║n│ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
-|║d│  Name                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║d│ -Tree                 │            ║║ └──STAMPS                            ║| 1Bx2 30x2 33x1 30x22 03x2 1Bx51
+|║e│  On/Off       Ctrl-F1 │            ║║    └──SUB                            ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║h│ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+|║n│√ Name                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║r│  eXtension            │            ║║                                      ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
-|║e│  tiMe                 │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+|║r│  tiMe                 │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
+|║ │  Unsorted             │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -1045,12 +1045,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │►UP--DIR◄│ 6-16-00│12:00p║║ ├─ WORK                             ◄║| 1Bx44 3Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS        │►SUB-DIR◄│ 6-16-00│12:00p║║ │  ├──DOCS                           ║| 1Bx80
 |║SRC         │►SUB-DIR◄│ 6-16-00│12:00p║║ │  └──SRC                            ║| 1Bx80
-|║readme   txt│       40│ 6-16-00│12:00p║║ └──STAMPS                            ║| 1Bx80
-|║hello    txt│       15│ 6-16-00│12:00p║║    └──SUB                            ║| 1Bx80
+|║data     bin│     1024│ 6-16-00│12:00p║║ └──STAMPS                            ║| 1Bx80
+|║empty    dat│        0│ 6-16-00│12:00p║║    └──SUB                            ║| 1Bx80
+|║hello    txt│       15│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║notes    doc│       32│ 6-16-00│12:00p║║                                      ║| 1Bx80
-|║data     bin│     1024│ 6-16-00│12:00p║║                                      ║| 1Bx80
+|║readme   txt│       40│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║run      bat│       21│ 6-16-00│12:00p║║                                      ║| 1Bx80
-|║empty    dat│        0│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -1073,12 +1073,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │►UP--│ Tree                  Alt-F10 │     ▐                    ◄║| 1Bx19 30x1 0Fx1 0Ex1 0Fx29 30x1 06x2 1Ex4 1Bx20 1Ex1 1Bx1
 |║DOCS        │►SUB-│ Volume label          Ctrl-F4 │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║SRC         │►SUB-│ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
-|║readme   txt│     │ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║hello    txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║notes    doc│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║data     bin│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
-|║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║data     bin│     │ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║empty    dat│     │ Find file             Alt-F7  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║notes    doc│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║readme   txt│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+|║run      bat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
 |║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
@@ -1325,12 +1325,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │►UP--DIR◄│ 6-16-00│12:00p║║ ├─▌WORK        ▐                    ◄║| 1Bx44 1Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS        │►SUB-DIR◄│ 6-16-00│12:00p║║ │  ├──DOCS                           ║| 1Bx80
 |║SRC         │►SUB-DIR◄│ 6-16-00│12:00p║║ │  └──SRC                            ║| 1Bx80
-|║readme   txt│       40│ 6-16-00│12:00p║║ └──STAMPS                            ║| 1Bx80
-|║hello    txt│       15│ 6-16-00│12:00p║║    └──SUB                            ║| 1Bx80
+|║data     bin│     1024│ 6-16-00│12:00p║║ └──STAMPS                            ║| 1Bx80
+|║empty    dat│        0│ 6-16-00│12:00p║║    └──SUB                            ║| 1Bx1 30x38 1Bx41
+|║hello    txt│       15│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║notes    doc│       32│ 6-16-00│12:00p║║                                      ║| 1Bx80
-|║data     bin│     1024│ 6-16-00│12:00p║║                                      ║| 1Bx80
+|║readme   txt│       40│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║run      bat│       21│ 6-16-00│12:00p║║                                      ║| 1Bx80
-|║empty    dat│        0│ 6-16-00│12:00p║║                                      ║| 1Bx1 30x38 1Bx41
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -1350,15 +1350,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ════════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx80
-|║DOCS        │►SUB-DIR◄│ 6-16-00│12:00p║║STAMPS      │            │            ║| 1Bx80
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║STAMPS      │            │            ║| 1Bx80
+|║DOCS        │►SUB-DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx80
 |║SRC         │►SUB-DIR◄│ 6-16-00│12:00p║║treeinfo ncd│            │            ║| 1Bx80
-|║readme   txt│       40│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
+|║data     bin│     1024│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
+|║empty    dat│        0│ 6-16-00│12:00p║║            │            │            ║| 1Bx1 30x38 1Bx41
 |║hello    txt│       15│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║notes    doc│       32│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
-|║data     bin│     1024│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
+|║readme   txt│       40│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║run      bat│       21│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
-|║empty    dat│        0│ 6-16-00│12:00p║║            │            │            ║| 1Bx1 30x38 1Bx41
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║            │            │            ║| 1Bx80
@@ -1369,7 +1369,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║empty.dat            0  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║empty.dat            0  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1381,12 +1381,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │►UP--│ Tree                  Alt-F10 │ │            │            ║| 1Bx19 30x1 0Fx1 0Ex1 0Fx29 30x1 03x2 1Bx26
 |║DOCS        │►SUB-│ Volume label          Ctrl-F4 │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║SRC         │►SUB-│ memory Info           Alt-F5  │d│            │            ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
-|║readme   txt│     │ Directory sizes       Alt-F6  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║hello    txt│     │ Find file             Alt-F7  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║notes    doc│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║data     bin│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║run      bat│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
-|║empty    dat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║data     bin│     │ Directory sizes       Alt-F6  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║empty    dat│     │ Find file             Alt-F7  │ │            │            ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║hello    txt│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║notes    doc│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║readme   txt│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+|║run      bat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx18 48x1 3Fx10 30x1 03x2 1Bx26
 |║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
@@ -1397,7 +1397,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║empty.dat            0  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║empty.dat            0  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1406,8 +1406,8 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |The Volkov Commander, Version 4.05 freew╔════════════╤═══ C:\ ════╤════════════╗| 07x40 1Bx17 30x5 1Bx18
 |Copyright (C) 1991-2000 Vsevolod V. Volk║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|                                        ║WORK        │            │            ║| 07x40 1Bx1 30x12 1Bx27
-|                                        ║STAMPS      │            │            ║| 07x40 1Bx40
+|                                        ║STAMPS      │            │            ║| 07x40 1Bx1 30x12 1Bx27
+|                                        ║WORK        │            │            ║| 07x40 1Bx40
 |                                        ║treeinfo ncd│            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
@@ -1425,7 +1425,7 @@ cursor 4 23 lines 6 7 mode 3
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ╟────────────┴────────────┴────────────╢| 07x40 1Bx40
-|                                        ║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x40 1Bx40
+|                                        ║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x40 1Bx40
 |                                        ╚══════════════════════════════════════╝| 07x40 1Bx40
 |C:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1453,7 +1453,7 @@ cursor 0 127 lines 6 7 mode 3
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ╟────────────┴────────────┴────────────╢| 07x40 1Bx40
-|                                        ║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x40 1Bx40
+|                                        ║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x40 1Bx40
 |                                        ╚══════════════════════════════════════╝| 07x40 1Bx40
 |C:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1462,8 +1462,8 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |The Volkov Commander, Version 4.05 freew╔════════════╤═══ C:\ ════╤════════════╗| 07x40 1Bx17 30x5 1Bx18
 |Copyright (C) 1991-2000 Vsevolod V. Volk║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|                                        ║WORK        │            │            ║| 07x40 1Bx1 30x12 1Bx27
-|                                        ║STAMPS      │            │            ║| 07x40 1Bx40
+|                                        ║STAMPS      │            │            ║| 07x40 1Bx1 30x12 1Bx27
+|                                        ║WORK        │            │            ║| 07x40 1Bx40
 |                                        ║treeinfo ncd│            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
@@ -1481,7 +1481,7 @@ cursor 4 23 lines 6 7 mode 3
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ╟────────────┴────────────┴────────────╢| 07x40 1Bx40
-|                                        ║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x40 1Bx40
+|                                        ║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x40 1Bx40
 |                                        ╚══════════════════════════════════════╝| 07x40 1Bx40
 |C:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1512,7 +1512,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  d09acbec75a63963
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

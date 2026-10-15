@@ -3029,7 +3029,8 @@ SCENARIOS = {
             "Ctrl+l",                     # the Info on the right: a panel of
                                           # each kind is next to the menus
                                           # in turn
-            "End",                        # a file under the cursor
+            "End Up Up Up Up",            # a file under the cursor,
+                                          # empty.dat, fifth of the list
             "Shift+F10",                  # nothing chosen yet: the bar
             "z Home End Up PgUp PgDn Left",   # keys that mean nothing on
                                           # the bar, and round to Right
@@ -3112,7 +3113,11 @@ SCENARIOS = {
             "F9 l d",                     # the drive, from the menu
             "Esc",
             "F9 r d",                     # and that of the right panel,
-            "a",                          # which shows files then
+            "a Tab Down Down Down Tab",   # which shows files then, its
+                                          # cursor on kernel.sys, the
+                                          # fourth entry, where Tab and
+                                          # Tab leave it: a file, with
+                                          # its size under the panel
             "Ctrl+F2",                    # the right panel off,
             "Ctrl+F1",                    # and the left one, the current
             "Ctrl+F2",                    # the right one on, and current
@@ -3194,7 +3199,8 @@ SCENARIOS = {
         "down to Swap panels; the key bar; and a panel read again and "
         "switched off from its menu",
         steps=(
-            "Down Down Down",             # readme.txt
+            "Down Down Down Down Down Down Down",     # readme.txt, the
+                                          # eighth entry
             "F9 f v",                     # View
             "Esc",
             "F9 f e",                     # Edit
@@ -3248,7 +3254,8 @@ SCENARIOS = {
         "each asking for a name with Shift and taking the file under the "
         "cursor with Ctrl",
         steps=(
-            "Down Down Down",             # readme.txt
+            "Down Down Down Down Down Down Down",     # readme.txt, the
+                                          # eighth entry
             "F9 f Shift+Enter",           # Help
             "Esc",
             "Shift+F10 Down Shift+Enter",     # the main user menu
@@ -3274,8 +3281,8 @@ SCENARIOS = {
             "Esc",
             "Shift+F10 Down Ctrl+Enter",  # Edit
             "Esc",
-            "Ins Ins",                    # two files selected: readme.txt
-                                          # and hello.txt
+            "Ins Up Up Up Ins",           # two files selected: readme.txt
+                                          # and hello.txt, two above it
             "Shift+F10 Down Down Ctrl+Enter",     # Rename, of the one file
             "Esc",                        # under the cursor, notes.doc
             "Shift+F10 Down Ctrl+Enter",  # Make directory
@@ -5056,7 +5063,9 @@ SCENARIOS = {
                                           # in the right half
             "Tab Tab Tab",                # the buttons there
             "Esc",
-            "Down Down Down F5",          # a copy: the tree is F10 here
+            "Down Down Down Down Down Down Down F5",  # a copy of
+                                          # readme.txt, the eighth entry:
+                                          # the tree is F10 here
             "Left",                       # at the start of the field
             '"ab" Left',                  # in it
             "F10",                        # the tree, to choose from
@@ -5487,10 +5496,10 @@ SCENARIOS = {
         "The mouse on a panel of files: the left button puts the cursor "
         "on a file, the right one selects it",
         steps=(
-            "Click@3,5",                  # the cursor onto readme.txt
-            "Click@3,8",                  # and onto data.bin
-            "RightClick@3,6",             # hello.txt selected
-            "RightClick@3,6",             # and not
+            "Click@3,9",                  # the cursor onto readme.txt
+            "Click@3,5",                  # and onto data.bin
+            "RightClick@3,7",             # hello.txt selected
+            "RightClick@3,7",             # and not
             "Move@40,12",                 # the pointer by itself
         )),
 
@@ -5530,7 +5539,7 @@ SCENARIOS = {
     "mouse-dialog": Scenario(
         "The mouse on the buttons of a dialog",
         steps=(
-            "Click@3,5",
+            "Click@3,9",                  # readme.txt
             "Click@45,24",                # F6 of the key bar: Rename
             "Click@55,10",                # its button Cancel
             "Click@37,24",                # F5: Copy
@@ -5578,9 +5587,9 @@ SCENARIOS = {
             "F9 o c",                     # the Configuration
             "Click@40,15",                # Left-handed mouse, ticked
             "Enter",
-            "RightClick@3,5",             # the cursor onto readme.txt
-            "Click@3,6",                  # hello.txt selected
-            "Click@3,8",                  # and data.bin
+            "RightClick@3,9",             # the cursor onto readme.txt
+            "Click@3,7",                  # hello.txt selected
+            "Click@3,5",                  # and data.bin
         )),
 
     "mouse-select": Scenario(
@@ -5590,7 +5599,8 @@ SCENARIOS = {
         steps=(
             "F9 o f",                     # panels half the screen high
             "Alt+F1 a",
-            "Down Down Down Enter",       # A:\\FREEDOS
+            "Enter",                      # A:\\FREEDOS, the first
+                                          # entry
             "Down Enter",                 # and its BIN: 44 entries
             "F9 l f",                     # in one column, ten at a time
             "RightClick@3,3",             # a file: selected
@@ -5630,8 +5640,10 @@ SCENARIOS = {
             "x",
             "Click@8,8 y",                # at its start
             "Click@40,10",                # in the box, below the line
-            "RightClick@40,10",           # Enter: the directory is made
-            "Down Down Down Down",
+            "RightClick@40,10",           # Enter: the directory is made,
+                                          # and the cursor is on it,
+                                          # YABCDEFX behind SRC
+            "Down Up",                    # off it and back
             "F6",                         # offers the directory of the
                                           # other panel, C:\\
             "Click@10,8 x",               # a click, and that text is kept
@@ -5704,7 +5716,8 @@ SCENARIOS = {
             "Click@70,0",                 # beside the names: no menu
             "F9",                         # the bar by its key
             "Click@40,12",                # a click below it: gone
-            "Down Down Down",             # readme.txt
+            "Down Down Down Down Down Down Down",     # readme.txt, the
+                                          # eighth entry
             "Click@10,0",
             "RightClick@12,6",            # Copy with the right button, as
             "Esc",                        # with Shift: Shift+F5
@@ -5772,7 +5785,9 @@ SCENARIOS = {
             "Click@18,8",                 # the letter of the cursor: it
                                           # is chosen
             "Alt+F1",
-            "Click@14,8",                 # another letter: A
+            "Click@14,8 Down Down Down",  # another letter: A, and
+                                          # the cursor onto its fourth
+                                          # entry, kernel.sys, a file
             "Alt+F1 Right",               # the cursor on C
             "RightClick@30,15",           # the right button is Enter,
                                           # wherever it is
@@ -5811,7 +5826,8 @@ SCENARIOS = {
         "the way out of a dialog, the user menu, the history, the box of "
         "the drives and the map of the memory",
         steps=(
-            "Down Down Down",             # readme.txt
+            "Down Down Down Down Down Down Down",     # readme.txt, the
+                                          # eighth entry
             "MiddleClick@37,24",          # F5 of the key bar: Shift+F5
             "MiddleClick@30,8",           # in a dialog, wherever: Esc
             "F2",
@@ -5837,7 +5853,8 @@ SCENARIOS = {
             "Click@40,3>40,10",           # down outside the box and up in
                                           # it: nothing
             "Click@40,10>40,3",           # the other way: Esc
-            "Down Down Down",
+            "Down Down Down Down Down Down Down",     # readme.txt, the
+                                          # eighth entry
             'F6 "moved.txt" PgDn',        # a new name, and to the buttons
             "Click@25,10>25,12",          # off the button that is chosen:
                                           # it is not pressed
@@ -5897,8 +5914,10 @@ SCENARIOS = {
         "A button of the mouse that is moved while it is down, over the "
         "files of a panel, in the user menu and in the map of the memory",
         steps=(
-            "RightClick@3,5>3,6>3,7>3,8",  # four files: selected
-            "RightClick@3,8>3,7>3,6",     # back over three: not any more
+            "RightClick@3,6>3,7>3,8>3,9",  # four files: selected,
+                                          # empty.dat to readme.txt
+            "RightClick@3,6>3,7>3,8",     # over three again: not any
+                                          # more, but readme.txt
             "F2",
             "Click@35,8 Click@35,8>35,3",  # a second click that comes up
                                           # beside its line: nothing
@@ -7489,8 +7508,9 @@ SCENARIOS = {
             "RightClick@5,5",             # and leaves the menu: save the
                                           # current setup?
             "Click@40,8",                 # Enter: Save
-            "RightClick@3,5",             # the program has it: the cursor
-            "Click@3,6",                  # on a file, and a file selected
+            "RightClick@3,9",             # the program has it: the cursor
+            "Click@3,7",                  # on a file, readme.txt, and a
+                                          # file selected, hello.txt
         ),
         setup=True),
 

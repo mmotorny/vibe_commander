@@ -19709,7 +19709,6 @@ order, which `sort` still runs. The C translation passes all fifteen
 - What the end has to know: the header of `harness/scenarios.py` was
   not touched. `_STAMPS`, the first two steps of `stamps` and
   `stamps-russia`, is theirs alone, and goes to STAMPS by "Up Enter".
-||||||| parent of 11bbf68 (Rewrite the scenarios of the editor and the viewer for the bench sorted by name)
 
 ### S4: done
 
@@ -19768,6 +19767,68 @@ eighteen (`harness/compare.py build/c/VC.EXE`). By scenario:
   right, where the cursor is on it.
 - What the end has to know: the header of `harness/scenarios.py` was
   not touched. None of the eighteen rests on a new file coming last.
+
+### S5: done
+
+The seventeen scenarios of the menus, the dialogs, the mouse and the
+setup program go to the files that they meant, each with its number of
+steps, and their goldens are derived on the new bench. The C
+translation passes the sixteen of the main program
+(`harness/compare.py build/c/VC.EXE`); `setup-left-handed` is not run
+for it. `python3 harness/sortcheck.py` loses no instruction of the
+batches but the two of the unsorted order, and two kinds explained
+below. By scenario:
+
+- As before, every screen, and nothing lost: `menu`, `menu-held`,
+  `dialog-keys`, `mouse-left-hand`, `mouse-line`, `mouse-menu`,
+  `mouse-middle`, `mouse-drag-dialog`, `setup-left-handed`. A step
+  that went to readme.txt by "Down Down Down" goes by seven Downs, and
+  a click on a row of the panel goes to the row that the file is on
+  now: readme.txt 9, notes.doc 8, hello.txt 7, empty.dat 6, data.bin
+  5. `menu` goes to empty.dat by "End Up Up Up Up", keeping End;
+  `menu-held` selects readme.txt and hello.txt by "Ins Up Up Up Ins",
+  which leaves the cursor on notes.doc as before; `mouse-line` has the
+  cursor on the directory that it made, YABCDEFX, which sorts behind
+  SRC now, by "Down Up" where "Down Down Down Down" went to it as the
+  last entry.
+- A file of A: in the mini status again, as in S4: the first entry of
+  A:\ was kernel.sys, a file, and is FREEDOS, so `PutSize` and
+  `Number` were not run. `menu-panel` has "a Tab Down Down Down Tab"
+  where it had "a", which puts the right panel's cursor on kernel.sys
+  with the left panel current again (screens 10, 13, 14 and 18), and
+  `mouse-drive` has "Click@14,8 Down Down Down" (screens 5 and 6). The
+  tool names those screens, kernel.sys not being the first entry; it
+  is the file shown before. `mouse-select` goes into A:\FREEDOS by
+  Enter alone, its first entry.
+- Another file or another sum on purpose, by the order:
+  - `mouse-list`, screens 3 and 5: a click below the last file, and
+    the status line, go to the last file, run.bat where it was
+    empty.dat.
+  - `mouse-select`, screens 7 to 9: the right button held below and
+    above the list of A:\FREEDOS\BIN selects as many files as before,
+    10, 15 and 14, which are others in the sorted list: 119,986 bytes
+    where it was 252,598, and so on.
+  - `mouse-drag-lists`, screen 1: the four files dragged over are
+    empty.dat to readme.txt, 87 bytes, where they were readme.txt,
+    hello.txt, notes.doc and data.bin, 1,111: those are not neighbours
+    now. The drag over three that unselects them goes the same way
+    down, from empty.dat, where it went back up, so that readme.txt is
+    the one left selected, 40 bytes, as on every screen behind it.
+- Instructions lost, and left so:
+  - `menu-items`, screens 19 to 21: the directory NEW that is made and
+    deleted was the last entry, and `NearFl` looked backwards from it
+    for the nearest file, empty.dat; it sorts among the directories
+    now and the cursor goes to SRC behind it. No directory can be last
+    in a sorted list. Six instructions of `NearFl`, which S2 has for
+    `view-commands` too, and `delete-mask`, `move` and `emptied` run.
+  - `mouse-panel` and `mouse-dialog`: `DoublMo` at DblMo1, `CMP DH,60`
+    and the two behind it, which carry the hundredths of a second of a
+    click's time into the seconds. Whether that happens follows the
+    machine's clock at the click, not the files: `mouse-drag-lists`,
+    `mouse-help`, `mouse-memory`, `mouse-tree` and `mouse-user-menu`
+    run them on the new bench.
+- What the end has to know: the header of `harness/scenarios.py` was
+  not touched; none of the seventeen rests on a new file coming last.
 
 ## A deviation held by a patch: done, and what comes behind it
 
