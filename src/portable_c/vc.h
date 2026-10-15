@@ -993,7 +993,6 @@ u8 *BufTime(const struct TimeText *text, u8 *buffer);
 u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
             u16 *screen, u16 color);
 void SetMask(struct WCBdef *panel);                     /* files.c */
-bool TstExe(const u8 *name);
 void Sort(struct WCBdef *panel);
 i32 FnFile(struct WCBdef *panel, const u8 *name);
 i32 NearFl(struct WCBdef *panel, const u8 *name, i32 end);

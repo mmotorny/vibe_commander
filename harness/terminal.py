@@ -180,7 +180,28 @@ COMMANDS = [
     ("Up, on readme.txt", ["4800"], ESC + b"[A"),
     ("Enter on readme.txt, which goes to xdg-open", ["1C0D"], b"\r"),
     ("a name of DOS's in a command", *typed("wc -c README.TXT")),
+    # L7: the panel's filter of programs, of the panel on the right, the
+    # current one (the left one is off in this run), which on Linux
+    # shows what the user may execute, zrun, and not the three
+    # extensions of DOS's (FILTERED); then all files again.
+    ("Ctrl-F, the filter", ["2106"], b"\x06"),
+    ("Tab", ["0F09"], b"\t"),
+    ("Tab", ["0F09"], b"\t"),
+    ("Space, only programs", ["3920"], b" "),
+    ("Enter: the panel has zrun alone", ["1C0D"], b"\r"),
+    ("Ctrl-F, the filter", ["2106"], b"\x06"),
+    ("Tab", ["0F09"], b"\t"),
+    ("Tab", ["0F09"], b"\t"),
+    ("Space, all files", ["3920"], b" "),
+    ("Enter: all files again", ["1C0D"], b"\r"),
 ]
+# The steps of COMMANDS behind which the panel is filtered, and what it
+# shows then of the files of lay_out: zrun, which the user may execute,
+# and none of the others, readme.txt, data.bin, zero and prog.com, which
+# DOS would run; behind which it shows all files again.
+FILTERED = COMMANDS.index(("Enter: the panel has zrun alone", ["1C0D"],
+                           b"\r"))
+UNFILTERED = len(COMMANDS) - 1
 OWN_LINES = [
     "H:\\HERE>echo hello", "hello",
     r"H:\HERE>test -f H:\HERE\README.TXT && echo found", "found",
@@ -348,7 +369,8 @@ def lay_out(top, commands=False):
     nothing in it, and HERE in it with the files, every time fixed. Each
     run has one of its own, since a run may save the setup there. For
     the commands, HERE has a program besides, zrun, a script of the
-    shell's that the user may execute; and the run's directory has BIN,
+    shell's that the user may execute, and prog.com, which the user may
+    not; and the run's directory has BIN,
     which environment() puts in front of PATH, with a stub of xdg-open
     that writes what it is handed into OPENED there."""
     home = top / "home"
@@ -363,7 +385,10 @@ def lay_out(top, commands=False):
     if commands:
         (here / "zrun").write_text("#!/bin/sh\necho zrun ran\n")
         (here / "zrun").chmod(0o755)
-        files.append(here / "zrun")
+        # A name that DOS runs, which the user may not execute: no
+        # program on Linux, for the panel's filter (L7).
+        (here / "prog.com").write_bytes(b"\xC3")
+        files += [here / "zrun", here / "prog.com"]
         (top / "bin").mkdir()
         (top / "bin" / "xdg-open").write_text(
             '#!/bin/sh\nprintf "%s\\n" "$*" >> "$(dirname "$0")/opened"\n')
@@ -425,6 +450,34 @@ def channel(program, home, here, work, steps, name):
 def cell(record, column, row):
     at = 8 + (row * 80 + column) * 2
     return record[at] | record[at + 1] << 8
+
+
+def text_of(record, columns=range(80), rows=range(25)):
+    """The characters of a grid, row by row, as the code page has them:
+    of the columns and the rows given."""
+    return "\n".join("".join(glyph(cell(record, column, row) & 0xFF)
+                              for column in columns) for row in rows)
+
+
+def filtered(records, failures):
+    """The panel's filter of programs (L7): with it, the panel on the
+    right of the commands' run has zrun, which the user may execute, and none of the
+    other files; without it, all of them again. records[n + 1] is the
+    grid behind the step COMMANDS[n]."""
+    for step, wanted, unwanted in (
+            (FILTERED, ["zrun"], ["readme", "data", "zero", "prog"]),
+            (UNFILTERED, ["zrun", "readme", "data", "zero", "prog"], [])):
+        panels = text_of(records[step + 1], range(40, 80), range(1, 21))
+        for name in wanted:
+            if name not in panels:
+                failures.append(f"the test channel, commands, behind "
+                                f"{COMMANDS[step][0]!r}: the panel has no "
+                                f"{name}")
+        for name in unwanted:
+            if name in panels:
+                failures.append(f"the test channel, commands, behind "
+                                f"{COMMANDS[step][0]!r}: the panel has "
+                                f"{name}, which is no program")
 
 
 def pointer(records, failures):
@@ -785,6 +838,7 @@ def run_commands(pyte, program, home, here, work, channelled, failures):
     terminal.colours24 = False
     terminal.read()
     held_to(name, terminal, COMMANDS, records, trace, failures)
+    filtered(records, failures)
     own = [line.rstrip() for line in terminal.own.display]
     at = 0
     for line in own:

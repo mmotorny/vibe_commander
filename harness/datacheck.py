@@ -132,6 +132,9 @@ TO_SEGMENT, TO_GROUP, TO_EXTERNAL = 0, 1, 2
 # how far behind it). They are compared there.
 ELSEWHERE = {
     "AllIn_S": ("Mask_S", 0),
+    # The extensions of a program, which ProgramOfFile of sys_dos.c asks
+    # since the filter of programs asks it (L7; Enter since L6b).
+    "ProgramExtensions": ("Ext_S", 0),
     "DirMarker": ("UpDir", 0),
     "FindColors": ("Find_P", 0),
     "MainExt_F": ("Ext_F", 0),
@@ -207,10 +210,6 @@ OWN_OF = {
                      "original's Aloc_S, which the tree has in exec.c "
                      "and which is held there, in a copy that ends as DOS "
                      "takes a text and not as the original's does",
-        "ProgramExtensions": "the extensions of a program that "
-                             "ProgramOfFile of sys_dos.c asks, a copy of "
-                             "the original's Ext_S, which the tree has in "
-                             "files.c and which is held there (L6b)",
     },
 }
 
@@ -252,6 +251,10 @@ GONE = {
              "ResCnt"),
             _ONE_PROGRAM + "no tool writes numbers of its layout into "
             "it"),
+    },
+    "c": {
+        "ProgramExtensions": "the portable C's copy of Ext_S in sys_dos.c, "
+                             "which the C translation has as Ext_S itself",
     },
 }
 

@@ -19,30 +19,24 @@
 
 #define SIZE_FILENT ((i32)sizeof(struct FILENT))
 
-/* SetMask, Sort, FnFile, NearFl and TstExe are in vc.h. */
+/* SetMask, Sort, FnFile and NearFl are in vc.h. */
 
-/* The extensions of programs. Names in a list are in small letters. */
-static const u8 Ext_S[9] = {
-    'c', 'o', 'm', 'e', 'x', 'e', 'b', 'a', 't'
-};
-
-/* Whether a file is a program, by the three characters behind the first
-   full stop of its name. */
-bool TstExe(const u8 *name)
+/* Whether a file of a panel is a program, which the original asks of the
+   three characters behind the first full stop of its name, com, exe or
+   bat (Ext_S): here the system is asked, ProgramOfFile of sys.h, by the
+   file's path, the panel's directory being no current one as a rule. On
+   DOS that is the same three; on Linux a file that the user may
+   execute, whatever its name (DEVIATIONS.md, L8). `path` holds the
+   panel's directory with a backslash behind it, and `end` is where that
+   ends: the name is put there. */
+static bool TstExe(u8 *path, u8 *end, const u8 *name)
 {
     i32 i;
-    u8 c;
 
-    do {
-        c = *name++;
-        if (c == 0)
-            return false;
-    } while (c != '.');
-    for (i = 0; i < (i32)sizeof Ext_S; i += 3)
-        if (name[0] == Ext_S[i] && name[1] == Ext_S[i + 1]
-            && name[2] == Ext_S[i + 2])
-            return true;
-    return false;
+    for (i = 0; i < 13; i++)
+        end[i] = name[i];
+    end[12] = 0;
+    return ProgramOfFile(path) != 0;
 }
 
 /* Choose the files of a panel that it shows, by its filter, and put the
@@ -55,9 +49,12 @@ void SetMask(struct WCBdef *panel)
     u8 *mask = md.TmpBuf;
     u8 *one;
     u8 *other;
+    u8 path[LenPath + 14];              /* the directory, \ and a name */
+    u8 *end;
     i32 file, last, i;
     u8 attributes, c;
 
+    end = AddFile(MvzLine(path, panel->WinPath, LenPath));
     for (i = 0; i < 11; i++)
         mask[i] = '?';
     if (panel->DskMas[0] != 0)
@@ -72,7 +69,7 @@ void SetMask(struct WCBdef *panel)
                  || !(attributes & (ATTR_HIDDEN | ATTR_SYSTEM)))
                 && ((attributes & ATTR_DIRECTORY)
                     || ((panel->MasTyp == 0
-                         || TstExe(ENTRY(panel, file)->NameF))
+                         || TstExe(path, end, ENTRY(panel, file)->NameF))
                         && TstMas(ENTRY(panel, file)->NameF, mask)))) {
                 file += SIZE_FILENT;
                 if (file > last)

@@ -396,11 +396,13 @@ void Idle(void);
 struct Answer ProgramRun(const u8 *name, const u8 *tail);
 struct Answer ProgramRunBare(const u8 *name, const u8 *tail);
 
-/* Whether the file `name` of the current directory is a program that a
-   command runs by naming it: where it is, the text that is typed in
-   front of its name for that, which may be empty; where it is not, 0.
-   On DOS a program is a file whose extension is COM, EXE or BAT, and
-   nothing is typed in front of it. */
+/* Whether the file `name`, of the current directory or a path, is a
+   program that a command runs by naming it: where it is, the text that
+   is typed in front of its name for that, which may be empty; where it
+   is not, 0. On DOS a program is a file whose extension is COM, EXE or
+   BAT, and nothing is typed in front of it. Enter asks it of a file of
+   the current directory, and the panel's filter of programs of a path
+   of the panel's directory. */
 const u8 *ProgramOfFile(const u8 *name);
 
 /* The file `name` of the current directory handed to what the system

@@ -2760,8 +2760,11 @@ nothing of their own. Its name is typed into the command line behind
 `.\`, `.\zrun`, and the shell runs it as `./zrun`. A file that is no
 program and that the extension file has no command for is handed to
 `xdg-open`, which is not waited for and has none of the terminal, and
-the panels stay, where the original does nothing. The panel's
-filter of programs still goes by the three extensions. A shell that
+the panels stay, where the original does nothing. The panel's filter
+of programs asks the same of the system, by the path of each file of
+the panel's directory: on Linux it shows the files that the user may
+execute, and a file whose name ends in `.COM`, `.EXE` or `.BAT` that
+the user may not is left out like any other. A shell that
 cannot be run is asked for as the original asks for a COMSPEC that
 names no file, "Can't find file" with its name.
 
@@ -2769,7 +2772,8 @@ names no file, "Can't find file" with its name.
 through `$SHELL -c`, on the terminal's own screen; and of 15 October
 2026, Enter on a file and a name of DOS's form in a command (`TODO.md`,
 "L6, commands", Q1 and Q2); the shell that cannot be run stays as it
-was built (Q3).
+was built (Q3); and, the same day, that the panel's filter of programs
+shows what Enter would run.
 
 **Which scenarios show it.** What DOS showed behind the panels after a
 command is masked. Not run on Linux, being about a program or a command
@@ -2781,10 +2785,14 @@ whose value is the command or comes behind one that the shell has not:
 `setup-missing-saved`, `setup-save-fails`, `setup-new` and
 `clock-morning`. Cut at such a command: `help-broken`, `menu-files`,
 `setup-help-file`, `setup-damaged`, `user-menu` and `view-commands`.
+Cut where the filter of programs is chosen, at step 29, its copies of a
+text named `.COM` and `.EXE` being no programs on Linux: `filter`.
 The test `portable_c-terminal` runs four commands, one of them with a
 name of DOS's form, and Enter on a program without an extension and on
 a text, with a stub of `xdg-open` on PATH that notes what it is handed,
-and holds the terminal's own screen to what they wrote;
+and holds the terminal's own screen to what they wrote, and the filter
+of programs, which shows the program without an extension and not a
+file `prog.com` that the user may not execute;
 `harness/posixcheck.c` holds the names made the host's. `enter` and
 `user-menu-run` stay not run: what they show is DOS running its
 programs and commands, and what those print.

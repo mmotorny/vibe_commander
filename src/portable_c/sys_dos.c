@@ -1572,19 +1572,23 @@ struct Answer ProgramRunBare(const u8 *name, const u8 *tail)
 }
 
 /* A program, by the three characters behind the first full stop of its
-   name, as the original has it: TstExe of files.c, which the panel's
-   filter of programs asks, and which this is a copy of, since the
-   functions of the system are the system's alone. The names of a panel
-   are in small letters. DOS is asked nothing. */
+   name, as the original has it: TstExe of files.c, of which this is the
+   test (Ext_S), since the functions of the system are the system's
+   alone. Of a path, the name is what is behind its last backslash. The
+   names of a panel are in small letters. DOS is asked nothing. */
 static const u8 ProgramExtensions[9] = {
     'c', 'o', 'm', 'e', 'x', 'e', 'b', 'a', 't'
 };
 
 const u8 *ProgramOfFile(const u8 *name)
 {
+    const u8 *last;
     i32 i;
     u8 c;
 
+    for (last = name; *last != 0; last++)
+        if (*last == '\\')
+            name = last + 1;
     do {
         c = *name++;
         if (c == 0)

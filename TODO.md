@@ -19889,6 +19889,23 @@ The last piece of step 6, a commit for each part:
    leaves out the files of Linux alone. `VC.EXE` the same bytes. The
    sections above that name the stub and its test are history and stay
    as they were written.
+2. **The panel's filter of programs asks the system** (the user's word
+   of 15 October 2026): `SetMask` of `files.c` asks `ProgramOfFile` of
+   `sys.h` of each file, by its path in the panel's directory (a panel's
+   directory is no current one as a rule), through `TstExe`, which is
+   static there now and puts the name behind the directory; `Ext_S` went
+   from `files.c`. `ProgramOfFile` of `sys_dos.c` takes a path and goes
+   by the name behind its last backslash, the extensions being the
+   original's `Ext_S`, which the data's test holds `ProgramExtensions`
+   against now (`ELSEWHERE`, and `GONE` of the C translation). On DOS
+   the same files are programs; `VC.EXE` other bytes, the scenarios
+   judge. On Linux the filter shows what the user may execute: `filter`
+   is cut at step 29 there, where its copies of a text named `.com` and
+   `.exe` would be programs, and `portable_c-terminal` holds it, the
+   commands' run filtering the panel on the right by Ctrl-F, with zrun
+   in it and not a `prog.com` that the user may not execute, and all
+   files again behind it (`FILTERED` of `harness/terminal.py`).
+   Declared in L8 of `DEVIATIONS.md`.
 
 ## SORT, the bench sorted by name: the plan
 

@@ -1548,6 +1548,10 @@ LINUX_CUT = {
                        "14 a search of A:, which Linux has not"),
     "copy": (62, f"a file copied: from step 62 a file of NUL's and one "
                  f"to CON, {_DEVICE}"),
+    "filter": (29, "the panel's filter of programs, which on Linux shows "
+                   "what the user may execute and not the files of DOS's "
+                   "three extensions, here copies of a text (L8): at step "
+                   "29 only programs, and all files again behind it"),
     # Of those that went to A: or to D:\VC, the ones that went there for
     # more than files to work on, which the others find in C:\FILES,
     # H:\FILES on Linux (CLAUDE.md, step 6).
