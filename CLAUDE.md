@@ -172,15 +172,20 @@ These held while `src/c/` was made, and they say what it is.
      key is made a word of the BIOS; a command runs through `$SHELL
      -c`. A design from the user's screens and what they are used for,
      made anew for modern systems, is the right way for a redesign and
-     was set aside as more than is wanted now: the surveys of the
-     platforms and what was decided in that direction on 13 and 14
-     October 2026 are in `src/portable_c/LAYER.md` and
-     `src/portable_c/layer/`, kept for reference and superseded. That
-     the program saves its preferences and its session by itself, on
-     every platform, DOS included, decided on 14 October 2026 with the
-     rule of the harness for it, is of the program and not of the layer,
-     and stands until the user says otherwise.
-  4. The implementation for DOS is `dos32.c` behind `sys.h`, as it is.
+     was set aside as more than is wanted now: its surveys and what was
+     decided in that direction on 13 and 14 October 2026 are in git's
+     history only, and none of those decisions is on the road but
+     those that the user named again; what the surveys found of Linux
+     is in `TODO.md`, "What the surveys of the layer found that step 6
+     needs". That the program saves its preferences and its session by
+     itself, on every platform, DOS included, decided on 14 October
+     2026 with the rule of the harness for it (`TODO.md`, "The program
+     saves its setup and its session by itself"), is of the program and
+     not of the layer, and stands until the user says otherwise; the
+     setup file keeps the original's format, which works wherever DOS
+     is emulated.
+  4. The implementation for DOS is `sys_dos.c` (which was `dos32.c`)
+     behind `sys.h`, as it is.
   5. A second implementation is made that builds and is not meant to
      run: a stub.
   6. The implementation for Linux, of 64 bits, built with clang, a
@@ -208,7 +213,13 @@ These held while `src/c/` was made, and they say what it is.
      it draws in the terminal is held to that grid by replaying it
      through pyte, a terminal emulator in Python, pinned, which is
      the download that this allows; a setting gives a test the clock
-     to start from. Once the stub compiles on Linux, on the user's
+     to start from. Of what the abandoned design had decided for other
+     systems, the user named three again for Linux on 14 October 2026:
+     Enter on a file that the program cannot run hands it to
+     `xdg-open`; the PC's sixteen colours are drawn as DOS has them,
+     exactly, in 24 bits where the terminal allows it; and the screen
+     is 80 columns by 25 rows and no other size, whatever the
+     terminal's. The rest of that design is dropped. Once the stub compiles on Linux, on the user's
      word of 14 October 2026, every build with clang has the
      sanitizers that fit it, a high level of warnings and clang-tidy,
      and a warning of any of them stops the build; which warnings and
@@ -389,8 +400,9 @@ These held while `src/c/` was made, and they say what it is.
   README lists as resting on Open Watcom is to shrink, not grow.
 - What the program asks of the system it is on, it asks in one place; the
   rest of it does not know which system that is. Today that place is
-  `sys.h`, with `dos32.c` behind it, the one file of the system's
-  functions since the 16-bit build went.
+  `sys.h`, with `sys_dos.c` behind it (`dos32.c` until the piece 5a),
+  the one file of the system's functions since the 16-bit build went,
+  and a file of each other implementation beside it.
 - A number is signed unless there is a reason for it not to be, on the
   user's word of 13 October 2026: a size, a count, an index, a length,
   a place in a text is an `i32` when it is widened, and one that is a
@@ -407,8 +419,10 @@ These held while `src/c/` was made, and they say what it is.
   gigabytes while there is no signed type of 64 bits, the size of a
   file, of a disk and of what is free on it, the sum of what is
   selected, which the original shows up to four gigabytes: those stay
-  `u32` until the layer's design gives the size of a file its type,
-  which is then signed.
+  `u32`, the width that DOS has, which `sys.h` keeps by step 3: on the
+  user's word of 14 October 2026 the size of a file stays 32 bits on
+  every platform, Linux too, where a file of four gigabytes or more is
+  then shown and copied as DOS would.
 - Where a number meets one of another sign or is put into fewer bits,
   the code says so with a cast, on the user's word of 13 October 2026:
   a file of the portable C whose numbers have been sorted is held to
@@ -431,16 +445,15 @@ These held while `src/c/` was made, and they say what it is.
   word `wraps` in a comment where the program counts on it, as any
   other cut.
 - An integer type gets a name of its own only where its width is not
-  the same everywhere, on the user's word of 13 October 2026: the size
-  of a file, 32 bits on one platform and 64 on another, is such a type,
-  and the layer's design will define it and its like. A name for what
+  the same everywhere, on the user's word of 13 October 2026: none is
+  made while `sys.h` keeps DOS's widths, by step 3, and the size of a
+  file, which was to be such a type, is DOS's `u32`. A name for what
   a number merely means, a count of columns, a colour, is not made: C
   holds such a name apart from nothing, a `Colour` that is a `u16` is
   taken wherever a `u16` is, so it is a comment that looks like a
   type. Such a number has the type of its width, `u8`, `u16`, `u32`,
   `i32`, or is a `bool`, and its name and a comment say what it is.
-  Until the layer is designed, what crosses to the system has the
-  type of its width too, signed or not by the rule above: a count of
+  What crosses to the system has the type of its width too, signed or not by the rule above: a count of
   bytes an `i32`, the size of a file a `u32`. Where the compiler is to hold two things apart, they are
   structures.
 - Names may change here once a thing no longer is what its name in the
