@@ -81,7 +81,11 @@ whole of one:
     the number of the entry that the difference is declared in, or
     several, "1, 7"; and "Why: ", a sentence on what is otherwise here,
     which may go on in the lines below it. The entry has to be there and
-    to name the scenario: ported.py holds that.
+    to name the scenario: ported.py holds that. A patch of the program
+    for Linux, harness/goldens/posix/, has "Decided: CLAUDE.md, step 6"
+    in place of the line of the entry, and "Why: " names the decision of
+    the user's that it is by (DECIDED); where it has no patch, the
+    portable C's holds for it.
   - "== 13: Alt+F10" is a screen, by the line that it has in the
     original's golden, word for word: the number of the step as the
     original is taken through it and the step. Where steps are left out
@@ -229,7 +233,24 @@ TOGETHER = min(4, os.cpu_count() or 1)
 
 # The trees that may have patches, and what each is called in the first
 # line of one.
-TREES = {"portable_c": "The portable C"}
+TREES = {"portable_c": "The portable C", "posix": "The program for Linux"}
+
+# The build of a tree that `patch` and `record` take through a scenario,
+# under build/: TREE/VC.EXE where it is not here.
+PROGRAMS = {"posix": "portable_c/posix-asan/vc"}
+
+# Where a tree's patches are declared, where that is not an entry of
+# src/TREE/DEVIATIONS.md: the program for Linux is of the portable C's
+# source, and what it alone is expected to show otherwise is by what the
+# user decided of Linux (CLAUDE.md, step 6). Its patch has a line
+# "Decided: CLAUDE.md, step 6" in place of "Deviation: N of ...", and
+# "Why: " says which decision.
+DECIDED = {"posix": "CLAUDE.md, step 6"}
+
+
+def program_path(tree):
+    """The build of the tree `tree` that `patch` and `record` run."""
+    return deps.ROOT / "build" / PROGRAMS.get(tree, f"{tree}/VC.EXE")
 
 # What a header has until its author has filled it in.
 TO_WRITE = "TO BE WRITTEN"
@@ -656,6 +677,9 @@ def read_header(header, tree):
             rf"src/{tree}/DEVIATIONS\.md", line)
         if match:
             numbers = tuple(int(word) for word in match[1].split(", "))
+        if tree in DECIDED and line == f"Decided: {DECIDED[tree]}":
+            # By a decision of the user's, which has no number.
+            numbers = ()
         if line.startswith("Why: "):
             rest = header[number + 1:]
             end = next((n for n, more in enumerate(rest) if not more),
@@ -976,10 +1000,13 @@ def write_patch(patch, golden):
         f"{shown(path(golden.scenario))}, see harness/goldens.py: a line "
         "with - is the golden's, a line with + is what is expected in its "
         "place.", width=78, break_on_hyphens=False)
-    out.append("Deviation: "
-               + (", ".join(str(number) for number in patch.deviations)
-                  or TO_WRITE)
-               + f" of src/{golden.tree}/DEVIATIONS.md")
+    if golden.tree in DECIDED:
+        out.append(f"Decided: {DECIDED[golden.tree]}")
+    else:
+        out.append("Deviation: "
+                   + (", ".join(str(number) for number in patch.deviations)
+                      or TO_WRITE)
+                   + f" of src/{golden.tree}/DEVIATIONS.md")
     out += textwrap.wrap(f"Why: {patch.why}", width=78,
                          break_on_hyphens=False)
     for key, screen in patch.screens.items():
@@ -1397,6 +1424,7 @@ def from_run(name, program, benches):
         want = golden.screens[number]
         got = deviations.compared(run.screens[number], tree)
         got = replace(got, cells=settled(deviations.compared(want), got))
+        got = unmasked(want, got, tree, getattr(run, "written", None))
         stated = PatchedScreen()
         for row in range(ROWS):
             start, end = row * COLUMNS * 2, (row + 1) * COLUMNS * 2
@@ -1414,9 +1442,14 @@ def from_run(name, program, benches):
             patch.screens[f"{place}: {golden.original_steps[number]}"] = \
                 stated
     left = disk_lines(run.disks, {program.filename})
-    for drive in sorted(golden.disks):
-        for entry in sorted(golden.disks[drive].keys() | left[drive].keys()):
-            a, b = golden.disks[drive].get(entry), left[drive].get(entry)
+    disks = golden.disks
+    if tree == "posix":
+        # As the test holds them (departures).
+        disks = on_the_host(disks)
+        left = on_the_host(left, disks)
+    for drive in sorted(disks):
+        for entry in sorted(disks[drive].keys() | left[drive].keys()):
+            a, b = disks[drive].get(entry), left[drive].get(entry)
             if a != b:
                 patch.disks += [(sign, disk_line(drive, entry, text))
                                 for sign, text in (("-", a), ("+", b))
@@ -1436,10 +1469,27 @@ def from_run(name, program, benches):
             f"expected otherwise on {len(patch.screens)} screen"
             f"{'s' if len(patch.screens) != 1 else ''}"
             + (" and the disks" if patch.disks else "")
-            + (", under the header that it had" if numbers else
-               f", its header {TO_WRITE.lower()}")] \
+            + (", under the header that it had" if numbers is not None
+               else f", its header {TO_WRITE.lower()}")] \
         + changes(name, tree, patch) \
         + (restated(old, patch, golden.codepage) if old else [])
+
+
+def unmasked(want, got, tree, written):
+    """The screen `got` of a build with every cell that a mask of the
+    tree `tree` leaves out of the comparison where the golden has `want`
+    (deviations.masked) as the golden has it: a patch says nothing of
+    such a cell, and the mask is to find it on the patched golden too."""
+    rules = deviations.declared(tree).rules
+    blanked, _ = deviations.masked(deviations.compared(want), got, rules,
+                                   written)
+    if blanked.cells == deviations.compared(want).cells:
+        return got
+    cells = bytearray(got.cells)
+    for at in range(0, len(cells), 2):
+        if blanked.cells[at:at + 2] == deviations.MASKED:
+            cells[at:at + 2] = want.cells[at:at + 2]
+    return replace(got, cells=bytes(cells))
 
 
 def restated(old, new, codepage):
@@ -1636,8 +1686,7 @@ def main():
         if args.command == "record":
             if not args.scenario:
                 parser.error("record wants the scenario named")
-            program = setups.Program.load(
-                deps.ROOT / "build" / args.tree / "VC.EXE")
+            program = setups.Program.load(program_path(args.tree))
             with setups.Benches() as benches:
                 for name in args.scenario:
                     print("\n".join(record(name, program, benches)))
@@ -1648,9 +1697,11 @@ def main():
                     print(f"{name}: no patch")
                 else:
                     patch = read(name, args.tree).patch
-                    print(f"{name}: {shown(patch.file)}, deviation "
-                          f"{', '.join(map(str, patch.deviations))}: "
-                          f"{patch.why}")
+                    print(f"{name}: {shown(patch.file)}, "
+                          + (f"decided in {DECIDED[args.tree]}"
+                             if args.tree in DECIDED else "deviation "
+                             + ", ".join(map(str, patch.deviations)))
+                          + f": {patch.why}")
                 print("\n".join(changes(name, args.tree)
                                 or ["as the original's golden"]))
             return
@@ -1659,8 +1710,7 @@ def main():
                 "patch wants the scenarios named: a patch is written for "
                 "a difference that has been declared and is then read, "
                 "one at a time")
-        program = setups.Program.load(
-            deps.ROOT / "build" / args.tree / "VC.EXE")
+        program = setups.Program.load(program_path(args.tree))
         with setups.Benches() as benches:
             for name in args.scenario:
                 print("\n".join(from_run(name, program, benches)))

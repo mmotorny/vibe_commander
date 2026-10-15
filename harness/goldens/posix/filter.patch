@@ -1,0 +1,64 @@
+The program for Linux in the scenario filter: what it is expected to show
+otherwise than the original. A patch of harness/goldens/filter.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Decided: CLAUDE.md, step 6
+Why: hidden and system are taken when they are set and not kept on Linux,
+the host having nowhere for them (the user's word of 14 October 2026): a
+file made hidden, readme.txt at step 15 and run.bat at step 19, stays in
+the panel where the original, which shows no hidden file then, takes it
+out, and the cursor stays on it.
+
+== 15: Enter
+rows 12-13
+-|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
+-|║            │            │            ║║            │            │            ║| 1Bx80
++|║readme   txt│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
++|║run      bat│            │            ║║            │            │            ║| 1Bx80
+row 21
+-|║run.bat             21  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|║readme.txt          40  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+
+== 16: End
+rows 12-13
+-|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
+-|║            │            │            ║║            │            │            ║| 1Bx80
++|║readme   txt│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
++|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+
+== 17: Ctrl+a
+rows 12-13
+-|║run      bat│          ╟──────────────────────────────╢          │            ║| 1Bx1 30x12 1Bx8 70x19 07x1 70x18 03x2 1Bx19
+-|║            │          ║     [ Set ]   [ Cancel ]     ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║readme   txt│          ╟──────────────────────────────╢          │            ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
++|║run      bat│          ║     [ Set ]   [ Cancel ]     ║          │            ║| 1Bx1 30x12 1Bx8 70x38 03x2 1Bx19
+
+== 18: Tab Tab Space
+rows 12-13
+-|║run      bat│          ╟──────────────────────────────╢          │            ║| 1Bx1 30x12 1Bx8 70x19 07x1 70x18 03x2 1Bx19
+-|║            │          ║     [ Set ]   [ Cancel ]     ║          │            ║| 1Bx21 70x38 03x2 1Bx19
++|║readme   txt│          ╟──────────────────────────────╢          │            ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
++|║run      bat│          ║     [ Set ]   [ Cancel ]     ║          │            ║| 1Bx1 30x12 1Bx8 70x38 03x2 1Bx19
+
+== 19: Enter
+rows 11-13
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+-|║            │            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
++|║readme   txt│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
++|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+row 21
+-|║notes.doc           32  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|║run.bat             21  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+
+== 20: Ctrl+h
+row 11
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
++|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+row 13
+-|║run      bat│            │            ║║            │            │            ║| 1Bx80
++|║run      bat│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+row 21
+-|║notes.doc           32  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|║run.bat             21  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
