@@ -462,7 +462,7 @@ view.c, V00_10: widen
     panel's less 12, 3 or more and below 50.
 
 view.c, V82_00: widen
-    | i32 more = SRCH_LEN - HexLen; /* places at the end where only
+    | i32 more = GET16(SRCH_LEN) - GET16(HexLen);
     HexLen is how many bytes the hex digits of the text name, one for
     one or two of its characters, so not more than SRCH_LEN (V81_00).
 

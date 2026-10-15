@@ -40,14 +40,14 @@ static struct Entry Item(const u8 *file, bool rest)
 
     for (;;) {
         if (!rest) {
-            pair = *(const u16 *)file;
+            pair = GET16(file);
             c = pair & 0xFF;
             if (c != ' ' && c != '\t' && c != '\'' && !IS_CRLF(pair))
                 return Found(c == EOF_CHAR, file);
         }
         rest = false;
         for (;;) {                      /* FndIt1: to the end of the line */
-            pair = *(const u16 *)file;
+            pair = GET16(file);
             if (IS_CRLF(pair)) {
                 file += 2;
                 break;
@@ -129,7 +129,7 @@ u8 *FindExt(const u8 *name)
             continue;
         }
         for (;;) {                      /* FnEx09: it is this entry */
-            pair = *(const u16 *)file;
+            pair = GET16(file);
             if (IS_CRLF(pair)) {
                 /* No colon in its line: on with the next entry. */
                 item = FndItem(file + 2);

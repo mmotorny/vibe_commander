@@ -472,7 +472,7 @@ struct SpeedKey F77_00(u16 key, struct WCBdef *panel)
     line.include = AltSr_S;
     NgLine(&line);
     Window(begin, size);
-    *(u16 *)(md.MenuBuf + SPEED - 2) = 0;
+    PUT16(md.MenuBuf + SPEED - 2, 0);
     md.MenuBuf[SPEED] = 0;
     bar = md.KeyBar;
     md.KeyBar = 0;
@@ -525,7 +525,7 @@ struct SpeedKey F77_00(u16 key, struct WCBdef *panel)
         /* F77_01: what has been typed, and a key */
         InSt10(begin + 0x10A, md.MenuBuf + SPEED, 12,
                (u16)AltSr_P[1] << 8);
-        place = *(u16 *)(md.MenuBuf + SPEED - 2) + begin + 0x10A;
+        place = GET16(md.MenuBuf + SPEED - 2) + begin + 0x10A;
         Cursor(place);
         key = Input(place);
     }

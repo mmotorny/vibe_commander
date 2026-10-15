@@ -124,14 +124,15 @@ extern const u8 Tree_F[];
 
 #define LenCmd 124                      /* Length of command line */
 
-/* What a command keeps in TmpBuf. */
+/* What a command keeps in TmpBuf: bytes, and two words by their places,
+   which GET16 and PUT16 of vc.h read and write. */
 #define DEL_ALL    md.TmpBuf[90]
 #define FNC_CHANGE md.TmpBuf[91]
 #define DEL_TREE   md.TmpBuf[92]
 #define ATTR_KEEP  md.TmpBuf[94]
 #define ATTR_SET   md.TmpBuf[95]
-#define AttrDat    (*(u16 *)(md.TmpBuf + 96))
-#define AttrTim    (*(u16 *)(md.TmpBuf + 98))
+#define AttrDat    (md.TmpBuf + 96)
+#define AttrTim    (md.TmpBuf + 98)
 
 #define DONE 1                          /* what a routine of FncAddr */
 #define NOT_DONE 0                      /* answers with */
@@ -496,7 +497,7 @@ static u16 M30_51(void)
     if (had.failed)
         return M30_56(had.value);
     old = had.attributes;
-    if ((AttrDat & AttrTim) != 0xFFFF) {
+    if ((GET16(AttrDat) & GET16(AttrTim)) != 0xFFFF) {
         asked = FileSetAttributes(md.TmpBuf, old & 0xFFFE);
         if (asked.failed)
             return M30_56(asked.value);
@@ -512,10 +513,10 @@ static u16 M30_51(void)
             stamp.time = old & 0xFFFE;
             stamp.date = MD_AT(TmpBuf);
         }
-        if (AttrDat != 0xFFFF)
-            stamp.date = AttrDat;
-        if (AttrTim != 0xFFFF)
-            stamp.time = AttrTim;
+        if (GET16(AttrDat) != 0xFFFF)
+            stamp.date = GET16(AttrDat);
+        if (GET16(AttrTim) != 0xFFFF)
+            stamp.time = GET16(AttrTim);
         FileSetTime(opened.value, stamp.time, stamp.date);
         asked = FileClose(opened.value);
         if (asked.failed)
@@ -617,8 +618,8 @@ struct Checked M30_60(u16 answer)
 
     if ((u8)answer != 0)
         return Accepted(answer);
-    AttrDat = 0xFFFF;
-    AttrTim = 0xFFFF;
+    PUT16(AttrDat, 0xFFFF);
+    PUT16(AttrTim, 0xFFFF);
     text = FndLet(md.DosBuf + LenCmd + 10 + 3);
     if (*text != 0) {
         if (!Figure(&text, &month))
@@ -671,7 +672,7 @@ struct Checked M30_60(u16 answer)
             return M30_75();
         /* Below 64K, by the tests above: a year below 128, a month to 12
            and a day to 31. */
-        AttrDat = (u16)((year << 9) + (month << 5) + day);
+        PUT16(AttrDat, (u16)((year << 9) + (month << 5) + day));
     }
 
     /* M30_70 */
@@ -716,7 +717,8 @@ struct Checked M30_60(u16 answer)
         hours = 0;
     /* Below 64K, by the tests above: hours to 23, minutes and seconds to
        59. */
-    AttrTim = (u16)(((hours + add) << 11) + (minutes << 5) + (seconds >> 1));
+    PUT16(AttrTim,
+          (u16)(((hours + add) << 11) + (minutes << 5) + (seconds >> 1)));
     return Accepted(0);
 }
 
@@ -1104,7 +1106,7 @@ i32 F48_00(void)
         return TO_FUNC04;
     name = CUT_PATH(md.TmpBuf);
     every = true;
-    if (*(u16 *)name != '.') {
+    if (GET16(name) != '.') {
         /* Every file, if DOS makes eleven question marks of it. */
         if ((u8)FcbParse(name, md.TmpBuf + 100, 0) != 1)
             every = false;
@@ -1291,8 +1293,8 @@ i32 F54_00(void)
     }
     /* F54_03 */
     FcbDelete(md.TmpBuf + 20, false);
-    *(u16 *)(md.TmpBuf + 12) = *(u16 *)(md.TmpBuf + 11);
-    *(u16 *)(md.TmpBuf + 10) = *(u16 *)(md.TmpBuf + 9);
+    PUT16(md.TmpBuf + 12, GET16(md.TmpBuf + 11));
+    PUT16(md.TmpBuf + 10, GET16(md.TmpBuf + 9));
     md.TmpBuf[9] = '.';
     made = FileCreate(md.TmpBuf, 8);
     if (!made.failed) {
@@ -1300,8 +1302,8 @@ i32 F54_00(void)
         return TO_FNCEXT;
     }
     /* F54_04 */
-    *(u16 *)(md.TmpBuf + 9) = *(u16 *)(md.TmpBuf + 10);
-    *(u16 *)(md.TmpBuf + 11) = *(u16 *)(md.TmpBuf + 12);
+    PUT16(md.TmpBuf + 9, GET16(md.TmpBuf + 10));
+    PUT16(md.TmpBuf + 11, GET16(md.TmpBuf + 12));
     Dialog(&ErVol_B, 0, 0, 0, &md);
     return TO_FNCEXT;
 }
@@ -1353,10 +1355,10 @@ static i32 FncMs1(const u8 *include)
     /* FncMs5 */
     if (include == 0)
         return TO_FNCEXT;
-    *(u16 *)(md.TmpBuf + 100) = 0;
+    PUT16(md.TmpBuf + 100, 0);
     for (text = md.TmpBuf; *text != 0; text++)
         if (*text == '*' || *text == '?') {
-            *(u16 *)(md.TmpBuf + 100) = 's';
+            PUT16(md.TmpBuf + 100, 's');
             break;
         }
     Dialog(&NoFnc_B, include, 0, 0, &md);

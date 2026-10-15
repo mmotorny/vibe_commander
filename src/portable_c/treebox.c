@@ -159,7 +159,7 @@ static bool TreeFileRight(i32 done)
     if (done - 11 != count)             /* beyond TreeBuf for 4,096 */
         return false;
     return ChkSum((const u8 *)TRELIST, (u16)count)      /* in TreeBuf */
-           == *(const u16 *)((const u8 *)TRELIST + count);
+           == GET16((const u8 *)TRELIST + count);
 }
 
 /* RdTr18: the reading ends as it is, with `error`, and no entry has
@@ -209,7 +209,7 @@ static void RdTr10(struct Box *box)
         count = ++TREE->TreeLen;
         if (count >= 5) {
             if (count == 5) {
-                *(u16 *)md.MenuBuf = md.DosPth[0];  /* and the end */
+                PUT16(md.MenuBuf, md.DosPth[0]);  /* and the end */
                 OncZoom(0x728, &Tree_P, 0, box);
             }
             Number(md.MenuBuf, 0, (u16)count, NUM_SEPARATED);  /* at most
@@ -375,8 +375,8 @@ bool ReadTre(void)
         md.TreeBuf[i] = TreBeg[i];
     count = TREE->TreeLen << 4;
     TREE->TreSum1 = ChkSum(md.TreeBuf, 7);
-    *(u16 *)((u8 *)TRELIST + count) = ChkSum((const u8 *)TRELIST,
-                                             (u16)count);   /* in TreeBuf */
+    PUT16((u8 *)TRELIST + count, ChkSum((const u8 *)TRELIST,
+                                        (u16)count));   /* in TreeBuf */
     size = count + 11;
     had = FileAttributes(Tree_F);       /* with the attributes it has */
     if (had.failed && had.value == 2)   /* none yet */
@@ -496,7 +496,7 @@ static void ChTr12(u16 begin, u16 size, i32 cursor, i32 first)
 static void ChTr11(u16 begin, u16 size, i32 cursor, i32 first)
 {
     if (cursor != TREE_OFFSET(TreeCursor)) {
-        *(u16 *)(md.MenuBuf + SPEED - 2) = 0;
+        PUT16(md.MenuBuf + SPEED - 2, 0);
         md.MenuBuf[SPEED] = 0;
     }
     ChTr12(begin, size, cursor, first);
@@ -609,7 +609,7 @@ bool ChTree(i32 column)
         n = ADDRESS(n);
         if (n < TREE_OFFSET(TreeFirst))
             TreeFirst = TREE_ENTRY(n);
-        ((u16 *)&md.MousTim)[1] = 0xFFFF;
+        md.MousTim |= 0xFFFF0000UL;
         md.MousEnt = 0;
         /* Nothing is shown yet: the screen is taken to be elsewhere. */
         cursor = TREE_OFFSET(TreeCursor);
@@ -623,7 +623,7 @@ bool ChTree(i32 column)
             place = begin + (size & 0xFF00) - 0x400 + 19;
             if (md.WinMous == 0)
                 InSt10(place, md.MenuBuf + SPEED, 12, ChTr_P[1] << 8);
-            Cursor(place + *(u16 *)(md.MenuBuf + SPEED - 2));
+            Cursor(place + GET16(md.MenuBuf + SPEED - 2));
             cursor = NUMBER(TreeCursor);
             first = NUMBER(TreeFirst);
             mousing = GetMous(0).buttons != 0;

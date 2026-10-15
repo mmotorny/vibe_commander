@@ -33,8 +33,8 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
 #define GOES_ON (md.MenuBuf)            /* for each level, whether a line
                                            runs down the screen there: 40
                                            bytes */
-#define STATUS  (*(u16 *)(md.MenuBuf + 46))     /* where the path of the
-                                                   cursor is written */
+#define STATUS  (md.MenuBuf + 46)       /* where the path of the
+                                           cursor is written */
 /* The word at 48 is the panel in the original, its segment, kept there
    by PutTree for itself. Here that is PutTree's `panel`, and the word is
    not written. */
@@ -159,7 +159,7 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
     i32 lines, width, which, level, i, n;
     bool current;
 
-    STATUS = place + (size & 0xFF00) - 0x200 + 1;
+    PUT16(STATUS, place + (size & 0xFF00) - 0x200 + 1);
     TreeCurrent = 0;
     entry = TRELIST;
     n = TREE->TreeLen;
@@ -266,7 +266,7 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
             for (i = 0; i < LenPath; i++)
                 md.CrnPath[i] = SHOWN[i];
             ShrtLin(SHOWN, 38);
-            text = (u8 *)BasAdr(STATUS);
+            text = (u8 *)BasAdr(GET16(STATUS));
             n = 0;
             for (i = 38; i; i--) {
                 if (SHOWN[n] != 0)

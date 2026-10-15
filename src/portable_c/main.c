@@ -486,7 +486,7 @@ static struct Asked Func40(struct Regs *r, const struct WCBdef *wcb)
     i32 lines, rows, column, answer;
 
     md.WinMous |= 1;
-    *(u16 *)md.TmpBuf = r->cx;          /* TmpMous */
+    PUT16(md.TmpBuf, r->cx);            /* TmpMous */
     r->bp = r->ax;
     AdrNum(r->ds, &place);
     r->si = place.cursor;
@@ -555,7 +555,7 @@ static struct Asked Func40(struct Regs *r, const struct WCBdef *wcb)
     if (!(r->bp & 1))                   /* Func43 */
         return Asks(CMD_F00_60);
 
-    r->cx = *(u16 *)md.TmpBuf;          /* Func60: double click */
+    r->cx = GET16(md.TmpBuf);           /* Func60: double click */
     r->bx = BegBX(r->ds) + 1;
     r->bx = (r->bx & 0xFF) | (r->cx & 0xFF00);
     r->dx = 0x126;
@@ -815,7 +815,7 @@ static i32 Loop(i32 entry, struct Regs *r)
             MakeIni();
             image = md.MenuBuf;
             saved = IniSave;
-            if (*(u16 *)saved == 0x5656) {              /* 'VV' */
+            if (GET16(saved) == 0x5656) {              /* 'VV' */
                 for (i = 0; i < LenPath; i++) {
                     saved[INI_WCB(0, WinPath) + i] =
                         image[INI_WCB(0, WinPath) + i];
@@ -1385,7 +1385,7 @@ u16 ErrRdy(u16 letter)
     u16 *cell;
     u16 drive, key, c, buttons, place, look, shown, last;
 
-    *(u16 *)(md.TmpErr + 1) = (u8)letter;     /* and the end of the text */
+    PUT16(md.TmpErr + 1, (u8)letter);   /* and the end of the text */
     drive = letter & 0xFF;
     PutKey(2);
     DialBox(0x528, &NoRd_P, 0, &md, &where);
@@ -1567,7 +1567,7 @@ static u16 FtErr1(u16 how, u16 code, const u8 *device)
     page = md.HlpPage;
     setup = StOpen;
     StOpen = 0;
-    *(u16 *)&md.AutoTim = 0xFFFF;
+    md.AutoTim |= 0xFFFF;               /* its low word */
     if (how & 0x1000)
         answer = (u8)Dialog(&FtEr1_B, text, 0, 0, &md)
                  == 0 ? DEVICE_RETRY : DEVICE_FAIL;

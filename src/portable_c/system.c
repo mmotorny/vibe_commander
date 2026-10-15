@@ -174,7 +174,7 @@ bool Fantom(i32 drive)
         return false;
     if (DriveSetLetter((u16)goes_by).failed)
         return false;
-    *(u16 *)(md.TmpErr + 1) = (u8)(drive + 'A' - 1);
+    PUT16(md.TmpErr + 1, (u8)(drive + 'A' - 1));
     page = md.HlpPage;
     answer = Dialog(&Fant_B, 0, 0, 0, &md);
     md.HlpPage = (u8)page;

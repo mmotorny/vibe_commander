@@ -230,8 +230,8 @@ static void Help70(i32 line)
        16 bits from a line of 10,923 on: only an index that is not true
        to its text has such lines. */
     entry = hd.HlpInfo + 2 + (u16)(line + line + line);
-    hd.HlpOffsLo = *(u16 *)entry;
-    hd.HlpOffsHi = *(u16 *)(entry + 2);
+    hd.HlpOffsLo = GET16(entry);
+    hd.HlpOffsHi = GET16(entry + 2);
 }
 
 /* Where the text of a line is: of the index behind its six bytes for
@@ -368,7 +368,7 @@ static i32 Help30(u16 item, u16 size, struct Paged *at)
             if (clicked == 0)
                 return HELP_KEY;
             md.MousEnt = 0;
-            ((u16 *)&md.MousTim)[1] = 0xFFFF;
+            md.MousTim |= 0xFFFF0000UL;
             TypMous(0);
             return HELP_ENTER;
         }
@@ -519,7 +519,7 @@ static void Help05(void)
     md.HlpPage = 0xFF;
     md.WinMous = 0;
     md.MousEnt = 0;
-    ((u16 *)&md.MousTim)[1] = 0xFFFF;
+    md.MousTim |= 0xFFFF0000UL;
 
     /* Help06: the title and the buttons */
     do {

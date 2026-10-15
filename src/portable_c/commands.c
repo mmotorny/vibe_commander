@@ -345,7 +345,7 @@ i32 M42_00(struct WCBdef *panel)
     struct Box where;
 
     if (FilePan(panel)) {
-        *(u16 *)md.TmpBuf = panel->WinPath[0];
+        PUT16(md.TmpBuf, panel->WinPath[0]);
         PutMnu(3);
         DialBox(0x528, &DiSiz_P, 0, &md, &where);
         Window(where.begin, where.size);

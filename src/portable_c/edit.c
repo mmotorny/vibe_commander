@@ -138,6 +138,10 @@ struct Drawn {
 
 #define ed (*(struct EdData *)(md.TmpBuf + 100))
 
+/* The size of the edit window as the one word that the assembly reads
+   there, the columns in its low byte and the rows in its high one. */
+#define ED_SIZE ((u16)(ed.EdSizeY << 8 | ed.EdSizeX))
+
 /* The fields of EdData that count, as variables. The room for the text,
    in bytes: EdSpace counted paragraphs in the assembly. Places in the
    text: where the line in the buffer begins and where the part of it
@@ -206,8 +210,9 @@ static bool T80_00(void);
    where the search ended, behind what it found, and 1 for the text
    found, 0 for the bytes that it names in hex, and 100h for neither. */
 
-/* How long the text is that V80_00 has made ready. */
-#define SrchLen (*(u16 *)(md.HelpBuf + 90))
+/* How long the text is that V80_00 has made ready: a word at this place,
+   which GET16 reads. */
+#define SrchLen (md.HelpBuf + 90)
 
 /* Boxes, dialogs and texts of edit_t.c and view_t.c, and
    three of other files: Prot_B, Menu_F and Ext_F. DialBox and Dialog
@@ -354,7 +359,7 @@ static void T50_00(void)
            further than its end: a length of the room, which is not
            below 0. */
         length = (i32)(end.at - EdOffst);
-        if (length >= 2 && ENDS_LINE(*(const u16 *)(Room + end.at - 2)))
+        if (length >= 2 && ENDS_LINE(GET16(Room + end.at - 2)))
             length -= 2;
         if (length > LenEdit - 100) {
             size = LenEdit - 100;
@@ -495,7 +500,7 @@ static struct Ending T53_10(i32 place)
     /* As far as the text goes. The last word that is looked at has its
        second byte behind the text, and ends no line. */
     while (place < ed.EdLen) {
-        word = *(const u16 *)(Room + place);
+        word = GET16(Room + place);
         place += 2;
         if (place <= ed.EdLen && ENDS_LINE(word))
             return EndsAt(place);
@@ -528,7 +533,7 @@ static bool T53_00(struct Where *where)
     } else {
         if (end.at - place <= 1)
             return true;
-        if (!ENDS_LINE(*(const u16 *)(Room + end.at - 2)))
+        if (!ENDS_LINE(GET16(Room + end.at - 2)))
             return true;
     }
     where->place = end.at;
@@ -580,7 +585,7 @@ static bool T54_00(struct Where *where)
             at = 0;
             break;
         }
-        word = *(const u16 *)(Room + at - 2);
+        word = GET16(Room + at - 2);
         if (!found) {
             if (ENDS_LINE(word)) {
                 found = true;
@@ -742,7 +747,7 @@ void T71_00(u16 function, u16 place, i32 step)
     } while (--count);
     Scroll(function >> 8 == 7, Color(Back_C),
            (u16)(ed.EdBase + ((function & 0xFF) << 8)),
-           *(u16 *)&ed.EdSizeX + ed.EdBase - 0x101);
+           ED_SIZE + ed.EdBase - 0x101);
 }
 
 /* Write a line of the text to the line `line` of the window in the
@@ -780,7 +785,7 @@ static void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base)
     if (ed.EdTxHex == 0) {
         column = 0;
         if (end - base >= 2) {
-            c = *(const u16 *)(end - 2);
+            c = GET16(end - 2);
             if (c == CR_LF || c == LF_CR)
                 end -= 2;
         }
@@ -1090,7 +1095,7 @@ static void T80_14(void)
     u16 letter, c;
     i32 count, i;
 
-    letter = *(const u16 *)name;
+    letter = GET16(name);
     if (letter >> 8 == ':')
         name += 2;
     else
@@ -1440,7 +1445,7 @@ static void T02_00(void)
         *to = to[-2];
         to--;
     }
-    *(u16 *)(EditBuf + EdCursr) = CR_LF;     /* T02_02 */
+    PUT16(EditBuf + EdCursr, CR_LF);    /* T02_02 */
     ed.EdUpdat = 1;
     T51_00();
     T02_03();
@@ -1672,7 +1677,7 @@ static void T20_05(bool drawn)
     if (T53_00(&where) != 0)
         return;
     EdUndo = 2;
-    *(u16 *)UndoBuf = CR_LF;
+    PUT16(UndoBuf, CR_LF);
     T20_06(where.place, drawn);
 }
 
@@ -1785,7 +1790,7 @@ static void T25_00(void)
     for (count = 0; count < size; count++)
         UndoBuf[count] = EditBuf[count];
     EdUndo = size + 2;
-    *(u16 *)(UndoBuf + size) = CR_LF;
+    PUT16(UndoBuf + size, CR_LF);
     T60_10(&where);
     where.line = 0;                     /* see T20_05 */
     end = ed.EdLen;
@@ -1812,7 +1817,7 @@ static void T26_00(void)
 
     if (ed.EdTxHex != 0 || count == 0)
         return;
-    if (count >= 2 && ENDS_LINE(*(const u16 *)(UndoBuf + count - 2)))
+    if (count >= 2 && ENDS_LINE(GET16(UndoBuf + count - 2)))
         line = true;
     else if (EdSizLn < LenEdit + 1 - count) {
         EdSizLn += count;            /* T26_01 */
@@ -1927,11 +1932,11 @@ static void T32_00(void)
             }
             break;
         }
-        if (count < SrchLen) {
+        if (count < GET16(SrchLen)) {
             Dialog(&SrEr_B, EdFl_S, 0, 0, &md);    /* T32_03 */
             break;
         }
-        place += count - SrchLen + 1;
+        place += count - GET16(SrchLen) + 1;
     }
     T50_00();                           /* T32_07 */
     ResWin(box.begin, box.size, box.saved);
@@ -2157,7 +2162,7 @@ static bool T00_83(u16 key)
 static bool T00_71(u16 mouse)
 {
     u16 base = ed.EdBase;
-    u16 size = *(u16 *)&ed.EdSizeX;
+    u16 size = ED_SIZE;
     i32 row, count, column, where;
     bool down;
 
@@ -2282,7 +2287,7 @@ static void T00_40(void)
                with the two characters. */
             if (start < 2)              /* T00_45 */
                 break;
-            if (!ENDS_LINE(*(const u16 *)(Room + start - 2)))
+            if (!ENDS_LINE(GET16(Room + start - 2)))
                 break;
             /* Nothing before it is looked at: the assembly hands it
                over as ending at the start of a segment. */
@@ -2308,7 +2313,7 @@ static void T00_40(void)
         row++;                          /* T00_44 */
     } while (--count);
     T73_10();                           /* T00_48 */
-    Window(ed.EdBase, *(u16 *)&ed.EdSizeX);
+    Window(ed.EdBase, ED_SIZE);
 }
 
 /* Bring the screen up to where the cursor is: the first column and the
@@ -2320,7 +2325,8 @@ static void T00_20(void)
     i32 column, first_column, first_line, line, old_column, old_line;
     i32 delta, row, count, size, i;
     u16 color;
-    u16 *saved, *cell;
+    u8 *saved;                          /* the line as it was, in TmpErr */
+    u16 *cell;
 
     column = T57_02();
     EdCol = column;
@@ -2389,9 +2395,9 @@ static void T00_20(void)
     ed.EdCurLn = 0;
 
     if (ed.EdStat != 0) {
-        saved = (u16 *)md.TmpErr;       /* T00_51 */
+        saved = md.TmpErr;              /* T00_51 */
         for (i = 0; i < 80; i++)
-            saved[i] = md.ScrBuf[i];
+            PUT16(saved + 2 * i, md.ScrBuf[i]);
         color = ' ';
         if (ed.EdChng != 0)
             color = '*';
@@ -2418,7 +2424,7 @@ static void T00_20(void)
            in seven cells from 62 on, behind "Free" at 70: a figure of
            free memory, which goes (src/portable_c/DEVIATIONS.md, 24). */
         for (i = 0; i < 80; i++)
-            if (saved[i] != md.ScrBuf[i]) {
+            if (GET16(saved + 2 * i) != md.ScrBuf[i]) {
                 Window(0, 0x150);
                 break;
             }

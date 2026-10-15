@@ -131,7 +131,7 @@ static bool Inpt41(u16 key, i32 bar, struct Key *pressed)
     i32 shift, column;
     bool tracking, outside;
 
-    *(u16 *)&md.AutoTim = 0xFFFF;
+    md.AutoTim |= 0xFFFF;               /* its low word */
     if ((key & 0xFF00) != KEY_MOUSE || md.KeyBar == 0) {
         *pressed = Pressed(key, false);
         return true;
@@ -632,7 +632,7 @@ i32 Search(const u8 *list, i32 at, i32 begin, i32 end, i32 step, u16 key)
     for (i = 0; i < 15; i++)
         tried[i] = typed[i];
     if ((key & 0xFF) != 0x0A)
-        *(u16 *)tried = (u16)EdLin(key, tried + 2, *(u16 *)tried, 12).cursor;
+        PUT16(tried, (u16)EdLin(key, tried + 2, GET16(tried), 12).cursor);
     length = (i32)(MvzLine(md.MenuBuf, tried + 2, 13) - md.MenuBuf);
     PathLin(md.MenuBuf);
     if (length != 0) {

@@ -19190,6 +19190,95 @@ second copy, which is on no screen now. Those of `menu`, `mouse-menu`,
 screens whose steps have other numbers; those of `setup-config` and
 `setup-screen` have the other setup file among the disks.
 
+### AL, words made of their bytes: done
+
+On the user's word of 15 October 2026 (`CLAUDE.md`, "The portable C",
+step 6): a word of 16 or 32 bits in a buffer of bytes is made of its
+bytes, by `GET16`, `GET32`, `PUT16` and `PUT32` of `vc.h`, not read or
+written through a pointer of the word's type cast from the byte's.
+
+- The four are `static inline` functions of `vc.h`, little-endian by
+  their bytes, taking `const u8 *` or `u8 *`: `wcc386` takes `static
+  inline` in a header, says nothing of one that a file does not call,
+  and puts the instructions in place, and the compilers hold the type of
+  the pointer, which a macro would not. `PUT16` stepped the pointer
+  behind what it wrote; it writes now and no more, and its nine calls in
+  `format.c` step the pointer themselves.
+- The 128 casts of 5a's list in the common files, to `(u16 *)`,
+  `(const u16 *)` and `(u32 *)`, are gone but seven: 112 reads by
+  `GET16`, 19 by `GET32`, 76 writes by `PUT16` and 10 by `PUT32`, in
+  23 files. A script (kept in `build/`, not committed) took the regular
+  forms, a read `*(u16 *)place` and a write as a statement of its own,
+  and the macros that named a word of a buffer as an lvalue, `CpSize`
+  to `CpCntBg` of `copy.c`, `AttrDat` and `AttrTim` of `dirfunc.c`,
+  `SrchLen` of `edit.c`, `SRCH_LEN` and `HexLen` of `view.c`, `STATUS`
+  of `tree.c`, `SUM` of `stmain.c`: each names the word's place now, and
+  every use reads it or writes it by the four. By hand: `+=` and `++` on
+  them; `WORD_TO` of `view.c` and `MDW` of `dialog.c`, places now;
+  `KEYS` of `usermenu.c`, which `F32_00` walked with a `u16 *`, a `u8 *`
+  stepped by two; the line of the editor's status that `T00_00` keeps in
+  `TmpErr`; the sum of `DiSi10` of `read.c`. Each file was read again
+  in the diff.
+- Not of a buffer, and made numbers: the high word of `MousTim` set
+  through `((u16 *)&md.MousTim)[1]`, five places, is `md.MousTim |=
+  0xFFFF0000UL`, as three other files had it already; the low word of
+  `AutoTim`, two, is `md.AutoTim |= 0xFFFF`; `*(u16 *)&ed.EdSizeX`, the
+  size of the editor's window as one word, three, is `ED_SIZE` of
+  `edit.c`, the two bytes put together; and the low byte of a pair of
+  digits that `PutDate` and `PutTime` of `format.c` wrote through `(u8
+  *)&`, two, is a mask.
+- The seven casts that stay are of cells of the screen, a `u16 *` made
+  of a `u8 *` that points into an array of cells at a cell: `HexByt` in
+  the viewer's hex, five, and in `dialog.c` the buffer that a box names
+  by its offset in the main data, `ErrBuf` and its like, and a button's
+  place in cells. Those arrays are of `u16` and at even places of the
+  main data, so such a pointer is aligned where the main data is.
+- Structures laid over bytes: 33 casts, of which 32 are to structures
+  declared packed, `#pragma pack(1)` in `vc.h`, `tables.h`, `edit.c`,
+  `find.c`, `help.c`, `sthelp.c` and `view.c`, whose members are read
+  where they are and are right already. The one that was not is
+  `struct StData`, the setup's own data, which lies over `MenuBuf`, at an
+  odd place of the main data: it is packed now, with two members `Gap1`
+  and `Gap2` where the compilers had put three bytes to align its
+  numbers of 32 bits, so that it is laid out as it was, which a `HOLDS`
+  says; and its 50th row of what DOS had on the screen, `Row50`, which
+  `StUserScr` handed out as a row of cells, is bytes, and the two loops
+  of `stmain.c` that copy a row copy its 160 bytes.
+- The little-endian check of `vc.h` stays. What was looked at: the
+  setup file is the main data's bytes and the panels', copied in and
+  out as bytes by `start.c`, `stmain.c` and `setup.c`, so a word of it is
+  read as a number of the structure; the help file is read into `struct
+  HlpData` (`HD_BYTES`), the tree's file into `struct DIRTREE`; and twelve
+  places write the character of a cell of the screen as its first byte,
+  `*(u8 *)(cell)`. Each of those rests on the low byte being first, and
+  none is a read through a cast of a word, so none was this piece's.
+  The comment at the check says so now.
+- The DOS program: `VC.EXE` was `2b6cc9b5...`, and is
+  `9a71cae6...`: the code of every file that changed is other code, and
+  `stcolor.c`, which reads `StData` and changed nowhere, has the same
+  listing, so the packing left the layout as it was. The code is 4,133
+  bytes longer, `_TEXT` 1E5F6h where it was 1D5D1h: the four put their
+  instructions in place, some two hundred times. Nothing was done about
+  that, the size being no aim.
+- What judged it: `ctest -L portable_c`, eleven tests, every scenario
+  with them, no golden and no patch changed;
+  `harness/int16.txt` and `harness/width.txt` written anew for a line of
+  `view.c` and one of `dirfunc.c` that were written otherwise, with
+  their reasons, and for the members of `StData`. The images: against
+  `main`'s build every scenario differs in the room, which begins 4K
+  later; against `main`'s build padded to the same length of code, a
+  function of 1,377 byte stores behind the last of `sys_dos.c`, not
+  kept (every segment of the map where this build has it), 150 of 159
+  scenarios with nothing but what may differ, the stack pointer at the
+  last call of DOS and the byte `DTA+41`; `copy`, `copy-dirs` and
+  `russian` with that byte where a name was copied, in `TmpBuf` and
+  `TmpErr`, which the tool does not know there (the note of `CLAUDE.md`
+  on two builds whose code differs); and the six that earlier pieces
+  met, `comspec`, `ended`, `second-copy`, `start-screen` and
+  `start-setup`, whose second copy lives in the room, and
+  `start-memory`, `ViewSeg` and `FreMem2` naming nothing known. Nothing
+  is declared as changed.
+
 ### Put off: eight scenarios that could leave the Info off
 
 Put off on purpose, on 13 October 2026. Eleven scenarios switch the Info

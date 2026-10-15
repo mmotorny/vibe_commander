@@ -56,7 +56,7 @@
 #define WCB1   ((struct WCBdef *)(sd.File + 3))
 #define WCB2   ((struct WCBdef *)(sd.File + 3 + WCBini))
 #define COMMON (sd.File + 3 + 2 * WCBini)
-#define SUM    (*(u16 *)(sd.File + INI_LEN - 2))
+#define SUM    (sd.File + INI_LEN - 2)
 
 #define Hist_C  23                      /* the colours of the menu: a line, */
 #define HstCu_C 24                      /* and the one under the cursor */
@@ -138,11 +138,12 @@ static const u8 StStErr_S[49] NONSTRING =
 /* A row of what DOS had on the screen when the setup was entered:
    UserScr of the setup program, which has 50 rows. The main data's has
    the 49 that the main program keeps, so the last of 50 is with the
-   setup's own data. */
-static u16 *StUserScr(i32 row)
+   setup's own data, which lies at an odd place: a row is its bytes, and
+   is copied as bytes. */
+static u8 *StUserScr(i32 row)
 {
     if (row < MaxLins - 1)
-        return md.UserScr + row * 80;
+        return (u8 *)(md.UserScr + row * 80);
     return sd.Row50;
 }
 
@@ -150,13 +151,13 @@ static u16 *StUserScr(i32 row)
    DOS had on the screen. */
 static void StKeep(void)
 {
-    const u16 *from = md.ScrBuf;
-    u16 *to;
+    const u8 *from = (const u8 *)md.ScrBuf;
+    u8 *to;
     i32 row, i;
 
     for (row = 0; row < md.Lines; row++) {
         to = StUserScr(row);
-        for (i = 0; i < 80; i++)
+        for (i = 0; i < 2 * 80; i++)
             *to++ = *from++;
     }
 }
@@ -165,13 +166,13 @@ static void StKeep(void)
    it, from the row `first` on. */
 void StUser(i32 first, i32 rows)
 {
-    u16 *to = BasAdr((u16)(first << 8));
-    const u16 *from;
+    u8 *to = (u8 *)BasAdr((u16)(first << 8));
+    const u8 *from;
     i32 i;
 
     for (; rows != 0; rows--) {
         from = StUserScr(first++);
-        for (i = 0; i < 80; i++)
+        for (i = 0; i < 2 * 80; i++)
             *to++ = *from++;
     }
 }
@@ -254,7 +255,7 @@ static void StInit15(void)
             sd.IniStat = 1;
             if (read.count == INI_LEN
                 && file[0] == 'V' && file[1] == 'V' && file[2] == 'V'
-                && ChkSum(file, INI_LEN - 2) == SUM) {
+                && ChkSum(file, INI_LEN - 2) == GET16(SUM)) {
                 for (i = 0; i < CmnIni; i++)
                     ((u8 *)&md)[i] = COMMON[i];
                 return;
@@ -483,7 +484,7 @@ static void StExit(void)
     sd.File[2] = 'V';
     for (i = 0; i < CmnIni; i++)
         COMMON[i] = ((u8 *)&md)[i];
-    SUM = ChkSum(sd.File, INI_LEN - 2);
+    PUT16(SUM, ChkSum(sd.File, INI_LEN - 2));
     StFile();
     had = FileAttributes(md.NcPath);
     /* A file that is not there has no attributes: the original goes on

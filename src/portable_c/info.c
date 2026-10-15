@@ -174,7 +174,7 @@ void PutInf(struct WCBdef *panel)
         cell = (u8 *)screen;
         room = 36;
         for (;;) {
-            two = *(u16 *)text;
+            two = GET16(text);
             text += 2;
             if (two == LF_CR || two == CR_LF)
                 break;

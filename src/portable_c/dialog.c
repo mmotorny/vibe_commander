@@ -91,9 +91,10 @@
 #define LEFT_RIGHT  0xC7B6              /* where one meets the frame, on the
                                            left and on the right */
 
-/* A byte and a word of the main data, by their offsets. */
+/* A byte of the main data, and the place of a word of it, by their
+   offsets: GET16 and PUT16 read and write the word. */
 #define MD(offset)  (*((u8 *)&md + (offset)))
-#define MDW(offset) (*(u16 *)((u8 *)&md + (offset)))
+#define MDW(offset) ((u8 *)&md + (offset))
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -977,16 +978,16 @@ u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
             if (type == FIELD_INPUT) {
                 control = NUMBER_OF(field->mCtrl);
                 text = INPUT(control);
-                typed = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
+                typed = InpStr(place, text + 3, GET16(text), control & 0xFF,
                                colors[1], head->bKeyBar);
                 /* a byte's length at most */
-                *(u16 *)text = (u16)typed.cursor;
+                PUT16(text, (u16)typed.cursor);
                 key = typed.key;
             } else if (type == FIELD_SELECT) {
                 chosen = Select(place, head->bKeyBar,
                                 NUMBER_OF(field->mCtrl) & 0xFF,
-                                MDW(field->mPoint));
-                MDW(field->mPoint) = chosen.lines;
+                                GET16(MDW(field->mPoint)));
+                PUT16(MDW(field->mPoint), chosen.lines);
                 key = chosen.key;
             } else if (type == FIELD_FLIP) {
                 ticked = FlipFl(place, head->bKeyBar, MD(field->mPoint));

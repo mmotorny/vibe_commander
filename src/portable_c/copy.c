@@ -20,7 +20,9 @@
  */
 #include "vc.h"
 
-/* What is kept in TmpBuf: the equates at the top of VCCOPY.INC. */
+/* What is kept in TmpBuf: the equates at the top of VCCOPY.INC. A byte
+   is named as the byte; a word or a double word by its place, which
+   GET16, GET32, PUT16 and PUT32 of vc.h read and write. */
 #define CpInpt  (md.TmpBuf + 0)         /* Input buffer */
 #define CpVar1  (md.TmpBuf + 120)       /* Variable 1 */
 #define CpVar2  (md.TmpBuf + 140)       /* Variable 2 */
@@ -38,17 +40,17 @@
 #define FncChg  md.TmpBuf[91]           /* There was writing */
 #define SplitFl md.TmpBuf[94]           /* Split flag */
 #define CpCntSz md.TmpBuf[95]           /* Length of the per cent counter */
-#define CpSize  (*(u32 *)(md.TmpBuf + 96))      /* File size */
+#define CpSize  (md.TmpBuf + 96)        /* File size */
 #define CopyMov md.TmpBuf[100]          /* Copy / Move / Rename */
 #define CpDev2  md.TmpBuf[104]          /* Destination is a device */
-#define CpRead  (*(u32 *)(md.TmpBuf + 106))     /* Was read */
-#define CpWrite (*(u32 *)(md.TmpBuf + 110))     /* Was written */
-#define CpHndl1 (*(u16 *)(md.TmpBuf + 116))     /* Source handle */
-#define CpHndl2 (*(u16 *)(md.TmpBuf + 118))     /* Destination handle */
-#define CpAttr  (*(u16 *)(md.TmpBuf + 120))     /* File attribute */
-#define CpDate  (*(u16 *)(md.TmpBuf + 122))     /* File date */
-#define CpTime  (*(u16 *)(md.TmpBuf + 124))     /* File time */
-#define CpCntBg (*(u16 *)(md.TmpBuf + 126))     /* Base of the per cent counter */
+#define CpRead  (md.TmpBuf + 106)       /* Was read */
+#define CpWrite (md.TmpBuf + 110)       /* Was written */
+#define CpHndl1 (md.TmpBuf + 116)       /* Source handle */
+#define CpHndl2 (md.TmpBuf + 118)       /* Destination handle */
+#define CpAttr  (md.TmpBuf + 120)       /* File attribute */
+#define CpDate  (md.TmpBuf + 122)       /* File date */
+#define CpTime  (md.TmpBuf + 124)       /* File time */
+#define CpCntBg (md.TmpBuf + 126)       /* Base of the per cent counter */
 
 /* Two words of the assembly's that are not in TmpBuf here, since each
    holds an address and a pointer is longer than its word: CpBgNam at
@@ -179,7 +181,7 @@ static i32 C00_End(const u8 *text, i32 *count)
    begins with two backslashes. */
 static u16 C00_30(const u8 *path)
 {
-    u16 pair = *(const u16 *)path;
+    u16 pair = GET16(path);
 
     if (pair == 0x5C5C)
         return 0;
@@ -205,7 +207,7 @@ static void C40_05(const u8 *path, u8 *buffer)
     i32 count;
 
     to = AddFile(MvzLine(buffer, md.DosPth, LenPath));
-    pair = *(const u16 *)path;
+    pair = GET16(path);
     if (pair >> 8 == ':' && (u8)UpCase(pair) != buffer[0])
         to = buffer;                                    /* C40_12 */
     else {
@@ -265,7 +267,7 @@ static void SetDate(u16 handle)
 {
     if (SplitFl == 1)
         return;
-    FileSetTime(handle, CpTime, CpDate);
+    FileSetTime(handle, GET16(CpTime), GET16(CpDate));
 }
 
 /* Show how far the copying has got: of the row of cells that C20_00 has
@@ -282,8 +284,8 @@ static void PerCent(void)
     u16 *screen;
     u16 cell;
 
-    sum = CpRead + CpWrite;
-    carry = sum < CpRead;
+    sum = GET32(CpRead) + GET32(CpWrite);
+    carry = sum < GET32(CpRead);
     count = CpCntSz;
     do {
         before = low;
@@ -291,9 +293,9 @@ static void PerCent(void)
         high += carry + (low < before);
     } while (--count);
     cells = CpCntSz;
-    if (CpSize != 0) {
-        twice = CpSize << 1;
-        twice_high = HIGH(CpSize) >> 15;
+    if (GET32(CpSize) != 0) {
+        twice = GET32(CpSize) << 1;
+        twice_high = HIGH(GET32(CpSize)) >> 15;
         cells = -1;
         do {
             cells++;
@@ -305,11 +307,11 @@ static void PerCent(void)
         if (cells > CpCntSz)
             cells = CpCntSz;
     }
-    screen = BasAdr(CpCntBg);
+    screen = BasAdr(GET16(CpCntBg));
     cell = (*screen & 0xFF00) | 0xDB;
     for (; cells; cells--)
         *screen++ = cell;
-    Window(CpCntBg, 0x100 | CpCntSz);
+    Window(GET16(CpCntBg), 0x100 | CpCntSz);
 }
 
 /* What C00_01 puts behind the name of the target, at `to`: what follows
@@ -404,7 +406,7 @@ static bool C00_01(void)
         C00_05(name);
         return true;
     }
-    if (*(const u16 *)name == 0x2E2E && *FndLet(name + 2) == 0) {
+    if (GET16(name) == 0x2E2E && *FndLet(name + 2) == 0) {
         C00_04(name + 3);
         return true;
     }
@@ -661,13 +663,13 @@ static u16 C20_00(i32 fits)
         shown = &MovFi_P;
     /* None of the lines of these boxes has ^I: no include line. */
     OncZoom(0x428, shown, 0, &box);
-    CpCntBg = box.begin + 0x605;
+    PUT16(CpCntBg, box.begin + 0x605);
     CpCntSz = (u8)(box.size - 12);
-    screen = BasAdr(CpCntBg);
+    screen = BasAdr(GET16(CpCntBg));
     cell = (u16)((u8)Color(Box_C) << 8 | 0xB0);
     for (i = CpCntSz; i; i--)
         *screen++ = cell;
-    Window(CpCntBg, 0x100 | CpCntSz);
+    Window(GET16(CpCntBg), 0x100 | CpCntSz);
     report = &OpnEr_B;
     if (fits == 0)
         goto ask;
@@ -681,8 +683,8 @@ static u16 C20_00(i32 fits)
     error = opened.value;
     if (opened.failed)
         goto unopened;
-    CpHndl1 = opened.value;
-    device = FileDevice(CpHndl1);
+    PUT16(CpHndl1, opened.value);
+    device = FileDevice(GET16(CpHndl1));
     info = device.kind;
     /* The assembly goes on with DX as it is, which DOS has not set if it
        would not say what the handle is: the address of the name, here
@@ -692,19 +694,19 @@ static u16 C20_00(i32 fits)
     if ((info & 0x81) == 0x81)
         goto no_source;
     CpDev1 = (u8)(info & 0x80);
-    CpSize = 0xFFFFFFFF;
-    CpAttr = 0x20;
+    PUT32(CpSize, 0xFFFFFFFF);
+    PUT16(CpAttr, 0x20);
     if (CpDev1 == 0) {
         attr = FileAttributes(CpSrc);
         if (attr.failed) {
             error = attr.value;
             goto unopened;
         }
-        CpAttr = (attr.attributes & 0x27) | 0x20;
-        CpSize = FileStep(CpHndl1, 2, 0).place;
-        FileSeek(CpHndl1, 0);
+        PUT16(CpAttr, (attr.attributes & 0x27) | 0x20);
+        PUT32(CpSize, FileStep(GET16(CpHndl1), 2, 0).place);
+        FileSeek(GET16(CpHndl1), 0);
     }
-    stamp = FileTime(CpHndl1);
+    stamp = FileTime(GET16(CpHndl1));
     if (stamp.failed && CpDev1 != 0) {
         /* The assembly goes on with CX and DX as they are, which DOS has
            not set then. For a file both are 0, of the place just gone
@@ -713,11 +715,11 @@ static u16 C20_00(i32 fits)
         stamp.time = (u16)count;
         stamp.date = CpSrcAt;
     }
-    CpDate = stamp.date;
-    CpTime = stamp.time;
-    CpRead = 0;
-    CpWrite = 0;
-    CpHndl2 = 0;
+    PUT16(CpDate, stamp.date);
+    PUT16(CpTime, stamp.time);
+    PUT32(CpRead, 0);
+    PUT32(CpWrite, 0);
+    PUT16(CpHndl2, 0);
     rest = 0;
     SplitFl = 0;
 
@@ -736,12 +738,12 @@ read:
         do {
             got = 0;
             if (count != 0) {
-                moved = FileRead(CpHndl1, buffer + offset, count);
+                moved = FileRead(GET16(CpHndl1), buffer + offset, count);
                 if (moved.failed)
                     goto terminate;
                 got = moved.count;
             }
-            CpRead += (u32)got;
+            PUT32(CpRead, GET32(CpRead) + (u32)got);
             PerCent();
             if (got == 0)
                 goto ended;
@@ -758,11 +760,11 @@ read:
     } while (left != 0);
     goto target;
 ended:
-    FileClose(CpHndl1);
-    CpHndl1 = 0;
+    FileClose(GET16(CpHndl1));
+    PUT16(CpHndl1, 0);
     if (CpDev1 != 0) {
-        CpSize = CpRead;
-        if (CpRead == 0)
+        PUT32(CpSize, GET32(CpRead));
+        if (GET32(CpRead) == 0)
             goto terminate;
         PerCent();
     }
@@ -770,7 +772,7 @@ ended:
 target:
     if (ChgDisk(CpDest))
         goto terminate;
-    if (CpHndl2 != 0)
+    if (GET16(CpHndl2) != 0)
         goto write;
 open:
     C50_00();
@@ -821,9 +823,9 @@ create:
     if (opened.failed)
         goto no_target;
 opened:
-    CpHndl2 = opened.value;
+    PUT16(CpHndl2, opened.value);
     FncChg = 1;
-    device = FileDevice(CpHndl2);
+    device = FileDevice(GET16(CpHndl2));
     info = device.kind;
     if (device.failed)
         info = CpDestAt;
@@ -851,8 +853,8 @@ append:
         error = attr.value;
         goto no_target;
     }
-    CpAttr = (attr.attributes & 0x27) | 0x20;
-    attributes = CpAttr;
+    PUT16(CpAttr, (attr.attributes & 0x27) | 0x20);
+    attributes = GET16(CpAttr);
     opened = OpenFil(CpDest, 0x12);
     if (opened.failed) {
         error = opened.value;
@@ -873,29 +875,29 @@ append:
             goto no_target;
     }
     FncChg = 1;
-    CpHndl2 = opened.value;
-    stamp = FileTime(CpHndl2);
+    PUT16(CpHndl2, opened.value);
+    stamp = FileTime(GET16(CpHndl2));
     if (stamp.failed) {
         /* CX and DX as they are, again: the attributes that were last
            kept or set, and the address of the name. */
         stamp.time = attributes;
         stamp.date = CpDestAt;
     }
-    CpDate = stamp.date;
-    CpTime = stamp.time;
-    size = FileStep(CpHndl2, 2, 0).place;
+    PUT16(CpDate, stamp.date);
+    PUT16(CpTime, stamp.time);
+    size = FileStep(GET16(CpHndl2), 2, 0).place;
     if (size != 0) {
         size--;
-        FileSeek(CpHndl2, size);
-        if (FileRead(CpHndl2, md.TmpErr, 1).failed)
+        FileSeek(GET16(CpHndl2), size);
+        if (FileRead(GET16(CpHndl2), md.TmpErr, 1).failed)
             goto terminate;
         if (md.TmpErr[0] == 0x1A)
-            FileSeek(CpHndl2, size);
+            FileSeek(GET16(CpHndl2), size);
     }
 
 write:
     /* What was read and is not written yet, which is in the room. */
-    left = (i32)(CpRead - CpWrite);
+    left = (i32)(GET32(CpRead) - GET32(CpWrite));
     buffer = Room;
     if (rest != 0)
         buffer = rest;
@@ -908,14 +910,14 @@ write:
             count = left;
         got = 0;
         if (count != 0) {
-            moved = FileWrite(CpHndl2, buffer, count);
+            moved = FileWrite(GET16(CpHndl2), buffer, count);
             if (moved.failed)
                 goto terminate;
             got = moved.count;
             if (got == 0)
                 goto full;
         }
-        CpWrite += (u32)got;
+        PUT32(CpWrite, GET32(CpWrite) + (u32)got);
         PerCent();
         left -= got;
         /* The assembly steps a segment, by the paragraphs that were
@@ -923,14 +925,14 @@ write:
            stepped over. */
         buffer += got >> 4 << 4;
     } while (left != 0);
-    if (CpHndl1 != 0)
+    if (GET16(CpHndl1) != 0)
         goto read;
 
-    SetDate(CpHndl2);
-    if (FileClose(CpHndl2).failed)
+    SetDate(GET16(CpHndl2));
+    if (FileClose(GET16(CpHndl2)).failed)
         goto stop;
     if (CpDev2 == 0) {
-        asked = FileSetAttributes(CpDest, CpAttr);
+        asked = FileSetAttributes(CpDest, GET16(CpAttr));
         if (asked.failed && asked.value != ERR_NO_ACCESS)
             goto stop;
     }
@@ -969,7 +971,7 @@ done:
 
 full:
     /* Not a byte of the piece was written. How much room is there? */
-    drive = *(const u16 *)CpDest;
+    drive = GET16(CpDest);
     if (drive >> 8 != ':')
         drive = md.DosPth[0];
     /* DOS leaves the carry flag as it finds it here: the assembly has it
@@ -978,7 +980,7 @@ full:
     if (space.failed) {
         /* The assembly goes on with BX and CX as they are, which DOS has
            not set then: the handle, and the size of the piece. */
-        space.free = CpHndl2;
+        space.free = GET16(CpHndl2);
         space.sector = (u16)count;
     }
     got = 0;
@@ -986,25 +988,25 @@ full:
         /* The bytes of a cluster as 16 bits, times the clusters. */
         free = (u32)(u16)(space.value * space.sector) * space.free;
         if (free < (u32)count) {
-            moved = FileWrite(CpHndl2, buffer, (i32)free);
+            moved = FileWrite(GET16(CpHndl2), buffer, (i32)free);
             if (moved.failed)
                 goto terminate;
             got = moved.count;
         }
     }
-    CpWrite += (u32)got;
+    PUT32(CpWrite, GET32(CpWrite) + (u32)got);
     PerCent();
     rest = buffer + (got >> 4 << 4);         /* in paragraphs, as above */
-    SetDate(CpHndl2);
+    SetDate(GET16(CpHndl2));
     /* Is anything in the file? */
-    filled = FileStep(CpHndl2, 2, 0).place != 0;
-    if (FileClose(CpHndl2).failed)
+    filled = FileStep(GET16(CpHndl2), 2, 0).place != 0;
+    if (FileClose(GET16(CpHndl2)).failed)
         goto forget;
     if (!filled) {
         if (FileDelete(CpDest).failed)
             goto terminate;
     } else {
-        asked = FileSetAttributes(CpDest, CpAttr);
+        asked = FileSetAttributes(CpDest, GET16(CpAttr));
         if (asked.failed && asked.value != ERR_NO_ACCESS)
             goto forget;
     }
@@ -1018,7 +1020,7 @@ full:
     /* On another disk: the directories of the target are made there, one
        after the other, if the last of them is not there. */
     SplitFl = 2;
-    if (CpWrite != 0)
+    if (GET32(CpWrite) != 0)
         SplitFl = 1;
     for (i = 0; i < LenName; i++)
         md.TmpErr[i] = CpDest[i];
@@ -1055,17 +1057,17 @@ full:
     }
 
 forget:
-    CpHndl2 = 0;
+    PUT16(CpHndl2, 0);
 terminate:
     result = STOP;
     md.BlocEr = 1;
-    if (CpHndl2 != 0 && !ChgDisk(CpDest)) {
-        FileClose(CpHndl2);
+    if (GET16(CpHndl2) != 0 && !ChgDisk(CpDest)) {
+        FileClose(GET16(CpHndl2));
         FileDelete(CpDest);
     }
 close_source:
-    if (CpHndl1 != 0)
-        FileClose(CpHndl1);
+    if (GET16(CpHndl1) != 0)
+        FileClose(GET16(CpHndl1));
     md.BlocEr = 0;
     goto close;
 
@@ -1646,7 +1648,7 @@ bool F35_61(u16 answer, u16 place)
         for (i = 0; i < LenStr + 1; i++)
             md.TmpBuf[i] = line[i];
         NormStr(md.TmpBuf);
-        pair = *(u16 *)md.TmpBuf;
+        pair = GET16(md.TmpBuf);
         if (pair >> 8 == ':') {
             DriveSelect((u8)(UpCase(pair) - 'A'));
             if (SetPth())
@@ -1670,7 +1672,7 @@ bool F35_61(u16 answer, u16 place)
     line[LenStr] = 0;
     for (i = 0; line[i] != 0; i++)
         ;
-    *(u16 *)(line - 3) = (u16)i;        /* the cursor behind the path */
+    PUT16(line - 3, (u16)i);            /* the cursor behind the path */
     line[-1] = 1;                       /* and what is typed added to it */
     InSt10(place, line, LenStr, BoxCu_C << 8);
     return true;

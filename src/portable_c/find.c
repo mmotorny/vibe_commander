@@ -796,8 +796,8 @@ static i32 F67_08(void)
            letter in place of what is looked for */
         rest = md.FindStr + 2;
         end = md.TmpErr + 2;
-        *(u16 *)md.TmpErr = *(u16 *)md.FindStr;
-        if (*(u16 *)md.FindStr == ALL_DRIVES
+        PUT16(md.TmpErr, GET16(md.FindStr));
+        if (GET16(md.FindStr) == ALL_DRIVES
             && CutPath(rest) == rest)
             *end++ = '\\';
         for (i = 0; i < LenPath + 13 - 2; i++)
@@ -805,8 +805,8 @@ static i32 F67_08(void)
         NormStr(md.TmpErr);
         if (md.TmpErr[0] == 0)
             return SEARCH_CLOSED;       /* F67_25 */
-        *(u16 *)CUT_PATH(md.TmpErr) = 'A';
-        first = *(u16 *)md.TmpErr;
+        PUT16(CUT_PATH(md.TmpErr), 'A');
+        first = GET16(md.TmpErr);
         if (first == ALL_DRIVES) {
             for (;;) {
                 /* F67_10: the next drive that is searched */
@@ -832,13 +832,13 @@ static i32 F67_08(void)
         if (ChgDisk(md.TmpErr))
             return SEARCH_CLOSED;       /* F67_25 */
         rest = md.TmpErr + 2;
-        drive = *(u16 *)md.TmpErr;
+        drive = GET16(md.TmpErr);
         if ((drive >> 8) != ':') {
             rest = md.TmpErr;
-            drive = *(u16 *)md.DosPth;
+            drive = GET16(md.DosPth);
         }
         drive = UpCase(drive);
-        *(u16 *)md.TmpBuf = drive;
+        PUT16(md.TmpBuf, drive);
         end = md.TmpBuf + 2;
         count = LenPath + 13;
         if (*rest != '\\') {
@@ -969,7 +969,7 @@ struct Searched F67_00(void)
         FND->FndMenu = 0;
         md.WinMous = 0;
         md.MousEnt = 0;
-        ((u16 *)&md.MousTim)[1] = 0xFFFF;
+        md.MousTim |= 0xFFFF0000UL;
         ViTxHex = 0;
         /* As many lines as the memory behind the program has room for. */
         FND->FndSize = RoomBytes() / LenFnf - 1;

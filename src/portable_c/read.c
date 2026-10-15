@@ -541,12 +541,12 @@ struct Label GetVol(u8 *volume)
     u8 c;
 
     volume[0] = 0;
-    *(u16 *)md.TmpErr = 'A';
+    PUT16(md.TmpErr, 'A');
     asked = FileTrueName(md.TmpErr, md.TmpErr + 100);
     if (asked.failed)
         return Labelled(true, asked.value, true);
     scan = md.TmpErr + 100;
-    if (*(u16 *)scan == 0x5C5C) {               /* \\server\name\... */
+    if (GET16(scan) == 0x5C5C) {        /* \\server\name\... */
         scan += 2;
         for (i = 100; i != 0; i--)
             if (*scan++ == '\\')
@@ -593,19 +593,19 @@ void DirSize(struct WCBdef *panel)
     md.FncAddr = FNC_DISI10;
     to = MvzLine(md.TmpBuf, panel->WinPath, LenPath);
     if (to[-1] != '\\')
-        *(u16 *)to = '\\';
+        PUT16(to, '\\');
     for (file = DSKBUF; file < PLACES(panel)->EndFul; file += SIZE_FILENT) {
         entry = ENTRY(panel, file);
         if (!(entry->AttrF & ATTR_DIRECTORY) || entry->NameF[0] == '.')
             continue;
-        *(u16 *)(md.TmpBuf + 90) = 0;
-        *(u16 *)(md.TmpBuf + 92) = 0;
+        PUT16(md.TmpBuf + 90, 0);
+        PUT16(md.TmpBuf + 92, 0);
         to = CUT_PATH(md.TmpBuf);
         for (i = 0; i < 13; i++)
             to[i] = entry->NameF[i];
         if (FncCall(ATTR_DIRECTORY) >> 8)
             return;
-        entry->SizeF = *(u32 *)(md.TmpBuf + 90);
+        entry->SizeF = GET32(md.TmpBuf + 90);
     }
     panel->SizDir = 1;
 }
@@ -618,15 +618,15 @@ void DirSize(struct WCBdef *panel)
    not, 100h to stop. For a file it is 0. */
 u16 DiSi10(u16 attributes)
 {
-    u32 *sum = (u32 *)(md.TmpBuf + 90);
+    u8 *sum = md.TmpBuf + 90;           /* a double word, GET32 and PUT32 */
     u32 size;
 
     if (attributes & ATTR_DIRECTORY)
         return DirFunc();
     size = md.DTA.FilSize;
-    *sum += size;
-    if (*sum < size)
-        *sum = 0xFFFFFFFFUL;
+    PUT32(sum, GET32(sum) + size);
+    if (GET32(sum) < size)
+        PUT32(sum, 0xFFFFFFFFUL);
     return 0;
 }
 

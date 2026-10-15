@@ -82,8 +82,9 @@ extern const u8 Mask_S[];               /* "\*.*" */
 
 #define EOF_CHAR 0x1A
 
-/* Where the keys of the lines of the menu are kept. */
-#define KEYS ((u16 *)(md.TmpBuf + 100))
+/* Where the keys of the lines of the menu are kept, a word for each,
+   which GET16 and PUT16 of vc.h read and write. */
+#define KEYS (md.TmpBuf + 100)
 
 /* Not 0 once the list file has been written for a line of the menu. */
 #define ListFlg (md.TmpBuf[0])
@@ -97,7 +98,7 @@ extern const u8 Mask_S[];               /* "\*.*" */
 static const u8 CrLf_S[] = { 13, 10 };
 
 /* The word at an address in the main data. */
-#define WORD_AT(address) (*(const u16 *)(address))
+#define WORD_AT(address) GET16(address)
 
 /* What the menu shows instead of the key bar and the menu bar. */
 static void F42_10(void)
@@ -447,7 +448,7 @@ Run_23:
 
 Run_30:                                 /* that is all of them */
     *to = 0;
-    *(u16 *)COMMANDS_END = 0;
+    PUT16(COMMANDS_END, 0);
     for (count = 0; count < 255; count++)
         if (md.DosBuf[count] == 0)
             break;
@@ -475,7 +476,7 @@ bool F32_00(bool main)
     struct Moved read;
     const u8 *text;                     /* SI */
     u16 *screen;                        /* DI */
-    u16 *key;                           /* BP */
+    u8 *key;                            /* BP: a word of KEYS */
     u16 begin, size;                    /* BX and DX: the box */
     i32 keys;                           /* CL: how wide the keys are */
     i32 row;                            /* CH: the line of the cursor */
@@ -542,7 +543,7 @@ F32_05:                                 /* read it */
 F32_10:
     width = 0;
     length = 0;
-    *key = 0;
+    PUT16(key, 0);
     c = text[0];
     next = text[1];
     if (c <= ' ' || c == 0xFF || c == 0x7F)
@@ -581,7 +582,7 @@ F32_13:
     scan = 0;
 F32_14:
     length += 2;
-    *key = (u16)(scan << 8 | c);
+    PUT16(key, (u16)(scan << 8 | c));
     text += length;
     while (*text == ' ' || *text == '\t')
         text++;
@@ -603,7 +604,7 @@ F32_15:                                 /* how long the line is */
 F32_16:
     if (width > widest)
         widest = width;
-    key++;
+    key += 2;
     lines++;
     if ((u8)c == EOF_CHAR)
         goto F32_18;
@@ -641,7 +642,7 @@ F32_18:                                 /* the box */
 F32_22:
     text = FndItem(text).at;
     screen = BasAdr(place);
-    if (*key != 0) {
+    if (GET16(key) != 0) {
         i = 0;
         c = *text++;
         do {
@@ -672,7 +673,7 @@ F32_26:
     room--;
     goto F32_26;
 F32_28:
-    key++;
+    key += 2;
     place += 0x100;
     if (--lines != 0)
         goto F32_22;
@@ -719,7 +720,7 @@ F32_31:
         answer = UpCase(answer & 0xFF);
     lines = (u8)((size >> 8) - 5);      /* the key of a line */
     for (i = 0; i < lines; i++)
-        if (KEYS[i] == answer) {
+        if (GET16(KEYS + 2 * i) == answer) {
             row = i;
             goto F32_50;
         }

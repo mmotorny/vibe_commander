@@ -101,10 +101,13 @@ HOLDS(a_bool_is_one_byte, sizeof(bool) == 1);
 /* The low byte of a number is the first of it in the memory, as it is
    on DOS, and the code counts on that all over. The main data, DOS's
    structures, the screen and the files that the program keeps hold
-   words, which it reads and writes as numbers, through the structures
-   below and through pointers; PUT16 writes one so; and a number of 32
-   bits that is an address or a size is taken for its two words. So
-   nothing compiles for a machine that is not known to have it so. The
+   words, which it reads and writes as numbers through the structures
+   below, and copies as bytes: the setup file is the bytes of the main
+   data and of the panels, the help file and the tree's file are read
+   into structures, and the character of a cell of the screen is
+   written as its first byte. A word in a buffer of bytes is made of
+   its bytes, by GET16 and its like below, and does not count on it.
+   So nothing compiles for a machine that is not known to have it so. The
    one that Open Watcom compiles for here has, the 386; gcc and clang
    say which it is. Of another compiler nothing is known here: say how
    it tells. */
@@ -119,9 +122,34 @@ HOLDS(a_bool_is_one_byte, sizeof(bool) == 1);
 #include <stddef.h>
 #define OFFSET_IN(type, field) ((u16)offsetof(type, field))
 
-/* Write a 16-bit value to a buffer of bytes, low byte first, and step the
-   pointer past it. */
-#define PUT16(buffer, value) (*(u16 *)(buffer) = (value), (buffer) += 2)
+/* A word of 16 or 32 bits in a buffer of bytes, read and written as its
+   bytes, the low one first, as DOS has it. The program keeps such words
+   where the original does, in buffers and in files, at an address that
+   may be odd, and reads them so, not through a pointer of the word's
+   type cast from the byte's: C does not promise such a read where the
+   address is not aligned, and a sanitizer's check of alignment stops at
+   one. Open Watcom puts the few instructions in place. */
+static inline u16 GET16(const u8 *at)
+{
+    return (u16)(at[0] | at[1] << 8);
+}
+
+static inline u32 GET32(const u8 *at)
+{
+    return (u32)GET16(at) | (u32)GET16(at + 2) << 16;
+}
+
+static inline void PUT16(u8 *at, u16 value)
+{
+    at[0] = (u8)value;                  /* the low byte, */
+    at[1] = (u8)(value >> 8);           /* and the high one */
+}
+
+static inline void PUT32(u8 *at, u32 value)
+{
+    PUT16(at, (u16)value);              /* the low word, */
+    PUT16(at + 2, (u16)(value >> 16));  /* and the high one */
+}
 
 /* Fails to compile when a structure is not laid out as in the assembly. */
 #define LAID_OUT(type, size) typedef char type##_size[sizeof(struct type) == (size) ? 1 : -1]
@@ -795,7 +823,14 @@ extern bool StOpen;
    the program, and has the name of the setup file behind it only where
    stmain.c says so; and UserScr, what DOS had on the screen, is the
    main data's with one row less than the 50 that the setup program
-   keeps: StUser of stmain.c has the rows. */
+   keeps: StUser of stmain.c has the rows.
+
+   It lies over MenuBuf, which is at an odd place of the main data, so it
+   is packed, as the structures above are, and its members are read where
+   they are. Gap1 and Gap2 are where a compiler, of a structure that is
+   not packed, puts a number of 32 bits at a place that four divides and
+   makes the whole as long as four divides, and keep it as it was. */
+#pragma pack(push, 1)
 struct StData {
     u8  File[INI_LEN + 1];              /* the setup file, and a byte more,
                                            which is read to know a file
@@ -807,6 +842,7 @@ struct StData {
     u8  BackC;                          /* of the palettes, stcolor.c */
     u8  HistC;
     u8  HstCuC;
+    u8  Gap1;
     i32 ColCur;                         /* the item under the cursor, */
     i32 ColFrst;                        /* the first shown, or FFF0h while
                                            none is, */
@@ -816,8 +852,14 @@ struct StData {
        own memory meanwhile; and the 50th row of what DOS had on the
        screen. */
     u8  Aside[CmnIni];
-    u16 Row50[80];
+    u8  Row50[2 * 80];                  /* its cells, as bytes */
+    u8  Gap2[2];
 };
+#pragma pack(pop)
+HOLDS(the_setups_numbers_are_where_they_were,
+      offsetof(struct StData, IniStat) % 4 == 0
+      && offsetof(struct StData, ColCur) % 4 == 0
+      && sizeof(struct StData) % 4 == 0);
 HOLDS(the_setups_data_fits_MenuBuf, sizeof(struct StData) <= LenMenu);
 
 /* The setup: entered from the Options menu, and left. It is no command

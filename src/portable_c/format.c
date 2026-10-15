@@ -119,22 +119,29 @@ void PutDate(u16 date, struct DateText *text)
         text->first = day;
     }
     if ((u8)text->first == '0')
-        *(u8 *)&text->first = ' ';
+        text->first = (u16)((text->first & 0xFF00) | ' ');    /* the low byte */
 }
 
 /* Write a date from PutDate() to `buffer`, with the century: 10 characters.
    Returns the address behind them. */
 u8 *BufDate(const struct DateText *text, u8 *buffer)
 {
-    if (md.Country.DateFmt > DATE_DMY)
+    if (md.Country.DateFmt > DATE_DMY) {
         PUT16(buffer, text->century);
+        buffer += 2;
+    }
     PUT16(buffer, text->first);
+    buffer += 2;
     *buffer++ = md.Country.DateSep[0];
     PUT16(buffer, text->second);
+    buffer += 2;
     *buffer++ = md.Country.DateSep[0];
-    if (md.Country.DateFmt <= DATE_DMY)
+    if (md.Country.DateFmt <= DATE_DMY) {
         PUT16(buffer, text->century);
+        buffer += 2;
+    }
     PUT16(buffer, text->third);
+    buffer += 2;
     return buffer;
 }
 
@@ -157,7 +164,7 @@ void PutTime(u16 time, struct TimeText *text)
     }
     text->hour = HexDec(hour);
     if ((u8)text->hour == '0')
-        *(u8 *)&text->hour = ' ';
+        text->hour = (u16)((text->hour & 0xFF00) | ' ');    /* the low byte */
 }
 
 /* Write a time from PutTime() to `buffer`, with seconds and the suffix:
@@ -165,10 +172,13 @@ void PutTime(u16 time, struct TimeText *text)
 u8 *BufTime(const struct TimeText *text, u8 *buffer)
 {
     PUT16(buffer, text->hour);
+    buffer += 2;
     *buffer++ = md.Country.TimeSep[0];
     PUT16(buffer, text->minute);
+    buffer += 2;
     *buffer++ = md.Country.TimeSep[0];
     PUT16(buffer, text->second);
+    buffer += 2;
     *buffer++ = text->suffix;
     return buffer;
 }

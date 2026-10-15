@@ -187,14 +187,14 @@ static void StRdPages(u16 handle, u8 *buffer)
     lines -= BegHlp - 1;
     /* Six bytes for every line of the index, of which the last four are
        where its page is in the file. */
-    first = *(u32 *)(buffer + HlpInfo + 2 + 6 * (BegHlp - 1));
+    first = GET32(buffer + HlpInfo + 2 + 6 * (BegHlp - 1));
     if (SeekDsk(handle, first))
         return;
     /* As much as there is room for: or, if the index has a page behind
        the setup's and that is nearer, as far as there. */
     count = LIMIT - (HELPBUF + 2);
     if (lines > NumHlp) {
-        between = *(u32 *)(buffer + HlpInfo + 2
+        between = GET32(buffer + HlpInfo + 2
                            + 6 * (BegHlp - 1 + NumHlp)) - first;
         if (between >> 16 == 0 && count > (u16)between)
             count = (u16)between;
@@ -204,7 +204,7 @@ static void StRdPages(u16 handle, u8 *buffer)
     read = FileRead(handle, buffer + 2, count);
     if (read.failed)
         return;
-    *(u16 *)buffer = (u16)read.count;   /* below the room's LIMIT */
+    PUT16(buffer, (u16)read.count);     /* below the room's LIMIT */
     /* The mark comes off as many bytes as were asked for, read or not. */
     DeCode(buffer + 2, (u16)count);
 }
@@ -293,7 +293,7 @@ static struct StHlpData *StPage(u8 *buffer, u8 page)
     u16 at, next, end, count;
 
     count = page;
-    end = HELPBUF + 2 + *(u16 *)buffer;
+    end = HELPBUF + 2 + GET16(buffer);
     next = HELPBUF + 2;
     do {
         at = next;
@@ -463,7 +463,7 @@ static void StHelp04(struct StHlpData *entry, u16 size)
     md.WinMous = 0;
     md.MousEnt = 0;
     md.HlpPage = 0xFF;
-    ((u16 *)&md.MousTim)[1] = 0xFFFF;
+    md.MousTim |= 0xFFFF0000UL;
     entry->HlpFrst = 0xFFF0;            /* nothing is shown yet */
     first = 0;
 

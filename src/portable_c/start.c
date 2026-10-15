@@ -315,7 +315,7 @@ void Init00(void)
         sum = 0;
         for (i = 0; i < INI_LEN - 2; i++)       /* Init01 */
             sum += image[i];
-        if (*(u16 *)(image + INI_LEN - 2) == sum
+        if (GET16(image + INI_LEN - 2) == sum
             && image[0] == 'V' && image[1] == 'V' && image[2] == 'V') {
             for (i = 0; i < CmnIni; i++)
                 ((u8 *)&md)[i] = image[3 + 2 * WCBini + i];
@@ -370,7 +370,7 @@ void Init00(void)
     md.ViewFil[0] = 0;
     md.ToFile[0] = 0;
     md.SrchStr[0] = 0;
-    *(u16 *)md.HstBuf = 0;
+    PUT16(md.HstBuf, 0);
     md.LastMnu = 1;
     md.MouseX = 0xFFFF;
     md.MouseY = 0xFFFF;

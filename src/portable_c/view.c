@@ -87,11 +87,13 @@ static i32 ViTmp2;                      /* Last byte of search string */
 
 /* What is looked for, in HelpBuf: the text in capitals and its length,
    and, if the text is hex digits and the viewer shows hex, the bytes they
-   stand for and how many those are. */
+   stand for and how many those are. The two lengths are words, at the
+   places that SRCH_LEN and HexLen name, read and written by GET16 and
+   PUT16. */
 #define SRCH_TEXT 0
-#define SRCH_LEN  (*(u16 *)(md.HelpBuf + 90))
+#define SRCH_LEN  (md.HelpBuf + 90)
 #define SRCH_HEX  100
-#define HexLen    (*(u16 *)(md.HelpBuf + 190))
+#define HexLen    (md.HelpBuf + 190)
 
 #define Arrow_C 35                      /* the colour of the arrows at the
                                            ends of a line that goes on */
@@ -171,10 +173,10 @@ static const u8 Byts_S[6] NONSTRING = " Bytes";
    that it is on DOS, at the segment's end, and not one in front of the
    text. One place reads so: a line that begins at 1, which NextLin does
    not ask about before it looks at the two bytes in front of it.
-   WORD_AT reads, of a text that may be const, and WORD_TO is the same
-   word to be written. */
-#define WORD_AT(text, at) (*(const u16 *)((text) + (u16)(at)))
-#define WORD_TO(text, at) (*(u16 *)((text) + (u16)(at)))
+   WORD_AT reads, of a text that may be const, by GET16 of vc.h, and
+   WORD_TO is the place of the same word, which PUT16 writes. */
+#define WORD_AT(text, at) GET16((text) + (u16)(at))
+#define WORD_TO(text, at) ((text) + (u16)(at))
 
 /* Whether two bytes end a line: CR LF, or LF CR. */
 #define IS_CRLF(word) ((word) == 0x0A0D || (word) == 0x0D0A)
@@ -588,8 +590,8 @@ static void V32_00(const u8 *text, i32 number, i32 at, i32 end)
                 continue;
             place -= ViCol;
             if ((u8)place >= (u8)VI->ViSize) {
-                *(u16 *)(screen + ((VI->ViSize & 0xFF) << 1) - 2) =
-                    (u16)(Color(Arrow_C) << 8 | 0x1A);
+                PUT16(screen + ((VI->ViSize & 0xFF) << 1) - 2,
+                      (u16)(Color(Arrow_C) << 8 | 0x1A));
                 break;
             }
             place <<= 1;
@@ -599,7 +601,7 @@ static void V32_00(const u8 *text, i32 number, i32 at, i32 end)
                 screen[place + 1] = (u8)Color(Cursr_C);
         }
         if (ViCol != 0)
-            *(u16 *)screen = (u16)(Color(Arrow_C) << 8 | 0x1B);
+            PUT16(screen, (u16)(Color(Arrow_C) << 8 | 0x1B));
         return;
     }
 
@@ -673,14 +675,14 @@ static void V50_00(u8 *text)
     VI->ViOffset += (u32)half;
     ViFirst -= half;
     from = to = ViSpace - 2;
-    WORD_TO(text, to) = 0;
+    PUT16(WORD_TO(text, to), 0);
     while (from >= ViEndTab) {
         at = WORD_AT(text, from);
         from -= 2;
         if (at <= half)
             continue;
         to -= 2;
-        WORD_TO(text, to) = (u16)(at - half);
+        PUT16(WORD_TO(text, to), (u16)(at - half));
     }
     ViEndTab = to;
     rest = VI->ViLen - VI->ViOffset;
@@ -778,7 +780,7 @@ static void V60_00(u8 *text, i32 at, i32 table)
         column = 0;
         if (at < table) {
             table -= 2;
-            WORD_TO(text, table) = (u16)at;
+            PUT16(WORD_TO(text, table), (u16)at);
             if (table < loaded)
                 loaded = table;
         } else {
@@ -1174,7 +1176,7 @@ V08_00:                                 /* PgDn */
         if (NEXT())
             goto V08_06;
         starts += 2;
-        *(u16 *)starts = (u16)line.at;
+        PUT16(starts, (u16)line.at);
     } while (--count);
     /* And a screen from there: where it is not full and the file ends,
        back by as many lines as it lacks. */
@@ -1195,7 +1197,7 @@ V08_03:
     if (starts < md.TmpBuf)
         goto V00_30;
 V08_05:
-    ViFirst = *(u16 *)starts;
+    ViFirst = GET16(starts);
     goto V00_20;
 V08_06:                                 /* the part ends: the next one */
     V50_00(text);
@@ -1316,9 +1318,9 @@ V15_04:                                 /* and on in the file, a piece of
         goto V15_10;
 V15_06:                                 /* not in these `count` bytes: on
                                            from where it may begin */
-    if (count < SRCH_LEN)
+    if (count < GET16(SRCH_LEN))
         goto V15_07;
-    count = count - SRCH_LEN + 1;
+    count = count - GET16(SRCH_LEN) + 1;
     VI->ViSearch += (u32)count;
     goto V15_04;
 V15_07:
@@ -1327,9 +1329,9 @@ V15_07:
     goto V15_22;
 V15_10:                                 /* found, as text or as bytes */
     VI->ViSrPan = (u8)found;
-    length = SRCH_LEN;
+    length = GET16(SRCH_LEN);
     if ((u8)found == 0)
-        length = HexLen;
+        length = GET16(HexLen);
     ViSrLen = length;
     behind -= length;
     VI->ViSearch += (u32)behind;
@@ -1472,8 +1474,8 @@ void V81_00(void)
 
     to = (u8 *)MvzLine(md.HelpBuf, md.SrchStr, LenStr + 1);
     PathLin(md.HelpBuf);
-    SRCH_LEN = (u16)(to - md.HelpBuf);
-    HexLen = 0;
+    PUT16(SRCH_LEN, (u16)(to - md.HelpBuf));
+    PUT16(HexLen, 0);
     if (VI->ViTxHex == 0)
         return;
     from = md.SrchStr;
@@ -1488,7 +1490,7 @@ void V81_00(void)
         if (digit > 0xFF)
             break;
         *to = (u8)digit;
-        HexLen++;
+        PUT16(HexLen, (u16)(GET16(HexLen) + 1));
         c = *from++;
         if (c == 0)
             return;
@@ -1505,7 +1507,7 @@ void V81_00(void)
         if (c != ',')
             from--;
     }
-    HexLen = 0;
+    PUT16(HexLen, 0);
 }
 
 /* Look for what V81_00 has prepared in `count` bytes of a text. Returns
@@ -1523,19 +1525,20 @@ static struct Sought Sought(u16 found, i32 end)
 
 struct Sought V82_00(const u8 *text, i32 at, i32 count)
 {
-    i32 more = SRCH_LEN - HexLen;       /* places at the end where only
-                                           the bytes have room */
+    /* places at the end where only the bytes have room */
+    i32 more = GET16(SRCH_LEN) - GET16(HexLen);
     i32 start, left, i;
 
-    if (count >= SRCH_LEN) {
-        count = count - SRCH_LEN + 1;
+    if (count >= GET16(SRCH_LEN)) {
+        count = count - GET16(SRCH_LEN) + 1;
     } else {
         /* The assembly adds what the text lacks, less than nothing, to
            `more` in 16 bits, and goes on where that carries: where the
            bytes have room at all. */
-        if (more + count < SRCH_LEN)    /* fewer bytes than are looked for */
+        /* fewer bytes than are looked for */
+        if (more + count < GET16(SRCH_LEN))
             goto none;
-        more += count - SRCH_LEN;
+        more += count - GET16(SRCH_LEN);
         more++;
         /* The assembly has the count 0 here, which bytes_only sets anew
            before it is read. */
@@ -1544,7 +1547,7 @@ struct Sought V82_00(const u8 *text, i32 at, i32 count)
     for (;;) {
         start = at;
         i = SRCH_TEXT;
-        left = SRCH_LEN;
+        left = GET16(SRCH_LEN);
         for (;;) {
             if ((u8)UpCase(text[at++]) != md.HelpBuf[i++])
                 break;
@@ -1553,7 +1556,7 @@ struct Sought V82_00(const u8 *text, i32 at, i32 count)
         }
         at = start;
 bytes:
-        left = HexLen;
+        left = GET16(HexLen);
         if (left != 0) {
             i = SRCH_HEX;
             for (;;) {
@@ -1672,7 +1675,7 @@ struct Next F34_30(const u8 *text)
 
     for (;;) {
         at = FndLet(at);
-        word = *(const u16 *)at;
+        word = GET16(at);
         at += 2;
         if (!IS_CRLF(word)) {
             at--;
@@ -1682,13 +1685,13 @@ struct Next F34_30(const u8 *text)
             return Next(false, at);
         }
         for (;;) {                      /* behind the end of a line */
-            word = *(const u16 *)at;
+            word = GET16(at);
             if ((u8)word == ' ' || (u8)word == '\t')
                 break;
             if (!IS_CRLF(word) && (u8)word != '\'')
                 return Next(true, at);
             do {                        /* to the end of this one */
-                word = *(const u16 *)at;
+                word = GET16(at);
                 at += 2;
                 if (IS_CRLF(word))
                     break;
@@ -1735,7 +1738,7 @@ struct Named F34_40(u8 *text, bool view)
     i32 count;
     u8 c;
 
-    word = *(const u16 *)at;
+    word = GET16(at);
     if (word >> 8 == ':') {
         c = (u8)UpCase(word & 0xFF);
         if (c < 'A' || c > 'Z')
@@ -1743,7 +1746,7 @@ struct Named F34_40(u8 *text, bool view)
         at += 2;
     }
     for (;;) {
-        word = *(const u16 *)at;
+        word = GET16(at);
         at++;
         c = (u8)word;
         if (c == '!')
@@ -1805,9 +1808,9 @@ static void Aexec0(bool edit)
     /* Neither box has ^I in its lines; the assembly has DX on TmpBuf. */
     DialBox(0x528, box, md.TmpBuf, &md, &where);
     Window(where.begin, where.size);
-    *(u16 *)(md.TmpBuf + 95) = where.begin;
-    *(u16 *)(md.TmpBuf + 97) = where.size;
-    *(u16 *)(md.TmpBuf + 93) = CursorWhere(0).shape;
+    PUT16(md.TmpBuf + 95, where.begin);
+    PUT16(md.TmpBuf + 97, where.size);
+    PUT16(md.TmpBuf + 93, CursorWhere(0).shape);
     for (i = 0; i < (i32)sizeof ViewPar; i++)
         tail[i] = ViewPar[i];
     for (; i < 45; i++)
@@ -1852,10 +1855,10 @@ static void Aexec0(bool edit)
         }
         Dialog(&RunEr_B, include, 0, 0, &md);
     }
-    ResWin(*(u16 *)(md.TmpBuf + 95), *(u16 *)(md.TmpBuf + 97),
+    ResWin(GET16(md.TmpBuf + 95), GET16(md.TmpBuf + 97),
            md.WinBuf);
     Window(0, (u16)(md.Lines << 8 | 80));
-    CurShp(*(u16 *)(md.TmpBuf + 93));
+    CurShp(GET16(md.TmpBuf + 93));
     FncEx1();
 }
 
