@@ -408,8 +408,74 @@ class DosShown:
                     yield row, column
 
 
+@dataclass(frozen=True)
+class OwnPath:
+    """A mask of the place of the program's own files, D:\\VC on the
+    bench, which is the directory of its setup file on Linux,
+    `$XDG_CONFIG_HOME/vc`, a directory of R: whose path is the run's own
+    and LONGER characters longer (posixrun.OWN): where a scenario types a
+    path of D:\\VC, the run types that one. A path of the place is masked
+    with the field that it stands in, as far as the next text behind its
+    spaces or the frame, since what follows it in the field moves: the
+    name in the status line of the viewer and the editor, a dialog's line
+    with the path typed into it. A box whose text has the path behind
+    other words is as wide as that text, centred, and the run's is wider:
+    all of it is masked, and as far beside it as it can grow, with a row
+    above and below and its shadow. Where the golden's cursor is in what is masked, a path being
+    typed there, the build's is taken for the golden's (the user's word
+    of 15 October 2026: only a scenario about the program's own files
+    has their place masked, and no other shows it)."""
+    what: str = "the place of the program's own files, a path of R:"
+
+    PATH = re.compile(r"(?<![A-Za-z0-9])[Dd]:\\[Vv][Cc](?:\\[^ ║│]*)? *")
+    LONGER = len("R:\\TMP\\VCxxxxxx\\VC") - len("D:\\VC")
+
+    def spans(self, golden):
+        """(row, start, end) of every stretch of a row that is masked on
+        the golden's screen."""
+        lines = golden.lines()
+        for row, line in enumerate(lines):
+            for match in self.PATH.finditer(line):
+                left = line.rfind("║", 0, match.start())
+                right = line.find("║", match.end())
+                box = self.box(lines, row, left, right) \
+                    if left >= 0 and right >= 0 and \
+                    line[left + 1:match.start()].strip() else None
+                if box is None:
+                    yield row, match.start(), match.end()
+                    continue
+                # A box may have a row of its colour above its frame and
+                # one below, and its shadow below that.
+                top, bottom = box
+                for at in range(max(top - 1, 0), min(bottom + 3, ROWS)):
+                    yield (at, max(left - self.LONGER, 0),
+                           min(right + 1 + self.LONGER + 2, COLUMNS))
+
+    @staticmethod
+    def box(lines, row, left, right):
+        """The rows of the top and the bottom frame of the box whose
+        sides are at the columns `left` and `right` of `row`, or None
+        where that is no box."""
+        top = row - 1
+        while top >= 0 and lines[top][left] in "║╟":
+            top -= 1
+        bottom = row + 1
+        while bottom < len(lines) and lines[bottom][left] in "║╟":
+            bottom += 1
+        if top < 0 or bottom >= len(lines) or \
+                lines[top][left] != "╔" or lines[top][right] != "╗" or \
+                lines[bottom][left] != "╚" or lines[bottom][right] != "╝":
+            return None
+        return top, bottom
+
+    def found(self, golden, written):
+        for row, start, end in self.spans(golden):
+            for column in range(start, end):
+                yield row, column
+
+
 # The masks that are found by a method of their own, `found`.
-_FOUND = (WrittenTimes, InfoUnder, DosPrompt, DosShown)
+_FOUND = (WrittenTimes, InfoUnder, DosPrompt, DosShown, OwnPath)
 
 
 def masked(golden, screen, rules, written=None, commanded=False):
@@ -441,6 +507,11 @@ def masked(golden, screen, rules, written=None, commanded=False):
                 at = (row * COLUMNS + column) * 2
                 cells[at:at + 2] = MASKED
             if isinstance(rule, DosPrompt) and golden.cursor[1] == row:
+                cursor = golden.cursor
+        if isinstance(rule, OwnPath):
+            column, row = golden.cursor
+            if any(row == at and start <= column <= end
+                   for at, start, end in rule.spans(golden)):
                 cursor = golden.cursor
     for pattern, _, below in masks:
         for row, line in enumerate(lines):
@@ -1307,6 +1378,13 @@ LINUX_MASKS = (
     # letter alone at the start of the row above the key bar, which is
     # the command line's.
     (re.compile(r"^(C)(?![:>])"), None, re.compile(r"^1\D{6,7}2")),
+    # And in the setup file's bytes, which the Linux program has saved
+    # with H: where the bench's has C: (CLAUDE.md, step 6), where the
+    # editor shows them in hex: the drive of the right panel's path, the
+    # last byte of the row of 60h (posixrun.SETUP_PATHS).
+    (re.compile(r"^ 00000060(?:  [0-9A-F]{2}(?: [0-9A-F]{2}){3}){3}"
+                r"  [0-9A-F]{2}(?: [0-9A-F]{2}){2} (43)  .{15}(C) $"),
+     None, None),
     # Its label: the bench's C: is WORK, and H: is HOME; behind the
     # drive's letter also where a box covers "Volume in drive".
     (re.compile(r": is (WORK)\b"), None, None),
@@ -1337,6 +1415,8 @@ LINUX_MASKS = (
     DosPrompt(),
     # What DOS has shown behind the panels, once a command has run.
     DosShown(),
+    # The place of the program's own files.
+    OwnPath(),
 )
 
 # The scenarios that the program for Linux is not taken through, not on
@@ -1411,33 +1491,27 @@ LINUX_NOT_RUN = {
 _ORDER = ("the order of a directory's entries, the tree's and the file "
           "search's, which waits on the user (TODO.md, L3b)")
 _NUL = "DOS's device NUL, which waits on the user (TODO.md, L3b)"
-_FILES = ("A: or D:\\VC for files to work on, until the scenario works in "
-          "C:\\FILES, H:\\FILES on Linux (CLAUDE.md, step 6; TODO.md, L3b)")
-_OWN = ("the program's own files in D:\\VC, whose path on Linux, a "
-        "directory of R:, is to be masked; the mask is not built (TODO.md, "
-        "L3b)")
 LINUX_CUT = {
     "editor-save": (20, f"the editor's errors on saving: at step 20 {_NUL}; "
                         "at step 23 a command of the extension file with "
                         "!.!, a question of L6's for the user"),
-    "help-broken": (3, f"a help file that cannot be read: {_OWN}; at step "
-                       "24 DOS's DEL"),
-    "menu-files": (4, f"the menu and extension files edited: {_OWN}; at "
-                      "step 24 DOS's ATTRIB"),
+    "help-broken": (24, "a help file that cannot be read: at step 24 "
+                        "DOS's DEL"),
+    "menu-files": (24, "the menu and extension files edited: at step 24 "
+                       "DOS's ATTRIB"),
     "panel-keys": (38, f"masks, the panels off and on, and commands: at "
                        f"step 38 {_ORDER}"),
     "history-drives": (60, "the history of commands and the drive box: "
                            "at step 60 the diskette in A:, which Linux has "
                            "not"),
-    "setup-help-file": (6, f"the setup's help file: {_OWN}; at step 22 "
-                           "DOS's CLS"),
-    "setup-damaged": (2, f"the setup file damaged: {_OWN}"),
-    "setup-delay-file": (5, f"the setup file and the delay: {_OWN}"),
+    "setup-help-file": (22, "the setup's help file: at step 22 DOS's "
+                            "CLS"),
+    "setup-damaged": (21, "the setup file damaged: at step 21 DOS's "
+                          "CLS, and COPY behind it"),
     "user-menu": (77, "the user menu's lines: from step 77 its file, "
                       "which DOS's DEL takes away at step 80"),
     "view-commands": (17, "F3 and F4 and their extension files: at step "
                           "17 DOS's DEL"),
-    "editor-keys": (5, f"the editor's keys: {_FILES}"),
     "delete-mask": (19, "a mask of files deleted: at step 19 B:, the "
                         "diskette, which Linux has not"),
     "view-window": (6, "the viewer's window on the Info panel: at step 6 "
@@ -1450,12 +1524,18 @@ LINUX_CUT = {
         ("menu-items", 24), ("tree-deep", 14), ("tree-box", 14),
         ("tree-choose", 4), ("delete", 38), ("make-directory", 3),
         ("dialog-keys", 32), ("copy-ask", 29), ("copy-tree", 4),
-        ("mouse-dialog", 5), ("mouse-tree", 12), ("mouse-find", 5))},
-    **{name: (step, _FILES) for name, step in (
-        ("sort", 19), ("cursor", 2), ("view-parts", 3), ("view-keys", 59),
-        ("view-search", 6), ("move", 4), ("attributes-directory", 19),
-        ("mouse-select", 2), ("mouse-drive", 5), ("mouse-view", 2),
-        ("mouse-edit", 5))},
+        ("mouse-dialog", 5), ("mouse-tree", 12), ("mouse-find", 5),
+        ("cursor", 41))},
+    # Of those that went to A: or to D:\VC, the ones that went there for
+    # more than files to work on, which the others find in C:\FILES,
+    # H:\FILES on Linux (CLAUDE.md, step 6).
+    "move": (4, "a file or a directory moved to another drive, D:, which "
+                "Linux has not: its other drive is R:, the host's root"),
+    "attributes-directory": (19, "the diskette in A:, write-protected, "
+                                 "and DOS's critical error for it, which "
+                                 "Linux has neither of"),
+    "mouse-drive": (5, "the letter A: chosen in the drive box by the "
+                       "mouse, where the box of Linux has H and R"),
 }
 
 # What the program for Linux is expected to show otherwise than the

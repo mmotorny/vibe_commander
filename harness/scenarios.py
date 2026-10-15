@@ -1574,10 +1574,16 @@ class Scenario:
     # is not what the scenario is about: see "A machine with less
     # memory" at the top.
     memory: int = None
+    # C:\FILES on the bench, H:\FILES on Linux: files to work on that
+    # are not the bench's own (setups.files_layout()), which the scenario
+    # goes to for them, by a path without a drive.
+    files: bool = False
 
     @property
     def bench(self):
         """What setups.Benches is asked for the bench of the scenario."""
+        if self.files:
+            return self.country, self.memory, True
         if self.memory is None:
             return self.country
         return self.country, self.memory
@@ -1950,10 +1956,11 @@ SCENARIOS = {
             "F9 l x",                     # by extension
             "F9 l m",                     # by time
             "F9 l s",                     # by size
-            "Alt+F1 a",                   # a disk with files before a
+            "Ctrl+PgUp Home Enter",       # C:\\FILES: files before a
                                           # directory, of different days
             "F9 l u",                     # unsorted: as they are on disk
-        )),
+        ),
+        files=True),
 
     "filter": Scenario(
         "The files of a panel chosen: without the hidden ones, by a mask, "
@@ -2030,8 +2037,8 @@ SCENARIOS = {
         "columns and pages, in a panel of files and in the tree",
         steps=(
             "F9 o f",                     # panels half the screen high
-            "Alt+F1 a",
-            "Enter",                      # A:\\FREEDOS, the first entry
+            "Ctrl+PgUp",
+            "Home Enter",                 # C:\\FILES, the first entry
             "Down Enter",                 # and its BIN: 44 entries, in
                                           # three columns of ten
             "Right",                      # a column on
@@ -2062,11 +2069,11 @@ SCENARIOS = {
             "PgDn PgDn PgDn PgDn",
             "Home",
             "Ins Ins",                    # nothing above is selected
-            "Alt+F1 c",
+            "Ctrl+PgUp Ctrl+PgUp End Enter",  # back in C:\\WORK
             "F9 l b",                     # Brief, and the mini status
             "F9 o n",                     # off: no time of day is shown
             *(f'F7 "{letter}" Enter'      # seven directories more: the
-              for letter in "abcdefg"),   # tree has thirteen
+              for letter in "abcdefg"),   # tree has fifteen
             "PgDn",                       # a list shorter than its panel
             "PgUp",
             "Ctrl+l",                     # the Info on the right: next to
@@ -2083,7 +2090,8 @@ SCENARIOS = {
             "Right",                      # not a key of the tree: it
                                           # goes to the command line
             "Home",
-        )),
+        ),
+        files=True),
 
     "panel-keys": Scenario(
         "Files selected by masks and what was selected restored; the "
@@ -4075,8 +4083,8 @@ SCENARIOS = {
         "A file larger than the memory the viewer has for it, read a part "
         "at a time, forwards and backwards",
         steps=(
-            "Shift+F3",                   # the shell that DOS started from
-            '"a:\\freedos\\bin\\command.com"',
+            "Shift+F3",                   # FreeDOS's shell
+            '"\\files\\bin\\command.com"',
             "Enter",                      # the first 64K of its 87772 bytes
             "Down",
             "Up",
@@ -4097,7 +4105,8 @@ SCENARIOS = {
             "Up",
             "End",
             "Esc",
-        )),
+        ),
+        files=True),
 
     "view-keys": Scenario(
         "The viewer: a file that is not there, its keys where they have "
@@ -4162,9 +4171,9 @@ SCENARIOS = {
             "Enter",
             "Esc",
             "Shift+F5",                   # and one of 65109 bytes, of two
-            '"a:\\freedos\\bin\\format.exe" Tab "big" Enter',
+            '"\\files\\bin\\format.exe" Tab "big" Enter',
             "Shift+F5",                   # programs: less than 64K, and
-            '"a:\\freedos\\bin\\xcopy.exe" Tab "big" Enter',
+            '"\\files\\bin\\xcopy.exe" Tab "big" Enter',
             "p",                          # more than the viewer holds
             "Shift+F3",
             '"big"',
@@ -4172,7 +4181,8 @@ SCENARIOS = {
             "End",                        # the end, read from the middle on
             "Home",                       # and the start again
             "Esc",
-        )),
+        ),
+        files=True),
 
     "view-window": Scenario(
         "A dirinfo that is too large for the editor, viewed in the window "
@@ -4209,8 +4219,8 @@ SCENARIOS = {
             "F9 o o",                     # Clear keyboard buffer off, for
             "Down Down Down Down Down Space",     # a key that is to wait
             "Enter",
-            "Shift+F3",                   # the shell that DOS started from
-            '"a:\\freedos\\bin\\command.com"',
+            "Shift+F3",                   # FreeDOS's shell
+            '"\\files\\bin\\command.com"',
             "Enter",
             "F2",                         # not wrapped
             "Down Down Down Down",        # the fifth line begins in the
@@ -4228,7 +4238,8 @@ SCENARIOS = {
             '"qqqq"',                     # nowhere: Esc is waiting when the
             "Enter+Esc",                  # file is to be read on, and stops
             "Esc",                        # the search
-        )),
+        ),
+        files=True),
 
     "view-commands": Scenario(
         "F3, F4 and their kin: a name asked for and not given, the "
@@ -4453,7 +4464,7 @@ SCENARIOS = {
             "Down Down Down Down Down Space",     # typing in the editor
             "Enter",
             "Shift+F4",                   # 23 lines, in a window of 13
-            '"d:\\vc\\vcview.ext" Enter',
+            '"\\files\\vcview.ext" Enter',
             '"alpha" Space "beta" Space "gamma"',
             # A line of its own; back in it, a character deleted before
             # the cursor and one under it.
@@ -4487,7 +4498,8 @@ SCENARIOS = {
             "Right Right Enter",          # go on editing
             "Esc",
             "Right Enter",                # not saved
-        )),
+        ),
+        files=True),
 
     "editor-hex-keys": Scenario(
         "The keys of the editor in hex: from digit to digit and byte to "
@@ -5605,9 +5617,8 @@ SCENARIOS = {
         "file",
         steps=(
             "F9 o f",                     # panels half the screen high
-            "Alt+F1 a",
-            "Enter",                      # A:\\FREEDOS, the first
-                                          # entry
+            "Ctrl+PgUp",
+            "Home Enter",                 # C:\\FILES, the first entry
             "Down Enter",                 # and its BIN: 44 entries
             "F9 l f",                     # in one column, ten at a time
             "RightClick@3,3",             # a file: selected
@@ -5616,7 +5627,8 @@ SCENARIOS = {
             "RightClick@3,1*8",           # held above it: back again
             "RightClick@3,5*40",          # held on a file that is
                                           # selected: not any more, once
-        )),
+        ),
+        files=True),
 
     "mouse-fields": Scenario(
         "The mouse on the fields of a dialog: a line of a group, a box to "
@@ -6060,7 +6072,7 @@ SCENARIOS = {
         "buttons, and the same in hex",
         steps=(
             "Shift+F3",
-            '"a:\\freedos\\nls\\setup.en" Enter',     # 7,948 bytes of text
+            '"\\files\\setup.en" Enter',  # 7,948 bytes of text
             "Click@40,20*8",              # the last third: down
             "Click@40,3*4",               # the first third: up
             "Click@40,12",                # the middle: nothing
@@ -6079,7 +6091,8 @@ SCENARIOS = {
             "Click@5,12*4",               # the left: nothing
             "Click@40,2*8",               # up
             "Click@73,24",                # F10 of the key bar
-        )),
+        ),
+        files=True),
 
     "mouse-edit": Scenario(
         "The mouse in the editor: a click that puts the cursor into the "
@@ -6092,7 +6105,7 @@ SCENARIOS = {
             "Down Down Down Down Down Space",     # the steps that type
             "Enter",
             "Shift+F4",
-            '"a:\\freedos\\nls\\setup.en" Enter',
+            '"\\files\\setup.en" Enter',
             "Click@10,5",                 # the cursor into a line
             "Click@60,3",                 # and into another
             "RightClick@30,9",            # behind a short line: to its end
@@ -6118,7 +6131,7 @@ SCENARIOS = {
             "Esc",
             "Right Enter",                # not saved
             "Shift+F4",
-            '"a:\\kernel.sys" Enter',     # lines of more than 3900
+            '"\\files\\kernel.sys" Enter',  # lines of more than 3900
             "End",                        # the last column that keys go to
             # The last column of another line is a column further on each
             # time: with the button down from one line to the other and
@@ -6144,7 +6157,8 @@ SCENARIOS = {
             "Click@77,11*8",              # its last column: to the right
             "Click@45,14>45,23*20",       # held below it: the text moves
             "Esc",
-        )),
+        ),
+        files=True),
 
     "setup-new": Scenario(
         "The setup saved where its file is gone, which makes it anew, and "

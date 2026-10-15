@@ -6,9 +6,9 @@ code page 437
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║..          │            │            ║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║WORK        │            │            ║| 1Bx80
 |║data     bin│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
@@ -25,7 +25,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -34,9 +34,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║..          │            │            ║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║WORK        │            │            ║| 1Bx80
 |║data     bin│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
@@ -45,7 +45,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -58,14 +58,14 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 2: Alt+F1 a
+== 2: Ctrl+PgUp
 cursor 4 23 lines 6 7 mode 3
-|╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
+|╔════════════╤═══ C:\ ════╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║FREEDOS     │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║fdauto   bat│            │            ║║WORK        │            │            ║| 1Bx80
-|║fdconfig sys│            │            ║║            │            │            ║| 1Bx80
-|║kernel   sys│            │            ║║            │            │            ║| 1Bx80
+|║FILES       │            │            ║║FILES       │            │            ║| 1Bx80
+|║STAMPS      │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║WORK        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -73,7 +73,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║WORK         ►SUB-DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -83,25 +83,25 @@ cursor 4 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\>                                                                            | 07x80
+|C:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 3: Enter
-cursor 11 23 lines 6 7 mode 3
-|╔════════════╤ A:\FREEDOS ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x12 1Bx54
+== 3: Home Enter
+cursor 9 23 lines 6 7 mode 3
+|╔════════════╤═ C:\FILES ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x10 1Bx55
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║BIN         │            │            ║║WORK        │            │            ║| 1Bx80
-|║CONFIGS     │            │            ║║            │            │            ║| 1Bx80
-|║NLS         │            │            ║║            │            │            ║| 1Bx80
-|║version  fdi│            │            ║║            │            │            ║| 1Bx80
+|║..          │            │            ║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║BIN         │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║kernel   sys│            │            ║║WORK        │            │            ║| 1Bx80
+|║setup    en │            │            ║║            │            │            ║| 1Bx80
+|║vcview   ext│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -111,25 +111,25 @@ cursor 11 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS>                                                                     | 07x80
+|C:\FILES>                                                                       | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 4: Down Enter
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx80
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -139,25 +139,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 5: Right
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx14 30x12 1Bx54
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx80
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx14 30x12 1Bx54
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║driver.com        2048  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║fc.exe           14835  1-09-05 12:03p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -167,25 +167,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 6: Right
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx27 30x12 1Bx41
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx80
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx27 30x12 1Bx41
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║mem.exe          15028  3-01-22  5:49p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║setlang.bat       5322  2-18-22  5:26p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -195,25 +195,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 7: Right
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║driver   com│mem      exe│vdelay   com║║STAMPS      │            │            ║| 1Bx27 30x12 1Bx41
-|║fasthelp bat│more     exe│veach    com║║WORK        │            │            ║| 1Bx80
-|║fc       exe│setlang  bat│vecho    com║║            │            │            ║| 1Bx80
-|║fdapm    com│setver   sys│verrlvl  com║║            │            │            ║| 1Bx80
-|║fdbanner com│slicerex exe│vfdutil  com║║            │            │            ║| 1Bx80
+|║fc       exe│setlang  bat│vecho    com║║FILES       │            │            ║| 1Bx27 30x12 1Bx41
+|║fdapm    com│setver   sys│verrlvl  com║║STAMPS      │            │            ║| 1Bx80
+|║fdbanner com│slicerex exe│vfdutil  com║║WORK        │            │            ║| 1Bx80
 |║fdisk    exe│sys      com│vfont    com║║            │            │            ║| 1Bx80
 |║fdisk    ini│vask     com│vframe   com║║            │            │            ║| 1Bx80
 |║fdwrapup bat│vchoice  com│vgotoxy  com║║            │            │            ║| 1Bx80
 |║format   exe│vcls     com│vinfo    com║║            │            │            ║| 1Bx80
 |║kernl386 sys│vcursor  com│vline    com║║            │            │            ║| 1Bx80
+|║mem      exe│vdelay   com│vpause   com║║            │            │            ║| 1Bx80
+|║more     exe│veach    com│vprogres com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║vdelay.com        1360 11-19-21  6:28a║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║vecho.com         2196  1-10-22  2:15p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -223,16 +223,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 8: Right
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║fdisk    ini│vask     com│vframe   com║║STAMPS      │            │            ║| 1Bx80
-|║fdwrapup bat│vchoice  com│vgotoxy  com║║WORK        │            │            ║| 1Bx80
-|║format   exe│vcls     com│vinfo    com║║            │            │            ║| 1Bx80
+|║fdisk    ini│vask     com│vframe   com║║FILES       │            │            ║| 1Bx80
+|║fdwrapup bat│vchoice  com│vgotoxy  com║║STAMPS      │            │            ║| 1Bx80
+|║format   exe│vcls     com│vinfo    com║║WORK        │            │            ║| 1Bx80
 |║kernl386 sys│vcursor  com│vline    com║║            │            │            ║| 1Bx80
 |║mem      exe│vdelay   com│vpause   com║║            │            │            ║| 1Bx80
 |║more     exe│veach    com│vprogres com║║            │            │            ║| 1Bx80
@@ -241,7 +241,7 @@ cursor 15 23 lines 6 7 mode 3
 |║slicerex exe│vfdutil  com│welcome  bat║║            │            │            ║| 1Bx80
 |║sys      com│vfont    com│xcopy    exe║║            │            │            ║| 1Bx27 30x12 1Bx41
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║xcopy.exe        22685  3-21-25  6:38p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║xcopy.exe        22685  3-21-25  6:38p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -251,16 +251,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 9: Left
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║fdisk    ini│vask     com│vframe   com║║STAMPS      │            │            ║| 1Bx80
-|║fdwrapup bat│vchoice  com│vgotoxy  com║║WORK        │            │            ║| 1Bx80
-|║format   exe│vcls     com│vinfo    com║║            │            │            ║| 1Bx80
+|║fdisk    ini│vask     com│vframe   com║║FILES       │            │            ║| 1Bx80
+|║fdwrapup bat│vchoice  com│vgotoxy  com║║STAMPS      │            │            ║| 1Bx80
+|║format   exe│vcls     com│vinfo    com║║WORK        │            │            ║| 1Bx80
 |║kernl386 sys│vcursor  com│vline    com║║            │            │            ║| 1Bx80
 |║mem      exe│vdelay   com│vpause   com║║            │            │            ║| 1Bx80
 |║more     exe│veach    com│vprogres com║║            │            │            ║| 1Bx80
@@ -269,7 +269,7 @@ cursor 15 23 lines 6 7 mode 3
 |║slicerex exe│vfdutil  com│welcome  bat║║            │            │            ║| 1Bx80
 |║sys      com│vfont    com│xcopy    exe║║            │            │            ║| 1Bx14 30x12 1Bx54
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║vfont.com         1970 11-19-21  6:28a║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║vfont.com         1970 11-19-21  6:28a║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -279,16 +279,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 10: Left
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║fdisk    ini│vask     com│vframe   com║║STAMPS      │            │            ║| 1Bx80
-|║fdwrapup bat│vchoice  com│vgotoxy  com║║WORK        │            │            ║| 1Bx80
-|║format   exe│vcls     com│vinfo    com║║            │            │            ║| 1Bx80
+|║fdisk    ini│vask     com│vframe   com║║FILES       │            │            ║| 1Bx80
+|║fdwrapup bat│vchoice  com│vgotoxy  com║║STAMPS      │            │            ║| 1Bx80
+|║format   exe│vcls     com│vinfo    com║║WORK        │            │            ║| 1Bx80
 |║kernl386 sys│vcursor  com│vline    com║║            │            │            ║| 1Bx80
 |║mem      exe│vdelay   com│vpause   com║║            │            │            ║| 1Bx80
 |║more     exe│veach    com│vprogres com║║            │            │            ║| 1Bx80
@@ -297,7 +297,7 @@ cursor 15 23 lines 6 7 mode 3
 |║slicerex exe│vfdutil  com│welcome  bat║║            │            │            ║| 1Bx80
 |║sys      com│vfont    com│xcopy    exe║║            │            │            ║| 1Bx1 30x12 1Bx67
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║sys.com          11727  5-14-21 10:38p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║sys.com          11727  5-14-21 10:38p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -307,25 +307,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 11: Left
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║cp858    v8f│fdisk    ini│vask     com║║STAMPS      │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║WORK        │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
-|║driver   com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║FILES       │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║STAMPS      │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║WORK        │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
 |║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |║fc       exe│setlang  bat│vecho    com║║            │            │            ║| 1Bx80
 |║fdapm    com│setver   sys│verrlvl  com║║            │            │            ║| 1Bx80
 |║fdbanner com│slicerex exe│vfdutil  com║║            │            │            ║| 1Bx80
 |║fdisk    exe│sys      com│vfont    com║║            │            │            ║| 1Bx1 30x12 1Bx67
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║fdisk.exe        39859  1-20-25  6:38p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║fdisk.exe        39859  1-20-25  6:38p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -335,25 +335,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 12: Left
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx80
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -363,25 +363,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 13: Down Down Down
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx80
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx1 30x12 1Bx67
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx80
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║country.sys      30250 11-03-24  9:55a║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║country.sys      30250 11-03-24  9:55a║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -391,25 +391,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 14: Left
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx80
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -419,16 +419,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 15: PgDn
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║fdisk    ini│vask     com│vframe   com║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║fdwrapup bat│vchoice  com│vgotoxy  com║║WORK        │            │            ║| 1Bx80
-|║format   exe│vcls     com│vinfo    com║║            │            │            ║| 1Bx80
+|║fdisk    ini│vask     com│vframe   com║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║fdwrapup bat│vchoice  com│vgotoxy  com║║STAMPS      │            │            ║| 1Bx80
+|║format   exe│vcls     com│vinfo    com║║WORK        │            │            ║| 1Bx80
 |║kernl386 sys│vcursor  com│vline    com║║            │            │            ║| 1Bx80
 |║mem      exe│vdelay   com│vpause   com║║            │            │            ║| 1Bx80
 |║more     exe│veach    com│vprogres com║║            │            │            ║| 1Bx80
@@ -437,7 +437,7 @@ cursor 15 23 lines 6 7 mode 3
 |║slicerex exe│vfdutil  com│welcome  bat║║            │            │            ║| 1Bx80
 |║sys      com│vfont    com│xcopy    exe║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║fdisk.ini         7046  8-15-24  6:52p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║fdisk.ini         7046  8-15-24  6:52p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -447,16 +447,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 16: PgDn
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║fdisk    ini│vask     com│vframe   com║║STAMPS      │            │            ║| 1Bx80
-|║fdwrapup bat│vchoice  com│vgotoxy  com║║WORK        │            │            ║| 1Bx80
-|║format   exe│vcls     com│vinfo    com║║            │            │            ║| 1Bx80
+|║fdisk    ini│vask     com│vframe   com║║FILES       │            │            ║| 1Bx80
+|║fdwrapup bat│vchoice  com│vgotoxy  com║║STAMPS      │            │            ║| 1Bx80
+|║format   exe│vcls     com│vinfo    com║║WORK        │            │            ║| 1Bx80
 |║kernl386 sys│vcursor  com│vline    com║║            │            │            ║| 1Bx80
 |║mem      exe│vdelay   com│vpause   com║║            │            │            ║| 1Bx80
 |║more     exe│veach    com│vprogres com║║            │            │            ║| 1Bx80
@@ -465,7 +465,7 @@ cursor 15 23 lines 6 7 mode 3
 |║slicerex exe│vfdutil  com│welcome  bat║║            │            │            ║| 1Bx80
 |║sys      com│vfont    com│xcopy    exe║║            │            │            ║| 1Bx27 30x12 1Bx41
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║xcopy.exe        22685  3-21-25  6:38p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║xcopy.exe        22685  3-21-25  6:38p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -475,25 +475,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 17: PgUp
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx80
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx80
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx27 30x12 1Bx41
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx80
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx27 30x12 1Bx41
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║vcursor.com       1342 11-19-21  6:28a║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║veach.com         3166 11-19-21  6:28a║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -503,25 +503,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 18: PgUp
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │driver   com│mem      exe║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║attrib   com│fasthelp bat│more     exe║║WORK        │            │            ║| 1Bx80
-|║command  com│fc       exe│setlang  bat║║            │            │            ║| 1Bx80
-|║country  sys│fdapm    com│setver   sys║║            │            │            ║| 1Bx80
-|║cp850    v8f│fdbanner com│slicerex exe║║            │            │            ║| 1Bx80
-|║cp857    v8f│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
-|║cp858    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
-|║cp866    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
-|║ctmouse  exe│format   exe│vcls     com║║            │            │            ║| 1Bx80
-|║deltree  com│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║..          │fc       exe│setlang  bat║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║attrib   com│fdapm    com│setver   sys║║STAMPS      │            │            ║| 1Bx80
+|║command  com│fdbanner com│slicerex exe║║WORK        │            │            ║| 1Bx80
+|║country  sys│fdisk    exe│sys      com║║            │            │            ║| 1Bx80
+|║cp850    v8f│fdisk    ini│vask     com║║            │            │            ║| 1Bx80
+|║cp857    v8f│fdwrapup bat│vchoice  com║║            │            │            ║| 1Bx80
+|║cp858    v8f│format   exe│vcls     com║║            │            │            ║| 1Bx80
+|║cp866    v8f│kernl386 sys│vcursor  com║║            │            │            ║| 1Bx80
+|║deltree  com│mem      exe│vdelay   com║║            │            │            ║| 1Bx80
+|║fasthelp bat│more     exe│veach    com║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -531,25 +531,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 19: F9 l f
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 4-02-25│ 2:37p║║STAMPS      │            │            ║| 1Bx1 30x38 1Bx41
-|║attrib   com│     5044│ 6-30-03│12:10p║║WORK        │            │            ║| 1Bx80
-|║command  com│    87772│ 2-21-25│ 2:06p║║            │            │            ║| 1Bx80
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║FILES       │            │            ║| 1Bx1 30x38 1Bx41
+|║attrib   com│     5044│ 6-30-03│12:10p║║STAMPS      │            │            ║| 1Bx80
+|║command  com│    87772│ 2-21-25│ 2:06p║║WORK        │            │            ║| 1Bx80
 |║country  sys│    30250│11-03-24│ 9:55a║║            │            │            ║| 1Bx80
 |║cp850    v8f│     3103│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp857    v8f│     3132│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp858    v8f│     1060│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp866    v8f│     1277│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
-|║ctmouse  exe│     5829│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║            │            │            ║| 1Bx80
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -559,16 +559,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 20: End
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║vframe   com│     2492│ 1-10-22│ 2:16p║║STAMPS      │            │            ║| 1Bx80
-|║vgotoxy  com│     2085│11-19-21│ 6:28a║║WORK        │            │            ║| 1Bx80
-|║vinfo    com│     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vframe   com│     2492│ 1-10-22│ 2:16p║║FILES       │            │            ║| 1Bx80
+|║vgotoxy  com│     2085│11-19-21│ 6:28a║║STAMPS      │            │            ║| 1Bx80
+|║vinfo    com│     3112│10-01-24│ 3:42a║║WORK        │            │            ║| 1Bx80
 |║vline    com│     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
 |║vpause   com│     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
 |║vprogres com│     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
@@ -577,7 +577,7 @@ cursor 15 23 lines 6 7 mode 3
 |║welcome  bat│      923│ 4-19-21│10:35a║║            │            │            ║| 1Bx80
 |║xcopy    exe│    22685│ 3-21-25│ 6:38p║║            │            │            ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║xcopy.exe        22685  3-21-25  6:38p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║xcopy.exe        22685  3-21-25  6:38p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -587,16 +587,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 21: PgUp
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║vchoice  com│     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
-|║vcls     com│     1976│ 1-10-22│ 9:14a║║WORK        │            │            ║| 1Bx80
-|║vcursor  com│     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vchoice  com│     2904│ 1-10-22│ 2:15p║║FILES       │            │            ║| 1Bx80
+|║vcls     com│     1976│ 1-10-22│ 9:14a║║STAMPS      │            │            ║| 1Bx80
+|║vcursor  com│     1342│11-19-21│ 6:28a║║WORK        │            │            ║| 1Bx80
 |║vdelay   com│     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
 |║veach    com│     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
 |║vecho    com│     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
@@ -605,7 +605,7 @@ cursor 15 23 lines 6 7 mode 3
 |║vfont    com│     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
 |║vframe   com│     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║vframe.com        2492  1-10-22  2:16p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║vframe.com        2492  1-10-22  2:16p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -615,25 +615,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 22: PgUp PgUp PgUp
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 4-02-25│ 2:37p║║STAMPS      │            │            ║| 1Bx80
-|║attrib   com│     5044│ 6-30-03│12:10p║║WORK        │            │            ║| 1Bx80
-|║command  com│    87772│ 2-21-25│ 2:06p║║            │            │            ║| 1Bx80
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║FILES       │            │            ║| 1Bx80
+|║attrib   com│     5044│ 6-30-03│12:10p║║STAMPS      │            │            ║| 1Bx80
+|║command  com│    87772│ 2-21-25│ 2:06p║║WORK        │            │            ║| 1Bx80
 |║country  sys│    30250│11-03-24│ 9:55a║║            │            │            ║| 1Bx80
 |║cp850    v8f│     3103│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp857    v8f│     3132│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp858    v8f│     1060│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp866    v8f│     1277│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
-|║ctmouse  exe│     5829│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
-|║deltree  com│     3339│ 3-30-13│ 4:14a║║            │            │            ║| 1Bx1 30x38 1Bx41
+|║deltree  com│     3339│ 3-30-13│ 4:14a║║            │            │            ║| 1Bx80
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║            │            │            ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║deltree.com       3339  3-30-13  4:14a║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║fasthelp.bat        64  2-09-22  4:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -643,25 +643,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 23: PgUp
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 4-02-25│ 2:37p║║STAMPS      │            │            ║| 1Bx1 30x38 1Bx41
-|║attrib   com│     5044│ 6-30-03│12:10p║║WORK        │            │            ║| 1Bx80
-|║command  com│    87772│ 2-21-25│ 2:06p║║            │            │            ║| 1Bx80
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║FILES       │            │            ║| 1Bx1 30x38 1Bx41
+|║attrib   com│     5044│ 6-30-03│12:10p║║STAMPS      │            │            ║| 1Bx80
+|║command  com│    87772│ 2-21-25│ 2:06p║║WORK        │            │            ║| 1Bx80
 |║country  sys│    30250│11-03-24│ 9:55a║║            │            │            ║| 1Bx80
 |║cp850    v8f│     3103│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp857    v8f│     3132│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp858    v8f│     1060│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp866    v8f│     1277│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
-|║ctmouse  exe│     5829│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║            │            │            ║| 1Bx80
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -671,25 +671,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 24: PgDn
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║deltree  com│     3339│ 3-30-13│ 4:14a║║STAMPS      │            │            ║| 1Bx1 30x38 1Bx41
-|║driver   com│     2048│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx80
-|║fasthelp bat│       64│ 2-09-22│ 4:00p║║            │            │            ║| 1Bx80
-|║fc       exe│    14835│ 1-09-05│12:03p║║            │            │            ║| 1Bx80
-|║fdapm    com│     7434│ 9-11-09│ 4:41a║║            │            │            ║| 1Bx80
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║FILES       │            │            ║| 1Bx1 30x38 1Bx41
+|║fc       exe│    14835│ 1-09-05│12:03p║║STAMPS      │            │            ║| 1Bx80
+|║fdapm    com│     7434│ 9-11-09│ 4:41a║║WORK        │            │            ║| 1Bx80
 |║fdbanner com│      475│11-30-21│ 5:44p║║            │            │            ║| 1Bx80
 |║fdisk    exe│    39859│ 1-20-25│ 6:38p║║            │            │            ║| 1Bx80
 |║fdisk    ini│     7046│ 8-15-24│ 6:52p║║            │            │            ║| 1Bx80
 |║fdwrapup bat│      757│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║format   exe│    42424│ 9-08-24│ 3:16p║║            │            │            ║| 1Bx80
+|║kernl386 sys│    46256│ 5-15-21│ 2:38a║║            │            │            ║| 1Bx80
+|║mem      exe│    15028│ 3-01-22│ 5:49p║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║deltree.com       3339  3-30-13  4:14a║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║fasthelp.bat        64  2-09-22  4:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -699,16 +699,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 25: PgDn PgDn PgDn PgDn
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║vframe   com│     2492│ 1-10-22│ 2:16p║║STAMPS      │            │            ║| 1Bx80
-|║vgotoxy  com│     2085│11-19-21│ 6:28a║║WORK        │            │            ║| 1Bx80
-|║vinfo    com│     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vframe   com│     2492│ 1-10-22│ 2:16p║║FILES       │            │            ║| 1Bx80
+|║vgotoxy  com│     2085│11-19-21│ 6:28a║║STAMPS      │            │            ║| 1Bx80
+|║vinfo    com│     3112│10-01-24│ 3:42a║║WORK        │            │            ║| 1Bx80
 |║vline    com│     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
 |║vpause   com│     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
 |║vprogres com│     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
@@ -717,7 +717,7 @@ cursor 15 23 lines 6 7 mode 3
 |║welcome  bat│      923│ 4-19-21│10:35a║║            │            │            ║| 1Bx80
 |║xcopy    exe│    22685│ 3-21-25│ 6:38p║║            │            │            ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║xcopy.exe        22685  3-21-25  6:38p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║xcopy.exe        22685  3-21-25  6:38p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -727,25 +727,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 26: Home
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 4-02-25│ 2:37p║║STAMPS      │            │            ║| 1Bx1 30x38 1Bx41
-|║attrib   com│     5044│ 6-30-03│12:10p║║WORK        │            │            ║| 1Bx80
-|║command  com│    87772│ 2-21-25│ 2:06p║║            │            │            ║| 1Bx80
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║FILES       │            │            ║| 1Bx1 30x38 1Bx41
+|║attrib   com│     5044│ 6-30-03│12:10p║║STAMPS      │            │            ║| 1Bx80
+|║command  com│    87772│ 2-21-25│ 2:06p║║WORK        │            │            ║| 1Bx80
 |║country  sys│    30250│11-03-24│ 9:55a║║            │            │            ║| 1Bx80
 |║cp850    v8f│     3103│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp857    v8f│     3132│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp858    v8f│     1060│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp866    v8f│     1277│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
-|║ctmouse  exe│     5829│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║            │            │            ║| 1Bx80
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  4-02-25  2:37p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -755,25 +755,25 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 27: Ins Ins
-cursor 15 23 lines 6 7 mode 3
-|╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x16 1Bx52
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\FILES\BIN ═════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x14 1Bx53
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 4-02-25│ 2:37p║║STAMPS      │            │            ║| 1Bx80
-|║attrib   com│     5044│ 6-30-03│12:10p║║WORK        │            │            ║| 1Bx1 1Ex38 1Bx41
-|║command  com│    87772│ 2-21-25│ 2:06p║║            │            │            ║| 1Bx1 30x38 1Bx41
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║FILES       │            │            ║| 1Bx80
+|║attrib   com│     5044│ 6-30-03│12:10p║║STAMPS      │            │            ║| 1Bx1 1Ex38 1Bx41
+|║command  com│    87772│ 2-21-25│ 2:06p║║WORK        │            │            ║| 1Bx1 30x38 1Bx41
 |║country  sys│    30250│11-03-24│ 9:55a║║            │            │            ║| 1Bx80
 |║cp850    v8f│     3103│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp857    v8f│     3132│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp858    v8f│     1060│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
 |║cp866    v8f│     1277│ 4-02-25│ 2:22p║║            │            │            ║| 1Bx80
-|║ctmouse  exe│     5829│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║            │            │            ║| 1Bx80
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║    5,044 bytes in 1 selected file    ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx5 1Ex30 1Bx45
+|║    5,044 bytes in 1 selected file    ║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx5 1Ex30 1Bx45
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -783,16 +783,16 @@ cursor 15 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|A:\FREEDOS\BIN>                                                                 | 07x80
+|C:\FILES\BIN>                                                                   | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 28: Alt+F1 c
+== 28: Ctrl+PgUp Ctrl+PgUp End Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ════════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 6-16-00│12:00p║║STAMPS      │            │            ║| 1Bx1 30x38 1Bx41
-|║DOCS        │►SUB-DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx80
-|║SRC         │►SUB-DIR◄│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║FILES       │            │            ║| 1Bx1 30x38 1Bx41
+|║DOCS        │►SUB-DIR◄│ 6-16-00│12:00p║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │►SUB-DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx80
 |║data     bin│     1024│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║empty    dat│        0│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║hello    txt│       15│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
@@ -801,7 +801,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│       21│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -818,9 +818,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║..          │            │            ║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║WORK        │            │            ║| 1Bx80
 |║data     bin│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
@@ -829,7 +829,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx40 6Cx1 1Bx39
-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FILES        ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -846,9 +846,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║..          │            │            ║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║WORK        │            │            ║| 1Bx80
 |║data     bin│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
@@ -874,9 +874,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║            │            │            ║| 1Bx80
+|║..          │            │            ║║FILES       │            │            ║| 1Bx80
+|║A           │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
 |║data     bin│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
@@ -902,9 +902,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │            │            ║║WORK        │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║..          │            │            ║║FILES       │            │            ║| 1Bx80
+|║A           │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
 |║data     bin│            │            ║║            │            │            ║| 1Bx80
@@ -930,9 +930,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │            │            ║║WORK        │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx80
+|║..          │            │            ║║FILES       │            │            ║| 1Bx80
+|║A           │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │            │            ║║WORK        │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
@@ -958,9 +958,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │run      bat│            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │            │            ║║WORK        │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx80
+|║..          │run      bat│            ║║FILES       │            │            ║| 1Bx80
+|║A           │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │            │            ║║WORK        │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
@@ -986,9 +986,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │readme   txt│            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │run      bat│            ║║WORK        │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx80
+|║..          │readme   txt│            ║║FILES       │            │            ║| 1Bx80
+|║A           │run      bat│            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │            │            ║║WORK        │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
@@ -1014,9 +1014,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │notes    doc│            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │readme   txt│            ║║WORK        │            │            ║| 1Bx80
-|║B           │run      bat│            ║║            │            │            ║| 1Bx80
+|║..          │notes    doc│            ║║FILES       │            │            ║| 1Bx80
+|║A           │readme   txt│            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │run      bat│            ║║WORK        │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
@@ -1042,9 +1042,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │hello    txt│            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │notes    doc│            ║║WORK        │            │            ║| 1Bx80
-|║B           │readme   txt│            ║║            │            │            ║| 1Bx80
+|║..          │hello    txt│            ║║FILES       │            │            ║| 1Bx80
+|║A           │notes    doc│            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │readme   txt│            ║║WORK        │            │            ║| 1Bx80
 |║C           │run      bat│            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
@@ -1070,9 +1070,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │hello    txt│            ║║STAMPS      │            │            ║| 1Bx80
-|║A           │notes    doc│            ║║WORK        │            │            ║| 1Bx80
-|║B           │readme   txt│            ║║            │            │            ║| 1Bx80
+|║..          │hello    txt│            ║║FILES       │            │            ║| 1Bx80
+|║A           │notes    doc│            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │readme   txt│            ║║WORK        │            │            ║| 1Bx80
 |║C           │run      bat│            ║║            │            │            ║| 1Bx14 30x12 1Bx54
 |║D           │            │            ║║            │            │            ║| 1Bx80
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
@@ -1098,9 +1098,9 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │hello    txt│            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
-|║A           │notes    doc│            ║║WORK        │            │            ║| 1Bx80
-|║B           │readme   txt│            ║║            │            │            ║| 1Bx80
+|║..          │hello    txt│            ║║FILES       │            │            ║| 1Bx1 30x12 1Bx67
+|║A           │notes    doc│            ║║STAMPS      │            │            ║| 1Bx80
+|║B           │readme   txt│            ║║WORK        │            │            ║| 1Bx80
 |║C           │run      bat│            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
 |║DOCS        │            │            ║║            │            │            ║| 1Bx80
@@ -1131,7 +1131,7 @@ cursor 8 23 lines 6 7 mode 3
 |║B           │readme   txt│            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║C           │run      bat│            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║D           │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║DOCS        │            │            ║║  32,715,264 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║DOCS        │            │            ║║  32,219,648 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║E           │            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
 |║F           │            │            ║║               C:\WORK                ║| 1Bx80
 |║G           │            │            ║╟──────────────────────────────────────╢| 1Bx80
@@ -1159,7 +1159,7 @@ cursor 8 23 lines 6 7 mode 3
 |║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║ │  ├──A                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──B                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──C                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──C                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──D                              ║║                                      ║| 1Bx80
 |║ │  ├──E                              ║║                                      ║| 1Bx80
 |║ │  ├──F                              ║╟──────────────────────────────────────╢| 1Bx80
@@ -1187,7 +1187,7 @@ cursor 10 23 lines 6 7 mode 3
 |║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║ │  ├──A                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──B                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├─ C                             ◄║║  32,714,752 bytes free on drive C:   ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├─ C                             ◄║║  32,219,136 bytes free on drive C:   ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx4 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──D                              ║║                                      ║| 1Bx80
 |║ │  ├──E                              ║║                                      ║| 1Bx80
 |║ │  ├──F                              ║╟──────────────────────────────────────╢| 1Bx80
@@ -1215,11 +1215,11 @@ cursor 10 23 lines 6 7 mode 3
 |║ │  ├──A                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║ │  ├──B                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──C                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──D                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──D                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──E                              ║║                                      ║| 1Bx80
 |║ │  ├──F                              ║║                                      ║| 1Bx80
 |║ │  └──G                              ║╟──────────────────────────────────────╢| 1Bx80
-|║ └─ STAMPS                           ◄║║                                      ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx41
+|║ ├─ STAMPS                           ◄║║                                      ║| 1Bx4 3Ex14 1Bx20 1Ex1 1Bx41
 |╟──────────────────────────────────────╢║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║C:\STAMPS                             ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
@@ -1243,11 +1243,11 @@ cursor 14 23 lines 6 7 mode 3
 |║ │  ├──B                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║ │  ├──C                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──D                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──E                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──E                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──F                              ║║                                      ║| 1Bx80
 |║ │  └──G                              ║║                                      ║| 1Bx80
-|║ └──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║    └─ SUB                           ◄║║                                      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └─ SUB                           ◄║║                                      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
 |╟──────────────────────────────────────╢║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║C:\STAMPS\SUB                         ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
@@ -1271,11 +1271,11 @@ cursor 10 23 lines 6 7 mode 3
 |║ │  ├──B                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║ │  ├─ C                             ◄║║      Volume in drive C: is WORK      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──D                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──E                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──E                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──F                              ║║                                      ║| 1Bx80
 |║ │  └──G                              ║║                                      ║| 1Bx80
-|║ └──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║    └──SUB                            ║║                                      ║| 1Bx80
+|║ ├──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  └──SUB                            ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║C:\WORK\C                             ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
@@ -1299,11 +1299,11 @@ cursor 8 23 lines 6 7 mode 3
 |║ │  ├──A                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║ │  ├──B                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──C                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──D                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──D                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──E                              ║║                                      ║| 1Bx80
 |║ │  ├──F                              ║║                                      ║| 1Bx80
 |║ │  └──G                              ║╟──────────────────────────────────────╢| 1Bx80
-|║ └──STAMPS                            ║║                                      ║| 1Bx80
+|║ ├──STAMPS                            ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║C:\WORK                               ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
@@ -1319,21 +1319,21 @@ cursor 8 23 lines 6 7 mode 3
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 47: PgDn
-cursor 13 23 lines 6 7 mode 3
+cursor 10 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
-|║ │  ├─ DOCS                          ◄║║  The Volkov Commander, Version 4.05  ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
-|║ │  ├──SRC                            ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  ├──A                              ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║ │  ├──B                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║ │  ├──C                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║ │  ├──D                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──E                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║ │  ├──F                              ║║                                      ║| 1Bx80
-|║ │  └──G                              ║║                                      ║| 1Bx80
-|║ └──STAMPS                            ║╟──────────────────────────────────────╢| 1Bx80
-|║    └──SUB                            ║║                                      ║| 1Bx80
+|║ │  ├─ A                             ◄║║  The Volkov Commander, Version 4.05  ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx41
+|║ │  ├──B                              ║╟──────────────────────────────────────╢| 1Bx80
+|║ │  ├──C                              ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║ │  ├──D                              ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║ │  ├──E                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║ │  ├──F                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║ │  └──G                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ ├──STAMPS                            ║║                                      ║| 1Bx80
+|║ │  └──SUB                            ║║                                      ║| 1Bx80
+|║ └──FILES                             ║╟──────────────────────────────────────╢| 1Bx80
+|║    └──BIN                            ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
+|║C:\WORK\A                             ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1343,25 +1343,25 @@ cursor 13 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|C:\WORK\DOCS>                                                                   | 07x80
+|C:\WORK\A>                                                                      | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 48: PgUp
-cursor 13 23 lines 6 7 mode 3
+cursor 10 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──WORK                              ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  ├─ DOCS                          ◄║║         653,296 Bytes Memory         ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx11 1Ex7 1Bx23
+|║ │  ├──DOCS                           ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║ │  ├──A                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║ │  ├─ A                             ◄║║      Volume in drive C: is WORK      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──B                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──C                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──C                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──D                              ║║                                      ║| 1Bx80
 |║ │  ├──E                              ║║                                      ║| 1Bx80
 |║ │  ├──F                              ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──G                              ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
+|║C:\WORK\A                             ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1371,25 +1371,25 @@ cursor 13 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|C:\WORK\DOCS>                                                                   | 07x80
+|C:\WORK\A>                                                                      | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 49: Right
-cursor 13 23 lines 6 7 mode 3
+cursor 10 23 lines 6 7 mode 3
 |╔════════════════ Tree ════════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x6 1Bx57
 |║ \                                    ║║  The Volkov Commander, Version 4.05  ║| 1Bx80
 |║ ├──WORK                              ║╟──────────────────────────────────────╢| 1Bx80
-|║ │  ├─ DOCS                          ◄║║         653,296 Bytes Memory         ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx11 1Ex7 1Bx23
+|║ │  ├──DOCS                           ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║ │  ├──A                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║ │  ├─ A                             ◄║║      Volume in drive C: is WORK      ║| 1Bx7 3Ex14 1Bx17 1Ex1 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──B                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──C                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──C                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──D                              ║║                                      ║| 1Bx80
 |║ │  ├──E                              ║║                                      ║| 1Bx80
 |║ │  ├──F                              ║╟──────────────────────────────────────╢| 1Bx80
 |║ │  └──G                              ║║                                      ║| 1Bx80
 |╟──────────────────────────────────────╢║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║C:\WORK\DOCS                          ║║                                      ║| 1Bx80
+|║C:\WORK\A                             ║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1399,7 +1399,7 @@ cursor 13 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|C:\WORK\DOCS>                                                                   | 07x80
+|C:\WORK\A>                                                                      | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 50: Home
@@ -1411,7 +1411,7 @@ cursor 4 23 lines 6 7 mode 3
 |║ │  ├──SRC                            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║ │  ├──A                              ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║ │  ├──B                              ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║ │  ├──C                              ║║  32,714,752 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║ │  ├──C                              ║║  32,219,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
 |║ │  ├──D                              ║║                                      ║| 1Bx80
 |║ │  ├──E                              ║║                                      ║| 1Bx80
 |║ │  ├──F                              ║╟──────────────────────────────────────╢| 1Bx80
@@ -1431,6 +1431,54 @@ cursor 4 23 lines 6 7 mode 3
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == disks
+C:\FILES  D   2000-06-16 12:00:00
+C:\FILES\BIN  D   2000-06-16 12:00:00
+C:\FILES\BIN\ATTRIB.COM  A   2003-06-30 12:10:00  5044 bytes  63e5932a6f6604c5
+C:\FILES\BIN\COMMAND.COM  A   2025-02-21 14:06:48  87772 bytes  077808379e896476
+C:\FILES\BIN\COUNTRY.SYS  A   2024-11-03 09:55:54  30250 bytes  f641d6eb65a392ef
+C:\FILES\BIN\CP850.V8F  A   2025-04-02 14:22:58  3103 bytes  69a7bac2cb83201d
+C:\FILES\BIN\CP857.V8F  A   2025-04-02 14:22:58  3132 bytes  bef70f051f22a61c
+C:\FILES\BIN\CP858.V8F  A   2025-04-02 14:22:58  1060 bytes  4e9bbdebb5fb9dd3
+C:\FILES\BIN\CP866.V8F  A   2025-04-02 14:22:58  1277 bytes  f94336d043119e0d
+C:\FILES\BIN\DELTREE.COM  A   2013-03-30 04:14:52  3339 bytes  72b6b5596048979a
+C:\FILES\BIN\FASTHELP.BAT  A   2022-02-09 16:00:48  64 bytes  e237660bb4053e6e
+C:\FILES\BIN\FC.EXE  A   2005-01-09 12:03:00  14835 bytes  f6f03ca1aaa48740
+C:\FILES\BIN\FDAPM.COM  A   2009-09-11 04:41:02  7434 bytes  8e670866c16c9cfb
+C:\FILES\BIN\FDBANNER.COM  A   2021-11-30 17:44:12  475 bytes  0c9c7d565c28416c
+C:\FILES\BIN\FDISK.EXE  A   2025-01-20 18:38:30  39859 bytes  4c78ef00fb19e811
+C:\FILES\BIN\FDISK.INI  A   2024-08-15 18:52:26  7046 bytes  de3c2dcbd0ca175b
+C:\FILES\BIN\FDWRAPUP.BAT  A   2025-04-02 14:22:58  757 bytes  450a4b2b47577403
+C:\FILES\BIN\FORMAT.EXE  A   2024-09-08 15:16:20  42424 bytes  524e443e0e4dd1cf
+C:\FILES\BIN\KERNL386.SYS  A   2021-05-15 02:38:20  46256 bytes  932c0c155701eddb
+C:\FILES\BIN\MEM.EXE  A   2022-03-01 17:49:18  15028 bytes  6f850921e0fdd40a
+C:\FILES\BIN\MORE.EXE  A   2007-09-24 05:26:00  6942 bytes  d57bba5d16674ed4
+C:\FILES\BIN\SETLANG.BAT  A   2022-02-18 17:26:06  5322 bytes  dd15099d8e4efeaa
+C:\FILES\BIN\SETVER.SYS  A   2021-05-14 03:32:40  109 bytes  bc67a19e687fc9a0
+C:\FILES\BIN\SLICEREX.EXE  A   2022-02-06 14:40:46  29234 bytes  650f14748153869b
+C:\FILES\BIN\SYS.COM  A   2021-05-14 22:38:14  11727 bytes  74e663071019cf64
+C:\FILES\BIN\VASK.COM  A   2022-09-19 09:21:22  3159 bytes  f710372e071b2505
+C:\FILES\BIN\VCHOICE.COM  A   2022-01-10 14:15:28  2904 bytes  fdefe05bf1601ba8
+C:\FILES\BIN\VCLS.COM  A   2022-01-10 09:14:46  1976 bytes  86f0f881b164b0af
+C:\FILES\BIN\VCURSOR.COM  A   2021-11-19 06:28:42  1342 bytes  c5ee4f90278514ba
+C:\FILES\BIN\VDELAY.COM  A   2021-11-19 06:28:42  1360 bytes  7daa53d304b0992c
+C:\FILES\BIN\VEACH.COM  A   2021-11-19 06:28:42  3166 bytes  11b763ce4099467b
+C:\FILES\BIN\VECHO.COM  A   2022-01-10 14:15:56  2196 bytes  f38fef1c4f5c7292
+C:\FILES\BIN\VERRLVL.COM  A   2021-11-19 06:28:42  1083 bytes  274a8b6abe0c2787
+C:\FILES\BIN\VFDUTIL.COM  A   2022-09-28 12:45:30  2334 bytes  4ebb9473ca0428a2
+C:\FILES\BIN\VFONT.COM  A   2021-11-19 06:28:44  1970 bytes  8acb7a777cfac756
+C:\FILES\BIN\VFRAME.COM  A   2022-01-10 14:16:18  2492 bytes  e6adb7a64b8baa20
+C:\FILES\BIN\VGOTOXY.COM  A   2021-11-19 06:28:44  2085 bytes  908671805e0929a8
+C:\FILES\BIN\VINFO.COM  A   2024-10-01 03:42:36  3112 bytes  71fff0ec4f570f9b
+C:\FILES\BIN\VLINE.COM  A   2022-01-10 09:14:48  2144 bytes  1972ec10bcd5c9d6
+C:\FILES\BIN\VPAUSE.COM  A   2022-01-10 09:14:48  2012 bytes  e98cac140c50331f
+C:\FILES\BIN\VPROGRES.COM  A   2022-01-10 09:14:48  2424 bytes  0a688188075b6831
+C:\FILES\BIN\VSTR.COM  A   2022-01-10 14:17:10  2387 bytes  2e026fd3e2dd8f31
+C:\FILES\BIN\VTEST.COM  A   2023-06-24 11:41:04  2791 bytes  db5fdd1a5f26ea8a
+C:\FILES\BIN\WELCOME.BAT  A   2021-04-19 10:35:32  923 bytes  b9b570389d951b21
+C:\FILES\BIN\XCOPY.EXE  A   2025-03-21 18:38:30  22685 bytes  d77ea853a49f4944
+C:\FILES\KERNEL.SYS  A   2021-05-14 03:32:52  46485 bytes  f34a7483c575fcf2
+C:\FILES\SETUP.EN  A   2025-04-02 14:23:12  7948 bytes  caee16a04c46b5c8
+C:\FILES\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3
 C:\STAMPS  D   2000-06-16 12:00:00
 C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
 C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
@@ -1440,7 +1488,7 @@ C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
 C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
 C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
 C:\STAMPS\SUB  D   2000-06-16 12:00:00
-C:\TREEINFO.NCD  A   during the run  219 bytes  02b8193ff58b19ee
+C:\TREEINFO.NCD  A   during the run  251 bytes  4c304658d519d6b4
 C:\WORK  D   2000-06-16 12:00:00
 C:\WORK\A  D   during the run
 C:\WORK\B  D   during the run

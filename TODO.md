@@ -20576,6 +20576,65 @@ step under the test channel):
   it, would let them go on, but most of them name `D:\VC`, which wants
   the FILES layout or the mask of a path of R: first.
 
+**Stage 7, the FILES layout and the place of the program's own files:
+done** (a seventh agent, on 15 October 2026):
+
+- C:\FILES, H:\FILES on Linux (`setups.files_layout()`): KERNEL.SYS and
+  SETUP.EN of FreeDOS's boot diskette, VCVIEW.EXT of the distribution,
+  in that order, with their times, and BIN, the diskette's FREEDOS\BIN
+  as the stock diskette has it, 43 files (the bench's diskette has the
+  mouse's driver and the tests' besides), so a panel shows 44 entries
+  with `..`. Taken out of the pinned download by `mcopy -s -m`, with the
+  times as UTC as the bench's disks are written. A scenario asks for it
+  by `files=True` (`scenarios.Scenario`), and its bench is one of its
+  own, `benches[country, memory, True]`, booted with that C:, since the
+  bench's disks are on every golden; `posixrun.lay_out` makes the same
+  in the home directory. A scenario goes there by a path without a
+  drive, `"\\files\\bin\\command.com"`, which is H: on Linux, or by
+  Ctrl+PgUp and Home from C:\WORK: C:\ sorted by name has FILES first.
+- The nine that went to A: or D:\VC only for files, their steps
+  rewritten and their goldens derived again from the original (the
+  user's word, `CLAUDE.md`, step 6): `sort` (step 19, FILES: files of
+  other days in front of a directory, for Unsorted), `cursor` (2 to 4,
+  FILES\BIN; 28, back to C:\WORK by Ctrl+PgUp, since the panel's drive
+  is C: now; the tree has fifteen directories, FILES and BIN among
+  them), `mouse-select` (2 to 4), `view-parts`, `view-search` and
+  `view-keys` (COMMAND.COM, FORMAT.EXE, XCOPY.EXE of FILES\BIN),
+  `mouse-view` and `mouse-edit` (SETUP.EN, KERNEL.SYS), `editor-keys`
+  (VCVIEW.EXT). Every screen with C:\ in the right panel has FILES on
+  it now. Each was read where it changed: the screens are what the
+  comments say. Both C trees pass them; the portable C's patches of
+  `view-search`, `editor-keys` and `mouse-edit` were made again and
+  expect what they did, the row under the Advanced options having FILES
+  where it had STAMPS. On Linux all nine pass, `cursor` cut at step 41,
+  the tree's order (`_ORDER`).
+- Three of the twelve of stage 6's `_FILES` went to A: or D: for more
+  than files, and stay as they are, cut with that reason: `move` (step
+  4, a move to another drive, D:; Linux's other drive is R:),
+  `attributes-directory` (19, the write-protected diskette and DOS's
+  critical error), `mouse-drive` (5, the letter A chosen in the drive
+  box). `move` names `D:\VC\VC.HLP` and `VC.MNU` at steps 77 and 80 for
+  files too, but stops at 4 on Linux whatever they are.
+- The place of the program's own files (`deviations.OwnPath`, a mask of
+  the tree `posix`): the run's directory is `/tmp/vcxxxxxx`, a name of
+  eight characters, so that the setup file's directory is
+  R:\TMP\VCxxxxxx\VC with no alias, 13 characters longer than D:\VC
+  always; `posixrun.own` types that path where a step types `d:\vc`.
+  The mask leaves out the path with the field that it is in, to the
+  next text or the frame (the status line of the viewer and the editor,
+  a dialog's line typed into, with the golden's cursor taken there), and
+  a box whose text has the path behind other words, which is centred and
+  grows with it, whole, 13 cells beside it, a row above and below and
+  its shadow (the setup's error for a damaged setup file). A second mask
+  leaves out the drive's letter in the setup file's bytes in hex, which
+  the Linux program saves with H: (`setup-delay-file`). The five pass:
+  `setup-delay-file` whole, `help-broken` and `menu-files` cut at 24
+  (DOS's DEL, ATTRIB), `setup-help-file` at 22 and `setup-damaged` at 21
+  (DOS's CLS).
+- Left as they were: the cuts at a command of DOS's that the host's
+  shell has not, and those of the tree's order and of NUL, which wait on
+  the user.
+
 **Left.**
 
 - What stage 3 lists above; the mouse scenarios once L5 has landed.
@@ -20602,9 +20661,12 @@ step under the test channel):
   disks are on every golden, so the directory is made only on the
   benches of the scenarios that ask for it (a field of the scenario, as
   `memory` is), and their goldens derived again. `setup-delay-file` and
-  those about the program's own files keep `D:\VC`, masked.
-- The masks of the design not built: the drive menu's box, a path of R:,
-  a directory's time on a screen after the run wrote into it, the line
+  those about the program's own files keep `D:\VC`, masked. Done in
+  stage 7, above; `copy-ask` (step 31, the tree of D:) and `copy-dirs`
+  (40 to 46, copies to D:\) go to D: as another drive, not for files,
+  and are cut before that by the tree's order and NUL.
+- The masks of the design not built: the drive menu's box, a directory's
+  time on a screen after the run wrote into it, the line
   where DOS writes its prompt behind `quit`, `label`'s patch.
 - The test `portable_c-posix-scenarios`, labelled `portable_c` and
   `machine` (the bench's setup file is made on a machine the first

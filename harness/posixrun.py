@@ -53,9 +53,11 @@ as driver.py has its packets (pointer()).
 import dataclasses
 import hashlib
 import os
+import random
 import re
+import shutil
+import string
 import subprocess
-import tempfile
 import time
 from pathlib import Path
 
@@ -244,6 +246,51 @@ def keys(steps):
     return "".join(" ".join(events(step)) + "\n" for step in ("",) + steps)
 
 
+# The place of the program's own files on the bench, D:\VC, as a
+# scenario types it, and where the run has them: the directory of its
+# setup file, `vc` of the run's directory, which is a directory of /tmp
+# with a name of eight characters at most, so that its path on R: is the
+# name itself and no alias, R:\TMP\VCxxxxxx\VC. A text that a step
+# types with that place in it is typed with the run's
+# (deviations.OwnPath masks it on the screen).
+OWN = re.compile(r"[Dd]:\\[Vv][Cc](?=[\\\"]|$)")
+
+
+def own(steps, bench):
+    """`steps` with the place of the program's own files typed as the
+    run's in the directory `bench`."""
+    path = "r:" + "\\".join(("",) + bench.parts[1:]) + "\\vc"
+
+    def typed(match):
+        return OWN.sub(lambda _: path, match.group(0))
+    return tuple(re.sub(r'"[^"]*"', typed, step) for step in steps)
+
+
+def _remove(path):
+    """Remove the directory `path` with what is in it, also what a run
+    has made read-only."""
+    def again(function, name, _):
+        for each in (os.path.dirname(name), name):
+            if os.path.exists(each) and not os.path.islink(each):
+                os.chmod(each, 0o700)
+        function(name)
+    shutil.rmtree(path, onexc=again)
+
+
+def _bench_directory():
+    """A directory of its own for a run, in /tmp, of a name of eight
+    characters at most (see OWN)."""
+    letters = string.ascii_lowercase + string.digits
+    while True:
+        path = Path("/tmp") / ("vc" + "".join(random.choices(letters,
+                                                             k=6)))
+        try:
+            path.mkdir(mode=0o700)
+        except FileExistsError:
+            continue
+        return path
+
+
 def _dos_stamp(seconds):
     """DOS's time and date words of a time of the host, in UTC."""
     moment = time.gmtime(seconds)
@@ -252,12 +299,13 @@ def _dos_stamp(seconds):
             (year - 1980) << 9 | moment.tm_mon << 5 | moment.tm_mday)
 
 
-def lay_out(bench, setup):
+def lay_out(bench, setup, files=False):
     """Lay the bench of a run out in the directory `bench`, with `setup`
     as the setup file: the home directory and the directory of the setup
     file, and the times of what is in them, each directory's as the
     bench's FAT has it, (directory, time) for each made, to be set when
-    what is in it has been made."""
+    what is in it has been made. With `files`, the home directory has
+    FILES as the bench's C: has it (setups.files_layout())."""
     home, config = bench / "home", bench / "vc"
     stamps = []
     for path in (home, home / "WORK", home / "STAMPS", config):
@@ -275,6 +323,16 @@ def lay_out(bench, setup):
         with open(home / "STAMPS" / name, "wb") as file:
             file.truncate(size)
         stamps.append((home / "STAMPS" / name, when))
+    if files:
+        (home / setups.FILES_DIRECTORY).mkdir()
+        for name, data, when in setups.files_layout():
+            path = home / setups.FILES_DIRECTORY / name
+            if data is None:
+                path.mkdir()
+            else:
+                path.write_bytes(data)
+            stamps.append((path, when))
+        stamps.append((home / setups.FILES_DIRECTORY, setups.EPOCH))
     files = setups.distribution()
     for name in setups.SUPPORT_FILES:
         data, when = files[name]
@@ -364,12 +422,12 @@ def run(scenario, program, setup=..., limit=60):
     if setup is ...:
         setup = linux_setup(program)
     steps = ("",) + scenario.steps
-    with tempfile.TemporaryDirectory(prefix="vc", dir="/tmp") as bench:
-        bench = Path(bench)
-        laid = lay_out(bench, setup)
+    bench = _bench_directory()
+    try:
+        laid = lay_out(bench, setup, scenario.files)
         channel = bench / "channel"
         channel.mkdir()
-        (channel / "keys").write_text(keys(scenario.steps))
+        (channel / "keys").write_text(keys(own(scenario.steps, bench)))
         environment = {
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "TZ": "UTC", "HOME": str(bench / "home"),
@@ -439,6 +497,8 @@ def run(scenario, program, setup=..., limit=60):
         # say no more of.
         disks["D"]["VC\\" + program.filename] = fat.Entry(
             "VC\\" + program.filename, 0x20, 0, 0, 0, "")
+    finally:
+        _remove(bench)
     ran = scenarios.Run(shown, disks)
     # The directories that the run wrote into, by their paths on the
     # bench, the drive's root among them: the mask of a directory's time

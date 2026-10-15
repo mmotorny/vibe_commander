@@ -11,7 +11,11 @@ Two setups share one clock and one source of files:
   test bench      the program under test on its own disk in D:\\VC, next to
                   the distribution's help and configuration files, and a
                   small fixed set of files on C:. VC is started in
-                  C:\\WORK. Keeping the program off the disk it displays
+                  C:\\WORK. A scenario that wants files to work on
+                  that are not the bench's own, programs of FreeDOS and
+                  a file of the distribution, has them in C:\\FILES, on
+                  its bench alone (files_layout()). Keeping the program
+                  off the disk it displays
                   means its size cannot show up as free space on screen.
                   The clock in the corner of the screen is off, so that
                   no screen depends on how long it took to get there,
@@ -34,8 +38,11 @@ Two setups share one clock and one source of files:
                   the top of scenarios.py). No other machine has that
                   file.
 """
+import functools
 import io
+import os
 import shutil
+import subprocess
 import threading
 import zipfile
 from dataclasses import dataclass, field
@@ -98,6 +105,64 @@ STAMPS_FILES = [
     ("LAST.DAT", 4294967295, timestamp(2107, 12, 31, 13, 1, 2)),
     ("HUGE.DAT", 1000000000, timestamp(2000, 6, 16, 12)),
 ]
+
+# C:\FILES: files to work on that are not the bench's own, for the
+# scenarios that ask for them (`files` of scenarios.Scenario), and on
+# their benches alone, since the bench's disks are on every golden. It
+# is laid out alike on every platform, H:\FILES on Linux (CLAUDE.md, step
+# 6, the user's word of 15 October 2026): where a scenario went to A:,
+# the diskette of FreeDOS, or to D:\VC, the original's directory, only
+# for a file to work on, it works here. So it holds what they went there
+# for, as FreeDOS's boot diskette and the distribution have it, with
+# their times: the files of the diskette's FREEDOS\BIN in BIN, of which
+# a panel shows 44 entries with `..`, and three files in front of it,
+# of other days, the first two from the diskette, the third from the
+# distribution.
+FILES_DIRECTORY = "FILES"
+_FILES_OF_THE_DISKETTE = (("KERNEL.SYS", "KERNEL.SYS"),
+                          ("SETUP.EN", "FREEDOS/NLS/SETUP.EN"))
+_FILES_OF_THE_DISTRIBUTION = ("VCVIEW.EXT",)
+_FILES_BIN = "BIN"
+
+
+@functools.cache
+def files_layout():
+    """What C:\\FILES holds, in the order in which it is made: (path
+    under FILES, with / between names; the contents, or None for a
+    directory; the time). The files of the diskette are taken out of it
+    by mtools, with their times as its directory has them, read as UTC
+    as the bench's disks are written."""
+    with zipfile.ZipFile(deps.fetch(deps.FREEDOS)) as archive:
+        image = archive.read("144m/x86BOOT.img")
+    with dos.workdir() as directory:
+        directory = Path(directory)
+        (directory / "boot.img").write_bytes(image)
+        environment = dict(os.environ, TZ="UTC", MTOOLS_SKIP_CHECK="1")
+        subprocess.run(["mcopy", "-s", "-m", "-i",
+                        str(directory / "boot.img"),
+                        "::/KERNEL.SYS", "::/FREEDOS", str(directory)],
+                       env=environment, check=True, capture_output=True)
+
+        def found(path):
+            # mtools writes a name as the diskette's long name has it,
+            # which is in small letters.
+            at = directory
+            for name in path.split("/"):
+                at = next(entry for entry in at.iterdir()
+                          if entry.name.upper() == name)
+            return at
+
+        def taken(path):
+            return path.read_bytes(), int(path.stat().st_mtime)
+
+        out = [(name, *taken(found(source)))
+               for name, source in _FILES_OF_THE_DISKETTE]
+        files = distribution()
+        out += [(name, *files[name]) for name in _FILES_OF_THE_DISTRIBUTION]
+        out.append((_FILES_BIN, None, EPOCH))
+        out += [(f"{_FILES_BIN}/{path.name.upper()}", *taken(path))
+                for path in sorted(found("FREEDOS/BIN").iterdir())]
+    return tuple(out)
 
 
 # The listing of the build of the published source that is laid out as
@@ -324,7 +389,7 @@ class Bench:
     """
 
     def __init__(self, workdir, country="us", setup=None, memory=None,
-                 home="D"):
+                 home="D", files=False):
         self._workdir = Path(workdir)
         self._home = home
         # The machine's memory in megabytes, dos.MEMORY if None: a state
@@ -337,7 +402,9 @@ class Bench:
                                COUNTRIES[country], KEYBOARDS.get(country),
                                bench=country).path
         self._work = self._workdir / "c.img"
-        _work_disk(self._work, self._workdir)
+        # C:\FILES, on the bench of the scenarios that ask for it, is on
+        # its disk from the start: DOS has been booted with that disk.
+        _work_disk(self._work, self._workdir, files)
         if home == "C":
             self._empty = FatImage.hard_disk(
                 self._workdir / "empty.img", self._workdir, EPOCH,
@@ -470,8 +537,8 @@ def _fill(disk, program, setup, beside):
     return disk.path
 
 
-def _work_disk(path, workdir):
-    """Build drive C: of the test bench."""
+def _work_disk(path, workdir, files=False):
+    """Build drive C: of the test bench, with C:\\FILES if `files`."""
     work = FatImage.hard_disk(path, workdir, EPOCH,
                               label="WORK", serial="20000616")
     work.mkdir("WORK")
@@ -485,14 +552,23 @@ def _work_disk(path, workdir):
     for name, size, time in STAMPS_FILES:
         work.write(f"STAMPS/{name}", b"", time)
         work.set_size(name, size)
+    if files:
+        work.mkdir(FILES_DIRECTORY)
+        for name, data, time in files_layout():
+            if data is None:
+                work.mkdir(f"{FILES_DIRECTORY}/{name}")
+            else:
+                work.write(f"{FILES_DIRECTORY}/{name}", data, time)
     return work
 
 
 class Benches:
     """A bench for each country that is asked for, booted when first used:
     benches[country], or benches[country, memory] for a machine of so
-    many megabytes (see `memory` of scenarios.Scenario; a scenario says
-    which by its `bench`). To be used in a `with` statement, which
+    many megabytes (see `memory` of scenarios.Scenario), or
+    benches[country, memory, True] for one with C:\\FILES (`files`
+    there; memory None for the bench's): a scenario says which by its
+    `bench`. To be used in a `with` statement, which
     removes them.
     """
 
@@ -512,21 +588,24 @@ class Benches:
         self._directory.cleanup()
 
     def __getitem__(self, key):
-        country, memory = key if isinstance(key, tuple) else (key, None)
+        country, memory, files = (key + (False,))[:3] \
+            if isinstance(key, tuple) else (key, None, False)
         with self._lock:                # scenarios may run side by side
             lock = self._locks.setdefault(key, threading.Lock())
         with lock:
             if key not in self._benches:
                 directory = Path(self._directory.name) / (
-                    country + (f"-{memory}" if memory else ""))
+                    country + (f"-{memory}" if memory else "")
+                    + ("-files" if files else ""))
                 with self._first:
                     if self._setup is None:
-                        bench = Bench(directory, country, memory=memory)
+                        bench = Bench(directory, country, memory=memory,
+                                      files=files)
                         self._setup = bench.setup
                     else:
                         bench = None
                 if bench is None:
                     bench = Bench(directory, country, self._setup,
-                                  memory=memory)
+                                  memory=memory, files=files)
                 self._benches[key] = bench
             return self._benches[key]
