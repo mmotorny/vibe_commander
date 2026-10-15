@@ -2615,8 +2615,10 @@ golden has C:, and so are the drive box's letters. Not run on Linux:
 the diskette, and `find-drives`, which would search the host's whole
 file system from R:. Cut: `move` at step 4, a move to D:;
 `attributes-directory` at 19 and `history-drives` at 60, the diskette
-in A:; `delete-mask` at 19, B:; `mouse-drive` at 5, A: chosen in the
-drive box by the mouse. The scenarios that went to A: or to `D:\VC`
+in A:; `tree-choose` at 15 and `mouse-find` at 14, the diskette in A:
+too; `delete-mask` at 19, B:; `copy-ask` at 31, the tree of D:, and
+`panel-keys` at 46, D:; `mouse-drive` at 5, A: chosen in the drive box
+by the mouse. The scenarios that went to A: or to `D:\VC`
 only for files to work on go to C:\FILES, which is H:\FILES on Linux.
 
 ### L2. The labels are ROOT and HOME, and no label is made
@@ -2723,9 +2725,15 @@ user's of 15 October 2026 (`CLAUDE.md`, "The program for Linux").
 
 **Which scenarios show it.** `device` is not run on Linux: it is about
 a device of DOS's and DOS's critical error, which the program for Linux
-is never entered for. Cut at NUL, each as `LINUX_CUT` of
-`harness/deviations.py` has it:
-`copy` at step 7, `copy-dirs` at 15, `editor-save` at 20.
+is never entered for. Cut at NUL or CON, each as `LINUX_CUT` of
+`harness/deviations.py` has it: `editor-save` at step 14, the text
+saved to NUL; `copy-dirs` at 14, the files of a directory copied to
+NUL, behind which the original's screen is a row higher; `user-menu` at
+62, a menu whose file is NUL.MNU; and `copy` at 62, a file of NUL's and
+one to CON. Left out where they leave no trace on DOS, as
+`LINUX_LEFT_OUT_OF` there has them: in `copy`, a file copied to NUL and
+one to CON, which is refused; in `delete`, NUL deleted by a mask, which
+DOS finds and cannot delete.
 
 ### L7. A file of four gigabytes or more, and the room of a disk
 
@@ -2810,7 +2818,8 @@ whose value is the command or comes behind one that the shell has not:
 `enter`, `user-menu-run`, `menu-panel`, `setup-missing`,
 `setup-missing-saved`, `setup-save-fails`, `setup-new` and
 `clock-morning`. Cut at such a command: `help-broken`, `menu-files`,
-`setup-help-file`, `setup-damaged`, `user-menu` and `view-commands`.
+`setup-help-file`, `setup-damaged` and `view-commands`; `user-menu`,
+which is cut at NUL.MNU (L6), would come to DOS's DEL behind it.
 Cut where the filter of programs is chosen, at step 29, its copies of a
 text named `.COM` and `.EXE` being no programs on Linux: `filter`.
 The test `portable_c-terminal` runs four commands, one of them with a
@@ -2919,12 +2928,12 @@ Linux puts at the end, and the file search, which meets the bench's
 directories in front of its files, is cut or kept out of the steps,
 each with its reason in `LINUX_CUT` of `harness/deviations.py`.
 
-**Which scenarios show it.** `tree` is not run on Linux. Cut at the
-first screen where the order shows: `command-line`, `stamps`, `menu`,
-`menu-items`, `tree-deep`, `tree-box`, `tree-choose`, `delete`,
-`make-directory`, `dialog-keys`, `copy-ask`, `mouse-dialog`,
-`mouse-tree`, `mouse-find`, `cursor` and `panel-keys`, each at the step
-that `harness/deviations.py` has. `copy-tree`, which renames
+**Which scenarios show it.** `stamps` is cut at step 18, the file
+search through C:, which meets the bench's directories in front of the
+files of STAMPS, where the program for Linux, whose emulation lists a
+directory by its names when it first reads it, has SUB behind them.
+Every other scenario that shows the tree or the file search is held to
+the original's golden as far as it is run. `copy-tree`, which renames
 directories in the tree, renames only the last of a parent's and WORK
 before anything is made in it, so that the order is the same on both,
 and is run whole.
