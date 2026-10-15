@@ -255,8 +255,8 @@ These held while `src/c/` was made, and they say what it is.
      of up to 64K; a file whose name begins with a dot may be
      overwritten; hidden, system and archive are taken when set and not
      kept, the host having nowhere for them; a pipe, a socket or a
-     device is listed as an empty file that cannot be opened; there is
-     no volume label, and making one is refused; and an error of the
+     device is listed as an empty file that cannot be opened; the
+     drives' labels are ROOT and HOME, and making one is refused; and an error of the
      host's with no number of DOS's is DOS's general failure. Once the stub compiles on Linux, on the user's
      word of 14 October 2026, every build with clang has the
      sanitizers that fit it, a high level of warnings and clang-tidy,
