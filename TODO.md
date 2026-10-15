@@ -766,7 +766,8 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **The clock.** Emscripten's clock_gettime uses the browser's Date and time zone. The test clock is shared from `machine_posix.c`.
 - **The drives (the user's decision).** Two, C: labelled VIBE, where the program lives, its own files in C:\VC, and D: labelled DEMO, the demo's (CLAUDE.md, "The web page").
   - D: starts as a small tree of sample files written for the project, nothing proprietary, served with the page.
-  - Both are directories of the page's server, a script for Node with Node's own modules: the page loads their tree from it, and every change, the setup file's too, is made there as it happens; what the server refuses or cannot do is DOS's error for that call. Nothing is kept in the browser.
+  - Both are directories of the page's server, a script for Node with Node's own modules: the page loads their tree from it, and every change, the setup file's too, is made there as it happens; what the server refuses or cannot do is DOS's error for that call. Nothing is kept in the browser then.
+  - Served statically, from GitHub Pages with no server, the same page has its drives start from what is served with it, and keeps what the user changes in the browser (CLAUDE.md, "The web page").
   - The program takes the drives from the environment, `VC_DRIVE_C`, `VC_DRIVE_D` and the rest: W2's section below has them and what W3b sets.
   - The tests map the letters as the bench has them, C: the working disk and D:\VC the program's files, so the masks of the drive's letter are not needed on the web.
 - **Files in and out.**
@@ -949,6 +950,9 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   in the calls of `files_posix.c` that change something (create, write,
   close, delete, rename, make and remove a directory, set a time or the
   attributes), the error of a failed fetch made the call's.
+  Served statically, with no server, the page keeps the changes in the
+  browser instead, and the program is the same: what it takes is the two
+  directories.
 - **A command** writes "Commands cannot be run in a web page." through
   DOS's console behind the prompt and the command that the program has
   typed, and answers that it ran with the code 1; `TestProgramRun` says
