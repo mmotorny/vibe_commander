@@ -210,10 +210,16 @@ These held while `src/c/` was made, and they say what it is.
      the keyboard where the terminal offers it. A command runs on the
      terminal's own screen, which Ctrl-O shows, as on DOS. The program
      for Linux is judged by scenarios driven as those of DOS are, with
-     C: the root of the file system in its tests too, so that what it
-     shows is held to expectations of its own, recorded from its build
-     and read row by row, not to the goldens of the original (the user,
-     later the same day): told so by a variable of the environment, it
+     C: the root of the file system in its tests too, and held to the
+     goldens of the original with masks: named elements of the screen
+     that the comparison leaves out for that tree, each declared with
+     its reason (the path in a panel's title, on the prompt and the
+     command line, what DOS had shown behind the panels), found by a
+     rule and not written as cells, every other cell compared, and an
+     element left out held whole in a scenario about it where one can
+     be; an expectation of the tree's own only where a mask cannot do
+     (the user, later the same day, in place of expectations of its
+     own; the masks are made with the harness for Linux): told so by a variable of the environment, it
      writes its grid of cells whenever it waits for a key, a harness
      drives it in a pseudo-terminal with the scenarios' keys, and what
      it draws in the terminal is held to that grid by replaying it
