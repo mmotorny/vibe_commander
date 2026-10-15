@@ -98,20 +98,23 @@
  */
 
 /* What the terminal is given back with: the attributes reset, the cursor
-   shown in the terminal's own shape, rows wrapped again, the mouse's
+   shown in the terminal's own shape, rows wrapped again, the keypad in
+   its normal mode, the mouse's
    reports and those of the focus off, and the terminal's own screen. The
    kitty protocol's flags are popped first where they were pushed (Pop):
    the alternate screen has a stack of its own in that protocol. */
 static const char Leave[] = "\033[?2026l\033[0m\033[0 q\033[?25h\033[?7h"
-                            "\033[?1004l\033[?1006l\033[?1003l\033[?1002l"
+                            "\033>\033[?1004l\033[?1006l\033[?1003l\033[?1002l"
                             "\033[?1000l\033[?1049l";
 static const char Pop[] = "\033[<u";
 /* What it is taken with: the alternate screen, no wrapping, no cursor
-   until a frame places it; the mouse reported in SGR's form, with every
+   until a frame places it; the keypad in xterm's application mode
+   (DECKPAM), so that a terminal without the kitty protocol sends its
+   signs and Enter by SS3 and not as the main keyboard's (Ss3); the mouse reported in SGR's form, with every
    motion, and the focus reported; and the question whether the terminal
    has the kitty protocol of the keyboard, whose answer pushes its flags
    (Answered). */
-static const char Enter[] = "\033[?1049h\033[?7l\033[?25l\033[?1000h"
+static const char Enter[] = "\033[?1049h\033[?7l\033[?25l\033=\033[?1000h"
                             "\033[?1002h\033[?1003h\033[?1006h\033[?1004h"
                             "\033[?u";
 /* The kitty protocol's flags that the program asks for: 1 keys told
@@ -1126,9 +1129,27 @@ static i32 Csi(const char *from, i32 count)
     return 0;
 }
 
+/* The keys of the keypad that xterm sends by SS3 in its application
+   mode, as kitty's codes: * + - . / Enter, and p to y for its figures. */
+static i32 PadOfSs3(char final)
+{
+    switch (final) {
+    case 'j': return KP_FIRST + 12;     /* * */
+    case 'k': return KP_FIRST + 14;     /* + */
+    case 'm': return KP_FIRST + 13;     /* - */
+    case 'n': return KP_FIRST + 10;     /* . */
+    case 'o': return KP_FIRST + 11;     /* / */
+    case 'M': return KP_FIRST + 15;     /* Enter */
+    }
+    if (final >= 'p' && final <= 'y')
+        return KP_FIRST + final - 'p';
+    return 0;
+}
+
 /* A sequence of SS3 at `from` (behind ESC O): F1 to F4, the arrows, Home
-   and End, as xterm sends them where its keypad is set so, with a
-   modifier's number in front in some. */
+   and End, as xterm sends them where its keypad is set so, and the
+   keypad's keys in its application mode, with a modifier's number in
+   front in some. */
 static i32 Ss3(const char *from, i32 count)
 {
     i32 i, held = 0;
@@ -1138,7 +1159,10 @@ static i32 Ss3(const char *from, i32 count)
             held = held * 10 + (from[i] - '0');
             continue;
         }
-        Push(KeyOfNamed(Final(from[i]), held > 1 ? held - 1 : 0));
+        if (PadOfSs3(from[i]) != 0)
+            Push(KeyOfPad(PadOfSs3(from[i]), held > 1 ? held - 1 : 0));
+        else
+            Push(KeyOfNamed(Final(from[i]), held > 1 ? held - 1 : 0));
         return i + 1;
     }
     return 0;

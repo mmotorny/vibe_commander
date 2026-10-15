@@ -19509,25 +19509,29 @@ steps: Alt alone, Shift held and let go, Ctrl-F1 with Ctrl held, Alt-D
 on a Russian layout, kitty's text with Shift, the keypad's +, a key
 repeated, a click whose press and release come in one write; the flags
 pushed, popped at SIGTSTP, pushed again at SIGCONT and popped at the end;
-and 43 keys in kitty's codes and 15 in other terminals', each with Esc
+and 43 keys in kitty's codes and 21 in other terminals', the keypad's
+by SS3 among them, each with Esc
 twice behind it, held to the bench's words alone. Tried against itself:
 Alt-Del given A300h fails the keys, and the pointer's character cleared
 fails the pointer.
 
-**Asked of the user** (the piece is not landed while this is open):
+**Kept as the original has them**, on the session's word that they need
+no decision to land, and put to the user as possible deviations later:
+the mouse's wheel does nothing, as a mouse driver of DOS has none (a turn
+could be Up and Down, or scroll the list under the pointer); and the
+pointer is in the middle of the screen until the mouse first moves, as
+on DOS, also on a terminal that reports no mouse (the Linux console),
+where it stays there.
 
-- The mouse's wheel. (a) Nothing, as a mouse driver of DOS has none and
-  the original knows none; this is what is built. (b) A turn is Up or
-  Down, a key each, three lines at a notch as terminals scroll, wherever
-  the program takes keys. (c) A turn scrolls only where the mouse is on
-  a list, the panel, the viewer, the editor, the help, by the keys that
-  scroll there. Recommended: (a) now, as DOS has it, and (c) as a
-  deviation of its own later, if wanted; (b) sends keys into dialogs
-  that the user does not look at.
-- The pointer on a terminal before the mouse has moved: it is in the
-  middle of the screen, as on DOS, also on a terminal that reports no
-  mouse (the Linux console), where it stays there. Recommended: as on
-  DOS; hiding it until the first report would be a deviation.
+**The keypad without the protocol.** `Enter` puts the keypad into
+xterm's application mode, `ESC =` (DECKPAM), and `Leave` back, `ESC >`,
+so that a terminal without the kitty protocol sends the keypad's *, +,
+-, ., / and Enter as `SS3 j`, `k`, `m`, `n`, `o` and `M`, and its
+figures as `SS3 p` to `y`, with a modifier's number in front for Ctrl
+and the like: `Ss3` makes them the bench's keypad words by `KeyOfPad`,
+so Grey +, - and * select, unselect and turn the selection round there
+too. A terminal that keeps its keypad plain where Num Lock is on sends
+the characters, which are then the main keyboard's.
 
 **What L6 should know.**
 
@@ -19538,10 +19542,7 @@ fails the pointer.
 - `MouseFromTerminal` of `sys_posix.c` takes the terminal's mouse at
   `Idle`, `KeyWaiting`, `KeyRead` and `MouseWhere`; a new place where
   the program waits wants it too.
-- Keypad keys come only by the protocol: without it a terminal sends
-  the keypad's + as +, so Grey + is the main keyboard's + (0D2Bh), which
-  the panels do not take for selecting a group. xterm's keypad mode
-  (`ESC =`) would send `SS3 k` and its like; that is not asked for.
+
 ### SAN, what the sanitizers found in the scenarios: done
 
 What `posix-asan` stopped at when L3b took the program for Linux

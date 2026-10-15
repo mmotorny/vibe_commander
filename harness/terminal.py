@@ -100,7 +100,7 @@ LEFT = ESC + b"[?1004l" + ESC + b"[?1006l" + ESC + b"[?1003l" + ESC \
     + b"[?1002l" + ESC + b"[?1000l" + ESC + b"[?1049l"
 # All of it, which the flags of the kitty protocol are popped in front of.
 LEAVE = ESC + b"[?2026l" + ESC + b"[0m" + ESC + b"[0 q" + ESC + b"[?25h" \
-    + ESC + b"[?7h" + LEFT
+    + ESC + b"[?7h" + ESC + b">" + LEFT
 KEYS = [
     ("Down", ["5000"], ESC + b"[B"),
     ("Alt-D, the speed search", ["2000"], ESC + b"d"),
@@ -240,6 +240,12 @@ DECODE_LEGACY = [
     (ESC + b"A", ["1E00"]),                             # Alt-Shift-A
     ("é".encode(), ["0082"]),
     (b"\x01", ["1E01"]),                                # Ctrl-A
+    (ESC + b"Ok", ["4E2B"]),                            # the keypad's +,
+    (ESC + b"Om", ["4A2D"]),                            # -, *, / and Enter
+    (ESC + b"Oj", ["372A"]),                            # in xterm's
+    (ESC + b"Oo", ["352F"]),                            # application mode
+    (ESC + b"O5j", ["9600"]),                           # Ctrl with its *
+    (ESC + b"Ox", ["4838"]),                            # its 8
 ]
 
 # What the VGA's font shows for the bytes below 20h and for 7Fh; the rest
@@ -582,6 +588,9 @@ def run(pyte, program, home, here, work, channelled, colours24, failures):
         terminal.resize(80, 25)
     if MOUSE_ON not in terminal.written:
         failures.append(f"{name}: the mouse's reports are not asked for")
+    if ESC + b"=" not in terminal.written:
+        failures.append(f"{name}: the keypad's application mode is not "
+                        "asked for")
     held_to(name, terminal, KEYS, records, trace, failures)
     if PUSH in terminal.written:
         failures.append(f"{name}: the kitty protocol's flags are pushed "
