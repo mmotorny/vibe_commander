@@ -459,6 +459,24 @@ struct Onward F26_00(void)
     return To(NEXT_FUNC05);
 }
 
+/* F27_05 of ^Enter: the name of the file under the cursor into the
+   command line at `cursor`, if the current panel lists files and the
+   cursor is on one. */
+static void F27_05(struct WCBdef *panel, i32 cursor)
+{
+    const struct FILENT *file;
+    i32 i;
+
+    if (!FilePan(panel))
+        return;
+    if (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf)
+        return;
+    file = ENTRY(panel, PLACES(panel)->CurAdr);
+    for (i = 0; i < 13; i++)
+        md.TmpBuf[i] = file->NameF[i];
+    F27_07(md.TmpBuf, cursor);
+}
+
 /* ^Enter: the name of the file under the cursor into the command line,
    if that is empty or its cursor is behind a character that words end at,
    or behind an "@". Else the history is gone through, from where it was
@@ -467,19 +485,22 @@ struct Onward F26_00(void)
    and the cursor is at the start of the line, the name again. */
 struct Onward F27_00(struct WCBdef *panel)
 {
-    const struct FILENT *file;
     const u8 *line, *entry, *found;
     i32 cursor = md.DosCol;
-    i32 count, i;
+    i32 count;
     u8 c, other;
 
-    if (md.DosBuf[0] == 0)
-        goto F27_05;
+    if (md.DosBuf[0] == 0) {
+        F27_05(panel, cursor);
+        return To(NEXT_FUNC05);
+    }
     entry = HistoryPlace;
     if (cursor != 0) {
         c = md.DosBuf[cursor - 1];
-        if (CmpSym(c) || c == '@')
-            goto F27_05;
+        if (CmpSym(c) || c == '@') {
+            F27_05(panel, cursor);
+            return To(NEXT_FUNC05);
+        }
     }
     for (;;) {
         count = 256;                    /* the command behind this one */
@@ -502,17 +523,8 @@ struct Onward F27_00(struct WCBdef *panel)
                 break;
         }
     }
-    if (cursor != 0)
-        return To(NEXT_FUNC05);
-F27_05:
-    if (!FilePan(panel))
-        return To(NEXT_FUNC05);
-    if (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf)
-        return To(NEXT_FUNC05);
-    file = ENTRY(panel, PLACES(panel)->CurAdr);
-    for (i = 0; i < 13; i++)
-        md.TmpBuf[i] = file->NameF[i];
-    F27_07(md.TmpBuf, cursor);
+    if (cursor == 0)
+        F27_05(panel, cursor);
     return To(NEXT_FUNC05);
 }
 
