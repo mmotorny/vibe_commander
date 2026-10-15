@@ -217,7 +217,7 @@ static void MovScr(i32 cell, u16 *buffer, i32 rows, bool read)
 void Window(u16 begin, u16 size)
 {
     u16 *from = BasAdr(begin);
-    i32 cell = from - md.ScrBuf;
+    i32 cell = (i32)(from - md.ScrBuf);
     i32 rows = size >> 8;
     i32 columns = size & 0xFF;
 

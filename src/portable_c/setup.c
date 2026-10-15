@@ -66,7 +66,7 @@ i32 MakeIni(void)
     to = MkIni1(to, RightPanel);
     for (i = 0; i < CmnIni; i++)
         *to++ = from[i];
-    length = to - md.MenuBuf;
+    length = (i32)(to - md.MenuBuf);
     *(u16 *)to = ChkSum(md.MenuBuf, (u16)length);  /* INI_LEN - 2 */
     return length + 2;
 }

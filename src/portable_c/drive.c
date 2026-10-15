@@ -190,7 +190,7 @@ F62_21:
     shape = CHECK;
     if (state & 2)
         goto F62_27;
-    at = first - md.ScrBuf;
+    at = (i32)(first - md.ScrBuf);
     place = (u16)((at / 80 & 0xFF) << 8 | at % 80);
     index = 0;
     for (;;) {

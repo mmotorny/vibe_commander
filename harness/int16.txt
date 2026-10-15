@@ -20,27 +20,27 @@ cmdline.c, F68_00: widen
     rows for: the row of a line of the list, 0 or more and below 256.
 
 copy.c, C00_01: widen
-    | count = end - CpDest;
+    | count = (i32)(end - CpDest);
     end is behind the zero byte of CpDest, looked for in LenName bytes
     of it by C00_End just above: 1 to LenName.
 
 copy.c, C00_01: widen
-    | count = from - CpSrc;
+    | count = (i32)(from - CpSrc);
     from is CpBgNam, the name in CpSrc behind its path, which CutPath or
     the start of CpSrc made: 0 to LenName.
 
 copy.c, C00_01: widen
-    | count = to - CpDest;
+    | count = (i32)(to - CpDest);
     to is where UnConv has written the name into CpDest, behind its
     path: within the LenName bytes of CpDest.
 
 copy.c, C40_00: widen
-    | count = C00_End(target, &count) - target;
+    | count = (i32)(C00_End(target, &count) - target);
     C00_End looked for the zero byte in LenName bytes of target, just
     above, and answers behind it: 1 to LenName.
 
 copy.c, C40_05: widen
-    | for (count = LenName - (to - buffer); count; count--)
+    | for (count = LenName - (i32)(to - buffer); count; count--)
     to is buffer, buffer + 2, or behind the path of LenPath bytes that
     AddFile ended: LenName less that is 1 or more.
 
@@ -82,7 +82,7 @@ dialog.c, MnMn11: shift
     button steps up from table, two at a time, in the loop above.
 
 drive.c, F62_01: widen
-    | at = first - md.ScrBuf;
+    | at = (i32)(first - md.ScrBuf);
     first is a cell of the box, which is on the screen: within the
     MaxLins * 80 cells of ScrBuf, 0 or more and below 64K.
 
@@ -92,7 +92,7 @@ drive.c, F62_01: widen
     the box, which is on the screen.
 
 edit.c, T00_00: widen
-    | count = end - md.TmpBuf;
+    | count = (i32)(end - md.TmpBuf);
     The length of a name, with its zero: MvzLine copies 13 bytes at the
     most to TmpBuf, and `end` is behind them, a byte further on.
 
@@ -107,12 +107,12 @@ edit.c, T01_10: widen
     line of hex and back, as the assembly steps it, and the cast is that.
 
 edit.c, T20_02: widen
-    | for (count = EditBuf + EdSizLn - end; count; count--)
+    | for (count = (i32)(EditBuf + EdSizLn - end); count; count--)
     Two places of the line buffer, which has 4,000 bytes: the line
     above asks that the end of what it holds is behind `end`.
 
 edit.c, T20_02: widen
-    | i32 count = end - from;
+    | i32 count = (i32)(end - from);
     Two places of the line buffer, which has 4,000 bytes, `end` not
     before `from`: what is cut out of the line, within 16 bits.
 
@@ -131,7 +131,7 @@ edit.c, T72_00: compare
     before `end` at every call.
 
 edit.c, T72_00: widen
-    | offset = from - Room;
+    | offset = (i32)(from - Room);
     The place of a byte of the text, an address less the address of the
     text, which is not below 0 and is shown as eight digits of hex.
 
@@ -142,12 +142,12 @@ edit.c, T75_00: widen
     separators.
 
 edit.c, T80_14: widen
-    | count = file - md.TmpBuf;
+    | count = (i32)(file - md.TmpBuf);
     The length of the path in front of the name: CutPath answers a
     place in the path that TmpBuf holds, at its start or behind it.
 
 edit.c, T80_14: widen
-    | for (count = md.TmpBuf + LenPath + 13 - to; count; count--)
+    | for (count = (i32)(md.TmpBuf + LenPath + 13 - to); count; count--)
     What is left of TmpBuf's first LenPath + 13 bytes: the line above
     returns where `to` is at their end or behind it.
 
@@ -217,7 +217,7 @@ place.c, CorPar: widen
     those are 10 or more, the same number in 32 bits as it was in 16.
 
 setup.c, MakeIni: widen
-    | length = to - md.MenuBuf;
+    | length = (i32)(to - md.MenuBuf);
     How far to has gone from md.MenuBuf: the three letters, what the
     file holds of two panels and of the main data, INI_LEN - 2 bytes,
     which the u16 that it was kept in held as it is.
@@ -384,7 +384,7 @@ window.c, ResUser: index
     above has it from, adds to md.ScrBuf and takes nothing away.
 
 window.c, Window: widen
-    | i32 cell = from - md.ScrBuf;
+    | i32 cell = (i32)(from - md.ScrBuf);
     How far from is behind md.ScrBuf, in cells: BasAdr, which the line
     above has it from, adds a place of the screen buffer to md.ScrBuf,
     a cell of its rows of 80, which the u16 that it was cut to held as

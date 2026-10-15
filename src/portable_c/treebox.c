@@ -381,9 +381,11 @@ RdTr40:
    bits that wrap round: a line that has moved up by a line is at an
    offset below 0, which the original has as one that has wrapped round,
    and all of it is differences and comparisons within the list. The
-   number of an entry, TreNum, is the pointer's own. */
+   number of an entry, TreNum, is the pointer's own, and a difference of
+   two pointers into the list, which is in TreeBuf of the main data,
+   shorter than 64K: an i32 holds it. */
 #define ADDRESS(number) ((number) << 4)
-#define NUMBER(entry) ((entry) - TRELIST)
+#define NUMBER(entry) ((i32)((entry) - TRELIST))
 
 /* Show a line of the list in the box that begins at `begin`: the one
    that is `offset` bytes of the list behind the first one shown, which

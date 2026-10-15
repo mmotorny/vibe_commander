@@ -215,7 +215,7 @@ static void C40_05(const u8 *path, u8 *buffer)
     if (*path == '\\')
         to = buffer + 2;
 copy:
-    for (count = LenName - (to - buffer); count; count--)
+    for (count = LenName - (i32)(to - buffer); count; count--)
         *to++ = *path++;
     *to = 0;
     NormStr(buffer);
@@ -237,7 +237,7 @@ static bool C40_00(i32 *left)
     C40_05(CpSrc, md.TmpErr);
     C40_05(CpDest, md.TmpErr + 100);
     count = LenName;
-    count = C00_End(target, &count) - target;
+    count = (i32)(C00_End(target, &count) - target);
     do {
         count--;
         if (*source++ != *target++) {
@@ -362,7 +362,7 @@ static bool C00_01(void)
     end = C00_End(CpDest, &count);
     to = (u8 *)end;
     other = OtherPanel;
-    count = end - CpDest;
+    count = (i32)(end - CpDest);
     for (i = 0; other->WinPath[i] == CpDest[i]; )
         if (++i == count)
             goto directory;
@@ -418,13 +418,13 @@ mask:
             md.TmpErr[i] = md.TmpErr[20 + i];
     to = UnConv(name, md.TmpErr);
     from = part;
-    count = to - CpDest;
+    count = (i32)(to - CpDest);
     goto rest;
 directory:
     to[-1] = '\\';
 source:
     from = CpBgNam;
-    count = from - CpSrc;
+    count = (i32)(from - CpSrc);
 rest:
     if (count < LenName)
         for (count = LenName - count; count; count--)

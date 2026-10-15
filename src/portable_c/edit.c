@@ -814,7 +814,7 @@ void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base)
         return;
     }
     /* In hex the line is of the text, and no place in it is below 0. */
-    offset = from - Room;
+    offset = (i32)(from - Room);
     cell = screen + 1;
     cell = HexByt(cell, (u16)(offset >> 24));
     cell = HexByt(cell, (u16)(offset >> 16));
@@ -1117,11 +1117,11 @@ static void T80_14(void)
     }
     if (md.TmpBuf + LenPath + 13 <= to)
         return;
-    for (count = md.TmpBuf + LenPath + 13 - to; count; count--)
+    for (count = (i32)(md.TmpBuf + LenPath + 13 - to); count; count--)
         *to++ = *name++;
     PathLin(md.TmpBuf);
     file = CutPath(md.TmpBuf);
-    count = file - md.TmpBuf;
+    count = (i32)(file - md.TmpBuf);
     for (i = 0; i < count; i++)
         if (md.TmpBuf[i] != md.NcPath[i])
             return;
@@ -1599,7 +1599,7 @@ static void T16_00(void)
 static void T20_02(u8 *from, u8 *end)
 {
     u8 *undo = UndoBuf;
-    i32 count = end - from;
+    i32 count = (i32)(end - from);
     i32 cut = count;
     const u8 *source = from;
 
@@ -1607,7 +1607,7 @@ static void T20_02(u8 *from, u8 *end)
     for (; count; count--)
         *undo++ = *source++;
     if (EditBuf + EdSizLn > end)
-        for (count = EditBuf + EdSizLn - end; count; count--)
+        for (count = (i32)(EditBuf + EdSizLn - end); count; count--)
             *from++ = *end++;
     EdSizLn -= cut;                  /* T20_03 */
     ed.EdUpdat = 1;
@@ -2533,7 +2533,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     end = MvzLine(md.TmpBuf, name, 13);
     *end++ = 0;
     PathLin(md.TmpBuf);
-    count = end - md.TmpBuf;
+    count = (i32)(end - md.TmpBuf);
     help = 1;
     file = Menu_F;
     if (!T64_00(file, md.TmpBuf, count)) {

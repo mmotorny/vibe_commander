@@ -40,10 +40,13 @@ u16 NumAdr(struct WCBdef *panel, i32 number);
 
 /* The number of the entry at an address, and the address of the entry
    with a number: in a list of files, and in the tree. An address in a
-   panel is 16 bits by the panel's layout, which FILE_ADDRESS says. */
+   panel is 16 bits by the panel's layout, which FILE_ADDRESS says. The
+   number of an entry of the tree is a difference of two pointers into
+   its list, which is in TreeBuf of the main data, shorter than 64K: an
+   i32 holds it, on a machine whose pointers have 64 bits too. */
 #define FILE_NUMBER(address) \
     ((i32)(u16)((address) - DSKBUF) / (i32)sizeof(struct FILENT))
-#define TREE_NUMBER(entry) ((entry) - TRELIST)
+#define TREE_NUMBER(entry) ((i32)((entry) - TRELIST))
 #define FILE_ADDRESS(number) \
     ((u16)(((number) << 4) + ((number) << 3) + (i32)DSKBUF))
 #define TREE_ADDRESS(number) (TRELIST + (number))
