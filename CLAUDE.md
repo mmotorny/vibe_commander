@@ -254,7 +254,12 @@ These held while `src/c/` was made, and they say what it is.
      start from. Of what the abandoned design had decided for other
      systems, the user named three again for Linux on 14 October 2026:
      Enter on a file that the program cannot run hands it to
-     `xdg-open`; the PC's sixteen colours are drawn as DOS has them,
+     `xdg-open`, the program asking `sys.h` whether a file runs where it
+     asked its extension, so that on Linux a file that the user may
+     execute runs whatever its name, and a name of DOS's form in a
+     command, a word that names a file of the current directory, is
+     handed to the shell as the host's name (the user, on 15 October
+     2026); the PC's sixteen colours are drawn as DOS has them,
      exactly, in 24 bits where the terminal allows it; and the screen
      is 80 columns by 25 rows and no other size, whatever the
      terminal's. The rest of that design is dropped. Of what the first
@@ -275,7 +280,10 @@ These held while `src/c/` was made, and they say what it is.
      overwritten; hidden, system and archive are taken when set and not
      kept, the host having nowhere for them; a pipe, a socket or a
      device is listed as an empty file that cannot be opened; the
-     drives' labels are ROOT and HOME, and making one is refused; and an error of the
+     drives' labels are ROOT and HOME, and making one is refused; DOS's names of devices, NUL, CON and the like, are
+     ordinary names of files on Linux, and the steps of scenarios that
+     use them as devices are not run there, declared (the user, on 15
+     October 2026); and an error of the
      host's with no number of DOS's is DOS's general failure. Once the stub compiles on Linux, on the user's
      word of 14 October 2026, every build with clang has the
      sanitizers that fit it, a high level of warnings and clang-tidy,
@@ -4373,7 +4381,11 @@ waiting for the user between its steps.
   by name unless the user picks another order. Since the scenarios move the
   cursor by places in a list, their steps are rewritten for it, each
   to go to the files that it meant, the user choosing that on the
-  same day over keeping the bench unsorted (`TODO.md`, "SORT").
+  same day over keeping the bench unsorted (`TODO.md`, "SORT"). The
+  tree, which has no order of its own and lists directories as they
+  stand on the disk, is made alphabetical the same way: the bench makes
+  its directories in the order of their names, so that the disk's order
+  is the names' on DOS too, on the user's word of 15 October 2026.
 - The countries tested are the United States and Russia.
 - Russian text is typed on the Russian keyboard of the Russian bench. Its
   Cyrillic letters are selected in a step that types text into an input
