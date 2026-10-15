@@ -229,8 +229,8 @@ def expected(screen, rules=None):
         if isinstance(rule, Part):
             rule.made(screen, cells)
             continue
-        if isinstance(rule, WrittenTimes):
-            continue                    # a mask of the run's: masked()
+        if isinstance(rule, (WrittenTimes, InfoUnder, DosPrompt)):
+            continue                    # a mask of its own: masked()
         pattern, text, below = rule
         if text is None:
             continue                    # a mask: see masked()
@@ -272,12 +272,13 @@ class WrittenTimes:
     WHEN = re.compile(r" ?\d{1,2}-\d\d-\d\d| ?\d{1,2}:\d\d[ap]")
     TITLE = re.compile(r"═ ([A-Za-z]:\\[^ ]*) ═")
 
-    def cells(self, lines, written):
-        """The places, (row, column), that the mask leaves out of a
-        screen whose rows are `lines`, of a run that wrote into the
-        directories `written`, paths of the bench in capitals."""
+    def found(self, golden, written):
+        """The places, (row, column), that the mask leaves out of the
+        screen `golden`, of a run that wrote into the directories
+        `written`, paths of the bench in capitals."""
         if not written:
             return
+        lines = golden.lines()
         for row, line in enumerate(lines):
             for match in self.LINE.finditer(line):
                 start, end = match.span(1)
@@ -306,6 +307,81 @@ class WrittenTimes:
         return True
 
 
+@dataclass(frozen=True)
+class InfoUnder:
+    """A mask of the lines of the Info panel that the rules of text leave
+    out whole where they show whole (the room of the drive and what the
+    files use, LINUX_MASKS), where a box covers a part of them: the line
+    is centred, its figure the host's, so what shows of it beside the box
+    stands elsewhere. Known by the panel's title, on the golden's screen,
+    and the rows below it that have those lines, the sixth to the eighth:
+    the cells between its frames that are in the panel's colours, or in
+    what a box's shadow makes of them, are left out."""
+    what: str = "the Info panel's lines of the host's figures, in part"
+
+    # What the panel is known by, each with the row that it is on,
+    # counted from the title's: the title, the line of the program's
+    # name below it, as the original has it or as a rule of the tree has
+    # made it of that, the drive's label as far as it shows.
+    KNOWN = ((re.compile(r"(╔═+ Info ═+╗)"), 0),
+             (re.compile(r"(4\.05  ║|0\.1 {10}║)"), 1),
+             (re.compile(r"(: is \S* *║|WORK {6}║)"), 5))
+    ROWS = (6, 7, 8)
+
+    def found(self, golden, written):
+        lines = golden.lines()
+        seen = set()
+        for row, line in enumerate(lines):
+            for pattern, down in self.KNOWN:
+                for known in pattern.finditer(line):
+                    # The panel is 40 cells wide, and known by its
+                    # right frame, which shows where a box covers the
+                    # rest.
+                    end = known.end(1)
+                    start = max(end - 40, 0)
+                    top = row - down
+                    if (top, start) in seen:
+                        continue
+                    seen.add((top, start))
+                    at = (row * COLUMNS + end - 1) * 2 + 1
+                    frame = golden.cells[at]
+                    colours = {frame, frame & 0xF0 | 0x0E}
+                    colours |= {shaded(colour) for colour in colours}
+                    for below in self.ROWS:
+                        if not 0 <= top + below < ROWS:
+                            continue
+                        for column in range(start + 1, end - 1):
+                            at = ((top + below) * COLUMNS + column) * 2 + 1
+                            if golden.cells[at] in colours:
+                                yield top + below, column
+
+
+@dataclass(frozen=True)
+class DosPrompt:
+    """A mask of the prompt that DOS writes when the program has been
+    left, a row of a prompt and nothing else with an empty row below it,
+    which no screen of the program has: its command line has the key bar
+    below it or is the last row. On Linux the shell writes its own, on
+    the terminal's screen. The cursor that DOS leaves behind the prompt
+    goes with it: where the golden's cursor is on such a row, the build's
+    is taken for the golden's."""
+    what: str = "the prompt that DOS writes behind the program"
+
+    PROMPT = re.compile(r"^([A-Za-z]:\\[^>]*>) *$")
+
+    def found(self, golden, written):
+        lines = golden.lines()
+        for row, line in enumerate(lines[:-1]):
+            match = self.PROMPT.match(line)
+            if match and not lines[row + 1].strip():
+                for column in range(*match.span(1)):
+                    yield row, column
+
+
+# The masks that are found by a method of their own, `found`.
+_FOUND = (WrittenTimes, InfoUnder, DosPrompt)
+
+
 def masked(golden, screen, rules, written=None):
     """The screen `golden` of a golden and the screen `screen` of a
     build, with the cells that a mask among `rules` finds on the
@@ -315,20 +391,24 @@ def masked(golden, screen, rules, written=None):
     match of its pattern on a row is found, and every group of a match
     is left out; with a pattern for the line below, only a row whose
     next one has that. A WrittenTimes among them goes by `written` as
-    well, the directories that the run wrote into."""
+    well, the directories that the run wrote into; it, an InfoUnder and
+    a DosPrompt find their cells by themselves."""
     masks = [rule for rule in rules
-             if not isinstance(rule, (Part, WrittenTimes))
+             if not isinstance(rule, (Part,) + _FOUND)
              and rule[1] is None]
-    by_run = [rule for rule in rules if isinstance(rule, WrittenTimes)]
+    by_run = [rule for rule in rules if isinstance(rule, _FOUND)]
     if not masks and not by_run:
         return golden, screen
     out = [bytearray(golden.cells), bytearray(screen.cells)]
     lines = golden.lines()
+    cursor = screen.cursor
     for rule in by_run:
-        for row, column in rule.cells(lines, written):
+        for row, column in rule.found(golden, written):
             for cells in out:
                 at = (row * COLUMNS + column) * 2
                 cells[at:at + 2] = MASKED
+            if isinstance(rule, DosPrompt) and golden.cursor[1] == row:
+                cursor = golden.cursor
     for pattern, _, below in masks:
         for row, line in enumerate(lines):
             if below and not (row + 1 < ROWS
@@ -342,7 +422,7 @@ def masked(golden, screen, rules, written=None):
                             at = (row * COLUMNS + column) * 2
                             cells[at:at + 2] = MASKED
     return (replace(golden, cells=bytes(out[0])),
-            replace(screen, cells=bytes(out[1])))
+            replace(screen, cells=bytes(out[1]), cursor=cursor))
 
 
 # What a masked cell is made on both screens: a character and a colour
@@ -1183,8 +1263,24 @@ LINUX_MASKS = (
     # home directory, in a title, on the prompt, in a dialog's line and
     # in the Info panel.
     (re.compile(r"(?<![A-Za-z0-9])([Cc]):(?=\\|[ >]|$)"), None, None),
-    # Its label: the bench's C: is WORK, and H: is HOME.
-    (re.compile(r"Volume in drive [A-Za-z]: is (WORK)"), None, None),
+    # And on a prompt of the drive alone, $N$G, "C>".
+    (re.compile(r"^(C)>"), None, None),
+    # And where the rest of the prompt is written over, as a panel's
+    # mini status does when a beep has moved the screen up a row: the
+    # letter alone at the start of the row above the key bar, which is
+    # the command line's.
+    (re.compile(r"^(C)(?![:>])"), None, re.compile(r"^1\D{6,7}2")),
+    # Its label: the bench's C: is WORK, and H: is HOME; behind the
+    # drive's letter also where a box covers "Volume in drive".
+    (re.compile(r": is (WORK)\b"), None, None),
+    # And where no more of the line shows than its end, in the Info
+    # panel, where it is centred: the label six cells from the frame.
+    (re.compile(r"(WORK)(?= {6}║)"), None, None),
+    # The drive menu's letters, the bench's A C D and the host's H R,
+    # the row between its frames above the bottom one: the box is as
+    # wide as its title.
+    (re.compile(r"║( {3,}[A-Z](?:   [A-Z])* {3,})║"), None,
+     re.compile(r"╚═+╝")),
     # The room of the drive in the Info panel, of the host's file
     # system (L2), and what the files of a directory use there, in
     # clusters of the host's: the whole line, which is centred, so the
@@ -1192,8 +1288,12 @@ LINUX_MASKS = (
     (re.compile(r"║(.*total bytes on drive.*)║"), None, None),
     (re.compile(r"║(.*bytes free on drive.*)║"), None, None),
     (re.compile(r"║(.*files? uses? .* bytes in.*)║"), None, None),
+    # The same lines where a box covers a part of them.
+    InfoUnder(),
     # The time of a directory that the run wrote into.
     WrittenTimes(),
+    # The prompt that DOS writes when the program has been left.
+    DosPrompt(),
 )
 
 # The scenarios that the program for Linux is not taken through, not on
@@ -1235,6 +1335,10 @@ LINUX_NOT_RUN = {
             "are as long as they say, up to four gigabytes",
     "find-drives": "every fixed drive, where R: is the host's root: the "
                    "search would go through the host's whole file system",
+    "label": "making and deleting the drive's label, which the program "
+             "for Linux refuses, its labels being ROOT and HOME always "
+             "(CLAUDE.md, step 6): from its first label on, every screen "
+             "is another",
     "editor-full": "memory that runs out, where Linux gives what the "
                    "machine has (CLAUDE.md, step 6)",
     "copy-big": "memory that runs out, where Linux gives what the "

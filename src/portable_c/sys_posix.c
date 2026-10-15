@@ -1861,6 +1861,8 @@ struct Answer ProgramRun(const u8 *name, const u8 *tail)
     struct Answer answer;
     i32 length = 0, start = 0, count = tail[0], made;
 
+    /* Under the test channel the step that asks for it is said on
+       standard error, for the harness. */
     if (ScreensFd >= 0)
         fprintf(stderr, "vc: a program is run at step %d\n",
                 (int)StepNow);
