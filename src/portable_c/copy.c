@@ -371,7 +371,7 @@ static bool C00_01(void)
         if (ChgDisk(CpDest))
             return false;
         opened = OpenFil(CpDest, 0x40);
-        if (opened.failed == 0) {
+        if (!opened.failed) {
             device = FileDevice(opened.value);
             info = device.kind;
             /* The assembly goes on with DX as it is, which DOS has not
@@ -442,7 +442,7 @@ static struct Answer DelTree(const u8 *path)
 
     if (md.ChgTree == 0) {
         marked.value = 0;
-        marked.failed = 0;
+        marked.failed = false;
         return marked;
     }
     return DelTr0(path);

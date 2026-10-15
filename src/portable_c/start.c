@@ -455,7 +455,7 @@ struct Answer Init11(void)
     for (side = 0; side < 2; side++) {
         block = MemTake(PANEL_BYTES);
         answer.value = Paragraphs(block.largest);
-        answer.failed = block.failed != 0;
+        answer.failed = block.failed;
         if (answer.failed)
             return answer;
         wcb = (struct WCBdef *)block.block;

@@ -98,7 +98,8 @@ void Blank(void)
     cursor = CursorWhere(ScreenState().page);
     CursorShape(NO_CURSOR);
     /* The screen empty, as a window scrolled by all its rows. */
-    ScreenScroll(0, 0, Color(Sky1_C), 0, (u16)((u8)(md.Lines - 1) << 8 | 79));
+    ScreenScroll(false, 0, Color(Sky1_C), 0,
+                 (u16)((u8)(md.Lines - 1) << 8 | 79));
     for (i = 0; i < NmbStrs; i++) {
         md.Stars[i].StarMod = 0;
         md.Stars[i].StarPos = 0;
@@ -174,7 +175,7 @@ void Blank(void)
 
         /* Blnk10: until the timer ticks. */
         for (;;) {
-            if (KeyWaiting().none == 0) {
+            if (!KeyWaiting().none) {
                 KeyRead();                      /* Blnk13 */
                 goto wake;
             }

@@ -54,7 +54,19 @@
  * went on with whatever it had there itself, and a caller that goes by
  * that says what it was, where it reads the answer.
  *
- * vc.h includes this file, and the types u8, u16, u32 and i32 are
+ * Widths. A number that DOS, the BIOS or the mouse driver takes or
+ * answers in keeps the width that it has there and has no sign: a drive,
+ * a handle, attributes, a packed time and date, AX as DOS leaves it, an
+ * error, a mode, a page, a place and a colour of the screen, a character
+ * and a key, the mouse's dots and buttons, the font. A count that the
+ * program reckons with is an i32, also where the system takes it in a
+ * register of 16 bits or fewer, which dos32.c then fills: the bytes that
+ * are read or written, the lines and the cells of the screen, a size in
+ * the memory. The size of a file and a place in one, and the figures that
+ * the size of a disk is made of, are u32: they may pass two gigabytes.
+ * Whether a thing failed, or is so, is a bool.
+ *
+ * vc.h includes this file, and the types u8, u16, u32, i32 and bool are
  * vc.h's.
  */
 #ifndef SYS_H
@@ -71,7 +83,7 @@ struct Answer {
     u16 value;                          /* what was asked for, a handle or
                                            a number of bytes, or the error:
                                            AX as DOS left it */
-    u16 failed;                         /* not 0 if that is the error */
+    bool failed;                        /* if that is the error */
 };
 
 /*
@@ -107,7 +119,7 @@ struct Moved {
                                            count that DOS takes at once */
     u16 error;                          /* if it failed, the error: AX as
                                            DOS left it; else 0 */
-    u16 failed;                         /* not 0 if it failed */
+    bool failed;                        /* if it failed */
 };
 
 /* Read up to `count` bytes of a file to `to`, from where the file is at.
@@ -132,7 +144,7 @@ struct Moved FileWrite(u16 handle, const u8 *from, i32 count);
    file, which has no sign; a step has one. */
 struct FilePlace {
     u32 place;
-    u16 failed;
+    bool failed;
 };
 struct FilePlace FileSeek(u16 handle, u32 place);
 struct FilePlace FileStep(u16 handle, u16 from, i32 step);
@@ -148,7 +160,7 @@ struct Answer FileRename(const u8 *from, const u8 *to);
    asking failed, `attributes` is 0. */
 struct FileAttr {
     u16 value;                          /* AX as DOS left it, or the error */
-    u16 failed;
+    bool failed;
     u16 attributes;
 };
 struct FileAttr FileAttributes(const u8 *name);
@@ -158,7 +170,7 @@ struct Answer FileSetAttributes(const u8 *name, u16 attributes);
    them, and others set for it. If asking failed, both are 0. */
 struct FileStamp {
     u16 value;                          /* AX as DOS left it, or the error */
-    u16 failed;
+    bool failed;
     u16 time;
     u16 date;
 };
@@ -170,7 +182,7 @@ struct Answer FileSetTime(u16 handle, u16 time, u16 date);
    failed, `kind` is 0. */
 struct Device {
     u16 value;                          /* AX as DOS left it, or the error */
-    u16 failed;
+    bool failed;
     u16 kind;
 };
 struct Device FileDevice(u16 handle);
@@ -198,9 +210,9 @@ u16 FcbParse(const u8 *name, u8 *fcb, u16 how);
    DOS leaves the carry flag as it finds it at this call, and the
    original takes a flag that is set for an error, whatever DOS did, and
    asks DOS which: that answer then comes back, with `failed`, in place
-   of the call's. `flagged` is not 0 where the original has the flag set
+   of the call's. `flagged` is true where the original has the flag set
    when it calls. */
-struct Answer FcbDelete(const u8 *fcb, u16 flagged);
+struct Answer FcbDelete(const u8 *fcb, bool flagged);
 
 /*
  * Directories. Asked with the program's errors, but for FindRecord and
@@ -249,12 +261,12 @@ void DriveSelect(u16 drive);
 struct Space {
     u16 value;                          /* the sectors of a cluster: AX as
                                            DOS left it, or the error */
-    u16 failed;
+    bool failed;
     u32 free;                           /* the clusters that are free */
     u32 sector;                         /* the bytes of a sector */
     u32 total;                          /* the clusters of the drive */
 };
-struct Space DriveSpace(u16 drive, u16 flagged);
+struct Space DriveSpace(u16 drive, bool flagged);
 
 /* A drive that shares its unit with another, as A: and B: share one
    floppy drive, 1 for A:. DriveLetter answers in the low byte of `value`
@@ -270,8 +282,8 @@ struct Answer DriveSetLetter(u16 drive);
 struct Device DriveRemote(u16 drive);
 struct Answer DriveFixed(u16 drive);
 
-/* Is a drive a CD-ROM? 1 or 0. */
-u16 DriveCd(u16 drive);
+/* Is a drive a CD-ROM? */
+bool DriveCd(u16 drive);
 
 /*
  * Memory, in blocks that are known by where they begin and counted in
@@ -293,7 +305,7 @@ struct Block {
                                            and MemResize; 0 if it failed */
     u16 value;                          /* 0, or the error: DOS's number
                                            for it */
-    u16 failed;
+    bool failed;
     i32 largest;                        /* if MemTake failed for want of
                                            memory, how many bytes the
                                            largest block has that it could
@@ -314,11 +326,11 @@ struct Block MemResize(u8 *block, i32 bytes);
 /* Where the system looks for a block that it is asked for: `how` is as
    DOS has it, 0 for the lowest block that fits, which is how DOS looks
    when it has started. And whether the upper memory, beyond the 640 KB
-   that every PC has, is among what it looks through: 1 or 0. Neither
+   that every PC has, is among what it looks through. Neither
    answers, and a system that does not know the question goes on looking
    as it did. */
 void MemSetSearch(u16 how);
-void MemSetUpper(u16 on);
+void MemSetUpper(bool on);
 
 /* The memory that the program itself is in. DOS gives a program all of
    the memory when it starts it, in one block, and this makes that block
@@ -362,10 +374,10 @@ struct SysVersion {
 struct SysVersion SystemVersion(void);
 struct SysVersion SystemTrueVersion(void);
 
-/* Whether the system looks for Ctrl-C whatever it is asked, 1 or 0, and
-   that set. */
-u16 BreakCheck(void);
-void SetBreakCheck(u16 on);
+/* Whether the system looks for Ctrl-C whatever it is asked, and that
+   set. */
+bool BreakCheck(void);
+void SetBreakCheck(bool on);
 
 /* Tell the system that the program is idle: once, each time that it
    looks for a key and finds none. */
@@ -483,14 +495,14 @@ void CtrlCTake(void);
    program that started this one goes on. It is one thing:
 
      ProgramEndedBreakCheck   whether the system is then to look for
-                              Ctrl-C whatever it is asked, 1 or 0, as
+                              Ctrl-C whatever it is asked, as
                               SetBreakCheck takes it: what the program
                               found. Said whenever the program has
                               found it anew, before Take or after
 
    Take, and Give before the program ends itself: then nothing is put
    back, and the program does that for itself. */
-void ProgramEndedBreakCheck(u16 on);
+void ProgramEndedBreakCheck(bool on);
 void ProgramEndedTake(void);
 void ProgramEndedGive(void);
 
@@ -512,7 +524,7 @@ struct Keys {
     u16 key;                            /* the key that waits: the
                                            character, and the scan code in
                                            the high byte */
-    u16 none;                           /* 1 if no key waits */
+    bool none;                          /* if no key waits */
 };
 
 /* Does a key wait, and which? It stays where it is. And the key that
@@ -560,15 +572,15 @@ void CursorTo(u16 page, u16 place);
 void CursorShape(u16 shape);
 
 /* Move what a window of the screen shows a number of lines up, or down
-   if `down` is not 0, with empty lines of the colour `color` where it
+   if `down`, with empty lines of the colour `color` where it
    came from: `upper` is the upper left corner of the window and `lower`
    the lower right one. No lines, 0, empties the window. */
-void ScreenScroll(u16 down, u16 lines, u16 color, u16 upper, u16 lower);
+void ScreenScroll(bool down, i32 lines, u16 color, u16 upper, u16 lower);
 
 /* The cell at the cursor of a page. And `count` cells from the cursor
    on, written as this character in this colour; the cursor stays. */
 u16 ScreenCell(u16 page);
-void ScreenFill(u16 page, u16 character, u16 color, u16 count);
+void ScreenFill(u16 page, u16 character, u16 color, i32 count);
 
 /* Write a character at the cursor as a terminal does: the cursor moves
    on, a line feed moves the lines up at the bottom, and 7 sounds the
@@ -577,9 +589,8 @@ void ScreenFill(u16 page, u16 character, u16 color, u16 count);
    graphics has: the original hands it what it happens to have. */
 void ScreenType(u16 character, u16 page, u16 color);
 
-/* Is the display an EGA or better, which can have more lines than 25? 1
-   or 0. */
-u16 ScreenEga(void);
+/* Is the display an EGA or better, which can have more lines than 25? */
+bool ScreenEga(void);
 
 /* The font of such a display: how many lines of dots a character has,
    and the last row of the screen with it, which is how the program
@@ -601,8 +612,8 @@ void ScreenMemory(u16 mode, u16 start);
 /* The cells of the screen themselves, 80 to a row: `count` of them from
    the cell `cell` on, written from `from` or read to `to`. The first
    cell is 0. ScreenMemory has to have said where they are. */
-void ScreenPut(u16 cell, const u16 *from, u16 count);
-void ScreenGet(u16 cell, u16 *to, u16 count);
+void ScreenPut(i32 cell, const u16 *from, i32 count);
+void ScreenGet(i32 cell, u16 *to, i32 count);
 
 /*
  * The mouse. It counts in dots, eight to a cell of the text screen.

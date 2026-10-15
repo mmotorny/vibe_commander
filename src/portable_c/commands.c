@@ -584,7 +584,7 @@ i32 M75_00(struct WCBdef *panel)
 
     if ((u8)Dialog(&SvSt_B, 0, 0, 0, panel) == 0) {
         saved = SaveSet();
-        if (saved.failed != 0 && saved.value != ERR_NOT_READY)
+        if (saved.failed && saved.value != ERR_NOT_READY)
             Dialog(&SetEr_B, 0, 0, 0, panel);
     }
     return MNU_FUNC04;

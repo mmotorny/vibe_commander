@@ -952,7 +952,7 @@ static struct Answer Done(u16 value)
     struct Answer answer;
 
     answer.value = value;
-    answer.failed = 0;
+    answer.failed = false;
     return answer;
 }
 
@@ -961,7 +961,7 @@ static struct Answer Failed(u16 error)
     struct Answer answer;
 
     answer.value = error;
-    answer.failed = 1;
+    answer.failed = true;
     return answer;
 }
 

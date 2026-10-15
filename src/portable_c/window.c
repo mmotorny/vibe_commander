@@ -195,12 +195,10 @@ void ResUser(u16 begin, u16 size)
    screen through here. */
 static void MovScr(i32 cell, u16 *buffer, i32 rows, bool read)
 {
-    /* The cell is one of the screen buffer's, and the rows a byte's
-       worth: both fit the 16 bits that the system takes. */
     if (read)
-        ScreenGet((u16)cell, buffer, (u16)(rows * 80));
+        ScreenGet(cell, buffer, rows * 80);
     else
-        ScreenPut((u16)cell, buffer, (u16)(rows * 80));
+        ScreenPut(cell, buffer, rows * 80);
     IntOn();
 }
 
@@ -228,13 +226,13 @@ void Window(u16 begin, u16 size)
         MovScr(cell - (begin & 0xFF), from - (begin & 0xFF), rows, false);
     } else {
         if (columns != 0)
-            ScreenPut((u16)cell, from, (u16)columns);
+            ScreenPut(cell, from, columns);
         else {
             /* 65536 cells, as the original's loop counts none: twice
                round the 64K that the display's memory and the main data
                each have, which is the same 32768 cells twice. */
-            ScreenPut((u16)cell, from, 0x8000);
-            ScreenPut((u16)cell, from, 0x8000);
+            ScreenPut(cell, from, 0x8000);
+            ScreenPut(cell, from, 0x8000);
         }
         IntOn();
     }

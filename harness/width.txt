@@ -90,13 +90,13 @@ N19a            54          0     1              0      52     3     2    10    
 N19b            22          0     0              0      21     1     2     1    18  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
-as a whole     569          0    59              0       0     0     0     1    19  the tables, dos32.c stack.c
-headers        268         55    15              4     173     5     0     0     0  vc.h sys.h tables.h
-all           1929         55   116              4    1217    65    54   173   955
+as a whole     551          0    59              0       0     0     0    13    25  the tables, dos32.c stack.c
+headers        259         20    15              0     203     5     0     0     0  vc.h sys.h tables.h
+all           1902         20   116              0    1247    65    54   185   961
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               213          0    11              0     173     5     0     0     0
-sys.h               35         35     4              4       0     0     0     0     0
+sys.h               26          0     4              0      30     0     0     0     0
 tables.h            20         20     0              0       0     0     0     0     0
 bars.c              19          0     0              0      19     0     2     0    21
 blank.c             12          0     0              0      12     0     2     0     7
@@ -745,7 +745,110 @@ vc.h, struct Mouse: field buttons, u16
 vc.h, struct Mouse: field place, u16
     place
 
-sys.h: not sorted, 35 numbers, 4 u32
+sys.h, struct Answer: field value, u16
+    system: AX as DOS leaves it, a handle, a number or the error.
+
+sys.h, struct Moved: field error, u16
+    system: DOS's number of the error, AX as DOS leaves it.
+
+sys.h, struct FilePlace: field place, u32
+    size: a place in a file, counted from its start; where the call
+    failed, the two words that DOS left in AX and DX.
+
+sys.h, struct FileAttr: field value, u16
+    system: AX as DOS leaves it, or the error.
+
+sys.h, struct FileAttr: field attributes, u16
+    attributes
+
+sys.h, struct FileStamp: field value, u16
+    system: AX as DOS leaves it, or the error.
+
+sys.h, struct FileStamp: field time, u16
+    time
+
+sys.h, struct FileStamp: field date, u16
+    time
+
+sys.h, struct Device: field value, u16
+    system: AX as DOS leaves it, or the error.
+
+sys.h, struct Device: field kind, u16
+    bits: DOS's bits of a device or of a drive, in DX.
+
+sys.h, struct Space: field value, u16
+    system: AX as DOS leaves it: the sectors of a cluster, FFFFh for
+    a drive that there is not, or the error.
+
+sys.h, struct Space: field free, u32
+    size: a factor of what is free on the disk, which the program
+    works out in 32 bits without a sign; as an i32 every such product
+    would be a place of a sign.
+
+sys.h, struct Space: field sector, u32
+    size: a factor of the size of the disk and of what is free on it,
+    as `free` is.
+
+sys.h, struct Space: field total, u32
+    size: a factor of the size of the disk, as `free` is.
+
+sys.h, struct Block: field value, u16
+    system: DOS's number of the error, or 0.
+
+sys.h, struct Time: field clock, u16
+    time
+
+sys.h, struct Time: field seconds, u16
+    time
+
+sys.h, struct SysVersion: field version, u16
+    system: the version as DOS answers it in AX, the major number in
+    the low byte.
+
+sys.h, struct SysVersion: field other, u16
+    system: who made it in the high byte, as DOS answers it in BX; or
+    AX as DOS left it.
+
+sys.h, struct Keys: field key, u16
+    key
+
+sys.h, struct Screen: field mode, u16
+    system: the mode of the screen as the BIOS has it, with the bit
+    that says it was not cleared.
+
+sys.h, struct Screen: field columns, u16
+    system: the columns of the screen as the BIOS answers them in AH,
+    which the program only holds against 80.
+
+sys.h, struct Screen: field page, u16
+    system: the page that is shown, as the BIOS answers it in BH and
+    takes it.
+
+sys.h, struct CursorAt: field place, u16
+    place
+
+sys.h, struct CursorAt: field shape, u16
+    system: the shape of the cursor, its first and last line of dots
+    in two bytes, as the BIOS has it.
+
+sys.h, struct Font: field height, u16
+    system: the lines of dots of a character, as the BIOS answers them
+    in CX.
+
+sys.h, struct Font: field last, u16
+    system: the last row of the screen, as the BIOS answers it in DL;
+    start.c adds one with the original's cut written.
+
+sys.h, struct MouseAt: field buttons, u16
+    bits
+
+sys.h, struct MouseAt: field x, u16
+    system: the column in dots, as the mouse driver answers it in CX,
+    which mouse.c keeps in MouseX of the main data.
+
+sys.h, struct MouseAt: field y, u16
+    system: the row in dots, as the mouse driver answers it in DX,
+    which mouse.c keeps in MouseY of the main data.
 
 tables.h: not sorted, 20 numbers
 
@@ -1897,7 +2000,7 @@ dirfunc.c, FncSel: sign
 dirfunc_t.c: as a whole, 60 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
 
-dos32.c: as a whole, 151 numbers, 59 u32
+dos32.c: as a whole, 133 numbers, 59 u32
     the system's file: what DOS, the BIOS and the extender take and answer in, and the layer's to shape, step 3
 
 drive.c, (): variable DrLe_S, u8[14]

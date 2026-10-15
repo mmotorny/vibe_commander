@@ -353,15 +353,15 @@ static u16 Real(struct DosRegs *regs, u16 number, u32 routine)
     return real.flags;
 }
 
-/* DOS, with the registers of `regs` and their answer there. Not 0 if
-   DOS leaves the carry flag set: FFFFh, which is what a function that
-   asks bare answers with for `failed`. */
-static u16 Call(struct DosRegs *regs)
+/* DOS, with the registers of `regs` and their answer there. True if
+   DOS leaves the carry flag set, which is what a function that asks
+   bare answers with for `failed`. */
+static bool Call(struct DosRegs *regs)
 {
     if (regs->low)
-        return Real(regs, 0x21, 0) & FLAG_CARRY ? 0xFFFF : 0;
+        return (Real(regs, 0x21, 0) & FLAG_CARRY) != 0;
     Below = StackNow() - STACK_KEPT;
-    return (u16)Dos(regs);
+    return Dos(regs) != 0;
 }
 
 /* The BIOS for the screen, with these registers, which come back in
@@ -440,7 +440,7 @@ static void NameLow(const u8 *name)
 }
 
 /* What DOS answers: AX, and whether the carry flag is set. */
-static struct Answer Answered(const struct DosRegs *regs, u16 failed)
+static struct Answer Answered(const struct DosRegs *regs, bool failed)
 {
     struct Answer answer;
 
@@ -465,7 +465,7 @@ static struct Answer Tell(struct DosRegs *regs)
    other registers are as the first call left them, which they are
    afterwards too.
 
-   `flagged` is not 0 where the original has the carry flag set when it
+   `flagged` is true where the original has the carry flag set when it
    calls, which it has at two calls that DOS leaves the flag at, 36h and
    13h: the flag is then set afterwards whatever DOS did, and the
    original takes that for an error. The program of 16 bits set the flag
@@ -473,18 +473,19 @@ static struct Answer Tell(struct DosRegs *regs)
    has set does not come back set through the extender, as the toy
    showed of 36h. So the flag counts as set afterwards if it was to be
    set before, which is the same for a DOS that leaves it. */
-static struct Answer Ask(struct DosRegs *regs, u16 flagged)
+static struct Answer Ask(struct DosRegs *regs, bool flagged)
 {
     u32 ebx, ecx, edx;
 
     md.ErrDat = 0;
-    flagged |= Call(regs);
+    if (Call(regs))
+        flagged = true;
     if (md.ErrDat != 0) {
         regs->eax = ERR_NOT_READY;
-        return Answered(regs, 1);
+        return Answered(regs, true);
     }
-    if (flagged == 0)
-        return Answered(regs, 0);
+    if (!flagged)
+        return Answered(regs, false);
     ebx = regs->ebx;
     ecx = regs->ecx;
     edx = regs->edx;
@@ -494,7 +495,7 @@ static struct Answer Ask(struct DosRegs *regs, u16 flagged)
     regs->ebx = ebx;
     regs->ecx = ecx;
     regs->edx = edx;
-    return Answered(regs, 1);
+    return Answered(regs, true);
 }
 
 /* A call that takes a name at EDX and a number in CX, and one that takes
@@ -505,7 +506,7 @@ static struct Answer Named(u16 ax, const u8 *name, u16 cx)
     struct DosRegs regs;
 
     Set(&regs, ax, 0, cx, ADDRESS(name));
-    return Ask(&regs, 0);
+    return Ask(&regs, false);
 }
 
 static struct Answer Handled(u16 ax, u16 handle, u32 edx, u16 count)
@@ -513,7 +514,7 @@ static struct Answer Handled(u16 ax, u16 handle, u32 edx, u16 count)
     struct DosRegs regs;
 
     Set(&regs, ax, handle, count, edx);
-    return Ask(&regs, 0);
+    return Ask(&regs, false);
 }
 
 /* Files. */
@@ -568,13 +569,13 @@ static struct Moved Move(u16 ax, u16 handle, const u8 *at, i32 count,
 
     moved.count = 0;
     moved.error = 0;
-    moved.failed = 0;
+    moved.failed = false;
     do {
         piece = count - moved.count;
         if (piece > PIECE_MOST)
             piece = PIECE_MOST;
         Set(&regs, ax, handle, (u32)piece, ADDRESS(at + moved.count));
-        answer = asked ? Ask(&regs, 0) : Tell(&regs);
+        answer = asked ? Ask(&regs, false) : Tell(&regs);
         if (answer.failed) {
             moved.error = answer.value;
             moved.failed = answer.failed;
@@ -607,7 +608,7 @@ static struct FilePlace Seek(u16 handle, u16 from, u32 offset)
     struct FilePlace sought;
 
     Set(&regs, 0x4200 | from & 0xFF, handle, offset >> 16, (u16)offset);
-    sought.failed = Ask(&regs, 0).failed;
+    sought.failed = Ask(&regs, false).failed;
     sought.place = (u32)(u16)regs.edx << 16 | (u16)regs.eax;
     return sought;
 }
@@ -636,7 +637,7 @@ struct Answer FileRename(const u8 *from, const u8 *to)
 
     Set(&regs, 0x5600, 0, 0, ADDRESS(from));
     regs.edi = ADDRESS(to);
-    return Ask(&regs, 0);
+    return Ask(&regs, false);
 }
 
 struct FileAttr FileAttributes(const u8 *name)
@@ -646,7 +647,7 @@ struct FileAttr FileAttributes(const u8 *name)
     struct FileAttr attr;
 
     Set(&regs, 0x4300, 0, 0, ADDRESS(name));
-    asked = Ask(&regs, 0);
+    asked = Ask(&regs, false);
     attr.value = asked.value;
     attr.failed = asked.failed;
     attr.attributes = (u16)regs.ecx;
@@ -660,7 +661,7 @@ struct Answer FileSetAttributes(const u8 *name, u16 attributes)
 
     NameLow(name);
     SetLow(&regs, 0x4301, 0, attributes, LOW_NAME);
-    return Ask(&regs, 0);
+    return Ask(&regs, false);
 }
 
 struct FileStamp FileTime(u16 handle)
@@ -670,7 +671,7 @@ struct FileStamp FileTime(u16 handle)
     struct FileStamp stamp;
 
     Set(&regs, 0x5700, handle, 0, 0);
-    asked = Ask(&regs, 0);
+    asked = Ask(&regs, false);
     stamp.value = asked.value;
     stamp.failed = asked.failed;
     stamp.time = (u16)regs.ecx;
@@ -690,7 +691,7 @@ struct Device FileDevice(u16 handle)
     struct Device device;
 
     Set(&regs, 0x4400, handle, 0, 0);
-    asked = Ask(&regs, 0);
+    asked = Ask(&regs, false);
     device.value = asked.value;
     device.failed = asked.failed;
     device.kind = (u16)regs.edx;
@@ -714,7 +715,7 @@ struct Answer FileTrueName(const u8 *name, u8 *to)
     SetLow(&regs, 0x6000, 0, 0, 0);
     regs.esi = LOW_NAME;
     regs.edi = LOW_SECOND;
-    asked = Ask(&regs, 0);
+    asked = Ask(&regs, false);
     Bytes(to, LOW(LOW_SECOND), PATH_SIZE);
     return asked;
 }
@@ -744,7 +745,7 @@ u16 FcbParse(const u8 *name, u8 *fcb, u16 how)
     return value;
 }
 
-struct Answer FcbDelete(const u8 *fcb, u16 flagged)
+struct Answer FcbDelete(const u8 *fcb, bool flagged)
 {
     struct DosRegs regs;
 
@@ -780,7 +781,7 @@ void FindRecord(struct DTAs *record)
 /* A call of a search, with the record brought up behind it. */
 static struct Answer Searched(struct DosRegs *regs)
 {
-    struct Answer found = Ask(regs, 0);
+    struct Answer found = Ask(regs, false);
 
     if (Record != 0)
         Bytes((u8 *)Record, LOW(LOW_RECORD), RECORD_SIZE);
@@ -833,7 +834,7 @@ static struct Answer Current(u16 drive, u8 *to, u16 bare)
 
     SetLow(&regs, 0x4700, 0, 0, drive & 0xFF);
     regs.esi = LOW_NAME;
-    asked = bare ? Tell(&regs) : Ask(&regs, 0);
+    asked = bare ? Tell(&regs) : Ask(&regs, false);
     if (!asked.failed)
         for (room = 64; room != 0 && (*to++ = *from++) != 0; room--)
             ;
@@ -868,7 +869,7 @@ void DriveSelect(u16 drive)
     Tell(&regs);
 }
 
-struct Space DriveSpace(u16 drive, u16 flagged)
+struct Space DriveSpace(u16 drive, bool flagged)
 {
     struct DosRegs regs;
     struct Answer asked;
@@ -925,7 +926,7 @@ struct Answer DriveFixed(u16 drive)
     return Unit(0x4408, drive, &regs);
 }
 
-u16 DriveCd(u16 drive)
+bool DriveCd(u16 drive)
 {
     u32 pair = Multiplex(0x150B, 0, drive & 0xFF);
 
@@ -1004,7 +1005,7 @@ static struct Block Refused(u16 error, i32 largest)
 
     block.block = 0;
     block.value = error;
-    block.failed = 0xFFFF;
+    block.failed = true;
     block.largest = largest;
     return block;
 }
@@ -1054,7 +1055,7 @@ struct Block MemTake(i32 bytes)
     held->name = NameOf(&regs);
     block.block = held->block;
     block.value = 0;
-    block.failed = 0;
+    block.failed = false;
     block.largest = bytes;
     return block;
 }
@@ -1066,7 +1067,7 @@ struct Answer MemGive(u8 *block)
     i32 at = Known(block), i;
 
     answer.value = ERR_NO_BLOCK;
-    answer.failed = 0xFFFF;
+    answer.failed = true;
     if (at == BlocksHeld)
         return answer;
     if (OfBlock(&regs, DPMI_GIVE, Blocks[at].name, 0) != 0)
@@ -1075,7 +1076,7 @@ struct Answer MemGive(u8 *block)
     for (i = at; i < BlocksHeld; i++)
         Blocks[i] = Blocks[i + 1];
     answer.value = 0;
-    answer.failed = 0;
+    answer.failed = false;
     return answer;
 }
 
@@ -1101,7 +1102,7 @@ struct Block MemResize(u8 *block, i32 bytes)
     held->name = NameOf(&regs);
     made.block = held->block;
     made.value = 0;
-    made.failed = 0;
+    made.failed = false;
     made.largest = bytes;
     return made;
 }
@@ -1115,7 +1116,7 @@ struct Block MemOwn(void)
 
     block.block = 0;
     block.value = 0;
-    block.failed = 0;
+    block.failed = false;
     block.largest = 0;
     return block;
 }
@@ -1131,11 +1132,11 @@ void MemSetSearch(u16 how)
     Tell(&regs);
 }
 
-void MemSetUpper(u16 on)
+void MemSetUpper(bool on)
 {
     struct DosRegs regs;
 
-    Set(&regs, 0x5803, on, 0, 0);
+    Set(&regs, 0x5803, on ? 1 : 0, 0, 0);
     Tell(&regs);
 }
 
@@ -1215,20 +1216,21 @@ struct SysVersion SystemTrueVersion(void)
     return version;
 }
 
-u16 BreakCheck(void)
+/* DOS answers 1 or 0 in DL. */
+bool BreakCheck(void)
 {
     struct DosRegs regs;
 
     Set(&regs, 0x3300, 0, 0, 0);
     Tell(&regs);
-    return (u16)regs.edx & 0xFF;
+    return (regs.edx & 0xFF) != 0;
 }
 
-void SetBreakCheck(u16 on)
+void SetBreakCheck(bool on)
 {
     struct DosRegs regs;
 
-    Set(&regs, 0x3301, 0, 0, on & 0xFF);
+    Set(&regs, 0x3301, 0, 0, on ? 1 : 0);
     Tell(&regs);
 }
 
@@ -1552,7 +1554,7 @@ struct Answer ProgramRun(const u8 *name, const u8 *tail)
     u32 goes = GoesOn();
 
     Run(&regs, name, tail);
-    ran = Ask(&regs, 0);
+    ran = Ask(&regs, false);
     SetGoesOn(goes);
     return ran;
 }
@@ -1695,10 +1697,9 @@ void CursorShape(u16 shape)
     Show(0x0100, 0, shape, 0);
 }
 
-void ScreenScroll(u16 down, u16 lines, u16 color, u16 upper, u16 lower)
+void ScreenScroll(bool down, i32 lines, u16 color, u16 upper, u16 lower)
 {
-    Show((down != 0 ? 0x0700 : 0x0600) | lines & 0xFF, color << 8, upper,
-         lower);
+    Show((down ? 0x0700 : 0x0600) | lines & 0xFF, color << 8, upper, lower);
 }
 
 u16 ScreenCell(u16 page)
@@ -1709,7 +1710,7 @@ u16 ScreenCell(u16 page)
     return regs.ax;
 }
 
-void ScreenFill(u16 page, u16 character, u16 color, u16 count)
+void ScreenFill(u16 page, u16 character, u16 color, i32 count)
 {
     Show(0x0900 | character & 0xFF, page << 8 | color & 0xFF, count, 0);
 }
@@ -1719,7 +1720,7 @@ void ScreenType(u16 character, u16 page, u16 color)
     Show(0x0E00 | character & 0xFF, page << 8 | color & 0xFF, 0, 0);
 }
 
-u16 ScreenEga(void)
+bool ScreenEga(void)
 {
     struct BiosRegs regs;
 
@@ -1754,19 +1755,19 @@ void ScreenMemory(u16 mode, u16 start)
    real mode. */
 #define CELLS ((u16 *)((md.Screen >> 16 << 4) + (u16)md.Screen))
 
-void ScreenPut(u16 cell, const u16 *from, u16 count)
+void ScreenPut(i32 cell, const u16 *from, i32 count)
 {
     u16 *to = CELLS + cell;
 
-    for (; count != 0; count--)
+    for (; count > 0; count--)
         *to++ = *from++;
 }
 
-void ScreenGet(u16 cell, u16 *to, u16 count)
+void ScreenGet(i32 cell, u16 *to, i32 count)
 {
     const u16 *from = CELLS + cell;
 
-    for (; count != 0; count--)
+    for (; count > 0; count--)
         *to++ = *from++;
 }
 
@@ -1912,9 +1913,9 @@ static const u8 Ended_T[] = {
 static u32 EndedWas = 0;
 static u8 EndedBreak = 0;
 
-void ProgramEndedBreakCheck(u16 on)
+void ProgramEndedBreakCheck(bool on)
 {
-    EndedBreak = (u8)on;
+    EndedBreak = on ? 1 : 0;
     *LOW(LOW_BREAK) = EndedBreak;
 }
 

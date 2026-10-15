@@ -290,7 +290,7 @@ static void System(void)
     struct Space space;
     struct Device device;
     u32 ticks;
-    u16 was;
+    bool was;
 
     SAY("MemOwn failed "); H4(Owned);
     version = SystemVersion();
@@ -300,12 +300,10 @@ static void System(void)
     Line();
     was = BreakCheck();
     SAY("BreakCheck "); H4(was);
-    SetBreakCheck(1);
+    SetBreakCheck(true);
     SAY("SetBreakCheck 1: "); H4(BreakCheck());
-    SetBreakCheck(0);
+    SetBreakCheck(false);
     SAY("0: "); H4(BreakCheck());
-    SetBreakCheck(0x0301);              /* the low byte counts */
-    SAY("0301: "); H4(BreakCheck());
     SetBreakCheck(was);
     Line();
     time = TimeOfDay();

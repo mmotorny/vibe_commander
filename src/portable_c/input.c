@@ -116,7 +116,7 @@ struct Key Input0(i32 bar)
     u16 *screen;
 
     bar &= 0xFF;
-    if (KeyWaiting().none == 0) {
+    if (!KeyWaiting().none) {
         key = KeyRead();
         goto Inpt41;
     }
@@ -210,7 +210,7 @@ Inpt12:
             goto Inpt40;
     }
     Rnd();                              /* Inpt31 */
-    if (KeyWaiting().none == 0) {
+    if (!KeyWaiting().none) {
         key = KeyRead();
         goto Inpt40;
     }

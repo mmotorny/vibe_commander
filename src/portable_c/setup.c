@@ -77,7 +77,7 @@ static struct Answer Failed(u16 error)
     struct Answer answer;
 
     answer.value = error;
-    answer.failed = 1;
+    answer.failed = true;
     return answer;
 }
 
@@ -119,6 +119,6 @@ struct Answer SaveSet(void)
     if (wrote.count != length)
         return Failed((u16)(wrote.count & 0xFF00));     /* SavSt2 */
     written.value = (u16)wrote.count;   /* the setup, which is not 64K */
-    written.failed = 0;
+    written.failed = false;
     return written;
 }

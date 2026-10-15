@@ -37,7 +37,7 @@ void ClrKbd(void)
 {
     if (md.ClrBuf == 0)
         return;
-    while (KeyWaiting().none == 0)
+    while (!KeyWaiting().none)
         KeyRead();
 }
 
@@ -53,7 +53,7 @@ bool TstBrk(void)
 
     for (;;) {
         keys = KeyWaiting();
-        if (keys.none != 0)
+        if (keys.none)
             break;
         key = keys.key;
         if (key != 0 && key != KEY_CTRL_C && key != KEY_ESC
@@ -116,7 +116,7 @@ struct Answer OpenFil(const u8 *name, u16 mode)
 {
     struct Answer opened = FileOpen(name, mode);
 
-    if (opened.failed != 0 && opened.value == ERR_SHARED)
+    if (opened.failed && opened.value == ERR_SHARED)
         opened = FileOpen(name, mode & 0x0F);
     return opened;
 }

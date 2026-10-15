@@ -224,7 +224,7 @@ i32 V00_02(i32 menu, bool edit, bool whole, struct Open *open)
         goto none;
     file = OpenFil(md.ViewFil, 0x40);
     handle = file.value;
-    if (file.failed != 0) {
+    if (file.failed) {
         if (handle == ERR_NOT_READY)
             goto none;
         include = ViFl_S;

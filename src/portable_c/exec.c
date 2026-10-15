@@ -128,9 +128,9 @@ static bool NotFind(const u8 *text, const u8 *name)
    program is not asked then: see TakeEnd. */
 void SetBrk(void)
 {
-    md.BreakFl = (u8)BreakCheck();
+    md.BreakFl = BreakCheck();
     ProgramEndedBreakCheck(md.BreakFl);
-    SetBreakCheck(0);
+    SetBreakCheck(false);
     CtrlCTake();
 }
 
@@ -314,7 +314,7 @@ void Exec(void)
 static void SetStat(void)
 {
     MemSetSearch(0);
-    MemSetUpper(0);
+    MemSetUpper(false);
 }
 
 /* No memory when the program begins: say so and end. */

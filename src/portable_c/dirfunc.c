@@ -264,7 +264,7 @@ u16 F38_40(u16 attributes)
     if (ChgDisk(md.TmpBuf))
         goto stop;
     removed = F38_60();
-    if (removed.failed != 0) {
+    if (removed.failed) {
         error = removed.value;
         if (error < 100 && (u8)error != ERR_NO_ACCESS) {
             report = &CntDi_B;
@@ -296,7 +296,7 @@ u16 F38_40(u16 attributes)
             goto out;
         OncZoom(BOX_PLACE, &DelDr_P, Del_S, &box);
         removed = F38_60();
-        if (removed.failed != 0) {
+        if (removed.failed) {
             if (removed.value == ERR_NOT_READY)
                 goto stop;
             goto not_done;
@@ -309,7 +309,7 @@ u16 F38_40(u16 attributes)
         /* DelTree */
         if (md.ChgTree != 0) {
             marked = DelTr0(md.TmpBuf);
-            if (marked.failed != 0 && marked.value == ERR_NOT_READY)
+            if (marked.failed && marked.value == ERR_NOT_READY)
                 goto stop;
         }
     }
@@ -482,7 +482,7 @@ u16 M30_50(u16 attributes)
         FNC_CHANGE = 1;
         opened = OpenFil(md.TmpBuf, 0x41);
         error = opened.value;
-        if (opened.failed != 0)
+        if (opened.failed)
             goto failed;
         stamp = FileTime(opened.value);
         if (stamp.failed) {
@@ -851,7 +851,7 @@ struct Answer DelTr0(const u8 *path)
     md.BlocEr = 1;
     opened = OpenFil(md.TmpErr, 0x11);
     written = opened.value;
-    if (opened.failed != 0) {
+    if (opened.failed) {
         carry = true;
         if (written == ERR_NO_ACCESS) {
             Beep();
@@ -1245,11 +1245,11 @@ i32 F54_00(void)
             return TO_FUNC04;
         if ((u8)Dialog(&DelVo_B, 0, 0, 0, &md) != 0)
             return TO_FUNC04;
-        FcbDelete(md.TmpBuf + 20, 0);
+        FcbDelete(md.TmpBuf + 20, false);
         return TO_FNCEXT;
     }
     /* F54_03 */
-    FcbDelete(md.TmpBuf + 20, 0);
+    FcbDelete(md.TmpBuf + 20, false);
     *(u16 *)(md.TmpBuf + 12) = *(u16 *)(md.TmpBuf + 11);
     *(u16 *)(md.TmpBuf + 10) = *(u16 *)(md.TmpBuf + 9);
     md.TmpBuf[9] = '.';
