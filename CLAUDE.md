@@ -226,7 +226,13 @@ These held while `src/c/` was made, and they say what it is.
      element left out held whole in a scenario about it where one can
      be; an expectation of the tree's own only where a mask cannot do
      (the user, later the same day, in place of expectations of its
-     own; the masks are made with the harness for Linux): told so by a variable of the environment, it
+     own; the masks are made with the harness for Linux; on 15 October
+     2026 the user named among them the drive's letter and its label,
+     but in a scenario about them, and the time of a directory that the
+     run has written into; and while a test drives the program for
+     Linux its clock starts at the bench's time and goes on only by the
+     steps' waits, as the machine's clock does on the bench, a user
+     always having the real one): told so by a variable of the environment, it
      writes its grid of cells whenever it waits for a key, a harness
      drives it in a pseudo-terminal with the scenarios' keys, and what
      it draws in the terminal is held to that grid by replaying it
@@ -4345,6 +4351,13 @@ waiting for the user between its steps.
   program, such as the clock or a count of free memory, is left out of
   the comparison, in `harness/deviations.py`. The exception is a scenario
   that is made to test that figure.
+- The panels of the bench list files sorted by name, on the user's
+  word of 15 October 2026: the bench's setup file is the one that the
+  original saves with that set in its own menus, and the goldens are
+  derived again with it. In the portable C there is no unsorted order:
+  the order of a directory means something on DOS alone, so it goes,
+  as a thing that only made sense on DOS, declared, and a panel sorts
+  by name unless the user picks another order.
 - The countries tested are the United States and Russia.
 - Russian text is typed on the Russian keyboard of the Russian bench. Its
   Cyrillic letters are selected in a step that types text into an input
