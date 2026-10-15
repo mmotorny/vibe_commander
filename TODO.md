@@ -19579,6 +19579,43 @@ directory of the bench and derives their goldens again. It and `sort`
 change the same goldens and `harness/scenarios.py`. Whichever lands
 second derives the goldens again on top of the other.
 
+### S1: done
+
+The ten scenarios of copying, moving, deleting and names go to the
+files they went to, each in as many steps as it had, with their
+goldens derived on the new bench. `harness/sortcheck.py` loses no
+instruction of the batches in any of them, but the two of the unsorted
+order, and the C translation passes all ten (`harness/compare.py
+build/c/VC.EXE`). By scenario:
+
+- `names`, `delete`, `delete-mask`, `copy-ask`, `copy-big`,
+  `copy-full`, `move`: every screen as before. Where a list changes
+  under the cursor, a key behind the step's own takes the cursor back
+  to the file it was on before, `'"d:\\" Enter Down Down Down Down'`
+  in `move`; End stays where a scenario ran End, with Up behind it.
+- `rename-keys`: as before but for End and for Right in Brief, which
+  go to the last file, run.bat now and empty.dat before, and Ins then
+  selects that one, 21 bytes where it was 0, on screens 7, 8 and 11 to
+  17. The scenario is about the registers that the keys of the cursor
+  leave, not about the file, so the step is left so.
+- `copy`: as before but for two things that the order makes. On
+  screens 29 to 35, which a beep has moved a row up, the right panel's
+  row in C:\ is STAMPS where it was WORK, and the other way round. And
+  screen 60: of the two files copied into DOCS, readme.txt and
+  hello.txt, the panel's order copies hello.txt first, so that one is
+  no longer selected when readme.txt, which is there already, is asked
+  about: "40 bytes in 1 selected file" where it said 55 in 2. The two
+  files are the same as before; picking run.bat in place of hello.txt
+  to keep readme.txt first would have changed the selection on four
+  screens instead of one.
+- `copy-dirs`: as before but for the right panel's row in C:\ on the
+  screens moved up by a beep, 12 to 14, 19 and 24 to 26, and the last
+  screen, where with both directories gone the cursor stays at its
+  place, on the first file of the list: data.bin, readme.txt before.
+
+The header of `harness/scenarios.py` still says that a new file comes
+last; none of the ten rests on that line, which is the end's to mend.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes

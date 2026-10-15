@@ -5327,10 +5327,10 @@ SCENARIOS = {
             "Down Enter",                 # into DOCS
             'F7 "subdir.dir" Enter',      # the time of day, in the first
             "Ctrl+PgUp",                  # minute
-            "Down Down",                  # onto readme.txt
+            "Down Down Down Down Down Down",  # onto readme.txt
             "F5",
             '"docs\\" Enter',
-            "Up Up",                      # onto DOCS
+            "Up Up Up Up Up Up",          # onto DOCS
             "F5",
             '"hello.txt" Enter',          # a file of that name: an error
             "Enter",
@@ -5371,7 +5371,9 @@ SCENARIOS = {
             "Enter",                      # SRC, where there is none
             "F6",
             '"d:\\" Enter',
-            "Enter",                      # overwrite: all of it goes
+            "Enter",                      # overwrite: all of it goes,
+                                          # and the cursor stays at its
+                                          # place, on the first file
         )),
 
     "copy-big": Scenario(
@@ -5401,7 +5403,7 @@ SCENARIOS = {
             "Shift+F5",
             '"a:\\freedos\\bin\\command.com" Tab "a"',
             "Enter",
-            "End",                        # onto it
+            "End Up Up Up Up Up Up",      # onto it, behind SRC
             "F5",
             '"b" Enter',
             # Each appended to the other in turn, seven times: b is 3 MB
