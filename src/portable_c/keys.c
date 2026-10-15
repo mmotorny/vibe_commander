@@ -22,7 +22,7 @@ void F20_02(struct WCBdef *panel);
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
-u16 NumAdr(struct WCBdef *panel, i32 number);           /* place.c */
+i32 NumAdr(struct WCBdef *panel, i32 number);           /* place.c */
 void PutPath(struct WCBdef *panel);                     /* panel.c */
 void PutFls(struct WCBdef *panel);
 void SetCur(struct WCBdef *panel, bool set);
@@ -132,7 +132,7 @@ static struct Left Leaves(u16 bx, u16 dx)
    those two; where the panel is and its size if all of it was; else the
    place and the size of the line written last, which is one that the
    BIOS has scrolled in, or the status line. DX is never 0. */
-struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first)
+struct Left F00_50(struct WCBdef *panel, i32 cursor, i32 first)
 {
     struct Shown was = ChgAdr(panel, cursor, first);
     struct Shown now;
@@ -143,8 +143,8 @@ struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first)
     CorPar(panel);
     if (panel->WinTyp == 0) {
         step = sizeof(struct FILENT);
-        first = panel->First;
-        cursor = panel->CurAdr;
+        first = PLACES(panel)->First;
+        cursor = PLACES(panel)->CurAdr;
     } else {
         step = sizeof(struct DIRENT);
         first = TREE_OFFSET(TreeFirst);
@@ -173,9 +173,14 @@ struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first)
            BX and DX, which Rename reads as two counts. */
         if (panel->WinTyp != 0)
             return Leaves(MD_PLACE(TreeFirst), MD_PLACE(TreeCursor));
-        return Leaves(first, cursor);
+        /* Of a panel's files the two places, cut to the 16 bits of BX
+           and DX, as the original's places are: no such cut is 0, since
+           an entry is at DSKBUF and a multiple of 24 bytes on, and so
+           at no multiple of 65,536, and what Rename asks of the two is
+           what it was. */
+        return Leaves((u16)first, (u16)cursor);
     }
-    left = Leaves(first, cursor);
+    left = Leaves((u16)first, (u16)cursor); /* as above */
 
     /* The cursor goes from where it was, on the screen as it is. */
     now = ChgAdr(panel, was.cursor, was.first);
@@ -243,12 +248,12 @@ struct Onward F00_60(struct WCBdef *panel, i32 cursor, i32 first, u16 buttons,
                      struct Regs *r)
 {
     struct FILENT *file;
-    u16 address;
+    i32 address;
     u8 attributes;
 
     if (buttons & 2) {
         if (panel->WinTyp == 0
-            && (address = NumAdr(panel, cursor)) < panel->EndBuf
+            && (address = NumAdr(panel, cursor)) < PLACES(panel)->EndBuf
             && (file = ENTRY(panel, address))->NameF[0] != '.') {
             if (!(md.WinMous & MOUSE_PASSED)) {
                 md.WinMous |= MOUSE_PASSED;
@@ -463,15 +468,15 @@ struct Onward F07_00(struct WCBdef *panel, struct Regs *r)
 struct Onward F08_00(struct WCBdef *panel, struct Regs *r)
 {
     struct FILENT *file;
-    u16 address;
+    i32 address;
 
     if (!FilePan(panel))
         return To(NEXT_FUNC07);
-    address = panel->CurAdr;
-    if (address >= panel->EndBuf)
+    address = PLACES(panel)->CurAdr;
+    if (address >= PLACES(panel)->EndBuf)
         return To(NEXT_FUNC07);
     if (md.InsDwn != 0
-        && (u16)(address + sizeof(struct FILENT)) < panel->EndBuf)
+        && address + (i32)sizeof(struct FILENT) < PLACES(panel)->EndBuf)
         KeyForgetIns();
     file = ENTRY(panel, address);
     if (file->NameF[0] != '.')
@@ -489,7 +494,7 @@ struct Onward F08_00(struct WCBdef *panel, struct Regs *r)
 static struct Onward F10_01(struct WCBdef *panel, const u8 *include)
 {
     struct FILENT *file;
-    u16 address;
+    i32 address;
     bool found;
 
     if (!FilePan(panel))
@@ -499,7 +504,7 @@ static struct Onward F10_01(struct WCBdef *panel, const u8 *include)
         return To(NEXT_FUNC04);
     Convert(md.SelMas, md.TmpBuf);
     found = false;
-    for (address = DSKBUF; address < panel->EndBuf;
+    for (address = DSKBUF; address < PLACES(panel)->EndBuf;
          address += sizeof(struct FILENT)) {
         file = ENTRY(panel, address);
         if (file->NameF[0] == '.' || !TstMas(file->NameF, md.TmpBuf))
@@ -551,11 +556,11 @@ struct Onward F10_00(struct WCBdef *panel)
 struct Onward F78_00(struct WCBdef *panel)
 {
     struct FILENT *file;
-    u16 address;
+    i32 address;
 
     if (!FilePan(panel))
         return To(NEXT_FUNC04);
-    for (address = DSKBUF; address < panel->EndBuf;
+    for (address = DSKBUF; address < PLACES(panel)->EndBuf;
          address += sizeof(struct FILENT)) {
         file = ENTRY(panel, address);
         if (file->NameF[0] != '.' && file->AttrF & ATTR_WAS_SELECTED)
@@ -674,7 +679,7 @@ static struct Onward F17_06(struct WCBdef *panel)
 struct Onward F17_01(struct WCBdef *panel)
 {
     i32 kind = panel->WinTyp;
-    u16 address;
+    i32 address;
     struct Answer marked;
 
     if (kind != 0) {
@@ -682,16 +687,16 @@ struct Onward F17_01(struct WCBdef *panel)
             return To(NEXT_POP_FUNC04);
         if (kind != 2) {
             marked = DelTr0(md.DosPth);
-            if (marked.failed != 0)
+            if (marked.failed)
                 return To(NEXT_POP_FUNC04);
             kind = (u8)marked.value;
         }
         return ToMenu(NEXT_M03_00, panel, 5 - kind);       /* F17_02 */
     }
-    address = panel->EndBuf;
-    panel->CurAdr = address;
+    address = PLACES(panel)->EndBuf;
+    PLACES(panel)->CurAdr = address;
     ENTRY(panel, address)->NameF[0] = 0;
-    for (address = DSKBUF; address < panel->EndBuf;
+    for (address = DSKBUF; address < PLACES(panel)->EndBuf;
          address += sizeof(struct FILENT))
         ENTRY(panel, address)->AttrF &= ~ATTR_SELECTED;
     return F17_06(panel);

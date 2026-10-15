@@ -319,7 +319,7 @@ F62_45:
     panel->WinTyp = 0;
     panel->ChgFlg = 1;
     md.BlocEr = 1;
-    panel->CurAdr = DSKBUF;
-    panel->EndBuf = DSKBUF;
+    PLACES(panel)->CurAdr = DSKBUF;
+    PLACES(panel)->EndBuf = DSKBUF;
     return true;
 }

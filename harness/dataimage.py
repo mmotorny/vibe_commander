@@ -182,6 +182,13 @@ PARAGRAPH = 16
 MAIN_DATA = "MainDat"
 LAID_OVER = ("ViewDat", "EdData", "FndData", "HlpData")
 PANEL, ENTRY, LIST = "WCBdef", "FILENT", "DskBuf"
+# The places of a panel's list, which a build since the piece P keeps in
+# 32 bits in the paragraph right in front of the panel, the last of
+# struct Places of vc.h, in this order, and the symbol of the map by
+# which such a build is known, the function that grows a panel's block.
+PLACES = ("CurAdr", "First", "EndBuf", "EndFul")
+PLACES_SIZE = 16
+PLACED = ("start", "PanelGrow_")
 # A field that the portable C has under another name than the original,
 # since it is another thing there: structure -> the original's name ->
 # the name in vc.h, which is the one that is printed.
@@ -591,6 +598,7 @@ class Build:
                          "listing")
         self.fields = dict(self.structures[MAIN_DATA][1])
         self.variables = self._variables()
+        self.places = self._symbol(*PLACED) is not None
 
     def _symbol(self, module, name):
         """Where a symbol is in the program's data, or None."""
@@ -832,9 +840,11 @@ class Read:
             self.data[build.main:build.main + build.main_size],
             "the main data", build.field_name)}
         for begins, size, name, one in self.things:
-            found[name] = Part(name, build.address + begins,
-                               self.span(begins, size), "a block",
-                               self._namer(one))
+            data = self.span(begins, size)
+            if one is not None and one.cut == PANEL and build.places:
+                data = self._placed(begins, data)
+            found[name] = Part(name, build.address + begins, data,
+                               "a block", self._namer(one))
         for name, (begins, size) in build.variables.items():
             if name in POINTERS:        # held by what it names
                 continue
@@ -842,6 +852,24 @@ class Read:
                                self.data[begins:begins + size],
                                "a variable")
         return found
+
+    def _placed(self, begins, data):
+        """The bytes of a panel at `begins` with its places put into the
+        original's words of them, CurAdr, First, EndBuf and EndFul, cut
+        to their 16 bits: a build that keeps them as numbers of 32 bits
+        in front of the panel (PLACES), and leaves those words unset, is
+        then held against a build from before by what the words were,
+        as far as the places are below 64K. The places themselves are
+        the stretch of the block in front of the panel, which a build
+        from before has not."""
+        _, fields = self.build.structures[PANEL]
+        at = dict(fields)
+        places = struct.unpack("<4i", self.span(begins - PLACES_SIZE,
+                                                PLACES_SIZE))
+        data = bytearray(data)
+        for field, value in zip(PLACES, places):
+            data[at[field]:at[field] + 2] = struct.pack("<H", value & 0xFFFF)
+        return bytes(data)
 
     def _namer(self, one):
         """What names a byte of the thing that the Address `one` says

@@ -455,13 +455,12 @@ static void C10_13(void)
 {
     struct WCBdef *wcb = CurrentPanel;
     u8 *entry;
-    u16 file;
-    i32 i;
+    i32 file, i;
 
     if (CutPath(CpSrc) != CpSrc || CutPath(CpDest) != CpDest)
         return;
     file = FnFile(CurrentPanel, CpSrc);
-    if (file >= wcb->EndBuf)
+    if (file >= PLACES(wcb)->EndBuf)
         return;
     entry = (u8 *)wcb + file;
     for (i = 0; i < 12; i++)
@@ -1348,9 +1347,9 @@ static u8 *F35_50(struct WCBdef *panel, i32 directories, i32 files)
             goto F35_57;
     }
     wcb = panel;                                        /* F35_54 */
-    if (wcb->CurAdr < wcb->EndBuf
-        && ENTRY(wcb, wcb->CurAdr)->NameF[0] != '.')
-        from = ENTRY(wcb, wcb->CurAdr)->NameF;
+    if (PLACES(wcb)->CurAdr < PLACES(wcb)->EndBuf
+        && ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF[0] != '.')
+        from = ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF;
 F35_57:
     for (i = 0; i < LenStr; i++)
         CpInpt[i] = from[i];
@@ -1477,8 +1476,8 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
             files = selected.files;
         }
         if ((directories | files) == 0
-            && (panel->CurAdr >= panel->EndBuf
-                || ENTRY(panel, panel->CurAdr)->NameF[0] == '.'))
+            && (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf
+                || ENTRY(panel, PLACES(panel)->CurAdr)->NameF[0] == '.'))
             return Go(GO_KEYS);
     }
 
@@ -1495,7 +1494,7 @@ struct Copied F35_01(struct WCBdef *panel, i32 command, i32 directories,
     if ((directories | files) != 0) {
         to = FilDir(to, directories, files) - 1;
     } else {
-        from = ENTRY(panel, panel->CurAdr)->NameF;
+        from = ENTRY(panel, PLACES(panel)->CurAdr)->NameF;
         length = 13;
 F35_06:
         *to++ = '"';

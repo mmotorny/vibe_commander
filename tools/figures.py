@@ -127,6 +127,8 @@ def table():
     size = len(program.contents)
     # Where the room begins on the bench: behind the two panels, which
     # are behind the objects, as a second copy of the program would be.
+    # Each panel is as long as it is when the program starts, and as it
+    # is again behind a directory that its block holds, `PANEL_LEAST`.
     room_begins = program.behind(le.BENCH, le.KEPT)
 
     rows = [
@@ -146,8 +148,9 @@ def table():
          number(len(program.relocations))),
         ("What it has for its room on the bench of the tests, a machine "
          "of 16 MB, where the extender's memory ends at FE0000h: all "
-         "that is behind its objects and its two panels, each block "
-         "with the extender's 16 bytes in front",
+         "that is behind its objects and its two panels, as long as "
+         "each is when it holds the original's 64K, `PANEL_LEAST`, each "
+         "block with the extender's 16 bytes in front",
          f"{number(BENCH_END - room_begins)} "
          "bytes"),
         ("The least of that memory with which it gets to its panels: its "

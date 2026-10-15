@@ -206,7 +206,8 @@ static bool FileLst(void)
     struct Selected selected;
     struct Answer asked;
     i32 i, length;
-    u16 handle, at;
+    u16 handle;
+    i32 at;
     bool any;
 
     end = MvzLine(LIST_NAME, md.TempDir, LenPath);
@@ -232,21 +233,21 @@ FiLs03:
     selected = TotSel(CurrentPanel);
     any = selected.files != 0 || selected.directories != 0;
     if (!any) {
-        if (wcb->CurAdr >= wcb->EndBuf)
+        if (PLACES(wcb)->CurAdr >= PLACES(wcb)->EndBuf)
             goto FiLs18;
-        if (ENTRY(wcb, wcb->CurAdr)->NameF[0] == '.')
+        if (ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF[0] == '.')
             goto FiLs18;
     }
     asked = FileCreate(LIST_NAME, 0x20);    /* and make it */
     if (asked.failed)
         goto FiLs18;
     handle = asked.value;
-    at = wcb->CurAdr;
+    at = PLACES(wcb)->CurAdr;
     if (!any)
         goto FiLs13;
     at = DSKBUF;
 FiLs12:
-    if (at >= wcb->EndBuf)
+    if (at >= PLACES(wcb)->EndBuf)
         goto FiLs20;
     if (!(ENTRY(wcb, at)->AttrF & ATTR_SELECTED))
         goto FiLs16;
@@ -273,7 +274,7 @@ FiLs18:
 FiLs20:
     if (FileClose(handle).failed)
         goto FiLs18;
-    for (at = DSKBUF; at < wcb->EndBuf; at += sizeof(struct FILENT)) {
+    for (at = DSKBUF; at < PLACES(wcb)->EndBuf; at += sizeof(struct FILENT)) {
         file = ENTRY(wcb, at);
         file->AttrF &= 0x7F;
         if (file->AttrF & ATTR_SELECTED) {
@@ -440,9 +441,9 @@ Run_18:                                 /* the name of the file */
             goto Run_23;
         if (wcb->WinTyp != 0)
             goto Run_23;
-        if (wcb->CurAdr >= wcb->EndBuf)
+        if (PLACES(wcb)->CurAdr >= PLACES(wcb)->EndBuf)
             goto Run_23;
-        name = ENTRY(wcb, wcb->CurAdr)->NameF;
+        name = ENTRY(wcb, PLACES(wcb)->CurAdr)->NameF;
     }
     for (;;) {
         c = *name++;

@@ -56,8 +56,7 @@ void SetMask(struct WCBdef *panel)
     u8 *mask = md.TmpBuf;
     u8 *one;
     u8 *other;
-    u16 file, last;
-    i32 i;
+    i32 file, last, i;
     u8 attributes, c;
 
     for (i = 0; i < 11; i++)
@@ -65,7 +64,7 @@ void SetMask(struct WCBdef *panel)
     if (panel->DskMas[0] != 0)
         Convert(panel->DskMas, mask);
     file = DSKBUF;
-    last = panel->EndFul;
+    last = PLACES(panel)->EndFul;
     if (file < last) {
         last -= SIZE_FILENT;
         for (;;) {
@@ -94,7 +93,7 @@ void SetMask(struct WCBdef *panel)
             }
         }
     }
-    panel->EndBuf = file;
+    PLACES(panel)->EndBuf = file;
 }
 
 /* Whether two files of a list are in the wrong order, `first` being the
@@ -165,7 +164,7 @@ void Sort(struct WCBdef *panel)
     u8 *name;
     u8 *other;
     u8 *spare;
-    u16 file, end, swapped;
+    i32 file, end, swapped;
     i32 gap, length, dot, i;
     u16 count;
     u8 c, c0, c1, c2;
@@ -204,29 +203,28 @@ void Sort(struct WCBdef *panel)
             }
         }
         file += SIZE_FILENT;
-    } while (file < panel->EndBuf);
+    } while (file < PLACES(panel)->EndBuf);
 
     /* A sort by exchanging entries a gap apart, the gap halved each time
        round. Behind the last exchange of a pass the list is in order, so
        the next pass ends there. */
-    gap = panel->EndBuf - (i32)DSKBUF;
+    gap = PLACES(panel)->EndBuf - DSKBUF;
     for (;;) {
         gap = gap / SIZE_FILENT >> 1;
         gap = (gap << 4) + (gap << 3);  /* times the size of an entry */
         if (gap == 0)
             break;
-        end = panel->EndBuf;
+        end = PLACES(panel)->EndBuf;
         do {
             swapped = 0;
-            for (file = DSKBUF; (u16)(file + gap) < end;
-                 file += SIZE_FILENT) {
+            for (file = DSKBUF; file + gap < end; file += SIZE_FILENT) {
                 if (!CmpPar(ENTRY(panel, file), ENTRY(panel, file + gap),
                             panel->SortTyp))
                     continue;
-                swapped = (u16)(file + gap);
+                swapped = file + gap;
                 name = (u8 *)panel + file;
                 other = (u8 *)panel + swapped;
-                spare = (u8 *)panel + panel->EndFul;
+                spare = (u8 *)panel + PLACES(panel)->EndFul;
                 for (i = 0; i < SIZE_FILENT; i++) {
                     c = name[i];
                     spare[i] = c;
@@ -259,19 +257,18 @@ void Sort(struct WCBdef *panel)
                 length = i + 1;
         name[length] = 0;
         file += SIZE_FILENT;
-    } while (file < panel->EndBuf);
+    } while (file < PLACES(panel)->EndBuf);
 }
 
 /* Find a file in the list that a panel shows, by its name. Returns the
    address of its entry, or one that is not below EndBuf if it is not
    there. */
-u16 FnFile(struct WCBdef *panel, const u8 *name)
+i32 FnFile(struct WCBdef *panel, const u8 *name)
 {
     const u8 *entry;
-    u16 file;
-    i32 i;
+    i32 file, i;
 
-    for (file = DSKBUF; file < panel->EndBuf; file += SIZE_FILENT) {
+    for (file = DSKBUF; file < PLACES(panel)->EndBuf; file += SIZE_FILENT) {
         entry = (u8 *)panel + file;
         for (i = 0; entry[i] == name[i]; i++)
             if (entry[i] == 0)
@@ -289,21 +286,21 @@ u16 FnFile(struct WCBdef *panel, const u8 *name)
 
    The old list is where ReDr50 of read.c has it, the one routine that
    calls this: where the room begins, Room of vc.h. An entry of it is
-   an offset in it of 16 bits, as an entry of a panel's list is in the
-   panel: the list was a panel's. */
-u16 NearFl(struct WCBdef *panel, const u8 *name, i32 end)
+   an offset in it, as an entry of a panel's list is in the panel: the
+   list was a panel's. */
+i32 NearFl(struct WCBdef *panel, const u8 *name, i32 end)
 {
     const u8 *list = Room;
-    u16 start = (u16)(name - list);
-    u16 at = start;
+    i32 start = (i32)(name - list);
+    i32 at = start;
     bool forward = true;
-    u16 found;
+    i32 found;
 
     if (at >= end)
         return 0;
     for (;;) {
         found = FnFile(panel, list + at);
-        if (found < panel->EndBuf)
+        if (found < PLACES(panel)->EndBuf)
             return found;
         if (forward) {
             at += SIZE_FILENT;
@@ -326,10 +323,10 @@ struct Selected TotSel(struct WCBdef *panel)
     struct Selected selected;
     i32 files = 0;
     i32 directories = 0;
-    u16 file;
+    i32 file;
     u8 attributes;
 
-    for (file = DSKBUF; file < panel->EndBuf; file += SIZE_FILENT) {
+    for (file = DSKBUF; file < PLACES(panel)->EndBuf; file += SIZE_FILENT) {
         attributes = ENTRY(panel, file)->AttrF;
         if (attributes & ATTR_SELECTED) {
             if (attributes & ATTR_DIRECTORY)

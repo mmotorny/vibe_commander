@@ -556,12 +556,12 @@ E00_05:                                 /* take out what is between */
    word and a line of twelve characters, which takes the key as any line
    does. It is tried at MenuBuf+208 and kept if a name fits it, and the
    capitals of it are at MenuBuf. */
-u16 Search(const u8 *list, u16 at, u16 begin, u16 end, u16 step, u16 key)
+i32 Search(const u8 *list, i32 at, i32 begin, i32 end, i32 step, u16 key)
 {
     u8 *tried = md.MenuBuf + 208;
     u8 *typed = md.MenuBuf + 228;
     const u8 *name;
-    u16 from = at;
+    i32 from = at;
     i32 length, i;
 
     if ((key & 0xFF) == 0x0A) {

@@ -432,18 +432,44 @@ struct WCBdef {
     u8  WinPath[LenPath];
     /* End of WCB part saved in VC.INI */
 
-    u16 CurAdr;
-    u16 First;
-    u16 EndBuf;
+    /* Of the original: CurAdr, First and EndBuf, places in the panel
+       as offsets of 16 bits. Not set or read here: see struct Places. */
+    u16 CurAdr16;
+    u16 First16;
+    u16 EndBuf16;
     /* End of WCB part saved in memory */
 
     u8  ExtBuf[LenExt];
-    u16 EndFul;
+    u16 EndFul16;                       /* of the original: EndFul. Not
+                                           set or read here */
     u8  ChgFlg;
     u8  SizDir;
     /* End of WCB */
 
     struct FILENT DskBuf[MinFls];
+};
+
+/* What a panel's block has in front of the panel, PLACES: how long the
+   block is, and the places that the panel keeps of its list, each an
+   offset from where the panel begins, as ENTRY takes it: the entry that
+   the cursor is on, the first one shown, the end of the list as it is
+   shown, which a filter makes shorter, and the end of all that was
+   read. The original has the places in the panel, CurAdr, First, EndBuf
+   and EndFul, in 16 bits, which is as far as its panel reaches; here a
+   panel's block grows as its directory needs, and they are 32 bits.
+   The panel keeps the original's words, which nothing sets or reads.
+   The places are the last paragraph in front of the panel, and the
+   length is in the paragraph before them, so that the panel begins on
+   a paragraph as its block does. */
+struct Places {
+    i32 Bytes;                          /* how long the block is, the
+                                           panel's and its list's own
+                                           and these 32 */
+    i32 Unused[3];
+    i32 CurAdr;
+    i32 First;
+    i32 EndBuf;
+    i32 EndFul;
 };
 
 #pragma pack(pop)
@@ -453,6 +479,7 @@ LAID_OUT(DTAs, 0x2C);
 LAID_OUT(FILENT, 0x18);
 LAID_OUT(MainDat, 0xF48B);
 LAID_OUT(WCBdef, 0x1A62);
+LAID_OUT(Places, 0x20);
 
 /* The main data, which is the first thing of the segment that DS points
    at: main.c has the object, and says how it comes to be first. Much
@@ -464,11 +491,14 @@ extern struct MainDat md;
    one and the right one, each a pointer to the panel's block. They are
    WCBcrn, WCBsec, WCB1seg and WCB2seg of the original, which has the
    segment of each in the main data; a pointer is longer than such a
-   word, so they are beside the main data. A panel's block is taken
-   once, by Init11 of start.c, and neither moved nor given back: a
-   pointer to a panel holds for as long as the program runs. The places
-   that a panel keeps in itself, CurAdr, First, EndBuf and EndFul, are
-   offsets of 16 bits from where it begins: see ENTRY. */
+   word, so they are beside the main data. A panel's block is taken by
+   Init11 of start.c and never given back, and grows and shrinks as its
+   directory needs while ReDir of read.c reads it, which may move it:
+   these four are then made to point where it is (PanelGrow and
+   PanelFit of start.c), and nothing else keeps a pointer to a panel or
+   into its list across ReDir. The places that a panel keeps of its list,
+   CurAdr, First, EndBuf and EndFul, are offsets from where it begins,
+   in front of it: see struct Places. */
 extern struct WCBdef *CurrentPanel;
 extern struct WCBdef *OtherPanel;
 extern struct WCBdef *LeftPanel;
@@ -505,8 +535,10 @@ extern struct WCBdef *RightPanel;
    the second panel ends, wherever that is. The room is given back for
    a command and taken again, and may then be elsewhere and of another
    length: nothing keeps a pointer into it across GiveMem, TakeMem or
-   Aexec0 of view.c. RoomBytes, of start.c, says how long it is, in
-   bytes. */
+   Aexec0 of view.c, nor across ReDir of read.c, which makes it shorter
+   for a panel that grows and takes it again when it has read the
+   directory (PanelGrow and RoomAgain of start.c). RoomBytes, of
+   start.c, says how long it is, in bytes. */
 extern u8 *Room;
 extern u8 *RoomEnd;
 i32 RoomBytes(void);
@@ -564,13 +596,29 @@ extern u32 DiskClusters;
 extern u32 FreeClusters;
 extern i32 ClickLine;
 
-/* The bytes of a panel's block: 64K, which is as far as the offsets of
-   16 bits reach that a panel keeps its places in. And the bytes that the
-   room has at the least, which is what the viewer needs, in whole
-   paragraphs as the original counts it: with less the program does not
-   start. */
+/* A panel's block, of start.c: what it has in front of the panel,
+   struct Places, the panel and its list. The list ends where the next
+   entry would come within a paragraph and two entries of the block's
+   end, PANEL_TAIL, as the original's ends so short of 64K (ReDr00 of
+   read.c). A panel's block is the original's 64K and the places at the
+   least, PANEL_LEAST, which holds 2,703 entries, and is taken so by
+   Init11; ReDir makes it longer while it reads a directory that the
+   block does not hold, PanelGrow, and as short as the list is when it
+   has read it, but not shorter than that, PanelFit. Neither has a
+   ceiling of its own: a panel holds as many entries as there is memory
+   for. Each answers with where the panel is then, which may be
+   elsewhere, and makes the four pointers to the panels point there.
+   PanelGrow answers 0 where there is no more memory, and the panel is
+   then where and as long as it was. */
+#define PANEL_TAIL    (16 + 2 * (i32)sizeof(struct FILENT))
+#define PANEL_LEAST   ((i32)sizeof(struct Places) + 0x10000)
+struct WCBdef *PanelGrow(struct WCBdef *panel, i32 kept);
+struct WCBdef *PanelFit(struct WCBdef *panel);
+void RoomAgain(void);
+/* The bytes that the room has at the least, which is what the viewer
+   needs, in whole paragraphs as the original counts it: with less the
+   program does not start. */
 #define MinView     8000                /* Minimum view buffer size */
-#define PANEL_BYTES 0x10000
 #define LEAST_ROOM  ((MinView + 15) & ~15)
 
 /* The stack, of stack_dos.c: LenStk bytes in a segment of their own. */
@@ -647,9 +695,9 @@ void HookVct(void);
 void Quit(void);
 u16 ErrRdy(u16 letter);
 /* Read what a panel shows, keeping the cursor of a list of files and
-   what is selected in it if `keep`: true if it could not be read. See
-   read.c. */
-bool ReDir(struct WCBdef *panel, bool keep);
+   what is selected in it if `keep`: true if it could not be read. The
+   panel may move: `*panel` is where it is afterwards. See read.c. */
+bool ReDir(struct WCBdef **panel, bool keep);
 /* Get the label of the current drive, a text of at most 11 characters,
    to `volume` in the main data. See read.c. */
 struct Label {                          /* what GetVol returns: */
@@ -693,7 +741,7 @@ NO_RETURN void Main(void);
 /* What the setup file holds: three letters V, of each panel what a
    WCBdef has before CurAdr, of the main data what it has before LoadRes,
    and the sum of all these bytes. */
-#define WCBini  OFFSET_IN(struct WCBdef, CurAdr)
+#define WCBini  OFFSET_IN(struct WCBdef, CurAdr16)
 #define CmnIni  OFFSET_IN(struct MainDat, LoadRes)
 #define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
@@ -855,8 +903,8 @@ u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
             u16 *screen, u16 color);
 void SetMask(struct WCBdef *panel);                     /* files.c */
 void Sort(struct WCBdef *panel);
-u16 FnFile(struct WCBdef *panel, const u8 *name);
-u16 NearFl(struct WCBdef *panel, const u8 *name, i32 end);
+i32 FnFile(struct WCBdef *panel, const u8 *name);
+i32 NearFl(struct WCBdef *panel, const u8 *name, i32 end);
 struct Selected {                       /* what is selected in a panel: */
     i32 directories;                    /* how many directories, */
     i32 files;                          /* and how many files */
@@ -873,10 +921,10 @@ struct Shown {                          /* what a panel shows, as offsets
                                            in its list's home, the panel
                                            for files and TRELIST for the
                                            tree (see TREE_OFFSET): */
-    u16 cursor;                         /* the entry that the cursor is on, */
-    u16 first;                          /* and the first one shown */
+    i32 cursor;                         /* the entry that the cursor is on, */
+    i32 first;                          /* and the first one shown */
 };
-struct Shown ChgAdr(struct WCBdef *panel, u16 cursor, u16 first);
+struct Shown ChgAdr(struct WCBdef *panel, i32 cursor, i32 first);
 u8 *PtPt10(struct WCBdef *panel);                       /* panel.c */
 /* The tree in a panel, tree.c: its colours are four numbers in the code,
    which come as a pointer. */
@@ -1057,10 +1105,19 @@ enum {
    them, as the loop and the command before have left them, and what it
    leaves there in its turn. A command is handed what it reads of them.
    One that leaves something which another may read gets them all, to
-   put it there: see main.c for what is read. */
+   put it there: see main.c for what is read. SI and DI carry nothing
+   round the loop but the numbers of two entries of a panel, for the
+   mouse's commands, and with them `last`, the number that the original
+   has in DX for one of them, F01_05: a panel holds as many entries as
+   there is memory for, and the numbers are 32 bits. DX keeps that
+   number too, in its 16 bits, for what reads DX as the loop leaves it
+   (Func40 of main.c). */
 struct Regs {
-    u16 ax, bx, cx, dx, si, di, bp;
+    u16 ax, bx, cx, dx;
+    i32 si, di;                         /* the numbers of two entries */
+    u16 bp;
     struct WCBdef *ds;                  /* the current panel */
+    i32 last;                           /* and of the last entry */
 };
 
 /* The keys of the panels, keys.c: `panel` is the current panel. F00_60,
@@ -1076,7 +1133,7 @@ struct Left {
     u16 dx;                             /* DX: see F00_50 for what each
                                            holds */
 };
-struct Left F00_50(struct WCBdef *panel, u16 cursor, u16 first);
+struct Left F00_50(struct WCBdef *panel, i32 cursor, i32 first);
 struct Onward F00_60(struct WCBdef *panel, i32 cursor, i32 first, u16 buttons,
                      struct Regs *r);
 struct Onward F00_00(struct WCBdef *panel, struct Regs *r);
@@ -1430,7 +1487,7 @@ u16 Rnd(void);
 struct Edited EdLin(u16 key, u8 *text, i32 cursor, i32 length);
 i32 EdSub1(const u8 *line, i32 cursor);
 bool CmpSym(u16 symbol);
-u16 Search(const u8 *list, u16 at, u16 begin, u16 end, u16 step,
+i32 Search(const u8 *list, i32 at, i32 begin, i32 end, i32 step,
            u16 key);
 
 /* What the program makes of the system at every turn: see each in
@@ -1555,7 +1612,7 @@ struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
    in the panel; and the list of the tree's directories in the main
    data, TreeBuf.TreList, a pointer to its first entry, the root. The
    assembly keeps places in both as addresses, not as numbers. */
-#define DSKBUF  (sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT))
+#define DSKBUF  ((i32)(sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT)))
 #define TRELIST \
     ((struct DIRENT *)&((struct DIRTREE *)md.TreeBuf)->TreSum2)
 
@@ -1575,12 +1632,17 @@ struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
 #define TREE_ENTRY(offset) \
     ((struct DIRENT *)((u8 *)TRELIST + (u16)(offset)))
 
-/* The file entry at an address in a panel's block. The address is
-   cut to 16 bits, so one that has wrapped round means what it means on
-   DOS, where the offset of a pointer wraps round with it: `wcb` is
-   the panel, where its block begins, at every use. */
+/* The file entry at an address in a panel, an offset from where the
+   panel begins: `wcb` is the panel at every use. The original's offset
+   was 16 bits, and one that went below 0 wrapped round in its segment;
+   here a panel is longer than 64K, and an address is a place in it,
+   never below 0. */
 #define ENTRY(wcb, address) \
-    ((struct FILENT *)((u8 *)(wcb) + (u16)(address)))
+    ((struct FILENT *)((u8 *)(wcb) + (address)))
+
+/* The places of a panel's list, struct Places, which are in front of
+   the panel in its block. */
+#define PLACES(wcb) ((struct Places *)(wcb) - 1)
 
 /* Bits of a file's attributes. The two highest are the program's own, in
    its lists of files. */

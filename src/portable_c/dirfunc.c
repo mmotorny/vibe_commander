@@ -942,9 +942,9 @@ failed:
         /* F47_06 */
         PathLin(path);
         wcb = CurrentPanel;
-        entry = ENTRY(wcb, wcb->EndBuf);
-        wcb->CurAdr = wcb->EndBuf;
-        wcb->EndBuf += sizeof(struct FILENT);
+        entry = ENTRY(wcb, PLACES(wcb)->EndBuf);
+        PLACES(wcb)->CurAdr = PLACES(wcb)->EndBuf;
+        PLACES(wcb)->EndBuf += sizeof(struct FILENT);
         for (i = 0; i < 12; i++)
             entry->NameF[i] = path[i];
         entry->NameF[12] = 0;
@@ -1024,9 +1024,9 @@ i32 F38_00(struct WCBdef *panel)
         include = 0;
     } else {
         /* F38_06 */
-        if (panel->CurAdr >= panel->EndBuf)
+        if (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf)
             return TO_FNCEXT;
-        file = ENTRY(panel, panel->CurAdr);
+        file = ENTRY(panel, PLACES(panel)->CurAdr);
         if (file->NameF[0] == '.')
             return TO_FNCEXT;
         box = &DelFi_B;
@@ -1149,9 +1149,9 @@ i32 M30_00(struct WCBdef *panel)
     selected = TotSel(panel);
     if (selected.directories == 0 && selected.files == 0) {
         /* M30_03 */
-        if (panel->CurAdr >= panel->EndBuf)
+        if (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf)
             return TO_FUNC04;
-        file = ENTRY(panel, panel->CurAdr);
+        file = ENTRY(panel, PLACES(panel)->CurAdr);
         if (file->NameF[0] == '.')
             return TO_FUNC04;
         attributes = file->AttrF;
@@ -1369,22 +1369,23 @@ bool FncSel(void)
     struct WCBdef *wcb = panel;
     struct FILENT *file;
     struct Selected selected;
-    u16 address, answer, begin;
+    i32 address;
+    u16 answer, begin;
     i32 lines, number, i;
 
     md.ZoomOne = 0;
     FNC_CHANGE = 0;
-    address = wcb->CurAdr;
+    address = PLACES(wcb)->CurAdr;
     if (md.OneFile != 0)
         goto one;
-    for (address = DSKBUF; address < wcb->EndBuf;
+    for (address = DSKBUF; address < PLACES(wcb)->EndBuf;
          address += sizeof(struct FILENT))
         ENTRY(wcb, address)->AttrF &= 0x7F;
-    address = wcb->CurAdr;
+    address = PLACES(wcb)->CurAdr;
     selected = TotSel(panel);
     if (selected.directories == 0 && selected.files == 0)
         goto one;
-    for (address = DSKBUF; address < wcb->EndBuf;
+    for (address = DSKBUF; address < PLACES(wcb)->EndBuf;
          address += sizeof(struct FILENT)) {
         if (!(ENTRY(wcb, address)->AttrF & ATTR_SELECTED))
             continue;
@@ -1409,16 +1410,19 @@ one:
                 else
                     PutInf(panel);
                 lines = LnsAX();
-                /* wraps: a file above the page is one far behind it,
-                   and is not drawn. */
-                number = (i32)((u16)(address - wcb->First)
-                               / sizeof(struct FILENT));
-                i = number % lines;
-                number /= lines;
-                if (number <= (wcb->BrfFul == 0 ? 2 : 0)) {
-                    begin = BegBX(panel) + 0x201;
-                    /* Its row of the page, which is on the screen. */
-                    Window((u16)(begin + (i << 8)), 0x126);
+                /* A file above the page is not drawn: the original's
+                   difference wraps round there, in 16 bits, to one far
+                   behind the page. */
+                if (address >= PLACES(wcb)->First) {
+                    number = (address - PLACES(wcb)->First)
+                             / (i32)sizeof(struct FILENT);
+                    i = number % lines;
+                    number /= lines;
+                    if (number <= (wcb->BrfFul == 0 ? 2 : 0)) {
+                        begin = BegBX(panel) + 0x201;
+                        /* Its row of the page, which is on the screen. */
+                        Window((u16)(begin + (i << 8)), 0x126);
+                    }
                 }
                 if (md.MiniSta != 0) {
                     begin = BegBX(panel);

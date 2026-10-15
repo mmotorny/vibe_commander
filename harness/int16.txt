@@ -19,6 +19,32 @@ cmdline.c, F68_00: widen
     from the history's place on, which are no more than the box has
     rows for: the row of a line of the list, 0 or more and below 256.
 
+cmdline.c, F77_10: widen
+    | end = ((struct DIRTREE *)md.TreeBuf)->TreeLen << 4;
+    The length of the tree's list in bytes: ReadTre refuses a tree of
+    4,096 entries or more, so it stays below 64K.
+
+cmdline.c, F80_00: widen
+    | at += sizeof(struct FILENT);
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
+cmdline.c, F80_00: widen
+    | entry += sizeof(struct FILENT))
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
+commands.c, M49_10: widen
+    | address += sizeof(struct FILENT)) {
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
 copy.c, C00_01: widen
     | count = (i32)(end - CpDest);
     end is behind the zero byte of CpDest, looked for in LenName bytes
@@ -75,6 +101,27 @@ dialog.c, MnMn11: shift
 dialog.c, MnMn11: shift
     | key = (u16)((button - table) >> 1);
     button steps up from table, two at a time, in the loop above.
+
+dirfunc.c, F47_01: widen
+    | PLACES(wcb)->EndBuf += sizeof(struct FILENT);
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
+dirfunc.c, FncSel: widen
+    | address += sizeof(struct FILENT))
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
+dirfunc.c, FncSel: widen
+    | address += sizeof(struct FILENT)) {
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
 
 drive.c, F62_01: widen
     | at = (i32)(first - md.ScrBuf);
@@ -146,6 +193,12 @@ edit.c, T80_14: widen
     What is left of TmpBuf's first LenPath + 13 bytes: the line above
     returns where `to` is at their end or behind it.
 
+files.c, NearFl: widen
+    | i32 start = (i32)(name - list);
+    An offset in the old list, in the room, which ReDr00 keeps as long
+    as the panel's list or as the room holds: of 32 bits since the
+    piece P, as a place in the panel is.
+
 find.c, FindFil: widen
     | left = (i32)(RoomEnd - part);
     Two places of the room, its end and where a part is read to: the
@@ -170,11 +223,12 @@ help.c, Help30: widen
     Cut to a byte; third is 4 to 12, a third of the box's rows less 9,
     and less than the rows less 5.
 
-info.c, PutInf: compare
-    | (const u8 *)file - (const u8 *)other < other->EndBuf;
-    An offset in the other panel's block: the loop stops at the first
-    entry at or behind EndBuf, which is FFC0h at the most (ReDr00), so
-    it stays below 64K.
+info.c, PutInf: widen
+    | (const u8 *)file - (const u8 *)other < PLACES(other)->EndBuf;
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
 
 input.c, Input0: widen
     | outside = InWind(mouse, (u16)((md.Lines - 1) << 8 | column),
@@ -187,18 +241,38 @@ input.c, Search: widen
     MvzLine copies no more than 13 bytes into MenuBuf, and answers
     where it stopped: 0 to 13.
 
-keys.c, F00_50: widen
-    | moved = was.first - first;
-    was.first and first are offsets of entries in one list, a panel's
-    block or the tree's list, each below 64K and the two at most the
-    list's length apart: the difference is how far the first entry shown
-    has moved, back or on, and is held only against 0 and a step either
-    way, -step where the original had it in 16 bits.
+keys.c, F10_01: widen
+    | address += sizeof(struct FILENT)) {
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
+keys.c, F17_01: widen
+    | address += sizeof(struct FILENT))
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
+keys.c, F78_00: widen
+    | address += sizeof(struct FILENT)) {
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
 
 panel.c, PutFls: compare
     | if (text - md.TmpBuf > 36) {
     text is behind TmpBuf, where the lines above have written two
     numbers and 25 characters: 0 or more, and below 64K.
+
+panel.c, PutFls: widen, 2 times
+    | address += sizeof(struct FILENT);
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
 
 place.c, AdrNum: widen
     | PLACE(panel, cursor, first, last, lines);
@@ -343,6 +417,20 @@ usermenu.c, F32_70: shift
     Only the low byte of what is shifted is kept, (u8): bits 8 to 15
     of the sum, which are the same whether or not it has a bit above
     them.
+
+usermenu.c, FileLst: widen
+    | at += sizeof(struct FILENT);
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
+
+usermenu.c, FileLst: widen
+    | for (at = DSKBUF; at < PLACES(wcb)->EndBuf; at += sizeof(struct FILENT)) {
+    A place in a panel's block, of 32 bits since the piece P: the
+    16-bit build would wrap round at 64K, where the original's list
+    ends short of it (ReDr00); here a panel's block is longer, and the
+    list ends before its end, PanelBytes of start.c, as vc.h says.
 
 view.c, F34_40: compare
     | if (end - text >= LenPath + 12)

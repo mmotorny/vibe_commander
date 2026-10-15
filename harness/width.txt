@@ -74,62 +74,62 @@ N2              79          0     0              0      68    11     0     3    
 N3, N4          56          0    13              0      67     2     7    23    91  view.c
 N5              76          0     0              0      70     6     3     4    44  find.c
 N6 to N8        69          0     4              0      73     0    13    38   152  edit.c
-N9              41          0     6              0      39     8     2     7    39  copy.c
-N10             55          0     0              0      49     6     3     9    37  dirfunc.c
-N11             47          0     1              0      46     2     2    10    34  files.c read.c place.c
-N12             47          0     4              0      51     0     5     3    33  panel.c info.c drive.c
+N9              40          0     6              0      38     8     2     7    40  copy.c
+N10             54          0     0              0      49     5     4     9    38  dirfunc.c
+N11             24          0     1              0      23     2     4    11    58  files.c read.c place.c
+N12             46          0     4              0      50     0     9     3    34  panel.c info.c drive.c
 N13             30          0     0              0      30     0     1     9    35  tree.c treebox.c extfile.c
-N14             62          0     0              0      62     0     0     6    38  cmdline.c enter.c exec.c
-N15             64          0     3              0      65     2     3    14    39  input.c usermenu.c
+N14             51          0     0              0      51     0     0     6    49  cmdline.c enter.c exec.c
+N15             57          0     3              0      58     2     3    14    46  input.c usermenu.c
 N16             36          0     3              0      38     1     3    12    48  main.c
-N17a            26          0     0              0      24     2     0     2    37  keys.c
-N17b            28          0     0              0      28     0     0     5    41  commands.c
+N17a            19          0     0              0      17     2     0     2    44  keys.c
+N17b            22          0     0              0      22     0     0     5    47  commands.c
 N18             75          0     1              0      55     1     0     7    45  menu.c help.c
 N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
-N19b            21          0     0              0      20     1     2     1    18  start.c
+N19b            21          0     0              0      20     1     3     1    24  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             60          0     3              0      46     7     0     5    34  stmain.c sthelp.c
 as a whole     647          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
-headers        333         94    15              0     203     5     0     0     0  vc.h sys.h tables.h
-all           2083         94   116              0    1257    66    54   191   985
+headers        329         94    15              0     201     5     0     0     0  vc.h sys.h tables.h
+all           2022         94   116              0    1199    65    62   192  1049
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
-vc.h               213          0    11              0     173     5     0     0     0
+vc.h               209          0    11              0     171     5     0     0     0
 sys.h               26          0     4              0      30     0     0     0     0
 tables.h            94         94     0              0       0     0     0     0     0
 bars.c              19          0     0              0      19     0     2     0    21
 blank.c             12          0     0              0      12     0     2     0     7
 box.c               30          0     0              0      29     1     1     0    18
-cmdline.c           37          0     0              0      37     0     0     4    22
-commands.c          28          0     0              0      28     0     0     5    41
-copy.c              41          0     6              0      39     8     2     7    39
+cmdline.c           29          0     0              0      29     0     0     4    30
+commands.c          22          0     0              0      22     0     0     5    47
+copy.c              40          0     6              0      38     8     2     7    40
 dialog.c            79          0     0              0      68    11     0     3    29
 digits.c             2          0     1              0       3     0     0     0     4
-dirfunc.c           55          0     0              0      49     6     3     9    37
+dirfunc.c           54          0     0              0      49     5     4     9    38
 drive.c             16          0     0              0      16     0     2     2    10
 edit.c              69          0     4              0      73     0    13    38   152
-enter.c             12          0     0              0      12     0     0     1    14
+enter.c              9          0     0              0       9     0     0     1    17
 exec.c              13          0     0              0      13     0     0     1     2
 extfile.c            4          0     0              0       4     0     0     2     1
-files.c             22          0     0              0      21     1     1     3    12
+files.c             10          0     0              0       9     1     1     3    24
 find.c              76          0     0              0      70     6     3     4    44
 format.c            29          0     2              0      31     0     4     2     7
 help.c              44          0     1              0      30     1     0     5    22
-info.c              11          0     3              0      14     0     0     0     5
-input.c             36          0     3              0      39     0     3     6    20
-keys.c              26          0     0              0      24     2     0     2    37
+info.c              11          0     3              0      14     0     1     0     5
+input.c             30          0     3              0      33     0     3     6    26
+keys.c              19          0     0              0      17     2     0     2    44
 line.c               5          0     0              0       5     0     1     0    10
 main.c              36          0     3              0      38     1     3    12    48
 mask.c               4          0     0              0       4     0     0     1     3
 menu.c              31          0     0              0      25     0     0     2    23
 misc.c               4          0     0              0       1     3     0     2     9
 mouse.c             12          0     0              0      12     0     0     2     4
-panel.c             20          0     1              0      21     0     3     1    18
-place.c              5          0     0              0       5     0     0     1    11
-read.c              20          0     1              0      20     1     1     6    11
+panel.c             19          0     1              0      20     0     6     1    19
+place.c              2          0     0              0       2     0     2     1    14
+read.c              12          0     1              0      12     1     1     7    20
 screen.c            12          0     0              0      10     2     0     0     3
 setup.c              3          0     0              0       3     0     0     0     5
-start.c             21          0     0              0      20     1     2     1    18
+start.c             21          0     0              0      20     1     3     1    24
 stcolor.c           43          0     0              0      43     0     0     3    39
 sthelp.c            43          0     3              0      30     6     0     2    16
 stmain.c            17          0     0              0      16     1     0     3    18
@@ -138,7 +138,7 @@ string.c             6          0     0              0       6     0     0     0
 system.c             8          0     1              0       9     0     0     6     7
 tree.c               5          0     0              0       5     0     0     4    14
 treebox.c           21          0     0              0      21     0     1     3    20
-usermenu.c          28          0     0              0      26     2     0     8    19
+usermenu.c          27          0     0              0      25     2     0     8    20
 view.c              56          0    13              0      67     2     7    23    91
 window.c            24          0     0              0      21     3     0     4    11
 
@@ -592,24 +592,20 @@ vc.h, struct WCBdef: field WinPath, u8[68]
     setup: of the part of a panel that the setup file has, which stays
     as it is.
 
-vc.h, struct WCBdef: field CurAdr, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
+vc.h, struct WCBdef: field CurAdr16, u16
+    unused
 
-vc.h, struct WCBdef: field First, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
+vc.h, struct WCBdef: field First16, u16
+    unused
 
-vc.h, struct WCBdef: field EndBuf, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
+vc.h, struct WCBdef: field EndBuf16, u16
+    unused
 
 vc.h, struct WCBdef: field ExtBuf, u8[512]
     text
 
-vc.h, struct WCBdef: field EndFul, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
+vc.h, struct WCBdef: field EndFul16, u16
+    unused
 
 vc.h, struct WCBdef: field ChgFlg, u8
     flag
@@ -650,15 +646,6 @@ vc.h, struct LineArgs: field value, u16
     place, a row and a column with the row in the high byte; for NgLine
     the cells that it may write in, of which it reads the low byte.
 
-vc.h, struct Shown: field cursor, u16
-    address: an entry of a panel's list as its place in the panel's
-    block, 16 bits while a panel is 64K, or of the tree's list as
-    TREE_OFFSET has it, in the same type. Widened only if question 3 of
-    the plan says so, by the piece P.
-
-vc.h, struct Shown: field first, u16
-    address: as cursor.
-
 vc.h, struct Box: field begin, u16
     place
 
@@ -672,9 +659,10 @@ vc.h, struct Onward: field item, u8
     small: a byte as the assembly has it in CL or CH, for M03_00 five less
     the kind of a panel and for M06_00 a place of the menu bar.
 
-vc.h, struct Regs: laid out, 7 numbers
-    The original's: AX, BX, CX, DX, SI, DI and BP as they go round
-    the main loop, which a command reads as the original has them.
+vc.h, struct Regs: laid out, 5 numbers
+    The original's: AX, BX, CX, DX and BP as they go round the main
+    loop, which a command reads as the original has them. SI and DI,
+    which carry nothing there but the numbers of entries, are i32.
 
 vc.h, struct Left: field bx, u16
     BX as the original has it where a key of the cursor goes back to
@@ -1094,18 +1082,8 @@ cmdline.c, (): variable Ascii_T, u8[38]
 cmdline.c, F73_00: parameter key, u16
     key
 
-cmdline.c, F80_00: variable at, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
 cmdline.c, F80_00: variable c, u16
     character
-
-cmdline.c, F80_00: variable entry, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 cmdline.c, F68_25: parameter end, u16
     character: in the low byte, and the scan code in the high one,
@@ -1158,40 +1136,6 @@ cmdline.c, F68_00: variable key, u16
 cmdline.c, F77_10: parameter key, u16
     key
 
-cmdline.c, F77_10: variable at, u16
-    address: as Search of input.c takes it, an offset of 16 bits: a
-    place in the panel's block while a panel is 64K, or of the
-    tree's list as TREE_OFFSET has it (question 3 of the plan, the
-    piece P).
-
-cmdline.c, F77_10: variable begin, u16
-    address: as Search of input.c takes it, an offset of 16 bits: a
-    place in the panel's block while a panel is 64K, or of the
-    tree's list as TREE_OFFSET has it (question 3 of the plan, the
-    piece P).
-
-cmdline.c, F77_10: variable end, u16
-    address: as Search of input.c takes it, an offset of 16 bits: a
-    place in the panel's block while a panel is 64K, or of the
-    tree's list as TREE_OFFSET has it (question 3 of the plan, the
-    piece P).
-
-cmdline.c, F77_10: variable first, u16
-    address: as Search of input.c takes it, an offset of 16 bits: a
-    place in the panel's block while a panel is 64K, or of the
-    tree's list as TREE_OFFSET has it (question 3 of the plan, the
-    piece P).
-
-cmdline.c, F77_10: variable found, u16
-    address: as Search of input.c takes it, an offset of 16 bits: a
-    place in the panel's block while a panel is 64K, or of the
-    tree's list as TREE_OFFSET has it (question 3 of the plan, the
-    piece P).
-
-cmdline.c, F77_10: variable step, u16
-    address: the length of an entry, as Search of input.c takes it
-    with the offsets that it steps.
-
 cmdline.c, F77_00: parameter key, u16
     key
 
@@ -1240,26 +1184,6 @@ commands.c, (): variable EditE_F, u8[]
 commands.c, (): variable Delay_T, u8[6]
     setup: the minutes as BlDelay of the setup has them.
 
-commands.c, M16_20: variable was, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-commands.c, M16_20: variable cursor, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-commands.c, M16_20: variable first, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-commands.c, M16_20: variable found, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
 commands.c, M06_10: parameter item, u16
     bits: what the original has in CX, the menu in the low byte and
     the item of it in the high one, as the menu bar and the keys of
@@ -1289,16 +1213,6 @@ commands.c, M06_00: parameter item, u16
     bits: what the original has in CX, the menu in the low byte and
     the item of it in the high one, as the menu bar and the keys of
     the panels hand it on and PutMnu takes it.
-
-commands.c, M49_10: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-commands.c, M49_10: variable found, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 commands.c, M64_02: parameter item, u16
     bits: what the original has in CX, the menu in the low byte and
@@ -1412,11 +1326,6 @@ copy.c, C00_01: variable info, u16
 
 copy.c, C00_01: variable c, u8
     character
-
-copy.c, C10_13: variable file, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 copy.c, C10_00: returns, u16
     bits: DONE, NOTHING or STOP, 1, 0 or 100h, which the original has
@@ -1973,18 +1882,17 @@ dirfunc.c, FncMs1: variable answer, u16
     bits: what a routine of FncAddr answers, 1 or 0 in the low byte
     for done or not, and something above it to stop.
 
-dirfunc.c, FncSel: variable address, u16
-    A place in the panel's block, as CurAdr, First and EndBuf have
-    it: 16 bits while a panel is 64K, by question 3 of the plan. Its
-    difference with First is cut to 16 bits, which the program
-    counts on for a file above the page, with the cast written.
-
 dirfunc.c, FncSel: variable answer, u16
     bits: what a routine of FncAddr answers, 1 or 0 in the low byte
     for done or not, and something above it to stop.
 
 dirfunc.c, FncSel: variable begin, u16
     place
+
+dirfunc.c, FncSel: sign
+    | number = (address - PLACES(wcb)->First)
+    address is not below the first entry shown, by the test above: 0
+    or more.
 
 dirfunc.c, FncSel: sign
     | i = number % lines;
@@ -2350,23 +2258,8 @@ enter.c, (): variable CDir_S, u8[2]
 enter.c, F21_25: variable c, u8
     character
 
-enter.c, F21_10: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
 enter.c, F21_10: variable c, u8
     character
-
-enter.c, F23_02: parameter address, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-enter.c, F23_00: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 enter.c, F27_07: variable c, u8
     character
@@ -2453,31 +2346,11 @@ files.c, (): variable Ext_S, u8[9]
 files.c, TstExe: variable c, u8
     character
 
-files.c, SetMask: variable file, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-files.c, SetMask: variable last, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
 files.c, SetMask: variable attributes, u8
     attributes
 
 files.c, SetMask: variable c, u8
     text: a byte of an entry, on its way to another.
-
-files.c, Sort: variable end, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-files.c, Sort: variable file, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-files.c, Sort: variable swapped, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 files.c, Sort: variable count, u16
     Counts down to nothing as the original's LOOP does, in 16 bits: a
@@ -2500,36 +2373,6 @@ files.c, Sort: sign
     | gap = gap / SIZE_FILENT >> 1;
     gap is EndBuf less DskBuf, and the list never ends in front of where
     it begins; then a half of that, 0 or more.
-
-files.c, FnFile: returns, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-files.c, FnFile: variable file, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-files.c, NearFl: returns, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-files.c, NearFl: variable start, u16
-    address: an offset in the old list, which was a panel's list and is
-    kept as long as one: 16 bits while a panel is 64K, with the panel's
-    (question 3 of the plan, the piece P).
-
-files.c, NearFl: variable at, u16
-    address: an offset in the old list, which was a panel's list and is
-    kept as long as one: 16 bits while a panel is 64K, with the panel's
-    (question 3 of the plan, the piece P).
-
-files.c, NearFl: variable found, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-files.c, TotSel: variable file, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 files.c, TotSel: variable attributes, u8
     attributes
@@ -3058,6 +2901,10 @@ info.c, PutInf: variable two, u16
     character: two characters of dirinfo as a word, which is held
     against the two that end a line; then the first of them.
 
+info.c, PutInf: sign
+    | Number(md.TmpErr + 1, (u16)(count >> 16), (u16)count,
+    count counts the files of the other panel up from 0.
+
 input.c, (): variable CtEn_T, u8[10]
     character
 
@@ -3172,37 +3019,8 @@ input.c, EdLin: parameter key, u16
 input.c, EdLin: variable low, u16
     character
 
-input.c, Search: parameter at, u16
-    address: as Search takes it, an offset of 16 bits: a place in the
-    panel's block while a panel is 64K, or of the tree's list as
-    TREE_OFFSET has it (question 3 of the plan, the piece P).
-
-input.c, Search: parameter begin, u16
-    address: as Search takes it, an offset of 16 bits: a place in the
-    panel's block while a panel is 64K, or of the tree's list as
-    TREE_OFFSET has it (question 3 of the plan, the piece P).
-
-input.c, Search: parameter end, u16
-    address: as Search takes it, an offset of 16 bits: a place in the
-    panel's block while a panel is 64K, or of the tree's list as
-    TREE_OFFSET has it (question 3 of the plan, the piece P).
-
 input.c, Search: parameter key, u16
     key
-
-input.c, Search: parameter step, u16
-    address: the length of an entry, with the offsets that it steps
-    and wraps at end, in 16 bits.
-
-input.c, Search: returns, u16
-    address: as Search takes it, an offset of 16 bits: a place in the
-    panel's block while a panel is 64K, or of the tree's list as
-    TREE_OFFSET has it (question 3 of the plan, the piece P).
-
-input.c, Search: variable from, u16
-    address: as Search takes it, an offset of 16 bits: a place in the
-    panel's block while a panel is 64K, or of the tree's list as
-    TREE_OFFSET has it (question 3 of the plan, the piece P).
 
 keys.c, (): variable Sel_S, u8[]
     text
@@ -3225,12 +3043,6 @@ keys.c, Leaves: parameter dx, u16
     has it, or the place of one in the main data, which Rename reads as
     a count (F00_50 says which).
 
-keys.c, F00_50: parameter cursor, u16
-    address: an entry as struct Shown has it, which ChgAdr takes.
-
-keys.c, F00_50: parameter first, u16
-    address: as cursor.
-
 keys.c, F00_50: variable begin, u16
     place
 
@@ -3243,10 +3055,6 @@ keys.c, F00_50: variable corner, u16
 keys.c, F00_60: parameter buttons, u16
     bits: the mouse's buttons, as its driver answers them.
 
-keys.c, F00_60: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
 keys.c, F00_60: variable attributes, u8
     attributes
 
@@ -3255,18 +3063,6 @@ keys.c, F00_05: parameter buttons, u16
 
 keys.c, F01_05: parameter buttons, u16
     bits: as F00_60 takes them.
-
-keys.c, F08_00: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-keys.c, F10_01: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-keys.c, F78_00: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 keys.c, F11_00: variable begin, u16
     place
@@ -3286,10 +3082,6 @@ keys.c, F16_00: variable begin, u16
 
 keys.c, F16_00: variable size, u16
     place
-
-keys.c, F17_01: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 keys.c, F20_02: variable whole, u16
     place
@@ -3670,10 +3462,6 @@ panel.c, PutPath: sign
 panel.c, PutFls: variable size, u32
     size
 
-panel.c, PutFls: variable address, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    The piece P widens it, with the panel's (question 3 of the plan).
-
 panel.c, PutFls: variable c, u16
     character
 
@@ -3683,6 +3471,10 @@ panel.c, PutFls: variable color, u16
 
 panel.c, PutFls: variable place, u16
     place
+
+panel.c, PutFls: sign
+    | text = Number(text, (u16)(count >> 16), (u16)count, NUM_SEPARATED);
+    count counts what is selected, up from 0.
 
 panel.c, SetCur: variable color, u16
     colour
@@ -3702,31 +3494,29 @@ panel.c, SetCur: sign
     | below %= lines;
     As on the line above: below is 0 or more.
 
+panel.c, FilDir: sign
+    | buffer = Number(buffer, (u16)(files >> 16), (u16)files,
+    files is a count of what is selected, 0 or more: TotSel.
+
+panel.c, FilDir: sign
+    | buffer = Number(buffer, (u16)(directories >> 16), (u16)directories,
+    directories is a count of what is selected, 0 or more: TotSel.
+
 place.c, BegBX: returns, u16
     place
 
 place.c, SizDX: returns, u16
     place
 
-place.c, NumAdr: returns, u16
-    address: an entry as struct Shown has it, a place in the panel's
-    block or an offset in the tree's list, 16 bits while a panel is 64K.
+place.c, AdrNum: sign
+    | PLACE(panel, cursor, first, last, lines);
+    FILE_NUMBER divides a place in the panel less DSKBUF, and every
+    place of a panel's list is DSKBUF or more.
 
-place.c, ChgAdr: parameter cursor, u16
-    address: as struct Shown has it.
-
-place.c, ChgAdr: parameter first, u16
-    address: as struct Shown has it.
-
-read.c, struct OldList: field cursor, u16
-    address: an offset in the old list, which was a panel's list and is
-    kept as long as one: 16 bits while a panel is 64K, with the panel's
-    (question 3 of the plan, the piece P).
-
-read.c, struct OldList: field first, u16
-    address: an offset in the old list, which was a panel's list and is
-    kept as long as one: 16 bits while a panel is 64K, with the panel's
-    (question 3 of the plan, the piece P).
+place.c, CorPar: sign
+    | PLACE(panel, cursor, first, last, lines);
+    FILE_NUMBER divides a place in the panel less DSKBUF, and every
+    place of a panel's list is DSKBUF or more.
 
 read.c, (): variable Mask_S, u8[]
     text
@@ -3736,24 +3526,6 @@ read.c, (): variable Ext_F, u8[]
 
 read.c, (): variable DrIn_F, u8[8]
     text
-
-read.c, ReDr00: variable file, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-read.c, ReDr00: variable limit, u16
-    address: where the list has to end, a place in the panel's block
-    that is the original's, a paragraph short of 64K less two entries: a
-    number of the program's own, which question 3 of the plan may move,
-    by the piece P.
-
-read.c, ReDr00: variable oldCursor, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
-read.c, ReDr00: variable oldFirst, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 read.c, ReDr00: variable answer, u16
     system: what DOS answered, of which the low byte is its error.
@@ -3772,10 +3544,6 @@ read.c, ReDr00: sign
 read.c, ReDr50: variable attributes, u16
     attributes: the two of selection.
 
-read.c, ReDr50: variable found, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
-
 read.c, RdInfo: variable handle, u16
     handle: or DOS's error where it could not open the file.
 
@@ -3784,10 +3552,6 @@ read.c, Labelled: parameter answer, u16
 
 read.c, GetVol: variable c, u8
     character
-
-read.c, DirSize: variable file, u16
-    address: a place in the panel's block, 16 bits while a panel is 64K.
-    Widened only if question 3 of the plan says so, by the piece P.
 
 read.c, DiSi10: parameter attributes, u16
     attributes: in the low byte, as FncFn of dirfunc.c hands them to
@@ -3911,6 +3675,10 @@ start.c, Paragraphs: sign
     | return (u16)(bytes >> 4);
     The length of a block as the extender answers it, MemTake's
     largest, which is not below 0.
+
+start.c, PanelGrow: sign
+    | if (bytes < want / 2)
+    `want` is 7FFFFFF0h there, the most that a block has.
 
 start.c, CurNl: returns, u16
     system: the page that the display shows.
@@ -4510,10 +4278,6 @@ usermenu.c, F32_70: variable look, u16
 
 usermenu.c, F32_70: variable mouse, u16
     place
-
-usermenu.c, FileLst: variable at, u16
-    address: a place in the panel's block, 16 bits while a panel is
-    64K (question 3 of the plan, the piece P).
 
 usermenu.c, FileLst: variable handle, u16
     handle

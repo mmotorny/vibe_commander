@@ -397,6 +397,10 @@ static u16 Paragraphs(i32 bytes)
     return (u16)(bytes >> 4);
 }
 
+/* More bytes than any block has: a block asked for so is refused, with
+   how large one can be. */
+#define BYTES_MOST 0x7FFFFFFF
+
 /* Take the largest block that there is for the room. Answers as Init11
    does. */
 static struct Answer TakeRoom(void)
@@ -405,9 +409,7 @@ static struct Answer TakeRoom(void)
     struct Block block;
     i32 largest;
 
-    largest = MemTake(0x7FFFFFFF).largest; /* a block of more than there
-                                              is, which is refused, with
-                                              how large one can be */
+    largest = MemTake(BYTES_MOST).largest;
     block = MemTake(largest);
     answer.value = Paragraphs(largest);
     answer.failed = LEAST_ROOM > largest;
@@ -424,18 +426,116 @@ i32 RoomBytes(void)
     return (i32)(RoomEnd - Room);
 }
 
+/* The panel of the block that the extender has made of a panel's,
+   `made`, `bytes` long, where `panel` was: the four pointers to the
+   panels that pointed at it point there. */
+static struct WCBdef *Moved(struct WCBdef *panel, struct Block made,
+                            i32 bytes)
+{
+    struct WCBdef *now = (struct WCBdef *)(made.block
+                                           + sizeof(struct Places));
+
+    PLACES(now)->Bytes = bytes;
+    if (LeftPanel == panel)
+        LeftPanel = now;
+    if (RightPanel == panel)
+        RightPanel = now;
+    if (CurrentPanel == panel)
+        CurrentPanel = now;
+    if (OtherPanel == panel)
+        OtherPanel = now;
+    return now;
+}
+
+/* Make the block of a panel whose list is full longer, while ReDir reads
+   its directory: see vc.h. The room has the old list in its first
+   `kept` bytes, which it keeps: it is made as short as that first, but
+   not shorter than the least that it has, so that the panel can grow
+   into what it gives back. The block is made twice as long, or, where
+   there is not that much, as long as the largest block that there is,
+   if that is longer than it is. The extender moves a block that cannot
+   grow where it is to where it can, with what it holds (TODO.md, "X,
+   the extender's memory on the bench"): the room, which keeps its
+   start where it is made shorter, and the panel, which goes behind
+   what is taken.
+
+   The original has no such thing: its panel stops at 64K. The room
+   comes back whole when the directory has been read, RoomAgain. */
+struct WCBdef *PanelGrow(struct WCBdef *panel, i32 kept)
+{
+    struct Block made;
+    u8 *block = (u8 *)PLACES(panel);
+    i32 bytes = PLACES(panel)->Bytes;
+    i32 room, want;
+
+    room = (kept + 15) & ~15;
+    if (room < LEAST_ROOM)
+        room = LEAST_ROOM;
+    if (RoomBytes() > room) {
+        made = MemResize(Room, room);
+        if (!made.failed)
+            Memory(made.block, room);
+    }
+    want = BYTES_MOST & ~15;
+    if (bytes < want / 2)
+        want = bytes * 2;
+    made = MemResize(block, want);
+    if (made.failed) {
+        want = MemTake(BYTES_MOST).largest & ~15;
+        if (want <= bytes)
+            return 0;
+        made = MemResize(block, want);
+        if (made.failed)
+            return 0;
+    }
+    return Moved(panel, made, want);
+}
+
+/* Make the block of a panel that has read its directory as short as its
+   list, with the tail of PANEL_TAIL, but not shorter than PANEL_LEAST:
+   see vc.h. A block that the extender would not make shorter stays as
+   it is. */
+struct WCBdef *PanelFit(struct WCBdef *panel)
+{
+    struct Block made;
+    i32 bytes;
+
+    bytes = ((i32)sizeof(struct Places) + PLACES(panel)->EndFul
+             + PANEL_TAIL + 15) & ~15;
+    if (bytes < PANEL_LEAST)
+        bytes = PANEL_LEAST;
+    if (bytes >= PLACES(panel)->Bytes)
+        return panel;
+    made = MemResize((u8 *)PLACES(panel), bytes);
+    if (made.failed)
+        return panel;
+    return Moved(panel, made, bytes);
+}
+
+/* Take the room again, as the largest block that there is, when a panel
+   has grown or shrunk: it was the largest that there was behind the
+   panels, and the memory that is free now may be elsewhere. What it
+   held is not kept. It does not fail: the room is at least LEAST_ROOM
+   (PanelGrow), and given back that much is free. */
+void RoomAgain(void)
+{
+    MemGive(Room);
+    TakeRoom();
+}
+
 /* Ask for the memory of the two panels and for the room, and make the
    panels of what Init00 has left of them at IMAGE, without files. Each
-   panel has a block of its own, as long as a panel can get, which it
-   keeps for as long as the program runs and which is never moved; the
-   room is the largest block that there is when the panels have theirs.
-   Answers with how many paragraphs there were for the room, or for a
-   panel that got none, and whether that is too few for the least that
-   the program needs: the assembly has them in BX where it says that
-   there is no memory, and the BIOS takes a page of the screen there
-   (see AlocEr of exec.c). The blocks are the extender's, anywhere above
-   the megabyte (MemTake of sys_dos.c): the two panels are taken first, so
-   that the room has nothing behind it.
+   panel has a block of its own, as long as the original's panel can be,
+   which it keeps for as long as the program runs, and which grows and
+   shrinks as its directory needs (PanelGrow); the room is the largest
+   block that there is when the panels have theirs. Answers with how
+   many paragraphs there were for the room, or for a panel that got
+   none, and whether that is too few for the least that the program
+   needs: the assembly has them in BX where it says that there is no
+   memory, and the BIOS takes a page of the screen there (see AlocEr of
+   exec.c). The blocks are the extender's, anywhere above the megabyte
+   (MemTake of sys_dos.c): the two panels are taken first, so that the
+   room has nothing behind it.
 
    The original asks DOS for one block, the largest that there is, and
    cuts it up itself: its main data at the start, behind it the two
@@ -452,21 +552,25 @@ struct Answer Init11(void)
     i32 side, i;
 
     for (side = 0; side < 2; side++) {
-        block = MemTake(PANEL_BYTES);
+        block = MemTake(PANEL_LEAST);
         answer.value = Paragraphs(block.largest);
         answer.failed = block.failed;
         if (answer.failed)
             return answer;
-        wcb = (struct WCBdef *)block.block;
+        /* The panel's places, then the panel. */
+        wcb = (struct WCBdef *)(block.block + sizeof(struct Places));
         if (side == 0)                  /* Init13 */
             LeftPanel = wcb;
         else
             RightPanel = wcb;
         for (i = 0; i < WCBini; i++)
             ((u8 *)wcb)[i] = *from++;
-        wcb->CurAdr = DSKBUF;
-        wcb->First = DSKBUF;
-        wcb->EndBuf = DSKBUF;
+        PLACES(wcb)->Bytes = PANEL_LEAST;
+        for (i = 0; i < 3; i++)
+            PLACES(wcb)->Unused[i] = 0;
+        PLACES(wcb)->CurAdr = DSKBUF;
+        PLACES(wcb)->First = DSKBUF;
+        PLACES(wcb)->EndBuf = DSKBUF;
     }
     return TakeRoom();
 }

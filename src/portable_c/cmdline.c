@@ -111,28 +111,29 @@ bool F80_00(struct WCBdef *panel)
     struct FILENT *file;
     struct Selected selected;
     bool any;
-    u16 at, entry, c;
+    i32 at, entry;
+    u16 c;
     i32 length, used, column, i;
 
     if (!FilePan(panel))
         return false;
     selected = TotSel(panel);
     any = (selected.files | selected.directories) != 0;
-    at = panel->CurAdr;
+    at = PLACES(panel)->CurAdr;
     if (!any) {
-        if (at >= panel->EndBuf)
+        if (at >= PLACES(panel)->EndBuf)
             return false;
         if (ENTRY(panel, at)->NameF[0] == '.')
             return false;
     }
-    for (entry = DSKBUF; entry < panel->EndBuf;
+    for (entry = DSKBUF; entry < PLACES(panel)->EndBuf;
          entry += sizeof(struct FILENT))
         ENTRY(panel, entry)->AttrF &= 0x7F;
     if (!any)
         goto F80_05;
     at = DSKBUF;
 F80_04:
-    if (at >= panel->EndBuf)
+    if (at >= PLACES(panel)->EndBuf)
         goto F80_10;
     if (!(ENTRY(panel, at)->AttrF & ATTR_SELECTED))
         goto F80_12;
@@ -411,13 +412,13 @@ F68_20:                                 /* the box goes */
 static void F77_10(u16 key, struct WCBdef *panel)
 {
     const u8 *list;
-    u16 at, first, begin, end, step, found;
+    i32 at, first, begin, end, step, found;
 
     if (panel->WinTyp == 0) {
         list = (const u8 *)panel;
-        at = panel->CurAdr;
-        first = panel->First;
-        end = panel->EndBuf;
+        at = PLACES(panel)->CurAdr;
+        first = PLACES(panel)->First;
+        end = PLACES(panel)->EndBuf;
         begin = DSKBUF;
         step = sizeof(struct FILENT);
     } else {
@@ -425,8 +426,7 @@ static void F77_10(u16 key, struct WCBdef *panel)
         at = TREE_OFFSET(TreeCursor);
         first = TREE_OFFSET(TreeFirst);
         begin = 0;
-        end = (u16)(((struct DIRTREE *)md.TreeBuf)->TreeLen << 4);
-                                        /* MinTree entries at the most */
+        end = ((struct DIRTREE *)md.TreeBuf)->TreeLen << 4;
         step = sizeof(struct DIRENT);
     }
     found = Search(list, at, begin, end, step, key);

@@ -138,14 +138,14 @@ static bool M02_10(struct WCBdef *panel)
 static void M16_20(struct WCBdef *panel)
 {
     const u8 *from;
-    u16 was = panel->EndBuf;
-    u16 cursor, first, found;
+    i32 was = PLACES(panel)->EndBuf;
+    i32 cursor, first, found;
     i32 i;
 
-    from = (const u8 *)panel + panel->CurAdr;
+    from = (const u8 *)panel + PLACES(panel)->CurAdr;
     for (i = 0; i < 13; i++)
         md.MenuBuf[i] = from[i];
-    from = (const u8 *)panel + panel->First;
+    from = (const u8 *)panel + PLACES(panel)->First;
     for (i = 0; i < 13; i++)
         md.MenuBuf[13 + i] = from[i];
     SetMask(panel);
@@ -154,14 +154,14 @@ static void M16_20(struct WCBdef *panel)
     first = DSKBUF;
     if (was > DSKBUF) {
         found = FnFile(panel, md.MenuBuf);
-        if (found < panel->EndBuf)
+        if (found < PLACES(panel)->EndBuf)
             cursor = found;
         found = FnFile(panel, md.MenuBuf + 13);
-        if (found < panel->EndBuf)
+        if (found < PLACES(panel)->EndBuf)
             first = found;
     }
-    panel->CurAdr = cursor;
-    panel->First = first;
+    PLACES(panel)->CurAdr = cursor;
+    PLACES(panel)->First = first;
 }
 
 /* M06_10: a panel switched on. If the current panel is off, this one
@@ -389,10 +389,10 @@ static bool M49_10(struct WCBdef *panel, bool marked)
     struct WCBdef *other = InvWCB(panel);
     struct FILENT *file;
     const struct FILENT *its;
-    u16 address, found;
+    i32 address, found;
     i32 i;
 
-    for (address = DSKBUF; address < panel->EndBuf;
+    for (address = DSKBUF; address < PLACES(panel)->EndBuf;
          address += sizeof(struct FILENT)) {
         file = ENTRY(panel, address);
         if (file->AttrF & ATTR_DIRECTORY)
@@ -401,7 +401,7 @@ static bool M49_10(struct WCBdef *panel, bool marked)
             md.TmpBuf[i] = file->NameF[i];
         found = FnFile(other, md.TmpBuf);
         its = ENTRY(other, found);
-        if (found < other->EndBuf
+        if (found < PLACES(other)->EndBuf
             && !(its->AttrF & ATTR_DIRECTORY)
             && (its->DateF > file->DateF
                 || (its->DateF == file->DateF

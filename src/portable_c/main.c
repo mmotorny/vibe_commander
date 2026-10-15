@@ -268,10 +268,10 @@ static void Init90(struct WCBdef *panel)
     i32 i;
 
     if (panel->WinTyp == 0) {
-        panel->EndBuf = DSKBUF;
-        panel->EndFul = DSKBUF;
-        panel->CurAdr = DSKBUF;
-        panel->First = DSKBUF;
+        PLACES(panel)->EndBuf = DSKBUF;
+        PLACES(panel)->EndFul = DSKBUF;
+        PLACES(panel)->CurAdr = DSKBUF;
+        PLACES(panel)->First = DSKBUF;
     } else if (panel->WinTyp == 2) {
         DiskClusters = 0;
         FreeClusters = 0;
@@ -362,7 +362,8 @@ Init53:
                 keep = true;
             if (wcb->WinTyp == 0)       /* Init57 */
                 md.BlocEr = 1;
-            failed = ReDir(panel, keep);
+            failed = ReDir(&panel, keep);  /* which may move it */
+            wcb = panel;
             md.BlocEr = 0;
         }
         if (failed) {                   /* Init59 */
@@ -410,7 +411,9 @@ Init70:
             } else {
                 if (wcb->WinTyp == 0)   /* Init74 */
                     md.BlocEr = 1;
-                failed = ReDir(panel, keep);    /* Init75 */
+                failed = ReDir(&panel, keep);   /* Init75: which may
+                                                   move it */
+                wcb = panel;
                 md.BlocEr = 0;
             }
         }
@@ -559,10 +562,12 @@ Func40:                                 /* Move the cursor */
     *(u16 *)md.TmpBuf = r->cx;          /* TmpMous */
     r->bp = r->ax;
     AdrNum(r->ds, &place);
-    /* The numbers fit: a panel holds 2,703 entries, ReDr00, which the
-       piece P lifts. */
-    r->si = (u16)place.cursor;
-    r->di = (u16)place.first;
+    r->si = place.cursor;
+    r->di = place.first;
+    r->last = place.last;
+    /* DX as the original leaves it for a command that the loop goes on
+       to from here, which Rename reads as a count, in 16 bits: a panel
+       of more entries than 65,536 is cut there, wraps. */
     r->dx = (u16)place.last;
     lines = place.lines;
     r->ax = (u16)lines;
@@ -587,8 +592,8 @@ Func40:                                 /* Move the cursor */
             r->ax = (lines & 0xFF) * 3;
         r->ax--;                        /* Func56 */
         r->si = r->di + r->ax;
-        if (r->si > r->dx)
-            r->si = r->dx;
+        if (r->si > r->last)
+            r->si = r->last;
         return Asks(CMD_F01_05);
     }
     column = (u8)(column - (r->bx & 0xFF));     /* Set cursor position */
@@ -609,13 +614,15 @@ Func40:                                 /* Move the cursor */
        the line for a byte with a sign, and a line of 128 or more is one
        of the third column on a panel of 43 lines or more, full screen
        and brief, on a screen of 48 lines or more. The cursor then goes
-       256 entries back, or to the last entry if there are not as many. */
-    r->ax = (u16)((signed char)rows + r->di);   /* wraps: below the
-                                                   first entry is above
-                                                   the last */
-    r->si = r->ax;
-    if (r->si > r->dx) {
-        r->si = r->dx;
+       256 entries back, or to the last entry if there are not as many:
+       the original's number wraps round in 16 bits there, and one below
+       the first entry is above the last. AX has the number as the
+       original has it, in 16 bits, wraps, for the double click below,
+       which hands on its high byte. */
+    r->si = (signed char)rows + r->di;
+    r->ax = (u16)r->si;
+    if (r->si < 0 || r->si > r->last) {
+        r->si = r->last;
         return Asks(CMD_F00_60);
     }
     if (!(r->bp & 1))                   /* Func43 */
@@ -1195,7 +1202,7 @@ static i32 Command(i32 command, struct WCBdef *panel, struct Regs *r)
     case CMD_F00_05:
         return CmdEnd(F00_05(panel, r->si, r->di, r->bp, r), r);
     case CMD_F01_05:
-        return CmdEnd(F01_05(panel, r->si, r->di, r->dx, r->bp, r), r);
+        return CmdEnd(F01_05(panel, r->si, r->di, r->last, r->bp, r), r);
     case CMD_F00_00: return CmdEnd(F00_00(panel, r), r);
     case CMD_F01_00: return CmdEnd(F01_00(panel, r), r);
     case CMD_F02_00: return CmdEnd(F02_00(panel, r), r);
@@ -1334,7 +1341,8 @@ static i32 MainLoop(void)
 
     /* What the start of the program leaves in the registers: nothing of
        it is read. Loop sets each before it is. */
-    r->ax = r->bx = r->cx = r->dx = r->si = r->di = r->bp = 0;
+    r->ax = r->bx = r->cx = r->dx = r->bp = 0;
+    r->si = r->di = r->last = 0;
     r->ds = 0;
     for (;;) {
         command = Loop(entry, r);

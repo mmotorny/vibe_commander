@@ -110,7 +110,7 @@ void PutInf(struct WCBdef *panel)
         count = 0;
         cluster = ClusterBytes;
         for (file = ENTRY(other, DSKBUF);
-             (const u8 *)file - (const u8 *)other < other->EndBuf;
+             (const u8 *)file - (const u8 *)other < PLACES(other)->EndBuf;
              file++) {
             if (file->AttrF & ATTR_DIRECTORY)
                 continue;
@@ -127,8 +127,10 @@ void PutInf(struct WCBdef *panel)
                 size += cluster - size % cluster;
             total += size;
         }
-        /* The count fits: a panel holds 2,703 entries, ReDr00. */
-        Number(md.TmpErr + 1, 0, (u16)count, NUM_SEPARATED);
+        /* The count in its two words: a panel holds more than 65,535
+           entries where there is the memory, ReDr00. */
+        Number(md.TmpErr + 1, (u16)(count >> 16), (u16)count,
+               NUM_SEPARATED);
         Number(md.TmpErr + 101, (u16)(total >> 16), (u16)total,
                NUM_SEPARATED);
         /* "files uses" without the one s or the other, and "bytes"

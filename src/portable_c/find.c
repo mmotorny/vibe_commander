@@ -1064,9 +1064,9 @@ close:
     to = wcb->WinPath;
     for (i = 0; i < LenPath + 1; i++)
         to[i] = from[i];
-    wcb->CurAdr = DSKBUF;
-    wcb->First = DSKBUF + sizeof(struct FILENT);
-    wcb->EndBuf = DSKBUF + sizeof(struct FILENT);
+    PLACES(wcb)->CurAdr = DSKBUF;
+    PLACES(wcb)->First = DSKBUF + sizeof(struct FILENT);
+    PLACES(wcb)->EndBuf = DSKBUF + sizeof(struct FILENT);
     wcb->DskBuf[0].NameF[0] = 0;
     wcb->DskBuf[1].NameF[0] = 0;
     from = Line(FND->FndCur);

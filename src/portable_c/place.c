@@ -19,7 +19,7 @@
  */
 #include "vc.h"
 
-u16 NumAdr(struct WCBdef *panel, i32 number);
+i32 NumAdr(struct WCBdef *panel, i32 number);
 
 /* struct Place, BegBX, SizDX, LnsAX, InvWCB, FilePan, AdrNum and CorPar
    are in vc.h, and so is ChgAdr, with struct Shown. */
@@ -40,15 +40,14 @@ u16 NumAdr(struct WCBdef *panel, i32 number);
 
 /* The number of the entry at an address, and the address of the entry
    with a number: in a list of files, and in the tree. An address in a
-   panel is 16 bits by the panel's layout, which FILE_ADDRESS says. The
-   number of an entry of the tree is a difference of two pointers into
-   its list, which is in TreeBuf of the main data, shorter than 64K: an
-   i32 holds it, on a machine whose pointers have 64 bits too. */
+   panel is not below DSKBUF, where the list begins. The number of an
+   entry of the tree is a difference of two pointers into its list,
+   which is in TreeBuf of the main data, shorter than 64K: an i32 holds
+   it, on a machine whose pointers have 64 bits too. */
 #define FILE_NUMBER(address) \
-    ((i32)(u16)((address) - DSKBUF) / (i32)sizeof(struct FILENT))
+    (((address) - DSKBUF) / (i32)sizeof(struct FILENT))
 #define TREE_NUMBER(entry) ((i32)((entry) - TRELIST))
-#define FILE_ADDRESS(number) \
-    ((u16)(((number) << 4) + ((number) << 3) + (i32)DSKBUF))
+#define FILE_ADDRESS(number) (((number) << 4) + ((number) << 3) + DSKBUF)
 #define TREE_ADDRESS(number) (TRELIST + (number))
 
 /* Where on the screen a panel begins: the row in the high byte, below the
@@ -93,9 +92,9 @@ bool FilePan(struct WCBdef *panel)
 #define PLACE(wcb, cursor, first, last, lines) \
     do { \
         if ((wcb)->WinTyp == 0) { \
-            cursor = FILE_NUMBER((wcb)->CurAdr); \
-            first = FILE_NUMBER((wcb)->First); \
-            last = FILE_NUMBER((wcb)->EndBuf); \
+            cursor = FILE_NUMBER(PLACES(wcb)->CurAdr); \
+            first = FILE_NUMBER(PLACES(wcb)->First); \
+            last = FILE_NUMBER(PLACES(wcb)->EndBuf); \
             lines = LINES(ROWS()); \
         } else { \
             cursor = TREE_NUMBER(TreeCursor); \
@@ -120,24 +119,24 @@ void AdrNum(struct WCBdef *panel, struct Place *place)
 
 /* The address of the entry with a number, in the list of a panel: its
    offset in the panel, or in the tree's list. */
-u16 NumAdr(struct WCBdef *panel, i32 number)
+i32 NumAdr(struct WCBdef *panel, i32 number)
 {
     if (panel->WinTyp == 0)
         return FILE_ADDRESS(number);
-    return (u16)(number << 4);          /* TreeBuf holds 768 entries */
+    return number << 4;
 }
 
 /* Give a panel another cursor and another first line, as such offsets,
    and return those it had. */
-struct Shown ChgAdr(struct WCBdef *panel, u16 cursor, u16 first)
+struct Shown ChgAdr(struct WCBdef *panel, i32 cursor, i32 first)
 {
     struct Shown was;
 
     if (panel->WinTyp == 0) {
-        was.cursor = panel->CurAdr;
-        was.first = panel->First;
-        panel->CurAdr = cursor;
-        panel->First = first;
+        was.cursor = PLACES(panel)->CurAdr;
+        was.first = PLACES(panel)->First;
+        PLACES(panel)->CurAdr = cursor;
+        PLACES(panel)->First = first;
     } else {
         was.cursor = TREE_OFFSET(TreeCursor);
         was.first = TREE_OFFSET(TreeFirst);
@@ -173,8 +172,8 @@ void CorPar(struct WCBdef *panel)
         first = first >= lines ? first - lines : 0;
     }
     if (panel->WinTyp == 0) {
-        panel->CurAdr = FILE_ADDRESS(cursor);
-        panel->First = FILE_ADDRESS(first);
+        PLACES(panel)->CurAdr = FILE_ADDRESS(cursor);
+        PLACES(panel)->First = FILE_ADDRESS(first);
     } else {
         TreeCursor = TREE_ADDRESS(cursor);
         TreeFirst = TREE_ADDRESS(first);

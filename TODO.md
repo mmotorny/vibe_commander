@@ -16344,6 +16344,191 @@ half of the time.
 The program: `VC.EXE` a9421c89... of `main` at 96e8039; 2f2fc833...
 with N22.
 
+### P, the panel without its limit: done, and what a later piece should know
+
+**What the user decided.** On 14 October 2026, as `CLAUDE.md` has it:
+a panel's memory grows as its directory needs, with no ceiling of
+entries and nothing reserved for it beforehand, and a scenario of it is
+kept only if it runs in reasonable time, the one that took ten minutes
+being dropped. A first form of the piece had taken a block of some
+1.5 MB for each panel when the program started, as much as 65,536
+entries take, or a quarter of the memory where there was less; that
+was a ceiling and a reservation both, and is not what landed.
+
+**What there is.** A panel holds as many entries of a directory as there
+is memory for, where the original stops at 2,703 (`DEVIATIONS.md`, 27).
+A panel's block begins with `struct Places` of `vc.h`, 32 bytes: the
+block's length, `Bytes`, three words unused, and the four places of the
+list, `CurAdr`, `First`, `EndBuf` and `EndFul`, `i32` each, in the
+paragraph right in front of the panel, `PLACES(panel)`. The panel keeps
+the original's words as `CurAdr16`, `First16`, `EndBuf16` and
+`EndFul16`, unset and unread, so that its layout, `WCBini` and the setup
+file are as they were, and a read of the old name does not compile.
+`ENTRY` has no cut. `DSKBUF` is an `i32`.
+
+- `Init11` of `start.c` takes each panel's block as `PANEL_LEAST`, the
+  original's 64K and the places, which holds 2,703 entries, and the
+  room behind them as before, the largest block that there is.
+- `ReDr00` of `read.c` ends the list a paragraph and two entries,
+  `PANEL_TAIL`, short of the block's end, as the original does short of
+  64K. Where DOS has another entry to give there, it asks `PanelGrow`
+  of `start.c` for a longer block and goes on; only where that answers
+  0 does it beep and stop, as the original does at 2,703.
+- `PanelGrow` makes the room as short as the old list that it holds, but
+  not shorter than `LEAST_ROOM`, and the panel's block twice as long, or
+  as long as the largest block that there is if it is longer than the
+  panel's and twice is too much. The extender moves a block that cannot
+  grow where it is, with what it holds (`TODO.md`, "X", rows 8 and 9):
+  the panel goes behind what is taken, and the room, made shorter,
+  stays where it begins. Both answers are taken as addresses whatever
+  they are, since DPMI promises neither.
+- When the directory has been read, `PanelFit` makes the block as short
+  as the list with its tail, but not shorter than `PANEL_LEAST`; and
+  `ReDir`, behind `ReDr50`, which still reads the old list in the room,
+  takes the room again, `RoomAgain`: given back and taken as the largest
+  block that there is, where it may begin elsewhere. That is done only
+  where a block was made longer or shorter, which no scenario does.
+- A block that moves has the four pointers to the panels, `LeftPanel`,
+  `RightPanel`, `CurrentPanel` and `OtherPanel`, made to point where it
+  is (`Moved` of `start.c`). `ReDir` takes the panel as `struct WCBdef
+  **` and leaves it there; its one caller, `Init50` of `main.c`, takes
+  `panel` and `wcb` again from it, and the main loop takes the current
+  panel from `CurrentPanel` behind `Init50`, as it did. Nothing else
+  holds a pointer to a panel or into a list across `ReDir`: a place in
+  a list is an offset from the panel everywhere, the main data's words
+  of it too.
+- The numbers of entries that go round the main loop for the mouse are
+  `i32`: SI and DI of `struct Regs`, which carry nothing else, and
+  `last`, the number that the original has in DX for `F01_05`. DX keeps
+  it as well, cut to its 16 bits with `wraps`, for what reads DX as the
+  loop leaves it; AX the number under the mouse, as the original has
+  it, for the double click. `Func40` of `main.c` takes a number below
+  the first entry for one above the last, which is what the wrapping of
+  16 bits made of it.
+- `NumbF` of an entry, the order in which DOS gave it, stays the
+  original's word of 16 bits: an entry's layout is the original's, 24
+  bytes, which every place that steps through a list counts in and which
+  the image's tool reads by the original's listing, and a directory of
+  DOS has 65,536 entries at the most. `number` in `ReDr00` is an `i32`,
+  and the cut is written with that reason. A panel stops at 65,536
+  entries for good, as the user decided later on 14 October 2026
+  (`CLAUDE.md`): a system that is not DOS shows at most so many entries
+  of a directory, which is declared when such a system comes.
+
+Every number that held a place in a panel is an `i32`, by the record of
+`harness/width.py`: `struct Shown`, `struct OldList`, `FnFile`, `NearFl`,
+`NumAdr`, `ChgAdr`, `F00_50`, `Search`, and the variables of `cmdline.c`,
+`commands.c`, `copy.c`, `dirfunc.c`, `enter.c`, `files.c`, `keys.c`,
+`panel.c`, `place.c`, `read.c` and `usermenu.c`. What stays 16 bits:
+BX and DX that `F00_50` leaves for Rename, cut with a comment that no
+such cut is 0; the tree's offsets, `TREE_OFFSET`, its list being short.
+The counts that fitted by 2,703, in `info.c`, `main.c` and `panel.c`,
+are shown in their 32 bits, or say why they fit. `FncSel` of
+`dirfunc.c` tested a file above the page by a difference wrapping in 16
+bits; it tests `address >= First` now.
+
+**The harness.** `harness/dataimage.py` knows a build with the places by
+the symbol `PanelGrow_` and puts them, cut to 16 bits, into the panel's
+original words when it reads the image, so that such a build is held
+against one from before word for word; the 32 bytes in front of the
+panel are a part that a build from before has not. `KEPT` of
+`harness/le.py` is `PANEL_LEAST` twice, 32 bytes more than a panel was,
+for where a second copy of the program is loaded; a scenario that ran a
+program with a panel that has grown would have it elsewhere, and there
+is none. `harness/int16.txt` has the places of the kind `widen` with
+their reason, `harness/width.txt` the fields unused.
+
+**The test of merges.** `harness/conflicts.py`, asked by the test
+`portable_c-words`, fails for a line of a merge's conflict in any file
+that git tracks but for `src/asm` and the goldens.
+
+**The scenario that was dropped.** `panel-full` made C:\WORK\FULL of
+2,873 empty files by copies to masks, thirteen letters in each of the
+first three places of the name and then the 676 of the last four
+letters to the extension Z, every copy of files that both programs
+list, and was held to the original's golden by a patch of the rows that
+differ: the last files of the list, the count of what is selected, the
+count of the files in the Info panel. It took the original six minutes
+and the portable C eight to ten, and was dropped as the user decided:
+the time is DOS's, creating some 2,900 files in a directory that grows,
+and a directory has to have 2,704 entries to pass the original's
+limit. Its steps, for whoever wants to see it again: `F7 "full" Enter`,
+`Enter`, `Shift+F5` with `"c:\work\empty.dat" Tab
+"c:\work\full\aaaaaaaa.aaa" Enter`; then for each of the first three
+places of the name `GrayPlus "*.*" Enter` and, for each letter from b to
+m, `Ctrl+m F5` with the mask that has the letter in that place, `"b*.*"`,
+`"?b*.*"`, `"??b*.*"`, `Enter`; then `GrayPlus` of `"j*.*"` to `"m*.*"`
+and `F5 "*.z" Enter`; then `Home`, `End`, `GrayPlus "*.*" Enter` and
+`Ctrl+l`. In a copy of the harness, with the scenario put back, its
+golden derived from the original (`python3 harness/goldens.py derive
+panel-full`, six minutes), its patch made (`python3 harness/goldens.py
+patch --tree portable_c panel-full`), and the step's time raised
+(`STEP_TIME` of `harness/scenarios.py`, 1,200 seconds: the last copy
+takes longer than 300 on a host that is busy).
+
+**How growing was seen.** On a build of the tree with `PANEL_LEAST`
+made `sizeof(struct Places) + 0x1C00` in a copy, a block that holds 273
+entries (the panel's fields, 0x262 bytes, have to fit too), configured
+and built in `build/` as a copy of `main` is: the scenarios
+`enter-many` and `enter-many-selected`, whose directory of 288 files
+the panel then does not hold, passed as they pass with the build of the
+tree, against the original's golden and the patch of the second, and
+their images had the left panel's block grown, moved behind the right
+one's and made as short as its list again, 7,648 bytes where it began
+with 7,216, with the room taken again behind it and the pointers to the
+panels where the block is (`python3 harness/dataimage.py show`). Both
+scenarios run a command afterwards, so the room was given back and
+taken again with the panel where it had gone. That is a part of the
+program replaced in a test build, as "Scenarios" of `CLAUDE.md` allows,
+and is not kept. With the tree as it is, `panel-full` was run in a copy
+of the harness as above, twice, on a host with a load of some 34 on
+four processors, and was given up in its last copy both times, at 300
+and at 1,200 seconds, with the program still copying, 63 and 96 files
+from the end, before the read that grows the panel: the time is DOS's,
+and the build of the tree was not seen past 2,703 entries for that.
+
+**What was not tried.** The program where the memory runs out while a
+panel grows: `PanelGrow` then answers 0, `ReDr00` beeps and stops with
+what the block holds, as the original does at 2,703, and the room is
+taken again; that wants a machine with little memory and a directory
+of thousands of files, `harness/trial32/second.c` and the steps above,
+and was not run. The Sort and the search of `NearFl` with tens of
+thousands of entries: the Sort is the original's, by halving gaps, and
+`NearFl` and `ReDr50` find each selected file of the old list by name
+in the new one, as the original does, which is quadratic. Nothing
+measured them.
+
+**The images**, of `main` at 63360dd saved by its own tool, against the
+build with `--changed` for "the blocks", "behind the panels", `FreMem2`,
+`ViewSeg`, `edit.EdSpace`, `MenuBuf` and `FndData`: 158 scenarios, 0
+differences outside those. Every panel is equal, its places folded into
+its words. What was declared follows where the room begins, behind
+panels that are 32 bytes longer for their places and behind objects
+that are longer by the code of this piece: the 32 bytes in front of
+each panel; what the room has behind its text, which is what the
+machine's start left in the memory, at another offset in the room; its
+end, `FreMem2`, and `ViewSeg`; the editor's free bytes; the file
+search's count of what fits in the room, `FndData.FndFls` at
+`TmpBuf+112`, the field being declared by its structure, which is as
+narrow as the tool takes; and `MenuBuf`, the editor's line, which copies
+bytes from behind the text in the room, as F9 found, in `comspec`,
+`start-setup`, `command-edit`, `editor-save` and `sizes`.
+
+**For whoever lands it.** The two commits are made on `main` at 63360dd
+and are not pushed: the test of merges, then the piece. At a rebase,
+`harness/width.txt`, `harness/int16.txt`, `harness/words.txt` and
+`harness/hostcheck.txt` are written anew with `--record`, not merged.
+`--record` keeps the reason of an entry whose line is as it was, from
+the file that it is given: for `harness/width.txt` that is `main`'s
+file with this piece's entries that have reasons put in front of its
+own, which win where both have one, so that neither side's reasons are
+lost. Those of this piece are the four fields `unused` of `struct WCBdef`,
+the places of a sign in `dirfunc.c`, `info.c`, `panel.c`, `place.c` and
+`start.c`, `struct Regs` with its five numbers, and the places of the
+kind `widen` in `harness/int16.txt` with "A place in a panel's block".
+Then `python3 tools/figures.py --write`. The checks: the whole suite,
+and the images against `main`'s with the `--changed` list above.
+
 ## Step 5: a second implementation of `sys.h`
 
 The road of `CLAUDE.md`, step 5: an implementation of `sys.h` that is

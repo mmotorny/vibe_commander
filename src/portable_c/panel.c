@@ -251,23 +251,23 @@ void PutFls(struct WCBdef *panel)
     u8 *text;
     const u8 *from;
     u32 size;
-    u16 place, address, color, c;
-    i32 lines, count, bottom, i;
+    u16 place, color, c;
+    i32 address, lines, count, bottom, i;
 
     CorPar(panel);
     lines = LnsAX();
     count = lines;
     place = BegBX(panel) + 0x201;
     bottom = (u8)((place >> 8) + lines);
-    address = wcb->First;
+    address = PLACES(wcb)->First;
     if (wcb->BrfFul == 0)
         count += lines + lines;
     do {
-        if (address >= wcb->EndBuf)
+        if (address >= PLACES(wcb)->EndBuf)
             break;
         file = ENTRY(wcb, address);
         color = Back_C;
-        if (address == wcb->CurAdr && panel == CurrentPanel)
+        if (address == PLACES(wcb)->CurAdr && panel == CurrentPanel)
             color = Cursr_C;
         if (file->AttrF & ATTR_SELECTED)
             color += Slct_C;
@@ -327,7 +327,7 @@ void PutFls(struct WCBdef *panel)
     for (i = 0; i < 38; i++)
         screen[i] = color | ' ';
     address = DSKBUF;
-    if (address >= wcb->EndBuf)
+    if (address >= PLACES(wcb)->EndBuf)
         return;
     size = 0;
     count = 0;
@@ -339,9 +339,9 @@ void PutFls(struct WCBdef *panel)
             count++;
         }
         address += sizeof(struct FILENT);
-    } while (address < wcb->EndBuf);
+    } while (address < PLACES(wcb)->EndBuf);
     if (count == 0) {
-        file = ENTRY(wcb, wcb->CurAdr);
+        file = ENTRY(wcb, PLACES(wcb)->CurAdr);
         MovDz0(screen, file->NameF);
         SzDtTm(wcb, file, screen + 12, color);
         return;
@@ -354,8 +354,9 @@ void PutFls(struct WCBdef *panel)
         text--;                         /* 1 byte */
     for (; i < 10; i++)
         *text++ = BytIn_S[i];
-    /* The count fits: a panel holds 2,703 entries, ReDr00. */
-    text = Number(text, 0, (u16)count, NUM_SEPARATED);
+    /* The count in its two words: a panel holds more than 65,535
+       entries where there is the memory, ReDr00. */
+    text = Number(text, (u16)(count >> 16), (u16)count, NUM_SEPARATED);
     for (; i < 25; i++)
         *text++ = BytIn_S[i];
     if (count == 1)
@@ -410,7 +411,7 @@ void SetCur(struct WCBdef *panel, bool set)
     if (panel->WinTyp > 1)
         return;
     if (panel->WinTyp == 0) {
-        if (panel->CurAdr >= panel->EndBuf)
+        if (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf)
             return;
         place = BegBX(panel) + 0x201;
         width = 38;
@@ -424,7 +425,7 @@ void SetCur(struct WCBdef *panel, bool set)
         }
         place += (below & 0xFF) << 8;
         screen = BasAdr(place);
-        attributes = ENTRY(panel, panel->CurAdr)->AttrF;
+        attributes = ENTRY(panel, PLACES(panel)->CurAdr)->AttrF;
         mark = (u8 *)(screen + 8);
         *mark = ' ';
         if (attributes & (ATTR_HIDDEN | ATTR_SYSTEM))
@@ -478,9 +479,10 @@ u8 *FilDir(u8 *buffer, i32 directories, i32 files)
     i32 i;
 
     if (files != 0) {
-        /* Both counts fit: they are of what a panel holds, 2,703
-           entries, ReDr00. */
-        buffer = Number(buffer, 0, (u16)files, NUM_SEPARATED);
+        /* Both counts in their two words: they are of what a panel
+           holds, which may be more than 65,535 entries, ReDr00. */
+        buffer = Number(buffer, (u16)(files >> 16), (u16)files,
+                        NUM_SEPARATED);
         for (i = 0; i < 6; i++)
             *buffer++ = FilDi_S[i];
         if (files == 1)
@@ -490,7 +492,8 @@ u8 *FilDir(u8 *buffer, i32 directories, i32 files)
         for (; i < 11; i++)
             *buffer++ = FilDi_S[i];
     }
-    buffer = Number(buffer, 0, (u16)directories, NUM_SEPARATED);
+    buffer = Number(buffer, (u16)(directories >> 16), (u16)directories,
+                    NUM_SEPARATED);
     for (i = 11; i < 23; i++)
         *buffer++ = FilDi_S[i];
     if (directories == 1) {

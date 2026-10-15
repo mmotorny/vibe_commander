@@ -2004,9 +2004,9 @@ static struct Onward F34_01(struct WCBdef *panel, u16 how)
     if (panel->Visible == 0)
         return F44_01(how);
     if (panel->WinTyp == 0) {
-        if (panel->CurAdr >= panel->EndBuf)
+        if (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf)
             return To(NEXT_FUNC04);
-        file = ENTRY(panel, panel->CurAdr);
+        file = ENTRY(panel, PLACES(panel)->CurAdr);
         if (file->AttrF & ATTR_DIRECTORY)
             return To(NEXT_FUNC04);
         for (i = 0; i < 13; i++)

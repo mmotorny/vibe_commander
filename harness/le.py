@@ -80,8 +80,14 @@ BENCH = 0x00100010
 IN_FRONT = 16
 # What the portable C keeps of the extender's memory while a program
 # that it has run is in the memory, in bytes: the blocks of its two
-# panels (PANEL_BYTES of vc.h), which it takes behind its objects.
-KEPT = (0x10000, 0x10000)
+# panels, which it takes behind its objects, each as long as PANEL_LEAST
+# of vc.h, the original's 64K and the 32 bytes in front of the panel.
+# A panel's block grows while it reads a directory of more entries than
+# that holds, 2,703, and shrinks to it again with one of fewer: a
+# scenario that runs a program with such a directory in a panel would
+# have it elsewhere, and there is none.
+PANEL_LEAST = 32 + 0x10000
+KEPT = (PANEL_LEAST, PANEL_LEAST)
 
 # The header of a linear executable, as offsets in it. The tables are
 # counted from the header, the pages from the beginning of the file.

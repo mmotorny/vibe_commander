@@ -51,7 +51,7 @@ extern const u8 Name_S[];
 
 static const u8 CDir_S[] = "\\";
 
-static struct Onward F23_02(struct WCBdef *panel, u16 address);
+static struct Onward F23_02(struct WCBdef *panel, i32 address);
 
 /* What a command returns, struct Onward of vc.h: the place where the
    program goes on, a NEXT_ there. None of these places takes a panel. */
@@ -194,8 +194,7 @@ struct Onward F21_10(struct WCBdef *panel)
     const u8 *from;
     u8 *command;
     struct Edited edited;
-    u16 address;
-    i32 cursor, i;
+    i32 address, cursor, i;
     u8 c;
 
     if (panel->WinTyp == 1) {
@@ -218,8 +217,8 @@ struct Onward F21_10(struct WCBdef *panel)
     }
     if (panel->WinTyp != 0)
         return To(NEXT_FUNC04);
-    address = panel->CurAdr;
-    if (address >= panel->EndBuf)
+    address = PLACES(panel)->CurAdr;
+    if (address >= PLACES(panel)->EndBuf)
         return To(NEXT_FUNC04);
     file = ENTRY(panel, address);
     if (file->AttrF & ATTR_DIRECTORY)
@@ -229,7 +228,7 @@ struct Onward F21_10(struct WCBdef *panel)
         for (i = 0; i < LenMenu - 1; i++)
             md.MenuBuf[i] = from[i];
         md.MenuBuf[LenMenu - 1] = 0x1A;
-        command = FindExt(ENTRY(panel, panel->CurAdr)->NameF);
+        command = FindExt(ENTRY(panel, PLACES(panel)->CurAdr)->NameF);
         if (command == 0)
             return To(NEXT_FUNC04);
         command--;
@@ -239,7 +238,7 @@ struct Onward F21_10(struct WCBdef *panel)
         return To(NEXT_FUNC04);
     }
     /* The name is typed into the command line, as far as that takes it. */
-    file = ENTRY(panel, panel->CurAdr);
+    file = ENTRY(panel, PLACES(panel)->CurAdr);
     cursor = 0;
     md.DosBuf[0] = 0;
     for (i = 0; (c = file->NameF[i]) != 0; i++) {
@@ -298,7 +297,7 @@ void F24_02(struct WCBdef *panel)
    name of the directory that is left: the cursor is put on that name when
    the list has been read. The name is taken off the path of the panel
    with it, 12 bytes of it whatever its length. */
-static struct Onward F23_02(struct WCBdef *panel, u16 address)
+static struct Onward F23_02(struct WCBdef *panel, i32 address)
 {
     struct FILENT *file = ENTRY(panel, address);
     u8 *name;
@@ -310,9 +309,9 @@ static struct Onward F23_02(struct WCBdef *panel, u16 address)
     if (DirChange(file->NameF).failed)
         return To(NEXT_FUNC04);
     if (file->NameF[0] == '.') {
-        panel->CurAdr = DSKBUF;
-        panel->First = DSKBUF + sizeof(struct FILENT);
-        panel->EndBuf = DSKBUF + sizeof(struct FILENT);
+        PLACES(panel)->CurAdr = DSKBUF;
+        PLACES(panel)->First = DSKBUF + sizeof(struct FILENT);
+        PLACES(panel)->EndBuf = DSKBUF + sizeof(struct FILENT);
         ENTRY(panel, DSKBUF + sizeof(struct FILENT))->NameF[0] = 0;
         name = CUT_PATH(panel->WinPath);
         file = ENTRY(panel, DSKBUF);
@@ -335,7 +334,7 @@ struct Onward F22_00(struct WCBdef *panel)
         return To(NEXT_FUNC05);
     if (!FilePan(panel))
         return To(NEXT_FUNC05);
-    if (DSKBUF >= panel->EndBuf)
+    if (DSKBUF >= PLACES(panel)->EndBuf)
         return To(NEXT_FUNC05);
     if (!(ENTRY(panel, DSKBUF)->AttrF & ATTR_DIRECTORY))
         return To(NEXT_FUNC05);
@@ -345,11 +344,11 @@ struct Onward F22_00(struct WCBdef *panel)
 /* ^PgDn: the directory under the cursor. */
 struct Onward F23_00(struct WCBdef *panel)
 {
-    u16 address = panel->CurAdr;
+    i32 address = PLACES(panel)->CurAdr;
 
     if (!FilePan(panel))
         return To(NEXT_FUNC05);
-    if (address >= panel->EndBuf)
+    if (address >= PLACES(panel)->EndBuf)
         return To(NEXT_FUNC05);
     if (!(ENTRY(panel, address)->AttrF & ATTR_DIRECTORY))
         return To(NEXT_FUNC05);
@@ -363,7 +362,7 @@ static struct Onward ChDir(struct WCBdef *panel, const u8 *path)
 {
     if (DirChange(path).failed)
         return To(NEXT_FUNC04);
-    panel->EndBuf = DSKBUF;
+    PLACES(panel)->EndBuf = DSKBUF;
     F24_02(panel);
     return To(NEXT_INIT50);
 }
@@ -510,9 +509,9 @@ struct Onward F27_00(struct WCBdef *panel)
 F27_05:
     if (!FilePan(panel))
         return To(NEXT_FUNC05);
-    if (panel->CurAdr >= panel->EndBuf)
+    if (PLACES(panel)->CurAdr >= PLACES(panel)->EndBuf)
         return To(NEXT_FUNC05);
-    file = ENTRY(panel, panel->CurAdr);
+    file = ENTRY(panel, PLACES(panel)->CurAdr);
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = file->NameF[i];
     F27_07(md.TmpBuf, cursor);

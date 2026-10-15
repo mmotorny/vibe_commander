@@ -108,15 +108,17 @@ below the megabyte stays the extender.
   they are the extender's, above the megabyte, which the program asks
   for as the original asks DOS for its block, and of which it gets as
   much as the machine has. They are three blocks where the original has
-  one that it cuts up: one for each panel, 64K, which is as long as a
-  panel's list of files can get, asked for when the program starts and
-  kept for as long as it runs; and the room, the largest block that
-  there is then, which is all that the extender has behind the panels:
-  the README's figures have how much that is on the bench of the tests,
-  some 15 MB, and 13 says what follows for the editor. The original has
-  each panel as long as its list and the room behind them, and moves
-  the second panel and the room when a list grows or shrinks; here
-  nothing is moved. For a command the room is given back, and
+  one that it cuts up: one for each panel, 64K, which is as long as the
+  original's panel's list of files can get, asked for when the program
+  starts and kept for as long as it runs, and made longer for a
+  directory of more entries than that holds (27); and the room, the
+  largest block that there is then, which is all that the extender has
+  behind the panels: the README's figures have how much that is on the
+  bench of the tests, some 15 MB, and 13 says what follows for the
+  editor. The original has each panel as long as its list and the room
+  behind them, and moves the second panel and the room when a list
+  grows or shrinks; here nothing is moved but for a panel whose list
+  grows past 64K, and the room then gives way (27). For a command the room is given back, and
   afterwards the program asks for the largest block that there is, as
   the original does. DOS gains nothing by that; a program that the same
   extender starts, a second copy of the program among them, gets its
@@ -1668,8 +1670,9 @@ its text in the extender's memory, above the megabyte, of which it asks
 for as much as there is, as the original asks DOS (`TODO.md`, "The
 portable C in a flat memory: the plan", "The memory from the
 extender"): its editor has all of that but its own objects and its two
-panels, 64K each, whatever DOS has free. The README's figures have how
-much that is on the bench of the tests, some 15 MB: more than forty
+panels, 64K each unless a directory has needed more (27), whatever DOS
+has free. The README's figures have how much that is on the bench of
+the tests, some 15 MB: more than forty
 times the original's room there, 345,840 bytes. From when it was
 switched to 32 bits until the memory was the extender's, on 14 October
 2026, the program handed out 640 KB of its own instead, and its room
@@ -2357,3 +2360,73 @@ fewer clusters if FreeDOS takes clusters of 64K there, which was not
 tried. Every scenario that shows the Info panel is held to the
 original's golden as it is, which shows that a disk of smaller clusters
 is counted as the original counts it.
+
+### 27. A panel holds as many entries of a directory as there is memory for
+
+**What the original does.** A panel's list of files is in the panel's
+segment, behind its fields, and the places in it, of the cursor, of the
+first entry shown and of the list's two ends, are offsets of 16 bits.
+`ReDr00` of `VCSUB3.INC` reads a directory into it until the next entry
+would come within a paragraph and two entries of 64K: so a panel holds
+2,703 entries, `..` among them where the directory is not a root, and
+when DOS has a 2,704th to give, the program beeps and shows the 2,703.
+What lies behind them is neither shown nor selected nor counted, in the
+panel, in the Info panel or by a command that goes through the files of
+the panel. The entries kept are the first that DOS gives, which are then
+sorted. A root of FAT12 or FAT16 has room for no more than 512 entries,
+so a subdirectory, or the root of a FAT32 disk, gets there.
+
+**What the portable C does.** The places are numbers of 32 bits, in
+front of the panel in its block, `struct Places` of `vc.h`, where the
+panel keeps the original's words unset. A panel's block is the
+original's 64K when the program starts, and nothing more is reserved
+for it. When its list fills it while a directory is read, the block is
+made twice as long, or as long as the largest block that the extender
+has where there is not that much, and the program goes on reading; the
+room, which has the old list in it then and all the rest of the memory
+behind the panels, is made as short as the old list first, so that the
+panel can grow into what it gives back. When the directory has been
+read, the block is made as short as its list, but not shorter than
+64K, and the room is taken again, the largest block that there is.
+The extender may move a block that it makes longer, and the four
+pointers to the panels are then made to point where it is; nothing
+else keeps a pointer to a panel across the read. So a panel has no
+ceiling of entries: the list ends where the memory does, with the
+original's beep, and on the bench of the tests every directory is read
+whole. What is selected is kept when a panel is read again, as far as
+the room holds the old list, where the original keeps no more than 64K
+of it. The counts that the program shows of a panel's files, in the
+line of what is selected and in the Info panel, and the numbers of the
+entries that go round the main loop for the mouse, are of 32 bits. An
+entry keeps its number, the order in which DOS gave it, in the
+original's word of 16 bits, the layout of an entry being the
+original's: a directory of DOS has 65,536 entries at the most, and a
+panel stops there for good, on the user's word of 14 October 2026, so
+that a system that is not DOS shows at most so many entries of a
+directory, which is declared with that system. What the room held before a panel grew or shrank is not kept, where the
+original moves the room with what it holds; the original writes the
+old list over its start in either case. `Init11`, `PanelGrow`,
+`PanelFit` and `RoomAgain` of `start.c`, `ReDr00` and `ReDr50` of
+`read.c`, the main loop's numbers of entries in `main.c`, and the
+places of a panel wherever they are read.
+
+**Why.** The user's decision, on 14 October 2026, as `CLAUDE.md` has it
+under "The portable C": a panel holds as many entries of a directory as
+the memory allows, where the original stops at 2,703, lifted by a piece
+of its own at the end of step 2, the piece P (`TODO.md`, "P, the panel
+without its limit"). It is the limit of 16 bits that a user of a file
+manager meets first.
+
+**Which scenarios show it.** None. A directory of more than 2,703
+entries can be made on the bench only through the program's own keys,
+by its copies, and making it took the original six minutes and the
+portable C eight to ten: the time is DOS's, creating some 2,900 files
+in a directory that grows, which any way of making them through the
+program has to have it do as well. The scenario that did so, `panel-full`, was dropped on the user's word
+of 14 October 2026, that such a scenario is kept only if it runs in
+reasonable time. What it showed, and that the panel's block grows and
+moves while it is read and shrinks again, was seen on the build that
+made this, by its steps (`TODO.md`, "P, the panel without its limit").
+Every scenario shows that a directory that the original's 64K hold is
+read as it was, in a panel's block of 64K and the places, and is held
+to the original's golden.

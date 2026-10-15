@@ -4,16 +4,21 @@
  *
  * Translated from VCSUB2.INC and VCSUB3.INC.
  *
- * Each panel has a block of the memory of its own, 64K, which is as long
- * as a list of files can get, and the room that the viewer and the
- * editor take is a third, at Room (see vc.h). In the original the panels
- * lie one behind the other, each as long as its list, and the room
- * begins behind them, at ViewSeg: before a directory is read the panel
- * behind the one that reads is moved up as far as it goes, so that the
- * list may grow, and afterwards down again to where the list ends.
- * Nothing is moved here. While the directory is read the list that the
- * panel had is kept in the room: what was selected in it and where the
- * cursor was is looked up in the new one by name.
+ * Each panel has a block of the memory of its own, the original's 64K at
+ * the least, and the room that the viewer and the editor take is a
+ * third, at Room (see vc.h). In the original the panels lie one behind
+ * the other, each as long as its list, and the room begins behind them,
+ * at ViewSeg: before a directory is read the panel behind the one that
+ * reads is moved up as far as it goes, no further than 64K from where
+ * the panel begins, so that the list may grow, and afterwards down
+ * again to where the list ends. Here a panel's block is made longer
+ * while the directory is read, as often as its list fills it, and as
+ * short as the list when it has been read, never shorter than 64K: the
+ * extender may move it to do either, and the room then gives way and is
+ * taken again (PanelGrow, PanelFit and RoomAgain of start.c). While the
+ * directory is read the list that the panel had is kept in the room:
+ * what was selected in it and where the cursor was is looked up in the
+ * new one by name.
  *
  * ReDir chooses by which of the three kinds a panel is of: RdInfo for
  * the Info, for the tree ReadTre of treebox.c, and for files ReDr00,
@@ -34,12 +39,17 @@
 struct OldList {
     bool keep;                          /* the cursor and what is selected
                                            are to stay */
+    bool resized;                       /* the room was made shorter for
+                                           the panel, or the panel's block
+                                           shorter, and the room is to be
+                                           taken again */
     i32 end;                            /* how long the list is, in bytes */
-    u16 cursor;                         /* where in it the cursor was */
-    u16 first;                          /* and the first entry shown */
+    i32 cursor;                         /* where in it the cursor was */
+    i32 first;                          /* and the first entry shown */
 };
 
-static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old);
+static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
+                             struct OldList *old);
 static void ReDr45(struct WCBdef *panel);
 static void ReDr50(struct WCBdef *panel, struct OldList *old);
 static void RdInfo(struct WCBdef *panel);
@@ -78,8 +88,12 @@ static const u8 DrIn_F[] = "DIRINFO";
    then the entries as DOS has them, but for "." and "..", with the names
    of files in small letters and numbered in that order. A directory that
    is not there is tried again as the current directory of the drive, and
-   then as the root of the current drive. When the list is full, the
-   program beeps and shows what it has.
+   then as the root of the current drive. When the list fills the
+   panel's block, the block is made longer, PanelGrow; where there is no
+   more memory, the program beeps and shows what it has, as the original
+   does when its list is full, at 2,703 entries. Then the block is made
+   as short as the list, PanelFit. Answers with where the panel is: each
+   may move it, and `old` says whether either changed it.
 
    Then the extension file of the directory is read, VC.EXT, or the main
    one taken where it has none.
@@ -94,15 +108,17 @@ static const u8 DrIn_F[] = "DIRINFO";
    lies where the fourth character of the path lies in a panel, which is
    the 24th colour of the first palette: the assembly has DS on the main
    data there. */
-static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
+static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
+                             struct OldList *old)
 {
+    struct WCBdef *grown;
     struct FILENT *entry;
     u8 *to;
     const u8 *from;
     i32 size, count, i;
     i32 number, retries, drive;
-    u16 limit, file;
-    u16 oldCursor, oldFirst;
+    i32 limit, file, bytes;
+    i32 oldCursor, oldFirst;
     u16 attributes, found, answer;
     struct Answer opened, asked, closed;
     struct Moved got;
@@ -110,29 +126,32 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
     /* Expand, in the original: it moves the panel behind this one as
        far up as it goes, but no further than 64K from here, and the
        room with it, so that the list has room to grow. Here a panel has
-       its 64K from the start, and nothing is moved. Where the list has
-       to end is what the original has with memory enough: a paragraph
-       short of 64K, which is as far as it counts in 16 bits. */
-    limit = PANEL_BYTES - 16 - 2 * SIZE_FILENT;
+       a block of its own, which is made longer below when the list
+       fills it. The list ends a paragraph and two entries short of the
+       block's end, as the original's ends so short of 64K, which is as
+       far as it counts in 16 bits: there, at 2,703 entries; here, at as
+       many as the block holds. The places count from where the panel
+       begins, behind its own. */
+    old->resized = false;
+    limit = PLACES(panel)->Bytes - (i32)sizeof(struct Places) - PANEL_TAIL;
 
     /* Keep the old list in the room, as much of it as there is room for
-       in whole entries, and no more than a paragraph short of 64K, which
-       is as far as the original counts in 16 bits: that is more than a
-       panel's list, which is shorter than its block. */
+       in whole entries. The original keeps no more than a paragraph
+       short of 64K, which is as far as it counts in 16 bits, and more
+       than its panel's list; here a list may be longer, and what the
+       room holds of it is kept. */
     size = RoomBytes();
-    if (size > 0xFFF0)
-        size = 0xFFF0;
     size = size / SIZE_FILENT * SIZE_FILENT;
-    count = panel->EndBuf - (i32)DSKBUF;
-    oldCursor = panel->CurAdr;
-    oldFirst = panel->First;
+    count = PLACES(panel)->EndBuf - DSKBUF;
+    oldCursor = PLACES(panel)->CurAdr;
+    oldFirst = PLACES(panel)->First;
     if (count > size) {
         count = size;
-        size += (i32)DSKBUF - SIZE_FILENT;
+        size += DSKBUF - SIZE_FILENT;
         if (oldCursor > size) {
-            oldCursor = (u16)size;
+            oldCursor = size;
             if (oldFirst > size)
-                oldFirst = (u16)size;
+                oldFirst = size;
         }
     }
     from = (const u8 *)panel + DSKBUF;
@@ -213,7 +232,12 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
             }
         } else {
             entry = ENTRY(panel, file);
-            entry->NumbF = (u16)number; /* fewer than the list holds */
+            /* The entry keeps the number in the original's word, the
+               layout of an entry being the original's: a directory of
+               DOS has 65,536 entries at the most, and the number counts
+               from 0, so it fits there. A system with longer
+               directories gives an entry another layout. */
+            entry->NumbF = (u16)number;
             number++;
             for (i = 0; i < 13; i++) {
                 found = md.DTA.FilName[i];
@@ -234,8 +258,16 @@ static void ReDr00(struct WCBdef *panel, bool keep, struct OldList *old)
             break;
         }
         if (file >= limit) {
-            Beep();
-            break;
+            old->resized = true;        /* the room made shorter, at
+                                           least, whatever comes of it */
+            grown = PanelGrow(panel, count);
+            if (grown == 0) {
+                Beep();
+                break;
+            }
+            panel = grown;
+            limit = PLACES(panel)->Bytes - (i32)sizeof(struct Places)
+                    - PANEL_TAIL;
         }
     }
 read:
@@ -245,11 +277,15 @@ unread:
     keep = false;
 ended:
     /* ReDr35 */
-    panel->EndFul = file;
-    panel->EndBuf = file;
-    panel->CurAdr = DSKBUF;
-    panel->First = DSKBUF;
+    PLACES(panel)->EndFul = file;
+    PLACES(panel)->EndBuf = file;
+    PLACES(panel)->CurAdr = DSKBUF;
+    PLACES(panel)->First = DSKBUF;
     md.BlocEr = 0;
+    bytes = PLACES(panel)->Bytes;
+    panel = PanelFit(panel);
+    if (PLACES(panel)->Bytes != bytes)
+        old->resized = true;
 
     /* The extension file of the directory, or else the main one. */
     if (panel->ChgFlg == 0) {
@@ -257,7 +293,7 @@ ended:
         MvzLine(to, Ext_F, LenPath);
         opened = OpenFil(md.TmpBuf, 0x40);
         answer = opened.value;
-        if (opened.failed == 0) {
+        if (!opened.failed) {
             got = FileRead(opened.value, panel->ExtBuf, LenExt - 1);
             closed = FileClose(opened.value);
             if (!closed.failed && !got.failed) {
@@ -289,6 +325,7 @@ ended:
         panel->ExtBuf[i] = md.ExtMain[i];
 done:
     old->keep = keep;
+    return panel;
 }
 
 /* When the directory has been read: work out the sizes of the
@@ -313,8 +350,8 @@ static void ReDr45(struct WCBdef *panel)
 static void ReDr50(struct WCBdef *panel, struct OldList *old)
 {
     const u8 *from;
-    i32 i;
-    u16 attributes, found;
+    i32 i, found;
+    u16 attributes;
 
     from = Room;
     for (i = 0; i < old->end; i += SIZE_FILENT) {
@@ -327,16 +364,16 @@ static void ReDr50(struct WCBdef *panel, struct OldList *old)
                 continue;
         }
         found = FnFile(panel, from + i);
-        if (found < panel->EndBuf)
+        if (found < PLACES(panel)->EndBuf)
             ENTRY(panel, found)->AttrF |= attributes;
     }
     if (old->keep) {
         found = NearFl(panel, from + old->cursor, old->end);
         if (found != 0)
-            panel->CurAdr = found;
+            PLACES(panel)->CurAdr = found;
         found = NearFl(panel, from + old->first, old->end);
         if (found != 0)
-            panel->First = found;
+            PLACES(panel)->First = found;
     }
 
     /* Compress, in the original: it moves the panel behind this one
@@ -383,7 +420,7 @@ static void RdInfo(struct WCBdef *panel)
     drive = (u8)(md.DosPth[0] - ('A' - 1));
     if (Fantom(drive))
         return;
-    space = DriveSpace((u16)drive, 0);
+    space = DriveSpace((u16)drive, false);
     if (space.failed)
         return;
     if (space.value == 0xFFFF)
@@ -395,7 +432,7 @@ static void RdInfo(struct WCBdef *panel)
     ClusterBytes = (u32)space.value * space.sector;
     opened = OpenFil(DrIn_F, 0x40);
     handle = opened.value;
-    if (opened.failed != 0) {
+    if (opened.failed) {
         if (handle != ERR_NO_FILE)
             return;
     } else {
@@ -414,16 +451,24 @@ static void RdInfo(struct WCBdef *panel)
    disk or what the Info says, by the kind of the panel. With `keep` the
    cursor of a list of files and what is selected in it stay where they
    are. Returns whether it could not be read: the original answers in
-   the carry flag, which it makes of ChgFlg. */
-bool ReDir(struct WCBdef *panel, bool keep)
+   the carry flag, which it makes of ChgFlg. The panel's block may move
+   as the list grows: `*at` is where the panel is afterwards, and the
+   four pointers to the panels have been made to point there.
+   Ported as it is, but for the panel that grows and the room taken
+   again behind it, which the original has not (see the top). */
+bool ReDir(struct WCBdef **at, bool keep)
 {
+    struct WCBdef *panel = *at;
     struct OldList old;
 
     panel->ChgFlg = 1;
     if (panel->WinTyp == 0) {
-        ReDr00(panel, keep, &old);
+        panel = ReDr00(panel, keep, &old);
+        *at = panel;
         ReDr45(panel);
         ReDr50(panel, &old);
+        if (old.resized)
+            RoomAgain();
     } else if (panel->WinTyp == 1) {      /* ReDr01: the tree */
         if (!ReadTre())
             panel->ChgFlg = 0;
@@ -514,14 +559,13 @@ void DirSize(struct WCBdef *panel)
 {
     struct FILENT *entry;
     u8 *to;
-    u16 file;
-    i32 i;
+    i32 file, i;
 
     md.FncAddr = FNC_DISI10;
     to = MvzLine(md.TmpBuf, panel->WinPath, LenPath);
     if (to[-1] != '\\')
         *(u16 *)to = '\\';
-    for (file = DSKBUF; file < panel->EndFul; file += SIZE_FILENT) {
+    for (file = DSKBUF; file < PLACES(panel)->EndFul; file += SIZE_FILENT) {
         entry = ENTRY(panel, file);
         if (!(entry->AttrF & ATTR_DIRECTORY) || entry->NameF[0] == '.')
             continue;
