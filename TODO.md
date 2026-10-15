@@ -23936,3 +23936,33 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   the second, and the golden lists it; deriving is slower than testing, so
   the two differ. No scenario makes one yet. Such a time stamp could be
   recorded only as made during the run.
+
+## From CLAUDE.md
+
+What `CLAUDE.md` had among its rules and notes that is still to do, moved
+here when it was cut down to the rules as they stand (15 October 2026).
+
+- The jumps that stay. The rule of `CLAUDE.md` ("One program, one place
+  for the system") has the jumps of the assembly go where they are easy,
+  and those of a function where loops are entered in the middle or paths
+  cross stay until the function is rewritten for another reason. The
+  sweeps G1 to G6 left `goto` in `view.c`, `usermenu.c`, `copy.c`,
+  `menu.c`, `main.c` and `dirfunc.c` (`grep -c goto src/portable_c/*.c`
+  counts them): `V00_10` of `view.c`, `C20_00` of `copy.c`, `F32_00` and
+  `Run_00` of `usermenu.c` and `F39_00` of `menu.c` among them. Each goes
+  when its function is rewritten.
+- iOS, step 8: the room of the editor and the viewer is as much as the
+  machine has on Linux and on the web page; on iOS it gets a cap, since
+  the system ends a program that takes too much.
+- No test builds the toy that asks every function of `sys.h`,
+  `harness/trial32/sys.c`, so a change to what a function takes leaves it
+  broken without a word (the piece F9 did, and S found it so). After such
+  a change, `harness/trial32/build.sh sys 32`, run from `build/`, and
+  `harness/trial32/asked.py`; or a test that builds it.
+- `IntOn` is a function of `sys.h` because the critical error's box gets
+  its keys by the `STI` of `Window`, `MovScr` and `MinBx3`, which the
+  original has there, three of them in the common code. Having the entry
+  of the critical error let the machine interrupt before it asks the
+  program would take those calls out of the common code, and would be the
+  program doing otherwise than the original between the entry and its
+  first `Window`: a deviation, to ask first. Not asked yet.
