@@ -213,7 +213,20 @@ These held while `src/c/` was made, and they say what it is.
      sanitizers that fit it, a high level of warnings and clang-tidy,
      and a warning of any of them stops the build; which warnings and
      which checks of clang-tidy is recommended to the user from what
-     popular projects of open source use, and the user decides.
+     popular projects of open source use, and the user decides. The
+     user decided it the same day, from a survey of curl, systemd,
+     git, PostgreSQL, libuv, OpenSSL, LLVM and the guide of the
+     OpenSSF: a list of warnings of clang's, written out, close to
+     curl's, and not `-Weverything`, each an error; clang-tidy with a
+     broad set, the analyser, `bugprone-*` and `misc-*` and a few of
+     `readability-*`, where each check that is turned off has its
+     reason in `.clang-tidy`; a build with the sanitizers of
+     addresses and of undefined behaviour, and of integers and of
+     implicit conversions, all fatal, and one with the sanitizer of
+     memory, apart; the usual hardening in the build that is not
+     sanitized; and a fall-through of a `switch` and a table of bytes
+     without its zero said by words of `compiler.h`, not by turning
+     the warnings off.
   7. iOS, when Linux is done. Windows and macOS are not targets for now,
      on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
@@ -395,7 +408,12 @@ These held while `src/c/` was made, and they say what it is.
   is written, by the same word: a step or a sum that is kept at its
   own width, `word++` or `byte = a - b` of numbers of 8 or 16 bits,
   wraps in that width, which is what C says of it; no rule of the
-  project's own is put on top of the compiler's.
+  project's own is put on top of the compiler's. That changed on the
+  user's word of 14 October 2026, with the build for Linux: its
+  sanitizers of integers are fatal, so a step or a sum that wraps at
+  its own width and that a run reaches gets its cast too, with the
+  word `wraps` in a comment where the program counts on it, as any
+  other cut.
 - An integer type gets a name of its own only where its width is not
   the same everywhere, on the user's word of 13 October 2026: the size
   of a file, 32 bits on one platform and 64 on another, is such a type,
