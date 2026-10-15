@@ -16738,9 +16738,9 @@ whose second copy of the program lives in the room with code of
 another layout, and `start-memory`, `ViewSeg` and `FreMem2` naming
 nothing known. Nothing is declared as changed.
 
-### 5b, the stub: the first half landed, and what is left
+### 5b, the stub: done, and what step 6 should know
 
-Done, a commit each:
+The first half, a commit each:
 
 1. `FALLTHROUGH` of `compiler.h`, beside `NONSTRING`:
    `__attribute__((fallthrough))` to gcc and clang, nothing to Open
@@ -16800,62 +16800,97 @@ Done, a commit each:
 4. `ed.EdHxCur++` of `edit.c` is `= true` at both places, `T14_11` and
    `T06_00`: the flag is 0 just before each.
 
-Left, for the next agent of 5b:
+The second half: `.clang-tidy`, the test `portable_c-stub`, and what
+clang-tidy named mended in the code.
 
-- `.clang-tidy` at the top and the test `portable_c-stub`, which is to
-  build the stub with the full strictness (the command is in
-  `build/portable_c/stub/compiled.txt`, which the build writes) and run
-  clang-tidy 23 over the common code and `sys_stub.c`, skipped (77)
-  without clang. The survey below was made with clang-tidy 23.1.3 and
-  the broad set, every check on: `build/try/` of the checkout that made
-  it had the scripts; `clang-tidy --quiet --config-file=FILE SOURCE --
-  FLAGS` over the 64 files took two and a half minutes on four
-  processors. `Checks:` as a YAML list takes a `#` comment above each
-  entry, which is where a reason goes.
-- What it named, by place once, and what the recommendation the user
-  accepted says of it:
-  - off by the recommendation: `misc-include-cleaner` 464 (every file
-    has `vc.h` whole, by design), `bugprone-easily-swappable-parameters`
-    56, `bugprone-switch-missing-default-case` 28,
-    `bugprone-implicit-widening-of-multiplication-result` 27,
-    `misc-no-recursion` 4 (the help enters itself, the main loop's
-    commands), `bugprone-branch-clone` 2 (the original's own branches),
-    `bugprone-narrowing-conversions` 1 (what `-Wconversion` holds).
-  - not in the recommendation: `bugprone-signed-bitwise` 1,697, a mask
-    or a shift of a `u8` or a `u16`, which C makes an `int`, goes off in
-    `.clang-tidy` with that reason, on the user's word (`CLAUDE.md`, the
-    item on the strictness); `bugprone-unhandled-code-paths` 13, "add a
-    default label", the same as the check of a missing default, is noise
-    of the same kind, to be turned off with its reason.
-  - to mend in the code: `misc-use-internal-linkage` 77 (a function or
-    an object that only its file names and is not static: `edit.c` 20,
-    `view.c` 14, then fewer; read each against wcc386's W202, an object
-    that nothing names cannot be static), `bugprone-macro-parentheses`
-    44 (`tree.c` 34, `place.c` 10), `readability-redundant-declaration`
-    3 (`HexByt` and `PathLin` in `edit.c`, `ErrRdy` in `main.c`),
-    `readability-inconsistent-declaration-parameter-name` 1 (`OncZoom`),
-    `readability-suspicious-call-argument` 1 (`edit.c`, `T56_00(EdOffst,
-    EdLine, place)` in `T32_06`, whose parameters are `place` and
-    `target`: read whether the names or the call are wrong),
-    `bugprone-assignment-in-if-condition` 2 (`keys.c`),
-    `bugprone-too-small-loop-variable` 1 (`drive.c`),
-    `clang-analyzer-deadcode.DeadStores` 2 (`usermenu.c` `include`,
-    `view.c` `count`).
-  - the analyser on the layout of the main data:
-    `clang-analyzer-security.ArrayBound` 13, a read in front of a field
-    or behind it, `md.TmpBuf`, `md.TmpErr`, `md.TreeBuf[0].TreSum2` (the
-    tree's list behind its header, `TreList`), `md.DTA.FilAttr`,
-    `md.HelpBuf[0].HlpMode`, `MnuTab`, `StMainHlp`; and
-    `clang-analyzer-security.PointerSub` 10, a difference of two
-    pointers into two fields (`copy.c` 4, `exec.c` 4, `dirfunc.c`,
-    `edit.c`). Each is the original reading its main data as one block,
-    which C promises nothing of. On the user's word (`CLAUDE.md`, the
-    item on the strictness) these are mended, not turned off, by a
-    piece of their own that reads the main data as bytes at an offset;
-    until that piece has landed, the test cannot be clean of them.
-- `bugprone-*` of clang-tidy 23 has `signed-bitwise` and
-  `unhandled-code-paths`, which the survey of 14 October did not name:
-  the version is pinned for that reason.
+1. `.clang-tidy` at the top of the checkout: the analyser, `bugprone-*`,
+   `misc-*` and six of `readability-*`, `WarningsAsErrors: "*"`, every
+   check that is off with its reason above it in the file. Off: those of
+   the recommendation that the user accepted, `misc-include-cleaner`,
+   `bugprone-easily-swappable-parameters`,
+   `bugprone-switch-missing-default-case`,
+   `bugprone-implicit-widening-of-multiplication-result`,
+   `misc-no-recursion` (the main loop's commands, `Command`, `CmdEnd`,
+   `MnuEnd` and `F39_01`, enter the loop again), `bugprone-branch-clone`;
+   `bugprone-signed-bitwise`, on the user's word; and
+   `bugprone-unhandled-code-paths`, judged here: its 13 places are each a
+   `switch` with no `default`, "add a default label", the check of a
+   missing default under another name. `bugprone-narrowing-conversions`,
+   which the recommendation had off as what `-Wconversion` holds, is on:
+   its one place, `n -= TreeFirst - TRELIST` of `tree.c`, a difference of
+   pointers taken from an `i32` by a compound assignment, is one that
+   `-Wconversion` does not name, and the rule of CLAUDE.md has the cast
+   written; it has it, and the check holds the next one.
+2. The test `portable_c-stub`, `harness/stubcheck.py`: it compiles every
+   file of the stub again by `build/portable_c/stub/compiled.txt` with
+   `-fsyntax-only` and fails for anything that clang says, and runs
+   clang-tidy over the same files with `.clang-tidy`, and fails for every
+   place but those of `EXPECTED` there; 77 where there is no clang or no
+   clang-tidy, and a failure for a clang-tidy that is not of version 23.
+   A minute and a half on four processors. `EXPECTED` is the 12 places
+   of `clang-analyzer-security.ArrayBound` and the 10 of `PointerSub`
+   where the program reads the main data across its fields, by file,
+   check and message with a count, since the analyser's line moves with
+   every change: one more fails, and one fewer, which the piece MD is to
+   take out of the list as it mends them. The analyser follows paths,
+   and code that changes elsewhere changes what it names: on the pieces
+   G1, G4 and G5 a place of `copy.c` and one of `help.c` were no longer
+   named, and `RdTr18` of `treebox.c`, which clears the tree's list
+   behind its header, was, under the name of a field further on.
+3. Mended in the code, by the rules of CLAUDE.md:
+   - `misc-use-internal-linkage`, 77 functions that no header declared.
+     34 that only their file calls are `static`: `edit.c` and `view.c`
+     most, `F38_40` and `M30_50` of `dirfunc.c`, `RstVc1` of `main.c`.
+     wcc386's W202 is for a static function that nothing calls, which
+     none of them is: clang's `-Wunused-function` would say it, and does
+     not. The 43 that other files call, each of which those files had
+     declared for themselves, are declared once in `vc.h`, in the
+     section of the routines by their files, and every other
+     declaration went (94); `struct DateText` and `struct TimeText`,
+     which three files had each defined, went into `vc.h` with them. A
+     function of a batch that is static is no longer among the public
+     symbols of the map: `check_translation` of `harness/ported.py`
+     looks for it among the static ones of the portable C, where it has
+     to be once.
+   - `bugprone-macro-parentheses`, 44: the arguments of `DESCEND`,
+     `IS_PATH` and `FIND` of `tree.c` and `PLACE` of `place.c`, which
+     the macros assign to, are in brackets, `(i) = 0`.
+   - `readability-redundant-declaration`, 3; the parameter's name of
+     `OncZoom` in `vc.h`; `T56_00` of `edit.c` takes `start` where it
+     took `place`, which made `T56_00(EdOffst, EdLine, place)` look
+     swapped and was not: the call is right.
+   - `bugprone-assignment-in-if-condition`, 2, in `F00_60` of `keys.c`:
+     the file under the mouse is looked for in statements of their own.
+   - `bugprone-too-small-loop-variable`, `drive.c`: `letter <=
+     (u16)'Z'`. The check takes a character constant for an `int` that
+     may not fit, where it lets `90` be.
+   - `clang-analyzer-deadcode.DeadStores`, 2: `include = md.TmpBuf` of
+     `F32_00` in `usermenu.c` and `count = 0` of `V82_00` in `view.c`,
+     each set again on every way before it is read, with a comment that
+     says what the assembly has there.
+   The program for DOS is not the same bytes, by the static functions,
+   the declarations and `F00_60`; its code is 8 bytes longer, so
+   against `main`'s build every scenario differs in all of the room.
+   Against `main`'s build padded to the same length, a function of one
+   store behind the last of `sys_dos.c`, not kept: 151 of 158 scenarios
+   with nothing that differs, `cursor` with nothing but what may differ,
+   and the six of earlier pieces, `comspec`, `ended`, `second-copy`,
+   `start-screen`, `start-setup` (a second copy of the program in the
+   room, with addresses of the code 8 bytes on), and `start-memory`
+   (`ViewSeg` and `FreMem2` naming nothing known). The whole suite,
+   fifteen tests, passes, and no golden and no patch changed.
+
+What step 6 should know:
+
+- The stub and the program for Linux are held by the same test: a file
+  `_posix.c` wants `harness/stubcheck.py` to read it too, from the
+  `compiled.txt` of that build.
+- A function that another file calls is declared in `vc.h`, not in the
+  file that calls it: clang-tidy names a function that no header
+  declares and that is not static.
+- clang-tidy of another version fails the test: judge its new checks,
+  then change `VERSION` there and the comment at the top of
+  `.clang-tidy`.
 
 ### G5, the jumps of menu.c, help.c, sthelp.c and stmain.c: done
 

@@ -723,6 +723,22 @@ add_test(NAME portable_c-cut
             --compiled ${CMAKE_BINARY_DIR}/portable_c/compiled.txt
             --out ${CMAKE_BINARY_DIR}/cutcheck)
 set_tests_properties(portable_c-cut PROPERTIES SKIP_RETURN_CODE 77)
+# The stub of the portable C held to clang's warnings, with the command
+# that the build compiles it with, and to clang-tidy, by .clang-tidy at
+# the top of the checkout, with clang-tidy 23: every place that it names
+# fails the test, but those that a piece of their own is to mend, which
+# the test lists. See harness/stubcheck.py. It runs no machine, and is
+# skipped where there is no clang.
+if(clang_tidy)
+    set(stub_tidy ${clang_tidy})
+else()
+    set(stub_tidy clang-tidy)
+endif()
+add_test(NAME portable_c-stub
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/stubcheck.py
+            --compiled ${CMAKE_BINARY_DIR}/portable_c/stub/compiled.txt
+            --clang-tidy ${stub_tidy})
+set_tests_properties(portable_c-stub PROPERTIES SKIP_RETURN_CODE 77)
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see

@@ -3380,6 +3380,22 @@ in "The portable C".
   - A rule of the test of the layout that goes takes its row of the
     figures with it: `tools/figures.py` read `room` of
     `harness/layoutcheck.py`, which is gone.
+- The tree is held to clang-tidy since the piece 5b, by the test
+  `portable_c-stub` and `.clang-tidy` at the top (`TODO.md`, "5b, the
+  stub: done, and what step 6 should know"). What that asks of code
+  that is written:
+  - A function that only its file calls is `static`, and one that other
+    files call is declared in `vc.h`, once: a file no longer declares
+    another's function for itself, which clang-tidy names as a function
+    that no header declares. A function of a batch may be static:
+    `harness/ported.py` finds it among the static symbols of the map.
+  - A macro that assigns to an argument has it in brackets, `(i) = 0`.
+  - What the analyser names where the main data is read across its
+    fields is listed in `EXPECTED` of `harness/stubcheck.py` until the
+    piece that reads it as bytes at an offset has mended it; any other
+    place fails the test, and so does one of those that is gone.
+  - The test takes a minute and a half; `python3 harness/stubcheck.py
+    --compiled build/portable_c/stub/compiled.txt` runs it by itself.
 
 ### Moving a file to the system's functions
 

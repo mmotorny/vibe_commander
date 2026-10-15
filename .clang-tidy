@@ -1,0 +1,54 @@
+# clang-tidy for the portable C, on the user's word of 14 October 2026
+# (CLAUDE.md, "The portable C", the road, step 6): a broad set, the
+# analyser, bugprone-* and misc-* and a few of readability-*, every
+# check that is turned off with its reason above it, and every place
+# that a check names an error. The test portable_c-stub runs it over the
+# common code and sys_stub.c (harness/stubcheck.py). It is written for
+# clang-tidy 23, which the test holds the version to: another version
+# has other checks, which are judged before they are taken.
+Checks:
+  - "-*"
+  - "clang-analyzer-*"
+  - "bugprone-*"
+  - "misc-*"
+  - "readability-duplicate-include"
+  - "readability-inconsistent-declaration-parameter-name"
+  - "readability-misleading-indentation"
+  - "readability-named-parameter"
+  - "readability-redundant-declaration"
+  - "readability-suspicious-call-argument"
+  # A mask or a shift of a u8 or a u16, which C makes an int: the program
+  # is written in such numbers by the rule of CLAUDE.md, "The portable C",
+  # and every one of its masks would want a cast that says nothing, on
+  # the user's word of 14 October 2026.
+  - "-bugprone-signed-bitwise"
+  # A switch without a default label, said twice, by this check and by
+  # the next: a switch of the program does nothing for a value that it
+  # has no case for, as the original's table of keys did nothing for a
+  # key that it did not have, and a default that does nothing would say
+  # so at a hundred places without saying anything.
+  - "-bugprone-switch-missing-default-case"
+  - "-bugprone-unhandled-code-paths"
+  # Every file includes vc.h whole, by design: the headers are three, of
+  # the program, of its tables and of the system, and a file is not to
+  # name which declarations of them it uses.
+  - "-misc-include-cleaner"
+  # Two parameters of one type next to each other: the routines of the
+  # original take a row and a column, a place and a length, and a
+  # structure for each pair would be the layer's design, not a mend.
+  - "-bugprone-easily-swappable-parameters"
+  # A product reckoned in an int and then made a pointer's step, `screen
+  # + 3 * 80`, `first + width * cursor`: the numbers are rows, columns
+  # and entries, of 8 or 16 bits, whose product an int holds, which the
+  # check cannot know; a cast to a wider type at each would say nothing.
+  - "-bugprone-implicit-widening-of-multiplication-result"
+  # A command of the main loop may go on into the loop again, as the
+  # original's do: Command, CmdEnd, MnuEnd and F39_01 of main.c.
+  - "-misc-no-recursion"
+  # Two tests of a chain that do the same, as the original's do: in
+  # F39_00 of menu.c a key held and a button of the mouse each choose a
+  # table of commands, tested one after the other as the assembly tests
+  # them, so that the code can be held against src/c and src/asm.
+  - "-bugprone-branch-clone"
+WarningsAsErrors: "*"
+HeaderFilterRegex: "src/portable_c/.*"
