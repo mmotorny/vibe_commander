@@ -17233,9 +17233,12 @@ first way to it, a drag from beside the names onto one, is a bug of
 the original to fix: the loop `F39_03` keeps the menu under the
 pointer, `DEVIATIONS.md` 28, a commit of its own, with
 `mouse-drag-menu`'s patch two rows longer. That silenced `F39_10`.
-`F39_51` is still named, `MnuTab[255]`, by the second way, which the
-fix does not touch and which waits for a decision: see "Known and not
-dealt with".
+`F39_51`, `MnuTab[255]`, was the second way, a button moved off the
+names and let go or below the bar at the next look: the user decided
+the same day that the bar is left there, as when the button is let go
+in the loop, a commit of its own again. Then clang-tidy names nothing
+of the two checks. No scenario has the second way: the original does
+not come back from it to wait for a key.
 
 The bytes: the reads compile as they did (`find.c`, `menu.c`,
 `read.c`, `help.c`, `edit.c`, `tree.c`, `treebox.c`, `main.c` the same
@@ -18749,14 +18752,12 @@ than it is would pass.
   were not tried, and F1 stays out of the scenario: they open a menu
   from behind the table, or show a page by that byte, so the original
   goes by stray memory there and the translation cannot be held to it.
-  The portable C has the first way fixed, on the user's word of 14
-  October 2026 (its `DEVIATIONS.md`, 28): the loop keeps the menu under
-  the pointer. The second is not decided: a button on the bar that is
-  moved off the names, with a menu open or not, makes the menu 0 with
-  the item FFh, and if it is let go or below the bar at the next look,
-  `F39_04` goes to `F39_51` and opens menu 0 from behind the table,
-  `MnuTab[255]` in the portable C, which clang-tidy names ("MD, the
-  main data read as bytes").
+  The portable C has both ways fixed, on the user's word of 14 October
+  2026 (its `DEVIATIONS.md`, 28): the loop keeps the menu under the
+  pointer; and a button on the bar that is moved off the names, which
+  makes the menu 0 with the item FFh, and is let go or below the bar
+  at the next look, leaves the bar, where the original opens menu 0
+  from behind the table and does not come back on the bench.
 - In an open menu the key of an item that is dark, Ctrl+a in the Files
   menu of a tree, is not dropped: the number of the item is looked for
   among the letters of the items, where it is not. And the table of

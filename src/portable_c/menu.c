@@ -531,7 +531,14 @@ F39_02:
                 menu = F40_50(mouse.place, names);
             } while (menu == 0);
         }
-    }
+    } else if (menu == 0)
+        /* The menu that is none, which F39_14 leaves when a button on
+           the bar has gone off the names, with the button let go or
+           below the bar now: the bar is left, as when the button is let
+           go in the loop above. The original opens menu 0 there, from
+           behind the table of the menus: a bug of the original, fixed
+           (DEVIATIONS.md, 28). */
+        goto F39_85;
     if (item != 0)                      /* F39_04 */
         goto F39_51;
 F39_07:

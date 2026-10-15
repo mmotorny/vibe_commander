@@ -2431,7 +2431,7 @@ Every scenario shows that a directory that the original's 64K hold is
 read as it was, in a panel's block of 64K and the places, and is held
 to the original's golden.
 
-### 28. A drag along the menu bar onto a name opens that name's menu
+### 28. The menu bar never goes on with the menu that is none
 
 **What the original does.** A button pressed on the menu bar beside the
 names, and moved onto one while it is held, is waited for in a loop,
@@ -2445,22 +2445,40 @@ the help's page for the round is read by a word in front of the table
 of the menus, and a button let go at that look leaves the bar with no
 name lit and the keys working on menu 0: Right goes to the first menu,
 and Left, Down or Enter open a menu read from 2,040 bytes behind the
-table, and F1 shows a page by a byte of stray memory. `TODO.md`, "Known
-and not dealt with", had it.
+table, and F1 shows a page by a byte of stray memory.
+
+There is a second way to menu 0. A button held on the bar and moved off
+the names, with a menu open or not, makes the menu 0 with no item,
+`F39_14`, and goes back to the first look, `F39_02`. With the button
+still on the bar there, the loop above waits for a name. But if it has
+been let go, or is below the bar, at that look, the bar goes on to open
+the menu that it has, `F39_51`, and opens menu 0 from 2,040 bytes
+behind the table: on the bench the original does not come back to wait
+for a key then. `TODO.md`, "Known and not dealt with", had both.
 
 **What the portable C does.** The loop keeps the menu that the pointer
 is on, as the look before it does: the name is lit as soon as the
 pointer is on it, and a button let go then leaves the bar on that
-name's menu, as one pressed on the name and let go does. `F39_00` of
-`menu.c`.
+name's menu, as one pressed on the name and let go does. And at the
+first look, with the menu that is none and the button let go or below
+the bar, the bar is left, as when the button is let go in the loop:
+the panels and the key bar are as they were, and the program waits for
+a key. `F39_00` of `menu.c`.
 
-**Why.** The user's decision, on 14 October 2026: a bug of the
-original, fixed. The analyser of clang-tidy named the read in front of
-the table (`TODO.md`, "MD, the main data read as bytes").
+**Why.** The user's decisions, on 14 October 2026: two bugs of the
+original, fixed, the first way and then the second. The analyser of
+clang-tidy named the reads in front of the table and behind it
+(`TODO.md`, "MD, the main data read as bytes").
 
 **Which scenarios show it.** `mouse-drag-menu`, whose sixth step lets
 the button go at that look, "Click@70,0*5>25,0*1": the original shows
 the bar with no name lit and goes to Left with Right, the portable C
 has Commands lit and goes to Options. Its patch has the two rows of
 the bar. The other drags of that scenario and of `mouse-menu` show
-every screen as the original does.
+every screen as the original does. The second way has none: the
+original does not come back from it to wait for a key, so no golden
+can be derived of it, as was tried with "Click@25,0*6>70,0*1", the
+button let go at the look after it left the names, and with
+"Click@25,0*6>70,0*1>70,5*1", moved below the bar there. The portable C
+leaves the bar in both, which `harness/show.py --program` shows; it
+went the original's way before the fix.
