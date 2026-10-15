@@ -68,8 +68,9 @@ The planned stages:
    working program to hold against the original. Bytes no longer match from
    here on; behaviour has to, bugs included, with every intended deviation
    listed explicitly.
-3. Give the C program a layer for what it asks of the operating system, and
-   put modern operating systems under it next to DOS.
+3. Put modern operating systems under the C program next to DOS: it goes
+   on asking what it asks DOS, through one header of functions named for
+   DOS's services, and every other system emulates DOS behind them.
 
 Where it stands: the first stage is done. Outside the reserved room, both
 programs come out identical to the originals. The second stage is nearly

@@ -56,8 +56,7 @@ not plain behind a colon. The code has no name for any of them.
     size        the size of a file, a place in one, the size of a disk
                 or of what is free on it, or a sum of such: it can pass
                 two gigabytes, and there is no signed type of 64 bits. A
-                u32 until the layer's design gives the size of a file
-                its type
+                u32, DOS's width, which sys.h keeps
     setup       a byte of the setup file, which stays a byte
     flag        true or false, in a byte of the layout: the code asks
                 whether it is 0
@@ -4298,7 +4297,7 @@ string.c, LetLin: variable c, u8
     character
 
 sys_dos.c: as a whole, 133 numbers, 59 u32
-    the system's file: what DOS, the BIOS and the extender take and answer in, and the layer's to shape, step 3
+    the system's file: what DOS, the BIOS and the extender take and answer in, in their widths, as sys.h has them
 
 system.c, Timer: returns, u32
     system: the timer's count of ticks since midnight, as the BIOS keeps

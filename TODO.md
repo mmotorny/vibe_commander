@@ -1651,7 +1651,7 @@ this compiler reads. The first count, of the program of 16 bits, was
 
 | Kind | Places | Files | What it is | What it waits for |
 |---|---|---|---|---|
-| `to-number` | 15 | 1 | A pointer cast to a number of 32 bits, which does not hold it on a machine of 64: `dos32.c` hands DOS and the extender addresses in registers | Nothing in the common code. The layer, steps 3 to 6 of the road: `dos32.c` is the side of it that is DOS |
+| `to-number` | 15 | 1 | A pointer cast to a number of 32 bits, which does not hold it on a machine of 64: `dos32.c` hands DOS and the extender addresses in registers | Nothing in the common code. Steps 4 to 6 of the road: `sys_dos.c`, which was `dos32.c`, is DOS's implementation of `sys.h`, and another system's file has none of it |
 | `to-pointer` | 24 | 1 | A number of 32 bits made a pointer, in `dos32.c`: an address of the machine, or one that DOS or the extender answered with | The same |
 | `naked`, `asm` | 2, 2 | 1 | The two functions of `dos32.c` that are their `_asm`, `DeviceEntry` and `NothingEntry` | The same |
 | `asm-pragma` | 11 | 1 | The eleven pieces of inline assembly of `dos32.c`, a `#pragma aux` each | The same |
@@ -5215,8 +5215,8 @@ What is otherwise than the plan had it:
 
 - The program's function is handed over, and not called by its name.
   The plan had `dos.c` call `FtErr1` of `main.c`; "An implementation of
-  the layer for tests" asks for call backs "that the layer names and
-  the program hands it", and that costs four bytes of data and a call
+  `sys.h` for tests" asked for call backs that the interface names and
+  the program hands it, and that costs four bytes of data and a call
   through them. So `dos.c` names nothing of the program, `FtErr1`
   stays static, and the toy needs no function of that name: S1's
   warning for this piece is moot, and it stands for S3, which has
@@ -5251,7 +5251,8 @@ I did not ask". To have the decision above the header, the functions
 that are asked with the program's errors would be the bare ones with a
 routine of the program around each, which clears `ErrDat`, looks at it
 and asks for the extended error: one function more in `sys.h`, for AH
-59h, and some forty to go through. That is step 3's to weigh.
+59h, and some forty to go through. Step 3 keeps `sys.h` as it is
+(`CLAUDE.md`), and `AskEs` with it.
 
 `IntOn`, which is not of this piece's row and is where the critical
 error still shows in the common code: DOS enters `FatErr` with the
@@ -8646,9 +8647,10 @@ that. Steps 3 to 6 are not planned here.
 - What crosses to the system is a plain number in this step (S): a
   count of bytes read or written and a size in the memory an `i32`,
   the size of a file and a place in one a `u32`, since it can pass two
-  gigabytes. A type whose width differs by platform, the size of a file
-  first among them, gets a name of its own, and the layer's design
-  defines it: so do sizes beyond 32 bits.
+  gigabytes. That was to wait for a type of the platform's width, which
+  the layer's design was to define; step 3 has since kept `sys.h` in
+  DOS's widths (`CLAUDE.md`), so the size of a file stays DOS's `u32`
+  ("Left for later steps", at the end).
 - The main data keeps the original's layout through all of it. A word
   of it that held a segment or a place leaves it and is a pointer
   beside it, and a number of it that is widened does the same; its
@@ -8678,7 +8680,7 @@ that. Steps 3 to 6 are not planned here.
 
 | What | Who |
 |---|---|
-| The words of step 2, above, and that step 3 follows it, with the layer's design approved before anything is built on it | The user, 12 October 2026 (`CLAUDE.md`) |
+| The words of step 2, above, and that step 3 follows it | The user, 12 October 2026; step 3 itself, DOS as the layer with `sys.h` as it is, 14 October 2026 (`CLAUDE.md`) |
 | That every deviation is declared, and that any which is not the removal of something that only made sense on DOS is asked first; that a bug of the original stays until its fix is decided | The user (`CLAUDE.md`) |
 | That the editor of the program of 32 bits has more room than the original's, declared and not mended by a number made for a test | The user, 13 October 2026 (`src/portable_c/DEVIATIONS.md`, 13) |
 | That the memory for the panels and the texts comes from the extender from this step on, as much as the machine has, with what a user then sees otherwise declared: the editor opens whatever fits | The user, 13 October 2026 (`CLAUDE.md`, step 2 of the road): the answer to question 2 |
@@ -8687,8 +8689,8 @@ that. Steps 3 to 6 are not planned here.
 | Questions 6 and 7 at the end: the flags of the setup file stay bytes, and the main data keeps its layout through step 2 | Taken by the session as recommended, 13 October 2026. Neither changes what the program does |
 | The sixth way: three blocks where there was one, with a panel's block fixed at 1000h paragraphs from F1 on; F9 as the piece that takes the memory from the extender, and the trial X at once | Accepted by the session, 13 October 2026 |
 | The clusters N0 to N21 with S, M and P, and their order; that no cap is in a program that has landed, with F9 behind the five clusters that count the room, and the cap as the fallback, which wants the session's word; the answer of `FileRead` and `FileWrite` as a structure of their own; the 16 bytes round each block of the 640 KB, in the program as it is shipped from F1 to F9, held by F0's tool | Accepted by the session, 13 October 2026 |
-| That an integer type gets a name of its own only where its width is not the same everywhere: the size of a file is such a type, and the layer's design will define it and its like. A name for what a number merely means, a count of columns, a colour, is not made: such a number has the type of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`. Until the layer is designed, what crosses to the system is a `u32` too; where the compiler is to hold two things apart, they are structures. So the names that the session had accepted for `sys.h` are gone for now, to be defined by the layer, and five that the session had asked of N0 for a character, a colour, a cell and a place never landed | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
-| That a number is signed unless there is a reason for it not to be: a size, a count, an index, a length, a place in a text is an `i32` when it is widened, and a `u32` of today is asked the same question. Without a sign stay bits, a mask, a character, a colour, a cell; wrapping that the program counts on; a width that a file, DOS or the BIOS has; and a quantity that can pass two gigabytes, a `u32` until the layer's design gives the size of a file its type, which is then signed. The plan had `u32` for whatever is widened, and N0 had widened 29 numbers so: N0b turned them | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
+| That an integer type gets a name of its own only where its width is not the same everywhere: the size of a file was to be such a type, defined by the layer's design. A name for what a number merely means, a count of columns, a colour, is not made: such a number has the type of its width, `u8`, `u16`, `u32`, `i32`, or is a `bool`. What crosses to the system is a `u32` too; where the compiler is to hold two things apart, they are structures. So the names that the session had accepted for `sys.h` are gone, and step 3, which keeps `sys.h` in DOS's widths, brings none back; and five that the session had asked of N0 for a character, a colour, a cell and a place never landed | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
+| That a number is signed unless there is a reason for it not to be: a size, a count, an index, a length, a place in a text is an `i32` when it is widened, and a `u32` of today is asked the same question. Without a sign stay bits, a mask, a character, a colour, a cell; wrapping that the program counts on; a width that a file, DOS or the BIOS has; and a quantity that can pass two gigabytes, a `u32`, DOS's width, which step 3 keeps. The plan had `u32` for whatever is widened, and N0 had widened 29 numbers so: N0b turned them | The user, 13 October 2026 (`CLAUDE.md`, "The portable C") |
 | N17 and N19 as two clusters each, `start.c` by itself behind F9; and the program's own structures of the headers with the cluster of the functions that return them, those of `sys.h` with S | The session, 13 October 2026, on what N0 counted |
 | Questions 3, 4, 5, 8 and 9 | With the user, each when the work comes to it: "The questions for the user" |
 
@@ -8770,7 +8772,7 @@ The counts below are of the tree before the third stage, as it was at
 | d | A place of the main data in a variable or handed on | The 150 of `MD_PLACE` and `MD_POINTER` | F4 to F8 |
 | e | An offset in a panel: `CurAdr`, `First`, `EndBuf`, `EndFul` of `WCBdef`, and every `file`, `cursor`, `first` that is made of them | The 60 of `ENTRY` and more that are plain numbers | Stays |
 | f | An offset in a text: the viewer's `struct Line`, `ViPoint`, `ViEndTab`, `ViFirst`, with its table of lines at the top of the same segment; the editor's, which are numbers of 32 bits of which 20 count already, `EdOffst`, `EdLen`, `EdFirst`, made a segment and an offset below 16 by `AddressOf` some 22 times | `view.c`, `edit.c` | F4, F5: `text + place`. `AddressOf` and `OFFSET_OF` go |
-| g | A far address in the main data: `Screen`, `ErrVct`, `BrkVct`, the block `EPB` | 4 fields | Not step 2: only the system's file reads them. They leave the main data when that file moves under the layer |
+| g | A far address in the main data: `Screen`, `ErrVct`, `BrkVct`, the block `EPB` | 4 fields | Not step 2: only the system's file reads them, and they stay where they are while `sys_dos.c`, which was `dos32.c`, is as it is (step 4) |
 | h | Arithmetic on segments | `PANEL_PARAS` and `VIEW_PARAS`, 9 places in `start.c`; the room behind the panels, `MAIN_SEG + md.FreMem2 - md.ViewSeg`, written out five times in `view.c`, `edit.c`, `copy.c` and twice in `find.c`, and twice otherwise in `read.c`; `panel + 0x1000` and `0xFFF` paragraphs in `ReDr00`, which is the 64K of a panel; `GiveMem`, `TakeMem`, `Aexec0` of `view.c` | F1 |
 | i | The main data read as a panel, as the original does with DS left on it | 5 places: `BegBX(MAIN_SEG)` in `main.c` and `keys.c`, `PutPrm(MAIN_SEG)` in `enter.c`, `M60_02(MAIN_SEG)` in `commands.c`, and `md.ColTab[OFFSET_IN_SEG(panel, wcb->WinPath + 3)]` in `read.c` | F2: written as what it is, `(struct WCBdef *)&md`, with its comment. As far as was read they read within the first 82 bytes, which are bytes of the setup in both structures: F2 holds each to that |
 | j | A number of 16 bits added to a pointer, which was right on DOS because the offset wrapped with it | `harness/trial32/added.py` lists 158 places and found none wrong; `harness/int16.txt` has 10 of the kind `back` and 4 of `minus`. C1's fault was of this kind and through no word (`TODO.md`, "C1, the editor") | Each piece reads those of its files again when the pointer changes: see "What could go wrong", 1 |
@@ -8807,7 +8809,7 @@ memory from the extender" below.
 
    So freeing the layout buys nothing that step 2 needs and risks the
    fifth row, which nothing would catch. Whether it is ever freed is
-   for when the layer is designed.
+   open; nothing on the road asks for it.
 
 2. **A segment becomes a typed pointer to what is there.** A panel is
    `struct WCBdef *`, a text `u8 *`. Where one routine is handed now a
@@ -8844,11 +8846,11 @@ memory from the extender" below.
    640 KB, and the blocks are the extender's once no segment names
    one. The three functions of `sys.h` stay three, asked in the order
    in which the program asks today, in bytes from F9 on, an `i32`;
-   what the layer makes of them is step 3's. The screen, the BIOS's
+   step 3 keeps them so. The screen, the BIOS's
    data, the PSP and the environment
    are behind `sys.h` already and stay there; `md.Screen` and the
-   three other fields of kind g are the system's file's own and wait
-   for step 4.
+   three other fields of kind g are the system's file's own, and stay
+   so by step 4.
 
 ### The widths: what there is
 
@@ -8903,7 +8905,7 @@ is asked the same question, and is of kind 1, 3, 4 or 5:
 | 1 | As wide as it is by what it is, and without a sign. Laid out by someone else: a field of a structure that a file, DOS, the BIOS or the screen has, or of the main data and a panel, whose layout is the original's. Or a thing that has its width: a character, a colour, a key with its scan code, a cell of the screen, a handle, a byte of the setup. Or bits and no number: a mask, flags, what is only taken apart and put together by shifts and masks | Stays. A number that is taken out of a structure into a variable is of the other kinds | The structure says whose it is, once, in the record; a variable by one word there, `character`, `colour`, `key`, `bits` |
 | 2 | True or false and nothing else: every value put into it is 0, 1 or a comparison, and every use asks whether it is 0 | `bool` | The finder: a range of 0 to 1 and no use in arithmetic, in a shift, or held against a number other than 0 and 1. A number that is tested by its bits, held against 0FFh, or returned as "1, 0, or 100h to stop" is none |
 | 3 | Counted on to wrap round | Stays 16 bits and without a sign if it wraps all its life, a random number, a sum. If it wraps at one place, the variable is widened, to an `i32`, and the cut is written there, `(u16)(a - b)`, with a comment that has the word `wraps` and says what the program counts on | Read, at every cut that `--show` lists of the file, before the variable is widened: a cut that is not written is where a wider variable keeps another number |
-| 4 | A quantity that can pass two gigabytes: the size of a file and a place in one, the size of a disk and of what is free on it, the sum of what is selected, which the original shows up to four gigabytes | A `u32`, until the layer's design gives the size of a file its type, which is then signed. There is no signed type of 64 bits to keep it in meanwhile: "Left for the layer's design" | By what it counts: the word `size` of the record |
+| 4 | A quantity that can pass two gigabytes: the size of a file and a place in one, the size of a disk and of what is free on it, the sum of what is selected, which the original shows up to four gigabytes | A `u32`, DOS's width, which `sys.h` keeps by step 3. There is no signed type of 64 bits to keep it in: "Left for later steps" | By what it counts: the word `size` of the record |
 | 5 | Anything else: a count, an index, a length, a number of a line, a column, a size in the memory, a step that may be back | An `i32`, also where it is handed to the system or comes from it | What is left |
 
 **A number is signed unless there is a reason for it not to be**, on
@@ -9095,11 +9097,11 @@ number in this step, of the kind that "The rule for a number" makes
 it. An integer type gets a name of its own where its
 width is not the same everywhere, on the user's word of 13 October
 2026 (`CLAUDE.md`, "The portable C"): the size of a file, 32 bits on
-one platform and 64 on another, is such a type, and the layer's design,
-step 3, will define it and its like. Until then nothing defines one.
-The piece N0 had defined four in `sys.h`, `FileSize`, `FileStep`,
-`ByteCount` and `MemSize`, which nothing used yet; they are gone for
-now, and the layer says which of them come back and how wide each is.
+one platform and 64 on another, was to be such a type, defined by the
+layer's design. Step 3 has since kept `sys.h` in DOS's terms and
+widths (`CLAUDE.md`), and nothing defines one. The piece N0 had
+defined four in `sys.h`, `FileSize`, `FileStep`, `ByteCount` and
+`MemSize`, which nothing used yet; they are gone.
 What a number counts, its name and a comment say:
 
 | What it counts | Its type | Where |
@@ -9120,8 +9122,8 @@ a file, `place + count`: that sum is reckoned without a sign, which is
 right for a count that is 0 or more, and where the sum is kept in the
 place nothing is said. Where it is kept in a count, or the two are held
 against each other, clang names the place and it gets its cast. That
-is the price of the two types until the layer gives the size of a file
-a signed one: by a trial that made every local number of 16 bits an
+is the price of the two types while the size of a file is DOS's `u32`:
+by a trial that made every local number of 16 bits an
 `i32`, some 30 places in `edit.c`, 9 in `view.c`, 7 in `copy.c`, and
 one or two in a file elsewhere.
 
@@ -9141,9 +9143,8 @@ it; S gives the toy of `harness/trial32/` a read and a write of more
 than 64K, so that it has
 run once.
 
-**What is left for the layer**: the types whose width differs by
-platform, the size of a file first among them, which it defines; sizes
-beyond 32 bits; and all of the shape of `sys.h`. "Left for the layer's design", at the end.
+**What was left for the layer**, and what step 3 made of it: "Left for
+later steps", at the end.
 
 ### Booleans
 
@@ -9338,7 +9339,7 @@ scenario of the program's own: questions 8 and 9.
 | The data's image, new (F0) | At the end of every scenario, the main data and each block that the program has, by name, a panel, the other panel, the room, by QEMU's `pmemsave`, which `harness/dos.py` has; a tool holds the images of two builds against each other. For a piece that is to change nothing they are equal but for what the piece names. It is what would have shown C1's fault, where eleven scenarios passed over a write 64K off. Not a test of the build: run by the piece, before and after |
 | The words' record, new (F0) | The count of each word of the addresses by file, held as the host check's record is. It is the measure of the addresses: up at F1 to F3, nothing left that rests on the megabyte at F10 |
 | The 16 bytes round a block, new (F1) | A pattern in front of each block of the 640 KB and behind the last, held by the image's tool at the end of every scenario: a write just behind the end of a block, or in front of one, is named with its scenario from F1 on, where the extender ends the program for it from F9 on. "What could go wrong", 15 |
-| `portable_c-host` | Clean already in every file of the common code, since gcc reads the flat bodies, which cast nothing: it does not measure step 2. It guards it: a file must stay clean. Of what it still counted, `aborts` (5 places) went to a word of `vc.h` in F10; `data_seg` and all of the system's file wait for the layer |
+| `portable_c-host` | Clean already in every file of the common code, since gcc reads the flat bodies, which cast nothing: it does not measure step 2. It guards it: a file must stay clean. Of what it still counted, `aborts` (5 places) went to a word of `vc.h` in F10; `data_seg` and all of the system's file are DOS's implementation of `sys.h`, which a build for another system does not compile (steps 4 to 6) |
 | Not counted by it, and worth knowing | gcc's `-Wcast-align=strict` names 376 casts that make a pointer to something wider of a pointer to bytes, `copy.c` 85, `view.c` 64, `stcolor.c` 53. Right on the 386 and on x86-64; what clang's sanitizer will name first in step 6. Not step 2's to mend, and not held to |
 | `portable_c-width` | The numbers of step 2 (N0): what is narrow or without a sign, with why, in a record; and, since N0d, every file that is sorted held to the casts, by clang's `-Wconversion` and `-Wsign-compare`, and to nothing beyond what clang names. Its finder also prints the cuts of a file, a step and a sum of a narrow number among them, which a cluster reads and no test holds. It is the measure of the clusters: the two `not sorted` of a row, to nothing |
 | `portable_c-cut` | That every cast which narrows is one that the compiler keeps (N0c): the form that it loses is refused in the tree, and the compiler is held to the instructions of the forms that the tree writes. It matters more since N0d, with every cut a cast |
@@ -9368,11 +9369,11 @@ thought and long in lines.
 | F6, a copy and what goes through files. **Done**: "F6, a copy and what goes through files" below | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
 | F7, the tree, the history, the commands. **Done**: "F7, the tree, the history, the commands" below, and the commands of a line, which waited for F4, by the small piece F7b: "F7b, the commands of a line" below | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest. **Done**: "F8, the rest" below | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
-| F9, the memory from the extender. **Done**: "F9, the memory from the extender" below | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
+| F9, the memory from the extender. **Done**: "F9, the memory from the extender" below | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes, an `i32`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what `sys.h` is asked of the memory, call for call |
 | F10, the megabyte goes. **Done**: "F10, the megabyte goes" below | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
 | N0, the finder, the record, the types. **Done**: "N0, the finder, the record, the types" below, and "N0b, the rule turned to a sign" behind it | `harness/width.py` of `harness/int16.py`, its record `harness/width.txt` and its test, with the two things that the finder has to learn ("The rule for a number"); `bool` in `vc.h`, and `i32`, the type with a sign; the fields of the main data and of a panel sorted, once. The rule tried whole on the five files that have no word of the addresses and are handed no panel, `digits.c`, `mask.c`, `line.c`, `mouse.c`, `blank.c`, 738 lines: each number sorted and then widened, made a `bool`, or recorded | `harness/`, `CMakeLists.txt` for the test, those files, their lines of `vc.h`, the types' lines of `sys.h` | The switch's fourth stage, F0; beside F1 to F3 | The scenarios; the images equal; the record holds those five files and has every other as not sorted yet; clang's three warnings of "Booleans" silent | The rule as it stood up, with a line as it was and as it is, in `CLAUDE.md`; how long the record gets; and how many numbers a cluster of one agent holds, by which the session cuts the clusters again |
 | N1 to N21, the numbers by file: "The clusters" below | In its files every number of 8 or 16 bits sorted by "The rule for a number" and then widened, made a `bool`, or kept and recorded with its reason, so that a file is read once; every cut that clang names written as a cast, with a comment where the program counts on it; a call in another file that counted on a parameter to cut, given its cut | Its files, their lines of `vc.h`, their part of the record | N0, and the piece of the addresses that has its files; beside everything else | The scenarios; the images equal but for what it names; clang's warnings of a conversion silent, which the test of the record asks; the test of the record; `portable_c-cut` | A number that wraps within a user's reach, with what the original was seen to do, handed back and not mended. For a number that counts memory or a place in a block: how it is known that nothing writes behind the block's end |
-| S, what crosses to the system. **Done**: "S, what crosses to the system" below | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What the layer will be asked of files, call for call |
+| S, what crosses to the system. **Done**: "S, what crosses to the system" below | `FileRead`, `FileReadBare` and `FileWrite` take a count that is an `i32` and answer with a structure of their own, the count in it an `i32` too; `FileSeek` takes a step that is an `i32` where it may be back; `DriveSpace`'s three figures are `u32`, and the place in a file stays one; the system's file loops where it is asked for more than DOS takes at once. In the callers the variable that takes the answer and the lines that read it, some 40 places in 13 files, and no call's own line, which F4 to F8 change. No caller asks for more than it asked | `sys.h`, the system's file, those lines, a line of the toy in `harness/trial32/` | N0, F3; beside F4 to F8 and the clusters | The scenarios; the images; `harness/trial32/calls.asm` lists the calls of DOS that it listed, each with the count that it had; the toy has read and written more than 64K at once | What `sys.h` is asked of files, call for call |
 | M, the main data's numbers. **Done**: "M, the numbers of the main data and of a panel" below | Each field of the main data or of a panel that the record has as to be widened: a variable beside the structure, its word left unused, and every line that names it. `ClstSiz` among them, decided by the user on 14 October 2026 (question A of "N12" below): a cluster of 64K is its bytes and not 0, declared then as an entry of `DEVIATIONS.md` of its own, which rests on the count of entry 19; `cluster` of `PutInf` is widened with it | Those lines, in whatever file | Every cluster; alone | The scenarios; the images, the main data equal but for those words | |
 | P, a panel as long as its directory. Wanted: question 3 is answered so, 14 October 2026 | "The questions for the user", 3: a panel's block longer than 64K, its four offsets beside it in 32 bits, `ENTRY` without its cut, and a scenario that fills what the original can hold | `files.c`, `read.c`, `place.c`, `panel.c`, `enter.c`, `start.c`, and the lines of other files that keep an offset in a panel; `harness/scenarios.py`, `DEVIATIONS.md` | M; alone | The scenarios, with the new one held to the original's golden and its patch; the images | |
 
@@ -9632,7 +9633,8 @@ some later machine; the cap that the plan had put in its way was a
 second limit made to keep the first. What the first opinion had right
 is small and is kept: how wide a thing is that crosses to the system
 is the layer's to say, so it gets a name now and no more, and sizes
-beyond 32 bits wait. What the decision costs is time in front of step
+beyond 32 bits wait. (Step 3 has since kept DOS's widths in `sys.h`:
+"Left for later steps".) What the decision costs is time in front of step
 3: some twenty clusters that sort and widen, where the split had seven
 that sorted.
 
@@ -9659,9 +9661,10 @@ reads, that is known before twenty agents go by it.
    together, with the reason written down for every number that stays
    16 bits. A named type for what crosses to the system was part of
    that answer. The user has said since, on the same day, that the
-   layer's design defines such types, where the width differs by
+   layer's design would define such types, where the width differs by
    platform, and that until then each is a plain number, a `u32` or an
-   `i32` by what it counts ("What crosses to the system").
+   `i32` by what it counts ("What crosses to the system"). Step 3 has
+   since kept DOS's widths in `sys.h`, and no such type is defined.
 2. **The memory for the panels and the text.** "From the extender
    now", as much as the machine has, and what a user then sees
    otherwise is declared: the editor opens whatever fits.
@@ -9788,8 +9791,8 @@ recommendation first.
      hex, a byte typed far in, saved, the file held by its length and
      the sum of its contents. Arithmetic of widened numbers that no
      test reaches is where C1's fault was. And no other until the
-     implementation of the layer for tests ("An implementation of the
-     layer for tests: future work"), which can tell the program that
+     implementation of `sys.h` for tests ("An implementation of
+     `sys.h` for tests: future work"), which can tell the program that
      it has the original's room to the byte: `editor-big` and
      `editor-full` are then held to the original's goldens again, and
      a limit is tested where it is and not where the bench's memory
@@ -9919,28 +9922,32 @@ may find a number that wraps within a user's reach where nobody has
 looked: it hands that back like these, with what the original was
 seen to do.
 
-### Left for the layer's design
+### Left for later steps
 
-The layer's design, step 3, is in `src/portable_c/LAYER.md`, being made
-anew from what the platforms provide; it says what the user has decided.
+This plan left some things to the design of the layer. Step 3 was
+decided on 14 October 2026: DOS is the layer, and `sys.h` stays in
+DOS's terms, values and widths (`CLAUDE.md`). What became of each:
 
+- **The types whose width differs by platform**: none is made. The
+  size of a file and a place in one stay DOS's `u32`, a step in a file,
+  a count of bytes read or written and a size in the memory an `i32`
+  ("What crosses to the system").
+- **The shape of `sys.h`**: DOS's, as it is. `failed` and what else
+  answers yes or no are `bool` since N22.
 - **Sizes beyond 32 bits**: of a file, of the files that are selected
-  taken together, of the room that a drive has free. They want numbers
-  of 64 bits, for which the tree has no helper routines, having no C
+  taken together, of the room that a drive has free. DOS has none, and
+  `sys.h` answers in its widths: on the user's word of 14 October 2026
+  the size of a file stays 32 bits on every platform, and on Linux a
+  file of 4 GB or more is shown and copied as DOS would (`CLAUDE.md`,
+  the sign; "What the surveys of the layer found that step 6 needs").
+  Sizes of 64 bits in the program
+  itself would want helper routines that the tree lacks, having no C
   library (the compiler calls `__U8M` and `__U8D` as it called `__U4M`
   in 16 bits), and room for more than ten digits on a panel.
-- **The types whose width differs by platform**: the layer defines
-  them, the size of a file first among them, and with it a place in a
-  file and a step in one; whether a count of bytes read or written and
-  a size in the memory are such types is its to say. Until it does,
-  the size of a file is a plain `u32` and the other two an `i32`
-  ("What crosses to the system"). The size of a file is signed when it
-  has its type.
-- **The shape of `sys.h`** otherwise: `failed` and what else answers
-  yes or no, a handle, DOS's forms of a time, a date and attributes.
-- **Whether the main data's layout is freed**: "The way taken", 1.
+- **Whether the main data's layout is freed**: open, "The way taken",
+  1.
 - **The proper test of a limit**, with the system's answer made for
-  the test: "An implementation of the layer for tests: future work".
+  the test: "An implementation of `sys.h` for tests: future work".
 
 ### Where this plan guesses
 
@@ -12580,8 +12587,9 @@ character, a colour, a cell and a place, with a finder that took a
 number of such a type for sorted. The user overruled both on 13
 October 2026 (`CLAUDE.md`, "The portable C"). An integer type gets a
 name of its own only where its width is not the same everywhere: the
-size of a file is such a type, and the layer's design will define it
-and its like, so the four are gone from `sys.h` for now, which nothing
+size of a file was to be such a type, defined by the layer's design
+(step 3 has since kept `sys.h` in DOS's widths, and none is defined),
+so the four are gone from `sys.h`, which nothing
 used and which left `VC.EXE` the same bytes. And a name for what a
 number merely means, a colour, a place, is not made, since C holds
 such a name apart from nothing: the five never landed, and what they
@@ -14402,7 +14410,7 @@ A scenario does show it, which the asking did not know: `LAST.DAT` of
 and `view-window`, which show the Info beside that directory, have the
 line of its files 33,554,432 bytes higher, a patch each. The sum wraps
 at 4 GB in both, so neither says the 6 GB that the seven files take:
-that is a size, kind 4, `u32` until the layer's design.
+that is a size, kind 4, DOS's `u32`.
 A is the piece M's: it widens `ClstSiz` to 32 bits and declares the fix
 then, in an entry of its own; it rests on B's count, which divides by
 the cluster's size in 32 bits, and `cluster` of `PutInf`, a `u16` as
@@ -16016,7 +16024,7 @@ take). `cluster` of `PutInf` is a `u32` with it. 65,535 clusters of 64K
 are 4,294,901,760 bytes, so `DiskClusters * ClusterBytes` does not wrap
 while `DriveSpace` answers in 16 bits; when S gives it 32, the product
 can, and is a size that wraps at 4 GB as every size of the program does
-until the layer.
+in DOS's widths.
 
 The five are without a value, as the other variables of `main.c`
 beside the main data: one with a value is held by `portable_c-data` as
@@ -16113,19 +16121,17 @@ onto M at c238b02.
   `u32`, and `FileStep(handle, from, step)`, which is new, a step from
   where the file is (1) or from its end (2), an `i32` that may be back.
   The plan had one function take a place and a step in one parameter,
-  which no type does: a place is a size of a file and has no sign until
-  the layer gives it one, and a step has one. The three arguments of
-  the old call are refused by their count. When the layer gives the
-  size of a file a signed type, the two can be one again, as `lseek`
-  is. DOS is asked 42h with AL 0, 1 or 2 as before, and the same
-  registers. The README counts 97 functions, 18 of them for files, and
-  the table of `CLAUDE.md`, "Moving a file to the system's functions",
-  has the row for 42h written anew.
+  which no type does: a place is a size of a file and has no sign,
+  DOS's `u32`, and a step has one. The three arguments of the old call
+  are refused by their count. DOS is asked 42h with AL 0, 1 or 2 as
+  before, and the same registers. The README counts 97 functions, 18
+  of them for files, and the table of `CLAUDE.md`, "Moving a file to
+  the system's functions", has the row for 42h written anew.
 - `DriveSpace`'s `free`, `sector` and `total` are `u32`. DOS answers in
   16 bits, so on DOS they hold what they held; another system's figures
   may be larger, and then `DiskClusters * ClusterBytes`, which M says
   cannot wrap while the figures are 16 bits, can: a size that wraps at
-  4 GB, as every size of the program does until the layer.
+  4 GB, as every size of the program does in DOS's widths.
 
 **`dos32.c`.** `Move` asks 3Fh or 40h at one call for a count of
 0FFFFh or less, which is every count that the program asks, with the
@@ -16188,7 +16194,7 @@ copy of the program lives in the room with code of another layout, and
 `start-memory`, `ViewSeg` and `FreMem2` naming nothing known at the same
 address, as N19b found. Nothing is declared as changed.
 
-**For the cluster that sorts these numbers**, and for the layer:
+**For the cluster that sorts these numbers**:
 
 - `sys.h` is still `not sorted`, 35 numbers and 4 `u32`, as the brief of
   S had it: the plan gave the numbers of `sys.h`'s structures to S, and
@@ -16196,7 +16202,8 @@ address, as N19b found. Nothing is declared as changed.
   `struct Moved` and `FileStep` are new among them.
 - `struct Moved` is eight bytes and comes back through a pointer to
   room in the caller's frame, where `struct Answer` came back in EAX.
-- `failed` stays a `u16` in every answer, the layer's shape ("Booleans").
+- `failed` stays a `u16` in every answer here; N22 made it a `bool`
+  ("Booleans").
 - `Move` is the only place that knows DOS's limit of 0FFFFh bytes. A
   system with no such limit loops never; one with another sets its own
   `PIECE_MOST`. No caller asks for more than it did, and what a user
@@ -16761,13 +16768,13 @@ was sent.
 >         || TypeClassSize[next->type_class] > TypeClassSize[ins->type_class] ) )
 >         return( false );
 
-## An implementation of the layer for tests: future work
+## An implementation of `sys.h` for tests: future work
 
-The road of the portable C (`CLAUDE.md`, "The portable C") has a
-platform abstraction layer designed at its step 3, the implementation
-for DOS moved under it at step 4, and at step 5 a second implementation
-that builds and is not meant to run, a stub. An implementation of the
-layer made for tests would be a third: one that does run, on this
+The road of the portable C (`CLAUDE.md`, "The portable C") has DOS as
+the layer at its step 3, `sys.h` as it is, the implementation for DOS
+behind it at step 4, and at step 5 a second implementation that builds
+and is not meant to run, a stub. An implementation of `sys.h` made for
+tests would be another: one that does run, on this
 computer, built by clang, with the common code of the program above it,
 and that answers the program where a system would. It is future work,
 on the user's word of 13 October 2026, with everything that it would
@@ -16893,7 +16900,7 @@ estimate:
    | A disk that is full, a write that comes up short, the next disk | 43 | reached: the test says the answer |
    | Memory that runs out, or more than there is room for | 42 | reached in part: where the program asks for memory and is refused |
    | Another version of DOS | 30 | reached: the test says the answer |
-   | A drive that is not ready, the critical error | 19 | reached, if the layer has the critical error as a call back into the program: see below |
+   | A drive that is not ready, the critical error | 19 | reached: the critical error is a call back that the program hands over since S2 |
    | The time of day at the end of a minute, an hour, a day | 14 | reached: the clock is the implementation's |
    | A country that neither bench has | 11 | reached, also by calling the routine with the country's record |
    | Code that nothing calls, or input that no step makes: markup that no text has, a file with a line end in every two bytes, a path of 68 characters | 80 | some 50 by calling the routine itself or with a file made for it (an estimate); the rest nothing reaches |
@@ -16925,7 +16932,7 @@ estimate:
    C translation and by another way. The program draws into its own
    copy of the screen, `ScrBuf`, so much of what draws is in the first
    row, and a test reads the cells there with no implementation of
-   anything. Those functions need the layer for nothing but to be
+   anything. Those functions need `sys.h` for nothing but to be
    built on this computer. The candidates, each wholly or mostly in
    the first row:
 
@@ -16974,7 +16981,7 @@ estimate:
 
    | The bug | What would have caught it |
    |---|---|
-   | BX and DX going round the main loop from one command to the next: Rename behind Down offered a name that the original does not, and no scenario had the two keys one behind the other | Nothing on this computer. Sequences of keys made at random, on the bench, against the original: the first of the two things that need no layer, below |
+   | BX and DX going round the main loop from one command to the next: Rename behind Down offered a name that the original does not, and no scenario had the two keys one behind the other | Nothing on this computer. Sequences of keys made at random, on the bench, against the original: the first of the two things that need no implementation for tests, below |
    | Texts read behind their end: `CrLf_S` with a zero byte too many, `User_S` copied as 80 bytes | The address sanitizer, in the first scenario that reads them |
    | The table of the blanker's stars, three bytes wrong where no screen shows | Not this: `c-data` holds it now. Mutation testing would have said that no screen watches the blanker |
    | A `name` that was never set, so DOS was handed what the stack held, in `SetStat` and at the entry | The memory sanitizer, in a build of 64 bits |
@@ -16984,8 +16991,8 @@ estimate:
 
 The rule of "Scenarios" in `CLAUDE.md` is that a test puts no stand-in
 where something is that the project does not own, and that what a test
-knows of DOS, the BIOS and the machine it gets from the real ones. The
-layer is the project's. What a function of it promises is a statement
+knows of DOS, the BIOS and the machine it gets from the real ones.
+`sys.h` is the project's. What a function of it promises is a statement
 about a system all the same: that `FileWrite` answers with fewer bytes
 on a disk that is full is so of DOS, whoever wrote the header. So an
 implementation for tests is within the rule only as this:
@@ -17014,7 +17021,7 @@ anything.
 A wording for the rule was proposed. It is **not adopted**: the rule is
 the user's, and this is here as what was proposed, no more:
 
-> The layer is the project's, and an implementation of it made for
+> `sys.h` is the project's, and an implementation of it made for
 > tests is a part of the program replaced. It answers what a test tells
 > it, or what the real system was recorded answering on the bench, and
 > knows nothing of its own of what a system does. What runs on it shows
@@ -17042,14 +17049,13 @@ the user's, and this is here as what was proposed, no more:
   things in the same order. This is the session's reservation, and it
   is right; what there is to add makes it sharper, not weaker. Replay
   serves work that leaves the questions alone: pointers for segments,
-  numbers widened, a routine written anew above the layer, what is
+  numbers widened, a routine written anew above `sys.h`, what is
   drawn into the program's own buffer. Any change to what the program
   asks of the system, one call more or two in another order, ends the
   trace of every scenario that passes there, and those are recorded
   again on the bench, from a run that has passed against the
   original's golden. The same holds, for all of them at once, of a
-  change to the layer itself, so no trace is worth recording before
-  the design of step 3 has settled. Two things keep this from being a
+  change to `sys.h` itself. Two things keep this from being a
   trap. A replay that meets another question than was recorded fails,
   it does not pass on a wrong answer, so a stale trace is noticed and
   says that the bench is wanted. And a trace is what a golden of the
@@ -17061,88 +17067,28 @@ the user's, and this is here as what was proposed, no more:
   otherwise. A fault that only the layout of DOS makes they do not
   see, and one that they see may be the original's.
 
-### What it asks of the layer's design
+### What it needs of `sys.h`
 
-The design of step 3 is made before any of this is built, and is not to
-close the door on it. What of today's `sys.h` helps (read):
+This section asked a design of the layer, on 13 October 2026, to leave
+room for it. Step 3 settled the design the next day as DOS's, `sys.h`
+as it is, and the critical error has been a call back that the program
+hands over since S2. What still stands in the way of an implementation
+for tests, from what was read then:
 
-- 84 functions, each one thing asked, with no register in them.
-- A failure is a value that comes back, `struct Answer`, so an
-  implementation can be told to give it.
-- The screen is cells put and got, `ScreenPut` and `ScreenGet`, and the
-  keys are `KeyWaiting` and `KeyRead`: a test reads the one and fills
-  the other.
-- The timer and the time of day, memory, the version, the country,
-  the display and the mouse are all asked there, so a test can have
-  each be otherwise.
-- `Idle` is a call of its own. It is where `harness/DRIVER.ASM` knows
-  that a step is over, and where an implementation for tests would.
-- `dos.c` decides next to nothing: 5 conditional branches of the 3,302
-  counted (IR). An implementation without decisions needs no coverage,
-  and the bench is enough to judge it.
-
-And what hurts:
-
-- A decision of the program's under the seam: `AskEs` of `dos.c` makes
-  the error 53h of a call that the user gave up, asks DOS for its
-  extended error, and reads `md.ErrDat`. Every other implementation
-  would have to do the same again.
-- What a system enters of the program is outside the header: `FatErr`
-  of `main.c` is an `__interrupt` function that `SetVector` hooks, and
-  `resident.c` has the entries. With the critical error not a call
-  back that the layer names, the build of this computer does not link,
-  and the 19 instructions of a drive that is not ready stay out of
-  reach.
-- What DOS happens to do, in what the functions take and answer: some
-  25 of the 84 have such a thing (read, and approximate). `value` as
-  DOS left AX where nothing failed, `flagged`, what `FileSeek` answers
-  when it fails, the five functions with Bare in their names, the page
-  and the colour of `ScreenType`, `FcbParse` and `FcbDelete`,
-  `ScreenMemory` and `ScreenPageStart`, `ProgramPrefix`, which has left
-  the header since, memory by the segment. Each is one thing more that every implementation and every
-  trace has to do as DOS does. Taking one out is a deviation, to be
-  asked.
+- A decision of the program's under the seam: `AskEs` of the system's
+  file makes the error 53h of a call that the user gave up, asks DOS for
+  its extended error, and reads `md.ErrDat`. Every implementation has
+  to do the same again.
+- What DOS happens to do, in what the functions take and answer:
+  `value` as DOS left AX where nothing failed, `flagged`, the functions
+  with Bare in their names, the page and the colour of `ScreenType`,
+  `FcbParse` and `FcbDelete`. Each is one thing more that every
+  implementation and every trace has to do as DOS does.
 - What the system keeps between two calls and no call names: the
-  current drive and directory, the record of a search, `FindRecord`,
-  how often the pointer was hidden.
-- Nothing that a test can call to start the program: it is entered in
-  `resident.c`, as DOS enters it, and `ProgramEnd` does not return.
-
-So, of the design:
-
-- Low and narrow, as `sys.h` is. A layer that knows more, a file system
-  or a console, takes logic under it, where only the bench sees it and
-  every implementation writes it again; and replay rests on a trace of
-  small questions being all that the program knew.
-- An implementation that decides nothing; what the program decides
-  about an answer is above the layer.
-- The layer reads nothing of the program's data, and the program
-  nothing of the machine's.
-- What a system enters of the program, the critical error and
-  Ctrl-Break, as call backs that the layer names and the program hands
-  it.
-- Every answer said in full by its function, and nothing "as DOS left
-  it" that a caller goes on with unsaid.
-- The shapes of DOS that the screens show, a name of eight and three,
-  the bits of the attributes, a date and a time packed, the number of
-  an error, as the layer's own, written in its header: another system
-  answers in them.
-- Numbers of a width that is said, so that what is recorded of a
-  program of 32 bits can be answered to one of 64.
-- No waiting but through the layer: time is what the layer says it
-  is.
-- Memory asked of the layer in blocks that are pointers, so that on
-  this computer each is a block of its own and the sanitizer sees one
-  panel run into the next.
-- One call that says whether the program has anything left that it
-  will do by itself, where the driver reads `AutoTim` and `Clock` at
-  their addresses today.
-- All that is kept, by the program and by the layer, set anew by one
-  call; and the program started by a function that a test can call,
-  and ended so that the test goes on.
-- One implementation to a program, chosen when it is linked, `_dos.c`,
-  `_posix.c` and one for tests beside them, as the road has it. What
-  tells that one to fail is its own header, and no part of the layer.
+  current drive and directory, the record of a search, how often the
+  pointer was hidden.
+- Nothing that a test can call to start the program, and `ProgramEnd`
+  does not return.
 
 ### Open, for the user
 
@@ -17153,7 +17099,8 @@ So, of the design:
   the goldens.
 - Whether the rule gets the wording above, or another, before any of
   this is built.
-- Two things need no layer and could be done now. Neither is started:
+- Two things need no implementation for tests and could be done now.
+  Neither is started:
   - Sequences of keys made at random, on the bench, against the
     original and a tree, with one that differs kept as a scenario. It
     is the one thing here that looks for a mistake of the translation
@@ -17164,6 +17111,127 @@ So, of the design:
     where it looks today only at where each function begins. Half a
     day, an estimate. It says which blocks ran, not which way a branch
     went.
+
+## The program saves its setup and its session by itself: decided, not started
+
+On the user's word of 14 October 2026 (`CLAUDE.md`, step 3 of the
+road), given while a layer was being designed and kept when that design
+was set aside: the program saves its preferences and its session, the
+panels' directories and cursors, the sort modes, the command line and
+its history, by itself, when they change, after a short wait so that a
+run of changes is one write, and when it is ended, on Linux by a signal
+or by its terminal going; on every platform, DOS included. "Save setup"
+and the setting "Auto save setup" go. On DOS that is a deviation, to be
+declared when it is built. The rule of the harness for it: the
+comparison of a scenario's disks leaves the setup file out, but in the
+scenarios that are about the setup itself.
+
+To settle when it is built: one file or two, and which field is in
+which; where each lives, on DOS beside the program under names of 8.3;
+how long a change waits; a write that an end in the middle of it leaves
+whole; what two copies of the program running at once do with one file;
+and what the scenarios about the setup hold, now that the file is
+written when the setup changes and not by a command. The setup file
+keeps the original's format, on the user's word of 14 October 2026
+(`CLAUDE.md`, step 3), which works wherever DOS is emulated: the
+design that was set aside had made it a format of the program's own
+everywhere, and that is dropped.
+
+## What the surveys of the layer found that step 6 needs
+
+A layer designed from the platforms' side was surveyed on 13 and 14
+October 2026 and set aside for DOS as the layer (`CLAUDE.md`, step 3).
+Its documents and the decisions made for it are in the history, `git
+log --diff-filter=D -- src/portable_c/LAYER.md src/portable_c/layer`,
+and none of those decisions is on the road but three that the user
+named again for Linux on 14 October 2026 (`CLAUDE.md`, step 6):
+
+- **Decided.** Enter on a file that the program cannot run hands it to
+  `xdg-open`. The PC's sixteen colours are drawn as DOS has them,
+  exactly, in 24 bits where the terminal allows it. The screen is 80
+  columns by 25 rows and no other size, whatever the terminal's. And
+  the size of a file stays DOS's `u32`: a file of 4 GB or more is shown
+  and copied as DOS would (`CLAUDE.md`, the sign).
+
+What the surveys found of Linux that the implementation of step 6
+meets, beside what `CLAUDE.md` decides there; read in the documentation
+then, nothing tried:
+
+- **Reading the screen back.** A terminal cannot say what a cell shows;
+  the Linux console alone can, by `/dev/vcsa`. What `ScreenGet` reads
+  after a command, the screen that the command wrote, is the
+  implementation's own copy or nothing. The alternate screen, `?1049h`,
+  keeps the panels apart from what a command writes, one shown at a
+  time, as Midnight Commander's Ctrl-O does.
+- **Drawing.** A terminal decides a character's width by its own table,
+  and terminals disagree; the frames and Cyrillic are of ambiguous
+  width (UAX #11), two cells in a terminal set up for East Asian text.
+  Placing the cursor at each run loses at most a cell where one
+  disagrees. A terminal without colours of 24 bits has only the 16
+  named ones, which are the user's theme; blinking is not everywhere.
+  An update may tear without synchronized output, mode 2026 (xterm has
+  it, st not). `TIOCGWINSZ`, and `SIGWINCH` when it changes, say only
+  whether the 80 by 25 fit; the cursor is DECTCEM and DECSCUSR; a
+  scroll is DECSTBM with SU and SD.
+- **Keys.** Bytes on standard input in raw mode, read with a timeout;
+  Esc and Alt with a letter both begin with ESC and are told apart by a
+  timeout unless the protocol says. Ctrl with a letter is a control
+  character, so Ctrl and Ctrl-Shift are one. A modifier alone, a key let
+  go and a repeat come only by the kitty protocol, flags 2 and 8: kitty,
+  Alacritty, foot, Ghostty, iTerm2, WezTerm, Windows Terminal and
+  xterm.js have it, macOS Terminal and the Linux console not. Without
+  it `KeysHeld` has nothing to answer: no tap on Alt, no key bar of
+  Shift, Ctrl and Alt. The kitty protocol's flag 4 adds the key of a US
+  layout, "Ctrl+С on a Cyrillic layout reports c", which is what the
+  BIOS's scan code is for the speed search by Alt with a letter. A
+  terminal has F1 to F12; the desktop keeps some, Alt-F4, and Alt-F7
+  under some window managers.
+- **The mouse.** `?1000h`, `?1002h` and the SGR form `?1006h`, in cells,
+  with Shift, Alt and Ctrl, where the terminal keeps Shift for
+  selecting text as a rule. A double click is the program's to measure.
+- **The country.** `setlocale(LC_ALL, "")` by `LANG`, `LC_*` and
+  `LC_ALL`; a locale that is not installed leaves "C". glibc's ru_RU
+  has `%d.%m.%Y`, `%T`, and U+202F, three bytes of UTF-8, for the
+  thousands; en_US `%m/%d/%Y` and `%r`. DOS's record, 38h, has one order
+  of three and a byte for each separator.
+- **Names.** Bytes, any but `/` and NUL, UTF-8 by custom and not by
+  rule; 255 bytes, a path up to 4,096 and no hard limit. ext4 tells
+  case apart, so two names of DOS's form may be one; two forms of
+  Unicode are two names. A name that begins with a dot is hidden by
+  custom; system and archive mean nothing, and permissions are the
+  mode's bits.
+- **Files.** `rename` replaces a target that is there, where DOS fails
+  (`renameat2` with `RENAME_NOREPLACE` does not), and fails with
+  `EXDEV` across file systems. A time is UTC to the nanosecond, DOS's
+  local to two seconds from 1980 to 2107. `off_t` is 64 bits: a file of
+  4 GB or more is shown and copied as DOS would, as decided above.
+  `statvfs` gives the blocks
+  free to the user and their size. A listing is `readdir` and a
+  `fstatat` or `statx` for each entry, `d_type` maybe unknown, with no
+  pattern. Mounts are in `/proc/self/mountinfo`, removable media under
+  `/media`, `/run/media` or `/run/user/.../gvfs`.
+- **Errors.** `errno`: `ENOENT`, `ENOTDIR`, `EACCES`, `EPERM`, `EROFS`,
+  `EBUSY`, `ETXTBSY`, `EIO`, `ENOSPC`, `EDQUOT`, `ENOTEMPTY`, `EXDEV`,
+  `EINTR`, each to be made a number of DOS's. There is no critical
+  error: a drive that is not ready fails, `EIO` or `ENOMEDIUM`, and a
+  network or FUSE mount may wait without end.
+- **Programs and the program's life.** `$SHELL -c`, and `/bin/sh` where
+  `SHELL` is not set; `system` ignores SIGINT and SIGQUIT while it
+  waits; 127 where the shell or the command could not start. The
+  terminal goes to a command with its modes put back, `tcsetattr` and
+  `tcsetpgrp`, and a command may leave it odd. Ctrl-C is byte 03h with
+  `ISIG` off; Ctrl-Break has nothing; Ctrl-Z stops by SIGTSTP where
+  `ISIG` is on, and the program redraws on SIGCONT; SIGTERM and SIGHUP
+  end it, the terminal to be put back first. The program's own file is
+  `/proc/self/exe`; `xdg-open` answers 0, or 1 to 4 for an error, and
+  does not wait for the program that it starts; a user's settings are
+  in `$XDG_CONFIG_HOME`,
+  `~/.config`, the state and a command history in `$XDG_STATE_HOME`;
+  temporary files in `TMPDIR` or `/tmp`.
+- **Waiting and time.** `poll` on the terminal with a timeout, where DOS
+  has INT 28h. `clock_gettime` with `CLOCK_REALTIME` and `localtime_r`
+  for the time of day; `CLOCK_MONOTONIC`, which stops while the machine
+  sleeps, or `CLOCK_BOOTTIME`, which does not, for the BIOS's ticks.
 
 ## A deviation held by a patch: done, and what comes behind it
 

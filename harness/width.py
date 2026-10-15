@@ -254,7 +254,7 @@ TABLES = ("the tables: constants that are laid out as the original has "
           "them, which the test of the data holds byte for byte")
 WHOLE = {
     "sys_dos.c": "the system's file: what DOS, the BIOS and the extender "
-               "take and answer in, and the layer's to shape, step 3",
+                 "take and answer in, in their widths, as sys.h has them",
     "stack_dos.c": "the stack, an array of bytes",
 }
 
@@ -308,8 +308,8 @@ WORDS = {
             "apart and put together by shifts and masks",
     "size": "the size of a file, a place in one, the size of a disk or of "
             "what is free on it, or a sum of such: it can pass two "
-            "gigabytes, and there is no signed type of 64 bits. A u32 "
-            "until the layer's design gives the size of a file its type",
+            "gigabytes, and there is no signed type of 64 bits. A u32, "
+            "DOS's width, which sys.h keeps",
     "setup": "a byte of the setup file, which stays a byte",
     "flag": "true or false, in a byte of the layout: the code asks "
             "whether it is 0",
