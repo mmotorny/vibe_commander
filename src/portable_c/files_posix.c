@@ -251,6 +251,7 @@ void DosBegin(struct Dos *dos, const char *home)
         dos->handles[i].access = 2;
     }
     dos->record = &dos->own;
+    dos->clock = NULL;
 }
 
 void DosEnd(struct Dos *dos)
@@ -538,6 +539,8 @@ struct Answer DosFileClose(struct Dos *dos, u16 handle)
            the same, on Linux, and is not made again. */
         if (open->stamped)
             Stamp(open->fd, open->stamp);
+        else if (open->written && dos->clock != NULL)
+            Stamp(open->fd, dos->clock());
         close(open->fd);
     }
     open->fd = -1;

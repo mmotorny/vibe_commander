@@ -508,7 +508,7 @@ if(NOT clang)
                    "the test portable_c-stub is skipped")
 endif()
 
-# add_portable_c_host(<target> <directory> <implementation>
+# add_portable_c_host(<target> <directory> <implementation> [BY_NAME]
 #                     [COMPILE <option>...] [LINK <option>...])
 # builds src/portable_c/ for this computer with clang, as
 # <directory>/vc, of the common code and the files of <implementation>
@@ -519,9 +519,11 @@ endif()
 # as DOS does, which C promises nothing of without it (TODO.md, "5a, the
 # split"). The command of the compiler is written into
 # <directory>/compiled.txt, which every object follows, as add_portable_c
-# has it, and which the test portable_c-stub reads.
+# has it, and which the test portable_c-stub reads. With BY_NAME the
+# target is not of the default one: it is built when it is named,
+# `cmake --build build --target <target>`.
 function(add_portable_c_host target directory implementation)
-    cmake_parse_arguments(PARSE_ARGV 3 host "" "" "COMPILE;LINK")
+    cmake_parse_arguments(PARSE_ARGV 3 host "BY_NAME" "" "COMPILE;LINK")
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
@@ -556,7 +558,11 @@ function(add_portable_c_host target directory implementation)
         DEPENDS ${objects}
         COMMENT "Linking the portable C (${target})"
         VERBATIM)
-    add_custom_target(${target} ALL DEPENDS ${directory}/vc)
+    if(host_BY_NAME)
+        add_custom_target(${target} DEPENDS ${directory}/vc)
+    else()
+        add_custom_target(${target} ALL DEPENDS ${directory}/vc)
+    endif()
 endfunction()
 
 # The trees.
@@ -615,8 +621,8 @@ if(clang)
 endif()
 # The program for Linux, step 6 of the road: src/portable_c/*_posix.c for
 # sys.h, sys_posix.c with the emulation of DOS of the pieces L1 and L2
-# behind it (TODO.md, "L3a, the program runs on Linux"). Two builds,
-# each its own directory of build/portable_c/, both with
+# behind it (TODO.md, "L3a, the program runs on Linux"). Three builds,
+# each its own directory of build/portable_c/, all with
 # -D_XOPEN_SOURCE=700, as the test of the emulation below has it:
 #   posix/vc        the program, with the hardening of the stub's first
 #                   build
@@ -624,7 +630,11 @@ endif()
 #                   the alignment of what is read among them: a word in
 #                   a buffer of bytes is made of its bytes, GET16 and its
 #                   like of vc.h (TODO.md, "AL, words made of their
-#                   bytes")
+#                   bytes"); the one that the tests run
+#   posix-msan/vc   with the sanitizer of memory, which goes with no other,
+#                   for an audit by hand: not of the default target, built
+#                   by its name, and run by no test (TODO.md, "L3b, the
+#                   scenarios on Linux", says how)
 if(clang)
     add_portable_c_host(portable_c-posix ${CMAKE_BINARY_DIR}/portable_c/posix
         posix
@@ -636,6 +646,11 @@ if(clang)
         ${CMAKE_BINARY_DIR}/portable_c/posix-asan posix
         COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer
                 -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
+                -fno-sanitize-recover=all)
+    add_portable_c_host(portable_c-posix-msan
+        ${CMAKE_BINARY_DIR}/portable_c/posix-msan posix BY_NAME
+        COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer
+                -fsanitize=memory -fsanitize-memory-track-origins
                 -fno-sanitize-recover=all)
 endif()
 

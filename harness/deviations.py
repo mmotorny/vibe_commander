@@ -230,6 +230,8 @@ def expected(screen, rules=None):
             rule.made(screen, cells)
             continue
         pattern, text, below = rule
+        if text is None:
+            continue                    # a mask: see masked()
         for row in range(ROWS):
             match = pattern.search(line(row))
             if match and below:
@@ -243,6 +245,42 @@ def expected(screen, rules=None):
                     cells[(row * COLUMNS + column) * 2] = \
                         ord(text[column - start])
     return replace(screen, cells=bytes(cells))
+
+
+def masked(golden, screen, rules):
+    """The screen `golden` of a golden and the screen `screen` of a
+    build, with the cells that a mask among `rules` finds on the
+    golden's left out of both, character and colour: a mask is a rule
+    with None for its text (Declared.rules), of a tree whose program
+    shows there what nothing can expect, a thing of the host's. Every
+    match of its pattern on a row is found, and every group of a match
+    is left out; with a pattern for the line below, only a row whose
+    next one has that."""
+    masks = [rule for rule in rules
+             if not isinstance(rule, Part) and rule[1] is None]
+    if not masks:
+        return golden, screen
+    out = [bytearray(golden.cells), bytearray(screen.cells)]
+    lines = golden.lines()
+    for pattern, _, below in masks:
+        for row, line in enumerate(lines):
+            if below and not (row + 1 < ROWS
+                              and below.search(lines[row + 1])):
+                continue
+            for match in pattern.finditer(line):
+                for group in range(1, (pattern.groups or 0) + 1):
+                    start, end = match.span(group)
+                    for column in range(max(start, 0), end):
+                        for cells in out:
+                            at = (row * COLUMNS + column) * 2
+                            cells[at:at + 2] = MASKED
+    return (replace(golden, cells=bytes(out[0])),
+            replace(screen, cells=bytes(out[1])))
+
+
+# What a masked cell is made on both screens: a character and a colour
+# that the program never shows together.
+MASKED = bytes((0, 0))
 
 
 def compared(screen, tree=None):
@@ -573,6 +611,12 @@ class Declared:
     # no patch, no step left out or taken in place of another, and the
     # rules of the tree are not made to what is its own already.
     own: dict = field(default_factory=dict)
+    # Scenarios that the tree is taken through only as far as a step:
+    # scenario -> (the first step that it is not taken through, and none
+    # behind it; why). For a scenario of which what comes before that
+    # step is worth holding the tree to, and what comes from there on
+    # rests on what the tree cannot do yet, or at all.
+    cut: dict = field(default_factory=dict)
 
     def taken(self, steps, name=None):
         """How the tree is taken through `steps`, those of the scenario
@@ -589,6 +633,10 @@ class Declared:
             for at in found([steps[at] for at in places], some):
                 instead.update(zip(places[at:at + len(some)], others,
                                    strict=True))
+        if name in self.cut:
+            first = self.cut[name][0]
+            places = [at for at in places
+                      if at < steps.index(first)]
         return [(at, instead.get(at) or
                  self.in_place_of.get(steps[at], (steps[at],))[0])
                 for at in places if instead.get(at, "") is not None]
@@ -1033,6 +1081,106 @@ TREES = {
         },
     ),
 }
+
+
+# The trees that are of another's source and are declared as that one is,
+# with what is declared for them besides: tree -> the tree of the source.
+# The program for Linux is of the portable C's source, and what the
+# portable C is declared to do otherwise it does too: its scenarios not
+# run, its steps, its rules and its patches (goldens.read). What is of
+# Linux alone is ON_LINUX, below.
+BASE = {"posix": "portable_c"}
+
+
+def _on_top(base, more):
+    """What `base` declares with what `more` declares besides: the
+    scenarios not run and the steps of both, and the rules of `base`
+    followed by those of `more`."""
+    def joined(name):
+        return {**getattr(base, name), **getattr(more, name)}
+    return replace(
+        base, not_run=joined("not_run"), left_out=joined("left_out"),
+        left_out_of=joined("left_out_of"), rules=base.rules + more.rules,
+        in_place_of=joined("in_place_of"), in_place_in=joined("in_place_in"),
+        cut=joined("cut"))
+
+
+# What the program for Linux shows that nothing can expect, a thing of
+# the host's, each left out where the golden has the original's: masks
+# (CLAUDE.md, step 6; the user's word of 15 October 2026), rules with
+# None for their text (masked()).
+LINUX_MASKS = (
+    # The drive's letter: the bench's C:, which is H: on Linux, the
+    # home directory, in a title, on the prompt, in a dialog's line and
+    # in the Info panel.
+    (re.compile(r"(?<![A-Za-z0-9])([Cc]):(?=\\|[ >]|$)"), None, None),
+    # Its label: the bench's C: is WORK, and H: is HOME.
+    (re.compile(r"Volume in drive [A-Za-z]: is (WORK)"), None, None),
+    # The room of the drive in the Info panel, of the host's file
+    # system (L2), and what the files of a directory use there, in
+    # clusters of the host's: the whole line, which is centred, so the
+    # figure's length moves it.
+    (re.compile(r"║(.*total bytes on drive.*)║"), None, None),
+    (re.compile(r"║(.*bytes free on drive.*)║"), None, None),
+    (re.compile(r"║(.*files? uses? .* bytes in.*)║"), None, None),
+)
+
+# The scenarios that the program for Linux is not taken through, not on
+# this platform, each with its reason (the user's word of 15 October
+# 2026: a scenario that rests on what only DOS has is not run on Linux).
+_RUSSIA = ("Russia, code page 866: the program for Linux has the code "
+           "page 437, always (CLAUDE.md, step 6)")
+_MOUSE = ("the mouse, which has no event in the test channel until the "
+          "piece L5")
+_FLOPPY = ("the diskette drive, which Linux has not: the drives are R: "
+           "and H: (CLAUDE.md, step 6)")
+_DOS = ("a program of DOS or a command of DOS is what it is about, its "
+        "output or the program coming back from it")
+LINUX_NOT_RUN = {
+    **dict.fromkeys(
+        ["stamps-russia", "russian", "clock-russia", "clock-path-russia",
+         "clock-night-russia", "attributes-russia", "setup-options-russia"],
+        _RUSSIA),
+    **dict.fromkeys(
+        ["mouse-panel", "mouse-list", "mouse-bars", "mouse-dialog",
+         "mouse-left-hand", "mouse-select", "mouse-fields", "mouse-line",
+         "mouse-filter", "mouse-keys", "mouse-menu", "mouse-user-menu",
+         "mouse-history", "mouse-drive", "mouse-middle",
+         "mouse-drag-dialog", "mouse-drag-menu", "menu-none",
+         "mouse-drag-lists", "mouse-help", "mouse-find", "mouse-tree",
+         "mouse-view", "mouse-edit", "blank", "setup-config-mouse",
+         "setup-screen", "setup-panels", "setup-country",
+         "setup-colors-mouse", "setup-help-mouse", "setup-mouse",
+         "setup-left-handed"], _MOUSE),
+    **dict.fromkeys(["drive-b", "not-ready", "phantom",
+                     "diskette-command"], _FLOPPY),
+    "device": "a device of DOS's and DOS's critical error, which the "
+              "program for Linux is never entered for (L3a)",
+    "copy-full": "a disk that is full, which a test on the host cannot "
+                 "make without a file system of its own to mount",
+    "find-drives": "every fixed drive, where R: is the host's root: the "
+                   "search would go through the host's whole file system",
+    "editor-full": "memory that runs out, where Linux gives what the "
+                   "machine has (CLAUDE.md, step 6)",
+    "copy-big": "memory that runs out, where Linux gives what the "
+                "machine has (CLAUDE.md, step 6)",
+    **dict.fromkeys(
+        ["command", "comspec", "ended", "stay-left", "start-screen",
+         "start-memory", "second-copy", "lost", "enter-many",
+         "enter-many-selected", "start-setup", "setup-defaults"], _DOS),
+    # Of the 18 that run a command, those whose value is the command
+    # itself (TODO.md, "L3b"): the rest are to be run up to the step
+    # before their first command, `cut`, which waits for a way to know
+    # that step.
+    "enter": "Enter on a file that DOS runs, and the commands before and "
+             "after it: what it holds is DOS running them",
+    "user-menu-run": "the commands of the user menu, whose parameters "
+                     "show only in what the command run prints",
+}
+
+ON_LINUX = Declared(not_run=LINUX_NOT_RUN, rules=LINUX_MASKS)
+
+TREES["posix"] = _on_top(TREES["portable_c"], ON_LINUX)
 
 
 def ruled(screen, rule):

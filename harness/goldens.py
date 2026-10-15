@@ -235,6 +235,10 @@ TO_WRITE = "TO BE WRITTEN"
 
 ATTRIBUTES = "RHSVDA"             # read-only, hidden, system, label, ...
 
+# What disk_lines() says of the time of a directory of the program for
+# Linux that the run has written into, which is not compared.
+WRITTEN_INTO = "written into by the run"
+
 # A file stamped with a time in the minutes after the machine's clock was
 # started has been written during the run. Here as DOS counts minutes in a
 # time stamp: 10 of them.
@@ -358,7 +362,12 @@ def disk_lines(disks, programs):
             flags = "".join(letter for bit, letter in enumerate(ATTRIBUTES)
                             if entry.attributes >> bit & 1) or "-"
             date, time = setups.DOS_CLOCK
-            if entry.date == date and time < entry.time < time + RUN_TIME:
+            if entry.is_directory and entry.date == entry.time == 0xFFFF:
+                # Of the program for Linux, a directory whose time the
+                # host has moved, since the run wrote into it: DOS keeps
+                # a directory's time (posixrun.WRITTEN_INTO).
+                when = WRITTEN_INTO
+            elif entry.date == date and time < entry.time < time + RUN_TIME:
                 when = "during the run"
             else:
                 when = (f"{1980 + (entry.date >> 9)}-"
@@ -474,10 +483,14 @@ def read(name, tree=None, patched=True):
                           for screen in golden.screens]
     kept = [0] + [at + 1 for at in declared.kept(golden.steps[1:], name)]
     file = patch_path(name, tree)
+    if not file.exists() and tree in deviations.BASE:
+        # A tree of another's source has that one's patch where it has
+        # none of its own.
+        file = patch_path(name, deviations.BASE[tree])
     if isinstance(patched, Patch):
         golden.patch = patched
     elif patched and file.exists():
-        golden.patch = read_patch(file, tree)
+        golden.patch = read_patch(file, file.parent.name)
     if golden.patch:
         fit(golden.patch, golden, kept)
     golden.places = kept
@@ -1052,13 +1065,44 @@ def departures(golden, run, programs):
                           + _in_golden(golden, number), lines))
     if run.cut:
         return found
+    want, got = golden.disks, disk_lines(run.disks, programs)
+    if golden.tree == "posix":
+        want = on_the_host(want)
+        got = on_the_host(got, want)
     lines = disk_differences(
-        golden.disks, disk_lines(run.disks, programs),
+        want, got,
         golden.patch.files if golden.patch else (),
         mine="its own expectation has" if golden.own else None)
     if lines:
         found.append((None, lines))
     return found
+
+
+def on_the_host(disks, golden=None):
+    """The disks of disk_lines() as the program for Linux is held to
+    them: without the attributes hidden, system and archive, which the
+    host has nowhere for (CLAUDE.md, step 6: taken when set and not
+    kept); and, of the run's, `golden` given, with a directory that the
+    run has written into said so of in the golden's line too, where the
+    golden has the directory, since the host moves a directory's time
+    at every entry made or removed and DOS does not (a mask, on the
+    user's word of 15 October 2026)."""
+    out = {}
+    for drive, lines in disks.items():
+        out[drive] = {}
+        for name, line in lines.items():
+            flags, rest = line[:3].strip(), line[4:]
+            if flags != "the":          # "the program under test"
+                flags = "".join(c for c in flags if c not in "HSA") or "-"
+                line = f"{flags:<3} {rest}"
+            out[drive][name] = line
+    if golden is not None:
+        for drive, lines in out.items():
+            for name, line in lines.items():
+                was = golden.get(drive, {}).get(name)
+                if WRITTEN_INTO in line and was and was.startswith("D "):
+                    golden[drive][name] = line
+    return out
 
 
 def screen_departs(golden, number, screen):
@@ -1071,9 +1115,12 @@ def screen_departs(golden, number, screen):
     # and the build's without what its own tree does.
     made = golden.patch.made if golden.patch else {}
     place = golden.places[number] if golden.places else number
-    return screen_differences(
+    expected, actual = deviations.masked(
         deviations.compared(golden.screens[number]),
-        deviations.compared(screen, golden.tree), made.get(place),
+        deviations.compared(screen, golden.tree),
+        deviations.declared(golden.tree).rules)
+    return screen_differences(
+        expected, actual, made.get(place),
         mine="its own" if golden.own else "original")
 
 

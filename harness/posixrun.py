@@ -1,0 +1,378 @@
+"""The program for Linux taken through the scenarios.
+
+(Not posix.py, which Python has a module of its own by.)
+
+The program for Linux, build/portable_c/posix-asan/vc (or posix/vc), is
+judged by the scenarios as the program for DOS is (CLAUDE.md, "The
+portable C", step 6), but runs on the host, not in a machine: it is
+started as a process of its own with its test channel (the top of the
+test channel in src/portable_c/sys_posix.c), which does from inside what
+the driver of the tests does from outside on the bench. This module lays
+out the bench of a run, makes a scenario's steps into the channel's
+`keys`, runs the program, and makes of what it wrote and left a
+scenarios.Run, so that compare.py and goldens.py take it as they take a
+build for DOS. What the program for Linux is declared to show otherwise
+is in deviations.py, under the tree "posix".
+
+The bench of a run is a directory of /tmp of its own, removed behind it:
+
+  - `home`, which is HOME and so the drive H:, laid out as the bench's
+    C: is, WORK and STAMPS with the same files and the same times
+    (setups.WORK_FILES, STAMPS_FILES; the large sizes as sparse files),
+    the program started in home/WORK, so on H:\\WORK where the original
+    is on C:\\WORK;
+  - `vc`, the directory of the setup file, which XDG_CONFIG_HOME names,
+    with what the bench has beside the program in D:\\VC
+    (setups.SUPPORT_FILES, from the pinned distribution, with their
+    dates), named in small letters as the program names what it makes,
+    and the bench's setup file as it is (setups.Bench.setup).
+
+The bench's directory is in /tmp, not in build/tmp, so that the path of
+`vc` holds in DOS's 63 characters on R: whatever the checkout's path
+is: the program ends where DOS cannot name the directory of its setup
+file (TODO.md, L3a).
+
+The environment has TZ=UTC, under which the host's times of the files
+are the bench's, PATH, and the channel's two variables: VC_TEST and
+VC_TEST_CLOCK, the bench's clock at the start (setups.CLOCK), from which
+the program's clock goes on only while the test waits, as the machine's
+does on the bench.
+
+A key is made the word that the bench's BIOS makes of it, the scan code
+above the character, as INT 16h 00h answers it: the table of the IBM
+PC's BIOS for the keys of a US keyboard (IBM's Technical Reference; RBIL,
+INT 16h), with the cursor's keys of the gray block, which the driver
+presses (driver.EXTENDED), as 00h answers them, the character E0h made
+0. Shift, Ctrl and Alt are `held=` around the key, as the bench has them
+held while it is pressed: 02h for Shift, the left one, 01h for the right
+one, 04h for Ctrl, 08h for Alt, as the BIOS keeps them at 40:17h. The
+mouse has no event in the channel yet (L5): a scenario with a step of it
+is not run.
+"""
+import hashlib
+import os
+import subprocess
+import tempfile
+import time
+from pathlib import Path
+
+import deps
+import fat
+import setups
+from dos import COLUMNS, ROWS, Screen, MachineError
+
+ROOT = deps.ROOT
+# The program for Linux, with the sanitizers that go together.
+PROGRAM = ROOT / "build" / "portable_c" / "posix-asan" / "vc"
+
+# The time and the date of a directory that the run has written into:
+# none of DOS's, whose date has no month 15 (see goldens.disk_lines).
+WRITTEN_INTO = 0xFFFF
+
+# A record of the channel's `screens`.
+RECORD = 4 + 4 + COLUMNS * ROWS * 2 + 8
+
+# The keys that are no character, by the driver's name: the BIOS's word
+# alone, with Shift, with Ctrl and with Alt; None where the BIOS makes
+# nothing of the key so held.
+SPECIAL = {
+    "Esc": (0x011B, 0x011B, 0x011B, 0x0100),
+    "Backspace": (0x0E08, 0x0E08, 0x0E7F, 0x0E00),
+    "Tab": (0x0F09, 0x0F00, 0x9400, 0xA500),
+    "Enter": (0x1C0D, 0x1C0D, 0x1C0A, 0x1C00),
+    "Space": (0x3920, 0x3920, 0x3920, 0x3920),
+    "GrayStar": (0x372A, 0x372A, 0x9600, 0x3700),
+    "GrayMinus": (0x4A2D, 0x4A2D, 0x8E00, 0x4A00),
+    "GrayPlus": (0x4E2B, 0x4E2B, 0x9000, 0x4E00),
+    # The gray block of the cursor: E0h for the character, which INT 16h
+    # 00h makes 0.
+    "Home": (0x4700, 0x4700, 0x7700, 0x9700),
+    "Up": (0x4800, 0x4800, 0x8D00, 0x9800),
+    "PgUp": (0x4900, 0x4900, 0x8400, 0x9900),
+    "Left": (0x4B00, 0x4B00, 0x7300, 0x9B00),
+    "Right": (0x4D00, 0x4D00, 0x7400, 0x9D00),
+    "End": (0x4F00, 0x4F00, 0x7500, 0x9F00),
+    "Down": (0x5000, 0x5000, 0x9100, 0xA000),
+    "PgDn": (0x5100, 0x5100, 0x7600, 0xA100),
+    "Ins": (0x5200, 0x5200, 0x9200, 0xA200),
+    "Del": (0x5300, 0x5300, 0x9300, 0xA300),
+}
+for _number in range(1, 11):
+    SPECIAL[f"F{_number}"] = tuple((code + _number - 1) << 8 for code in
+                                   (0x3B, 0x54, 0x5E, 0x68))
+SPECIAL["F11"] = (0x8500, 0x8700, 0x8900, 0x8B00)
+SPECIAL["F12"] = (0x8600, 0x8800, 0x8A00, 0x8C00)
+
+# The keys of characters, by the character that they type alone: the
+# scan code, and the character with Shift and with Ctrl, or None.
+_ROWS = [("1234567890-=", 0x02), ("qwertyuiop[]", 0x10),
+         ("asdfghjkl;'`", 0x1E), ("\\zxcvbnm,./", 0x2B)]
+_SHIFTED = dict(zip("1234567890-=[];'`\\,./",
+                    "!@#$%^&*()_+{}:\"~|<>?"))
+CHARACTERS = {}
+for _keys, _scan in _ROWS:
+    for _at, _char in enumerate(_keys):
+        if _char.isalpha():
+            shift, ctrl = _char.upper(), chr(ord(_char) - 0x60)
+        else:
+            shift = _SHIFTED[_char]
+            ctrl = {"[": "\x1b", "]": "\x1d", "\\": "\x1c", "-": "\x1f",
+                    "2": "\x00", "6": "\x1e"}.get(_char)
+        CHARACTERS[_char] = (_scan + _at, shift, ctrl)
+# Alt with a digit or with - and =, which the BIOS gives scan codes of
+# their own: 78h for Alt-1 to 83h for Alt-=.
+ALT_DIGITS = {char: 0x78 + at for at, char in enumerate("1234567890-=")}
+# Shift with a character that it types, and the key that is pressed.
+BY_SHIFTED = {shift: char for char, (_, shift, _) in CHARACTERS.items()}
+
+HELD = {"Shift": 0x02, "RightShift": 0x01, "Ctrl": 0x04, "Alt": 0x08}
+
+
+def word(name, held):
+    """The BIOS's word for the key `name`, as the driver names it, with
+    the keys of HELD that `held` has down."""
+    column = 3 if held & 8 else 2 if held & 4 else 1 if held & 3 else 0
+    if name in SPECIAL:
+        found = SPECIAL[name][column]
+    else:
+        char = name.lower() if len(name) == 1 else None
+        if char not in CHARACTERS:
+            raise ValueError(f"unknown key {name!r}")
+        scan, shift, ctrl = CHARACTERS[char]
+        if column == 3:
+            found = (ALT_DIGITS[char] << 8) if char in ALT_DIGITS \
+                else scan << 8
+        elif column == 2:
+            found = None if ctrl is None else scan << 8 | ord(ctrl)
+        elif column == 1:
+            found = scan << 8 | ord(shift)
+        else:
+            found = scan << 8 | ord(char)
+    if found is None:
+        raise ValueError(f"the BIOS makes nothing of {name!r} with "
+                         f"{held:02X}h held")
+    return found
+
+
+def events(step):
+    """The words of the channel's `keys` for one step of a scenario, as
+    driver.events() has its events: Shift, Ctrl and Alt down first, one
+    after the other, and up last; keys of one name that are not those
+    one behind the other; a text a key for each character, with Shift
+    where the character wants it."""
+    out = []
+    for name in step.split():
+        if "@" in name and not name.startswith('"'):
+            raise ValueError(f"the mouse has no event in the channel: "
+                             f"{name!r}")
+        if name.startswith("Wait*"):
+            out.append(f"wait={int(name.partition('*')[2])}")
+            continue
+        if name.startswith('"'):
+            chords = [["Shift", BY_SHIFTED[char]] if char in BY_SHIFTED
+                      else [char] for char in name.strip('"')]
+        else:
+            chords = [name.split("+")]
+        for chord in chords:
+            held = 0
+            mods = [key for key in chord if key in HELD]
+            keys = [key for key in chord if key not in HELD]
+            for key in mods:
+                held |= HELD[key]
+                out.append(f"held={held:02X}")
+            for key in keys:
+                out.append(f"{word(key, held):04X}")
+            for key in mods[::-1]:
+                held &= ~HELD[key]
+                out.append(f"held={held:02X}")
+    return out
+
+
+def keys(steps):
+    """The channel's `keys` for a scenario of `steps`: the start, which
+    is an empty step, and a line for each."""
+    return "".join(" ".join(events(step)) + "\n" for step in ("",) + steps)
+
+
+def _dos_stamp(seconds):
+    """DOS's time and date words of a time of the host, in UTC."""
+    moment = time.gmtime(seconds)
+    year = max(moment.tm_year, 1980)
+    return (moment.tm_hour << 11 | moment.tm_min << 5 | moment.tm_sec // 2,
+            (year - 1980) << 9 | moment.tm_mon << 5 | moment.tm_mday)
+
+
+def lay_out(bench, setup):
+    """Lay the bench of a run out in the directory `bench`, with `setup`
+    as the setup file: the home directory and the directory of the setup
+    file, and the times of what is in them, each directory's as the
+    bench's FAT has it, (directory, time) for each made, to be set when
+    what is in it has been made."""
+    home, config = bench / "home", bench / "vc"
+    stamps = []
+    for path in (home, home / "WORK", home / "STAMPS", config):
+        path.mkdir(parents=True)
+    for name in setups.WORK_DIRECTORIES:
+        (home / "WORK" / name).mkdir()
+        stamps.append((home / "WORK" / name, setups.EPOCH))
+    for name, data in setups.WORK_FILES:
+        (home / "WORK" / name).write_bytes(data)
+        stamps.append((home / "WORK" / name, setups.EPOCH))
+    for name in setups.STAMPS_DIRECTORIES:
+        (home / "STAMPS" / name).mkdir()
+        stamps.append((home / "STAMPS" / name, setups.EPOCH))
+    for name, size, when in setups.STAMPS_FILES:
+        with open(home / "STAMPS" / name, "wb") as file:
+            file.truncate(size)
+        stamps.append((home / "STAMPS" / name, when))
+    files = setups.distribution()
+    for name in setups.SUPPORT_FILES:
+        data, when = files[name]
+        path = config / name.lower()
+        path.write_bytes(setup if name == setups.SETUP_FILE else data)
+        stamps.append((path, when))
+    for path in (home / "WORK", home / "STAMPS", config, home):
+        stamps.append((path, setups.EPOCH))
+    for path, when in stamps:
+        os.utime(path, (when, when))
+    # What was laid out, with its time and, of a file, its size and the
+    # sum that the bench's disk has of it: the files of STAMPS have their
+    # sizes only in the bench's directory, and no contents, and are
+    # sparse here, so that none of their bytes is read.
+    laid = {}
+    for path, when in stamps:
+        size = path.stat().st_size
+        if path.parent.name == "STAMPS" and path.is_file():
+            data = b""
+        elif path.is_file():
+            data = path.read_bytes()
+        else:
+            data = None
+        laid[path] = (when, size,
+                      None if data is None else
+                      hashlib.sha256(data).hexdigest())
+    return laid
+
+
+def read_tree(directory, prefix, laid):
+    """The files and directories under `directory` as fat.read_tree()
+    has a disk's, with `prefix` in front of each path: names as DOS has
+    them, in capitals; a directory as 10h, a file as 20h, archive, as
+    DOS makes one, with 01h where the host does not let it be written.
+    A directory whose time is not what `laid` has for it has been
+    written into by the run (or made by it), and has WRITTEN_INTO for
+    its time and its date, which goldens.disk_lines() says so of. A file
+    that is as it was laid out has the sum that the bench has of it."""
+    entries = {}
+    for path in sorted(directory.rglob("*")):
+        name = prefix + "\\".join(part.upper() for part in
+                                  path.relative_to(directory).parts)
+        stat = path.lstat()
+        stamp = _dos_stamp(stat.st_mtime)
+        was = laid.get(path)
+        if path.is_dir():
+            if was is None or was[0] != int(stat.st_mtime):
+                stamp = (WRITTEN_INTO, WRITTEN_INTO)
+            entries[name] = fat.Entry(name, fat.DIRECTORY, *stamp, 0, "")
+            continue
+        if was is not None and was[:2] == (int(stat.st_mtime),
+                                           stat.st_size):
+            sha256 = was[2]
+        else:
+            sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        entries[name] = fat.Entry(
+            name, 0x20 | (0 if os.access(path, os.W_OK) else 1),
+            *stamp, stat.st_size, sha256)
+    return entries
+
+
+def _screens(data):
+    """The records of `screens`: (kind, number, Screen)."""
+    out = []
+    for at in range(0, len(data) - RECORD + 1, RECORD):
+        record = data[at:at + RECORD]
+        kind, number = record[:4].decode("ascii"), \
+            int.from_bytes(record[4:8], "little")
+        cells, rest = record[8:8 + COLUMNS * ROWS * 2], record[-8:]
+        out.append((kind, number,
+                    Screen(cells=cells, cursor=(rest[0], rest[1]),
+                           cursor_lines=(rest[2], rest[3]),
+                           video_mode=rest[4])))
+    return out
+
+
+def run(scenario, program, setup, limit=60):
+    """Take the program for Linux, `program` (a setups.Program of the
+    tree "posix"), through `scenario` (its
+    steps as the tree "posix" is taken through them) with `setup` as the
+    bench's setup file, and return the scenarios.Run. Raises
+    MachineError where the program ends otherwise than the scenario has
+    it, or does not end within `limit` seconds."""
+    import scenarios
+    steps = ("",) + scenario.steps
+    with tempfile.TemporaryDirectory(prefix="vc", dir="/tmp") as bench:
+        bench = Path(bench)
+        laid = lay_out(bench, setup)
+        channel = bench / "channel"
+        channel.mkdir()
+        (channel / "keys").write_text(keys(scenario.steps))
+        environment = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "TZ": "UTC", "HOME": str(bench / "home"),
+            "XDG_CONFIG_HOME": str(bench),
+            "VC_TEST": str(channel), "VC_TEST_CLOCK": setups.CLOCK,
+        }
+        try:
+            done = subprocess.run(
+                [str(program.path.resolve())], cwd=bench / "home" / "WORK",
+                env=environment, stdin=subprocess.DEVNULL,
+                capture_output=True, timeout=limit)
+        except subprocess.TimeoutExpired:
+            raise MachineError(f"the program did not end within {limit} "
+                               "s") from None
+        records = _screens((channel / "screens").read_bytes())
+        said = done.stderr.decode(errors="replace").strip()
+        if done.returncode not in (0, 2) or (
+                done.returncode == 2 and "keys have run out" not in said):
+            raise MachineError(
+                f"the program ended with {done.returncode}: {said}")
+        shown = [screen for kind, _, screen in records if kind == "step"]
+        ending = [screen for kind, number, screen in records
+                  if kind == "end " and not (number == 2
+                                             and done.returncode == 2)]
+        shown += ending
+        if len(shown) != len(steps):
+            raise MachineError(
+                f"after {scenarios._where(steps, len(shown))}: the program "
+                f"wrote {len(shown)} screens for {len(steps)} steps"
+                + (f"; it said: {said}" if said else ""))
+        disks = {"C": read_tree(bench / "home", "", laid),
+                 "D": {"VC": fat.Entry("VC", fat.DIRECTORY,
+                                       *_dos_stamp(setups.EPOCH), 0, ""),
+                       **read_tree(bench / "vc", "VC\\", laid)}}
+        # Where the bench has the program under test, which the goldens
+        # say no more of.
+        disks["D"]["VC\\" + program.filename] = fat.Entry(
+            "VC\\" + program.filename, 0x20, 0, 0, 0, "")
+    ran = scenarios.Run(shown, disks)
+    # What the program said on standard error, for whoever looks.
+    ran.said = said
+    return ran
+
+
+# The bench's setup file, the one that the original saves once its
+# clock is off and its right panel one of files: made on a bench of DOS
+# the first time it is wanted, which starts a machine, and kept in
+# build/ beside the bench's other things. Every golden has its sum.
+SETUP = ROOT / "build" / "posix-bench" / "VC.INI"
+
+
+def bench_setup():
+    """The bench's setup file, made on the bench of DOS where build/ has
+    none yet."""
+    if not SETUP.exists():
+        with setups.Benches() as benches:
+            setup = benches["us"].setup
+        SETUP.parent.mkdir(parents=True, exist_ok=True)
+        SETUP.write_bytes(setup)
+    return SETUP.read_bytes()

@@ -433,12 +433,17 @@ static int64_t TodayMs(void)
            * 1000 + now.tv_nsec / 1000000;
 }
 
+static bool TestClock(void);
+static struct Time TestTime(void);
+
 struct Time TimeOfDay(void)
 {
     struct timespec now;
     struct tm local;
     struct Time time;
 
+    if (TestClock())
+        return TestTime();
     clock_gettime(CLOCK_REALTIME, &now);
     localtime_r(&now.tv_sec, &local);
     time.clock = (u16)(local.tm_hour << 8 | local.tm_min);
@@ -899,9 +904,21 @@ void ConsoleText(const u8 *text)
  *
  * Where the steps are all done and the program waits for a key all the
  * same, it ends with 2, and says so.
+ *
+ * With VC_TEST_CLOCK set as well, to a date and a time of the form
+ * 2000-06-16T12:00:00, the program's clock is the test's, as the
+ * machine's clock is on the bench, counted in what the machine executes:
+ * it starts at that time and goes on only while the test waits, a tick
+ * at every round that the program goes idle, by wait= or while AutoTim
+ * is believed, and while the program waits for the next tick by itself
+ * (Ticks), and a file that the program has written is stamped with
+ * it when it is closed, as DOS stamps it. The time of day and the timer
+ * are of it, and a user's run never has it.
  */
 
 #define TEST_VARIABLE "VC_TEST"
+#define CLOCK_VARIABLE "VC_TEST_CLOCK"
+#define TICKS_A_DAY 0x1800B0            /* the BIOS's, of the timer */
 #define RECORD_KIND 4
 
 enum Event { EVENT_KEY, EVENT_HELD, EVENT_WAIT, EVENT_MOUSE, EVENT_ASKS };
@@ -934,6 +951,94 @@ static i32 IdleRounds = 0;              /* with nothing left to take */
 static i32 Asks = 0;                    /* asks= that are left */
 static bool AutoSeen = false;           /* when AutoTim was first seen */
 static int64_t AutoSince = 0;
+static bool Clocked = false;            /* VC_TEST_CLOCK: the test's clock */
+static u32 TestTicks = 0;               /* since its day's midnight */
+static struct tm TestDay;               /* the date it began on */
+static u32 WaitTicks = 0;               /* by TestTicks */
+static u32 AutoTick = 0;                /* AutoSince, by TestTicks */
+static i32 Polled = 0;                  /* reads of Ticks since the program
+                                           was last idle */
+
+/* The ticks for which AutoTim is believed, as DRIVER.ASM has them. */
+#define SOON 37
+
+static bool TestClock(void)
+{
+    return Clocked;
+}
+
+/* The time of day of the test's clock, as DOS makes it of the BIOS's
+   ticks. */
+static struct Time TestTime(void)
+{
+    int64_t centis = (int64_t)(TestTicks % TICKS_A_DAY) * 6553600 / 1193180;
+    struct Time time;
+
+    time.clock = (u16)(centis / 360000 << 8 | centis / 6000 % 60);
+    time.seconds = (u16)(centis / 100 % 60 << 8 | centis % 100);
+    return time;
+}
+
+/* The stamp of DOS of the test's clock, for a file that is closed. */
+static struct DosStamp TestStamp(void)
+{
+    struct tm local = TestDay;
+    int64_t seconds = (int64_t)TestTicks * 65536 / 1193180;
+
+    local.tm_sec += (int)seconds;
+    mktime(&local);
+    return DosStampOfLocal(&local);
+}
+
+/* A number of the test's clock, of `digits` digits at `*at`, and the
+   character that is to follow it, or none for the end: -1 where it is
+   not so. */
+static long ClockPart(const char **at, int digits, char behind)
+{
+    char *end;
+    long value;
+
+    if (**at < '0' || **at > '9')
+        return -1;
+    errno = 0;
+    value = strtol(*at, &end, 10);
+    if (errno != 0 || end - *at != digits || *end != behind)
+        return -1;
+    *at = behind == 0 ? end : end + 1;
+    return value;
+}
+
+/* The test's clock from VC_TEST_CLOCK, if that is set. */
+static void ClockBegin(void)
+{
+    const char *given = getenv(CLOCK_VARIABLE);
+    const char *at = given;
+    long year, month, day, hour, minute, second;
+
+    if (given == 0)
+        return;
+    year = ClockPart(&at, 4, '-');
+    month = year < 0 ? -1 : ClockPart(&at, 2, '-');
+    day = month < 0 ? -1 : ClockPart(&at, 2, 'T');
+    hour = day < 0 ? -1 : ClockPart(&at, 2, ':');
+    minute = hour < 0 ? -1 : ClockPart(&at, 2, ':');
+    second = minute < 0 ? -1 : ClockPart(&at, 2, 0);
+    if (second < 0 || month < 1 || month > 12 || day < 1 || day > 31
+        || hour > 23 || minute > 59 || second > 59) {
+        fprintf(stderr, "vc: %s: no date and time: %s\n", CLOCK_VARIABLE,
+                given);
+        exit(1);
+    }
+    memset(&TestDay, 0, sizeof TestDay);
+    TestDay.tm_year = (int)year - 1900;
+    TestDay.tm_mon = (int)month - 1;
+    TestDay.tm_mday = (int)day;
+    TestDay.tm_isdst = -1;
+    TestTicks = (u32)((hour * 3600 + minute * 60 + second) * 1193180
+                      / 65536);
+    Clocked = true;
+    Emulated.clock = TestStamp;
+}
 
 /* A wait of the program's that is no busy one: a millisecond. */
 static void Pause(void)
@@ -1135,6 +1240,7 @@ static bool TestBegin(void)
 
     if (directory == 0)
         return false;
+    ClockBegin();
     snprintf(path, sizeof path, "%s/keys", directory);
     ReadKeys(path);
     snprintf(path, sizeof path, "%s/screens", directory);
@@ -1160,6 +1266,16 @@ static bool AutoPending(void)
     now = TimeOfDay();
     if (now.clock > clock || (now.clock == clock && now.seconds >= seconds))
         return false;
+    if (Clocked) {
+        if (!AutoSeen) {
+            AutoSeen = true;
+            AutoTick = TestTicks;
+        }
+        if (TestTicks - AutoTick >= SOON)
+            return false;
+        TestTicks++;
+        return true;
+    }
     if (!AutoSeen) {
         AutoSeen = true;
         AutoSince = Elapsed();
@@ -1176,13 +1292,20 @@ static bool TakeEvent(bool reading)
 {
     struct Due *due;
 
+    Polled = 0;
     if (KeyThere)
         return true;
     if (reading)
         Asks = 0;
     if (Asks > 0)
         return true;
-    if (Waiting) {
+    if (Waiting && Clocked) {
+        if (TestTicks < WaitTicks) {
+            TestTicks++;
+            return true;
+        }
+        Waiting = false;
+    } else if (Waiting) {
         if (Elapsed() < WaitUntil) {
             Pause();
             return true;
@@ -1199,11 +1322,14 @@ static bool TakeEvent(bool reading)
         KeyThere = true;
         break;
     case EVENT_HELD:
+        /* The program goes round once with each change of what is
+           held, as the driver has it on the bench. */
         Held = (u16)due->value;
         break;
     case EVENT_WAIT:
         Waiting = true;
         WaitUntil = Elapsed() + (int64_t)due->value * 65536000 / 1193180;
+        WaitTicks = TestTicks + due->value;
         break;
     case EVENT_MOUSE:
         MouseButtons = (u16)(due->value >> 16);
@@ -1358,6 +1484,9 @@ static void Traced(const char *line)
  * KeyRead waits for a key, which is idle as Idle is.
  */
 
+/* Asked with no key there, the program is idle as with Idle: the bench's
+   driver takes INT 16h with none waiting so, and the key that it then
+   makes due is there at the next asking. */
 struct Keys KeyWaiting(void)
 {
     struct Keys keys;
@@ -1371,6 +1500,8 @@ struct Keys KeyWaiting(void)
     }
     keys.key = KeyThere ? KeyWord : 0;
     keys.none = !KeyThere;
+    if (keys.none)
+        Due();
     return keys;
 }
 
@@ -1524,11 +1655,19 @@ void MousePointer(u16 keep, u16 turn)
  * monotonic clock since; the BIOS counts 1800B0h of them to a day.
  */
 
-#define TICKS_A_DAY 0x1800B0
 #define MS_A_DAY (24 * 3600 * 1000)
 
 u32 Ticks(void)
 {
+    if (TestClock()) {
+        /* A second read with no round idle between is the program
+           waiting for the next tick by itself, as the zooming boxes do,
+           which the machine's clock on the bench gets to by what the
+           machine executes meanwhile: the test's clock ticks then. */
+        if (++Polled > 1)
+            TestTicks++;
+        return TestTicks % TICKS_A_DAY;
+    }
     return (u32)((StartMs + Elapsed()) % MS_A_DAY * 1193180 / 65536000
                  % TICKS_A_DAY);
 }
@@ -1708,6 +1847,9 @@ struct Answer ProgramRun(const u8 *name, const u8 *tail)
     struct Answer answer;
     i32 length = 0, start = 0, count = tail[0], made;
 
+    if (ScreensFd >= 0)
+        fprintf(stderr, "vc: a program is run at step %d\n",
+                (int)StepNow);
     answer.failed = true;
     answer.value = FILE_NOT_FOUND;
     if (access(Shell, X_OK) != 0)

@@ -124,6 +124,8 @@ class Program:
     # behave otherwise than the original (see deviations.py), and is
     # then held against what is declared for it.
     tree: str = field(default=None, compare=False)
+    # Of the program for Linux, its file, which is run where it is.
+    path: Path = field(default=None, compare=False)
 
     @classmethod
     def load(cls, path):
@@ -132,6 +134,12 @@ class Program:
         translation."""
         path = Path(path)
         contents = path.read_bytes()
+        if contents[:4] == b"\x7fELF":
+            # The program for Linux, which runs on the host and not in a
+            # machine (see posixrun.py): the tree "posix", of the source of
+            # the portable C. What the goldens call the program under
+            # test is VC.EXE, which its bench has not.
+            return cls("VC.EXE", contents, None, None, "posix", path)
         if contents[:2] == b"MZ":
             # The translation has no assembly of its own to list: its main
             # data is laid out as the original's, and what the driver

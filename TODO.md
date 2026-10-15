@@ -20191,7 +20191,152 @@ each stage:
   of the tree, so nothing there changes for the portable C.
 - The branch `sort` can be deleted.
 
-### L3b, the scenarios on Linux: the design, waiting for the user
+### L3b, the scenarios on Linux: half done
+
+The user decided the design below on 15 October 2026 (`CLAUDE.md`, step
+6, from "The program for Linux is judged" on). Stage 2 builds it; what
+is built, what was found and what is left:
+
+**Built.**
+
+- `harness/posixrun.py` (not `posix.py`: Python has a module of its own
+  by that name, which `import posix` finds first): the bench of a run in
+  a directory of `/tmp` of its own, `home` as HOME laid out as the
+  bench's C: with its times, `vc` as the directory of the setup file
+  with the bench's `D:\VC` files in small letters and the bench's
+  setup file as it is; a scenario's steps made the channel's `keys` by
+  a table of the BIOS's words (IBM's for a US keyboard, the gray
+  cursor's keys as INT 16h 00h gives them); the program run with
+  `TZ=UTC`, `VC_TEST` and `VC_TEST_CLOCK`; its screens and its two
+  directories made a `scenarios.Run`. The bench's setup file is made
+  once on a bench of DOS and kept in `build/posix-bench/VC.INI`, so the
+  first run starts a machine. `setups.Program.load` takes an ELF file
+  for the tree `posix`, `scenarios.run` hands such a program to
+  `posixrun.run`, and `compare.py`, `goldens.py` take it as any tree:
+  `python3 harness/compare.py build/portable_c/posix-asan/vc NAME`.
+- The tree `posix` in `deviations.TREES`: `BASE` has it of the portable
+  C's source, so it is declared as the portable C is (its scenarios not
+  run, steps, rules) with `ON_LINUX` on top; a scenario's patch is the
+  portable C's where `harness/goldens/posix/` has none. `Declared` has a
+  field `cut`, a scenario taken as far as a step, which nothing uses
+  yet.
+- Masks: a rule with None for its text, which `deviations.masked`
+  finds on the golden's screen, every match on a row and every group,
+  and leaves out of both screens, character and colour
+  (`goldens.screen_departs`). `LINUX_MASKS`: the drive's letter where
+  the golden has `C:`, the label WORK, and the Info panel's lines of the
+  drive's room and of what the files use. On the disks
+  (`goldens.on_the_host`): the attributes hidden, system and archive
+  left out on both sides, and a directory that the run wrote into said
+  so of, `goldens.WRITTEN_INTO`, on both.
+- Not run on Linux, `LINUX_NOT_RUN`, each with its reason: the seven of
+  Russia, the 33 of the mouse (until L5), the four of the diskette,
+  `device`, `copy-full`, `find-drives`, `editor-full`, `copy-big`, the
+  twelve that are about a program or a command of DOS, and of the 18
+  that run a command `enter` and `user-menu-run`, whose value is the
+  command itself. 95 are run.
+- `sys_posix.c`, under the test channel only: `VC_TEST_CLOCK` gives the
+  clock to start from; it goes on a tick at every round idle while a
+  `wait=` lasts or while AutoTim is believed (37 ticks, `Soon` of
+  `DRIVER.ASM`), and at a second read of the timer with no round idle
+  between, which is the program waiting for the next tick by itself:
+  the zooming boxes do (`MinBx3` of `box.c`), and with a clock that did
+  not move there the program hung at its first box. That last is more
+  than "only by the steps' waits": the bench's clock moves by what the
+  machine executes, and a busy wait for a tick is the one place where
+  that shows; for the user to know. A file that the program has written
+  is stamped with the test's clock when it is closed (`clock` of `struct
+  Dos`). A change of what is held is a round of its own, as the driver
+  has it (Alt alone is `held=08 held=00`, which the program must see);
+  and `KeyWaiting` with no key is idle as `Idle` is, as the driver takes
+  INT 16h 01h: without it the program spun at 100% in a loop that asks
+  for a key that way. `ProgramRun` says on standard error at which step
+  it is asked for.
+- `posix-msan/vc`: the sanitizer of memory alone, `BY_NAME` of
+  `add_portable_c_host`, built by `cmake --build build --target
+  portable_c-posix-msan` and run by no test. To audit: build it, and run
+  it as `build/portable_c/posix-asan/vc` is run, with the bench of
+  `posixrun.lay_out` and the keys of `posixrun.keys`, e.g. a copy of
+  `posixrun.run` with the program's path changed. The first run of L3a's
+  section (Esc, Tab, Ctrl-F1, Ctrl-F2, F1, F9, Alt-F1, Ctrl-L, Down, F3,
+  F7, F8, each with Esc, and F10 with Enter) ends with 0, 21 screens,
+  and no finding.
+
+`VC.EXE` is the same bytes: nothing of the program for DOS changed.
+
+**Found, and why nothing passes yet.** All 95 run; 68 get to their end
+and differ, 27 are stopped by the sanitizers. What every screen differs
+in:
+
+1. The order of the files: the bench is unsorted, the emulation lists
+   by bytes. The piece SORT mends that, after which this piece's
+   screens are held again.
+2. The right panel, on nearly every screen: the bench's setup file
+   names `C:\WORK` and `C:\`. On Linux there is no C:, and the program
+   goes where the original goes then, read in its code: Init's `M02_10`
+   asks DOS to change to `C:\WORK`, which fails with 3, path not found,
+   so DOS stays in H:\WORK where it was started; the other panel's
+   `ReDir` finds no `C:\*.*`, and `ReDr24` takes the current directory
+   of DOS's drive, H:\WORK too (the emulation answers 3Bh and 4Eh with 3
+   and 47h with 0Fh for a drive that is none, as RBIL has DOS do; not
+   tried on the bench). So both panels show H:\WORK where the golden
+   has C:\WORK and C:\: the right panel differs on every screen, and
+   no mask can mend that. **For the user**: the setup file as it is
+   cannot hold the program for Linux to the goldens. What would: the
+   design's 7(a), the file with H for C and its sum made again; or 7(b),
+   one made by the program for Linux through its own menus, two panels
+   taken to H:\WORK and H:\ and saved; or the program started on H:\
+   with a panel left to the setup.
+3. The sanitizers, in the common code, each the original's behaviour,
+   which the rules mend by a cast with `wraps` or by reading the main
+   data as bytes at an offset, the DOS program judged by its scenarios
+   (not done here):
+   - `copy.c:303`, unsigned overflow, 0 - 64 in a `u32` (13 scenarios);
+   - `read.c:627`, the sum of sizes past 4 GB in `DiSi10`, which the
+     next line saturates (`sizes`);
+   - `view.c:833`, `ViewFil[65]` copied as `LenPath + 13`, 80 bytes,
+     into what follows it in the main data (8 scenarios);
+   - `copy.c:1592`, an index out of bounds (`copy-tree`);
+   - `stcolor.c:709`, 65,656 put into a `u16` (9 of the setup);
+   - `sthelp.c:506` and `help.c:586`, an implicit conversion.
+
+**Left.**
+
+- The user's answer to 2, then the order (SORT), then the findings of 3.
+- `cut`: which step of the 16 that run a command is the first that
+  does. `ProgramRun` is not reached: the program for Linux finds no
+  shell in its environment (no `COMSPEC`) and says so before it asks,
+  so its message on standard error is never written. Read it from the
+  golden's `.ran` per step, or have the program say where it looks for
+  the shell. The 16, one line each, all the program's own logic up to
+  their first command: `command-edit` the command line edited;
+  `editor-save` the editor's errors on saving; `help-broken` a help file
+  that cannot be read; `history-drives` the history and the drive box;
+  `menu-files` the menu and extension files edited, the setup saved;
+  `menu-panel` a panel's menu; `panel-keys` masks, panels off and on;
+  `setup-damaged`, `setup-help-file`, `setup-missing`,
+  `setup-missing-saved`, `setup-new`, `setup-save-fails` the setup with
+  its file broken, other, missing or not writable, each prepared by
+  commands; `sizes` the sizes of directories; `user-menu` the user
+  menu's lines; `view-commands` F3 and F4 and their extension files.
+- `D:\VC` and A: (the user's word): the scenarios that went there only
+  for files, `copy-ask`, `copy-dirs`, `editor-keys`, `move` and the A:
+  eight, to a directory of the bench laid out alike: C:\FILES on DOS
+  and H:\FILES on Linux would need no mask but the letter; the bench's
+  disks are on every golden, so the directory is made only on the
+  benches of the scenarios that ask for it (a field of the scenario, as
+  `memory` is), and their goldens derived again. `setup-delay-file` and
+  those about the program's own files keep `D:\VC`, masked.
+- The masks of the design not built: the drive menu's box, a path of R:,
+  a directory's time on a screen after the run wrote into it, the line
+  where DOS writes its prompt behind `quit`, `label`'s patch.
+- The test `portable_c-posix-scenarios`, labelled `portable_c` and
+  `machine` (the bench's setup file is made on a machine the first
+  time), once scenarios pass.
+- The table of the BIOS's words is held by the scenarios alone; the
+  toy on the bench of the design is not made.
+
+The design, as it went to the user:
 
 Stage 1 of the piece: how the program for Linux is taken through the
 scenarios and held to the original's goldens with masks (`CLAUDE.md`,

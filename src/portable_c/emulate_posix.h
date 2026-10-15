@@ -444,6 +444,12 @@ struct Dos {
     u16 error;                          /* the error of the last call that
                                            failed, which DOS answers to a
                                            program that asks for it */
+    /* The program's clock where it is not the host's, under the test
+       channel of sys_posix.c, or none: a file that has been written is
+       stamped with it when it is closed, as DOS stamps it, where the host
+       has stamped it with its own clock at every write. DosBegin makes it
+       none. */
+    struct DosStamp (*clock)(void);
 };
 
 /* The state that the emulation begins with: the drives, R: the current
