@@ -65,6 +65,7 @@ stopts_t.c        clean
 string.c          clean
 sys.h             clean
 sys_dos.c         to-number 13, to-pointer 25, naked 2, asm 2, asm-pragma 11, registers 1, intrinsic 1
+sys_posix.c       clean
 sys_stub.c        clean
 system.c          clean
 system_t.c        clean

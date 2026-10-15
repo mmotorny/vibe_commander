@@ -18728,6 +18728,186 @@ changed:
   second file would want `CMakeLists.txt` to name it, and `posix_files`
   of `harness/stubcheck.py`.
 
+### L3a, the program runs on Linux: done, and what L3b should know
+
+What it made: `src/portable_c/sys_posix.c`, every function of `sys.h`
+for Linux; two builds of the program with clang, `add_portable_c_host`
+of `CMakeLists.txt`, `build/portable_c/posix/vc` (the stub's hardening)
+and `build/portable_c/posix-asan/vc` (the stub's sanitizers, fatal, but
+for the alignment: below); the test channel; and three fixes of the
+common code that the sanitizers named on the first run. The stub builds
+as before. The program for DOS is not the same bytes, by the three
+fixes, and `portable_c-scenarios` judges it.
+
+**The binding.** Files, directories and drives are a line each to
+`files_posix.c`, with one `static struct Dos Emulated`; the Bare
+functions call the same function as the others. The rest, each said at
+its place in the file:
+
+- The screen: the display's memory as a VGA has it for text, 16,384
+  cells, of which the first 2,000 are the page that is shown; the calls
+  of the BIOS answer as the bench's (`harness/trial32/asked.py`, run for
+  this piece): mode 3, 80 columns, page 0, an EGA or better, a font of
+  16 lines whose last row is 24, the cursor 0607h; a mode set clears
+  the cells unless its bit 7 is set, and puts the cursor at 0,0; a
+  scroll, a fill (of no cells for a count of 0), and the BIOS's typing,
+  in which a carriage return, a line feed, a step back and the bell are
+  no characters and the cell keeps its colour; DOS's console types so
+  too, with a tab made blanks to the next column of eight. A read or a
+  write of `ScreenPut` and `ScreenGet` outside the 16,384 cells ends the
+  program with a line on standard error: on DOS it would land in
+  another page or in nothing.
+- The timer: the host's local time of day when the program starts, and
+  `CLOCK_MONOTONIC` since, at 1,193,180 / 65,536 ticks to the second,
+  1800B0h to a day. The time of day: `CLOCK_REALTIME`, `localtime_r`.
+- The memory: `malloc` and `realloc`, in a table as `sys_dos.c` keeps
+  the extender's blocks, and given back when the program ends. How much
+  there is, which is what a refusal says: the machine's memory,
+  `sysconf(_SC_PHYS_PAGES)`, less what the program holds, and no more
+  than 7FFFFFF0h, the most that a count of 32 bits with a sign holds in
+  paragraphs, as the user decided of the extender's, "as much as the
+  machine has". The room is then some 2 GB on a machine of more: Linux
+  gives the pages as they are written, so it costs nothing until it is
+  used, and the sanitized run is as fast as the other. A block that is
+  refused a greater length says how long it is, as the extender's.
+- The country: the United States, as the bench's DOS writes its 24
+  bytes (the date with `-`, month, day, year; the time of 12 hours with
+  `:`; a comma, a point; the dollar), and none of the 10 behind; the
+  address of DOS's routine for capitals, which is of real mode on the
+  bench, is 0. `CaseMap` is `CodePageUpper` of the low byte.
+- The version is the bench's, 7.10 made by FDh, and `BreakCheck` starts
+  on, as the bench's DOS has it; neither shows.
+- The tail: the arguments of `argv`, each behind a blank, in the code
+  page, 126 at the most, and a carriage return. The environment: every
+  text of `environ`, in the code page, as far as 32 KB hold them; a
+  character that 437 has not, or a byte that is no UTF-8, is `_`. Then
+  the program's own path: `VC` in the directory of the setup file,
+  `SetupFile` of `paths_posix.c`, which is made when the host has it
+  not, mode 0700, as the XDG Base Directory Specification has it. So
+  `VC.INI`, `VC.MNU`, `VC.EXT` and the other files that the original
+  reads beside its own file are read in `~/.config/vc`, and what the
+  program writes there is named in small letters: a run that quits by
+  F10 leaves `vc.ini`. A `VC=` or a `TEMP=` of the host's environment is
+  taken as a path of DOS, as on DOS: `/tmp` is then `C:\TMP`.
+- The start: the host's current directory, by `realpath` of
+  `getcwd`, is made C:'s by `DosStartIn`; where DOS's path of it is
+  longer than 63 characters even through the aliases, the deepest
+  directory above it whose path is not, the root at the least
+  (`StartIn`): a known limit, which the session's plan for paths longer
+  than DOS's lifts (the session's word of 15 October 2026: not to be
+  designed around here). The directory of the setup file has no such
+  fallback: where DOS cannot name it, the program says so on standard
+  error and ends with 1, a limit of the same kind.
+- What does not come yet: no terminal (L4), so without `VC_TEST` the
+  program says on standard error that there is none and ends with 1; no
+  mouse, `MouseFind` and `MouseReset` answer 0 as a driver that does not
+  answer (L5); `ProgramRun` fails with DOS's 1 (L6); the critical
+  error, Ctrl-Break and Ctrl-C never arrive.
+
+**The test channel.** `VC_TEST` names a directory of the host: the
+program takes its keys from `keys` there and writes its screens to
+`screens` there, made anew. It does from inside what the driver of the
+bench, `harness/DRIVER.ASM`, does from outside: a key is due when the
+program is idle (`Idle`, or `KeyRead` with no key) and none waits, one
+at a time, so that a clearing of the keyboard eats only what has come;
+a step has ended when the program has gone round idle twice with
+nothing left to take, and with nothing in `AutoTim` of the main data
+that it does by itself after a while, believed for 2 seconds as the
+driver believes it. `keys` is text, a line for each step, a word for
+each event: `XXXX`, a key as the BIOS's word in hex; `held=XX`, what
+`KeysHeld` answers from then on, which the bench has from the keys of
+Shift, Ctrl and Alt that the driver presses (Ctrl-F1 is `held=04 5E00
+held=00`); `wait=N`, nothing until N ticks have gone. A line that
+begins with `#` is none; every other line is a step, an empty one too.
+`screens` has a record of 4016 bytes for each screen: `step` or `end `,
+a number of 32 bits low byte first (the step's from 1, or the code that
+the program ends with), the 2,000 cells as character and colour, then
+the cursor's column and row, the first and the last line of its shape,
+the mode, and three zeros, as the BIOS's data has them where
+`harness/dos.py` reads them. `ProgramEnd` writes an `end ` record and
+ends with its code; where the steps are done and the program waits for a
+key all the same, it writes an `end ` record with 2, says on standard
+error that the keys have run out, and ends with 2.
+
+**The first run**, in a temporary directory under `/tmp` with `HOME`
+there, under `posix-asan/vc`: the program comes up, draws its banner,
+the panel, the command line and the key bar, takes Esc, Tab, Ctrl-F1,
+Ctrl-F2, F1, F9 with Esc, Alt-F1 with Esc, Ctrl-L, Down, F3, F7, F8 with
+Esc, and F10 with Enter, writes a screen for each step, saves `vc.ini`,
+and ends with 0 and no sanitizer finding; 0.26 seconds, the sanitized
+and the other alike. Its first screen against the golden of `start`,
+the plainest: the colours of the frame, the titles and the key bar are
+the golden's (1Bh, 1Eh, 30h, 07h), and the names and the cursor's shape;
+what differs is what the masks of L3b or the scenario's own setup cover:
+- the path, `C:\TMP\VCL3A~1.5GL\HERE` where the bench has `C:\WORK`, and
+  the prompt's length with it, so the cursor's column;
+- the files, of the host's directory, and the date and time of `..`;
+- the setup: with no `vc.ini` the program takes its defaults, the left
+  panel off, where the bench gives every scenario the setup file that
+  the original saves (`CLAUDE.md`, "Scenarios"): L3b puts that file at
+  `$HOME/.config/vc/vc.ini`;
+- what DOS showed behind the panels: the bench has DOS's lines above the
+  program's banner, scrolled; here the screen is empty when the program
+  starts, so the banner is on its first two rows and the rest blank;
+- the Info panel: no label, and the drive's room of the host's file
+  system, 4,294,901,760 bytes, the most that DOS's shape holds (L2);
+- F1 shows nothing, since `VC.HLP`, the help file of the shareware
+  distribution, is not in `~/.config/vc`: L3b puts it there as the
+  bench puts it beside the program, from the pinned download.
+
+**Found by the sanitizers, and fixed in the common code** (each the
+same behaviour on DOS; the scenarios judge the program for DOS):
+1. `LnStr` of `line.c` read the byte behind a line's end, as the
+   assembly's `LODSW` does: `Var_S` is `"^V"`, and the byte behind its
+   zero is behind the object. Nothing went by it; the second byte is
+   read now only where the first is not the end. (AddressSanitizer,
+   global-buffer-overflow.)
+2. `Dialog` of `dialog.c` read the place of the byte 0 that ends a
+   dialog's fields, 2 bytes behind `Quit_B`, before it looked at its
+   type; it looks first now, and leaves the loop for any type that is no
+   field, as the `else break` did. (AddressSanitizer.) The second loop
+   of `Dialog`, the keys of the field at the cursor, reads the place
+   before the type too, and would read so behind a dialog whose first
+   field is the end: none was seen.
+3. `Rnd` of `input.c`, the random numbers, wraps at 16 bits as the
+   original's: the two casts are written, with `wraps`. (The sanitizer
+   of implicit conversions.)
+
+**The alignment, left out of the sanitized build, for the session to
+decide.** UBSan's `alignment` stopped the first run at a read of a word
+at an odd place, `*(u16 *)text` of `Dialog`, which is one of the 128
+casts and 33 structures laid over bytes that 5a listed: the common code
+reads a word at any place of its bytes, as DOS does, which x86-64 does
+as DOS does and C does not promise, and 5a left how they are read to
+the layer. `posix-asan` has `-fno-sanitize=alignment` for that, with
+the reason in `CMakeLists.txt`. A build with that check recovering, run
+through the same keys, named three places: `dialog.c` 980 and 983 (the
+input field's cursor, a word at `INPUT(control)`), and `read.c` 549. To
+hold them, each such read becomes a `memcpy` or a function of `vc.h`
+that reads a word of bytes, a piece of its own across the 23 files.
+
+**What L3b should know:**
+
+- The program is `build/portable_c/posix/vc`, and `posix-asan/vc` beside
+  it; neither needs a terminal with `VC_TEST` set. A run wants `HOME` (or
+  `XDG_CONFIG_HOME`) of its own, with the bench's setup file at
+  `.config/vc/vc.ini` and the files that the bench puts beside the
+  program there; and a current directory whose path DOS holds in 63
+  characters, as `/tmp/...` does where a checkout's `build/` may not.
+- A scenario's steps become lines of `keys`; a key with Shift, Ctrl or
+  Alt wants `held=` around it, as the bench's BIOS has the key held
+  while it is pressed: the program looks at `KeysHeld` for some. The driver's
+  event of the timer is `wait=`; the mouse has none yet.
+- The program ends by itself only through `ProgramEnd`; a scenario whose
+  last step leaves it at its panels ends with 2 and an `end ` record.
+- `AutoTim` is read by the channel in `md`, as the driver reads it in the
+  machine's memory.
+- `tools/figures.py` counts the build for DOS, whose figures moved by
+  the three fixes, and was written. `harness/hostcheck.txt` and `harness/words.txt` have
+  `sys_posix.c`, clean and with no word; `harness/stubcheck.py` reads it
+  with the command of `posix-unit` (its top says why), and the build of
+  `posix-unit` leaves it out, for its `main`.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes

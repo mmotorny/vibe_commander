@@ -544,7 +544,8 @@ function(add_portable_c_host target directory implementation)
                     ${source_dir}/${source}
             DEPENDS ${source_dir}/${source} ${source_dir}/vc.h
                     ${source_dir}/tables.h ${source_dir}/sys.h
-                    ${source_dir}/compiler.h ${directory}/compiled.txt
+                    ${source_dir}/compiler.h ${source_dir}/emulate_posix.h
+                    ${directory}/compiled.txt
             COMMENT "Compiling portable_c/${source} (${target})"
             VERBATIM)
         list(APPEND objects ${directory}/${object})
@@ -612,6 +613,34 @@ if(clang)
         COMPILE -O1 -g -fno-omit-frame-pointer -fsanitize=memory
                 -fsanitize-memory-track-origins -fno-sanitize-recover=all)
 endif()
+# The program for Linux, step 6 of the road: src/portable_c/*_posix.c for
+# sys.h, sys_posix.c with the emulation of DOS of the pieces L1 and L2
+# behind it (TODO.md, "L3a, the program runs on Linux"). Two builds,
+# each its own directory of build/portable_c/, both with
+# -D_XOPEN_SOURCE=700, as the test of the emulation below has it:
+#   posix/vc        the program, with the hardening of the stub's first
+#                   build
+#   posix-asan/vc   with the sanitizers of the stub's second, each fatal,
+#                   but for the alignment of what is read: the common code
+#                   reads a word or a double word at any place of its bytes
+#                   through a cast pointer, as DOS does, which x86-64 does
+#                   as DOS does and C does not promise (TODO.md, "5a, the
+#                   split"); how that is read is the layer's to decide, and
+#                   until then the sanitizer would stop at the first such
+#                   read (TODO.md, "L3a")
+if(clang)
+    add_portable_c_host(portable_c-posix ${CMAKE_BINARY_DIR}/portable_c/posix
+        posix
+        COMPILE -D_XOPEN_SOURCE=700 -O2 -D_FORTIFY_SOURCE=3
+                -fstack-protector-strong -fstack-clash-protection
+                -fcf-protection=full -fPIE
+        LINK -pie -Wl,-z,relro,-z,now,-z,noexecstack)
+    add_portable_c_host(portable_c-posix-asan
+        ${CMAKE_BINARY_DIR}/portable_c/posix-asan posix
+        COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer
+                -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
+                -fno-sanitize=alignment -fno-sanitize-recover=all)
+endif()
 
 # What the program for Linux emulates of DOS without input or output of
 # its own, the files src/portable_c/*_posix.c of the piece L1 of step 6
@@ -627,6 +656,10 @@ if(clang)
     set(unit_dir ${CMAKE_BINARY_DIR}/portable_c/posix-unit)
     set(unit_source ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB unit_files CONFIGURE_DEPENDS ${unit_source}/*_posix.c)
+    # Of the files of Linux, those of the emulation: sys_posix.c is the
+    # program's, with its main, and the program's two builds above have
+    # it.
+    list(FILTER unit_files EXCLUDE REGEX "/sys_posix\\.c$")
     list(APPEND unit_files ${CMAKE_SOURCE_DIR}/harness/posixcheck.c)
     set(unit_compile ${clang} ${clang_warnings} -fno-strict-aliasing
         -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer

@@ -22,8 +22,13 @@ build is not looked at, and runs clang-tidy, which the build does not:
 The files of Linux, `*_posix.c`, are held so too, and with them their
 test, `harness/posixcheck.c`, by the command of the build of that test,
 `compiled.txt` of `build/portable_c/posix-unit` (CMakeLists.txt, the
-piece L1 of step 6), which `--posix-compiled` names: the common code is
-not among them until the program for Linux is built of it.
+piece L1 of step 6), which `--posix-compiled` names. `sys_posix.c`, the
+program's binding of sys.h, which that build leaves out for its `main`,
+is read with that command too: it has no option of its own but those of
+the program's builds, `build/portable_c/posix`, which differ in what
+they make and not in what clang is to say. The common code is read once,
+with the stub's command: the program for Linux is built of the same
+files with the same warnings.
 
 EXPECTED is the analyser's places where the program reads its main data
 as one block across its fields, as the original does: a read in front of
@@ -93,8 +98,9 @@ def files():
 
 
 def posix_files():
-    """The files of Linux and their test, as the build of
-    portable_c-posix-unit in CMakeLists.txt takes them."""
+    """The files of Linux and their test: those that the build of
+    portable_c-posix-unit in CMakeLists.txt takes, and sys_posix.c, which
+    it leaves out."""
     return sorted(SOURCE.glob("*_posix.c")) + [ROOT / "harness" /
                                                 "posixcheck.c"]
 
