@@ -327,7 +327,22 @@ These held while `src/c/` was made, and they say what it is.
      screen drawn as text, the 80 by 25 cells as lines of a `<pre>`
      with the colours of DOS in spans, not on a canvas. It comes before
      iOS as a rehearsal of what iOS has too: no shell, a file system of
-     the program's own, an event loop.
+     the program's own, an event loop. What the user decided of its
+     plan (`TODO.md`, "Step 7, the web page"), the same day: one
+     drive, C:, which starts as a small tree of sample files written
+     for the project and served with the page, nothing proprietary,
+     and which the user may change, what is changed being kept in the
+     browser; a command says on DOS's screen that commands cannot be
+     run in a web page; Enter on a file that is no program opens it in
+     a new tab of the browser, where the user may view it or save it;
+     the user's own files come in by a button and by dragging them onto
+     the page, into the current directory; the keys that a browser
+     keeps for itself are declared, and a button for the full screen
+     locks the keyboard where the browser allows it; the font is
+     VileR's Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned and put into
+     the page, and credited there; Emscripten is fetched only for a
+     build that asks for the web page, and Open Watcom likewise only
+     for one that asks for DOS, where that makes sense.
   8. iOS, when the web page is done. Windows and macOS are not targets
      for now, on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
