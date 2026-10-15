@@ -93,6 +93,7 @@ void Blank(void)
     u16 ticks = 0;                      /* the timer's, at the last turn */
     u16 place, number, look, now;
     i32 clock, kind, mode, vacant, i;
+    bool ticked;                        /* a turn more, or awake */
 
     CurMous(0);
     cursor = CursorWhere(ScreenState().page);
@@ -107,34 +108,33 @@ void Blank(void)
     mouse = GetMous(0).place;
     held = KeysHeld();
 
-    for (;;) {
+    do {
         /* Blnk01: a star comes out. */
         place = (u16)(Below(md.Lines) << 8);
         place |= Below(80);
         clock = Rnd() >> 3 & 0xFF;
-        if (clock < 100)
-            goto older;
-        number = Rnd();
-        look = number & 0xFF;
-        look = (look >> 5 | look << 3) & 0xFF;
-        if (look < 50)
-            goto older;
-        kind = (look | number >> 8) & 1;
-        vacant = NmbStrs;
-        for (i = 0; i < NmbStrs; i++) {         /* Blnk02 */
-            if (md.Stars[i].StarMod == 0) {
-                if (vacant == NmbStrs)
-                    vacant = i;
-            } else if (md.Stars[i].StarPos == place)
-                goto older;
+        if (clock >= 100) {
+            number = Rnd();
+            look = number & 0xFF;
+            look = (look >> 5 | look << 3) & 0xFF;
+            if (look >= 50) {
+                kind = (look | number >> 8) & 1;
+                vacant = NmbStrs;
+                for (i = 0; i < NmbStrs; i++) {         /* Blnk02 */
+                    if (md.Stars[i].StarMod == 0) {
+                        if (vacant == NmbStrs)
+                            vacant = i;
+                    } else if (md.Stars[i].StarPos == place)
+                        break;          /* one is there already */
+                }
+                if (i == NmbStrs && vacant != NmbStrs) {
+                    md.Stars[vacant].StarMod = (u16)(kind << 8 | clock);
+                    md.Stars[vacant].StarPos = place;
+                    Star(place, md.StarTab[0], Sky1_C);
+                }
+            }
         }
-        if (vacant == NmbStrs)
-            goto older;
-        md.Stars[vacant].StarMod = (u16)(kind << 8 | clock);
-        md.Stars[vacant].StarPos = place;
-        Star(place, md.StarTab[0], Sky1_C);
 
-    older:
         /* Blnk05: every star a turn older. One of the kind 0 flares up
            four times before it goes; one of the other kind goes when
            the first would flare up for the second time. */
@@ -149,14 +149,11 @@ void Blank(void)
             clock = mode & 0xFF;
             if (clock == FLARE_1)
                 look = md.StarTab[1];
+            else if (clock == FLARE_2 && mode >> 8 == 0)
+                look = md.StarTab[2];
             else {
-                if (clock == FLARE_2) {
-                    if (mode >> 8 == 0) {
-                        look = md.StarTab[2];
-                        goto shown;
-                    }
+                if (clock == FLARE_2)
                     clock = 0;
-                }
                 if (clock == FLARE_3)           /* Blnk07 */
                     look = md.StarTab[3];
                 else if (clock == FLARE_4)
@@ -169,37 +166,41 @@ void Blank(void)
                     look = ' ';
                 }
             }
-        shown:                                  /* Blnk08 */
+            /* Blnk08 */
             Star(place, look, Sky2_C);
         }
 
-        /* Blnk10: until the timer ticks. */
+        /* Blnk10: until the timer ticks, or anything wakes the
+           screen. */
+        ticked = false;
         for (;;) {
             if (!KeyWaiting().none) {
                 KeyRead();                      /* Blnk13 */
-                goto wake;
+                break;
             }
             now = KeysHeld();
             i = (held & 0xF0) ^ now;
             held = now;
             if (i != 0)
-                goto wake;
+                break;
             pointer = GetMous(0);
             if (pointer.buttons != 0)
-                goto wake;
+                break;
             if (!InWind(pointer.place, CORNER_BEGIN, CORNER_SIZE))
                 mouse = pointer.place;
             if (pointer.place != mouse)            /* Blnk11 */
-                goto wake;
-            now = (u16)Timer();         /* its low word: has it ticked */
-            if (now != ticks)
                 break;
+            now = (u16)Timer();         /* its low word: has it ticked */
+            if (now != ticks) {
+                ticks = now;
+                ticked = true;
+                break;
+            }
             LeaveTm();                          /* Blnk12 */
         }
-        ticks = now;
-    }
+    } while (ticked);
 
-wake:                                           /* Blnk14 */
+    /* Blnk14 */
     CursorTo(ScreenState().page, cursor.place);
     CursorShape(cursor.shape);
     CurMous(1);
