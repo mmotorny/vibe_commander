@@ -19830,6 +19830,84 @@ below. By scenario:
 - What the end has to know: the header of `harness/scenarios.py` was
   not touched; none of the seventeen rests on a new file coming last.
 
+### The end: done
+
+One agent put the five groups together on `sort`, brought it onto
+`main` and took the unsorted order out of the portable C, a commit for
+each stage:
+
+- The rebase onto `main` met one conflict, in this file, where L4 and
+  this plan were each added at the same place: both kept. The records
+  and the figures were the build's as they were. The header of
+  `harness/scenarios.py` says that the bench's panels are sorted by
+  name and that a new file stands where its name sorts; the two lines
+  that had it come last are gone.
+- `harness/sortcheck.py` read a scenario's `.ran` with the end of a
+  run as its last byte, where it is the byte behind, as
+  `goldens.read_ran` has it. An instruction behind a branch, whose first
+  byte ends the run in front of it, counted as run when it was not, and
+  five instructions lost on the sorted bench went unnamed by every
+  group: `MOV AX,[DI+22]` of `CmpPar` at AB5Fh, the first of the
+  unsorted order with AB62h and AB65h; `MOV AL,4` of `F40_00` at 2ED8h,
+  the menu's tick on Unsorted for an order of 5 or more, the
+  distribution's 8, which no item sets; `JMP F00_59` of `F00_50` at
+  137Fh, lost in `cursor`, `stamps`, `stamps-russia` and `mouse-line`;
+  and `TEST` at `FncSl4` of `FncSel`, D9CEh, in `view-window`. The last
+  two are run by other scenarios. The first two are the unsorted
+  order's, said apart now with AB62h and AB65h, `UNSORTED` there.
+- Of those, 2ED8h was run by no scenario on the sorted bench, and the
+  check of the batches against what all scenarios ran said so. The
+  third start of `start-setup`, which has the defaults, opens the Right
+  menu, "F9 r", and leaves it, "Esc": two steps put in behind its
+  Ctrl+o, which run it. Every other screen of the scenario is as it
+  was. With that the check prints True: AB5Fh to AB65h are run by
+  `sort` and `start-setup`, 2ED8h by `start-setup`.
+- All 170 goldens were derived again side by side. The 74 of the
+  groups came out as they left them, `start-setup` as its commit has
+  it, and the other 95 changed only as the sorted bench makes them,
+  each "as before" by the tool, with these kinds of difference, by a
+  script that held the words of each screen against the old ones: the
+  lists of the panels in the order of the names, with STAMPS first and
+  under the cursor at the root of C: on the right where WORK was; A:\
+  with FREEDOS first and in the mini status where kernel.sys was
+  (`not-ready`); other files showing beside a box or behind one; and in
+  the hex of a setup file, `setup-damaged` and `setup-delay-file`, byte
+  5 of each panel 0 where it was 8. The 32 of the setup program ran
+  what they ran before.
+- 35 patches of the portable C no longer fitted and were made again,
+  each read against the one before by what the tool says: 7 expect
+  what they did on rows of the original that are otherwise now; 22
+  have STAMPS for WORK on the row that the shorter Advanced options no
+  longer covers; `enter-many-selected` has the 253 files that the
+  original keeps selected, others by name; `enter` and `view-window`
+  have the same rows under steps that their group wrote anew;
+  `start-setup` has its rows of F10 two screens later; and the setup
+  file of `setup-config`, `setup-screen` and `setup-config-mouse` is
+  another in both programs. The whole suite then failed for three
+  more, which fitted their goldens and were otherwise than the build:
+  `lost`'s patch, whose rows are the portable C's panels where the
+  original has ended, and the portable C's own expectations of
+  `editor-huge` and `menu-none`. Each was recorded again, and differs
+  from before only by the order of the lists.
+- Unsorted went from the portable C, entry 29 of `DEVIATIONS.md`, as
+  the piece's commit says. Five scenarios showed it, by
+  `harness/compare.py`: `sort`, whose last step is left out; `stamps`
+  and `stamps-russia`, which open the Left menu and have patches of
+  their own now; `menu`, the Left and the Right menu on seven screens;
+  and `start-setup` and `setup-defaults`, the panels of the defaults
+  sorted and their setup files with 0 for the orders. The picture of
+  the Left menu among the setup's colours, in `stcolor_t.c`, still has
+  its line "Unsorted": it is a picture and no menu, and was left as the
+  original has it, for the user to decide.
+- `NumbF`, the number that `read.c` gives each entry, is written and
+  read by nothing now. It goes, if it goes, with the layout of an
+  entry.
+- The instructions of the unsorted order stay the original's and the
+  C translation's to run. The batch of `files.c` in
+  `harness/ported.py` lists routines of the original and no function
+  of the tree, so nothing there changes for the portable C.
+- The branch `sort` can be deleted.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes

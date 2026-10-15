@@ -44,10 +44,13 @@ out again (show.py --changes is how):
   - The bench's panels are sorted by name, as its setup file has them, and
     a list of a directory is in the order of the names, directories first.
     The order of a panel is in its menu only: "F9 l n", x, m, s and u for
-    name, extension, time, size and unsorted. Ctrl+F3 does nothing and
-    Ctrl+F4 asks for the volume label. "F9 l f" is Full and "F9 l l" the
-    filter: a mask, then two Tabs to "Executable files". Ctrl+h switches
-    hidden files off and on. "Alt+F1 a" is another drive.
+    name, extension, time, size and unsorted. The portable C has no
+    unsorted order (src/portable_c/DEVIATIONS.md, 29): its menu is a row
+    shorter, U chooses nothing there, and "F9 l u" of sort is left out for
+    it. Ctrl+F3 does nothing and Ctrl+F4 asks for the volume label.
+    "F9 l f" is Full and "F9 l l" the filter: a mask, then two Tabs to
+    "Executable files". Ctrl+h switches hidden files off and on.
+    "Alt+F1 a" is another drive.
   - "F9 o f" switches Full screen, which is on: off, a panel has ten lines
     of files. In the Configuration dialog four Tabs go to "Menu bar
     always visible". Alt+F9 switches to 50 lines and back; a screen is
