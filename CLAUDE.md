@@ -187,7 +187,10 @@ These held while `src/c/` was made, and they say what it is.
   4. The implementation for DOS is `sys_dos.c` (which was `dos32.c`)
      behind `sys.h`, as it is.
   5. A second implementation is made that builds and is not meant to
-     run: a stub.
+     run: a stub. Done on 14 October 2026, `sys_stub.c` with the test
+     `portable_c-stub`; on the user's word of that day it goes once
+     `sys_posix.c` is done, its test's checks moving to the build for
+     Linux.
   6. The implementation for Linux, of 64 bits, built with clang, a
      program that runs in a terminal, emulating DOS as step 3 says;
      whatever of the x86 is still in the common code goes behind
