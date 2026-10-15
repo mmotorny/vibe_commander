@@ -1,12 +1,16 @@
 # Vibe Commander
 
+<!-- The picture is screen.png of
+     python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE "F9 o l" Ctrl+l Alt+F1 d Enter Wait*9
+     with the project built: see "Running the original". -->
 <p align="center">
-  <img src="docs/volkov-commander-4.05.png" width="720"
-       alt="Volkov Commander 4.05 on a blue 80x25 text screen: a file panel listing C:\VC on the left, the Info panel on the right, a DOS prompt and the function key bar along the bottom">
+  <img src="docs/vibe-commander-0.1.png" width="720"
+       alt="Vibe Commander 0.1 on a blue 80x25 text screen: a file panel listing D:\VC on the left, the program and the files it reads, with the mouse pointer where it starts, in the middle of the screen on the frame of the right panel; the Info panel on the right headed &quot;Vibe Commander 0.1, based on Volkov Commander 4.05&quot;; a DOS prompt and the function key bar along the bottom">
 </p>
 <p align="center">
-  <em>Volkov Commander 4.05, as it starts up on the day of its release, 16 June 2000.<br>
-  The original binary running under FreeDOS, captured by the harness in this repository.</em>
+  <em>Vibe Commander 0.1, the portable C, in its own directory, with the mouse pointer where it starts, in the middle of the screen,<br>
+  on a PC whose clock reads the day of Volkov Commander 4.05's release, 16 June 2000.
+  Built from this repository, running under FreeDOS, captured by the harness in this repository.</em>
 </p>
 
 A faithful recreation of
@@ -1649,9 +1653,30 @@ stand still. It then writes to `out/`:
 
 The run is repeatable: the PC's clock starts at noon on 16 June 2000 on every
 boot and every file on its disks has a fixed date, so two runs give identical
-files. The picture at the top is `screen.png` from
-`python3 harness/screenshot.py --scale 3x4`, which enlarges the 720x400
-display to roughly the 4:3 shape it had on a monitor.
+files. `--scale 3x4` enlarges the 720x400 display to roughly the 4:3
+shape it had on a monitor.
+
+With `--program`, a build is run on the test bench instead, in `D:\VC`
+with the files that it reads there and nothing else, and taken through
+the steps that follow, written as a scenario's are: the screen is taken
+when the program waits for a key behind the last of them. The picture at
+the top is `screen.png` from
+
+```sh
+python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE \
+    "F9 o l" Ctrl+l Alt+F1 d Enter Wait*9
+```
+
+with the project built. Of the bench's setup, which has the clock off and
+files in the right panel, `F9 o l` switches the clock on and `Ctrl+l`
+makes the right panel the Info panel; `Alt+F1 d Enter` takes the left
+panel to `D:\VC`; and `Wait*9` lets half a second pass, so that the
+colon of the clock shows when the screen is taken. The bench has a
+mouse, and the program shows its pointer where the mouse driver puts it
+when the program starts, in the middle of the screen: a step such as
+`Move@4,7` would put it elsewhere. Two runs give the same files.
+`python3 harness/screenshot.py --scale 3x4` makes the picture of the
+original that the top of this README showed before, byte for byte.
 
 ## Using the C trees by hand
 
@@ -1741,4 +1766,5 @@ third condition is why this README says what [The extender](#the-extender)
 says.
 
 The shareware distribution of Volkov Commander is proprietary and is not
-part of this repository. The picture at the top shows it running.
+part of this repository. The picture at the top shows the portable C
+running in its directory, with its files beside it.
