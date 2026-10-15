@@ -191,7 +191,8 @@ class Program:
     # behave otherwise than the original (see deviations.py), and is
     # then held against what is declared for it.
     tree: str = field(default=None, compare=False)
-    # Of the program for Linux, its file, which is run where it is.
+    # Of the program for Linux, its file, which is run where it is; of
+    # the program for the web under Node, its vc.js.
     path: Path = field(default=None, compare=False)
 
     @classmethod
@@ -207,6 +208,11 @@ class Program:
             # the portable C. What the goldens call the program under
             # test is VC.EXE, which its bench has not.
             return cls("VC.EXE", contents, None, None, "posix", path)
+        if path.suffix == ".js":
+            # The program for the web under Node, the link web-node of
+            # the piece W2 of step 7, which runs on the host as the
+            # program for Linux does: the tree "web".
+            return cls("VC.EXE", contents, None, None, "web", path)
         if contents[:2] == b"MZ":
             # The translation has no assembly of its own to list: its main
             # data is laid out as the original's, and what the driver

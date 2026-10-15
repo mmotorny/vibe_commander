@@ -1886,16 +1886,17 @@ def deviation_entries(tree):
             if number is not None and number.isdigit()}
 
 
-def linux_entries():
+def linux_entries(letter="L"):
     """The entries of the program for Linux in the portable C's
     DEVIATIONS.md, number -> text: each from its heading, "### L1. ", to
-    the next heading of an entry or of a part."""
+    the next heading of an entry or of a part; or of the web page's, with
+    `letter` W, "### W1. "."""
     file = deps.ROOT / "src" / "portable_c" / "DEVIATIONS.md"
     parts = re.split(r"^(?:### (\w+)\. |## )",
                      file.read_text(encoding="utf-8"), flags=re.MULTILINE)
     return {number: text
             for number, text in zip(parts[1::2], parts[2::2])
-            if number is not None and re.fullmatch(r"L\d+", number)}
+            if number is not None and re.fullmatch(letter + r"\d+", number)}
 
 
 def check_linux_declared():
@@ -1918,6 +1919,29 @@ def check_linux_declared():
                 print(f"  {kind} on Linux, and no entry of Linux in "
                       f"src/portable_c/DEVIATIONS.md names the scenario, as "
                       f"`{name}`: what is not run, or cut, is declared "
+                      "there, or is run")
+    return passed
+
+
+def check_web_declared():
+    """Report on whether every scenario that the program for the web is
+    not taken through, or only as far as a step, besides what is
+    declared of Linux (deviations.WEB_NOT_RUN, WEB_CUT), is named by an
+    entry of the web page of the portable C's DEVIATIONS.md, as `NAME`;
+    return success."""
+    entries = linux_entries("W")
+    passed = True
+    for kind, table in (("not run", deviations.WEB_NOT_RUN),
+                        ("cut", deviations.WEB_CUT)):
+        for name in sorted(table):
+            if name not in scenarios.SCENARIOS:
+                passed = False
+                print(f"  {kind} on the web, and no scenario: {name}")
+            elif not any(f"`{name}`" in entry for entry in entries.values()):
+                passed = False
+                print(f"  {kind} on the web, and no entry of the web page "
+                      f"in src/portable_c/DEVIATIONS.md names the scenario, "
+                      f"as `{name}`: what is not run, or cut, is declared "
                       "there, or is run")
     return passed
 

@@ -210,6 +210,23 @@ void DosNameMake(const char *host, DosNameTaken *taken, const void *context,
  */
 #define DOS_ROOT_DRIVE 'R'              /* the root of the file system */
 #define DOS_HOME_DRIVE 'H'              /* the home directory */
+
+/*
+ * The web page has two drives, on the user's word of 15 October 2026
+ * (CLAUDE.md, "The web page"), each a directory of the host that its
+ * implementation names with the drive's letter and label: on the page,
+ * C:, labelled VIBE, where the program lives, its own files in C:\VC,
+ * and D:, labelled DEMO, the demo's files; in the tests, C: the bench's
+ * working disk and D: the drive of the program's own files, D:\VC, as
+ * the bench of DOS has them (the piece W2, TODO.md, "Step 7, the web
+ * page"). Both are drives like any other: the drive box, the Info panel
+ * and every question of a drive by its number have both.
+ */
+struct DriveGiven {
+    u8 letter;                          /* in capitals */
+    const char *label;                  /* of DOS's form, in capitals */
+    const char *root;                   /* a directory of the host */
+};
 #define DOS_DRIVES 2
 #define DOS_PATH_ROOM 128               /* a full path, with its zero, as
                                            sys.h's FileTrueName has it */
@@ -238,7 +255,8 @@ struct DosDrive {
                                            backslash */
 };
 struct Drives {
-    struct DosDrive drive[DOS_DRIVES];  /* H: and R:, by their letters */
+    struct DosDrive drive[DOS_DRIVES];  /* H: and R:, or the web page's
+                                           C: and D:, by their letters */
     i32 current;                        /* the current one, its index */
 };
 
@@ -248,6 +266,14 @@ struct Drives {
    of. R: is the current drive, and the root of each its current
    directory. */
 void DrivesBegin(struct Drives *drives, const char *home);
+
+/* The drives that an implementation names, `count` of them and at most
+   DOS_DRIVES, the web page's: the first is the current drive, and the
+   root of each its current directory. Each root is a path from the
+   host's root that is no link and a directory, which the caller has made
+   sure of. */
+void DrivesBeginGiven(struct Drives *drives, const struct DriveGiven *given,
+                      i32 count);
 
 /* The index of the drive of a letter, in capitals, or -1 where there is
    no such drive. */
@@ -468,6 +494,12 @@ struct Dos {
    else there is no H:. And what it holds given back, every handle that
    is still open closed. */
 void DosBegin(struct Dos *dos, const char *home);
+
+/* The same with the drives that an implementation names
+   (DrivesBeginGiven), each root with its links followed. Answers false,
+   with nothing begun, where a root names no directory. */
+bool DosBeginGiven(struct Dos *dos, const struct DriveGiven *given,
+                   i32 count);
 void DosEnd(struct Dos *dos);
 
 /* The directory of the host that the program is started in, from its
@@ -595,12 +627,17 @@ struct Space DosSpaceOf(u32 block, uint64_t blocks, uint64_t free);
 extern struct Dos MachineDos;
 
 /* The start: the test channel begun, from the directory that VC_TEST
-   names, where it does, else false; then the machine itself, its DOS
-   and where the program starts; then, once the implementation knows the
-   DOS's name of its shell, which COMSPEC is, the environment, the tail
-   of `arguments`, which are main()'s, and the screen in mode 3. */
+   names, where it does, else false; then the machine itself, its DOS,
+   with Linux's drives where `given` is NULL and else the `count` that
+   the implementation names (DosBeginGiven), and where the program
+   starts; its own files, its setup file among them, being where Linux
+   has them, or in the directory vc of the drive of the letter `own`,
+   which is made where the host has it not; then, once the implementation
+   knows the DOS's name of its shell, which COMSPEC is, the environment,
+   the tail of `arguments`, which are main()'s, and the screen in mode
+   3. */
 bool TestBegin(void);
-void MachineBegin(void);
+void MachineBegin(const struct DriveGiven *given, i32 count, u8 own);
 void MachineEnvironment(const u8 *shell, int count, char **arguments);
 
 /* The end: the last screen recorded for the test channel, the memory
@@ -655,6 +692,10 @@ void TestProgramRun(void);
 void TraceKey(u16 key);
 void TraceHeld(u16 held);
 void TraceFlush(void);
+
+/* The trace of the web page's ProgramOpenFile: the name of DOS's that it
+   was handed. */
+void TraceOpen(const u8 *name);
 
 /* The path of the host that the name of DOS's leads to from the current
    directory, with what the host says of it, or false where it leads to

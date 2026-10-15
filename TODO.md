@@ -764,17 +764,16 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   - The cell is worked out from the measured cell box and clamped to 80×25.
   - Buttons 1, 2 and 4. The context menu is suppressed, and the wheel does nothing (L11).
 - **The clock.** Emscripten's clock_gettime uses the browser's Date and time zone. The test clock is shared from `machine_posix.c`.
-- **The drive (the user's decision).** One drive, C:.
-  - It starts as a small tree of sample files written for the project, nothing proprietary, served with the page: preloaded or fetched by a manifest.
-  - The user may change it, and the changes are kept in the browser in IndexedDB (IDBFS), surviving a reload. A way to reset to the served content is offered.
-  - The store is synced at the first idle after a write and at pagehide. `navigator.storage.persist()` is asked for.
-  - Where IndexedDB is missing (a sandbox without same-origin), the page falls back to memory and says so.
-  - With C: as the drive, the Linux masks of the drive's letter may not be needed on the web: look at that in W2.
+- **The drives (the user's decision).** Two, C: labelled VIBE, where the program lives, its own files in C:\VC, and D: labelled DEMO, the demo's (CLAUDE.md, "The web page").
+  - D: starts as a small tree of sample files written for the project, nothing proprietary, served with the page.
+  - Both are directories of the page's server, a script for Node with Node's own modules: the page loads their tree from it, and every change, the setup file's too, is made there as it happens; what the server refuses or cannot do is DOS's error for that call. Nothing is kept in the browser.
+  - The program takes the drives from the environment, `VC_DRIVE_C`, `VC_DRIVE_D` and the rest: W2's section below has them and what W3b sets.
+  - The tests map the letters as the bench has them, C: the working disk and D:\VC the program's files, so the masks of the drive's letter are not needed on the web.
 - **Files in and out.**
   - An upload button and drag-and-drop write into the host directory of DOS's current directory, which C publishes to JS at each yield. Overwriting asks confirm(). Then Ctrl-R (1312h) is queued, so that the panel reads the directory anew.
   - `ProgramOpenFile` opens the file in a NEW TAB, as a blob URL with a MIME type from the extension (the user's decision, not a download): the user views or saves it from there.
   - `ProgramOfFile` answers 0: nothing on the page is a program.
-- **The setup file.** `$HOME/.config/vc/vc.ini`, where HOME is on the persistent store.
+- **The setup file.** C:\VC\VC.INI, `vc/vc.ini` of C:'s directory, on the server like the rest of the drive.
 
 ### Deviations (W entries of DEVIATIONS.md, a part of their own, "The web page")
 - **A command.** ProgramRun writes the prompt and the command, then "Commands cannot be run in a web page." on DOS's screen, and answers that it ran with code 1. This covers the user menu, VC.EXT, and the external viewer and editor.
@@ -831,10 +830,10 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
     - `keyboard_posix.c` is the decoder of `term_posix.c`, from "The keys, and the mouse" on, with the key buffer, what is held and the mouse's reports: `KeyboardWaiting`, `KeyboardTake`, `KeyboardHeld` and `KeyboardMouse` (`struct ReportedMouse`) where those were `Term...`. Bytes are handed in by `KeyboardBefore(&wait)`, `KeyboardRoom(&to)` just before they are read, and `KeyboardAfter(count)`: a page can hand it kitty's `CSI ... u` as bytes and have the terminal's words. What it had the terminal do, push the kitty protocol's flags at the answer to the question, is `KeyboardKittyAnswered()`, which `term_posix.c` asks behind each decoding (`Answered`); a terminal too small to show the program is `KeyboardRefuse(true)`.
     - `CodePageGlyph` is in `codepage_posix.c`, declared beside `CodePageToUnicode`.
     - `CMakeLists.txt` has `portable_c_sources(<variable> <implementation>)` with the lists `portable_c_implementations` (dos posix web), `portable_c_takes_<it>` and `portable_c_leaves_<it>`: `portable_c_sources(files web)` is the common code, `*_posix.c` but `sys_posix.c` and `term_posix.c`, and `*_web.c`. `add_portable_c` and `add_portable_c_host` take their files by it. The test of the emulation leaves out `machine_posix.c` as it does `sys_posix.c` (it reads the main data), and `harness/tidycheck.py` reads it with the program's command (`PROGRAM_POSIX`).
-    - `portable_c-web-probe` of W0 compiles both new files for the web with the rest, 68 files, and says nothing. It has its own list of what the web shares, `NOT_SHARED` of `harness/webprobe.py`, beside `portable_c_leaves_web` of `CMakeLists.txt`: the two are to say the same.
+    - `portable_c-web-probe` of W0 compiles both new files for the web with the rest, 68 files, and says nothing. It had its own list of what the web shares, `NOT_SHARED` of `harness/webprobe.py`, beside `portable_c_leaves_web` of `CMakeLists.txt`; since W2 it reads that one, which the configuration writes for it.
     - VC.EXE and debug/VC.EXE are the same bytes before and after (SHA-256 f6538da4... and cf1abd33...). The program for Linux is the same code moved: posix-scenarios, terminal, posix-unit and tidy pass. The records of `portable_c-host` and `portable_c-words` have the two new files, clean and with no word.
 - **W3a, the pure JS.** render.js, keys.js, mouse.js and the test `portable_c-web-render`. Medium.
-- **W2, the program under Node.** `sys_web.c`, the web-node link, the harness's tree "web", ON_WEB, and `portable_c-web-scenarios`. After W0 and W1.
+- **W2, the program under Node: done**, below. `sys_web.c`, the web-node link, the harness's tree "web", ON_WEB, and `portable_c-web-scenarios`.
 - **W3b, the page.** The glue, the shell HTML, the IDBFS sync, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, and the target `portable_c-web`. After W2 and W3a. The user tries it in a browser.
 - **W4.** DEVIATIONS "The web page", the README, TODO and CLAUDE notes, the licences, and the question of publishing to the user.
 
@@ -881,7 +880,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   `-O2`, with `clang_warnings`, `-fno-strict-aliasing` and
   `-D_XOPEN_SOURCE=700`, every file that the web is to have by the
   plan's list: the common code, every `*_posix.c` but `sys_posix.c` and
-  `term_posix.c`, and `*_web.c` (`NOT_SHARED` and `IMPLEMENTATIONS`
+  `term_posix.c`, and `*_web.c` (`NOT_SHARED`, `leaves.txt` since W2, and `IMPLEMENTATIONS`
   there; W1's `machine_posix.c` and `keyboard_posix.c` come in by
   themselves). 66 files, four seconds. What emcc says of itself at its
   first use is not counted.
@@ -892,6 +891,147 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   a `long` put into a `u16` and a `size_t` into an `int` was refused,
   so the warnings are on. Of wasm32: `size_t` is `unsigned long` there,
   32 bits.
+
+### W2, the program under Node: done, and what W3b should know
+
+- **`sys_web.c`** is written as `sys_posix.c` is, over the machine of
+  `machine_posix.c`: KeyRead, KeyWaiting, KeysHeld, Idle, Ticks,
+  MouseWhere, ProgramRun, ProgramOfFile, ProgramOpenFile, ProgramEnd and
+  main(). The yields are the plan's, `Yield` there: KeyRead waits by
+  `emscripten_sleep` (50 ms at a time while nothing is queued), Idle
+  yields, KeyWaiting yields once 50 ms of the host's clock have passed
+  since the last yield, Ticks at its second read with no yield between,
+  and ProgramEnd draws and waits for `web_sync` before the machine's end.
+  Under the test channel it yields at the same places, with 0 ms, so
+  that the scenarios go through Asyncify's unwinding as the page does.
+- **The page's side** is `web/library.js`, an Emscripten library
+  (`--js-library`) of four functions that go by what the page puts on
+  `Module`, and do nothing where it has put nothing, as under Node:
+  `web_input(to, room)` takes from `Module.vcInput`, an array of strings
+  of bytes, which W3b fills with what `keys.js` and `mouse.js` answer;
+  `web_draw` hands `Module.vcDraw(cells, place, shape)` the 2,000 cells
+  as a Uint16Array over the memory, good for the call alone, which is
+  what `render.js`'s `draw` takes; `web_open_file` calls
+  `Module.vcOpen(host, name)`, the file's path in the file system and
+  DOS's name, for the new tab; `web_sync` awaits `Module.vcSync()`,
+  by `Asyncify.handleAsync`. The bytes go to the decoder of
+  `keyboard_posix.c` as a terminal's do (`PageInput`, TermInput's way:
+  `KeyboardBefore`, `KeyboardRoom`, `KeyboardAfter`), mouse reports
+  included; Ctrl-O is the program's own key.
+- **The drives.** Two, C: and D:, each the directory of the host that
+  a variable of the environment names, `VC_DRIVE_C` and `VC_DRIVE_D`,
+  labelled as `VC_LABEL_C` and `VC_LABEL_D` say (11 characters at the
+  most, DOS's form), VIBE and DEMO where they say nothing; a drive whose
+  variable is not set is not there, and main() ends with a message
+  where neither is (`main` of `sys_web.c`, `DosBeginGiven` of
+  `files_posix.c`, `DrivesBeginGiven` of `paths_posix.c`, which take a
+  table of `struct DriveGiven`). The program's own files are in the
+  directory `vc` of the drive that `VC_PROGRAM_DRIVE` names, C: where it
+  names none, made where it is not there (`OwnDirectory` of
+  `machine_posix.c`): C:\VC on the page, as the user decided on 15
+  October 2026, and D:\VC in the tests, as on the bench. Both are
+  ordinary drives, which the drive box and the Info panel see. The
+  program starts in the host's current directory where a drive has it,
+  else at the root of the first. `DosPathOfHost` takes the first drive
+  in the table that a path is under, which is H: before R: on Linux as
+  it was. W1 of DEVIATIONS.md. HOME and XDG_CONFIG_HOME mean nothing on
+  the web. A first try had one drive C: and the program's files on a D:
+  that only a path led to; the user decided the two drives instead.
+- **What W3b must set** on the page: `VC_DRIVE_C` and `VC_DRIVE_D` to
+  the two directories of the file system that mirror the server's
+  drives, and nothing else, the labels and the program's drive having
+  the page's values by default (`ENV` in a `preRun`, as `web/node.js`
+  does). The drives are the server's (CLAUDE.md, "The web page"), a
+  script for Node with Node's own modules: every file operation has to
+  reach it as it happens, and what it refuses or cannot do is DOS's
+  error for that call. One way: a MEMFS mirror loaded from the server's
+  tree at the start, written through by fetches that Asyncify awaits,
+  in the calls of `files_posix.c` that change something (create, write,
+  close, delete, rename, make and remove a directory, set a time or the
+  attributes), the error of a failed fetch made the call's.
+- **A command** writes "Commands cannot be run in a web page." through
+  DOS's console behind the prompt and the command that the program has
+  typed, and answers that it ran with the code 1; `TestProgramRun` says
+  the step on standard error as on Linux, so what DOS shows behind the
+  panels is masked from there on. **ProgramOfFile** answers 0.
+  **ProgramOpenFile** writes "open NAME" into the trace where VC_TRACE
+  asks, and calls `web_open_file`.
+- **The link `web-node`**, target `portable_c-web-node`, is
+  `build/portable_c/web-node/vc.js` with its `vc.wasm`, by
+  `add_portable_c_host` with `COMPILER ${emcc}` and `OUTPUT vc.js`:
+  `-O2`, the sanitizers of addresses and of undefined behaviour, fatal,
+  `--profiling-funcs` for the names in a report (`-g` makes emcc warn
+  that it optimizes less, which `-Werror` stops), `-sASYNCIFY
+  -sASYNCIFY_STACK_SIZE=65536 -sNODERAWFS -sENVIRONMENT=node
+  -sEXIT_RUNTIME -sALLOW_MEMORY_GROWTH -sMAXIMUM_MEMORY=512MB`, and
+  `web/node.js` as the pre-js that copies VC_DRIVE_C, VC_DRIVE_D,
+  VC_LABEL_C, VC_LABEL_D, VC_PROGRAM_DRIVE, VC_TEST, VC_TEST_CLOCK,
+  VC_TRACE and TZ into `ENV`.
+  **ASan and UBSan go together with Asyncify**, so both are on.
+- **The memory.** The program asks for all that there is, and the
+  machine said the host's memory less what is held, which Linux gives;
+  a heap of wasm32 gives less, and the program's second ask, for what
+  it was told, failed. So the machine finds how long a block the C
+  library gives by taking it and giving it back, halving to a page,
+  where it does not give the whole (`Obtainable` of `machine_posix.c`;
+  Linux gives the whole at the first try). Two things met there: clang
+  drops a `malloc` whose block is only given back, and takes it for
+  given, so the block goes through a volatile pointer (`Tried`); and
+  the sanitizer of addresses keeps a block that is given back from use
+  for a while, so the next ask for the same length failed: under it the
+  web turns that off, `quarantine_size_mb=0`, with
+  `allocator_may_return_null=1` so that a refusal is NULL
+  (`__asan_default_options` of `sys_web.c`). With 2 GB, under the
+  sanitizer, the halving poisons and unpoisons a gigabyte's shadow at
+  every ask, and `start` took 24 seconds; the Node build has 512 MB, and
+  W3b's page, which has no sanitizer, the plan's 2 GB.
+- **The sanitizer found one fault** of a `long` of 32 bits: the test's
+  clock worked out the ticks of VC_TEST_CLOCK as `long`, which overflows
+  on wasm32 (`ClockBegin`, made `int64_t`).
+- **The harness.** `setups.Program.load` takes a `.js` for the tree
+  "web"; `posixrun.HOSTED` is the trees that run on the host, and
+  `posixrun.run` runs `[node, vc.js]` with `VC_DRIVE_C` the bench's
+  home, `VC_DRIVE_D` the run's `d` and `VC_PROGRAM_DRIVE=D`, the
+  program's files in `d/vc`, from the bench's setup file as it is
+  (C:\WORK and C:\, so no setup file of its own as Linux has) and with
+  the steps as the scenario has them, D:\VC being D:\VC. `TREES["web"]` is the portable C's with
+  `ON_WEB`: Linux's scenarios not run, cut and left out, and Linux's
+  masks but those of the drive's letter, `LINUX_LETTER_MASKS`, which the
+  web does not need; `WEB_NOT_RUN` and `WEB_CUT` are empty. `BASE`
+  goes down a chain, web to posix to portable_c, for a patch, and
+  `harness/goldens/web/` has none. `ported.check_web_declared` holds a
+  scenario of `WEB_NOT_RUN` or `WEB_CUT` to a W entry, as
+  `check_linux_declared` does for Linux, and both are asked for the
+  web. The label of the web had first been WEB: the box of Ctrl-F4 is as
+  wide as the label, and three letters made it narrower than the
+  golden's, which no mask can do; with four it is masked as on Linux.
+- **The result.** The 119 scenarios that the program for Linux passes
+  pass on the web, with nothing declared of the web's own; `find`,
+  `find-drives`, `label` and `enter`, tried on the web, differ as they
+  differ on Linux. Some 4 to 13 seconds a scenario, three side by side.
+- **The test** `portable_c-web-scenarios`, with VC_WEB alone, labels
+  portable_c and machine.
+- **One list of what the web leaves.** The configuration writes
+  `portable_c_leaves_web` into `build/portable_c/web-probe/leaves.txt`,
+  which `harness/webprobe.py` reads: `NOT_SHARED` is gone.
+- **The checks that read the tree** with the host's compilers leave
+  `*_web.c` to the probe, since they have not Emscripten's headers:
+  `OTHER_SYSTEMS` of `harness/int16.py` (and so `width.py` and `cut.py`)
+  and `NOT_READ` of `harness/hostcheck.py`. `harness/tidycheck.py` reads
+  no `*_web.c` either: clang-tidy does not read `sys_web.c`.
+- **The size**, measured on 15 October 2026 for the plan's question of
+  what Asyncify costs: the Node build as the test has it, sanitized,
+  `vc.wasm` 1.81 MB and `vc.js` 98 KB. The same objects without the
+  sanitizers, linked as the Node build is: at `-O2` 394 KB of wasm with
+  Asyncify and 298 KB without it (+32%), at `-Os` 313 KB and 221 KB
+  (+42%), the JS some 85 KB each. The plan's guess was +50 to 100%.
+- **The Asyncify stack used**, measured by a pre-js of a trial, not
+  kept, that wraps `_asyncify_stop_unwind` and reads how far the data
+  of the unwinding has gone at each: at the most 1,668 bytes, in all
+  119 scenarios that the web is taken through, of 26,166 unwindings,
+  against the 64 KB that the link gives it (the help over a dialog over
+  the panels among them). The sanitized build at `-O2`; another build
+  keeps other locals, so W3b may measure its page's the same way.
 
 ### W3a, the pure JS: done
 

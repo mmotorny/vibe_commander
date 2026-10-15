@@ -315,10 +315,23 @@ def read(command, source, path, at_its_use=True):
     return places, included
 
 
+# The files of the web page's, *_web.c, which include Emscripten's
+# headers and are read by its compiler, the test portable_c-web-probe
+# (harness/webprobe.py), and not here: gcc has not those headers.
+NOT_READ = ("_web.c",)
+
+
+def read_files(source):
+    """The C files of `source` that gcc reads, in the order of their
+    names."""
+    return sorted(path for path in source.glob("*.c")
+                  if not path.name.endswith(NOT_READ))
+
+
 def survey(command, source):
     """Every place in the tree, as (file, line, kind, message), and the
     names of its files."""
-    files = sorted(source.glob("*.c"))
+    files = read_files(source)
     headers = sorted(source.glob("*.h"))
     with ThreadPoolExecutor() as pool:
         results = list(pool.map(lambda path: read(command, source, path),
@@ -341,7 +354,7 @@ def makers(command, source, kinds):
     """Of the places of some kinds, how many each macro makes, by its
     name, and how many are written out, under the name "": gcc is asked
     again, for where the cast is written and not where it ends up."""
-    files = sorted(source.glob("*.c"))
+    files = read_files(source)
     with ThreadPoolExecutor() as pool:
         results = list(pool.map(
             lambda path: read(command, source, path, False), files))

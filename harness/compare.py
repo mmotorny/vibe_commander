@@ -44,6 +44,7 @@ from pathlib import Path
 
 import dataimage
 import goldens
+import posixrun
 import scenarios
 import setups
 from dos import MachineError
@@ -161,7 +162,7 @@ def compare(names, program, trace=False, together=None, stack=False,
             run = scenarios.run(
                 scenario, program,
                 # The program for Linux has no bench of DOS's.
-                None if program.tree == "posix"
+                None if program.tree in posixrun.HOSTED
                 else benches[scenario.bench], trace,
                 stack=stack,
                 limit=(limits or {}).get(name, scenarios.STEP_TIME),
@@ -302,7 +303,10 @@ def main():
         # so far, each named by an entry of Linux of DEVIATIONS.md
         # (ported.py imports this module, so it is imported here).
         import ported
-        if program.tree == "posix" and not ported.check_linux_declared():
+        if program.tree in posixrun.HOSTED and \
+                not ported.check_linux_declared():
+            sys.exit(1)
+        if program.tree == "web" and not ported.check_web_declared():
             sys.exit(1)
     failed, _ = compare(names, program, together=args.together,
                         limits=dict.fromkeys(names, args.limit),

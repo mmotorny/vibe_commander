@@ -1371,7 +1371,7 @@ def _on_top(base, more):
 # the host's, each left out where the golden has the original's: masks
 # (CLAUDE.md, "The scenarios of the program for Linux"; the user's word
 # of 15 October 2026), rules with None for their text (masked()).
-LINUX_MASKS = (
+LINUX_LETTER_MASKS = (
     # The drive's letter: the bench's C:, which is H: on Linux, the
     # home directory, in a title, on the prompt, in a dialog's line and
     # in the Info panel.
@@ -1395,6 +1395,8 @@ LINUX_MASKS = (
     (re.compile(r"^ 00000060(?:  [0-9A-F]{2}(?: [0-9A-F]{2}){3}){3}"
                 r"  [0-9A-F]{2}(?: [0-9A-F]{2}){2} (43)  .{15}(C) $"),
      None, None),
+)
+LINUX_MASKS = LINUX_LETTER_MASKS + (
     # Its label: the bench's C: is WORK, and H: is HOME; behind the
     # drive's letter also where a box covers "Volume in drive".
     (re.compile(r": is (WORK)\b"), None, None),
@@ -1619,6 +1621,21 @@ ON_LINUX = Declared(not_run=LINUX_NOT_RUN, rules=LINUX_MASKS + LINUX_RULES,
                     left_out_of=LINUX_LEFT_OUT_OF)
 
 TREES["posix"] = _on_top(TREES["portable_c"], ON_LINUX)
+
+# The program for the web under Node, the piece W2 of step 7 (TODO.md,
+# "Step 7, the web page"): the machine of the program for Linux over the
+# host's files, with its drive C: the bench's home directory and its
+# own files on D:\VC as on the bench (DEVIATIONS.md, W1), so that what Linux types on H:
+# is typed as the scenario has it. What it is declared to do otherwise
+# than the program for Linux is ON_WEB.
+WEB_NOT_RUN = {}
+WEB_CUT = {}
+ON_WEB = Declared(not_run={**LINUX_NOT_RUN, **WEB_NOT_RUN},
+                  rules=LINUX_MASKS[len(LINUX_LETTER_MASKS):] + LINUX_RULES,
+                  cut={**LINUX_CUT, **WEB_CUT},
+                  left_out_of=LINUX_LEFT_OUT_OF)
+BASE["web"] = "posix"
+TREES["web"] = _on_top(TREES["portable_c"], ON_WEB)
 
 
 def ruled(screen, rule):

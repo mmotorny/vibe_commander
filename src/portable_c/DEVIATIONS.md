@@ -2954,3 +2954,92 @@ refusal, and the emulation does not make one up.
 
 **Which scenarios show it.** None. `copy-tree` renames WORK while the
 current directory is a directory inside it, which DOS allows.
+
+## The web page
+
+The portable C is also a web page (`CLAUDE.md`, the road, step 7, and
+"The web page"): the program built to WebAssembly by Emscripten, with
+the machine of the program for Linux behind `sys.h` and a file of its
+own, `sys_web.c`. It shares the emulation of DOS of the program for
+Linux, so what the part above says of names, the code page, attributes,
+devices, large files and the order of a directory holds for it as well,
+L3 to L7, L12 and L13; what it has otherwise is here. The entries are W1 and
+on, and a patch of the web's, in `harness/goldens/web/`, names the
+decision that it is by, "Decided: CLAUDE.md, step 7".
+
+The test `portable_c-web-scenarios` takes the program under Node, the
+link `web-node`, through the scenarios as the program for Linux is
+taken, with the host's files (`NODERAWFS`) where the page has the
+directories of its server: so what the page does to have a change made
+on the server is not what the scenarios show. What the harness goes by is `ON_WEB` of
+`harness/deviations.py`, which has what is declared of Linux but its
+masks of the drive's letter, and what is the web's alone.
+
+### W1. Two drives, C: where the program lives and D: of the demo
+
+**What the original does.** It has the drives that DOS has: on the
+bench of the tests the diskettes A: and B:, C: and D:; its own files
+are beside its program, in D:\VC on the bench.
+
+**What the web page does.** It has two drives, each a directory of the
+host that the environment names, `VC_DRIVE_C` and `VC_DRIVE_D`, with
+the labels that `VC_LABEL_C` and `VC_LABEL_D` give (`sys_web.c`). On the
+page, C:, labelled VIBE, is where the program lives, its own files, the
+setup file, the menu and the extension file, in C:\VC; and D:, labelled
+DEMO, starts as the demo's sample files. Both are directories of the
+page's server, which every change is made on as it happens. Both are
+ordinary drives: the drive box, the Info panel and every question of a
+drive by its number have both. The program's own files are in the
+directory `vc` of the drive that `VC_PROGRAM_DRIVE` names, C: where it
+names none, made where it is not there. Making a label is refused as on
+Linux (L2). The program starts in the host's current directory where a
+drive has it, and at the root of the first drive otherwise.
+
+**Why.** The user's decision of 15 October 2026 (CLAUDE.md, "The web
+page"): the program has a place of its own for its files, C:\VC, which a
+listing of the demo's drive does not show, and the demo is a drive
+that the user may change. The tests map the letters as the bench has
+them: C: is the bench's working disk and D: holds the program's own
+files in D:\VC, so the letters are the original's and need no mask.
+
+**Which scenarios show it.** The drive's letter is as the original's,
+and is not masked; the drive box's letters and the labels, VIBE and
+DEMO, four letters as Linux's HOME, are masked as on Linux. Not run and
+cut as on Linux for the diskette and D: (L1).
+
+### W2. A command cannot be run
+
+**What the original does.** It runs a command by COMMAND.COM, `/C` and
+the command, on DOS's screen: those of the command line, of the user
+menu and of the extension file, and the external viewer and editor.
+
+**What the web page does.** DOS's screen has the prompt and the command
+that the program has written there, and behind them the line "Commands
+cannot be run in a web page."; DOS answers that the program ran, and
+ended with the code 1. Ctrl-O shows DOS's screen as on DOS.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page"): a page has no shell.
+
+**Which scenarios show it.** What DOS has shown behind the panels is
+masked from the step at which a command is asked for, as on Linux, and
+the scenarios that are not run on Linux for a command, or are cut at
+one, are not run or are cut on the web too (L8).
+
+### W3. Enter on a file opens it in a new tab, and nothing is a program
+
+**What the original does.** Enter on a file that DOS runs by its name,
+`.COM`, `.EXE` or `.BAT`, runs it; on another it does what the
+extension file says, or nothing.
+
+**What the web page does.** No file is a program (`ProgramOfFile`
+answers none), so the panel's filter of programs shows none; Enter on a
+file that the extension file has no command for opens it in a new tab
+of the browser, where the user may view it or save it.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page").
+
+**Which scenarios show it.** Under Node nothing is opened; the trace,
+`VC_TRACE`, has a line for each file that would be. `filter` is cut as
+on Linux (L8).

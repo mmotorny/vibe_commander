@@ -104,6 +104,18 @@ void DrivesBegin(struct Drives *drives, const char *home)
     drives->current = ROOT;
 }
 
+void DrivesBeginGiven(struct Drives *drives, const struct DriveGiven *given,
+                      i32 count)
+{
+    i32 i;
+
+    memset(drives, 0, sizeof *drives);
+    for (i = 0; i < count && i < DOS_DRIVES; i++)
+        DriveMake(&drives->drive[i], given[i].letter, given[i].label,
+                  given[i].root);
+    drives->current = 0;
+}
+
 i32 DriveIndex(const struct Drives *drives, u8 letter)
 {
     i32 i;
@@ -422,20 +434,21 @@ struct Answer DosPathOfHost(struct Directories *directories,
     const u8 *dos;
     i32 length;
     char *part;
-    const struct DosDrive *drive;
-    i32 home = DriveIndex(drives, DOS_HOME_DRIVE);
+    const struct DosDrive *drive = NULL;
     const char *rest = NULL;
+    i32 i;
 
     if (path[0] != '/')
         return Fails(PATH_NOT_FOUND);
-    if (home >= 0)
-        rest = Behind(drives->drive[home].root, path);
-    if (rest != NULL)
-        drive = &drives->drive[home];
-    else {
-        drive = &drives->drive[ROOT];
-        rest = path;
-    }
+    /* The first drive in the table that the path is under: on Linux H:
+       before R:, the root, which every path is under. */
+    for (i = 0; i < DOS_DRIVES && rest == NULL; i++)
+        if (drives->drive[i].letter != 0) {
+            drive = &drives->drive[i];
+            rest = Behind(drive->root, path);
+        }
+    if (rest == NULL)
+        return Fails(PATH_NOT_FOUND);
     at = HostJoin(directory, 0, (i32)sizeof directory, drive->root,
                   (i32)strlen(drive->root));
     if (at < 0)

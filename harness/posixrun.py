@@ -25,7 +25,8 @@ The bench of a run is a directory of /tmp of its own, removed behind it:
     with what the bench has beside the program in D:\\VC
     (setups.SUPPORT_FILES, from the pinned distribution, with their
     dates), named in small letters as the program names what it makes,
-    and the bench's setup file as it is (setups.Bench.setup).
+    and the bench's setup file as it is (setups.Bench.setup); for the
+    program for the web, `d/vc`, D:\\VC, of the drive D: that is `d`.
 
 The bench's directory is in /tmp, not in build/tmp, so that the path of
 `vc` holds in DOS's 63 characters on R: whatever the checkout's path
@@ -73,6 +74,17 @@ from dos import COLUMNS, ROWS, Screen, MachineError
 ROOT = deps.ROOT
 # The program for Linux, with the sanitizers that go together.
 PROGRAM = ROOT / "build" / "portable_c" / "posix-asan" / "vc"
+
+# The trees whose programs run on the host and are taken through the
+# scenarios here: the program for Linux, and the program for the web
+# under Node, build/portable_c/web-node/vc.js (the piece W2 of step 7),
+# which has the same machine and test channel behind sys.h, its drives
+# C: the bench's home directory (VC_DRIVE_C) and D: the run's `d`
+# (VC_DRIVE_D), with its own files on D:\VC, `d/vc`, as on the bench
+# (sys_web.c).
+HOSTED = ("posix", "web")
+# Node, which runs the program for the web.
+NODE = shutil.which("node") or "node"
 
 # The time and the date of a directory that the run has written into:
 # none of DOS's, whose date has no month 15 (see goldens.disk_lines).
@@ -302,14 +314,15 @@ def _dos_stamp(seconds):
             (year - 1980) << 9 | moment.tm_mon << 5 | moment.tm_mday)
 
 
-def lay_out(bench, setup, files=False):
+def lay_out(bench, setup, files=False, config=None):
     """Lay the bench of a run out in the directory `bench`, with `setup`
     as the setup file: the home directory and the directory of the setup
-    file, and the times of what is in them, each directory's as the
-    bench's FAT has it, (directory, time) for each made, to be set when
-    what is in it has been made. With `files`, the home directory has
+    file, `config`, `vc` of `bench` where it is None, and the times of
+    what is in them, each directory's as the bench's FAT has it,
+    (directory, time) for each made, to be set when what is in it has
+    been made. With `files`, the home directory has
     FILES as the bench's C: has it (setups.files_layout())."""
-    home, config = bench / "home", bench / "vc"
+    home, config = bench / "home", config or bench / "vc"
     stamps = []
     for path in (home, home / "WORK", home / "STAMPS", config):
         path.mkdir(parents=True)
@@ -422,15 +435,22 @@ def run(scenario, program, setup=..., limit=60):
     MachineError where the program ends otherwise than the scenario has
     it, or does not end within `limit` seconds."""
     import scenarios
+    web = program.tree == "web"
     if setup is ...:
-        setup = linux_setup(program)
+        # The program for the web has its drive C: as the bench has it,
+        # and starts from the bench's setup file as it is.
+        setup = bench_setup() if web else linux_setup(program)
     steps = ("",) + scenario.steps
     bench = _bench_directory()
+    # The directory of the program's own files: on the web D:\VC, `vc`
+    # of the drive D:, which is `d` of the run's directory.
+    config = bench / "d" / "vc" if web else bench / "vc"
     try:
-        laid = lay_out(bench, setup, scenario.files)
+        laid = lay_out(bench, setup, scenario.files, config)
         channel = bench / "channel"
         channel.mkdir()
-        (channel / "keys").write_text(keys(own(scenario.steps, bench)))
+        (channel / "keys").write_text(
+            keys(scenario.steps if web else own(scenario.steps, bench)))
         # Enter on a file that is no program and that no extension file
         # has a command for hands it to xdg-open (L6b): a stub of it in
         # front of PATH, which does nothing, so that a scenario never
@@ -445,9 +465,15 @@ def run(scenario, program, setup=..., limit=60):
             "XDG_CONFIG_HOME": str(bench),
             "VC_TEST": str(channel), "VC_TEST_CLOCK": CLOCK,
         }
+        command = [str(program.path.resolve())]
+        if web:
+            environment.update(VC_DRIVE_C=str(bench / "home"),
+                               VC_DRIVE_D=str(bench / "d"),
+                               VC_PROGRAM_DRIVE="D")
+            command = [NODE, *command]
         try:
             done = subprocess.run(
-                [str(program.path.resolve())], cwd=bench / "home" / "WORK",
+                command, cwd=bench / "home" / "WORK",
                 env=environment, stdin=subprocess.DEVNULL,
                 capture_output=True, timeout=limit)
         except subprocess.TimeoutExpired:
@@ -472,7 +498,7 @@ def run(scenario, program, setup=..., limit=60):
         disks = {"C": read_tree(bench / "home", "", laid),
                  "D": {"VC": fat.Entry("VC", fat.DIRECTORY,
                                        *_dos_stamp(setups.EPOCH), 0, ""),
-                       **read_tree(bench / "vc", "VC\\", laid)}}
+                       **read_tree(config, "VC\\", laid)}}
         # The directories of the bench that the run removed: a directory
         # is emptied before it is removed, and the host moves its time for
         # that, which a screen may show in between. One that the run made
@@ -496,9 +522,9 @@ def run(scenario, program, setup=..., limit=60):
                 left,
                 size=len(bench_file),
                 sha256=hashlib.sha256(bench_file).hexdigest())
-        saved = bench / "vc" / setups.SETUP_FILE.lower()
+        saved = config / setups.SETUP_FILE.lower()
         saved = saved.read_bytes() if saved.exists() else None
-        if left is not None and saved is not None and \
+        if left is not None and saved is not None and not web and \
                 left.sha256 != hashlib.sha256(setup).hexdigest():
             # A setup file that the run has saved is held by the sum of
             # what the bench's would be: its drives made the bench's.

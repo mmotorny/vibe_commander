@@ -230,9 +230,9 @@ static bool Home(const char *home, char *to)
     return taken;
 }
 
-void DosBegin(struct Dos *dos, const char *home)
+/* What DosBegin and DosBeginGiven have alike: all but the drives. */
+static void Begin(struct Dos *dos)
 {
-    char directory[HOST_ROOM];
     /* What DOS answers of its own five handles to INT 21h 4400h: the
        console, as the bench's FreeDOS answers of 0 and 1, the serial port,
        and the printer, as it answers of 4 (harness/trial32/asked.py). */
@@ -243,7 +243,6 @@ void DosBegin(struct Dos *dos, const char *home)
 
     memset(dos, 0, sizeof *dos);
     DirectoriesBegin(&dos->directories, ReadHost, NULL);
-    DrivesBegin(&dos->drives, Home(home, directory) ? directory : NULL);
     for (i = 0; i < DOS_HANDLES; i++) {
         dos->handles[i].fd = -1;
         dos->handles[i].open = i < DOS_STANDARD;
@@ -252,6 +251,57 @@ void DosBegin(struct Dos *dos, const char *home)
     }
     dos->record = &dos->own;
     dos->clock = NULL;
+}
+
+void DosBegin(struct Dos *dos, const char *home)
+{
+    char directory[HOST_ROOM];
+
+    Begin(dos);
+    DrivesBegin(&dos->drives, Home(home, directory) ? directory : NULL);
+}
+
+/* A directory of the host with its links followed, at `to`, which has
+   HOST_ROOM bytes: false where it is no directory. */
+static bool Directory(const char *path, char *to)
+{
+    char *real;
+    struct stat status;
+    size_t length;
+    bool taken;
+
+    if (path == NULL)
+        return false;
+    real = realpath(path, NULL);
+    if (real == NULL)
+        return false;
+    length = strlen(real);
+    taken = length < HOST_ROOM && stat(real, &status) == 0
+        && S_ISDIR(status.st_mode);
+    if (taken)
+        memcpy(to, real, length + 1);
+    free(real);
+    return taken;
+}
+
+bool DosBeginGiven(struct Dos *dos, const struct DriveGiven *given,
+                   i32 count)
+{
+    char roots[DOS_DRIVES][HOST_ROOM];
+    struct DriveGiven real[DOS_DRIVES];
+    i32 i;
+
+    if (count > DOS_DRIVES)
+        count = DOS_DRIVES;
+    for (i = 0; i < count; i++) {
+        if (!Directory(given[i].root, roots[i]))
+            return false;
+        real[i] = given[i];
+        real[i].root = roots[i];
+    }
+    Begin(dos);
+    DrivesBeginGiven(&dos->drives, real, count);
+    return true;
 }
 
 void DosEnd(struct Dos *dos)

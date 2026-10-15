@@ -462,7 +462,7 @@ int main(int count, char **arguments)
         }
         OnTerminal = true;
     }
-    MachineBegin();
+    MachineBegin(0, 0, 0);
     ShellOf();
     MachineEnvironment(ShellDos, count, arguments);
     Main();

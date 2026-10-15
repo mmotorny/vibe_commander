@@ -7691,9 +7691,10 @@ def run(scenario, program, bench, trace=False, blinking=False,
     that is the program the driver is told of. A C tree is one program
     there as anywhere.
     """
-    if program.tree == "posix":
+    if program.tree in posixrun.HOSTED:
         # The program for Linux runs on the host, with no machine and no
-        # driver: see posixrun.py. Nothing is traced or looked at in its
+        # driver, and the program for the web under Node too: see
+        # posixrun.py. Nothing is traced or looked at in its
         # memory there.
         return posixrun.run(scenario, program, limit=limit)
     steps = ("",) + scenario.steps

@@ -561,12 +561,16 @@ if(NOT clang)
 endif()
 
 # add_portable_c_host(<target> <directory> <implementation> [BY_NAME]
-#                     [COMPILE <option>...] [LINK <option>...])
+#                     [COMPILER <command>...] [OUTPUT <name>]
+#                     [COMPILE <option>...] [LINK <option>...]
+#                     [LINK_DEPENDS <file>...])
 # builds src/portable_c/ for this computer with clang, as
 # <directory>/vc, of the common code and the files of <implementation>
 # (posix), with the warnings above and the options given: those of
 # COMPILE to the compiler and the linker alike, those of LINK to the
-# linker alone. -fno-strict-aliasing is every such build's: the common
+# linker alone. COMPILER is another compiler than clang, emcc for the web
+# page, which then writes <directory>/<OUTPUT>; LINK_DEPENDS are files
+# that the link reads besides the objects. -fno-strict-aliasing is every such build's: the common
 # code reads a word of 16 or 32 bits out of bytes through a cast pointer,
 # as DOS does, which C promises nothing of without it (DIARY.md, "Write
 # down the piece 5a, the split, and what 5b should know"). The command of
@@ -576,10 +580,17 @@ endif()
 # one: it is built when it is named,
 # `cmake --build build --target <target>`.
 function(add_portable_c_host target directory implementation)
-    cmake_parse_arguments(PARSE_ARGV 3 host "BY_NAME" "" "COMPILE;LINK")
+    cmake_parse_arguments(PARSE_ARGV 3 host "BY_NAME" "OUTPUT"
+        "COMPILER;COMPILE;LINK;LINK_DEPENDS")
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
     portable_c_sources(c_files ${implementation})
-    set(compile ${clang} ${clang_warnings} -fno-strict-aliasing
+    if(NOT host_COMPILER)
+        set(host_COMPILER ${clang})
+    endif()
+    if(NOT host_OUTPUT)
+        set(host_OUTPUT vc)
+    endif()
+    set(compile ${host_COMPILER} ${clang_warnings} -fno-strict-aliasing
         ${host_COMPILE} -I${source_dir})
     file(MAKE_DIRECTORY ${directory})
     file(GENERATE OUTPUT ${directory}/compiled.txt
@@ -600,15 +611,16 @@ function(add_portable_c_host target directory implementation)
         list(APPEND objects ${directory}/${object})
     endforeach()
     add_custom_command(
-        OUTPUT ${directory}/vc
-        COMMAND ${compile} ${host_LINK} -o ${directory}/vc ${objects}
-        DEPENDS ${objects}
+        OUTPUT ${directory}/${host_OUTPUT}
+        COMMAND ${compile} ${host_LINK} -o ${directory}/${host_OUTPUT}
+                ${objects}
+        DEPENDS ${objects} ${host_LINK_DEPENDS}
         COMMENT "Linking the portable C (${target})"
         VERBATIM)
     if(host_BY_NAME)
-        add_custom_target(${target} DEPENDS ${directory}/vc)
+        add_custom_target(${target} DEPENDS ${directory}/${host_OUTPUT})
     else()
-        add_custom_target(${target} ALL DEPENDS ${directory}/vc)
+        add_custom_target(${target} ALL DEPENDS ${directory}/${host_OUTPUT})
     endif()
 endfunction()
 
@@ -789,6 +801,33 @@ if(VC_WEB)
     file(MAKE_DIRECTORY ${web_probe_dir})
     file(GENERATE OUTPUT ${web_probe_dir}/compiled.txt
          CONTENT "${emcc};${clang_warnings};-fno-strict-aliasing;-D_XOPEN_SOURCE=700;-O2;-I${CMAKE_SOURCE_DIR}/src/portable_c\n")
+    # What the web leaves of what it takes, for the probe, so that its
+    # list and the build's are one.
+    file(GENERATE OUTPUT ${web_probe_dir}/leaves.txt
+         CONTENT "${portable_c_leaves_web}\n")
+endif()
+
+# The program for the web under Node, the piece W2 of step 7 (TODO.md,
+# "Step 7, the web page"): the link web-node, build/portable_c/web-node/
+# vc.js with its vc.wasm, which Node runs with the host's file system
+# (NODERAWFS) and its environment copied in (web/node.js), and which the
+# test portable_c-web-scenarios takes through the scenarios as the
+# program for Linux is. Asyncify makes the key loop wait (sys_web.c), with
+# room for 64 KB of what it unwinds, at -O2, with the sanitizers of
+# addresses and of undefined behaviour, each fatal, as far as Emscripten
+# has them with Asyncify: see TODO.md, "W2".
+if(VC_WEB)
+    set(web_dir ${CMAKE_SOURCE_DIR}/src/portable_c/web)
+    add_portable_c_host(portable_c-web-node
+        ${CMAKE_BINARY_DIR}/portable_c/web-node web
+        COMPILER ${emcc} OUTPUT vc.js
+        COMPILE -D_XOPEN_SOURCE=700 -O2
+                -fsanitize=address,undefined -fno-sanitize-recover=all
+        LINK --profiling-funcs -sASYNCIFY -sASYNCIFY_STACK_SIZE=65536 -sNODERAWFS
+             -sENVIRONMENT=node -sEXIT_RUNTIME -sALLOW_MEMORY_GROWTH
+             -sMAXIMUM_MEMORY=512MB -sINITIAL_MEMORY=64MB
+             --js-library ${web_dir}/library.js --pre-js ${web_dir}/node.js
+        LINK_DEPENDS ${web_dir}/library.js ${web_dir}/node.js)
 endif()
 
 # --- Tests --------------------------------------------------------------------
@@ -1022,6 +1061,18 @@ if(VC_WEB)
                 --compiled ${web_probe_dir}/compiled.txt
                 --out ${web_probe_dir})
     set_tests_properties(portable_c-web-probe PROPERTIES LABELS portable_c)
+    # The program for the web under Node through the scenarios, the piece
+    # W2 of step 7: build/portable_c/web-node/vc.js, sanitized, run on the
+    # bench of the program for Linux (harness/posixrun.py) with its drive
+    # C: the bench's, its screens and its disks held to the goldens of the
+    # original with what is declared for the portable C, for Linux and,
+    # on top of that, for the web (ON_WEB of harness/deviations.py; its
+    # own patches in harness/goldens/web/).
+    add_test(NAME portable_c-web-scenarios
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
+                ${CMAKE_BINARY_DIR}/portable_c/web-node/vc.js)
+    set_tests_properties(portable_c-web-scenarios PROPERTIES
+        LABELS "portable_c;machine")
 endif()
 # What each test judges, as a label, so that a run can pick by it: `ctest
 # -L portable_c` for a change to the portable C alone, which cannot

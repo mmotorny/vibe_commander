@@ -13,8 +13,10 @@ compiler and such a machine find in the common code is found early:
   - the common code, every file of src/portable_c/ whose name ends in
     no implementation's;
   - the files of Linux's emulation of DOS that the web shares, every
-    `*_posix.c` but `sys_posix.c` and `term_posix.c`, which are the
-    terminal's and the shell's;
+    `*_posix.c` but those that `portable_c_leaves_web` of CMakeLists.txt
+    names, `sys_posix.c` and `term_posix.c`, which are the terminal's and
+    the shell's: the configuration writes that list into `leaves.txt`
+    beside `compiled.txt`, which this reads, so that the two are one;
   - the web's own, `*_web.c`.
 
 The command is the build's, `compiled.txt` of `build/portable_c/
@@ -36,20 +38,24 @@ SOURCE = ROOT / "src" / "portable_c"
 # The implementations of sys.h, by the end of a file's name.
 IMPLEMENTATIONS = ("dos", "posix", "web")
 
-# The files of Linux that the web has not.
-NOT_SHARED = ("sys_posix.c", "term_posix.c")
+def not_shared(compiled_path):
+    """The files of Linux that the web has not: `portable_c_leaves_web` of
+    CMakeLists.txt, which the configuration writes into leaves.txt beside
+    `compiled_path`, a list of CMake's."""
+    leaves = compiled_path.with_name("leaves.txt").read_text().strip()
+    return tuple(name for name in leaves.split(";") if name)
 
 
-def files():
+def files(not_shared_files):
     """What the build for the web is to compile, in the order of their
-    names."""
+    names: the files of Linux that `not_shared_files` names left out."""
     chosen = []
     for path in sorted(SOURCE.glob("*.c")):
         stem = path.stem
         kind = next((name for name in IMPLEMENTATIONS
                      if stem.endswith("_" + name)), None)
         if kind is None or kind == "web" or \
-                (kind == "posix" and path.name not in NOT_SHARED):
+                (kind == "posix" and path.name not in not_shared_files):
             chosen.append(path)
     return chosen
 
@@ -84,7 +90,7 @@ def main():
     args = parser.parse_args()
     compiler, options = compiled(args.compiled)
     args.out.mkdir(parents=True, exist_ok=True)
-    chosen = files()
+    chosen = files(not_shared(args.compiled))
     failed = []
     with concurrent.futures.ThreadPoolExecutor(args.jobs) as pool:
         for path, code, said in pool.map(

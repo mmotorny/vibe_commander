@@ -221,6 +221,7 @@ from pathlib import Path
 import deps
 import dataclasses
 import deviations
+import posixrun
 import scenarios
 import setups
 from dos import COLUMNS, CP437_CONTROLS, ROWS, Screen
@@ -233,11 +234,13 @@ TOGETHER = min(4, os.cpu_count() or 1)
 
 # The trees that may have patches, and what each is called in the first
 # line of one.
-TREES = {"portable_c": "The portable C", "posix": "The program for Linux"}
+TREES = {"portable_c": "The portable C", "posix": "The program for Linux",
+         "web": "The web page"}
 
 # The build of a tree that `patch` and `record` take through a scenario,
 # under build/: TREE/VC.EXE where it is not here.
-PROGRAMS = {"posix": "portable_c/posix-asan/vc"}
+PROGRAMS = {"posix": "portable_c/posix-asan/vc",
+            "web": "portable_c/web-node/vc.js"}
 
 # Where a tree's patches are declared, where that is not an entry of
 # src/TREE/DEVIATIONS.md: the program for Linux is of the portable C's
@@ -245,7 +248,7 @@ PROGRAMS = {"posix": "portable_c/posix-asan/vc"}
 # user decided of Linux (CLAUDE.md, step 6). Its patch has a line
 # "Decided: CLAUDE.md, step 6" in place of "Deviation: N of ...", and
 # "Why: " says which decision.
-DECIDED = {"posix": "CLAUDE.md, step 6"}
+DECIDED = {"posix": "CLAUDE.md, step 6", "web": "CLAUDE.md, step 7"}
 
 
 def program_path(tree):
@@ -505,10 +508,12 @@ def read(name, tree=None, patched=True):
                           for screen in golden.screens]
     kept = [0] + [at + 1 for at in declared.kept(golden.steps[1:], name)]
     file = patch_path(name, tree)
-    if not file.exists() and tree in deviations.BASE:
+    base = tree
+    while not file.exists() and base in deviations.BASE:
         # A tree of another's source has that one's patch where it has
-        # none of its own.
-        file = patch_path(name, deviations.BASE[tree])
+        # none of its own, and so on down.
+        base = deviations.BASE[base]
+        file = patch_path(name, base)
     if isinstance(patched, Patch):
         golden.patch = patched
     elif patched and file.exists():
@@ -1108,7 +1113,7 @@ def departures(golden, run, programs):
         # (deviations.Declared.cut) leaves its disks as they are then.
         return found
     want, got = golden.disks, disk_lines(run.disks, programs)
-    if golden.tree == "posix":
+    if golden.tree in posixrun.HOSTED:
         want = on_the_host(want)
         got = on_the_host(got, want)
     lines = disk_differences(
@@ -1448,7 +1453,7 @@ def from_run(name, program, benches):
                 stated
     left = disk_lines(run.disks, {program.filename})
     disks = golden.disks
-    if tree == "posix":
+    if tree in posixrun.HOSTED:
         # As the test holds them (departures).
         disks = on_the_host(disks)
         left = on_the_host(left, disks)

@@ -43,8 +43,9 @@
  *   - The program's tail and its environment are those of the host,
  *     argv and environ, in the code page; behind the environment, where
  *     DOS has the path of the program's file, is the path of the
- *     directory of the setup file (SetupFile of paths_posix.c) with the
- *     program's name, VC, so that the program reads its setup file, its
+ *     directory of the setup file (SetupFile of paths_posix.c), or on
+ *     the web page the directory vc of the drive that it names
+ *     (OwnDirectory), with the program's name, VC, so that the program reads its setup file, its
  *     menu and its extension file there, as the original reads them
  *     beside its file. COMSPEC is what the implementation names.
  *   - What the system asks the program never comes: the host has no
@@ -59,6 +60,9 @@
  * the host's current directory, on H: where that is under the home
  * directory and on R: otherwise; where DOS's path of it is longer than
  * DOS holds, the deepest directory above it whose path is not (StartIn).
+ * The web page's drives are those that its implementation names
+ * (DosBeginGiven), and the program starts in the host's current directory
+ * where a drive has it, else at the root of the first.
  */
 
 #include <errno.h>
@@ -290,8 +294,47 @@ static struct Held Blocks[BLOCKS_MOST];
 static i32 BlocksHeld = 0;
 static int64_t MemoryAll = 0;               /* the machine's, at the start */
 
+/* The longest block of at most `most` bytes that the C library gives
+   now: `most` where it gives that, as Linux does, which lets a program
+   have more than it touches; else found by halving, to a page, as the
+   web page's heap gives less, whose ceiling is the page's (the piece W2
+   of step 7, TODO.md, "Step 7, the web page"). */
+#define OBTAINED_TO 4096
+
+/* What is tried, kept where the compiler cannot see that nothing reads
+   it: a block taken and given back unused is no call to the compiler,
+   which takes it for one given. */
+static void *volatile Tried = 0;
+
+static bool Gives(i32 bytes)
+{
+    Tried = malloc((size_t)bytes);
+    if (Tried == 0)
+        return false;
+    free(Tried);
+    Tried = 0;
+    return true;
+}
+
+static i32 Obtainable(i32 most)
+{
+    i32 low = 0, high = most, middle;
+
+    if (Gives(most))
+        return most;
+    while (high - low > OBTAINED_TO) {
+        middle = low + (high - low) / 2;
+        if (Gives(middle))
+            low = middle;
+        else
+            high = middle;
+    }
+    return low;
+}
+
 /* How many bytes a block could have that is taken now: the machine's
-   memory less what the program holds, and no more than BYTES_MOST. */
+   memory less what the program holds, and no more than BYTES_MOST, nor
+   than the C library gives. */
 static i32 Largest(void)
 {
     int64_t left = MemoryAll;
@@ -299,11 +342,11 @@ static i32 Largest(void)
 
     for (i = 0; i < BlocksHeld; i++)
         left -= Blocks[i].bytes;
-    if (left < 0)
+    if (left <= 0)
         return 0;
     if (left > BYTES_MOST)
-        return BYTES_MOST;
-    return (i32)left;
+        left = BYTES_MOST;
+    return Obtainable((i32)left);
 }
 
 /* Which block of the table `block` is: BlocksHeld if it is none. */
@@ -1109,8 +1152,8 @@ static void ClockBegin(void)
     TestDay.tm_isdst = -1;
     /* The first tick at the time or after it: of the tick before, DOS
        makes a time of a second before, 11:59:59 of 12:00:00. */
-    TestTicks = (u32)(((hour * 3600 + minute * 60 + second) * 1193180
-                       + 65535) / 65536);
+    TestTicks = (u32)(((int64_t)(hour * 3600 + minute * 60 + second)
+                       * 1193180 + 65535) / 65536);
     Clocked = true;
 }
 
@@ -1519,8 +1562,10 @@ void TestProgramRun(void)
  * of the keyboard and the mouse, a line for each: "key XXXX" for a key
  * read, "held XX" where KeysHeld answers otherwise than it last did, and
  * "mouse B X Y" where MouseWhere does, the buttons and the place in dots,
- * in hex. It is for the tests, harness/terminal.py, which hold what a
- * terminal types to what the program receives, beside the test channel
+ * in hex; and on the web page "open NAME" for a file that Enter opens in
+ * a new tab, by the name that the program handed over. It is for the
+ * tests, harness/terminal.py, which hold what a terminal types to what
+ * the program receives, and harness/posixrun.py, beside the test channel
  * or without it; nothing else reads it.
  */
 
@@ -1562,6 +1607,14 @@ void TraceFlush(void)
 {
     if (Trace != 0)
         fflush(Trace);
+}
+
+void TraceOpen(const u8 *name)
+{
+    char line[DOS_PATH_ROOM + 8];
+
+    snprintf(line, sizeof line, "open %s\n", (const char *)name);
+    Traced(line);
 }
 
 void TraceHeld(u16 held)
@@ -1844,14 +1897,13 @@ static void MakeDirectories(char *path)
         Fail(path);
 }
 
-/* The path of the program's file, as DOS has it behind the environment:
-   VC in the directory of the setup file, which is made where the host
-   has it not. */
-static void ProgramPath(u8 *to)
+/* The directory of the setup file, at `to`, which has PATH_MAX bytes,
+   from the host's root with its links followed: made where the host has
+   it not. */
+static void SetupDirectory(char *to)
 {
-    char file[4096], real[PATH_MAX];
+    char file[4096];
     char *slash;
-    struct Answer made;
 
     if (!SetupFile(getenv("XDG_CONFIG_HOME"), getenv("HOME"), file,
                    (i32)sizeof file)) {
@@ -1862,13 +1914,51 @@ static void ProgramPath(u8 *to)
     slash = strrchr(file, '/');
     *slash = 0;
     MakeDirectories(file);
-    if (realpath(file, real) == 0)
+    if (realpath(file, to) == 0)
         Fail(file);
-    made = DosPathOfHost(&MachineDos.directories, &MachineDos.drives, real,
-                         to);
+}
+
+/* The directory of the program's own files on the drive of the letter
+   `own`, vc at its root, at `to`, which has PATH_MAX bytes, from the
+   host's root with its links followed: made where the host has it not.
+   The web page's, where C: has them on the page and D: in the tests. */
+static void OwnDirectory(u8 own, char *to)
+{
+    char directory[HOST_PATH_ROOM];
+    i32 drive = DriveIndex(&MachineDos.drives, own);
+    const char *root;
+    size_t length;
+
+    if (drive < 0) {
+        fprintf(stderr, "vc: there is no drive %c: for the program's own "
+                        "files\n", own);
+        exit(1);
+    }
+    root = MachineDos.drives.drive[drive].root;
+    length = strlen(root);
+    if (length > 0 && root[length - 1] == '/')
+        length--;
+    if (length + sizeof "/vc" > sizeof directory)
+        Fail(root);
+    memcpy(directory, root, length);
+    memcpy(directory + length, "/vc", sizeof "/vc");
+    if (mkdir(directory, 0700) != 0 && errno != EEXIST)
+        Fail(directory);
+    if (realpath(directory, to) == 0)
+        Fail(directory);
+}
+
+/* The path of the program's file, as DOS has it behind the environment:
+   VC in the directory of its own files, `directory`. */
+static void ProgramPath(const char *directory, u8 *to)
+{
+    struct Answer made;
+
+    made = DosPathOfHost(&MachineDos.directories, &MachineDos.drives,
+                         directory, to);
     if (made.failed) {
         fprintf(stderr, "vc: the directory of the setup file, %s, is not "
-                        "one that DOS can name\n", real);
+                        "one that DOS can name\n", directory);
         exit(1);
     }
     memcpy(to + strlen((const char *)to), "\\VC", sizeof "\\VC");
@@ -1955,15 +2045,24 @@ static void StartIn(char *here)
 
 static u8 Program[DOS_PATH_ROOM + 4];   /* the path of its file */
 
-void MachineBegin(void)
+void MachineBegin(const struct DriveGiven *given, i32 count, u8 own)
 {
-    char here[4096];
+    char here[4096], directory[PATH_MAX];
     long pages = sysconf(_SC_PHYS_PAGES), page = sysconf(_SC_PAGESIZE);
 
     MemoryAll = pages > 0 && page > 0 ? (int64_t)pages * page : BYTES_MOST;
     StartMs = TodayMs();
     clock_gettime(CLOCK_MONOTONIC, &StartedAt);
-    DosBegin(&MachineDos, getenv("HOME"));
+    if (given == 0) {
+        DosBegin(&MachineDos, getenv("HOME"));
+        SetupDirectory(directory);
+    } else {
+        if (!DosBeginGiven(&MachineDos, given, count)) {
+            fprintf(stderr, "vc: a drive is no directory\n");
+            exit(1);
+        }
+        OwnDirectory(own, directory);
+    }
     /* DosBegin has the host's clock for what is written; the test's
        clock, which TestBegin has set, takes its place. */
     if (Clocked)
@@ -1971,7 +2070,7 @@ void MachineBegin(void)
     if (getcwd(here, sizeof here) == 0)
         Fail("the current directory");
     StartIn(here);
-    ProgramPath(Program);
+    ProgramPath(directory, Program);
 }
 
 void MachineEnvironment(const u8 *shell, int count, char **arguments)
