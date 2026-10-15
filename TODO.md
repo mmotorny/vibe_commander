@@ -18227,28 +18227,23 @@ entry at the count, where the analyser takes a count that could be
 below 0 (an `assert` says that it is not); `strcpy`, which the analyser
 calls insecure (`memcpy` with the length).
 
-**Open, for the user** (none of it is behind a scenario yet; what is
-built is the recommendation, each a few lines to change):
-
-1. Where the file of settings is, and its form. Built: its text read,
-   lines of `mount D /home/user` and `codepage 866`, `#` for a comment,
-   as DOSBox's `mount`. Recommended: `$XDG_CONFIG_HOME/vibe-commander/
-   settings`, `~/.config/...` where that is not set, and a variable of
-   the environment that names another file, for the harness. Nothing
-   reads the file yet: that is L2's.
-2. The aliases beyond DOS's rule: in the order of the names' bytes,
-   kept for the run, a gone one never given again, and of two names that
-   differ in case the first in that order keeps the plain one.
-3. What a character shows that the code page has not, a Cyrillic letter
-   under 437, a byte that is not UTF-8: `_`, as Windows makes a short
-   name, so that `Документы` is `______~1` under 437.
-4. The case of a name that the program makes on the host, a file that
-   it creates or a directory: DOS hands over capitals, and DOSBox makes
-   the file so, `NEW.TXT`, which is built; small letters, `new.txt`,
-   are what a user of Linux expects, and are recommended. A name that
-   the host has is always found whatever its case.
-5. The locale: `LC_ALL` and `LC_CTYPE` before `LANG`, as POSIX has it,
-   where `CLAUDE.md` names `LANG` alone. Recommended as built.
+**Decided by the user**, on 14 October 2026, when L1 asked (`CLAUDE.md`,
+step 6): the program for Linux is called `vc`, and its file of settings
+is `$XDG_CONFIG_HOME/vc/settings`, or `~/.config/vc/settings` where that
+is not set, in the lines that L1 reads, `mount D /path` and `codepage
+866`, and the variable `VC_SETTINGS` names another file for the tests:
+`SettingsFile` of `paths_posix.c` says which file, from the three
+variables handed in, by the XDG Base Directory Specification (a
+`$XDG_CONFIG_HOME` that is empty or not a path from the root is not
+taken); reading it is L2's. A character that the code page lacks, or a
+byte that is no UTF-8, is `_`, as built. What the program makes on the
+host is named in small letters: `HostPathOfDos` writes a name that the
+host has not so, by `UnicodeSmall` of `codepage_posix.c`, Unicode's
+simple mappings to lower case for the Latin, Greek and Cyrillic
+capitals that 437 and 866 have (held against Python's `str.lower` for
+every byte of both); `NEW.TXT` is made as `new.txt`, `ПРИВЕТ.TXT` as
+`привет.txt`. The aliases' order, the locale read as POSIX has it and
+a directory never read-only stay as built.
 
 **What L2 should know:**
 
@@ -18262,7 +18257,7 @@ built is the recommendation, each a few lines to change):
   does first, with the current directories that L2 keeps;
   `HostPathOfDos` then gives the host's path, and says whether the last
   name was there, so that a file to create is named as the program
-  wrote it (open question 4). `DosPathOfHost` gives the program's path
+  makes it, in small letters. `DosPathOfHost` gives the program's path
   of the directory that it is started in: one that DOS's 67 characters
   do not hold fails with 3, and the program has to start somewhere
   else then, which is L2's, or the user's, to decide.

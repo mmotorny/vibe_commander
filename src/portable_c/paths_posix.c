@@ -49,6 +49,34 @@ static char *Copy(const char *text, size_t length)
  * The file of settings.
  */
 
+bool SettingsFile(const char *named, const char *config_home,
+                  const char *home, char *to, i32 room)
+{
+    const char *base;
+    const char *behind;
+    size_t length;
+    size_t more;
+
+    if (named != NULL && named[0] != '\0') {
+        base = named;
+        behind = "";
+    } else if (config_home != NULL && config_home[0] == '/') {
+        base = config_home;
+        behind = "/vc/settings";
+    } else if (home != NULL && home[0] != '\0') {
+        base = home;
+        behind = "/.config/vc/settings";
+    } else
+        return false;
+    length = strlen(base);
+    more = strlen(behind);
+    if (room <= 0 || length + more >= (size_t)room)
+        return false;
+    memcpy(to, base, length);
+    memcpy(to + length, behind, more + 1);
+    return true;
+}
+
 bool SettingsBegin(struct Settings *settings)
 {
     i32 i;
@@ -416,9 +444,9 @@ struct Answer HostPathOfDos(struct Directories *directories,
         if (names == NULL)
             return Fails(errno == ENOMEM ? NO_MEMORY : PATH_NOT_FOUND);
         if (host == NULL) {
-            /* Not there: the name as the program wrote it. */
+            /* Not there: the name that the program makes, small. */
             found = false;
-            if (CodePageToUtf8(directories->code_page, name, length,
+            if (CodePageToUtf8(directories->code_page, name, length, true,
                                written, (i32)sizeof written) < 0)
                 return Fails(PATH_NOT_FOUND);
             host = written;

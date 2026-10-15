@@ -135,6 +135,9 @@ static void Utf8(void)
     char bytes[4];
     char text[32];
     static const u8 Hello866[] = { 0xAF, 0xE0, 0xA8, 0xA2, 0xA5, 0xE2 };
+    static const u8 Capitals866[] = {
+        0x8F, 0x90, 0x88, 0x82, 0x85, 0x92, '.', 'T', 'X', 'T'
+    };
 
     /* RFC 3629, its examples */
     CHECK(Utf8Decode("\xE6\x97\xA5", 3, &character) == 3
@@ -159,10 +162,33 @@ static void Utf8(void)
           && memcmp(bytes, "\xF0\xA3\x8E\xB4", 4) == 0);
 
     /* CP866.TXT: привет */
-    CHECK(CodePageToUtf8(866, Hello866, 6, text, (i32)sizeof text) == 12);
+    CHECK(CodePageToUtf8(866, Hello866, 6, false, text, (i32)sizeof text) == 12);
     SAME(text, "\xD0\xBF\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82");
-    CHECK(CodePageToUtf8(866, Hello866, 6, text, 12) == -1);
-    CHECK(CodePageToUtf8(866, Hello866, 6, text, 13) == 12);
+    CHECK(CodePageToUtf8(866, Hello866, 6, false, text, 12) == -1);
+    CHECK(CodePageToUtf8(866, Hello866, 6, false, text, 13) == 12);
+
+    /* UnicodeData.txt, the simple mappings to lower case, as Python's
+       str.lower has them for every byte of the two code pages; CLAUDE.md,
+       step 6: what the program makes on the host is in small letters. */
+    CHECK(UnicodeSmall('N') == 'n');
+    CHECK(UnicodeSmall('n') == 'n');
+    CHECK(UnicodeSmall('~') == '~');
+    CHECK(UnicodeSmall(0x00DC) == 0x00FC);
+    CHECK(UnicodeSmall(0x00C7) == 0x00E7);
+    CHECK(UnicodeSmall(0x00D7) == 0x00D7);
+    CHECK(UnicodeSmall(0x00DF) == 0x00DF);
+    CHECK(UnicodeSmall(0x03A3) == 0x03C3);
+    CHECK(UnicodeSmall(0x0410) == 0x0430);
+    CHECK(UnicodeSmall(0x042F) == 0x044F);
+    CHECK(UnicodeSmall(0x0401) == 0x0451);
+    CHECK(UnicodeSmall(0x040E) == 0x045E);
+    CHECK(UnicodeSmall(0x2502) == 0x2502);
+    CHECK(CodePageToUtf8(866, Capitals866, 10, true, text, (i32)sizeof text)
+          == 16);
+    SAME(text, "\xD0\xBF\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82.txt");
+    CHECK(CodePageToUtf8(437, (const u8 *)"\x9A\x80.TXT", 6, true, text,
+                         (i32)sizeof text) == 8);
+    SAME(text, "\xC3\xBC\xC3\xA7.txt");
 }
 
 /*
@@ -424,6 +450,30 @@ static void Full(void)
 static void SettingsChecked(void)
 {
     struct Settings settings;
+    char file[64];
+
+    /* CLAUDE.md, step 6 of the road: vc/ where XDG says, a variable
+       naming another file for the tests. The XDG Base Directory
+       Specification: $HOME/.config where $XDG_CONFIG_HOME is not set or
+       is empty, and a path in it that is not absolute is ignored. */
+    CHECK(SettingsFile(NULL, "/home/user/.cfg", "/home/user", file,
+                       (i32)sizeof file));
+    SAME(file, "/home/user/.cfg/vc/settings");
+    CHECK(SettingsFile(NULL, NULL, "/home/user", file, (i32)sizeof file));
+    SAME(file, "/home/user/.config/vc/settings");
+    CHECK(SettingsFile(NULL, "", "/home/user", file, (i32)sizeof file));
+    SAME(file, "/home/user/.config/vc/settings");
+    CHECK(SettingsFile(NULL, "relative", "/home/user", file,
+                       (i32)sizeof file));
+    SAME(file, "/home/user/.config/vc/settings");
+    CHECK(SettingsFile("/tmp/test/settings", "/home/user/.cfg",
+                       "/home/user", file, (i32)sizeof file));
+    SAME(file, "/tmp/test/settings");
+    CHECK(SettingsFile("", NULL, "/home/user", file, (i32)sizeof file));
+    SAME(file, "/home/user/.config/vc/settings");
+    CHECK(!SettingsFile(NULL, NULL, NULL, file, (i32)sizeof file));
+    CHECK(!SettingsFile(NULL, NULL, "/home/user", file, 30));
+    CHECK(SettingsFile(NULL, NULL, "/home/user", file, 31));
 
     /* CLAUDE.md, step 6 of the road: C: is the root, and nothing else. */
     CHECK(SettingsBegin(&settings));
@@ -549,7 +599,7 @@ static void Paths(void)
     answer = HostPathOfDos(&directories, &settings,
                            (const u8 *)"D:\\NEW.TXT", host, (i32)sizeof host);
     CHECK(!answer.failed && answer.value == 0);
-    SAME(host, "/home/user/NEW.TXT");
+    SAME(host, "/home/user/new.txt");
     /* RBIL, INT 21h 3Dh: 3 where a directory on the way is not there,
        0Fh for a drive that there is not (INT 21h 0Eh and 47h) */
     answer = HostPathOfDos(&directories, &settings,

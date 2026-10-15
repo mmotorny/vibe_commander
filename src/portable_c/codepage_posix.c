@@ -232,16 +232,33 @@ i32 Utf8Encode(u32 character, char *to)
     return 4;
 }
 
-i32 CodePageToUtf8(u16 code_page, const u8 *from, i32 length, char *to,
-                   i32 room)
+u32 UnicodeSmall(u32 character)
 {
+    if ((character >= 'A' && character <= 'Z')
+        || (character >= 0x00C0 && character <= 0x00DE
+            && character != 0x00D7)
+        || (character >= 0x0391 && character <= 0x03A9
+            && character != 0x03A2)
+        || (character >= 0x0410 && character <= 0x042F))
+        return character + 0x20;
+    if (character >= 0x0400 && character <= 0x040F)
+        return character + 0x50;
+    return character;
+}
+
+i32 CodePageToUtf8(u16 code_page, const u8 *from, i32 length, bool small,
+                   char *to, i32 room)
+{
+    u32 character;
     char bytes[4];
     i32 written = 0;
     i32 count;
     i32 i;
 
     for (i = 0; i < length; i++) {
-        count = Utf8Encode(CodePageToUnicode(code_page, from[i]), bytes);
+        character = CodePageToUnicode(code_page, from[i]);
+        count = Utf8Encode(small ? UnicodeSmall(character) : character,
+                           bytes);
         if (written + count >= room)
             return -1;
         memcpy(to + written, bytes, (size_t)count);

@@ -76,12 +76,19 @@ i32 Utf8Decode(const char *text, i32 length, u32 *character);
    Answers how many. */
 i32 Utf8Encode(u32 character, char *to);
 
+/* The small letter of a character of Unicode, by Unicode's simple
+   mappings to lower case, UnicodeData.txt, for the capitals that 437
+   and 866 have: Latin, Greek and Cyrillic. Any other character is
+   itself. */
+u32 UnicodeSmall(u32 character);
+
 /* A text of the code page, `length` bytes at `from`, in UTF-8 at `to`,
-   which has room for `room` bytes, with a zero byte behind it. Answers
-   how many bytes it wrote, the zero not counted, or -1 where the room
-   is not enough. Every byte of the code page has a character. */
-i32 CodePageToUtf8(u16 code_page, const u8 *from, i32 length, char *to,
-                   i32 room);
+   which has room for `room` bytes, with a zero byte behind it, and with
+   every letter small where `small` says so. Answers how many bytes it
+   wrote, the zero not counted, or -1 where the room is not enough.
+   Every byte of the code page has a character. */
+i32 CodePageToUtf8(u16 code_page, const u8 *from, i32 length, bool small,
+                   char *to, i32 room);
 
 /*
  * Names.
@@ -191,6 +198,18 @@ void DosNameMake(u16 code_page, const char *host, DosNameTaken *taken,
                                            characters, the zero not
                                            counted */
 
+/* Where the file of settings is: the file that the variable of the
+   environment VC_SETTINGS names, where it is set and not empty, for the
+   tests; else vc/settings in $XDG_CONFIG_HOME, where that is set and is
+   a path from the root, and in $HOME/.config otherwise, as the XDG Base
+   Directory Specification has it, on the user's word of 14 October 2026
+   (CLAUDE.md, step 6). The three are handed in as the environment has
+   them, or NULL. At `to`, which has room for `room` bytes: answers false
+   where there is no $HOME to go by or the room is not enough. */
+#define SETTINGS_VARIABLE "VC_SETTINGS"
+bool SettingsFile(const char *named, const char *config_home,
+                  const char *home, char *to, i32 room);
+
 /* What the file of settings says. */
 struct Settings {
     char *drive[DOS_DRIVES];            /* the directory of each letter,
@@ -254,8 +273,9 @@ void DirectoriesEnd(struct Directories *directories);
 /* The path of the host that a full path of DOS's leads to, at `to`,
    which has room for `room` bytes: the directory of its drive, and for
    each name the name of the host that it leads to in the directory
-   before it; a name that the host has not, the last only, is written as
-   the program wrote it, in UTF-8. Answers whether it failed, with DOS's
+   before it; a name that the host has not, the last only, is the name
+   that the program makes there, in UTF-8 and in small letters, as the
+   user decided on 14 October 2026 (CLAUDE.md, step 6). Answers whether it failed, with DOS's
    error 0Fh for a drive that is none, 3 for a directory on the way that
    the host has not or cannot be read and where the room is not enough,
    and 8 where the memory ran out; else `value` is 1 where the last name
