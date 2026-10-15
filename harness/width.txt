@@ -77,7 +77,7 @@ N6 to N8        69          0     4              0      73     0    13    38   1
 N9              50          0     6              0      48     8     2     9    47  copy.c
 N10             54          0     0              0      49     5     4     9    38  dirfunc.c
 N11             24          0     1              0      23     2     4    11    58  files.c read.c place.c
-N12             46          0     4              0      50     0     9     3    34  panel.c info.c drive.c
+N12             47          0     4              0      51     0     9     3    35  panel.c info.c drive.c
 N13             30          0     0              0      30     0     1     9    35  tree.c treebox.c extfile.c
 N14             51          0     0              0      51     0     0     6    49  cmdline.c enter.c exec.c
 N15             57          0     3              0      58     2     3    14    46  input.c usermenu.c
@@ -91,7 +91,7 @@ N20             61          0     0              0      58     3     0     3    
 N21             60          0     3              0      46     7     0     5    34  stmain.c sthelp.c
 as a whole     647          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
 headers        329         94    15              0     201     5     0     0     0  vc.h sys.h tables.h
-all           2036         94   116              0    1212    66    62   194  1060
+all           2037         94   116              0    1213    66    62   194  1061
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               209          0    11              0     171     5     0     0     0
@@ -106,7 +106,7 @@ copy.c              50          0     6              0      48     8     2     9
 dialog.c            79          0     0              0      68    11     0     3    29
 digits.c             2          0     1              0       3     0     0     0     4
 dirfunc.c           54          0     0              0      49     5     4     9    38
-drive.c             16          0     0              0      16     0     2     2    10
+drive.c             17          0     0              0      17     0     2     2    11
 edit.c              69          0     4              0      73     0    13    38   152
 enter.c              9          0     0              0       9     0     0     1    17
 exec.c              13          0     0              0      13     0     0     1     2
@@ -1959,6 +1959,9 @@ drive.c, (): variable Rght_S, u8[5]
 
 drive.c, (): variable Driv_S, u8[7]
     text
+
+drive.c, Drive_T: parameter key, u16
+    key
 
 drive.c, F62_01: variable begin, u16
     place: where the box begins.

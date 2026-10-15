@@ -54,6 +54,44 @@ static const u8 Driv_S[7] NONSTRING = " drive:";
 /* The letters of the drives that the box offers. */
 #define DRIVES (md.TmpBuf)
 
+/* What a key asks of F62_01. */
+enum {
+    ASK_LETTER, ASK_LEFT, ASK_RIGHT, ASK_HOME, ASK_END, ASK_ENTER, ASK_ESC
+};
+
+/* Drive_T in the assembly, a table for Case: what a key asks. A key
+   without a scan code is none of these, and the characters are known
+   whatever the scan code is; anything else may be the letter of a
+   drive. */
+static i32 Drive_T(u16 key)
+{
+    if (key >> 8 != 0)
+        switch (key & 0xFF) {
+        case 0x08:
+            return ASK_LEFT;
+        case 0x20:
+            return ASK_RIGHT;
+        case 0x0D:
+            return ASK_ENTER;
+        case 0x1B:
+            return ASK_ESC;
+        case 0:
+            switch (key >> 8) {
+            case 0x4B:
+                return ASK_LEFT;
+            case 0x4D:
+                return ASK_RIGHT;
+            case 0x47:
+                return ASK_HOME;
+            case 0x4F:
+                return ASK_END;
+            case 0x44:
+                return ASK_ESC;         /* F10 */
+            }
+        }
+    return ASK_LETTER;
+}
+
 /* Ask for the drive of the panel `panel`, with the item `item` of the
    menu bar marked, 1 for the left panel and 5 for the right one, and put
    the panel on the drive that is chosen. Returns false if none was. */
@@ -97,22 +135,22 @@ bool F62_01(struct WCBdef *panel, i32 item)
 
     wide = count;
     apart = 0;
-    if (count > 14)
-        goto F62_06;
-    apart++;
-    wide += count;
-    wide--;
-    if (count > 9)
-        goto F62_06;
-    apart++;
-    wide += count;
-    wide++;
-    if (count > 7)
-        goto F62_06;
-    apart++;
-    wide += count;
-    wide--;
-F62_06:
+    if (count <= 14) {
+        apart++;
+        wide += count;
+        wide--;
+        if (count <= 9) {
+            apart++;
+            wide += count;
+            wide++;
+            if (count <= 7) {
+                apart++;
+                wide += count;
+                wide--;
+            }
+        }
+    }
+    /* F62_06 */
     begin = BegBX(panel);
     size = 18;
     if ((begin & 0xFF) >= 1)
@@ -163,159 +201,155 @@ F62_06:
     if (apart != 0)
         first--;
 
-F62_15:                                 /* the cursor */
-    MvsColr(BasAdr(begin) + 3 * 80 + 4, (u8)(size - 8 - 2), Color(Box_C));
-    cell = (u8 *)first + (u16)(u8)(apart + 2 + apart) * cursor + 1;
-    c = Color(BoxCu_C);
-    cell[0] = (u8)c;
-    if (apart != 0) {
-        cell[2] = (u8)c;
-        cell[4] = (u8)c;
-    }
-    Window(begin, size);
-
-    /* The mouse, while a button of it is down: the cursor goes to the
-       letter it is on. */
-    pointer = GetMous(0);
-    if (pointer.buttons == 0)
-        goto F62_30;
-    state = 0;
-    look = 0;
-F62_21:
-    state = (state & 0x80) | (pointer.buttons & 0xFF);
-    mouse = pointer.place;
-    shape = 'x';
-    if (state & 4)
-        goto F62_27;
-    shape = CHECK;
-    if (state & 2)
-        goto F62_27;
-    at = (i32)(first - md.ScrBuf);
-    place = (u16)((at / 80 & 0xFF) << 8 | at % 80);
-    index = 0;
     for (;;) {
-        if (!InWind(mouse, place, apart != 0 ? 0x103 : 0x101))
-            break;
-        place += apart;
-        place++;
-        index++;
-        if ((u8)index >= 27)
-            goto F62_26;
-    }
-    if ((u8)index >= count)
-        goto F62_26;
-    if (state & 0x80)
-        goto F62_25;
-    state |= 0x80;
-    if ((u8)index == cursor)
-        goto F62_25;
-    cursor = (u8)index;
-    goto F62_15;
-F62_25:
-    shape = CHECK;
-    if ((u8)index == cursor)
-        goto F62_27;
-F62_26:
-    shape = 0;
-F62_27:
-    if (shape != look) {
-        look = shape;
-        TypMous(shape);
-    }
-    pointer = GetMous(mouse);
-    if (pointer.buttons != 0)
-        goto F62_21;
-    TypMous(0);
-    if (state & 4)
-        goto F62_37;
-    if (state & 2)
-        goto F62_36;
-    if (look != 0)
-        goto F62_36;
-    pointer = GetMous(mouse);
-    if (InWind(pointer.place, begin, size - 0x102))
-        goto F62_37;
+        /* F62_15: the cursor */
+        MvsColr(BasAdr(begin) + 3 * 80 + 4, (u8)(size - 8 - 2),
+                Color(Box_C));
+        cell = (u8 *)first + (u16)(u8)(apart + 2 + apart) * cursor + 1;
+        c = Color(BoxCu_C);
+        cell[0] = (u8)c;
+        if (apart != 0) {
+            cell[2] = (u8)c;
+            cell[4] = (u8)c;
+        }
+        Window(begin, size);
 
-F62_30:                                 /* a key */
-    key = Input(1);
-    if (key >> 8 != 0)
-        switch (key & 0xFF) {
-        case 0x08:
-            goto F62_31;
-        case 0x20:
-            goto F62_34;
-        case 0x0D:
-            goto F62_36;
-        case 0x1B:
-            goto F62_37;
-        case 0:
-            switch (key >> 8) {
-            case 0x4B:
-                goto F62_31;
-            case 0x4D:
-                goto F62_34;
-            case 0x47:
-                goto F62_35;
-            case 0x4F:
-                goto F62_32;
-            case 0x44:
-                goto F62_37;
+        /* The mouse, while a button of it is down: the cursor goes to the
+           letter it is on. */
+        pointer = GetMous(0);
+        if (pointer.buttons != 0) {
+            state = 0;
+            look = 0;
+            do {
+                /* F62_21 */
+                state = (state & 0x80) | (pointer.buttons & 0xFF);
+                mouse = pointer.place;
+                if (state & 4)
+                    shape = 'x';
+                else if (state & 2)
+                    shape = CHECK;
+                else {
+                    at = (i32)(first - md.ScrBuf);
+                    place = (u16)((at / 80 & 0xFF) << 8 | at % 80);
+                    index = 0;
+                    while (InWind(mouse, place, apart != 0 ? 0x103 : 0x101)) {
+                        place += apart;
+                        place++;
+                        index++;
+                        if ((u8)index >= 27)
+                            break;
+                    }
+                    /* With 27 or more there is no such drive, the drives
+                       being 26 at the most: on to F62_26 below. */
+                    if ((u8)index >= count)
+                        shape = 0;      /* F62_26 */
+                    else {
+                        if (!(state & 0x80)) {
+                            state |= 0x80;
+                            if ((u8)index != cursor) {
+                                cursor = (u8)index;
+                                break;  /* to F62_15, with the button down */
+                            }
+                        }
+                        /* F62_25 */
+                        shape = CHECK;
+                        if ((u8)index != cursor)
+                            shape = 0;  /* F62_26 */
+                    }
+                }
+                /* F62_27 */
+                if (shape != look) {
+                    look = shape;
+                    TypMous(shape);
+                }
+                pointer = GetMous(mouse);
+            } while (pointer.buttons != 0);
+            /* The loop is left with a button down only where the mouse
+               has moved the cursor. */
+            if (pointer.buttons != 0)
+                continue;
+            TypMous(0);
+            if (state & 4) {
+                letter = 0;             /* F62_37 */
+                break;
+            }
+            if ((state & 2) || look != 0) {
+                letter = DRIVES[cursor];        /* F62_36 */
+                break;
+            }
+            pointer = GetMous(mouse);
+            if (InWind(pointer.place, begin, size - 0x102)) {
+                letter = 0;             /* F62_37 */
+                break;
             }
         }
-    if ((key & 0xFF) >= 0x80)
-        goto F62_15;
-    letter = UpCase(key) & 0xFF;        /* the letter of a drive */
-    for (i = 0; i < count; i++)
-        if (DRIVES[i] == letter)
-            goto F62_40;
-    goto F62_15;
-F62_31:                                 /* Left */
-    if (cursor == 0)
-        goto F62_32;
-    cursor--;
-    goto F62_15;
-F62_32:                                 /* End */
-    cursor = (u8)(count - 1);
-    goto F62_15;
-F62_34:                                 /* Right */
-    cursor++;
-    if (cursor < count)
-        goto F62_15;
-F62_35:                                 /* Home */
-    cursor = 0;
-    goto F62_15;
-F62_36:                                 /* Enter */
-    letter = DRIVES[cursor];
-    goto F62_40;
-F62_37:                                 /* Esc */
-    letter = 0;
-F62_40:
+
+        /* F62_30: a key */
+        key = Input(1);
+        switch (Drive_T(key)) {
+        case ASK_LEFT:                  /* F62_31 */
+            if (cursor != 0)
+                cursor--;
+            else
+                cursor = (u8)(count - 1);       /* F62_32 */
+            continue;
+        case ASK_END:                   /* F62_32 */
+            cursor = (u8)(count - 1);
+            continue;
+        case ASK_RIGHT:                 /* F62_34 */
+            cursor++;
+            if (cursor >= count)
+                cursor = 0;             /* F62_35 */
+            continue;
+        case ASK_HOME:                  /* F62_35 */
+            cursor = 0;
+            continue;
+        case ASK_ENTER:                 /* F62_36 */
+            letter = DRIVES[cursor];
+            break;
+        case ASK_ESC:                   /* F62_37 */
+            letter = 0;
+            break;
+        default:                        /* the letter of a drive */
+            if ((key & 0xFF) >= 0x80)
+                continue;
+            letter = UpCase(key) & 0xFF;
+            for (i = 0; i < count; i++)
+                if (DRIVES[i] == letter)
+                    break;
+            if (i == count)
+                continue;
+            break;
+        }
+        break;
+    }
+    /* F62_40 */
     ResWin(begin, size, md.WinBuf);
     Window(begin, size);
 
-F62_41:                                 /* the drive, and where it is */
-    if (letter == 0)
-        return false;
-    HidCur();
-    unit = (u8)(letter - ('A' - 1));
-    DriveSetLetter((u16)unit);
-    md.BlocEr = 1;
-    asked = DirCurrent((u16)unit, panel->WinPath + 3);
-    if (!asked.failed) {
-        panel->WinPath[0] = (u8)letter;
-        asked = DirChange(panel->WinPath);
-    }
-    md.BlocEr = 0;
-    if (asked.failed) {
+    for (;;) {
+        /* F62_41: the drive, and where it is */
+        if (letter == 0)
+            return false;
+        HidCur();
+        unit = (u8)(letter - ('A' - 1));
+        DriveSetLetter((u16)unit);
+        md.BlocEr = 1;
+        asked = DirCurrent((u16)unit, panel->WinPath + 3);
+        if (!asked.failed) {
+            panel->WinPath[0] = (u8)letter;
+            asked = DirChange(panel->WinPath);
+        }
+        md.BlocEr = 0;
+        if (!asked.failed)
+            break;
         letter = ErrRdy(letter) & 0xFF;
-        goto F62_41;
     }
     /* The drive is DOS's too, unless the other panel is the current one
        and shows files. */
-    if (panel != CurrentPanel && FilePan(InvWCB(panel)))
-        goto F62_45;
-    DriveSelect((u16)(unit - 1));
-F62_45:
+    if (panel == CurrentPanel || !FilePan(InvWCB(panel)))
+        DriveSelect((u16)(unit - 1));
+    /* F62_45 */
     panel->WinTyp = 0;
     panel->ChgFlg = 1;
     md.BlocEr = 1;
