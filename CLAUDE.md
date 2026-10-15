@@ -288,8 +288,8 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
 
 - The program built to WebAssembly by Emscripten, fetched and pinned as
   any other download and only for a build that asks for the web page; its
-  key loop made to wait by Emscripten's Asyncify, so that any static host
-  serves it; behind `sys.h` a file of its own.
+  key loop made to wait by Emscripten's Asyncify, which lets it wait on
+  the network too; behind `sys.h` a file of its own.
 - The screen is drawn as text: the 80 by 25 cells as lines of a `<pre>`
   with the colours of DOS in spans, not on a canvas. The font is VileR's
   Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned, put into the page and
@@ -298,8 +298,12 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   files in C:\VC as the bench has them in D:\VC. D:, labelled DEMO,
   starts as a small tree of sample files written for the project and
   served with the page, nothing proprietary, and the user may change it.
-  What is changed on either drive, the setup file too, is kept in the
-  browser. The tests map the letters as the bench has them. The
+  The drives are directories of the server's, two in the build or as the
+  server is told when it starts: the page loads their tree from the
+  server, and every change on either drive, the setup file too, is made
+  on the server as it happens, not kept in the browser; what the server
+  cannot do or refuses is DOS's error for that call. The tests map the
+  letters as the bench has them. The
   user's own files come in by a button and by dragging them onto the
   page, into the current directory.
 - A command says on DOS's screen that commands cannot be run in a web
@@ -313,9 +317,13 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   row of keys that a phone lacks, F1 to F10, Esc, Tab, the arrows, PgUp
   and PgDn, and Ctrl and Alt that stay held for the next key, stands
   with a button that brings up the phone's keyboard.
-- While it is built, it is served to the user's devices by Tailscale
-  Serve from the workstation, over HTTPS and to the user's tailnet
-  alone; publishing it anywhere else is asked first.
+- It is served by a server of the project's own, a script of Python's
+  standard library: the page, and the drives' directories with their
+  writes, and nothing outside them. It listens on the workstation alone,
+  and Tailscale Serve hands it to the user's tailnet over HTTPS: anyone
+  on the tailnet may write, the tailnet being the access. The page needs
+  that server and is not published as a static page; publishing it
+  anywhere else is asked first.
 - It comes before iOS as a rehearsal of what iOS has too: no shell, a file
   system of the program's own, an event loop. On iOS the room of the
   editor and the viewer gets a cap, since the system ends a program that
