@@ -926,6 +926,11 @@ u16 Dialog(const struct BOXHD *head, const u8 *include, u16 begin, u16 size,
     for (item = first; ; item++) {
         field = item;
         type = field->mType;
+        /* The byte 0 behind the last field ends them: the assembly reads
+           its place too, the bytes behind the dialog, and goes by none of
+           them, which are not read here. */
+        if (type < FIELD_INPUT || type > FIELD_BUTTONS)
+            break;
         place = begin + field->mBase;
         screen = BasAdr(place);
         if (type == FIELD_INPUT) {

@@ -65,11 +65,12 @@ static const u8 CtEn_T[10] = {
    blanker gets differ from one time to the next. */
 u16 Rnd(void)
 {
-    u16 first = md.Rand1 * 3;
+    u16 first = (u16)(md.Rand1 * 3);    /* wraps: the numbers are of 16
+                                           bits, as the original's are */
     u16 second = md.Rand2;
 
     md.Rand1 = second;
-    second = second * 3 + first + 23457;
+    second = (u16)(second * 3 + first + 23457); /* wraps, as above */
     md.Rand2 = second;
     return second;
 }

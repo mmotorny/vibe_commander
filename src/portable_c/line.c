@@ -54,11 +54,14 @@ i32 LnStr(const struct LineArgs *args)
     i32 more;
 
     for (;;) {
+        /* The assembly reads the two bytes at once, LODSW, the one behind
+           the line's end too; nothing goes by that one, which is not read
+           here, since it may be behind the object that the line is. */
         first = line[0];
-        second = line[1];
-        line += 2;
         if (first == 0)
             break;
+        second = line[1];
+        line += 2;
         if (first == '^') {
             if (second == '^') {
                 length++;
