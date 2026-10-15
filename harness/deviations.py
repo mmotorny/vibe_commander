@@ -482,9 +482,11 @@ IGNORED_OF = {
 # recorded from its build, where the original cannot go: `editor-huge`
 # alone, on the user's word of 14 October 2026, a text larger than the
 # original's editor has room for, when the memory comes from the
-# extender (CLAUDE.md, "The portable C"). goldens.read refuses any other,
+# extender (CLAUDE.md, "The portable C"); and `menu-none`, on the user's
+# word of the same day, the menu bar where the original opens the menu
+# that is none and does not come back. goldens.read refuses any other,
 # and the scenarios' test fails for a tree that declares one.
-OWN = ("editor-huge",)
+OWN = ("editor-huge", "menu-none")
 
 
 @dataclass(frozen=True)
@@ -746,6 +748,16 @@ TREES = {
                            "line: the original would refuse the file, and "
                            "what the portable C is to show there is its "
                            "own",
+            # On the user's word of 14 October 2026 (DEVIATIONS.md, 28):
+            # its expectation is harness/goldens/portable_c/menu-none.txt.
+            "menu-none": "it has a button on the menu bar moved off the "
+                         "names and let go, or moved below the bar, at "
+                         "the look after, where the original opens the "
+                         "menu that is none from behind its table of the "
+                         "menus and does not come back to wait for a key: "
+                         "no golden of the original can be derived, and "
+                         "what the portable C is to show there, the bar "
+                         "left, is its own",
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "

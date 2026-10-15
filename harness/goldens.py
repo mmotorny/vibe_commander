@@ -157,10 +157,12 @@ is not filled in fails them.
 
 What a tree is expected to show where the original cannot go: its own
 
-One scenario, `editor-huge`, is held against no golden of the original:
-the original cannot go where it goes, a text larger than its editor has
-room for, and the user allowed on 14 October 2026 that the portable C be
-held there to an expectation of its own (CLAUDE.md, "The portable C").
+Two scenarios are held against no golden of the original: `editor-huge`,
+where the original cannot go, a text larger than its editor has room
+for, and `menu-none`, from which the original does not come back, the
+menu bar opening the menu that is none. The user allowed on 14 October
+2026 that the portable C be held there to an expectation of its own
+(CLAUDE.md, "The portable C").
 deviations.OWN names it, `own` of deviations.TREES says which tree it is
 of and why, and an entry of the tree's DEVIATIONS.md names it as a patch
 is named. Neither the original nor another tree is taken through it

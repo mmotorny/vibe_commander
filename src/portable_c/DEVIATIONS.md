@@ -2475,10 +2475,16 @@ the button go at that look, "Click@70,0*5>25,0*1": the original shows
 the bar with no name lit and goes to Left with Right, the portable C
 has Commands lit and goes to Options. Its patch has the two rows of
 the bar. The other drags of that scenario and of `mouse-menu` show
-every screen as the original does. The second way has none: the
-original does not come back from it to wait for a key, so no golden
-can be derived of it, as was tried with "Click@25,0*6>70,0*1", the
+every screen as the original does. The second way has no golden of
+the original: the original does not come back from it to wait for a
+key, as was tried with "Click@25,0*6>70,0*1", the
 button let go at the look after it left the names, and with
 "Click@25,0*6>70,0*1>70,5*1", moved below the bar there. The portable C
-leaves the bar in both, which `harness/show.py --program` shows; it
-went the original's way before the fix.
+leaves the bar in both, and went the original's way before the fix.
+`menu-none` has the two, and F9 behind them: the portable C is held
+there to an expectation of its own, recorded from its build and read
+row by row, on the user's word of 14 October 2026
+(`harness/goldens/portable_c/menu-none.txt`;
+"What a tree is expected to show where the original cannot go" at the
+top of `harness/goldens.py`). The original and the C translation are
+not taken through it.

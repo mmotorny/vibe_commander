@@ -5827,6 +5827,25 @@ SCENARIOS = {
             "Esc",
         )),
 
+    # Of the portable C alone, and held to an expectation of its own:
+    # `own` of deviations.TREES["portable_c"], and "What a tree is
+    # expected to show where the original cannot go" at the top of
+    # goldens.py. The original opens the menu that is none there, from
+    # behind the table of the menus, and does not come back to wait for
+    # a key.
+    "menu-none": Scenario(
+        "A button of the mouse held on the menu bar, moved off the names "
+        "and let go, or moved below the bar, at the look after: the bar "
+        "is left",
+        steps=(
+            "Click@25,0*6>70,0*1",        # Commands open, then off the
+                                          # names and let go: the panels
+            "Click@25,0*6>70,0*1>70,5*1",  # the same, and below the bar
+                                          # at that look: the panels
+            "F9",                         # and the bar comes as ever
+            "Esc",
+        )),
+
     "mouse-drag-lists": Scenario(
         "A button of the mouse that is moved while it is down, over the "
         "files of a panel, in the user menu and in the map of the memory",

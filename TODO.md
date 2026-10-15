@@ -17237,8 +17237,10 @@ pointer, `DEVIATIONS.md` 28, a commit of its own, with
 names and let go or below the bar at the next look: the user decided
 the same day that the bar is left there, as when the button is let go
 in the loop, a commit of its own again. Then clang-tidy names nothing
-of the two checks. No scenario has the second way: the original does
-not come back from it to wait for a key.
+of the two checks. The original does not come back from the second way
+to wait for a key, so no golden of it can be derived: `menu-none` holds
+the portable C there to an expectation of its own, as `editor-huge`
+does, on the user's word of the same day, a third commit.
 
 The bytes: the reads compile as they did (`find.c`, `menu.c`,
 `read.c`, `help.c`, `edit.c`, `tree.c`, `treebox.c`, `main.c` the same
