@@ -16493,6 +16493,66 @@ has no sign, it says nothing either.
   `-D__declspec(x)=`: no file has `__interrupt` any more, and only
   `sys_dos.c` has `__declspec`, for its two naked functions.
 
+### G3, the jumps of view.c and edit.c: done
+
+The piece G3 of the sweep of jumps (`CLAUDE.md`, "The portable C", the
+bullet on `goto`), two commits, one for each file. 53 `goto` went, 101
+stay, all in `view.c`:
+
+- `view.c`, 21 went: `V00_02` 5, `NextLin` 4, `PrevLin` 4, `V30_00` 1,
+  `V60_00` 2, `F34_40` 5. `PrevLin` has its second loop, `PrLin5`,
+  inside the first, behind the end of a line that it finds.
+- `edit.c`, 32 went, none stays: `T80_02` 3, `T80_00` 5, `T32_00` 5,
+  `T00_83` 10, `T00_20` 4, `T00_19` 1, `T00_00` 4. `T00_83` jumped from
+  the switch of the characters into the cases of the switch of the scan
+  codes: a one-line case is written twice, as the original's table has
+  each key twice. `T80_00` reports a disk that is full when the file is
+  deleted again by the answer of the deletion, 0, which is not the
+  drive that is not ready (a comment says so). `T32_00` writes its
+  "not found" box at both places that go there, one line each.
+- Stay: `V00_10`, 98, as the bullet says; and `V82_00`, 3, whose loop
+  is entered in the middle, at `V82_04` behind `V82_06`, for a text
+  shorter than what is looked for, so that only the bytes are held
+  against it. It would go with a test of the count at the top of the
+  loop; that is a loop with two ways in, which the user's word leaves.
+
+Eleven static helpers, each named for its label in the assembly where
+it is the code there, and each said at its head: `V00_05`, `NoLine`
+(`NxLin4` and `PrLin7`, the same lines), `V60_06` and `F34_45` in
+`view.c`; `T80_13`, `T08_00` and `T35_00` (^F and ^Right, Esc and F10,
+which two switches reach), `FirstLine` (`T00_27` to `T00_31`, where the
+window's first line is now), `T00_40` (the window drawn whole),
+`T00_70` (the mouse while a button is held) and `T00_10` in `edit.c`.
+A label's name stands in a comment where the label was.
+
+What no scenario runs, by `harness/ported.py`'s list of what is out of
+reach in the original: in `T80_00` the deletion of a file on a disk
+that is full, and the path behind it, which is the one place where the
+code was written otherwise than as it stood (read twice against the
+old code and the assembly, `T80_03` to `T80_06`); in `T00_00` a read
+that fails, now `return T00_10(...)`; in `PrevLin` the lines in front
+of `PrLin3`, which did not change. That every instruction of the
+original ran says nothing of which way a jump went, so the paths that
+a key stops, `TstBrk` in `V00_02`, `T32_00` and `T00_00`, were read
+side by side with the old code as well.
+
+The record of `harness/width.py` has the helpers' numbers, and the two
+parameters of `T00_10` with the reasons of those of `T00_00`. The
+records of `int16.py`, `hostcheck.py` and `words.py` did not move.
+
+**What judged it.** The whole suite, fourteen tests, 158 scenarios, no
+golden and no patch changed. The code is 121 bytes longer (37 of
+`view.c`, 84 of `edit.c`), so against `main`'s build every scenario
+differs in all of the room. Against `main`'s build padded to the same
+length of code, a function of 30 stores to a `volatile` pointer behind
+the last of `sys_dos.c`, not kept (`_TEXT` 1C955h in both): 150 of 158
+scenarios with nothing that differs, `blank-timed` and `cursor` with
+nothing but what may differ, and the six that S and N22 met,
+`comspec`, `ended`, `second-copy`, `start-screen`, `start-setup`,
+whose second copy of the program lives in the room with code of
+another layout, and `start-memory`, `ViewSeg` and `FreMem2` naming
+nothing known. Nothing is declared as changed.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

@@ -1027,12 +1027,11 @@ static struct Answer T80_02(u16 attributes)
     device = FileDevice(handle);
     failed = device.failed;
     error = device.value;
-    if (!failed) {
-        if (device.kind & 0x80) {
-            if (device.kind & 2)
-                goto close;
+    /* A device keeps its attributes, and the console is written
+       nothing. */
+    if (!failed && !((device.kind & 0x80) != 0 && (device.kind & 2) != 0)) {
+        if (device.kind & 0x80)
             attributes = 0xFFFF;
-        }
         left = ed.EdLen;
         piece = Room;
         do {
@@ -1043,18 +1042,17 @@ static struct Answer T80_02(u16 attributes)
             failed = wrote.failed;
             error = wrote.error;
             if (failed)
-                goto close;
+                break;
             if (wrote.count != count) {
                 failed = wrote.count < count;
                 error = ERR_DISK_FULL;
-                goto close;
+                break;
             }
             piece += PIECE;
             left -= count;
         } while (left != 0);
     }
-close:
-    answer = FileClose(handle);
+    answer = FileClose(handle);         /* T80_11 */
     if (answer.failed)
         return Failed(answer.value);
     if (failed)
@@ -1139,6 +1137,16 @@ static void T80_14(void)
     md.ExtMain[count] = 0x1A;
 }
 
+/* T80_13, the end of T80_00: the box off the screen, and what follows the
+   saving of the file. Returns `failed`. */
+static bool T80_13(struct Box *box, bool failed)
+{
+    ResWin(box->begin, box->size, box->saved);
+    Window(box->begin, box->size);
+    T80_14();
+    return failed;
+}
+
 /* Save the text as the file ViewFil. Returns false if it is saved.
 
    With a box on the screen that says so: the line buffer goes back into
@@ -1154,7 +1162,6 @@ bool T80_00(void)
 {
     struct Box box;
     struct Answer answer;
-    bool failed = true;
 
     T51_00();
     T50_00();
@@ -1162,35 +1169,27 @@ bool T80_00(void)
     DialBox(0x528, &SavFi_P, 0, &md, &box);
     Window(box.begin, box.size);
     if (ChgDisk(md.ViewFil))
-        goto done;
+        return T80_13(&box, true);
     answer = T80_01();
     if (!answer.failed) {
         if (answer.value & 1) {
             T80_Name();
             if ((u8)Dialog(&Prot_B, EdFl_S, 0, 0, &md) != 0)
-                goto done;
+                return T80_13(&box, true);
         }
         answer = T80_02(answer.value);
-        if (!answer.failed) {
-            failed = false;
-            goto done;
-        }
-    }
-    if (answer.value == ERR_DISK_FULL) {
-        answer = T80_03();
         if (!answer.failed)
-            goto report;
+            return T80_13(&box, false);
     }
-    if (answer.value == ERR_NOT_READY)
-        goto done;
-report:
-    /* None of its lines has ^I: no include line. */
-    Dialog(&SavEr_B, 0, 0, 0, &md);
-done:
-    ResWin(box.begin, box.size, box.saved);
-    Window(box.begin, box.size);
-    T80_14();
-    return failed;
+    /* T80_03. A file that is deleted answers 0, which is not the drive
+       that is not ready. */
+    if (answer.value == ERR_DISK_FULL)
+        answer = T80_03();
+    if (answer.value != ERR_NOT_READY) {
+        /* T80_05. None of its lines has ^I: no include line. */
+        Dialog(&SavEr_B, 0, 0, 0, &md);
+    }
+    return T80_13(&box, true);
 }
 
 /* The line that the cursor is in, as T53_00 and T54_00 take one. T60_00
@@ -1903,9 +1902,11 @@ static void T32_00(void)
     place = EdOffst + EdCursr;
     for (;;) {                          /* T32_01 */
         if (TstBrk())
-            goto done;
-        if (ed.EdLen < place)
-            goto none;
+            break;
+        if (ed.EdLen < place) {
+            Dialog(&SrEr_B, EdFl_S, 0, 0, &md);    /* T32_03 */
+            break;
+        }
         left = ed.EdLen - place;
         count = 0x8000;
         if (left < count)
@@ -1915,28 +1916,27 @@ static void T32_00(void)
            assembly had them, a segment and an offset of less than 16. */
         base = place & ~0x0F;
         sought = V82_00(Room + base, place - base, count);
-        if (sought.found < 0x100)
+        if (sought.found < 0x100) {
+            if (TstBrk())               /* T32_05 */
+                break;
+            place = base + sought.end;
+            if (ed.EdTxHex != 0) {
+                ed.EdHexAs = sought.found != 0;
+                ed.EdHxCur = 0;
+                EdOffst = place & ~0x0F;
+                EdLine = place >> 4;
+                EdCursr = place & 0x0F;
+            } else {
+                T56_00(EdOffst, EdLine, place);       /* T32_06 */
+            }
             break;
-        if (count < SrchLen)
-            goto none;
+        }
+        if (count < SrchLen) {
+            Dialog(&SrEr_B, EdFl_S, 0, 0, &md);    /* T32_03 */
+            break;
+        }
         place += count - SrchLen + 1;
     }
-    if (TstBrk())                       /* T32_05 */
-        goto done;
-    place = base + sought.end;
-    if (ed.EdTxHex != 0) {
-        ed.EdHexAs = sought.found != 0;
-        ed.EdHxCur = 0;
-        EdOffst = place & ~0x0F;
-        EdLine = place >> 4;
-        EdCursr = place & 0x0F;
-    } else {
-        T56_00(EdOffst, EdLine, place);               /* T32_06 */
-    }
-    goto done;
-none:
-    Dialog(&SrEr_B, EdFl_S, 0, 0, &md);    /* T32_03 */
-done:
     T50_00();                           /* T32_07 */
     ResWin(box.begin, box.size, box.saved);
     Window(box.begin, box.size);
@@ -1951,12 +1951,37 @@ static void T34_00(void)
         T74_00();
 }
 
+/* ^Right and ^F: T08_00. */
+static void T08_00(void)
+{
+    if (ed.EdTxHex == 0) {
+        EdCursr = T55_00(EdCursr);
+        T08_01();
+    }
+}
+
+/* F10 and Esc: T35_00. Returns true if that is to leave: if the text has
+   not changed, if the user says not to save it, or if it is saved. */
+static bool T35_00(void)
+{
+    i32 answer;
+
+    if (ed.EdChng == 0)
+        return 1;
+    answer = (u8)Dialog(&SavCn_B, 0, 0, 0, &md);
+    if (answer == 1)
+        return 1;
+    if (answer > 1)
+        return 0;
+    return T80_00() == 0;               /* T35_01 */
+}
+
 /* What the editor does with a key. Returns true if that is to leave. */
 static bool T00_83(u16 key)
 {
     u16 scan = key >> 8;
     u16 c = key & 0xFF;
-    i32 cursor, answer;
+    i32 cursor;
 
     /* The table of keys that the assembly has for Case: a character with
        any scan code, or a key that has no character. A key without a
@@ -1974,23 +1999,33 @@ static bool T00_83(u16 key)
             md.Quote = 1;
             return 0;
         case 0x13:                      /* ^S */
-            goto left;
+            T05_00();
+            return 0;
         case 0x04:                      /* ^D */
-            goto right;
+            T06_00();
+            return 0;
         case 0x01:                      /* ^A */
-            goto word_left;
+            if (ed.EdTxHex == 0)
+                EdCursr = EdSub1(EditBuf, EdCursr);
+            return 0;
         case 0x06:                      /* ^F */
-            goto word_right;
+            T08_00();
+            return 0;
         case 0x05:                      /* ^E */
-            goto up;
+            T10_02(false, 1);
+            return 0;
         case 0x18:                      /* ^X */
-            goto down;
+            T10_02(true, 1);
+            return 0;
         case 0x12:                      /* ^R */
-            goto page_up;
+            T12_01(false);
+            return 0;
         case 0x03:                      /* ^C */
-            goto page_down;
+            T12_01(true);
+            return 0;
         case 0x07:                      /* ^G */
-            goto delete;
+            T20_00();
+            return 0;
         case 0x08:                      /* BackSpace */
             T21_00();
             return 0;
@@ -2022,44 +2057,33 @@ static bool T00_83(u16 key)
             T26_00();
             return 0;
         case 0x1B:                      /* Esc */
-            goto quit;
+            return T35_00();
         }
     } else if (scan != 0) {
         switch (scan) {
-        case 0x4B:                      /* Left */
-left:
+        case 0x4B:                      /* Left: T05_00 */
             T05_00();
             return 0;
-        case 0x4D:                      /* Right */
-right:
+        case 0x4D:                      /* Right: T06_00 */
             T06_00();
             return 0;
         case 0x73:                      /* ^Left: T07_00 */
-word_left:
             if (ed.EdTxHex == 0)
                 EdCursr = EdSub1(EditBuf, EdCursr);
             return 0;
-        case 0x74:                      /* ^Right: T08_00 */
-word_right:
-            if (ed.EdTxHex == 0) {
-                EdCursr = T55_00(EdCursr);
-                T08_01();
-            }
+        case 0x74:                      /* ^Right */
+            T08_00();
             return 0;
         case 0x48:                      /* Up: T09_00 */
-up:
             T10_02(false, 1);
             return 0;
         case 0x50:                      /* Down: T10_00 */
-down:
             T10_02(true, 1);
             return 0;
         case 0x49:                      /* PgUp: T11_00 */
-page_up:
             T12_01(false);
             return 0;
         case 0x51:                      /* PgDn: T12_00 */
-page_down:
             T12_01(true);
             return 0;
         case 0x47:                      /* Home: T13_00 */
@@ -2082,8 +2106,7 @@ page_down:
         case 0x75:                      /* ^End */
             T16_00();
             return 0;
-        case 0x53:                      /* Del */
-delete:
+        case 0x53:                      /* Del: T20_00 */
             T20_00();
             return 0;
         case 0x3E:                      /* F4 */
@@ -2105,16 +2128,8 @@ delete:
         case 0x3C:                      /* F2 */
             T34_00();
             return 0;
-        case 0x44:                      /* F10: T35_00 */
-quit:
-            if (ed.EdChng == 0)
-                return 1;
-            answer = (u8)Dialog(&SavCn_B, 0, 0, 0, &md);
-            if (answer == 1)
-                return 1;
-            if (answer > 1)
-                return 0;
-            return T80_00() == 0;       /* T35_01 */
+        case 0x44:                      /* F10 */
+            return T35_00();
         case 0x5D:                      /* Shift F10: T35_01 */
             return T80_00() == 0;
         }
@@ -2208,121 +2223,55 @@ static bool T00_71(u16 mouse)
     return 1;
 }
 
-/* Bring the screen up to where the cursor is: the first column and the
-   first line that the window shows follow the cursor, the window is
-   drawn again as far as it has changed, the status line says where the
-   cursor is, and the cursor is put there. */
-static void T00_20(void)
+/* Where the first line of the window is now, when it has moved: so many
+   lines on from where it was, or back, or back from the cursor's line if
+   that is nearer; the top of the text if the window begins there. */
+static i32 FirstLine(i32 first_line, i32 old_line)
 {
     struct Where where;
-    struct Ending end;
-    const u8 *base;
-    i32 place, start;
-    i32 column, first_column, first_line, line, old_column, old_line;
-    i32 delta, row, count, size, state, i;
-    u16 color;
-    u16 *saved, *cell;
+    i32 delta = first_line - old_line;
+    i32 row = EdLine - EdLin0;
+    i32 count;
 
-    column = T57_02();
-    EdCol = column;
-    if (ed.EdUpDwn == 0) {
-        EdCol1 = column;
-        ed.EdHex1 = ed.EdHxCur;
-    }
-    ed.EdUpDwn = 0;                     /* T00_21 */
-    line = EdLine;
-    first_column = EdCol0;
-    first_line = EdLin0;
-    if (ed.EdTxHex == 0) {
-        if (column < first_column
-            || (column == first_column && first_column != 0)) {
-            first_column = column;      /* T00_22 */
-            if (column != 0)
-                first_column--;
-        } else if (column > first_column) {
-            size = ed.EdSizeX - 1;      /* T00_23 */
-            if (column >= size + first_column)
-                first_column = column - (size - 1);
-        }
-    }
-    if (line < first_line) {            /* T00_24 */
-        first_line = line;
-    } else {
-        size = ed.EdSizeY;              /* T00_25 */
-        if (line >= size + first_line) {
-            size--;
-            first_line = line < size ? 0 : line - size;
-        }
-    }
-    old_column = EdCol0;             /* T00_26 */
-    EdCol0 = first_column;
-    old_line = EdLin0;
-    EdLin0 = first_line;
-    delta = first_line - old_line;
-    if (delta != 0) {
-        /* Where the first line of the window is now: so many lines on
-           from where it was, or back, or back from the cursor's line if
-           that is nearer. */
-        row = EdLine - EdLin0;
-        T60_10(&where);
-        where.line = 0;
-        place = 0;
-        if (first_line >= old_line) {
-            count = delta;
-            if (count <= row) {
-                where.place = EdFirst;
-                do                      /* T00_27 */
-                    T53_00(&where);
-                while (--count);
-                goto first;
-            }
-        } else {
-            if (EdLin0 == 0)         /* T00_28 */
-                goto top;
-            count = -delta;
-            if (count <= row) {
-                row = count;
-                where.place = EdFirst;
-            }
-        }
-        count = row;                    /* T00_29 */
-        if (count != 0) {
-            where.line--;
-            do                          /* T00_30 */
-                T54_00(&where);
+    T60_10(&where);
+    where.line = 0;
+    if (first_line >= old_line) {
+        count = delta;
+        if (count <= row) {
+            where.place = EdFirst;
+            do                          /* T00_27 */
+                T53_00(&where);
             while (--count);
-        }
-first:
-        place = where.place;            /* T00_31 */
-top:
-        EdFirst = place;             /* T00_32 */
-    }
-    if (ed.EdScrn == 0) {               /* T00_33 */
-        if (old_column == EdCol0) {
-            if (delta == 1) {
-                T71_00(0x600, ed.EdBase, 160);
-                ed.EdCurLn = 0;
-            } else if (delta == -1) {           /* T00_34 */
-                T71_00(0x700,
-                       (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)),
-                       -160);
-                ed.EdCurLn = 0;
-            } else if (delta != 0) {
-                goto whole;
-            }
-            if (ed.EdCurLn == 0)        /* T00_36 */
-                T73_00();
-            goto shown;
+            return where.place;         /* T00_31 */
         }
     } else {
-        count = ed.EdSizeY;             /* T00_38 */
-        row = 0;
-        do
-            T70_00(row++);
+        if (EdLin0 == 0)                /* T00_28 */
+            return 0;                   /* T00_32 */
+        count = -delta;
+        if (count <= row) {
+            row = count;
+            where.place = EdFirst;
+        }
+    }
+    count = row;                        /* T00_29 */
+    if (count != 0) {
+        where.line--;
+        do                              /* T00_30 */
+            T54_00(&where);
         while (--count);
     }
-whole:
-    ClrKbd();                           /* T00_40 */
+    return where.place;                 /* T00_31 */
+}
+
+/* T00_40: the window drawn whole, a line of the text in each row from
+   EdFirst on. */
+static void T00_40(void)
+{
+    struct Ending end;
+    const u8 *base;
+    i32 start, count, row, state;
+
+    ClrKbd();
     count = ed.EdSizeY;
     row = 0;
     /* The assembly has the lines as offsets in the segment of the first
@@ -2364,7 +2313,82 @@ whole:
     } while (--count);
     T73_10();                           /* T00_48 */
     Window(ed.EdBase, *(u16 *)&ed.EdSizeX);
-shown:
+}
+
+/* Bring the screen up to where the cursor is: the first column and the
+   first line that the window shows follow the cursor, the window is
+   drawn again as far as it has changed, the status line says where the
+   cursor is, and the cursor is put there. */
+static void T00_20(void)
+{
+    i32 column, first_column, first_line, line, old_column, old_line;
+    i32 delta, row, count, size, i;
+    u16 color;
+    u16 *saved, *cell;
+
+    column = T57_02();
+    EdCol = column;
+    if (ed.EdUpDwn == 0) {
+        EdCol1 = column;
+        ed.EdHex1 = ed.EdHxCur;
+    }
+    ed.EdUpDwn = 0;                     /* T00_21 */
+    line = EdLine;
+    first_column = EdCol0;
+    first_line = EdLin0;
+    if (ed.EdTxHex == 0) {
+        if (column < first_column
+            || (column == first_column && first_column != 0)) {
+            first_column = column;      /* T00_22 */
+            if (column != 0)
+                first_column--;
+        } else if (column > first_column) {
+            size = ed.EdSizeX - 1;      /* T00_23 */
+            if (column >= size + first_column)
+                first_column = column - (size - 1);
+        }
+    }
+    if (line < first_line) {            /* T00_24 */
+        first_line = line;
+    } else {
+        size = ed.EdSizeY;              /* T00_25 */
+        if (line >= size + first_line) {
+            size--;
+            first_line = line < size ? 0 : line - size;
+        }
+    }
+    old_column = EdCol0;             /* T00_26 */
+    EdCol0 = first_column;
+    old_line = EdLin0;
+    EdLin0 = first_line;
+    delta = first_line - old_line;
+    if (delta != 0)
+        EdFirst = FirstLine(first_line, old_line);  /* T00_32 */
+    /* T00_33. The window is drawn whole unless it is as it was, or a
+       line up or down. */
+    if (ed.EdScrn == 0 && old_column == EdCol0
+        && delta >= -1 && delta <= 1) {
+        if (delta == 1) {
+            T71_00(0x600, ed.EdBase, 160);
+            ed.EdCurLn = 0;
+        } else if (delta == -1) {               /* T00_34 */
+            T71_00(0x700,
+                   (u16)(ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8)),
+                   -160);
+            ed.EdCurLn = 0;
+        }
+        if (ed.EdCurLn == 0)            /* T00_36 */
+            T73_00();
+    } else {
+        if (ed.EdScrn != 0) {
+            count = ed.EdSizeY;         /* T00_38 */
+            row = 0;
+            do
+                T70_00(row++);
+            while (--count);
+        }
+        T00_40();
+    }
     ed.EdScrn = 0;                      /* T00_49 */
     ed.EdCurLn = 0;
 
@@ -2418,25 +2442,34 @@ shown:
                  + ed.EdBase));
 }
 
+/* T00_70: the mouse, as long as a button is held. Returns true if it has
+   moved the cursor, and the screen is to be brought up to it. */
+static bool T00_70(void)
+{
+    struct Mouse mouse;
+
+    for (;;) {
+        mouse = GetMous(0);
+        if (mouse.buttons == 0) {
+            md.WinMous = 0;
+            return false;
+        }
+        if (T00_71(mouse.place))
+            return true;
+    }
+}
+
 /* The loop of keys of the editor: the screen, the mouse, a key and what
    it does, until a key leaves the editor. */
 static void T00_19(void)
 {
-    struct Mouse mouse;
     u16 key;
     i32 bar;
 
     for (;;) {
         T00_20();
-        for (;;) {                      /* T00_70 */
-            mouse = GetMous(0);
-            if (mouse.buttons == 0) {
-                md.WinMous = 0;
-                break;
-            }
-            if (T00_71(mouse.place))
-                goto again;
-        }
+        if (T00_70())
+            continue;
         bar = 10;                       /* T00_80 */
         if (ed.EdStat != 0) {
             bar = 6;
@@ -2462,8 +2495,6 @@ static void T00_19(void)
         }
         if (T00_83(key))
             return;
-again:
-        ;
     }
 }
 
@@ -2476,6 +2507,15 @@ static struct EditEnd Ends(i32 how, bool written)
     end.how = (u8)how;
     end.written = written;
     return end;
+}
+
+/* T00_10: the box "Reading the file" off the screen, and the file to be
+   closed and nothing more. */
+static struct EditEnd T00_10(u16 begin, u16 size)
+{
+    ResWin(begin, size, md.WinBuf);
+    Window(begin, size);
+    return Ends(EDIT_CLOSE, 0);
 }
 
 /* The editor: T00_00 of the assembly, to which the viewer's code jumps
@@ -2521,7 +2561,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
            box before had there. Nothing reads the three: the box has no
            ^I in its lines, and the dialog puts its box up itself. */
         if ((u8)Dialog(&BigFi_B, 0, 0, 0, &md) != 0)
-            goto closed;
+            return T00_10(begin, size);
         place = (begin & 0xFF00) + 0x100 | 37;  /* T00_02 */
         MovDz0(BasAdr(place), ViFl_S);
         Window(place, 0x106);
@@ -2554,7 +2594,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
         /* A new file. */
         if ((u8)(md.Lines - 2) <= ed.EdSizeY
             && (u8)Dialog(&NewFi_B, 0, 0, 0, &md) != 0)
-            goto closed;
+            return T00_10(begin, size);
     } else {
         left = ed.EdLen;                /* T00_06 */
         piece = Room;
@@ -2564,9 +2604,9 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
                 count = left;
             read = FileRead(handle, piece, count);      /* T00_08 */
             if (read.failed)
-                goto closed;            /* T00_09 */
+                return T00_10(begin, size);            /* T00_09 */
             if (TstBrk())
-                goto closed;
+                return T00_10(begin, size);
             if (read.count != count) {
                 left -= read.count;     /* T00_11 */
                 ed.EdLen -= left;
@@ -2645,8 +2685,4 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size)
     T00_19();
     CurShp(ed.EdShape);                 /* T35_02 */
     return Ends(EDIT_DONE, ed.EdWrite);
-closed:
-    ResWin(begin, size, md.WinBuf);    /* T00_10 */
-    Window(begin, size);
-    return Ends(EDIT_CLOSE, 0);
 }
