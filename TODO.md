@@ -19616,6 +19616,53 @@ build/c/VC.EXE`). By scenario:
 The header of `harness/scenarios.py` still says that a new file comes
 last; none of the ten rests on that line, which is the end's to mend.
 
+### S2: done
+
+The fourteen scenarios of the editor and the viewer go to the files
+they went to, each in as many steps as it had, with their goldens
+derived on the new bench, and the C translation passes all fourteen
+(`harness/compare.py build/c/VC.EXE`). A step that went to a file by
+its place goes there by its place in the sorted list, and the comment
+names the file; a step that went to the file next to another goes by
+Up where the file is above it now, as data.bin is above notes.doc and
+hello.txt. Where a scenario ran End, End stays, with Up behind it to
+the file. By scenario:
+
+- `editor`, `editor-big`, `editor-hex`, `editor-hex-keys`,
+  `editor-save`, `editor-search`, `keys-waiting`, `view`, `hex`: every
+  screen as before, and no instruction lost but the two of the
+  unsorted order.
+- `view-keys`: as before but for screens 7 to 9, whose first row is
+  the right panel's in C:\, STAMPS above WORK: the order on the screen.
+- `emptied`: the same directory under the cursor on every screen, which
+  the tool counts as six that differ: at the root WORK was the first
+  entry and is the second, and STAMPS the other way round. "Ins Ins"
+  is "Ins Up Ins Up", so that both are selected and the cursor ends on
+  STAMPS as before. The two are deleted in the panel's order, STAMPS
+  first now, with the same boxes.
+- `columns`: the file made in the editor is two.txt where it was
+  one.txt, so that it is still the last, the eleventh in a column of
+  its own; one.txt would sort in front of readme.txt. Screens 9 to 11
+  and 13 to 14 name it.
+- `view-window`: as before but for screen 2, where the cursor is back
+  on WORK at the root, the second entry now. Two instructions of
+  `FncSel` are lost, `JNZ FncSl5` and `JMP FncSl9` at FncSl4: when one
+  file is renamed with nothing selected, the loop goes on from it to
+  the end of the list for selected files, and noon.dat, the one file of
+  a megabyte, is the last now, so nothing is left to look at. Left so:
+  no other file will do, and the two are run by many other scenarios
+  (S1's `copy` and `move`, and `editor-save`, `keys-waiting`,
+  `columns` and `view-commands` of this group, among them).
+- `view-commands`: every screen as before. The second half of
+  `NearFl`, which looks backwards for the file nearest to one that has
+  gone, is lost: the directory vcview.ext that F8 deletes was the last
+  entry and is among the directories now, so a file behind it is
+  found. Left so: the extension file has to be a directory of that
+  name, and `delete-mask`, `move` and `emptied` run those instructions.
+- Steps that are other keys and the same files: in `view-commands`,
+  readme.txt is the ninth entry for the second F3, behind nomem.exe,
+  which the scenario has made by then.
+
 ### S3: done
 
 The fifteen scenarios of the panels and their keys go to the files that
@@ -19662,6 +19709,7 @@ order, which `sort` still runs. The C translation passes all fifteen
 - What the end has to know: the header of `harness/scenarios.py` was
   not touched. `_STAMPS`, the first two steps of `stamps` and
   `stamps-russia`, is theirs alone, and goes to STAMPS by "Up Enter".
+||||||| parent of 11bbf68 (Rewrite the scenarios of the editor and the viewer for the bench sorted by name)
 
 ## A deviation held by a patch: done, and what comes behind it
 

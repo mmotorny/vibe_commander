@@ -1858,7 +1858,7 @@ SCENARIOS = {
     "hex": Scenario(
         "A file in hex, and bytes looked for in it by their hex digits",
         steps=(
-            "Down Down Down Down Down Down",   # onto the file of all bytes
+            "Down Down Down",             # onto data.bin, of all bytes
             "F3",
             "F4",                         # in hex
             "F7",
@@ -2143,7 +2143,7 @@ SCENARIOS = {
         "A disk with nothing left on it to list",
         steps=(
             "Ctrl+PgUp",                  # the root, with two directories
-            "Ins Ins",
+            "Ins Up Ins Up",              # WORK, then STAMPS
             "F8",
             "Enter",
             "Enter",                      # both of them
@@ -2154,7 +2154,7 @@ SCENARIOS = {
     "editor": Scenario(
         "The editor, as it opens a file",
         steps=(
-            "Down Down Down",             # onto a file
+            "Down Down Down Down Down Down Down",   # onto readme.txt
             "F4",
             "Esc",
         )),
@@ -2941,12 +2941,12 @@ SCENARIOS = {
         steps=(
             "F9 o f",                     # panels half the screen high:
                                           # ten files to a column
-            "Down Down Down Down",        # onto hello.txt
+            "Down Down Down Down Down",   # onto hello.txt
             "F5",
             '"hello.doc"',
             "Enter",                      # the tenth entry
-            "Shift+F4",                   # a new file, made in the editor
-            '"one.txt"',
+            "Shift+F4",                   # a new file, made in the editor,
+            '"two.txt"',                  # last by name
             "Enter",
             "Enter",                      # it is not there: a new one
             '"a"',                        # of one byte
@@ -4018,12 +4018,12 @@ SCENARIOS = {
         "The viewer: lines wrapped and not, a line longer than the screen "
         "moved sideways, and a text found in it",
         steps=(
-            "Down Down Down Down Down",   # onto notes.doc, of three lines
+            "Down Down Down Down Down Down",  # onto notes.doc, of three lines
             "F3",
             "F2",                         # not wrapped: the same
             "Down",                       # all of it is shown: no further
             "Esc",
-            "Down",                       # the file of all bytes: they do
+            "Up Up Up",                   # data.bin, of all bytes: they do
             "F3",                         # not end a line anywhere
             "F2",                         # not wrapped: one line, that goes
             "Right",                      # on to the right; and to the left
@@ -4085,7 +4085,7 @@ SCENARIOS = {
             '"nodir\\x.txt"',             # it is the directory that is
             "Enter",                      # not there
             "Enter",
-            "Down Down Down Down Down",   # onto notes.doc, of three lines
+            "Down Down Down Down Down Down",  # onto notes.doc, of three lines
             "F3",
             "Home",                       # at the start already
             "Shift+F7",                   # nothing to look for yet
@@ -4097,7 +4097,7 @@ SCENARIOS = {
             "Shift+F7",                   # and no line behind that to look
             "Esc",                        # in: not found, a box
             "Esc",
-            "Down",                       # the file of all bytes
+            "Up Up Up",                   # data.bin, of all bytes
             "F3",
             "F2",                         # not wrapped: one line
             "Right",
@@ -4153,9 +4153,11 @@ SCENARIOS = {
         steps=(
             "Ctrl+l",                     # the Info panel on the right
             "Home Enter",
-            "Down Down Enter",            # C:\\STAMPS
-            "Down Down Down Down Down",   # a megabyte, by its entry in
-            "F6",                         # the directory, and no contents
+            "Up Enter",                   # C:\\STAMPS
+            # noon.dat, a megabyte by its entry in the directory, and no
+            # contents
+            "Down Down Down Down Down Down Down Down",
+            "F6",
             '"dirinfo" Enter',
             "Tab",                        # to the Info panel
             "F4",                         # its dirinfo: too large to edit
@@ -4213,7 +4215,7 @@ SCENARIOS = {
             "Down Down Down Down Down Space Enter",   # the editor
             "Shift+F3",                   # which file? none
             "Esc",
-            "Down Down Down",             # onto readme.txt
+            "Down Down Down Down Down Down Down",   # onto readme.txt
             "Alt+F3",                     # the viewer, without a look at
             "Esc",                        # the extension file
             "Alt+F4",                     # the editor is the program's
@@ -4224,7 +4226,7 @@ SCENARIOS = {
             "F8", "Enter",                # the directory goes
             '"del" Space "d:\\vc\\vcview.ext"',
             "Enter",                      # and the main file
-            "Home Down Down Down",
+            "Home Down Down Down Down Down Down Down",   # readme.txt
             "F3",                         # no extension file: the viewer
             "Esc",
             "Shift+F4",                   # what DOS takes for a program
@@ -4244,16 +4246,16 @@ SCENARIOS = {
             '"vcedit.ext" Enter',
             '"txt:" Tab "a:\\freedos\\bin\\vecho.com" Enter',
             "F2 Esc",
-            "Home Down Down Down",
+            "Home Down Down Down Down Down Down Down Down",
             "F3",                         # readme.txt: the program is run
             "Alt+F4",                     # and as the editor
-            "Down Down",
+            "Up",
             "F3",                         # notes.doc: its viewer is on B:
             "Esc",                        # and the disk is not put in
-            "Down",
+            "Up Up Up Up",
             "F3",                         # data.bin: DOS finds a file for
             "Enter",                      # the mask and can run none
-            "End Up Up",
+            "End Up Up Up Up Up",
             "F3",                         # nomem.exe: no memory for it
             "Enter",
             "Ctrl+o",                     # what the programs printed is
@@ -4269,7 +4271,7 @@ SCENARIOS = {
             "Enter",
             "F9 o n",                     # the mini status off: it would
                                           # show the time of the file saved
-            "Down Down Down Down Down Down",      # onto data.bin
+            "Down Down Down",             # onto data.bin
             "F4",                         # 1024 characters, tabs among
                                           # them: an arrow where it goes on
             "End",                        # and one where it began
@@ -4313,7 +4315,7 @@ SCENARIOS = {
             "Enter",
             "F9 o n",                     # the mini status off: it would
                                           # show the time of the file saved
-            "Down Down Down Down",        # onto hello.txt
+            "Down Down Down Down Down",   # onto hello.txt
             "Ctrl+a",
             "Space",                      # read-only
             "Enter",
@@ -4334,7 +4336,7 @@ SCENARIOS = {
             '"dat:" Tab "echo" Space "!.!" Enter',
             "F2",                         # saved, and from now on what the
             "Esc",                        # program goes by
-            "End Enter",                  # empty.dat: the command just
+            "End Up Up Up Up Enter",      # empty.dat: the command just
             "Ctrl+o",                     # written for its kind
             "Ctrl+o",
         )),
@@ -4467,7 +4469,7 @@ SCENARIOS = {
             "F9 o o",                     # Clear keyboard buffer off, for
             "Down Down Down Down Down Space",     # typing in the editor
             "Enter",
-            "Down Down Down Down",        # onto hello.txt, 15 bytes
+            "Down Down Down Down Down",   # onto hello.txt, 15 bytes
             "F4",
             "F4",                         # in hex
             "Right Right Right",          # the second digit of a byte
@@ -4494,7 +4496,7 @@ SCENARIOS = {
             "Enter",                      # with Ctrl-Q or without
             "Esc",                        # changed: asks
             "Right Enter",                # not saved
-            "Down Down",                  # data.bin: 64 lines of 16
+            "Up Up",                      # data.bin: 64 lines of 16
             "F4",
             "F4",
             "PgDn",                       # to the last line of the window
@@ -4514,7 +4516,7 @@ SCENARIOS = {
     "editor-search": Scenario(
         "The editor looks for a text, and in hex for bytes",
         steps=(
-            "Down Down Down Down Down",   # onto notes.doc, three lines
+            "Down Down Down Down Down Down",  # onto notes.doc, three lines
             "F4",
             "Shift+F7",                   # nothing to look for yet
             "F7",
@@ -4620,18 +4622,18 @@ SCENARIOS = {
             '"a:\\freedos\\bin\\country.sys" Tab "b"',
             "Enter",
             "p",
-            "End",                        # onto it
+            "End Up Up Up Up Up Up",      # onto b
             "F4",                         # too large
             "Enter",                      # view it, then
             "Esc",
             "F4",
             "Esc",                        # or not
             "Ctrl+PgUp",
-            "Down Enter",                 # C:\\STAMPS
-            "Down Down Down",             # night.dat says 9 bytes and
-            "F4",                         # has none
+            "Up Enter",                   # C:\\STAMPS
+            "Down Down Down Down Down Down Down",   # night.dat says 9
+            "F4",                         # bytes and has none
             "Esc",
-            "Down Down",                  # noon.dat says 1 MB: too large
+            "Down",                       # noon.dat says 1 MB: too large
             "F4",                         # by more than that
             "Right Enter",                # Cancel
         )),
@@ -5527,7 +5529,7 @@ SCENARIOS = {
         "lost where the buffer is cleared, left there by a copy that it "
         "does not stop, and F10, which stops one",
         steps=(
-            "Down Down Down",             # onto a file
+            "Down Down Down Down Down Down Down",   # onto readme.txt
             "F4",                         # the editor clears the buffer
             "Right+Right",                # after a key: one column, not two
             "Esc",
