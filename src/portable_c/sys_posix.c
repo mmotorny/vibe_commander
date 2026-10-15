@@ -577,9 +577,11 @@ static void Place(i32 row, i32 column)
  * mode: the cell that it is on kept, and in its place the cell with the
  * bits of PointerKeep kept and those of PointerTurn turned round, while
  * the pointer is shown. The driver puts the cell back as it kept it when
- * the pointer moves or is hidden, whatever the program has written there
- * meanwhile, which is why the program hides the pointer around what it
- * writes. Places are in dots, eight to a cell, as the driver has them,
+ * the pointer moves or is hidden, where the cell still has what it drew
+ * there: one that has been written over is left as it is, as CuteMouse's
+ * notes say of it (DOC/CTMOUSE/TECHNOTE.TXT of its package), and as the
+ * screen shows where the BIOS moves the lines up under the pointer for an
+ * error's beep (view-keys). Places are in dots, eight to a cell, as the driver has them,
  * and always at the top left of a cell in the text mode.
  */
 
@@ -597,7 +599,9 @@ static u16 PointerUnder = 0;            /* what that cell had */
 
 static void PointerOff(void)
 {
-    if (PointerAt >= 0)
+    if (PointerAt >= 0
+        && Display[PointerAt]
+               == (u16)((PointerUnder & PointerKeep) ^ PointerTurn))
         Display[PointerAt] = PointerUnder;
     PointerAt = -1;
 }
@@ -757,7 +761,13 @@ static void LineFeed(void)
 /* What the BIOS does with a character that it types: a carriage return,
    a line feed, a step back and the bell are no characters; any other is
    written in the colour that the cell has, and the cursor goes on, to
-   the next line behind the last column. */
+   the next line behind the last column. And whatever it types, with the
+   cursor below the last row, as the program has it where it hides it
+   (Cursor of window.c), the BIOS takes it a row up and moves the lines
+   up a row, as for a line feed there: the bench's BIOS does, and an
+   error's beep moves the screen so (CLAUDE.md, the rules of a part).
+   The new row has the colour of the first cell of the last, which no
+   scenario tells from another: the ones there are have 07h in both. */
 void ScreenType(u16 character, u16 page, u16 color)
 {
     u16 *cell;
@@ -769,27 +779,34 @@ void ScreenType(u16 character, u16 page, u16 color)
     switch (c) {
     case '\r':
         Place(Row(), 0);
-        return;
+        break;
     case '\n':
         LineFeed();
         return;
     case '\b':
         if (Column() > 0)
             Place(Row(), Column() - 1);
-        return;
-    case 7:
-        return;
-    default:
         break;
-    }
-    cell = &Display[Row() * COLUMNS + Column()];
-    *cell = (u16)((*cell & 0xFF00) | c);
-    if (Column() < COLUMNS - 1) {
-        Place(Row(), Column() + 1);
+    case 7:
+        break;
+    default:
+        if (Row() >= ROWS)
+            break;
+        cell = &Display[Row() * COLUMNS + Column()];
+        *cell = (u16)((*cell & 0xFF00) | c);
+        if (Column() < COLUMNS - 1) {
+            Place(Row(), Column() + 1);
+            return;
+        }
+        Place(Row(), 0);
+        LineFeed();
         return;
     }
-    Place(Row(), 0);
-    LineFeed();
+    if (Row() >= ROWS) {
+        Place(Row() - 1, Column());
+        ScreenScroll(false, 1, (u16)(Display[(ROWS - 1) * COLUMNS] >> 8), 0,
+                     (ROWS - 1) << 8 | (COLUMNS - 1));
+    }
 }
 
 bool ScreenEga(void)
@@ -1640,9 +1657,9 @@ void MouseRows(u16 first, u16 last)
 
 void MousePointer(u16 keep, u16 turn)
 {
+    PointerOff();
     PointerKeep = keep;
     PointerTurn = turn;
-    PointerOff();
     PointerOn();
 }
 
