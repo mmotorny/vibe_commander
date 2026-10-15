@@ -18506,6 +18506,228 @@ that stayed keeps its named source; the checks of 437 that had a text of
   char *const` with each literal whole (a literal split over two lines
   inside a list of them is `-Wstring-concatenation`).
 
+### L2, files, directories, drives: done, and what L3 should know
+
+What it made: DOS's services for files, directories and drives on the
+host's files, every function of the groups of `sys.h` for files, files
+by a control block, directories and drives, each as a function of the
+emulation, `Dos` and the name of `sys.h`'s, in `files_posix.c`, with
+the state that they share, `struct Dos`, declared in the last part of
+`emulate_posix.h`, which says what each answers and where that comes
+from. `paths_posix.c` has a function more, `DirectoryNumber`, the number
+of a directory in the table, which a search keeps in its record; and
+`DosErrorOf` makes `EISDIR` DOS's 5. Nothing of it is compiled into
+`VC.EXE`, which is the same bytes, `2b6cc9b5...`. The test
+`portable_c-posix-unit` tries them on a tree that it makes in a
+temporary directory (`TMPDIR`, or `/tmp` where the program's path of
+that is longer than DOS holds), and removes it.
+
+The source of what they answer is the bench's DOS above all: FreeDOS
+1.4, as `harness/trial32/asked.py` has the toy `harness/trial32/sys.c`
+ask every function of `sys.h` there, with `sys_dos.c`, and print what
+it is answered. The checks of `harness/posixcheck.c` follow the toy's
+steps, with its names, and say "the bench" at each; where the bench was
+not asked, RBIL, and for the shapes of names L1's sources. What the
+bench showed, which `sys.h` does not say, and which is the emulation's
+now:
+
+- AX where nothing failed is what FreeDOS leaves: the number of the call
+  as it was handed, 3E00h behind a close, 4100h behind a delete, 5600h,
+  4300h, 5700h, 5701h, 3900h, 3A00h, 3B00h; 0100h behind DirCurrent; 0
+  behind FindFirst, FindNext and FileTrueName; the attributes behind
+  FileSetAttributes; the device's word behind FileDevice; 4400h of a
+  drive that shares its unit with none, 0300h behind DriveRemote with
+  08C2h for a drive that is of no network, 1 behind DriveFixed.
+- FileSeek and FileStep that fail have the low word of what was asked
+  in the high word of the place and the error in the low one, as
+  `sys.h` says; a place to count from that there is not is DOS's 1.
+- FileTrueName answers 3 for a drive that there is not, and leaves
+  `to` as it was; a directory that is not there is no failure. Every
+  call that takes a name answers 3 for such a drive, where
+  `HostPathOfDos` has 0Fh (RBIL has no 0Fh among those calls' errors).
+- DriveSpace of a drive that there is not answers FFFFh and leaves DX
+  the drive that it was asked of: `total` is that, where `sys.h` says
+  that the members are 0. With `flagged` it answers the last error that
+  a call has failed with, 0 when none has; FcbDelete leaves 12h as that,
+  its search for the files having ended so.
+- FcbParse leaves the block as it is for a drive that there is not and
+  answers 29FFh; the four bytes behind the name are 0.
+- DirRemove of the current directory is 10h, of one that is not there
+  3, of one with files 5. FileCreate over a hidden file is 5 on the
+  bench, and over a read-only one by RBIL; over a hidden one it is not
+  here (below).
+- DOS's own five handles answer FileDevice with 80D3h, the console, and
+  A0C0h for the printer; the first handle of the program is 5.
+- What a file was last written at that was set with FileSetTime is
+  answered by FileTime from then on, and is the file's when it is
+  closed (RBIL, 5701h: DOS writes it at the close, whatever was written
+  behind it).
+
+What the emulation decided, each said in `emulate_posix.h` or at its
+function:
+
+- Handles: a table of 20, as a program's prefix has by default, the
+  first five DOS's own, which no host's descriptor is behind: reading,
+  writing, seeking and the time of them answer 6. The program asks none
+  of that of them.
+- Only a regular file of the host is opened, after its links: a
+  directory, a FIFO, a socket and a device are DOS's 5, as a directory
+  is to DOS. The open does not wait, `O_NONBLOCK`, so that a FIFO with
+  no one at its other end answers at once. A link that leads nowhere is
+  listed by its own status, a file of no bytes, is not found when it is
+  opened, and is deleted. A file is opened `O_CLOEXEC`, so that a
+  program that the program runs does not have it.
+- Read-only is the mode's, by `DosAttributes`: DOS refuses to open such
+  a file to write, to make it anew and to delete it, as the bench does,
+  also where the host would let the program, as its superuser.
+  FileSetAttributes takes the write bits away for read-only and gives
+  the owner his for none; hidden, system and archive it takes and does
+  not keep, there being nothing on the host to keep them in; directory
+  and label it refuses, 5 (RBIL 4301h). FileCreate with directory or
+  label among the attributes is 5.
+- A name that is made, a file, a directory or a new name, is in small
+  letters, by `HostPathOfDos`; one with `*` or `?` is 3. FileRename
+  refuses a name that the host has, by DOS's name or its own, 5, where
+  the host's `rename` would replace it; across file systems it is the
+  host's `EXDEV`, DOS's 11h, on which the program copies and deletes as
+  it does between two drives (`C10_00` of `copy.c`). A directory into
+  itself is 5.
+- A table of names that the emulation has changed is read again: behind
+  a delete, a rename, a removed directory and a FcbDelete that deleted.
+  One that another program has changed is read again when a name that it
+  has leads to nothing on the host, besides when a name is not found
+  (L1).
+- FindFirst and FindNext keep where a search is in the record's first
+  21 bytes, as FreeDOS lays them out (`dmatch`): the drive, the template
+  of eleven characters, the attributes, the entry and the directory's
+  number in the table. A record that is put back, or one elsewhere, goes
+  on where it was, as the bench showed. The entries are `.` and `..`
+  but in the root, then the table's names in its order; a name matches
+  by the eleven characters of a control block, so `*` without a dot
+  names `.` and `..` and the names without an extension. There is no
+  label: a search for one alone is 12h.
+- DirChange takes no directory whose path DOS's 64 bytes do not hold,
+  3. `DosStartIn` makes the directory that the program is started in
+  the current one, by its path of the host, and answers 3 where it is
+  longer than that; the program then has to start elsewhere, which is
+  L3's or the user's to decide.
+- The room of a drive is that of the host's file system of the current
+  directory of C:, by `statvfs`, in DOS's shape: `DosSpaceOf`, said at
+  its declaration, clusters of the host's block, made larger up to 64
+  KB while the drive's do not fit 16 bits, and counts that do not fit
+  even then FFFFh. A file system that cannot say is a drive that there
+  is not, FFFFh.
+- A file of 4 GB or more is FFFFFFFFh bytes long to DOS, and is not
+  opened to be read, 5, access denied, so that it is never copied or
+  moved cut short, as the user decided (below, 2). Opened to write
+  alone, it is written as far as DOS's last place; a write beyond writes
+  what fits, as on a full disk. A file that grows beyond that place
+  while it is open is refused, 5, at a read that would go past it. A
+  file of FFFFFFFFh bytes exactly is DOS's and is read to its end. A
+  place is reckoned in 32 bits, as DOS does: a step back from the start
+  is a place far on.
+- A read and a write that the host interrupts, `EINTR`, go on; one that
+  fails half way says what whole pieces of FFFFh bytes were moved, as
+  `sys.h` has it; a disk that is full, `ENOSPC`, `EDQUOT` or `EFBIG`, is
+  no failure, as DOS writes fewer bytes then. An open and a directory's
+  read are made again when interrupted. A close is not: Linux has closed
+  the file all the same.
+- FcbDelete deletes in the current directory of C:, which the program
+  makes the directory of the mask first, no directory, no file that is
+  read-only (RBIL 13h), and a hidden or a system one only where an
+  extended block allows it.
+
+**Asked of the user, and answered on 14 October 2026** (each a thing
+that a user sees, which `CLAUDE.md` did not settle; it does now, step
+6). Six as they were built, while the user was asked; the second
+changed:
+
+1. A drive's room past 4 GB: shown as at most 4 GB less 64 KB, clusters
+   of up to 64 KB. As built. (Set aside: at most 2 GB, clusters of 32
+   KB, as MS-DOS 7.1 answers of a large FAT32 drive; or the counts in 32
+   bits, which the program's product of them then wraps.)
+2. A file of 4 GB or more: shown FFFFFFFFh bytes long, the most that DOS
+   can say, as built; but never copied or moved cut short, the program
+   refusing it with an error, where it was built to be read as far as
+   FFFFFFFFh bytes and so copied cut short without a word. (Set aside:
+   its size cut to 32 bits, 5 GB shown as 1 GB, as DOSBox has it.) How
+   that is done, with no message that the program does not have:
+   - The emulation does not open such a file to be read, mode 0 or 2,
+     DOS's 5, access denied (`Opened` of `files_posix.c`). The program
+     then says what it says of any file that it cannot open. Copy and
+     Move (`C20_00` of `copy.c`) show "Can't open the file" with its
+     name, before the target is made, and go on with the next file or
+     stop as the user answers; a move leaves the source where it was.
+     A move within one file system of the host is a rename, the file
+     whole, and is no copy.
+   - Why at the open and not at the read that reaches FFFFFFFFh bytes:
+     `C20_00` takes a read that fails for a stop, shows no box, and
+     deletes the target it has open; with the read refused, the copy
+     would have read and written 4 GB and then ended with no word of
+     why. At the open the error comes at once, in a box that the
+     program has, and nothing is written.
+   - The read is refused too, 5, where a file grows beyond FFFFFFFFh
+     bytes on the host while it is open and a read would go past that
+     place (`DosFileRead`): what a copy has read of it is then never
+     taken for the whole, and the copy stops and deletes its target.
+   - What that does to the rest of the program: F3 and F4 show "Can't
+     find the file", the box that they show for every file that they
+     cannot open, the editor not taking it for a new one, so that it
+     cannot overwrite it with nothing; the file search for a text passes
+     it by, as any file that it cannot open; the dialog of attributes
+     still sets its date and time, opening it to write alone, which is
+     allowed, a write going no further than DOS's last place. Delete and
+     the attributes themselves open nothing and are as for any file.
+   - `harness/posixcheck.c` holds it on a sparse file of 5 GB in the
+     temporary tree, which costs no disk: listed FFFFFFFFh, refused to
+     read in three modes, opened to write and written to the last place
+     only, and its size on the host untouched; and on one of FFFFFFFFh
+     bytes, read to its end and refused at the read past it once the
+     host has made it 5 GB.
+3. A hidden file, a name with a dot in front, made anew over: let, as
+   built, since nothing can take its hiddenness away on the host and the
+   program's way round DOS's refusal, the attributes cleared, would fail
+   for ever. (Set aside: refused, 5, as DOS refuses it.)
+4. Hidden, system and archive set by the program: taken and not kept, as
+   built, so that the dialog of attributes says it has set them. (Set
+   aside: refused, 5.)
+5. A FIFO, a socket or a device: listed as a file of no bytes, and not
+   opened, 5, as built. (Set aside: not listed.)
+6. A label: none, and making one refused, 5, as built. (Set aside: one
+   kept for the run as DOSBox keeps one that a program makes.)
+7. What the host answers that DOS has no number for: 1Fh, a general
+   failure, as L1 built. (Set aside: 5.)
+
+**What L3 should know:**
+
+- The binding is a line each: one `static struct Dos` begun with
+  `DosBegin` before anything is asked and `DosStartIn` with the host's
+  current directory, `getcwd`, and each function of `sys.h` calls its
+  `Dos` function with it; `FileOpenBare`, `FileCloseBare`,
+  `FileReadBare` and `DirCurrentBare` call the same function as the
+  others. `SetDTA` of the program calls `FindRecord`, which is
+  `DosFindRecord`. `DosEnd` at the end gives everything back.
+- `md.ErrDat`, which `sys_dos.c` clears in front of a call asked with
+  the program's errors, is set only by the program's box for a device
+  that is not ready, which the host never asks for: nothing is to be
+  done with it.
+- A function that the emulation has and the binding does not need is
+  none; `DosSpaceOf` is the room's shape by itself, for its test.
+- The emulation does not know DOS's devices by name, `NUL`, `CON`,
+  `PRN`: a name of one is a file of the directory, as on the host.
+- The rule for a file of 4 GB or more is the emulation's alone, at the
+  open and the read, and nothing of the program knows of it: a part of
+  the program that comes to read files otherwise, by the host's calls or
+  by a mapping, has to keep to it. It shows on no scenario: the original
+  has no such file, and a scenario of the program for Linux that shows
+  one would have no golden of the original's to be held to. What the
+  emulation answers is held by `harness/posixcheck.c`; the boxes that
+  the program shows for it are those of any file that it cannot open,
+  which scenarios hold.
+- `harness/posixcheck.c` is the one test file still, with a `main`; a
+  second file would want `CMakeLists.txt` to name it, and `posix_files`
+  of `harness/stubcheck.py`.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes

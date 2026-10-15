@@ -95,6 +95,7 @@ u16 DosErrorOf(int error, bool path)
     case EROFS:
     case EEXIST:
     case ENOTEMPTY:
+    case EISDIR:
         return ACCESS_DENIED;
     case EBADF:
         return INVALID_HANDLE;

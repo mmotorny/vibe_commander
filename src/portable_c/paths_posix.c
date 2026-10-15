@@ -214,56 +214,58 @@ void DirectoriesEnd(struct Directories *directories)
     directories->room = 0;
 }
 
-/* The names of a directory of the host, read where it is new or where
-   `again` says so: NULL where it cannot be read, with errno, or where
-   the memory ran out, with errno ENOMEM. */
-static struct DirectoryNames *Names(struct Directories *directories,
-                                    const char *path, bool again)
+i32 DirectoryNumber(struct Directories *directories, const char *path,
+                    bool again)
 {
-    struct Directory *directory = NULL;
+    struct Directory *directory;
     struct Directory *grown;
     i32 room;
     i32 i;
 
     for (i = 0; i < directories->count; i++)
         if (strcmp(directories->directories[i].path, path) == 0) {
-            directory = &directories->directories[i];
-            break;
+            if (again
+                && !directories->read(directories->context, path,
+                                      &directories->directories[i].names))
+                return -1;
+            return i;
         }
-    if (directory == NULL) {
-        if (directories->count == directories->room) {
-            room = directories->room == 0 ? 16 : 2 * directories->room;
-            grown = realloc(directories->directories,
-                            (size_t)room * sizeof *grown);
-            if (grown == NULL) {
-                errno = ENOMEM;
-                return NULL;
-            }
-            directories->directories = grown;
-            directories->room = room;
-        }
-        assert(directories->count >= 0
-               && directories->count < directories->room);
-        directory = &directories->directories[directories->count];
-        directory->path = Copy(path, strlen(path));
-        if (directory->path == NULL) {
+    if (directories->count == directories->room) {
+        room = directories->room == 0 ? 16 : 2 * directories->room;
+        grown = realloc(directories->directories,
+                        (size_t)room * sizeof *grown);
+        if (grown == NULL) {
             errno = ENOMEM;
-            return NULL;
+            return -1;
         }
-        DirectoryNamesBegin(&directory->names);
-        if (!directories->read(directories->context, path,
-                               &directory->names)) {
-            DirectoryNamesEnd(&directory->names);
-            free(directory->path);
-            return NULL;
-        }
-        directories->count++;
-        return &directory->names;
+        directories->directories = grown;
+        directories->room = room;
     }
-    if (again && !directories->read(directories->context, path,
-                                    &directory->names))
-        return NULL;
-    return &directory->names;
+    assert(directories->count >= 0 && directories->count < directories->room);
+    directory = &directories->directories[directories->count];
+    directory->path = Copy(path, strlen(path));
+    if (directory->path == NULL) {
+        errno = ENOMEM;
+        return -1;
+    }
+    DirectoryNamesBegin(&directory->names);
+    if (!directories->read(directories->context, path, &directory->names)) {
+        DirectoryNamesEnd(&directory->names);
+        free(directory->path);
+        return -1;
+    }
+    return directories->count++;
+}
+
+/* The names of a directory of the host, read where it is new or where
+   `again` says so: NULL where it cannot be read, with errno, or where
+   the memory ran out, with errno ENOMEM. */
+static struct DirectoryNames *Names(struct Directories *directories,
+                                    const char *path, bool again)
+{
+    i32 number = DirectoryNumber(directories, path, again);
+
+    return number < 0 ? NULL : &directories->directories[number].names;
 }
 
 /* `length` bytes at `name` behind the path of the host at `to`, which

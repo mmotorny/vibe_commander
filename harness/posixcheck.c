@@ -35,10 +35,14 @@
  *                          a disk of DOS's
  */
 #include <errno.h>
+#include <fcntl.h>
+#include <ftw.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "emulate_posix.h"
 
@@ -664,6 +668,750 @@ static void Errors(void)
     CHECK(DosErrorOf(EDQUOT, false) == 0x27);
 }
 
+/*
+ * DOS's services on the host's files, the piece L2: a tree that the test
+ * makes in a temporary directory, which the emulation is started in, as
+ * the program is started in the directory that it is run from. What each
+ * call answers is held to what the bench's DOS answers, FreeDOS 1.4, as
+ * harness/trial32/asked.py has it ask every function of sys.h there
+ * ("the bench" below: the toy harness/trial32/sys.c, whose steps these
+ * follow, with its names), or to RBIL where the bench was not asked.
+ */
+
+/* The temporary directory of the host, and a struct Dos on it. */
+static char Tree[512];
+static struct Dos Emulated;
+
+/* A name of the tree, at `to`, which has room for 600 bytes. */
+static void InTree(const char *name, char *to)
+{
+    size_t length = strlen(Tree);
+    size_t more = strlen(name);
+
+    memcpy(to, Tree, length + 1);
+    to[length] = '/';
+    memcpy(to + length + 1, name, more + 1);
+}
+
+/* A file of the tree made by the host with `text` in it. */
+static void HostFile(const char *name, const char *text)
+{
+    char path[600];
+    FILE *file;
+
+    InTree(name, path);
+    file = fopen(path, "w");
+    CHECK(file != NULL);
+    if (file == NULL)
+        return;
+    fputs(text, file);
+    fclose(file);
+}
+
+/* Whether the tree has a name, as the host has it. */
+static bool HostHas(const char *name)
+{
+    char path[600];
+    struct stat status;
+
+    InTree(name, path);
+    return lstat(path, &status) == 0;
+}
+
+static mode_t HostMode(const char *name)
+{
+    char path[600];
+    struct stat status;
+
+    InTree(name, path);
+    if (stat(path, &status) != 0)
+        return 0;
+    return status.st_mode & 07777;
+}
+
+/* Make a file of the tree `size` bytes long, or as long, by the host,
+   which holds it without its bytes: a sparse file costs no disk. Whether
+   the host could. */
+static bool HostSized(const char *name, off_t size)
+{
+    char path[600];
+    int fd;
+    bool made;
+
+    InTree(name, path);
+    fd = open(path, O_RDWR | O_CREAT, 0644);
+    if (fd < 0)
+        return false;
+    made = ftruncate(fd, size) == 0;
+    close(fd);
+    return made;
+}
+
+static off_t HostSize(const char *name)
+{
+    char path[600];
+    struct stat status;
+
+    InTree(name, path);
+    if (stat(path, &status) != 0)
+        return -1;
+    return status.st_size;
+}
+
+static int Removed(const char *path, const struct stat *status, int kind,
+                   struct FTW *walk)
+{
+    (void)status;
+    (void)kind;
+    (void)walk;
+    remove(path);
+    return 0;
+}
+
+#define NAME(text) ((const u8 *)(text))
+#define BIG_SIZE 30000
+
+static u8 Pattern(i32 at)
+{
+    return (u8)((at * 7 + at / 251) & 0xFF);
+}
+
+static u8 Big[BIG_SIZE];
+
+/* What the bench's toy does with files, Files and Names of sys.c. */
+static void ServiceFiles(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Answer asked;
+    struct Moved moved;
+    struct FilePlace place;
+    struct FileStamp stamp;
+    struct FileAttr attr;
+    struct Device device;
+    u16 handle;
+    i32 at;
+    i32 wrong;
+
+    for (at = 0; at < BIG_SIZE; at++)
+        Big[at] = Pattern(at);
+    /* The bench: the first handle is 5; CLAUDE.md, step 6: what the
+       program makes is named in small letters. */
+    asked = DosFileCreate(dos, NAME("TOY.DAT"), 0);
+    CHECK(!asked.failed && asked.value == 5);
+    CHECK(HostHas("toy.dat") && !HostHas("TOY.DAT"));
+    handle = asked.value;
+    moved = DosFileWrite(dos, handle, Big, BIG_SIZE);
+    CHECK(!moved.failed && moved.count == BIG_SIZE && moved.error == 0);
+    place = DosFileSeek(dos, handle, 100);
+    CHECK(!place.failed && place.place == 100);
+    place = DosFileStep(dos, handle, 2, 0);
+    CHECK(!place.failed && place.place == 30000);
+    place = DosFileStep(dos, handle, 2, -10);
+    CHECK(!place.failed && place.place == 29990);
+    place = DosFileStep(dos, handle, 1, 5);
+    CHECK(!place.failed && place.place == 29995);
+    place = DosFileSeek(dos, handle, 0x12345678);
+    CHECK(!place.failed && place.place == 0x12345678);
+    /* The bench: a place to count from that there is not is DOS's 1, and
+       one of no handle 6, with the low word of what was asked above. */
+    place = DosFileStep(dos, handle, 3, 0x89AB);
+    CHECK(place.failed && place.place == 0x89AB0001);
+    place = DosFileSeek(dos, 99, 0x12345);
+    CHECK(place.failed && place.place == 0x23450006);
+    /* RBIL, INT 21h 42h: a step back from the start is a place far on. */
+    place = DosFileStep(dos, handle, 0, -1);
+    CHECK(!place.failed && place.place == 0xFFFFFFFF);
+    place = DosFileSeek(dos, handle, 20000);
+    CHECK(!place.failed && place.place == 20000);
+    /* The bench: none written cuts the file off. */
+    moved = DosFileWrite(dos, handle, Big, 0);
+    CHECK(!moved.failed && moved.count == 0);
+    place = DosFileStep(dos, handle, 2, 0);
+    CHECK(!place.failed && place.place == 20000);
+    asked = DosFileSetTime(dos, handle, 0x6000, 0x28D0);
+    CHECK(!asked.failed && asked.value == 0x5701);
+    stamp = DosFileTime(dos, handle);
+    CHECK(!stamp.failed && stamp.value == 0x5700 && stamp.time == 0x6000
+          && stamp.date == 0x28D0);
+    stamp = DosFileTime(dos, 99);
+    CHECK(stamp.failed && stamp.value == 6 && stamp.time == 0
+          && stamp.date == 0);
+    asked = DosFileSetTime(dos, 99, 0x6000, 0x28D0);
+    CHECK(asked.failed && asked.value == 6);
+    /* The bench: written, its time set, on C:. */
+    device = DosFileDevice(dos, handle);
+    CHECK(!device.failed && device.kind == 0x4002 && device.value == 0x4002);
+    asked = DosFileClose(dos, handle);
+    CHECK(!asked.failed && asked.value == 0x3E00);
+    asked = DosFileClose(dos, handle);
+    CHECK(asked.failed && asked.value == 6);
+
+    asked = DosFileOpen(dos, NAME("toy.dat"), 0);
+    CHECK(!asked.failed && asked.value == 5);
+    handle = asked.value;
+    device = DosFileDevice(dos, handle);
+    CHECK(!device.failed && device.kind == 0x0042);
+    memset(Big, 0, sizeof Big);
+    moved = DosFileRead(dos, handle, Big, BIG_SIZE);
+    CHECK(!moved.failed && moved.count == 20000);
+    for (at = wrong = 0; at < 20000; at++)
+        wrong += Big[at] != Pattern(at);
+    for (; at < BIG_SIZE; at++)
+        wrong += Big[at] != 0;
+    CHECK(wrong == 0);
+    moved = DosFileRead(dos, handle, Big, 100);
+    CHECK(!moved.failed && moved.count == 0);
+    /* RBIL, INT 21h 5701h: the time that was set is the file's once it
+       is closed, with what was written before it. */
+    stamp = DosFileTime(dos, handle);
+    CHECK(!stamp.failed && stamp.time == 0x6000 && stamp.date == 0x28D0);
+    moved = DosFileRead(dos, 99, Big, 5);
+    CHECK(moved.failed && moved.error == 6 && moved.count == 0);
+    moved = DosFileWrite(dos, handle, Big, 5);
+    CHECK(moved.failed && moved.error == 5 && moved.count == 0);
+    moved = DosFileWrite(dos, 99, Big, 5);
+    CHECK(moved.failed && moved.error == 6);
+    asked = DosFileClose(dos, handle);
+    CHECK(!asked.failed);
+    asked = DosFileOpen(dos, NAME("NONE.DAT"), 0);
+    CHECK(asked.failed && asked.value == 2);
+    asked = DosFileOpen(dos, NAME("NODIR\\X.DAT"), 0);
+    CHECK(asked.failed && asked.value == 3);
+    /* The bench: only the low byte of the mode counts, and what others
+       may do is not in the way. RBIL, INT 21h 3Dh: 0Ch for a mode that
+       there is not. */
+    asked = DosFileOpen(dos, NAME("TOY.DAT"), 0x0142);
+    CHECK(!asked.failed && asked.value == 5);
+    DosFileClose(dos, 5);
+    asked = DosFileOpen(dos, NAME("TOY.DAT"), 3);
+    CHECK(asked.failed && asked.value == 0x0C);
+
+    /* The bench, Names. */
+    attr = DosFileAttributes(dos, NAME("TOY.DAT"));
+    CHECK(!attr.failed && attr.value == 0x4300 && attr.attributes == 0x20);
+    attr = DosFileAttributes(dos, NAME("DOCS"));
+    CHECK(!attr.failed && attr.attributes == 0x10);
+    attr = DosFileAttributes(dos, NAME("NONE.DAT"));
+    CHECK(attr.failed && attr.value == 2 && attr.attributes == 0);
+    attr = DosFileAttributes(dos, NAME("NODIR\\X.DAT"));
+    CHECK(attr.failed && attr.value == 3);
+    asked = DosFileSetAttributes(dos, NAME("TOY.DAT"), 1);
+    CHECK(!asked.failed && asked.value == 1);
+    CHECK((HostMode("toy.dat") & 0222) == 0);
+    attr = DosFileAttributes(dos, NAME("TOY.DAT"));
+    CHECK(!attr.failed && attr.attributes == 0x21);
+    asked = DosFileDelete(dos, NAME("TOY.DAT"));
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileOpen(dos, NAME("TOY.DAT"), 1);
+    CHECK(asked.failed && asked.value == 5);
+    /* RBIL, INT 21h 3Ch: 5 for a file that is read-only. */
+    asked = DosFileCreate(dos, NAME("TOY.DAT"), 0);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileSetAttributes(dos, NAME("TOY.DAT"), 0);
+    CHECK(!asked.failed && asked.value == 0);
+    CHECK((HostMode("toy.dat") & 0200) != 0);
+    asked = DosFileSetAttributes(dos, NAME("NONE.DAT"), 0);
+    CHECK(asked.failed && asked.value == 2);
+    /* RBIL, INT 21h 4301h: no directory, no label. */
+    asked = DosFileSetAttributes(dos, NAME("TOY.DAT"), 0x10);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileRename(dos, NAME("TOY.DAT"), NAME("TOY2.DAT"));
+    CHECK(!asked.failed && asked.value == 0x5600);
+    CHECK(HostHas("toy2.dat") && !HostHas("toy.dat"));
+    asked = DosFileRename(dos, NAME("TOY.DAT"), NAME("TOY2.DAT"));
+    CHECK(asked.failed && asked.value == 2);
+    asked = DosFileRename(dos, NAME("TOY2.DAT"), NAME("HELLO.TXT"));
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileRename(dos, NAME("TOY2.DAT"), NAME("NODIR\\X.DAT"));
+    CHECK(asked.failed && asked.value == 3);
+    /* RBIL, INT 21h 56h: 11h across drives. */
+    asked = DosFileRename(dos, NAME("TOY2.DAT"), NAME("D:\\X.DAT"));
+    CHECK(asked.failed && asked.value == 0x11);
+    asked = DosFileDelete(dos, NAME("TOY2.DAT"));
+    CHECK(!asked.failed && asked.value == 0x4100);
+    asked = DosFileDelete(dos, NAME("TOY2.DAT"));
+    CHECK(asked.failed && asked.value == 2);
+    asked = DosFileDelete(dos, NAME("NODIR\\X.DAT"));
+    CHECK(asked.failed && asked.value == 3);
+    asked = DosFileCreate(dos, NAME("NODIR\\X.DAT"), 0);
+    CHECK(asked.failed && asked.value == 3);
+    asked = DosFileCreate(dos, NAME("DOCS"), 0);
+    CHECK(asked.failed && asked.value == 5);
+    /* A directory is not opened and not deleted as a file: DOS's 5
+       (RBIL, INT 21h 3Dh and 41h). */
+    asked = DosFileOpen(dos, NAME("DOCS"), 0);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileDelete(dos, NAME("DOCS"));
+    CHECK(asked.failed && asked.value == 5);
+    /* A name with * or ? names no file to make (RBIL, INT 21h 3Ch: 3). */
+    asked = DosFileCreate(dos, NAME("TOY?.DAT"), 0);
+    CHECK(asked.failed && asked.value == 3);
+    CHECK(!HostHas("toy?.dat"));
+    /* A name of the host that is no name of DOS's form is reached by its
+       alias (L1, fatgen103), and one in capitals by its own. */
+    asked = DosFileOpen(dos, NAME("LONGFI~1.TXT"), 0);
+    CHECK(!asked.failed);
+    moved = DosFileRead(dos, asked.value, Big, 100);
+    CHECK(!moved.failed && moved.count == 4 && memcmp(Big, "long", 4) == 0);
+    DosFileClose(dos, asked.value);
+    asked = DosFileOpen(dos, NAME("readme.txt"), 0);
+    CHECK(!asked.failed);
+    DosFileClose(dos, asked.value);
+}
+
+/* The bench, the end of Files: DOS's own five handles. RBIL, INT 21h
+   3Dh: 4 where the program's table of handles is full, 20 with DOS's. */
+static void ServiceHandles(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Answer asked;
+    struct Device device;
+    u16 handle;
+
+    device = DosFileDevice(dos, 0);
+    CHECK(!device.failed && device.kind == 0x80D3 && device.value == 0x80D3);
+    device = DosFileDevice(dos, 1);
+    CHECK(!device.failed && device.kind == 0x80D3);
+    device = DosFileDevice(dos, 4);
+    CHECK(!device.failed && device.kind == 0xA0C0);
+    device = DosFileDevice(dos, 99);
+    CHECK(device.failed && device.value == 6 && device.kind == 0);
+    for (handle = 5; handle < DOS_HANDLES; handle++) {
+        asked = DosFileOpen(dos, NAME("HELLO.TXT"), 0);
+        CHECK(!asked.failed && asked.value == handle);
+    }
+    asked = DosFileOpen(dos, NAME("HELLO.TXT"), 0);
+    CHECK(asked.failed && asked.value == 4);
+    asked = DosFileCreate(dos, NAME("MORE.TXT"), 0);
+    CHECK(asked.failed && asked.value == 4);
+    for (handle = 5; handle < DOS_HANDLES; handle++)
+        CHECK(!DosFileClose(dos, handle).failed);
+}
+
+/* What is no file and no directory, and a file of 4 GB or more:
+   emulate_posix.h says what is done with them, as the user decided
+   (TODO.md, L2). */
+static void ServiceOthers(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Answer asked;
+    struct Moved moved;
+    struct FilePlace place;
+    char path[600];
+    char target[600];
+
+    InTree("pipe", path);
+    CHECK(mkfifo(path, 0644) == 0);
+    asked = DosFileOpen(dos, NAME("PIPE"), 0);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileOpen(dos, NAME("PIPE"), 1);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileCreate(dos, NAME("PIPE"), 0);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileOpen(dos, NAME("C:\\DEV\\NULL"), 0);
+    CHECK(asked.failed && asked.value == 5);
+    InTree("dangling", path);
+    InTree("nowhere", target);
+    CHECK(symlink(target, path) == 0);
+    asked = DosFileOpen(dos, NAME("DANGLING"), 0);
+    CHECK(asked.failed && asked.value == 2);
+
+    /* A file of 5 GB, which the host holds without its bytes. */
+    if (!HostSized("large.bin", (off_t)5 << 30)) {
+        printf("posixcheck.c: no file of 5 GB in %s: its checks are left "
+               "out\n", Tree);
+        return;
+    }
+    /* Listed as the most that DOS can say; never opened to be read, so
+       that no copy of it is cut short: 5, as the program shows of a file
+       that it cannot open. */
+    asked = DosFindFirst(dos, NAME("LARGE.BIN"), 0);
+    CHECK(!asked.failed && Emulated.record->FilSize == 0xFFFFFFFF);
+    asked = DosFileOpen(dos, NAME("LARGE.BIN"), 0);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileOpen(dos, NAME("LARGE.BIN"), 2);
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosFileOpen(dos, NAME("LARGE.BIN"), 0x40);
+    CHECK(asked.failed && asked.value == 5);
+    /* To write alone it is opened, as the program does to set the date
+       and the time, and written no further than DOS's last place. */
+    asked = DosFileOpen(dos, NAME("LARGE.BIN"), 1);
+    CHECK(!asked.failed);
+    place = DosFileStep(dos, asked.value, 2, 0);
+    CHECK(!place.failed && place.place == 0xFFFFFFFF);
+    place = DosFileSeek(dos, asked.value, 0xFFFFFFF0);
+    CHECK(!place.failed);
+    moved = DosFileWrite(dos, asked.value, Big, 100);
+    CHECK(!moved.failed && moved.count == 15);
+    DosFileClose(dos, asked.value);
+    CHECK(HostSize("large.bin") == (off_t)5 << 30);
+
+    /* A file of FFFFFFFFh bytes is DOS's and is read to its end; grown
+       beyond it on the host while it is open, a read that would go past
+       DOS's last place is refused, 5, and one short of it is not. */
+    HostSized("edge.bin", (off_t)0xFFFFFFFF);
+    asked = DosFileOpen(dos, NAME("EDGE.BIN"), 0);
+    CHECK(!asked.failed);
+    DosFileSeek(dos, asked.value, 0xFFFFFFF0);
+    moved = DosFileRead(dos, asked.value, Big, 100);
+    CHECK(!moved.failed && moved.count == 15);
+    moved = DosFileRead(dos, asked.value, Big, 100);
+    CHECK(!moved.failed && moved.count == 0);
+    HostSized("edge.bin", (off_t)5 << 30);
+    DosFileSeek(dos, asked.value, 0xFFFFFFF0);
+    moved = DosFileRead(dos, asked.value, Big, 10);
+    CHECK(!moved.failed && moved.count == 10);
+    moved = DosFileRead(dos, asked.value, Big, 100);
+    CHECK(moved.failed && moved.error == 5 && moved.count == 0);
+    DosFileClose(dos, asked.value);
+}
+
+/* The bench, Older. */
+static void ServiceOlder(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Answer asked;
+    u8 to[DOS_PATH_ROOM];
+    u8 fcb[48];
+    u8 start[DOS_PATH_ROOM];
+    char expected[DOS_PATH_ROOM + 16];
+    size_t length;
+
+    memcpy(start, "C:\\", 4);
+    length = strlen((const char *)Emulated.current);
+    memcpy(start + 3, Emulated.current, length + 1);
+    memset(to, '#', sizeof to);
+    asked = DosFileTrueName(dos, NAME("HELLO.TXT"), to);
+    CHECK(!asked.failed && asked.value == 0);
+    snprintf(expected, sizeof expected, "%s\\HELLO.TXT", (const char *)start);
+    SAME(to, expected);
+    asked = DosFileTrueName(dos, NAME("hello.txt"), to);
+    CHECK(!asked.failed);
+    SAME(to, expected);
+    asked = DosFileTrueName(dos, NAME("DOCS\\..\\.\\hello.txt"), to);
+    CHECK(!asked.failed);
+    SAME(to, expected);
+    asked = DosFileTrueName(dos, NAME("C:\\NODIR\\X.DAT"), to);
+    CHECK(!asked.failed);
+    SAME(to, "C:\\NODIR\\X.DAT");
+    memset(to, '#', sizeof to);
+    asked = DosFileTrueName(dos, NAME("Q:X.DAT"), to);
+    CHECK(asked.failed && asked.value == 3 && to[0] == '#' && to[127] == '#');
+
+    memset(fcb, '#', sizeof fcb);
+    CHECK(DosFcbParse(dos, NAME("TOY?.DAT"), fcb, 1) == 0x2901);
+    CHECK(fcb[0] == 0 && memcmp(fcb + 1, "TOY?    DAT", 11) == 0);
+    CHECK(memcmp(fcb + 12, "\0\0\0\0####", 8) == 0);
+    CHECK(DosFcbParse(dos, NAME("HELLO.TXT"), fcb, 1) == 0x2900);
+    CHECK(fcb[0] == 0 && memcmp(fcb + 1, "HELLO   TXT", 11) == 0);
+    CHECK(DosFcbParse(dos, NAME("C:TOY?.DAT"), fcb, 1) == 0x2901);
+    CHECK(fcb[0] == 3 && memcmp(fcb + 1, "TOY?    DAT", 11) == 0);
+    CHECK(DosFcbParse(dos, NAME("Q:X.DAT"), fcb, 1) == 0x29FF);
+    CHECK(fcb[0] == 3 && memcmp(fcb + 1, "TOY?    DAT", 11) == 0);
+    fcb[0] = 2;
+    CHECK(DosFcbParse(dos, NAME("*.*"), fcb, 2) == 0x2901);
+    CHECK(fcb[0] == 2 && memcmp(fcb + 1, "???????????", 11) == 0);
+    /* RBIL, INT 21h 29h: separators skipped by bit 0; a name ends at a
+       character that a name may not have (COUNTRY.SYS, FCHAR). */
+    CHECK(DosFcbParse(dos, NAME(" ;a.b+c"), fcb, 1) == 0x2900);
+    CHECK(fcb[0] == 0 && memcmp(fcb + 1, "A       B  ", 11) == 0);
+
+    DosFileClose(dos, DosFileCreate(dos, NAME("TOY1.DAT"), 0).value);
+    DosFileClose(dos, DosFileCreate(dos, NAME("TOY2.DAT"), 0).value);
+    memset(fcb, 0, sizeof fcb);
+    DosFcbParse(dos, NAME("TOY?.DAT"), fcb, 1);
+    asked = DosFcbDelete(dos, fcb, false);
+    CHECK(!asked.failed && asked.value == 0x1300);
+    CHECK(!HostHas("toy1.dat") && !HostHas("toy2.dat"));
+    asked = DosFcbDelete(dos, fcb, false);
+    CHECK(!asked.failed && asked.value == 0x13FF);
+    asked = DosFcbDelete(dos, fcb, true);
+    CHECK(asked.failed && asked.value == 0x12);
+    /* An extended one, as the program deletes: hidden and system too
+       with 26h. RBIL, INT 21h 13h: a file that is read-only stays. */
+    HostFile(".toy3.dat", "hidden");
+    HostFile("toy4.dat", "plain");
+    DosFileClose(dos, DosFileCreate(dos, NAME("TOY5.DAT"), 1).value);
+    DosFcbParse(dos, NAME("TOY*.DAT"), fcb, 1);
+    asked = DosFcbDelete(dos, fcb, false);
+    CHECK(!asked.failed && asked.value == 0x1300);
+    CHECK(HostHas(".toy3.dat") && !HostHas("toy4.dat")
+          && HostHas("toy5.dat"));
+    fcb[0] = 0xFF;
+    fcb[6] = 0x26;
+    fcb[7] = 0;
+    DosFcbParse(dos, NAME("TOY*.DAT"), fcb + 7, 2);
+    asked = DosFcbDelete(dos, fcb, false);
+    CHECK(!asked.failed && asked.value == 0x1300);
+    CHECK(!HostHas(".toy3.dat") && HostHas("toy5.dat"));
+    DosFileSetAttributes(dos, NAME("TOY5.DAT"), 0);
+    DosFileDelete(dos, NAME("TOY5.DAT"));
+}
+
+/* The bench, Directories. */
+static void ServiceDirectories(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Answer asked;
+    u8 to[80];
+    u8 here[80];
+    char expected[160];
+
+    memset(to, 0, sizeof to);
+    asked = DosDirCurrent(dos, 0, here);
+    CHECK(!asked.failed && asked.value == 0x0100);
+    SAME(here, Emulated.current);
+    asked = DosDirCurrent(dos, 4, to);
+    CHECK(asked.failed && asked.value == 0x0F);
+    asked = DosDirCurrent(dos, 0x0303, to);
+    CHECK(!asked.failed);
+    SAME(to, here);
+    asked = DosDirCurrent(dos, 26, to);
+    CHECK(asked.failed && asked.value == 0x0F);
+    asked = DosDirMake(dos, NAME("NEWDIR"));
+    CHECK(!asked.failed && asked.value == 0x3900);
+    CHECK(HostHas("newdir"));
+    asked = DosDirMake(dos, NAME("NEWDIR"));
+    CHECK(asked.failed && asked.value == 5);
+    asked = DosDirMake(dos, NAME("NODIR\\X"));
+    CHECK(asked.failed && asked.value == 3);
+    asked = DosDirChange(dos, NAME("NEWDIR"));
+    CHECK(!asked.failed && asked.value == 0x3B00);
+    asked = DosDirCurrent(dos, 0, to);
+    CHECK(!asked.failed);
+    snprintf(expected, sizeof expected, "%s\\NEWDIR", (const char *)here);
+    SAME(to, expected);
+    snprintf(expected, sizeof expected, "C:\\%s\\NEWDIR",
+             (const char *)here);
+    asked = DosDirRemove(dos, NAME(expected));
+    CHECK(asked.failed && asked.value == 0x10);
+    asked = DosDirChange(dos, NAME(".."));
+    CHECK(!asked.failed && asked.value == 0x3B00);
+    asked = DosDirRemove(dos, NAME("NEWDIR"));
+    CHECK(!asked.failed && asked.value == 0x3A00);
+    CHECK(!HostHas("newdir"));
+    asked = DosDirRemove(dos, NAME("NEWDIR"));
+    CHECK(asked.failed && asked.value == 3);
+    asked = DosDirChange(dos, NAME("NEWDIR"));
+    CHECK(asked.failed && asked.value == 3);
+    asked = DosDirRemove(dos, NAME("DOCS"));
+    CHECK(asked.failed && asked.value == 5);
+    /* RBIL, INT 21h 3Bh: a file is no directory to go to. */
+    asked = DosDirChange(dos, NAME("HELLO.TXT"));
+    CHECK(asked.failed && asked.value == 3);
+}
+
+/* A search to its end, each name found behind the last, with its
+   attributes in two digits of hex behind a slash, at `to`: and the
+   error that ended it. */
+static u16 Listed(const char *pattern, u16 attributes, char *to,
+                  size_t room)
+{
+    struct Answer found;
+    size_t at = 0;
+    int wrote;
+
+    to[0] = '\0';
+    found = DosFindFirst(&Emulated, NAME(pattern), attributes);
+    while (!found.failed) {
+        CHECK(found.value == 0);
+        wrote = snprintf(to + at, room - at, "%s/%02X ",
+                         (const char *)Emulated.record->FilName,
+                         (unsigned)Emulated.record->FilAttr);
+        if (wrote < 0 || (size_t)wrote >= room - at)
+            break;
+        at += (size_t)wrote;
+        found = DosFindNext(&Emulated);
+    }
+    return found.value;
+}
+
+/* The bench, Finds, in a directory of the tree with the files that the
+   bench's has, and the order in which their names are given. */
+static void ServiceFinds(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Answer asked;
+    struct DTAs kept;
+    struct DTAs elsewhere;
+    char list[1024];
+    char path[600];
+
+    CHECK(!DosDirMake(dos, NAME("FINDS")).failed);
+    CHECK(!DosDirChange(dos, NAME("FINDS")).failed);
+    CHECK(!DosDirMake(dos, NAME("DOCS")).failed);
+    HostFile("finds/hello.txt", "Hello, world!\r\n");
+    HostFile("finds/readme.txt", "read me");
+    HostFile("finds/data", "no extension");
+    HostFile("finds/.hidden.txt", "hidden");
+    InTree("finds/dangling", path);
+    CHECK(symlink("nowhere", path) == 0);
+    /* . and .. first, as on a disk of DOS's (the bench); the names then
+       in the order of their bytes, and a name that begins with a dot
+       hidden and with a tail, the dot being lost (L1, fatgen103); 12h at
+       the end (the bench). */
+    CHECK(Listed("*.*", 0x37, list, sizeof list) == 0x12);
+    SAME(list, "./10 ../10 HIDDEN~1.TXT/22 DANGLING/20 DATA/20 DOCS/10 "
+               "HELLO.TXT/20 README.TXT/20 ");
+    /* RBIL, INT 21h 4Eh: no hidden file and no directory unless they are
+       searched for. */
+    CHECK(Listed("*.*", 0, list, sizeof list) == 0x12);
+    SAME(list, "DANGLING/20 DATA/20 HELLO.TXT/20 README.TXT/20 ");
+    CHECK(Listed("*.TXT", 0, list, sizeof list) == 0x12);
+    SAME(list, "HELLO.TXT/20 README.TXT/20 ");
+    /* L1: * without a dot names only names without an extension, as the
+       eleven characters of a file control block have it, . and .. among
+       them. */
+    CHECK(Listed("*", 0x37, list, sizeof list) == 0x12);
+    SAME(list, "./10 ../10 DANGLING/20 DATA/20 DOCS/10 ");
+    /* The bench: nothing found, a directory that is not there, and no
+       label. */
+    CHECK(Listed("NONE.*", 0x37, list, sizeof list) == 0x12);
+    SAME(list, "");
+    CHECK(Listed("C:\\NODIR\\*.*", 0x37, list, sizeof list) == 3);
+    CHECK(Listed("C:\\*.*", 8, list, sizeof list) == 0x12);
+    SAME(list, "");
+    /* The root has no . and no .. (RBIL, INT 21h 4Eh). */
+    asked = DosFindFirst(dos, NAME("C:\\*.*"), 0x37);
+    CHECK(!asked.failed && Emulated.record->FilName[0] != '.');
+    /* What a search found, of the record: the size, and a name that is
+       ended by zeros. */
+    asked = DosFindFirst(dos, NAME("HELLO.TXT"), 0);
+    CHECK(!asked.failed && Emulated.record->FilSize == 15
+          && Emulated.record->FilAttr == 0x20);
+    CHECK(memcmp(Emulated.record->FilName, "HELLO.TXT\0\0\0\0", 13) == 0);
+    asked = DosFindFirst(dos, NAME("DANGLING"), 0);
+    CHECK(!asked.failed && Emulated.record->FilSize == 0);
+
+    /* The bench: other things asked between two finds of one search. */
+    asked = DosFindFirst(dos, NAME("*.TXT"), 0);
+    CHECK(!asked.failed);
+    SAME(Emulated.record->FilName, "HELLO.TXT");
+    DosFileClose(dos, DosFileOpen(dos, NAME("README.TXT"), 0).value);
+    DosFileAttributes(dos, NAME("DOCS"));
+    asked = DosFindNext(dos);
+    CHECK(!asked.failed);
+    SAME(Emulated.record->FilName, "README.TXT");
+    /* The record of one search kept while another is made, and put
+       back. */
+    DosFindFirst(dos, NAME("*.TXT"), 0);
+    kept = *Emulated.record;
+    asked = DosFindFirst(dos, NAME("C:\\*.*"), 0x37);
+    CHECK(!asked.failed);
+    *Emulated.record = kept;
+    asked = DosFindNext(dos);
+    CHECK(!asked.failed);
+    SAME(Emulated.record->FilName, "README.TXT");
+    /* The record elsewhere, with what it held. */
+    DosFindFirst(dos, NAME("*.TXT"), 0);
+    elsewhere = *Emulated.record;
+    DosFindRecord(dos, &elsewhere);
+    asked = DosFindNext(dos);
+    CHECK(!asked.failed);
+    SAME(elsewhere.FilName, "README.TXT");
+    SAME(Emulated.own.FilName, "HELLO.TXT");
+    asked = DosFindNext(dos);
+    CHECK(asked.failed && asked.value == 0x12);
+    DosFindRecord(dos, &Emulated.own);
+    CHECK(!DosDirChange(dos, NAME("..")).failed);
+}
+
+/* The bench, the drives; DosSpaceOf against what emulate_posix.h says
+   of the shape, worked out by hand. */
+static void ServiceDrives(void)
+{
+    struct Dos *dos = &Emulated;
+    struct Space space;
+    struct Answer asked;
+    struct Device device;
+
+    CHECK(DosDriveCurrent(dos) == 2);
+    DosDriveSelect(dos, 3);
+    CHECK(DosDriveCurrent(dos) == 2);
+    space = DosSpaceOf(4096, 10000, 5000);
+    CHECK(space.value == 8 && space.sector == 512 && space.total == 10000
+          && space.free == 5000 && !space.failed);
+    space = DosSpaceOf(512, 1000, 10);
+    CHECK(space.value == 1 && space.total == 1000 && space.free == 10);
+    /* 4,096,000,000 bytes: 62,500 clusters of 64 KB. */
+    space = DosSpaceOf(4096, 1000000, 500000);
+    CHECK(space.value == 128 && space.total == 62500 && space.free == 31250);
+    /* 400 GB: the counts as far as 16 bits go. */
+    space = DosSpaceOf(4096, 100000000, 100000000);
+    CHECK(space.value == 128 && space.total == 0xFFFF
+          && space.free == 0xFFFF);
+    space = DosDriveSpace(dos, 0, false);
+    CHECK(!space.failed && space.value >= 1 && space.value <= 128
+          && (space.value & (space.value - 1)) == 0 && space.sector == 512
+          && space.total >= 1 && space.total <= 0xFFFF
+          && space.free <= space.total);
+    space = DosDriveSpace(dos, 3, true);
+    CHECK(space.failed && space.value == Emulated.error
+          && space.sector == 512);
+    space = DosDriveSpace(dos, 26, false);
+    CHECK(!space.failed && space.value == 0xFFFF && space.free == 0
+          && space.sector == 0 && space.total == 0x1A);
+    space = DosDriveSpace(dos, 26, true);
+    CHECK(space.failed && space.total == 0x1A);
+    asked = DosDriveLetter(dos, 3);
+    CHECK(!asked.failed && asked.value == 0x4400);
+    asked = DosDriveLetter(dos, 26);
+    CHECK(asked.failed && asked.value == 0x0F);
+    asked = DosDriveSetLetter(dos, 3);
+    CHECK(!asked.failed && asked.value == 0x4400);
+    asked = DosDriveSetLetter(dos, 1);
+    CHECK(asked.failed && asked.value == 0x0F);
+    device = DosDriveRemote(dos, 3);
+    CHECK(!device.failed && device.value == 0x0300 && device.kind == 0x08C2);
+    device = DosDriveRemote(dos, 26);
+    CHECK(device.failed && device.value == 0x0F && device.kind == 0);
+    asked = DosDriveFixed(dos, 3);
+    CHECK(!asked.failed && asked.value == 1);
+    asked = DosDriveFixed(dos, 26);
+    CHECK(asked.failed && asked.value == 0x0F);
+    CHECK(!DosDriveCd(dos, 2) && !DosDriveCd(dos, 0));
+}
+
+static void Services(void)
+{
+    const char *base = getenv("TMPDIR");
+    struct Answer started = { 3, true };
+    i32 tries;
+
+    /* The tree where the environment keeps temporary files, or in /tmp
+       where the program's path of that is longer than DOS holds. */
+    for (tries = 0; tries < 2 && started.failed; tries++) {
+        if (tries == 1 || base == NULL || base[0] != '/')
+            base = "/tmp";
+        snprintf(Tree, sizeof Tree, "%s/vcXXXXXX", base);
+        if (mkdtemp(Tree) == NULL)
+            continue;
+        DosBegin(&Emulated);
+        started = DosStartIn(&Emulated, Tree);
+        if (started.failed) {
+            DosEnd(&Emulated);
+            rmdir(Tree);
+        }
+    }
+    CHECK(!started.failed);
+    if (started.failed)
+        return;
+    HostFile("hello.txt", "Hello, world!\r\n");
+    HostFile("README.TXT", "read me");
+    HostFile("Long File Name.txt", "long");
+    CHECK(!DosDirMake(&Emulated, NAME("DOCS")).failed);
+    HostFile("docs/inside.txt", "inside");
+    ServiceFiles();
+    ServiceHandles();
+    ServiceOthers();
+    ServiceOlder();
+    ServiceDirectories();
+    ServiceFinds();
+    ServiceDrives();
+    DosEnd(&Emulated);
+    nftw(Tree, Removed, 16, FTW_DEPTH | FTW_PHYS);
+}
+
 int main(void)
 {
     CodePages();
@@ -675,6 +1423,7 @@ int main(void)
     Paths();
     Stamps();
     Errors();
+    Services();
     if (failures != 0) {
         printf("%d checks failed.\n", failures);
         return 1;

@@ -28,6 +28,7 @@ enter.c           clean
 exec.c            clean
 extfile.c         clean
 files.c           clean
+files_posix.c     clean
 find.c            clean
 find_t.c          clean
 format.c          clean

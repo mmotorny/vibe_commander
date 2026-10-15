@@ -28,6 +28,7 @@ enter.c           ENTRY 10, DSKBUF 10, MAIN_AS_PANEL 1
 exec.c            MD_PLACE 1, MD_AT 1
 extfile.c         none
 files.c           ENTRY 7, DSKBUF 7
+files_posix.c     none
 find.c            MD_BYTES 1, DSKBUF 3, MD_AT 1
 find_t.c          MD_AT 2, NUMBER 2
 format.c          none

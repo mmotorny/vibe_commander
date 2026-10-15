@@ -10,11 +10,17 @@
  * failure of the host's is. Each answers in DOS's terms, as sys.h has
  * them.
  *
- * Nothing here reads or writes a file, the terminal or the environment:
- * what the host has, a directory's names, the mode of a file, a time, the
- * variables of the environment, is handed in. So all of it is tried by
- * itself on the host, by harness/posixcheck.c, the test
- * portable_c-posix-unit.
+ * Nothing of that reads or writes a file, the terminal or the
+ * environment: what the host has, a directory's names, the mode of a
+ * file, a time, the variables of the environment, is handed in. So all
+ * of it is tried by itself on the host, by harness/posixcheck.c, the
+ * test portable_c-posix-unit.
+ *
+ * The last part, of the piece L2 (TODO.md, "L2, files, directories,
+ * drives"), is DOS's services for files, directories and drives
+ * themselves, which do ask the host: struct Dos and the functions of
+ * files_posix.c. The same test tries them on a tree of its own that it
+ * makes in a temporary directory.
  *
  * On Linux there is one drive, C:, the root of the host's file system,
  * and one code page, 437, always, and nothing of either is a setting, on
@@ -27,6 +33,7 @@
 #ifndef EMULATE_POSIX_H
 #define EMULATE_POSIX_H
 
+#include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
@@ -239,6 +246,14 @@ void DirectoriesBegin(struct Directories *directories, DirectoryRead *read,
                       void *context);
 void DirectoriesEnd(struct Directories *directories);
 
+/* The number of a directory of the host, by its path from the root, in
+   the table: it is read where it is new, and read again where `again`
+   says so. The number stays the directory's for the run, whatever is
+   added to the table. Answers -1 with errno where the directory cannot
+   be read, and with ENOMEM where the memory ran out. */
+i32 DirectoryNumber(struct Directories *directories, const char *path,
+                    bool again);
+
 /* The path of the host that a full path of DOS's leads to, at `to`,
    which has room for `room` bytes: the root, which is C:, and for each
    name the name of the host that it leads to in the directory before it;
@@ -296,5 +311,166 @@ void DosStampToLocal(struct DosStamp stamp, struct tm *local);
  * failure.
  */
 u16 DosErrorOf(int error, bool path);
+
+/*
+ * DOS's services for files, directories and drives, on the host's files:
+ * the piece L2. Each is the function of sys.h of the same name behind
+ * Dos, with the emulation's state in front, and answers as sys.h says
+ * and as the bench's DOS, FreeDOS 1.4, answers there, AX as it leaves it
+ * too where nothing failed (harness/trial32/asked.py shows that of every
+ * function; the test names it at each check). The binding of sys.h for
+ * Linux has one struct Dos and calls each in a line:
+ *
+ *     struct Answer FileOpen(const u8 *name, u16 mode)
+ *     {
+ *         return DosFileOpen(&Emulated, name, mode);
+ *     }
+ *
+ * and the Bare functions of sys.h call the same function as the others:
+ * the host has no device that asks the program what to do, so a call
+ * that the program would have asked about fails as it is, with its
+ * error. What the host answers that DOS has no number for is DOS's 1Fh,
+ * a general failure (DosErrorOf). A call that the host interrupts, EINTR,
+ * is made again.
+ *
+ * What a name of the program leads to is HostPathOfDos's: a name of
+ * DOS's form, an alias, or for a file or a directory that is made, the
+ * name in small letters. DOS's attributes are DosAttributes': a file of
+ * the host is read-only where the mode's bits say that the program may
+ * not write it, and DOS refuses then to open it to write, to make it
+ * anew and to delete it, whoever the program runs as. A directory entry
+ * that is no file and no directory, a FIFO, a socket or a device, is
+ * listed as a file with what its status says, and is not opened: DOS's
+ * 5, as for a directory. A link that leads nowhere is listed by its own
+ * status and is not found when it is opened.
+ *
+ * A file of DOS is shorter than 4 GB: its size is 32 bits, on the user's
+ * word that it stays so (CLAUDE.md, step 6). A file of the host that is
+ * not is listed as FFFFFFFFh bytes long, the most that DOS has, and is
+ * never copied or moved cut short, on the user's word too: it is not
+ * opened to be read, DOS's 5, access denied, and a read that would go
+ * past DOS's last place in a file that has grown beyond it since it was
+ * opened is refused the same way (Opened and DosFileRead of
+ * files_posix.c say why there). Opened to write alone, as the program
+ * does to set its date and time, it is written no further than that
+ * place, a write that would go beyond writing what fits, as on a disk
+ * that is full.
+ */
+
+/* The handles of a program, as DOS's table of them in a program's
+   prefix has room for by default; the first five are DOS's own, for the
+   console, the serial port and the printer, which a program has when it
+   starts. */
+#define DOS_HANDLES 20
+#define DOS_STANDARD 5
+
+/* What one handle is. */
+struct DosHandle {
+    int fd;                             /* the host's, or -1 for one of
+                                           DOS's own */
+    u16 access;                         /* 0 to read, 1 to write, 2 both */
+    u16 kind;                           /* of a device, what FileDevice
+                                           answers */
+    bool open;
+    bool written;                       /* since it was opened */
+    bool stamped;                       /* a time was set for it: it is
+                                           set again when it is closed, as
+                                           DOS has it then */
+    struct DosStamp stamp;
+};
+
+/* The current directory of C: as DirCurrent answers it, 63 characters at
+   the most and the zero: a path that DOS's 64 bytes do not hold is not
+   made the current one. */
+#define DOS_CURRENT_ROOM 64
+
+struct Dos {
+    struct Directories directories;
+    u8 current[DOS_CURRENT_ROOM];       /* without the drive and the first
+                                           backslash */
+    struct DosHandle handles[DOS_HANDLES];
+    struct DTAs *record;                /* of FindRecord, or `own` */
+    struct DTAs own;                    /* the record before FindRecord
+                                           has named one, as DOS has it in
+                                           the program's prefix */
+    u16 error;                          /* the error of the last call that
+                                           failed, which DOS answers to a
+                                           program that asks for it */
+};
+
+/* The state that the emulation begins with: C: the current drive, its
+   root the current directory, DOS's five handles open, no record. And
+   what it holds given back, every handle that is still open closed. */
+void DosBegin(struct Dos *dos);
+void DosEnd(struct Dos *dos);
+
+/* The directory of the host that the program is started in, from its
+   root, made the current directory of C:, as the program's path of it
+   is (DosPathOfHost). Answers DOS's error 3 where that path is longer
+   than DOS holds, and the current directory is not changed then. */
+struct Answer DosStartIn(struct Dos *dos, const char *path);
+
+/* Files. */
+struct Answer DosFileCreate(struct Dos *dos, const u8 *name,
+                            u16 attributes);
+struct Answer DosFileOpen(struct Dos *dos, const u8 *name, u16 mode);
+struct Answer DosFileClose(struct Dos *dos, u16 handle);
+struct Moved DosFileRead(struct Dos *dos, u16 handle, u8 *to, i32 count);
+struct Moved DosFileWrite(struct Dos *dos, u16 handle, const u8 *from,
+                          i32 count);
+struct FilePlace DosFileSeek(struct Dos *dos, u16 handle, u32 place);
+struct FilePlace DosFileStep(struct Dos *dos, u16 handle, u16 from,
+                             i32 step);
+struct Answer DosFileDelete(struct Dos *dos, const u8 *name);
+struct Answer DosFileRename(struct Dos *dos, const u8 *from, const u8 *to);
+struct FileAttr DosFileAttributes(struct Dos *dos, const u8 *name);
+struct Answer DosFileSetAttributes(struct Dos *dos, const u8 *name,
+                                   u16 attributes);
+struct FileStamp DosFileTime(struct Dos *dos, u16 handle);
+struct Answer DosFileSetTime(struct Dos *dos, u16 handle, u16 time,
+                             u16 date);
+struct Device DosFileDevice(struct Dos *dos, u16 handle);
+struct Answer DosFileTrueName(struct Dos *dos, const u8 *name, u8 *to);
+
+/* Files by a file control block. */
+u16 DosFcbParse(struct Dos *dos, const u8 *name, u8 *fcb, u16 how);
+struct Answer DosFcbDelete(struct Dos *dos, const u8 *fcb, bool flagged);
+
+/* Directories. */
+void DosFindRecord(struct Dos *dos, struct DTAs *record);
+struct Answer DosFindFirst(struct Dos *dos, const u8 *pattern,
+                           u16 attributes);
+struct Answer DosFindNext(struct Dos *dos);
+struct Answer DosDirMake(struct Dos *dos, const u8 *name);
+struct Answer DosDirRemove(struct Dos *dos, const u8 *name);
+struct Answer DosDirChange(struct Dos *dos, const u8 *name);
+struct Answer DosDirCurrent(struct Dos *dos, u16 drive, u8 *to);
+
+/* Drives. C: is the one there is; it is fixed, of no network and no
+   CD-ROM, and shares its unit with no other letter.
+
+   How much room it has is that of the host's file system of its current
+   directory, by statvfs: what is free to the program, in DOS's shape,
+   which has no more than 16 bits for a count, as DOS answers INT 21h 36h.
+   A sector is 512 bytes; a cluster is as many sectors as the host's
+   block has, a power of two, and twice as many for as long as the
+   clusters of the drive do not fit 16 bits, up to 128 sectors, 64 KB, as
+   the program shows (src/portable_c/DEVIATIONS.md, 26); a count that does
+   not fit even then is FFFFh. So a drive shows 4 GB less 64 KB at the
+   most, of room and of room that is free. */
+u16 DosDriveCurrent(struct Dos *dos);
+void DosDriveSelect(struct Dos *dos, u16 drive);
+struct Space DosDriveSpace(struct Dos *dos, u16 drive, bool flagged);
+struct Answer DosDriveLetter(struct Dos *dos, u16 drive);
+struct Answer DosDriveSetLetter(struct Dos *dos, u16 drive);
+struct Device DosDriveRemote(struct Dos *dos, u16 drive);
+struct Answer DosDriveFixed(struct Dos *dos, u16 drive);
+bool DosDriveCd(struct Dos *dos, u16 drive);
+
+/* The room of a drive in DOS's shape, of a file system of `block` bytes
+   to a block with `blocks` blocks of which `free` are free to the
+   program, as DosDriveSpace answers it: by itself, so that it is tried
+   with file systems that the host where it is tried has not. */
+struct Space DosSpaceOf(u32 block, uint64_t blocks, uint64_t free);
 
 #endif
