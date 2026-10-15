@@ -425,6 +425,43 @@ static struct Edited Unchanged(i32 column)
     return edited;
 }
 
+/* E01_00, Left and Ctrl-S: the cursor a column back. */
+static struct Edited E01_00(i32 cursor)
+{
+    if (cursor == 0)
+        return Unchanged(cursor);
+    return Changed(cursor - 1);
+}
+
+/* E02_00, Right and Ctrl-D: the cursor a column on, within the text. */
+static struct Edited E02_00(const u8 *text, i32 cursor)
+{
+    if (text[cursor] == 0)
+        return Unchanged(cursor);
+    return Changed(cursor + 1);
+}
+
+/* E00_05: what is between the columns `cursor` and `from` of `text`
+   is taken out. */
+static struct Edited E00_05(u8 *text, i32 cursor, i32 from)
+{
+    u8 *to = text + cursor;
+
+    do
+        *to++ = text[from];
+    while (text[from++] != 0);
+    return Changed(cursor);
+}
+
+/* E08_00, Del and Ctrl-G, and Backspace behind its step back: the
+   character at the cursor is taken out. */
+static struct Edited E08_00(u8 *text, i32 cursor)
+{
+    if (text[cursor] == 0)
+        return Unchanged(cursor);
+    return E00_05(text, cursor, cursor + 1);
+}
+
 /* Have a line that is typed into take a key: `text` is the line, in the
    main data, with room for `length` characters and a zero byte, and
    `cursor` the column of the cursor in it. Returns the column of the
@@ -435,42 +472,70 @@ static struct Edited Unchanged(i32 column)
 struct Edited EdLin(u16 key, u8 *text, i32 cursor, i32 length)
 {
     u16 low = key & 0xFF;
-    i32 from, count;
+    i32 count;
     u8 *to;
 
     if (md.Quote != 0) {                /* E00_03 */
         md.Quote = 0;
         if (low == 0)
             return Unchanged(cursor);
-        goto E00_01;
-    }
-    /* A key without a scan code is a character, and none of these. */
-    if (key >> 8 != 0) {
+        /* on to E00_01 */
+    } else if (key >> 8 != 0) {
+        /* A key without a scan code is a character, and none of these. */
         if (low == 0) {
             switch (key >> 8) {
-            case 0x4B: goto E01_00;     /* Left */
-            case 0x4D: goto E02_00;     /* Right */
-            case 0x73: goto E03_00;     /* Ctrl-Left */
-            case 0x74: goto E04_00;     /* Ctrl-Right */
+            case 0x4B:                  /* Left */
+                return E01_00(cursor);
+            case 0x4D:                  /* Right */
+                return E02_00(text, cursor);
+            case 0x73:                  /* Ctrl-Left: E03_00 */
+                return Changed(EdSub1(text, cursor));
+            case 0x74:                  /* Ctrl-Right: E04_00 */
+                return Changed(EdSub2(text, cursor));
             case 0x47:                  /* Home */
-            case 0x77: goto E05_00;     /* Ctrl-Home */
+            case 0x77:                  /* Ctrl-Home: E05_00 */
+                return Changed(0);
             case 0x4F:                  /* End */
-            case 0x75: goto E06_00;     /* Ctrl-End */
-            case 0x53: goto E08_00;     /* Del */
+            case 0x75:                  /* Ctrl-End: E06_00 */
+                /* Where the text ends, looked for in the line and one
+                   more. */
+                cursor = 0;
+                for (count = length + 1; count != 0; count--)
+                    if (text[cursor++] == 0)
+                        break;
+                return Changed(cursor - 1);
+            case 0x53:                  /* Del */
+                return E08_00(text, cursor);
             }
         } else {
             switch (low) {
-            case 0x13: goto E01_00;     /* Ctrl-S */
-            case 0x04: goto E02_00;     /* Ctrl-D */
-            case 0x01: goto E03_00;     /* Ctrl-A */
-            case 0x06: goto E04_00;     /* Ctrl-F */
-            case 0x08: goto E07_00;     /* Backspace */
-            case 0x07: goto E08_00;     /* Ctrl-G */
-            case 0x19: goto E09_00;     /* Ctrl-Y */
-            case 0x0B: goto E10_00;     /* Ctrl-K */
+            case 0x13:                  /* Ctrl-S */
+                return E01_00(cursor);
+            case 0x04:                  /* Ctrl-D */
+                return E02_00(text, cursor);
+            case 0x01:                  /* Ctrl-A: E03_00 */
+                return Changed(EdSub1(text, cursor));
+            case 0x06:                  /* Ctrl-F: E04_00 */
+                return Changed(EdSub2(text, cursor));
+            case 0x08:                  /* Backspace: E07_00 */
+                if (cursor == 0)
+                    return Unchanged(cursor);
+                return E08_00(text, cursor - 1);
+            case 0x07:                  /* Ctrl-G */
+                return E08_00(text, cursor);
+            case 0x19:                  /* Ctrl-Y: E09_00, all of the line */
+                text[0] = 0;
+                return Changed(0);
+            case 0x0B:                  /* Ctrl-K: E10_00, the rest of it */
+                text[cursor] = 0;
+                return Changed(cursor);
             case 0x17:                  /* Ctrl-W */
-            case 0x7F: goto E11_00;     /* Ctrl-Backspace */
-            case 0x14: goto E12_00;     /* Ctrl-T */
+            case 0x7F:                  /* Ctrl-Backspace: E11_00, back to
+                                           where the word begins */
+                return E00_05(text, EdSub1(text, cursor), cursor);
+            case 0x14:                  /* Ctrl-T: E12_00, up to where it
+                                           ends */
+                return E00_05(text, cursor, EdSub2(text, cursor));
             case 0x11:                  /* Ctrl-Q */
                 md.Quote = 1;
                 return Unchanged(cursor);
@@ -481,7 +546,7 @@ struct Edited EdLin(u16 key, u8 *text, i32 cursor, i32 length)
     } else if (low == 0) {
         return Unchanged(cursor);
     }
-E00_01:                                 /* a character */
+    /* E00_01: a character */
     if (cursor >= length) {
         Beep();
         return Unchanged(cursor);
@@ -494,55 +559,6 @@ E00_01:                                 /* a character */
     text[length] = 0;
     text[cursor] = (u8)low;
     return Changed(cursor + 1);
-
-E01_00:                                 /* Left, Ctrl-S */
-    if (cursor == 0)
-        return Unchanged(cursor);
-    return Changed(cursor - 1);
-E02_00:                                 /* Right, Ctrl-D */
-    if (text[cursor] == 0)
-        return Unchanged(cursor);
-    return Changed(cursor + 1);
-E03_00:                                 /* Ctrl-Left, Ctrl-A */
-    return Changed(EdSub1(text, cursor));
-E04_00:                                 /* Ctrl-Right, Ctrl-F */
-    return Changed(EdSub2(text, cursor));
-E05_00:                                 /* Home */
-    return Changed(0);
-E06_00:                                 /* End: where the text ends, looked
-                                           for in the line and one more */
-    cursor = 0;
-    for (count = length + 1; count != 0; count--)
-        if (text[cursor++] == 0)
-            break;
-    return Changed(cursor - 1);
-E07_00:                                 /* Backspace */
-    if (cursor == 0)
-        return Unchanged(cursor);
-    cursor--;
-E08_00:                                 /* Del, Ctrl-G */
-    if (text[cursor] == 0)
-        return Unchanged(cursor);
-    from = cursor + 1;
-    goto E00_05;
-E09_00:                                 /* Ctrl-Y: all of the line */
-    cursor = 0;
-E10_00:                                 /* Ctrl-K: the rest of it */
-    text[cursor] = 0;
-    return Changed(cursor);
-E11_00:                                 /* Ctrl-Backspace, Ctrl-W: back to
-                                           where the word begins */
-    from = cursor;
-    cursor = EdSub1(text, cursor);
-    goto E00_05;
-E12_00:                                 /* Ctrl-T: up to where it ends */
-    from = EdSub2(text, cursor);
-E00_05:                                 /* take out what is between */
-    to = text + cursor;
-    do
-        *to++ = text[from];
-    while (text[from++] != 0);
-    return Changed(cursor);
 }
 
 /* The speed search: look for the next name that begins with what has
