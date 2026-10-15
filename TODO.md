@@ -19872,7 +19872,7 @@ and are compared, where 27 were stopped; no sanitizer says anything
 more in any of them. What they still differ in is L3b's: the order of
 the files and the setup file.
 
-### L7, the last of Linux: half done
+### L7, the last of Linux: done
 
 The last piece of step 6, a commit for each part:
 
@@ -19924,6 +19924,20 @@ The last piece of step 6, a commit for each part:
    after five seconds, the program's output read meanwhile. What it
    proves is the same: a program that Ctrl-C ended (Z, or gone) or
    Ctrl-Z stopped (T) is never asleep again.
+5. **A last pass of the sanitizers**: `python3 harness/compare.py` took
+   `posix-asan/vc` through the 118 scenarios that the program for Linux
+   is taken through, as the test does, and `posix-msan/vc` (built by
+   its name) through the same, once, for the audit: every one as the
+   original with what is declared, and neither sanitizer said anything.
+   Nothing was to mend.
+
+L7: done. With it Linux, step 6 of the road, is done: the program for
+Linux runs in a terminal, emulating DOS behind `sys.h`, judged by the
+scenarios with its masks, cuts and not-runs each declared in an entry
+of Linux of `DEVIATIONS.md`, and held to clang's warnings, clang-tidy
+and the sanitizers. What the user left open there stays as `DEVIATIONS.md`
+says it (the tree's order, NUL, the panels off without what the
+commands wrote, the wheel). Step 7, the web page, is next.
 
 ## SORT, the bench sorted by name: the plan
 
