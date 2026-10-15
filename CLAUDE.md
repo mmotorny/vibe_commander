@@ -388,7 +388,10 @@ These held while `src/c/` was made, and they say what it is.
   one, which in the original makes the menu 0 and reads in front of
   the table of the menus and behind it, opens the menu under the
   pointer, as the original meant: a bug of the original fixed and
-  declared, decided the same day. Of a help file that is broken,
+  declared, decided the same day; and the other way to the menu 0, the
+  button held on the bar, the pointer moved off the names and the
+  button let go there or moved below the bar, leaves the bar, as
+  letting go elsewhere does. Of a help file that is broken,
   decided the same day: where its numbers of lines run past 65,535,
   the help wraps them as the original does; and an entry that says its
   text has no bytes, for which the program of 32 bits would write 64K
