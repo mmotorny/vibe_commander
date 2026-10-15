@@ -324,16 +324,33 @@ function(add_portable_c target directory)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
-    # The files in the order of their names, and dos32.c, the file of
+    # Which files are of this build. The tree has the program's common
+    # code, which every implementation of sys.h is built with, and the
+    # files of each implementation, which only its own build takes: a
+    # file whose name ends in _<implementation>.c is that
+    # implementation's, and every other file is common. This build is
+    # the implementation for DOS, _dos.c: sys_dos.c, the system's
+    # functions, and stack_dos.c, the stack in a segment of its own. A
+    # file of another implementation, one of those named here, is left
+    # out; a file of a new implementation is named here when it is
+    # added, or it is taken for common code. (A file of tables ends in
+    # _t.c, which is common code and no implementation.)
+    set(implementations dos stub posix)
+    foreach(implementation ${implementations})
+        if(NOT implementation STREQUAL "dos")
+            list(FILTER c_files EXCLUDE REGEX "_${implementation}\\.c$")
+        endif()
+    endforeach()
+    # The files in the order of their names, and sys_dos.c, the file of
     # the system's functions, behind them all: the linker's command,
     # below, says why it was, and that nothing rests on it now.
-    if(NOT dos32.c IN_LIST c_files)
+    if(NOT sys_dos.c IN_LIST c_files)
         message(FATAL_ERROR
-            "src/portable_c/dos32.c is named in CMakeLists.txt and is not "
+            "src/portable_c/sys_dos.c is named in CMakeLists.txt and is not "
             "there: the file that is to be linked last has another name")
     endif()
-    list(REMOVE_ITEM c_files dos32.c)
-    list(APPEND c_files dos32.c)
+    list(REMOVE_ITEM c_files sys_dos.c)
+    list(APPEND c_files sys_dos.c)
     # -3r    code for the 386, with arguments in registers
     # -mf    the flat model: one segment of code and one of data, and a
     #        pointer is an offset of 32 bits
@@ -392,8 +409,8 @@ function(add_portable_c target directory)
     # is in no file of this repository; its licence is, LICENSE.DOS32A.
     # The linker's file of systems for Linux knows no `dos32a`, so the
     # format and the stub are said here. The extender enters the program
-    # at Start of dos32.c, on the stack that the header of the file
-    # names, which is the segment of the class STACK, of stack.c.
+    # at Start of sys_dos.c, on the stack that the header of the file
+    # names, which is the segment of the class STACK, of stack_dos.c.
     #
     # The order of the segments is said here, by their classes, and the
     # tests rest on it:
@@ -416,7 +433,7 @@ function(add_portable_c target directory)
     #   in it, counted from 64K below the main data, and the tables had
     #   to lie within 32K of Title_S of main_t.c, IniSave of setup.c
     #   within 64K of md, and the program within the megabyte that a
-    #   segment could name. dos32.c is linked last as it was for that, so
+    #   segment could name. sys_dos.c is linked last as it was for that, so
     #   that its variables are behind everything else that has none:
     #   nothing rests on it now, and it leaves the program as it was.
     # - The machine of the tests is many times slower at a write to a

@@ -87,7 +87,7 @@ static void Shorter(u32 by)
 }
 
 /* Run the file with the tail, in real mode, with the toy's own
-   environment named: see Run of the portable C's dos32.c for why. */
+   environment named: see Run of the portable C's sys_dos.c for why. */
 static void Run(u8 *low, u16 segment, u16 environment,
                 const char *name, const char *tail)
 {

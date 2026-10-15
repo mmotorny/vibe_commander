@@ -14,7 +14,7 @@
  * md is the main data, its variables are variables, and what it wants
  * of DOS it asks through sys.h. Nothing that DOS enters is here: where
  * the program begins and where DOS goes on when it has ended the
- * program are the system's, in dos32.c.
+ * program are the system's, in sys_dos.c.
  *
  * Two things are here. The first is what the program does before
  * anything else, Alloc3: it looks at the version of DOS and keeps no more
@@ -162,7 +162,7 @@ void Exit00(u16 code)
    program is entered then, and the registers that the program which
    started this one goes on with, which the scenario ended shows, are
    the system's to leave. On DOS the system has the PSP name a routine
-   of its own for that: a few instructions of real mode that dos32.c
+   of its own for that: a few instructions of real mode that sys_dos.c
    keeps below the megabyte. This was TakeDos while it took INT 21h as
    well.
 
@@ -330,7 +330,7 @@ static NO_RETURN void Alloc9(void)
    system: Main of main.c calls this when the system has entered the
    program. It is the original's Alloc0 from its label Alloc3 on; what
    stands in front of that label there, and where DOS enters the
-   program, is the system's: Start of dos32.c.
+   program, is the system's: Start of sys_dos.c.
 
    DOS has to be 3.20 at the least. DOS has given the program all of the
    memory: its block is made as long as the program is, MemOwn, and the

@@ -11,7 +11,7 @@ again, and asked further.
 
 Since then one toy has been added that is of the work itself: `sys.c`,
 which asks the system's functions of the portable C,
-`src/portable_c/dos32.c`, with `asked.py` to run it. While the portable
+`src/portable_c/sys_dos.c`, with `asked.py` to run it. While the portable
 C was a program of 16 bits as well, it held those functions against the
 ones of that program, `dos.c`, and the script was `both.py`.
 
@@ -93,7 +93,7 @@ the finding: see `csover.c`.
 | `csover.c` | The fault of QEMU that stops CauseWay, shown without CauseWay |
 | `cwtables.c` | For CauseWay only: its tables read before its fault; it does not end, so `--limit 5` |
 | `hello.c` | The one program with Open Watcom's C library: `build.sh hello cw` |
-| `sys.c`, `asked.py` | The functions of the portable C's `sys.h`, each asked and what it answers written out, with the program's `dos32.c`. `asked.py` builds the toy, runs it on the bench and prints its pages; see its top, and the top of `sys.c`. It was built both ways, with the `dos.c` of the 16-bit program too, and the two had to write the same, until that build went |
+| `sys.c`, `asked.py` | The functions of the portable C's `sys.h`, each asked and what it answers written out, with the program's `sys_dos.c`. `asked.py` builds the toy, runs it on the bench and prints its pages; see its top, and the top of `sys.c`. It was built both ways, with the `dos.c` of the 16-bit program too, and the two had to write the same, until that build went |
 | `depth.c` | How much of the program's own stack the extender writes below the stack pointer during a call of DOS, of the BIOS, of the mouse and of real mode, and for the timer's interrupts |
 | `ended.asm` | Real mode: DOS ends a program by another's hand, as the scenario `ended` has it, and what is left then of a program of 32 bits and of its extender. Its top says how it is run and what it writes |
 | `copies.c` | A copy of the toy run from the toy through the shell, and one from that: each with an `AutoTim`, a `Clock` and a stack of its own, elsewhere above the megabyte. `harness/drivercheck.py` holds the driver to it; by hand, steps of `t c o r q`, as its top has them |

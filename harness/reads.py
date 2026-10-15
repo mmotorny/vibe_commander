@@ -105,9 +105,9 @@ SETUP_PLACES = (("bars.c", "StKeyB_T"), ("bars.c", "StKeyC_T"),
 # The file of the system's functions, by the kind of program that a
 # tree is: whether the program is a flat one of 32 bits -> the file. A
 # tree has one of the two, the C translation dos.c and the portable C
-# dos32.c, and what REVIEWED has for the other is not held against the
+# sys_dos.c, and what REVIEWED has for the other is not held against the
 # program.
-SYSTEM_FILE = {False: "dos.c", True: "dos32.c"}
+SYSTEM_FILE = {False: "dos.c", True: "sys_dos.c"}
 
 # A file of code that a tree has under another name than the C
 # translation, which is the name that REVIEWED and GONE have it by: tree
@@ -251,9 +251,9 @@ REVIEWED = {
                                       "zero"),
     **{("resident.c", text): (ZERO, "OutStr0 writes it as far as its zero")
        for text in ("NoRun_S", "FnFil_S", "BadFl_S", "Retr_S", "Aloc_S")},
-    ("dos32.c", "Ended_T"): (OWN, "ProgramEndedTake copies it whole, by "
+    ("sys_dos.c", "Ended_T"): (OWN, "ProgramEndedTake copies it whole, by "
                                   "its size"),
-    ("dos32.c", "NoStart_S"): (35, "DOS writes it as far as its dollar "
+    ("sys_dos.c", "NoStart_S"): (35, "DOS writes it as far as its dollar "
                                    "sign, which is its last byte but the "
                                    "zero"),
     ("start.c", "NcEnv"): (OWN, "compared at its size"),

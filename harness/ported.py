@@ -1088,7 +1088,7 @@ BATCHES = [
         # FatErr is an interrupt function, which DOS calls and no stub:
         # it begins by loading DS with a number that is relocated, which
         # coverage.py knows of. In the portable C the entry alone is
-        # the system's, DeviceEntry of dos32.c (see RENAMED below), and
+        # the system's, DeviceEntry of sys_dos.c (see RENAMED below), and
         # calls FtErr1 of main.c, which the program hands the system.
         routines=("FatErr",),
         functions=("FatErr",),
@@ -1239,7 +1239,7 @@ SETUP_BATCHES = [
             0x109C:
                 "what the setup program has Ctrl-C and Ctrl-Break go to, "
                 "a routine that only returns: the one program has its "
-                "own, NothingEntry of dos32.c",
+                "own, NothingEntry of sys_dos.c",
         },
     ),
     Batch(
@@ -1356,7 +1356,7 @@ GONE = {
             "where DOS goes on when it has ended the program by another "
             "program's hand: under an extender nothing of the program "
             "can run then, and DOS goes on in a few instructions of real "
-            "mode that dos32.c keeps below the megabyte, Ended_T there, "
+            "mode that sys_dos.c keeps below the megabyte, Ended_T there, "
             "which are bytes of a table and no function. That they ran "
             "is held by what the scenario ended shows of the registers"),
         "T62_00_c": "the address of the first line on the editor's "
@@ -1377,12 +1377,12 @@ RENAMED = {
                       "part in the portable C"),
         "FatErr": ("DeviceEntry_", "the entry of DOS's critical error, "
                    "which the portable C takes through its extender: "
-                   "DeviceEntry of dos32.c, a routine of that file's own, "
+                   "DeviceEntry of sys_dos.c, a routine of that file's own, "
                    "which the extender enters from real mode where DOS "
                    "enters FatErr of the original, an interrupt's "
                    "routine"),
         "Alloc0": ("Start_", "where the program is entered, by the "
-                   "extender and not by DOS: Start of dos32.c, which "
+                   "extender and not by DOS: Start of sys_dos.c, which "
                    "calls Main"),
     },
 }

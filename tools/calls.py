@@ -4,7 +4,7 @@ interrupt.
 
 The portable C asks the system through the functions of its sys.h, which
 say what is asked and not how (see CLAUDE.md, "Moving a file to the
-system's functions"), and its dos32.c alone knows a register. The C
+system's functions"), and its sys_dos.c alone knows a register. The C
 translation fills a structure of registers and hands it to an interrupt
 from every file, and so did each file of the portable C until it went
 over. This counts, by file, the calls of that kind:
@@ -24,7 +24,7 @@ over. This counts, by file, the calls of that kind:
 It goes by the text, outside comments: a call is one of those names in
 front of a parenthesis, where the line is not the function's own
 definition or its declaration. The file of the system's functions is
-left out, which is where they are: dos.c of the C translation, dos32.c
+left out, which is where they are: dos.c of the C translation, sys_dos.c
 of the portable C. The portable C no longer declares the names of the
 first five kinds, so the compiler refuses a call of one there; of the
 sixth nothing does, and this is what would show it. tools/figures.py writes the sum,
@@ -51,7 +51,7 @@ def count(tree):
     the counts in the order of KINDS, of the files that have any."""
     rows = []
     for path in sorted(tree.glob("*.c")):
-        if path.name in ("dos.c", "dos32.c"):
+        if path.name in ("dos.c", "sys_dos.c"):
             continue
         text = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="latin-1"),
                       flags=re.S)

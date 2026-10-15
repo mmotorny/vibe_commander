@@ -231,7 +231,7 @@ word of 13 October 2026:
   the extender's as well, and was not seen: the bench has no such
   machine. And where the program itself says "Program too big to fit in
   memory", for want of the 512 bytes, the words are the original's,
-  written through DOS from a copy that `dos32.c` has of them, and the
+  written through DOS from a copy that `sys_dos.c` has of them, and the
   program ends with 8, DOS's number for too little memory; the original
   ends with 1 behind those words. No scenario shows any of this.
 - What the extender is in the machine while the program runs, a
@@ -568,12 +568,12 @@ hands over something else: a register that it never sets is what the
 stack holds, and `TODO.md` says where.
 
 **What the portable C does.** It asks through the functions of `sys.h`,
-and a function is handed what is asked and nothing else. `dos32.c` is
+and a function is handed what is asked and nothing else. `sys_dos.c` is
 those functions, for a program of 32 bits whose extender takes each call
 down to real mode, where DOS and the BIOS are. A call gets the registers
 that it takes from the function's arguments, and 0 in every other of AX,
 BX, CX, DX, SI and DI, and in the half of one that it takes nothing in:
-at a call of DOS by `Set` of `dos32.c`, which fills all six, and at a
+at a call of DOS by `Set` of `sys_dos.c`, which fills all six, and at a
 call of the BIOS or of the mouse driver by the function that makes it.
 Nothing is what the code before left there, and nothing what the stack
 holds. One call is handed something else than 0 where it takes nothing,
@@ -751,11 +751,11 @@ What DOS is handed besides the six registers:
   call that the extender translates, a name or a buffer handed over, DS
   was on the extender's own buffer below the megabyte, to which it
   copies the name, and ES as the extender left it. At the thirteen
-  functions that `dos32.c` makes in real mode, both are on the program's
+  functions that `sys_dos.c` makes in real mode, both are on the program's
   512 bytes below the megabyte, where the name or the buffer then is.
 - The carry flag is clear at the two calls that the original makes
   with it set and that DOS leaves it at, 36h and 13h: the extender does
-  not carry the program's flag down. `dos32.c` counts it as set
+  not carry the program's flag down. `sys_dos.c` counts it as set
   afterwards, so the program goes on as the original does behind a DOS
   that leaves the flag; a DOS that looked at it would see it clear.
 - At 4B00h, a program run, DOS's block names the program's environment
@@ -1142,7 +1142,7 @@ of it.
   program, memory that is free from then on. The extender sees the call
   that ends the program and, as it takes itself out, has Ctrl-Break go
   where it went when the program was started. And INT 22h names the few
-  instructions of real mode that `dos32.c` keeps in its 512 bytes below
+  instructions of real mode that `sys_dos.c` keeps in its 512 bytes below
   the megabyte, in which DOS goes on then, since nothing of a program of
   32 bits can run there: memory that DOS has freed like the ended
   program, where the interrupt stays until DOS sets it anew for the next

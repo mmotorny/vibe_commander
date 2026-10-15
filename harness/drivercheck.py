@@ -43,9 +43,9 @@ below it but what the toy's calls go down.
 
 A fourth toy is of the tree itself:
 
-  sys.c     asks the system's functions of the 32-bit program, dos32.c,
+  sys.c     asks the system's functions of the 32-bit program, sys_dos.c,
             a page for a step, and has the tree's main data, `md`, and
-            its stack, stack.c. It goes the way a scenario goes, by
+            its stack, stack_dos.c. It goes the way a scenario goes, by
             scenarios.run, with what driver.facts makes of a program:
             AutoTim and Clock by `_md` of the map and the offsets of the
             original's listing. Held: each step ends with its page, and

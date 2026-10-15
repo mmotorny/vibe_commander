@@ -33,7 +33,7 @@ What that order is, and is not:
     build/portable_c/<file>.lst.
   - The compiler gives every function that does nothing the address of
     the next instruction, so several names of the map are one place:
-    of dos32.c's functions that have nothing to do there, several are
+    of sys_dos.c's functions that have nothing to do there, several are
     one `ret`.
     Such a line names them all.
   - A block that is not what the reader has at its place is counted and

@@ -16337,6 +16337,43 @@ half of the time.
 The program: `VC.EXE` a9421c89... of `main` at 96e8039; 2f2fc833...
 with N22.
 
+## Step 5: a second implementation of `sys.h`
+
+The road of `CLAUDE.md`, step 5: an implementation of `sys.h` that is
+built and not meant to run, a stub, beside the one for DOS, with what
+the user decided of steps 5 and 6 on 14 October 2026. Two pieces: 5a,
+the split, which makes room for it in the tree and in the build and
+has clang hold the common code as it will hold the stub; and 5b, the
+stub, `sys_stub.c`, with its test.
+
+### 5a, the split: done, and what 5b should know
+
+1. The renames (one commit): `dos32.c` is `sys_dos.c` and `stack.c` is
+   `stack_dos.c`, by `git mv`. Every name of them in the build, the
+   harness, `tools/`, the README, `DEVIATIONS.md` and the source is the
+   new one, but where a text tells of what was taken out of the file
+   (two paragraphs of `DEVIATIONS.md`, entries 12 and 14, and their two
+   rows of the README). `LAYER.md` and `layer/`, kept for reference and
+   superseded, are as they were, and so is this file but for this
+   section; `CLAUDE.md` has a note that says how its older notes read.
+   `add_portable_c` of `CMakeLists.txt` says which files the build
+   takes: a file whose name ends in `_<implementation>.c` is that
+   implementation's, of `dos`, `stub` and `posix`, the list there, and
+   every other file is common code; the build for DOS takes the common
+   code and the files of `_dos.c`. A file of tables ends in `_t.c`,
+   which is common. `VC.EXE` is the same bytes, `2f2fc833...`, and so
+   is `debug/VC.EXE`, `f6b4a06c...`: the name of a source file is in
+   the map and not in the program. The records of the host check, of
+   the widths and of the words moved only by the order of the names.
+   - The harness's tools that read the tree take every `*.c` of it,
+     `hostcheck.py`, `width.py`, `int16.py`, `words.py`, `reads.py`,
+     `cut.py`, `tools/figures.py` and `tools/calls.py`: when
+     `sys_stub.c` is there, each of them reads it too, and each record
+     gets its line. Whether they should is 5b's to decide.
+   - `harness/dataimage.py` knows the variables of the system's file by
+     the module that the map names, `sys_dos` now: an image saved of a
+     build from before has them under `dos32`, and is saved anew.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

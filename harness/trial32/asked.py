@@ -6,7 +6,7 @@ the toy of sys.h, run it there, and print what it writes.
 
 The toy is sys.c, which asks every function of the portable C's sys.h
 and writes what it is answered, a page for each step of STEPS below.
-sys-32.exe is the toy with dos32.c, the system's functions of the
+sys-32.exe is the toy with sys_dos.c, the system's functions of the
 program, and DOS/32A. It is run by run.py, as VC.EXE, and what run.py
 prints of its screens is printed here, a screen for each step.
 
@@ -15,10 +15,10 @@ bits as well, this was both.py: it built the toy a second time, with the
 dos.c of that program, ran both and said where the two did not write
 the same, line for line; they wrote the same on every one of the 28
 screens when it was last run, with both files as they were when that
-build went. That is how dos32.c was written, a function at a time
+build went. That is how sys_dos.c was written, a function at a time
 (TODO.md, "The portable C in 32 bits: the plan", the pieces D1 and
 D2). What is left is the toy and its steps: for seeing
-what a function answers on the bench, and what a change to dos32.c does
+what a function answers on the bench, and what a change to sys_dos.c does
 to that, by holding what this prints against what it printed before.
 
 It ends with 1 if the toy did not write a screen for every step.

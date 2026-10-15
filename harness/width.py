@@ -253,9 +253,9 @@ CLUSTERS = [
 TABLES = ("the tables: constants that are laid out as the original has "
           "them, which the test of the data holds byte for byte")
 WHOLE = {
-    "dos32.c": "the system's file: what DOS, the BIOS and the extender "
+    "sys_dos.c": "the system's file: what DOS, the BIOS and the extender "
                "take and answer in, and the layer's to shape, step 3",
-    "stack.c": "the stack, an array of bytes",
+    "stack_dos.c": "the stack, an array of bytes",
 }
 
 # What clang is asked of every file that is sorted: the top of this file

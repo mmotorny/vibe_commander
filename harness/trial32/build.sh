@@ -7,7 +7,7 @@
 #   build.sh NAME com                NAME.asm as NAME.com, for real mode
 #   build.sh driver                  DRIVERX.ASM as DRIVERX.COM
 #   build.sh sys 32                  sys.c as sys-32.exe, with the
-#                                    dos32.c of the portable C and DOS/32A
+#                                    sys_dos.c of the portable C and DOS/32A
 #
 # It needs the project built once, for the compiler and the assembler
 # that the build fetches, and uses Open Watcom's tools for Linux on
@@ -45,7 +45,7 @@ if [ "$name" = sys ]; then
     case $kind in
     32)
         files=""
-        for source in "$here/sys.c" "$tree/dos32.c" "$tree/stack.c"; do
+        for source in "$here/sys.c" "$tree/sys_dos.c" "$tree/stack_dos.c"; do
             object=$out/$(basename "$source" .c)32.obj
             "$bin/wcc386" -q -3r -mf -os -s -zl -zls -wx -we -i="$tree" \
                 -i="$W/h" -fo="$object" "$source"

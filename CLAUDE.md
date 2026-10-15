@@ -1574,6 +1574,17 @@ in "The portable C".
     scripts and toys have the commands that run them in their
     comments.
 
+- Since the piece 5a of step 5, on 14 October 2026, `dos32.c` is
+  `sys_dos.c` and `stack.c` is `stack_dos.c`: a file whose name ends in
+  `_dos.c` is of the implementation of `sys.h` for DOS, and the build
+  for DOS takes those beside the common code, every file that ends in no
+  implementation's name (`add_portable_c` of `CMakeLists.txt`). The
+  notes from before name the two files by their old names, and are read
+  so; those that say how a thing is done, where a function of `sys.h` is
+  and how one is added, name them as they are. The map names an object
+  by its file, so an image of `harness/dataimage.py` saved before the
+  rename has the variables of `sys_dos.c` under `dos32`: save the
+  "before" anew. `TODO.md`, "5a, the split", has the rest.
 - The C translation is built by `add_c_tree` of `CMakeLists.txt`,
   which takes the tree's name, its model and the files of its second
   code segment: the notes above say `port_c_second` and `c_second` for
@@ -2415,9 +2426,9 @@ in "The portable C".
   - A function of `sys.h` that goes is in more places than those which
     the notes on the system's functions list: the toy that asks every
     function of `sys.h`, `harness/trial32/sys.c`; a table
-    of `dos32.c` alone in `OWN_OF` of `harness/datacheck.py` and
+    of `sys_dos.c` alone in `OWN_OF` of `harness/datacheck.py` and
     in `REVIEWED` of `harness/reads.py`; the count at the top of
-    `dos32.c` of those that are made in real mode; the count of the
+    `sys_dos.c` of those that are made in real mode; the count of the
     functions in the README, in its text and in its table by group;
     and the layout of the block below the megabyte, where what stands
     behind the bytes that go moves down.
@@ -2986,7 +2997,7 @@ in "The portable C".
   - A change to a file of tables was held by both tests while there
     were two, and the 16-bit one said the same in fewer words. There
     is the one now.
-  - Data that only this program has is that of `dos32.c`. A constant
+  - Data that only this program has is that of `sys_dos.c`. A constant
     of that file wants a line in `OWN_OF` there, and one in
     `REVIEWED` of `reads.py` for where code reads it; `reads.py` leaves
     out the file of the system's functions that a program is not built
@@ -3341,11 +3352,11 @@ in "The portable C".
 
 What the program asks of the system it asks through
 `src/portable_c/sys.h`, functions named for what is asked, with
-`dos32.c` as their one file for DOS: read the top of `sys.h` before
+`sys_dos.c` as their one file for DOS: read the top of `sys.h` before
 anything else. Every file has gone over. None fills a `struct DosRegs`
 or a `struct BiosRegs` and hands it to an interrupt, as each did and as
 the C translation does: `Intr21`, `Int21d`, `Int10` and their like are
-gone from the tree, the two structures are `dos32.c`'s own, and `python3
+gone from the tree, the two structures are `sys_dos.c`'s own, and `python3
 tools/calls.py` counts no such call. These notes are what the move met.
 They are kept for whoever writes a call of the system anew, brings code
 over from the C translation, or adds a function to the interface: the
@@ -3354,7 +3365,7 @@ a function is added.
 
 Since the 16-bit build went, on 13 October 2026: `dos.c` in the notes
 below is the file that the calls moved into, which went with that
-build, and what it held is `dos32.c`'s, written for a flat memory
+build, and what it held is `sys_dos.c`'s, written for a flat memory
 under the extender (`TODO.md`, the pieces D1 and D2 of the plan for the
 32 bits; what D2 met is further down); `resident.c` is `exec.c`. What a note says of `sys.h`, of what a call hands back and
 of the traps holds as it stands. What it says a function of `dos.c`
@@ -3362,7 +3373,7 @@ does, with registers, segments, a stack or `_asm`, is of that file and
 is history. The table was held against `sys.h` by a script when that
 build went: every function that it names as what a call is, is
 declared there, but for those that it says went with a command, and
-the rows that named something of `dos.c` say what `dos32.c` has.
+the rows that named something of `dos.c` say what `sys_dos.c` has.
 
 For one function, in this order:
 
@@ -3410,19 +3421,19 @@ is called both ways the bare function says so in its name.
 | 440Eh, 440Fh | bare | `DriveLetter(drive)`, `DriveSetLetter(drive)` |
 | 47h | asked, bare | `DirCurrent(drive, to)`, `DirCurrentBare` |
 | 48h, 49h, 4Ah | bare | `MemTake(paragraphs)`, `MemGive(block)`, `MemResize(block, paragraphs)` |
-| 4Ah, of the program's own block | bare | `MemOwn()`: the block that DOS loaded the program into made as long as the program is. Which block that is and how long the program is, `dos.c` knew; in `dos32.c` there is nothing to make shorter, the program's memory being the extender's, and it answers that nothing failed |
+| 4Ah, of the program's own block | bare | `MemOwn()`: the block that DOS loaded the program into made as long as the program is. Which block that is and how long the program is, `dos.c` knew; in `sys_dos.c` there is nothing to make shorter, the program's memory being the extender's, and it answers that nothing failed |
 | 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
-| 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is the system's file's to make, `Run` of `dos32.c` |
+| 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is the system's file's to make, `Run` of `sys_dos.c` |
 | INT 2Eh, COMMAND.COM's own | | Was `ShellRun(command)`, which came back, the stack kept and put back around the interrupt in `dos.c`: it went with Quick execute commands (`src/portable_c/DEVIATIONS.md`, 14) |
 | 4Ch | bare | `ProgramEnd(code)` |
 | INT 20h, entered at the start of the PSP | | `ProgramEndOld()`, for a DOS before 3 |
-| The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake()` and `ProgramEndedGive()`: the PSP names a routine of the system's file between the two, `Exit01` of `dos.c` then and the routine of real mode `Ended_T` of `dos32.c` now, which has DOS told what the program has said beforehand, `ProgramEndedBreakCheck(on)`, when DOS has ended the program. It called a function of the program's, `told`, until the program of 32 bits had to do the same |
-| 51h | bare | No function of `sys.h`, and no call any more: the entry of the 16-bit program, `Alloc0` of `dos.c`, asked where the PSP is, as the first thing that DOS was asked, by `ProgramPrefix`, static there; `Start` of `dos32.c` has it from the extender, by the selector that the program is entered with. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
+| The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake()` and `ProgramEndedGive()`: the PSP names a routine of the system's file between the two, `Exit01` of `dos.c` then and the routine of real mode `Ended_T` of `sys_dos.c` now, which has DOS told what the program has said beforehand, `ProgramEndedBreakCheck(on)`, when DOS has ended the program. It called a function of the program's, `told`, until the program of 32 bits had to do the same |
+| 51h | bare | No function of `sys.h`, and no call any more: the entry of the 16-bit program, `Alloc0` of `dos.c`, asked where the PSP is, as the first thing that DOS was asked, by `ProgramPrefix`, static there; `Start` of `sys_dos.c` has it from the extender, by the selector that the program is entered with. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
 | 60h | asked | `FileTrueName(name, to)` |
-| 25h, 35h | bare | The seven by which the program takes what DOS and the BIOS enter of it: `DeviceErrorNote()`, `DeviceErrorTake(ask)` and `DeviceErrorGive()` for INT 24h, `CtrlBreakNote()`, `CtrlBreakTake()` and `CtrlBreakGive()` for INT 1Bh, `CtrlCTake()` for INT 23h. `SetVector(number, to)` and `Vector(number)` were static in `dos.c` behind them; `PutVector(number, to)` beside them wrote the machine's table without DOS, for INT 21h, and went with that. In `dos32.c` the extender is asked, not DOS: `Note`, `Go` and `Give`, static there |
+| 25h, 35h | bare | The seven by which the program takes what DOS and the BIOS enter of it: `DeviceErrorNote()`, `DeviceErrorTake(ask)` and `DeviceErrorGive()` for INT 24h, `CtrlBreakNote()`, `CtrlBreakTake()` and `CtrlBreakGive()` for INT 1Bh, `CtrlCTake()` for INT 23h. `SetVector(number, to)` and `Vector(number)` were static in `dos.c` behind them; `PutVector(number, to)` beside them wrote the machine's table without DOS, for INT 21h, and went with that. In `sys_dos.c` the extender is asked, not DOS: `Note`, `Go` and `Give`, static there |
 
 The BIOS for the screen, `Int10`, by AH: 0Fh is `ScreenState()`, 0
 `ScreenSetMode(mode)`, 1 `CursorShape(shape)`, 2 `CursorTo(page,
@@ -3762,13 +3773,13 @@ function is added:
 - A function that the interface lacks is declared in `sys.h`, in the
   group of its kind, with a comment that says what is asked, what it
   answers and what it answers when it fails, in DOS's values and with
-  no register in it; and written in `dos32.c`, as it was in `dos.c`,
+  no register in it; and written in `sys_dos.c`, as it was in `dos.c`,
   where the comment at the head of its group says the service. If it
   takes a name, it goes into `NAMED` of `harness/reads.py`. The README
   counts the functions by group, under "The system in one place", and
   the table above gets its row. What is of DOS alone and no part of
   the interface, where an interrupt goes, was in the last part of
-  `dos.c` and declared in `vc.h`; of `dos32.c` nothing is declared
+  `dos.c` and declared in `vc.h`; of `sys_dos.c` nothing is declared
   there, and `vc.h` declares for it what it calls, `Main`. A function
   of `sys.h` is in more places besides, which the note on one that
   goes has, in "Notes on the portable C".
@@ -3798,7 +3809,7 @@ function is added:
   original's.
 - No file declares the names of the old way, so a call of one does not
   compile. What `tools/calls.py` still watches in the portable C is its
-  last kind, a fixed address of the machine written outside `dos32.c`,
+  last kind, a fixed address of the machine written outside `sys_dos.c`,
   and not where the segment comes from a variable, as it has to for
   the table of interrupts: `PutVector` of `dos.c` was where that was,
   and nothing writes that table now.

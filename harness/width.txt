@@ -90,7 +90,7 @@ N19a            54          0     1              0      52     3     2    10    
 N19b            22          0     0              0      21     1     2     1    18  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             54          0     3              0      41     6     0     5    27  stmain.c sthelp.c
-as a whole     551          0    59              0       0     0     0    13    25  the tables, dos32.c stack.c
+as a whole     551          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
 headers        259         20    15              0     203     5     0     0     0  vc.h sys.h tables.h
 all           1902         20   116              0    1247    65    54   185   961
 
@@ -497,7 +497,7 @@ vc.h, struct MainDat: field AutoTim, u32
 
 vc.h, struct MainDat: field Screen, u32
     system: where the display's memory is, a segment and an offset of
-    real mode, which dos32.c keeps here as the original does.
+    real mode, which sys_dos.c keeps here as the original does.
 
 vc.h, struct MainDat: field ErrVct, u32
     unused
@@ -1999,9 +1999,6 @@ dirfunc.c, FncSel: sign
 
 dirfunc_t.c: as a whole, 60 numbers
     the tables: constants that are laid out as the original has them, which the test of the data holds byte for byte
-
-dos32.c: as a whole, 133 numbers, 59 u32
-    the system's file: what DOS, the BIOS and the extender take and answer in, and the layer's to shape, step 3
 
 drive.c, (): variable DrLe_S, u8[14]
     text
@@ -3833,7 +3830,7 @@ setup.c, (): variable IniSave, u8[511]
 setup.c, Failed: parameter error, u16
     system: DOS's number of an error, as struct Answer has it.
 
-stack.c: as a whole, 1 number
+stack_dos.c: as a whole, 1 number
     the stack, an array of bytes
 
 start.c, (): variable Init_F, u8[]
@@ -4299,6 +4296,9 @@ string.c, PathLin: variable c, u8
 
 string.c, LetLin: variable c, u8
     character
+
+sys_dos.c: as a whole, 133 numbers, 59 u32
+    the system's file: what DOS, the BIOS and the extender take and answer in, and the layer's to shape, step 3
 
 system.c, Timer: returns, u32
     system: the timer's count of ticks since midnight, as the BIOS keeps

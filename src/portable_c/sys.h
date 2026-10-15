@@ -5,7 +5,7 @@
  * program. Each thing that it asks is a function here, named for what is
  * asked, and nothing here says how the system is asked: no register, no
  * number of a service, no interrupt.
- * dos32.c is these functions for DOS on a PC, and the only file that
+ * sys_dos.c is these functions for DOS on a PC, and the only file that
  * knows those; the same functions for another system are another file
  * beside it.
  *
@@ -50,7 +50,7 @@
  * callers go on with that. Where the system answers with something else
  * as well, that is a member with a name, and if the call failed it is 0
  * unless its function says otherwise: DOS leaves alone what it has
- * nothing to say in, and 0 is what dos32.c hands it there. The original
+ * nothing to say in, and 0 is what sys_dos.c hands it there. The original
  * went on with whatever it had there itself, and a caller that goes by
  * that says what it was, where it reads the answer.
  *
@@ -60,7 +60,7 @@
  * error, a mode, a page, a place and a colour of the screen, a character
  * and a key, the mouse's dots and buttons, the font. A count that the
  * program reckons with is an i32, also where the system takes it in a
- * register of 16 bits or fewer, which dos32.c then fills: the bytes that
+ * register of 16 bits or fewer, which sys_dos.c then fills: the bytes that
  * are read or written, the lines and the cells of the screen, a size in
  * the memory. The size of a file and a place in one, and the figures that
  * the size of a disk is made of, are u32: they may pass two gigabytes.

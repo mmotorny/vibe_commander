@@ -435,7 +435,7 @@ i32 RoomBytes(void)
    the program needs: the assembly has them in BX where it says that
    there is no memory, and the BIOS takes a page of the screen there
    (see AlocEr of exec.c). The blocks are the extender's, anywhere above
-   the megabyte (MemTake of dos32.c): the two panels are taken first, so
+   the megabyte (MemTake of sys_dos.c): the two panels are taken first, so
    that the room has nothing behind it.
 
    The original asks DOS for one block, the largest that there is, and
@@ -537,7 +537,7 @@ static u16 CurNl(void)
        FCBs at 5Ch and 6Ch of the main data, not of the PSP: ES is on
        the main data when the original fills in here the block for
        running a program. That block is made where a program is run
-       now, by ProgramRun of sys.h: see Run of dos32.c.
+       now, by ProgramRun of sys.h: see Run of sys_dos.c.
      - A cursor below the last line is put on it before the screen is
        fed a line, so the screen scrolls once. */
 void IniData(void)

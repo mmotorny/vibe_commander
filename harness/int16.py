@@ -99,7 +99,7 @@ and is read again.
 out what is gone, and writes what is new without a reason: that is then
 written into the file by whoever has read the place, under its line.
 
-What is read: every file of code and of tables. dos32.c, the system's
+What is read: every file of code and of tables. sys_dos.c, the system's
 functions, was written for an int of 32 bits and never compiled for
 another, so a place there has nothing to be the same as: its reason
 says that the number is meant as it is. What a macro makes is a place

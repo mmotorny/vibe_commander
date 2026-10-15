@@ -18,7 +18,6 @@ dialog.c      clean
 digits.c      clean
 dirfunc.c     clean
 dirfunc_t.c   clean
-dos32.c       to-number 13, to-pointer 25, naked 2, asm 2, asm-pragma 11, registers 1, intrinsic 1
 drive.c       clean
 edit.c        clean
 edit_t.c      clean
@@ -47,7 +46,7 @@ place.c       clean
 read.c        clean
 screen.c      clean
 setup.c       clean
-stack.c       data_seg 2
+stack_dos.c   data_seg 2
 start.c       clean
 stcolor.c     clean
 stcolor_t.c   clean
@@ -59,6 +58,7 @@ stopts.c      clean
 stopts_t.c    clean
 string.c      clean
 sys.h         clean
+sys_dos.c     to-number 13, to-pointer 25, naked 2, asm 2, asm-pragma 11, registers 1, intrinsic 1
 system.c      clean
 system_t.c    clean
 tables.h      clean

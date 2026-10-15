@@ -18,7 +18,6 @@ dialog.c      NUMBER_OF 9
 digits.c      none
 dirfunc.c     MD_PLACE 1, ENTRY 7, DSKBUF 2
 dirfunc_t.c   MD_AT 75, NUMBER 9
-dos32.c       none
 drive.c       DSKBUF 2
 edit.c        none
 edit_t.c      MD_AT 15, NUMBER 1
@@ -47,7 +46,7 @@ place.c       TRELIST 2, TREE_OFFSET 2, TREE_ENTRY 2, DSKBUF 2
 read.c        ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1
 screen.c      none
 setup.c       none
-stack.c       none
+stack_dos.c   none
 start.c       DSKBUF 3
 stcolor.c     none
 stcolor_t.c   MD_AT 2
@@ -59,6 +58,7 @@ stopts.c      none
 stopts_t.c    MD_AT 62, NUMBER 28
 string.c      none
 sys.h         none
+sys_dos.c     none
 system.c      none
 system_t.c    MD_AT 3
 tables.h      none

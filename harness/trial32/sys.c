@@ -1,11 +1,11 @@
 /* The functions of the portable C's sys.h, each asked and what it
-   answers written onto the screen: the toy by which dos32.c, the
+   answers written onto the screen: the toy by which sys_dos.c, the
    functions of the program, a flat one of 32 bits, was held against
    dos.c, those of the program of 16 bits that the portable C was
    before. It was one source built both ways, and is built one way now
    (build.sh):
 
-     sys-32.exe   by wcc386, with src/portable_c/dos32.c and stack.c, and
+     sys-32.exe   by wcc386, with src/portable_c/sys_dos.c and stack_dos.c, and
                   DOS/32A for its stub.
 
    The two had to write the same on the bench, a screen for a screen,
@@ -1070,7 +1070,7 @@ static void Older(void)
 }
 
 /* More than DOS takes at one call, 18000h bytes, written to a file at
-   once and read back at once, in a block of the memory: dos32.c asks
+   once and read back at once, in a block of the memory: sys_dos.c asks
    DOS a piece at a time for that, which the program never has it do. */
 static void Bigger(void)
 {
@@ -1405,7 +1405,7 @@ static void Ended(void)
 
 /* The pages, a step of the script behind each.
 
-   The toy is entered where the program is, at Start of dos32.c, which
+   The toy is entered where the program is, at Start of sys_dos.c, which
    calls Main. The first thing asked is what the program asks first,
    that it keep no more of the memory than it is. */
 void Main(void)
@@ -1448,7 +1448,7 @@ void Main(void)
     Page(0);
     /* The toy ends as the program does, but for its end, which it has
        left taken (see Ended): it gives Ctrl-Break back, and leaves the
-       critical error and Ctrl-C taken, which ProgramEnd of dos32.c
+       critical error and Ctrl-C taken, which ProgramEnd of sys_dos.c
        puts back. An interrupt that is left taken there has the extender
        write a warning under the last line. */
     CtrlBreakGive();

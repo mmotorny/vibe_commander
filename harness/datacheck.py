@@ -196,13 +196,13 @@ OWN_OF = {
                      "based on, where the original has the line across "
                      "the panel and below it two lines on the memory, "
                      "which the portable C has not",
-        # Of dos32.c, the file of the system's functions of a flat
+        # Of sys_dos.c, the file of the system's functions of a flat
         # program under an extender, which has constants of its own.
-        "Ended_T": "the instructions that dos32.c puts below the megabyte "
+        "Ended_T": "the instructions that sys_dos.c puts below the megabyte "
                    "for where DOS goes on when it has ended the program "
                    "by another's hand, in real mode: the original has "
                    "them as code, its Exit01 and Exit02",
-        "NoStart_S": "what dos32.c says where the extender has no memory "
+        "NoStart_S": "what sys_dos.c says where the extender has no memory "
                      "below the megabyte for it: the words of the "
                      "original's Aloc_S, which the tree has in exec.c "
                      "and which is held there, in a copy that ends as DOS "

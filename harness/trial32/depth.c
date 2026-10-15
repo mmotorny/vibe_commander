@@ -3,7 +3,7 @@
    entered on the program's stack, and what it keeps there of a call
    that is under way is where nothing else may go on meanwhile, the
    routine of the critical error least of all (STACK_KEPT of
-   src/portable_c/dos32.c). The stack is filled below the stack pointer,
+   src/portable_c/sys_dos.c). The stack is filled below the stack pointer,
    a call is made, and the lowest byte that is another then is how deep
    it went: written in decimal behind each call, with the 8 bytes that
    the toy's own instructions push. The last line is of the timer's

@@ -633,8 +633,8 @@ The lines that say something of registers still, and why:
 
 | What | Where |
 |---|---|
-| Inline assembly: the instruction and the registers it takes and leaves | eleven pieces of `src/portable_c/dos32.c` |
-| A function that assembly calls, where the extender enters the program for DOS's critical error, with its arguments in the registers that the assembly has them in | `Arrived` of `dos32.c` |
+| Inline assembly: the instruction and the registers it takes and leaves | eleven pieces of `src/portable_c/sys_dos.c` |
+| A function that assembly calls, where the extender enters the program for DOS's critical error, with its arguments in the registers that the assembly has them in | `Arrived` of `sys_dos.c` |
 
 That a function does not return, which lines of `#pragma aux` said
 with `aborts`, is said by a word of `vc.h` in front of it, `NO_RETURN`,
@@ -684,7 +684,7 @@ the number. No test holds the table.
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
 | The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 375,251 bytes, 205,548 of them code |
-| Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `dos32.c` |
+| Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `sys_dos.c` |
 | Lines of `#pragma aux` | 12 |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
@@ -753,13 +753,13 @@ it](#the-setup-program-in-it)).
 How the program is laid out. The linker writes `VC.EXE`, a linear
 executable with [the extender](#the-extender) in front of it. The
 extender loads it above the first megabyte, sets every word of it that
-holds an address, and enters it at `Start` of `dos32.c`, on the stack
+holds an address, and enters it at `Start` of `sys_dos.c`, on the stack
 that the file's header names. It is two objects, the code and the data,
 and the linker's command says in which order the data lies
 (`add_portable_c` of `CMakeLists.txt`, with the reason for each thing's
 place):
 
-- The stack, `stack.c`, first. The extender packs the data right behind
+- The stack, `stack_dos.c`, first. The extender packs the data right behind
   the code, and the machine of the tests is many times slower at a
   write to a page of the memory that has code which it has run: what
   shares that page is the low end of the stack, which a program writes
@@ -770,7 +770,7 @@ place):
 - The main data, `md`, a variable of `main.c`, which the file has as
   zeros.
 - What has no value, which the file does not hold: the variables of the
-  files, which a file may have here, those of `dos32.c` last.
+  files, which a file may have here, those of `sys_dos.c` last.
 
 A segment is no number in the program any more: a panel, the text of
 the viewer or of the editor, a block of the memory and a table are
@@ -801,7 +801,7 @@ many such words there are.
 The memory of the panels, the viewer and the editor is not DOS's but
 the extender's, above the megabyte, as much as the machine has. The
 program asks for it as the original asks DOS, all that there is, and
-`dos32.c` asks the extender, DPMI 0500h to 0503h: a block of 64K for
+`sys_dos.c` asks the extender, DPMI 0500h to 0503h: a block of 64K for
 each panel, which is kept for as long as the program runs and never
 moved, and one for the room that the viewer, the editor, a copy and
 the file search take, all that the extender has behind the panels,
@@ -839,7 +839,7 @@ written in, the first table of [What rests on Open
 Watcom](#what-rests-on-open-watcom) above: `#pragma aux` and `#pragma
 pack(1)`, each as often as [the figures](#the-figures) say; two
 `__declspec(naked)` functions, `DeviceEntry` and `NothingEntry` of
-`dos32.c`, which the extender enters where DOS's critical error,
+`sys_dos.c`, which the extender enters where DOS's critical error,
 Ctrl-Break and Ctrl-C arrive; two intrinsic functions, `_disable` and
 `_enable`; and, which the C translation has not, `#pragma data_seg`,
 for the main data and for the stack. It has no `__interrupt` and no
@@ -853,18 +853,18 @@ What this program rests on is where the linker puts things:
 | | What is relied on | Where it is done | What holds it |
 |---|---|---|---|
 | 1 | The linker's `order` directive: the classes of the segments in the order that its command names, each class linked whole | `CMakeLists.txt`, the linker's command | `portable_c-layout`, in each of the rows below |
-| 2 | `#pragma data_seg` makes a segment of the name and of the class that it names: the main data is of a class of its own, `MAIN`, and the stack of the class `STACK`, which the linker takes for the stack, naming its end in the file's header | `src/portable_c/main.c`, `src/portable_c/stack.c` | `portable_c-layout`: the stack is the segment that ends where the header has the stack's top, and is in the file as zeros, by which the scenarios' test tells how much of it a scenario has left |
+| 2 | `#pragma data_seg` makes a segment of the name and of the class that it names: the main data is of a class of its own, `MAIN`, and the stack of the class `STACK`, which the linker takes for the stack, naming its end in the file's header | `src/portable_c/main.c`, `src/portable_c/stack_dos.c` | `portable_c-layout`: the stack is the segment that ends where the header has the stack's top, and is in the file as zeros, by which the scenarios' test tells how much of it a scenario has left |
 | 3 | What has no value is of the class `BSS`, the last, and is not in the file; everything in front of it is | `CMakeLists.txt` | `portable_c-layout` |
 | 4 | The compiler puts nothing between the fields of a box or a dialog, nor between two objects of a file | `src/portable_c/tables.h`, by `#pragma pack(1)` | `portable_c-data`: an object is as long as its declaration makes it |
-| 5 | Compiled code takes ES to be on the data and the direction flag to be clear, and the extender enters the program with ES on the PSP: the first thing that the program does settles both | `Entered`, in `Start` of `src/portable_c/dos32.c` | every scenario |
-| 6 | A `__declspec(naked)` function is its `_asm` and nothing else, and `_asm` reads a variable through CS: where the extender enters the program from real mode, with DS and ES anywhere | `DeviceEntry` of `src/portable_c/dos32.c` | the scenarios of the critical error |
+| 5 | Compiled code takes ES to be on the data and the direction flag to be clear, and the extender enters the program with ES on the PSP: the first thing that the program does settles both | `Entered`, in `Start` of `src/portable_c/sys_dos.c` | every scenario |
+| 6 | A `__declspec(naked)` function is its `_asm` and nothing else, and `_asm` reads a variable through CS: where the extender enters the program from real mode, with DS and ES anywhere | `DeviceEntry` of `src/portable_c/sys_dos.c` | the scenarios of the critical error |
 | 7 | The compiler keeps a cut that a cast says. It loses one: of a byte with a sign made a number of 16 bits without one, `(u16)(signed char)byte`, which it extends with its sign to all 32 bits wherever the number goes on into 32 bits. The tree writes neither that nor the form with a `short` between, which it keeps: where the original has `CBW`, the byte is taken as it is, or with its sign into an int | `src/portable_c/vc.h`, "A byte with a sign made a word" | `portable_c-cut`: the tree has the form nowhere, and the compiler makes of `harness/cutcheck.c` the instructions that are written there, the wrong ones of the form that it loses and the right ones of every cast that narrows |
 
 The rule of the C translation that a file of code may have no variable
 and no string is gone with the two parts: nothing checks the object
 files of the portable C, and nothing has to.
 
-Inline assembly, for the portable C, is all in `dos32.c`, thirteen
+Inline assembly, for the portable C, is all in `sys_dos.c`, thirteen
 pieces: eleven that are a `#pragma aux` with their instructions, put in
 place where they are called, and the two functions that are their
 `_asm` and nothing else. [The figures](#the-figures) have how many
@@ -928,12 +928,16 @@ DOS.
 In the portable C that place is `src/portable_c/sys.h`: 97 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test
-`portable_c-host` has the file clean. `dos32.c` is those functions for
+`portable_c-host` has the file clean. `sys_dos.c` is those functions for
 DOS on a PC, for a program of 32 bits under [the
 extender](#the-extender), and the one file that knows how DOS is asked:
 no other file of the portable C has a structure of registers, the number
 of a service, or an interrupt that it calls. The same functions for
-another system will be another file beside it.
+another system will be another file beside it. A file whose name ends
+in `_dos.c` is of the implementation for DOS, `sys_dos.c` and the
+stack, `stack_dos.c`, and the build for DOS takes those beside the
+common code, every file that ends in no implementation's name; a
+second implementation's files will end in its own, `_stub.c`.
 
 | What | Functions |
 |---|---|
@@ -985,12 +989,12 @@ there, and the portable C hands them 0. No screen shows that, and
 `src/portable_c/DEVIATIONS.md` declares it, with every place.
 
 What DOS and the BIOS enter of the program while it runs is in the
-header too, and where they arrive is in `dos32.c`: DOS's critical error,
+header too, and where they arrive is in `sys_dos.c`: DOS's critical error,
 Ctrl-Break and Ctrl-C, each of which the program takes by a function and
 the first two of which it gives back by one, in the original's order.
 They are interrupts of real mode, which the program takes through the
 extender: that comes over from real mode and enters a routine of
-`dos32.c`, on a stack of its own. What the program does when DOS asks it
+`sys_dos.c`, on a stack of its own. What the program does when DOS asks it
 about a device, its box with Retry and Abort, is the program's own
 function, `FtErr1` of `main.c`, which it hands over when it takes the
 critical error; the entry, `DeviceEntry`, goes over to the program's
@@ -1010,7 +1014,7 @@ it has changed of DOS that DOS does not put back by itself, which is one
 thing, whether DOS looks for Ctrl-C at every call
 (`ProgramEndedBreakCheck`, which `SetBrk` of `exec.c` says whenever it
 has noted that). And where the PSP has DOS go on, while the program has
-taken its end, is eight instructions of real mode that `dos32.c` keeps
+taken its end, is eight instructions of real mode that `sys_dos.c` keeps
 in a block below the megabyte, written there as their bytes, `Ended_T`:
 they have DOS look for Ctrl-C as the program has said, leave the
 registers that the original leaves for the program that started this
@@ -1019,16 +1023,16 @@ those registers. One thing is left otherwise, by the extender:
 Ctrl-Break goes where it went before the program was started, where the
 original leaves it going into memory that is free.
 
-Not in the header, and in `dos32.c` all the same, is where the extender
+Not in the header, and in `sys_dos.c` all the same, is where the extender
 enters the program, `Start`: it settles what compiled code takes for
 granted, asks the extender where the PSP and the environment are and for
 a block of 512 bytes below the megabyte, makes ready the memory that the
 program is handed, and calls `Main` of `main.c`, which is the program.
 What the program does first it asks through the header like everything
 else: the version of DOS, and that it keep no more of the memory than it
-is. The PSP is read and written in `dos32.c` alone: the command tail and
+is. The PSP is read and written in `sys_dos.c` alone: the command tail and
 the environment, for the functions that answer with them, and the
-address at which DOS goes on when the program has ended; and `dos32.c`
+address at which DOS goes on when the program has ended; and `sys_dos.c`
 makes the block that DOS is told of a program to run.
 
 How a call gets to DOS is that file's matter too. DOS, the BIOS and the
@@ -1036,12 +1040,12 @@ mouse driver are of real mode: the program calls them by the same
 software interrupts, and the extender takes each call there and back. A
 call of DOS that takes the address of a name or of a buffer, and that
 the extender knows, the extender translates. Thirteen functions it does
-not carry through as `sys.h` has them, and those `dos32.c` makes in real
+not carry through as `sys.h` has them, and those `sys_dos.c` makes in real
 mode, by the extender's service for that, with what DOS reads and writes
 in the block below the megabyte. The top of the file says which they are
 and how each was found.
 
-Nothing of DOS is left outside `dos32.c`: no other file has a line of
+Nothing of DOS is left outside `sys_dos.c`: no other file has a line of
 assembly or a register in a `#pragma aux`, which the test
 `portable_c-host` holds. The commands' loop of `exec.c` has one way of
 running a command, by a COMMAND.COM of its own. Quick execute commands,
@@ -1223,7 +1227,7 @@ that does nothing else.
 | `portable_c-cut` | A cut that Open Watcom's compiler loses, and those that it keeps. It extends a number with a sign that is converted to a wider type without one, and from there to a still wider type, with its sign both times: a byte with a sign made a number of 16 bits without one, `(u16)(signed char)byte`, has its sign in all 32 bits wherever it goes on into 32 bits, FFFFFFFEh for the byte FEh where C says 0000FFFEh. With a `short` between it is right; the portable C writes neither, but takes the byte that the original's `CBW` makes a word as it is, or with its sign into an int. `harness/cut.py` has clang read every file of the tree and fails for the form that is lost, anywhere, also where a mask or arithmetic with a number that is written makes it come out right today, and for a number of 64 bits or a floating type, where the same fault is with another third type; it fails for a build whose options expand a function in place, `-oe` or `-ox`, with which the fault is across a call as well; and it compiles `harness/cutcheck.c` with the compiler and the options that the build compiles the tree with and holds each of its functions to the instructions that are written in front of it: those that have the fault to the wrong ones, so that a compiler which is mended is noticed, and the form with a `short` between, with every other cast that narrows, each handed on, added, compared and made an index, to the right ones. It runs no machine; without clang the tree is not read, and the test counts as skipped if the compiler's half has passed. |
 | `portable_c-layout`, `portable_c-debug-layout` | [The two programs of the portable C](#the-portable-c), each as the linker wrote it, against the layout that the tests rest on: one that is linked otherwise has its stack where the driver of the tests does not look, or is many times slower on the machine of the tests, with no word said. `harness/layoutcheck.py` reads the file and the linker's map of it, with the harness's reader, and holds: that the stack is the segment which ends where the file's header has the stack's top, as the driver of the tests looks for it, and is in the file as zeros; that the file holds of the data everything but what has no value; and that nothing which a scenario writes shares a page of the memory with code. And of the file itself: two objects, each as long as the map has it, the entry at `Start`, every relocation an address with the offset of what it names in the file, and a stub that is DOS/32A's with the banner switched off and nothing else changed. Until the piece F10 of step 2 it held the tables, `IniSave` and the end of the program to where the megabyte that the program kept inside its own let a segment and an offset name them: those rules went with that megabyte. No machine is run for them, and neither program is run; the debug program is read by no other test |
 | `harness-le` | It judges the harness and no tree, and is named for that. The harness's own reader of a 32-bit program for DOS, `harness/le.py`, which the tests of the portable C go by. `harness/lecheck.py` builds a toy, `harness/lecheck.c`, as a flat program with DOS/32A for its stub, with the compiler and the linker that the build fetches, and holds what the reader finds in the file and in the linker's map against what the toy's source says must be there: where the stub ends, the objects and how much of each the file has, the entry and the stack, where a symbol is, a static one too, and every address that the extender puts in when it loads the program, with those that lie across the end of a page and those that name something outside their object. The toy is not run; what it shows of itself on the bench, and how that is held against the reader by hand, is at the top of `harness/lecheck.py`. No machine is run for it |
-| `portable_c-scenarios` | The check of `c-scenarios` for the portable C, by the same `harness/ported.py` and against the same goldens: what is said of the translation in the row below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A scenario that is declared to change is held against the original's golden with that difference made to it, the steps that are left out, the rules and the rows of its patch, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original's golden as it is, and names the others. A patch that does not fit its golden, or that names no entry of `DEVIATIONS.md` which names its scenario, fails the test. Before anything is run it asks `harness/layoutcheck.py` for the layout, as the test `portable_c-layout` does; and from QEMU's log of the code that ran, it holds that the program was in the memory where the driver of the tests reads its variables and its stack, and so was a copy of it that a scenario starts from its command line. Half of the stack is to be left in every scenario. Every C function of a batch has to have run, under the name that this tree has it by: the entry of the critical error is `DeviceEntry` of `dos32.c`, and the entry of the program `Start`. Its file is held to no multiple of the original's size: the test says how long it is |
+| `portable_c-scenarios` | The check of `c-scenarios` for the portable C, by the same `harness/ported.py` and against the same goldens: what is said of the translation in the row below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A scenario that is declared to change is held against the original's golden with that difference made to it, the steps that are left out, the rules and the rows of its patch, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original's golden as it is, and names the others. A patch that does not fit its golden, or that names no entry of `DEVIATIONS.md` which names its scenario, fails the test. Before anything is run it asks `harness/layoutcheck.py` for the layout, as the test `portable_c-layout` does; and from QEMU's log of the code that ran, it holds that the program was in the memory where the driver of the tests reads its variables and its stack, and so was a copy of it that a scenario starts from its command line. Half of the stack is to be left in every scenario. Every C function of a batch has to have run, under the name that this tree has it by: the entry of the critical error is `DeviceEntry` of `sys_dos.c`, and the entry of the program `Start`. Its file is held to no multiple of the original's size: the test says how long it is |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens

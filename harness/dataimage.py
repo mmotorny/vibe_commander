@@ -42,7 +42,7 @@ structures of the original's listing, by which a place is named). Today
 it is one stretch, the program's data as the linker has it in one
 object: the stack, the tables, the variables with a value, the main
 data, and the variables without one, among them the 640 KB that the
-program hands out to itself (`Own` of dos32.c). The tool makes of it
+program hands out to itself (`Own` of sys_dos.c). The tool makes of it
 what it compares:
 
   - the main data, `md`, by the field of the original's `MainDat` that
@@ -66,11 +66,11 @@ what it compares:
     image is taken, so a write into them shows with no second build.
 
 Where the blocks are. The tool learns that from the image itself and the
-map: the main data at `_md`; the blocks by what dos32.c keeps of them.
+map: the main data at `_md`; the blocks by what sys_dos.c keeps of them.
 Since the memory comes from the extender, a block lies wherever the
 extender put it and is a stretch of its own in the image: taken by the
 same `pmemsave` at the address and with the length that the table of
-dos32.c has, `Blocks`, which the map names and `_handed` below reads,
+sys_dos.c has, `Blocks`, which the map names and `_handed` below reads,
 with the extender's 16 bytes in front of it. A build from before that,
 which handed out 640 KB of its own, `Own`, has its blocks inside the
 program's data: by a table beside `Own`, `OwnBlocks`, and in a build
@@ -114,7 +114,7 @@ looked at when an image is taken, by guards(): a scenario whose image
 has them otherwise than the extender or the pattern has them fails the
 scenarios' test, with the block and the place, and `save` and `compare`
 say the same. What the extender has there is EXTENDER below. In a
-build from before dos32.c wrote the pattern, which is known by its
+build from before sys_dos.c wrote the pattern, which is known by its
 having no table of its blocks, nothing is looked at.
 
 `compare` prints, for every scenario that differs, each run of bytes
@@ -149,22 +149,22 @@ PROGRAM = "the program's data"
 
 # What the program is linked of that the tool knows by name.
 MAIN = "_md"                      # the main data
-OWN = ("dos32", "_Own")           # the memory that the program hands out
-# What dos32.c keeps of the blocks of that memory, in a build that has
+OWN = ("sys_dos", "_Own")           # the memory that the program hands out
+# What sys_dos.c keeps of the blocks of that memory, in a build that has
 # a table for it: the table, and how many blocks it has. An entry is the
 # paragraph of the megabyte that the block begins in, its paragraphs,
 # and whether it is taken, a word each.
-OWN_BLOCKS = ("dos32", "_OwnBlocks")
-OWN_HELD = ("dos32", "_OwnHeld")
+OWN_BLOCKS = ("sys_dos", "_OwnBlocks")
+OWN_HELD = ("sys_dos", "_OwnHeld")
 OWN_ENTRY = "<HHH"
 OWN_MOST = 8                      # as many as the table has room for
-# What dos32.c keeps of the blocks that the extender gave it, since the
+# What sys_dos.c keeps of the blocks that the extender gave it, since the
 # memory is the extender's: the table, Blocks, and how many it has,
 # BlocksHeld. An entry is where the block begins, how many bytes it has
 # and the extender's name for it, four bytes each. Only the blocks that
 # are taken are in it.
-BLOCKS = ("dos32", "_Blocks")
-BLOCKS_HELD = ("dos32", "_BlocksHeld")
+BLOCKS = ("sys_dos", "_Blocks")
+BLOCKS_HELD = ("sys_dos", "_BlocksHeld")
 BLOCKS_ENTRY = "<IiI"
 BLOCKS_MOST = 8
 STACK = "STACK"                   # segments of the map
@@ -274,20 +274,20 @@ UNSTEADY = (
 )
 # Of the variables, by name.
 UNSTEADY_VARIABLES = {
-    "dos32.OwnFirst": "the paragraph of the megabyte that the program's "
+    "sys_dos.OwnFirst": "the paragraph of the megabyte that the program's "
                       "own memory begins in: by where the linker has it",
     # Found by F2, whose four pointers are 16 bytes in front of the
     # memory that the program hands out.
-    "dos32.OwnBlocks": "the paragraphs of the megabyte that the blocks "
+    "sys_dos.OwnBlocks": "the paragraphs of the megabyte that the blocks "
                        "begin in: by where the linker has the memory. "
                        "How many blocks there are, how long each is "
                        "and which are taken is held as `the blocks`",
     # Found by F9, against a build whose objects are a paragraph longer.
-    "dos32.Blocks": "where the extender gave each block, and its name "
+    "sys_dos.Blocks": "where the extender gave each block, and its name "
                     "for it: by where it has the program's objects. How "
                     "many blocks there are and how long each is is held "
                     "as `the blocks`",
-    "dos32.Below": "the stack pointer at the last call of DOS or of "
+    "sys_dos.Below": "the stack pointer at the last call of DOS or of "
                    "the extender: by the frames of the build's "
                    "functions, as the stack is, which is left out",
 }
@@ -330,9 +330,9 @@ DTA_NAME = 30                   # where the name is in the DTA
 # image's tool holds them when an image is taken, and a scenario whose
 # image has them otherwise fails the scenarios' test, with the block
 # and the place: guards(). The pattern is here as bytes, as Guard() of
-# dos32.c writes it, and _guarded() says where it is, by the blocks of
+# sys_dos.c writes it, and _guarded() says where it is, by the blocks of
 # _blocks().
-GUARD = bytes(0xF0 - at for at in range(16))   # Guard() of dos32.c
+GUARD = bytes(0xF0 - at for at in range(16))   # Guard() of sys_dos.c
 
 # What DOS/32A keeps in front of a block that it has given, as was seen
 # on the bench (TODO.md, "X, the extender's memory on the bench", row
@@ -443,7 +443,7 @@ class Taker:
 def _handed(build, data):
     """The blocks that the program was handed and that are no part of
     its own data: (name, address, length) of each, for the image to
-    take, with the extender's 16 bytes in front of it. dos32.c keeps a
+    take, with the extender's 16 bytes in front of it. sys_dos.c keeps a
     table of them, Blocks, which the map names, and this reads it in
     `data`. There are none in a build that hands out memory of its own,
     the blocks being inside `Own`."""
@@ -452,14 +452,14 @@ def _handed(build, data):
         return []
     count = int.from_bytes(data[held:held + 4], "little", signed=True)
     if not 0 <= count <= BLOCKS_MOST:
-        raise Spoilt(f"dos32.c's table of its blocks says that it has "
+        raise Spoilt(f"sys_dos.c's table of its blocks says that it has "
                      f"{count} of them")
     found = []
     for number in range(count):
         address, size, _ = struct.unpack_from(
             BLOCKS_ENTRY, data, table + number * struct.calcsize(BLOCKS_ENTRY))
         if size <= 0 or address < IN_FRONT:
-            raise Spoilt(f"dos32.c's table has block {number} where it "
+            raise Spoilt(f"sys_dos.c's table has block {number} where it "
                          "cannot be")
         found.append((f"block {number}", address - IN_FRONT,
                       size + IN_FRONT))
@@ -689,7 +689,7 @@ class Read:
     def _blocks(self):
         """The blocks of the memory that the program was handed, in
         their order: (offset in the program's data, length, taken).
-        dos32.c keeps them in a table, which the map names: of the
+        sys_dos.c keeps them in a table, which the map names: of the
         blocks that the extender gave, each a stretch of the image, or
         of the memory that the program handed out to itself, which a
         build from before it had the table keeps in a paragraph in front
@@ -711,7 +711,7 @@ class Read:
         if table is not None and held is not None:
             count = self.word(held, 4)
             if count > OWN_MOST:
-                raise Spoilt(f"dos32.c's table of its blocks says that it "
+                raise Spoilt(f"sys_dos.c's table of its blocks says that it "
                              f"has {count} of them")
             found = []
             for number in range(count):
@@ -723,7 +723,7 @@ class Read:
                 # rounded up to one; each a paragraph behind the last.
                 if at != sum(found[-1][:2]) + PARAGRAPH if found \
                         else not own < at <= own + 2 * PARAGRAPH:
-                    raise Spoilt(f"dos32.c's table has block {number} "
+                    raise Spoilt(f"sys_dos.c's table has block {number} "
                                  "where it cannot be")
                 found.append((at, paragraphs * PARAGRAPH, bool(taken)))
             return found
@@ -735,7 +735,7 @@ class Read:
             if kind not in (b"M", b"Z"):
                 if not found and kind == b"\0":
                     return found  # the program never set its memory up
-                raise Spoilt(f"what dos32.c keeps in front of block "
+                raise Spoilt(f"what sys_dos.c keeps in front of block "
                              f"{len(found)} is spoilt")
             found.append((at + PARAGRAPH, paragraphs * PARAGRAPH,
                           bool(taken)))
@@ -888,7 +888,7 @@ def guards(read, pattern=None, places=None):
     """Where the bytes round a block are not the pattern, as lines of
     text, each with the block and the first byte that is another. None
     is looked for in a build that has no table of its blocks, which is
-    one from before dos32.c wrote the pattern: see GUARD."""
+    one from before sys_dos.c wrote the pattern: see GUARD."""
     if not pattern and read.build._symbol(*BLOCKS) is not None:
         return _extender(read)
     if not pattern and read.build._symbol(*OWN_BLOCKS) is None:
@@ -914,7 +914,7 @@ def guards(read, pattern=None, places=None):
             + ("in front of the block, or behind the end of the one "
                "before it" if "front" in said else
                "behind the end of the block")
-            + ", or the block was not taken as dos32.c takes one")
+            + ", or the block was not taken as sys_dos.c takes one")
     return found
 
 
@@ -1447,7 +1447,7 @@ def check(directory, out=print):
                 out("\n".join("      " + line for line in lines))
     # The bytes round a block: what the extender has in front of a
     # block, or the pattern that the program's own hand-out wrote, or,
-    # in a build from before dos32.c wrote one, what the image has in
+    # in a build from before sys_dos.c wrote one, what the image has in
     # front of its first block that is taken, held there alone.
     front = begins - 16
     old = build._symbol(*OWN_BLOCKS) is None \

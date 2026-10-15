@@ -1567,7 +1567,7 @@ FtErr5:
    the first for FtErr1, and the second so that nothing happens. Both
    are noted before either is taken, as the original asks DOS. Where
    they arrive, FatErr and CtrlC of the original, is the system's:
-   dos32.c. */
+   sys_dos.c. */
 void HookVct(void)
 {
     DeviceErrorNote();
@@ -1627,7 +1627,7 @@ static NO_RETURN void Round(void)
 }
 
 /* The program, from when DOS has loaded it: the system calls this
-   where it enters the program, Start of dos32.c, and it does not return.
+   where it enters the program, Start of sys_dos.c, and it does not return.
    The version of DOS is looked at and the memory that the program does
    not fill is let go, Alloc3; the setup is read, Init00, and the memory
    of the panels asked for, Init11; with too little of it the program

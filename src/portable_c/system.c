@@ -7,10 +7,10 @@
  * Translated from VCSUB1.INC and VCSUB3.INC.
  *
  * What the system is asked is in sys.h, and how DOS and the BIOS are
- * asked for it in dos32.c; this is what the program makes of the answers.
+ * asked for it in sys_dos.c; this is what the program makes of the answers.
  * Intr21 of the original, DOS called with the program's errors looked
  * for, is no routine here: it is in every function of sys.h that is
- * asked so, in dos32.c.
+ * asked so, in sys_dos.c.
  */
 #include "vc.h"
 

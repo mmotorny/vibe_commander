@@ -403,7 +403,7 @@ struct MainDat {
                                            critical error, INT 24h, */
     u32 BrkVct;                         /* and who had Ctrl-Break, INT
                                            1Bh. Not set or read here:
-                                           dos32.c keeps them, as
+                                           sys_dos.c keeps them, as
                                            addresses of protected mode */
     u8  Volume[12];                     /* Volume label */
     u8  DosPth[LenPath];                /* The current path */
@@ -581,7 +581,7 @@ extern i32 ClickLine;
 #define PANEL_BYTES 0x10000
 #define LEAST_ROOM  ((MinView + 15) & ~15)
 
-/* The stack, of stack.c: LenStk bytes in a segment of their own. */
+/* The stack, of stack_dos.c: LenStk bytes in a segment of their own. */
 extern u8 Stack[];
 
 /* What the program knows of DOS around it, exec.c. Of its routines
@@ -623,7 +623,7 @@ extern const u8 Tree_S[];               /* the title of the tree */
 #define Title_C 4                       /* the titles of the columns */
 
 /* What the program asks of the system that it runs on, sys.h: the
-   functions of dos32.c by which it has files, directories, drives,
+   functions of sys_dos.c by which it has files, directories, drives,
    memory, the time, the keyboard, the screen, the mouse and the timer,
    and what they answer with, struct Answer first. */
 #include "sys.h"
@@ -689,7 +689,7 @@ struct Answer SaveSet(void);
    command. GiveMem gives the room back for a command, and TakeMem
    takes it again afterwards, and answers as Init11 does. Main of main.c
    is the program from when DOS has loaded it:
-   the system calls it where it enters the program, Start of dos32.c,
+   the system calls it where it enters the program, Start of sys_dos.c,
    and it does not return. */
 void Init00(void);
 struct Answer Init11(void);
