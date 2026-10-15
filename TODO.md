@@ -17193,6 +17193,70 @@ pointer at the last call of DOS, `sys_dos.Below`, 20 bytes higher:
 `Input0`'s frame is smaller by the variables that went to `Inpt41`.
 Nothing is declared as changed.
 
+### MD, the main data read as bytes: done
+
+clang-tidy 23 with `clang-analyzer-security.ArrayBound` and
+`clang-analyzer-security.PointerSub` alone, over the common code with
+the stub's command, named 23 places (13 and 10). 21 are the program
+reading its main data across fields, and read now as what they are:
+
+- `vc.h` has `MD_BYTES`, the main data as bytes, `(u8 *)&md`, and
+  `MD_AT(field)` of `tables.h` moved there, the place of a field as a
+  number (`MD_AT(DTA.FilAttr)` takes a field of a field). A read across
+  fields is `MD_BYTES + MD_AT(field) + n`, or `MD_BYTES[...]`.
+- ArrayBound: `TRELIST` (the tree's list begins in its header's last
+  field: `main.c`, `treebox.c`, `tree.c` twice); `LIST` of `menu.c`
+  (an item of 80h or more in front of `TmpBuf`, twice); the byte in
+  front of the end in `find.c` (`FindFil`) and in `C40_05` of `copy.c`,
+  whose two buffers are handed as bytes; the nine bytes from
+  `DTA.FilAttr` in `read.c`, and the nine of the entry that they go to
+  as bytes of the entry, which the analyser named next. Of the help,
+  `HD_BYTES(field)` of `help.c`, the bytes of `HelpBuf` at a field of
+  `HlpData`, for the 26 and the 4 bytes that are read and decoded as
+  one block, and in `sthelp.c` the buffer at `offsetof` likewise:
+  `DeCode` was named, `ReadDsk` beside it is the same read.
+- PointerSub: `MD_PLACE` of a field is the field's place, `MD_AT`:
+  `CpSrcAt` and `CpDestAt` of `copy.c`, 5 places (one not named), the
+  name's place in `dirfunc.c`, `EPB_WAS` of `exec.c` (3 named, 1
+  definition). `MD_PLACE` and `MD_POINTER` stay as they were, for a
+  pointer that is a variable. In `T73_10` of `edit.c` the editor's line
+  is `MD_BYTES + MD_AT(MenuBuf)` and the base `MD_BYTES`.
+- `stmain.c`: the analyser does not model the cut `(u8)` and took the
+  item Exit, `last`, for one that may be below 0, reading `StMainHlp`
+  in front: `& 0xFF` says the same number in a form it reads.
+
+Left, for the user (handed back): `MnuTab[menu - 1]` of `menu.c`, twice
+(`F39_10` and `F39_51`), is the menu that is none ("Known and not dealt
+with", the mouse on the bar): menu 0 is real there, and the program
+reads in front of its static table and 2,040 bytes behind it. Not the
+main data, and no offset makes it defined: it waits for a decision.
+
+The bytes: the reads compile as they did (`find.c`, `menu.c`,
+`read.c`, `help.c`, `edit.c`, `tree.c`, `treebox.c`, `main.c` the same
+listings); `sthelp.c` differs in one register. What does not: `wcc386`
+does not fold `&md.Field - &md`, so `MD_AT` in place of `MD_PLACE` of
+a field is a constant, 70 bytes of code fewer in `exec.c`, `copy.c`
+and `dirfunc.c`, and `stmain.c` has `and` for `movzx`, two bytes more:
+the code is 68 bytes shorter. `VC.EXE` was `40f83254...` and is
+`7f36091d...`.
+
+What judged it: the whole suite, fourteen tests, 158 scenarios, no
+golden and no patch changed; and the images. Against `main`'s build
+every scenario differs in the room, which begins 68 bytes earlier;
+against this build padded to `main`'s length of code, 68 bytes of
+stores to a `volatile` pointer behind the last of `sys_dos.c`, not kept
+(`_TEXT` 1CA9Fh in both): 151 of 158 scenarios with nothing that
+differs, `cursor` with nothing but what may differ, and the six that S
+and N22 met, `comspec`, `ended`, `second-copy`, `start-screen`,
+`start-setup`, and `start-memory` with `ViewSeg` and `FreMem2` naming
+nothing known. Nothing is declared as changed. The records of
+`hostcheck.py` and `int16.py` did not move; `words.py` has `MD_BYTES`
+and `MD_AT` in the code.
+
+The analyser names what its paths reach and no more: a read across
+fields that goes through a function it cannot see into, as `ReadDsk`
+was, is not named, and is found by reading.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

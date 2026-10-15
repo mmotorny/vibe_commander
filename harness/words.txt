@@ -13,20 +13,20 @@ cmdline.c     TRELIST 1, TREE_OFFSET 2, ENTRY 4, DSKBUF 3
 commands.c    ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
 commands_t.c  MD_AT 45, WCB_AT 3, NUMBER 17
 compiler.h    none
-copy.c        MD_PLACE 5, TRELIST 1, ENTRY 4
+copy.c        MD_BYTES 2, TRELIST 1, ENTRY 4, MD_AT 4
 copy_t.c      MD_AT 22, NUMBER 4
 dialog.c      NUMBER_OF 9
 digits.c      none
-dirfunc.c     MD_PLACE 1, ENTRY 7, DSKBUF 2
+dirfunc.c     ENTRY 7, DSKBUF 2, MD_AT 1
 dirfunc_t.c   MD_AT 75, NUMBER 9
 drive.c       DSKBUF 2
-edit.c        none
+edit.c        MD_BYTES 2, MD_AT 1
 edit_t.c      MD_AT 15, NUMBER 1
 enter.c       ENTRY 10, DSKBUF 10, MAIN_AS_PANEL 1
-exec.c        MD_PLACE 2
+exec.c        MD_PLACE 1, MD_AT 1
 extfile.c     none
 files.c       ENTRY 7, DSKBUF 7
-find.c        DSKBUF 3
+find.c        MD_BYTES 1, DSKBUF 3, MD_AT 1
 find_t.c      MD_AT 2, NUMBER 2
 format.c      none
 help.c        none
@@ -39,12 +39,12 @@ line.c        none
 main.c        TRELIST 3, DSKBUF 4, MAIN_AS_PANEL 1
 main_t.c      MD_AT 8
 mask.c        none
-menu.c        none
+menu.c        MD_BYTES 1, MD_AT 1
 misc.c        none
 mouse.c       none
 panel.c       TRELIST 1, ENTRY 4, DSKBUF 1
 place.c       TRELIST 2, TREE_OFFSET 2, TREE_ENTRY 2, DSKBUF 2
-read.c        ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1
+read.c        MD_BYTES 1, ENTRY 5, DSKBUF 10, MAIN_AS_PANEL 1, MD_AT 1
 screen.c      none
 setup.c       none
 stack_dos.c   none
@@ -68,7 +68,7 @@ tree.c        TRELIST 8
 treebox.c     MD_POINTER 1, TRELIST 7, TREE_OFFSET 11, TREE_ENTRY 3, NUMBER 2
 treebox_t.c   MD_AT 3
 usermenu.c    ENTRY 5, DSKBUF 2, PANEL_AS_MAIN 1
-vc.h          TRELIST 2
+vc.h          MD_BYTES 1, TRELIST 2, MD_AT 1
 view.c        ENTRY 1
 view_t.c      MD_AT 21, NUMBER 2
 window.c      none

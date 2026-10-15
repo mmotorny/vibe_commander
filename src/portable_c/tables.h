@@ -75,10 +75,6 @@
 #define Sky2_C  37                      /* and the other half of them */
 #define ShadFl  38                      /* the shadow of a box */
 
-/* Where in the main data something is: the word that the assembly has
-   for the name of a field of MainDat. */
-#define MD_AT(field) OFFSET_IN(struct MainDat, field)
-
 /* Where in the segment of a panel something is, a field of WCBdef: the
    filter of a panel is a dialog that is asked for with that segment. */
 #define WCB_AT(field) OFFSET_IN(struct WCBdef, field)

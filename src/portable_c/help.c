@@ -58,6 +58,11 @@ LAID_OUT(HlpData, LenHelp);
 
 #define hd (*(struct HlpData *)md.HelpBuf)
 
+/* Fields of what the help keeps that are read from the file and decoded
+   as one block, as they are in the file: the bytes of HelpBuf from the
+   first field's place. */
+#define HD_BYTES(field) (md.HelpBuf + offsetof(struct HlpData, field))
+
 /* This is Help. Its name is from when the assembly called it, under the
    name that the linker had for it then: the assembler took Help_c for
    Help_C, the number of a colour. */
@@ -200,9 +205,9 @@ static bool RdEntry(void)
     }
     if (SeekDsk(hd.HlpOffsHi, hd.HlpOffsLo))
         return true;
-    if (ReadDsk((u8 *)&hd.HlpMode, 26))
+    if (ReadDsk(HD_BYTES(HlpMode), 26))
         return true;
-    DeCode((u8 *)&hd.HlpMode, 26);
+    DeCode(HD_BYTES(HlpMode), 26);
     if (hd.HlpSize == 0 || hd.HlpSize >= LenHelp - 0x20)
         return true;
     if (ReadDsk(hd.HlpInfo, hd.HlpSize))
@@ -636,9 +641,9 @@ static bool HelpBad(void)
     for (i = 0; i < LenHead; i++)
         if (md.HelpBuf[16 + i] != Help_F[HlpHead + i])
             return true;
-    if (SeekDsk(0, 0x194) || ReadDsk((u8 *)&hd.HlpOffsLo, 4))
+    if (SeekDsk(0, 0x194) || ReadDsk(HD_BYTES(HlpOffsLo), 4))
         return true;
-    DeCode((u8 *)&hd.HlpOffsLo, 4);
+    DeCode(HD_BYTES(HlpOffsLo), 4);
     hd.HlpBkLn = 0;
     if (RdEntry())                      /* the index */
         return true;

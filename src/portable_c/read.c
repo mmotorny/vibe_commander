@@ -223,9 +223,13 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
             if (MAIN_AS_PANEL->WinPath[3] != 0) {
                 md.DTA.FilAttr &= 0xF9;
                 md.DTA.FilAttr &= 0x3F;
-                to = &ENTRY(panel, DSKBUF)->AttrF;
+                /* The attributes, the time, the date and the size, one
+                   block of the main data, to one of the entry: both as
+                   bytes. */
+                to = (u8 *)ENTRY(panel, DSKBUF)
+                     + offsetof(struct FILENT, AttrF);
                 for (i = 0; i < 9; i++)
-                    to[i] = (&md.DTA.FilAttr)[i];
+                    to[i] = MD_BYTES[MD_AT(DTA.FilAttr) + i];
             }
         } else {
             entry = ENTRY(panel, file);

@@ -852,13 +852,14 @@ static struct Drawn T73_10(void)
             T51_00();
             T50_00();
         }
-        from = EditBuf;
+        /* The segment of the buffer is the main data in the assembly,
+           where the buffer is far from the start: EditBuf as bytes of
+           the main data, which T72_00 holds against where they begin. */
+        from = MD_BYTES + MD_AT(MenuBuf);
         end = from + EdSizLn;
         T70_00(line);
-        /* The segment of the buffer is the main data in the assembly,
-           where the buffer is far from the start. */
         if (from < end)
-            T72_00(line, from, end, (const u8 *)&md);
+            T72_00(line, from, end, MD_BYTES);
     } else {
         from = Room + EdOffst;
         end = Room + T53_10(EdOffst).at;

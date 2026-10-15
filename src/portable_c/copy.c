@@ -26,6 +26,10 @@
 #define CpVar2  (md.TmpBuf + 140)       /* Variable 2 */
 #define CpSrc   (md.TmpBuf + 0)         /* Source filename */
 #define CpDest  (md.TmpBuf + 130)       /* Destination filename */
+/* Where the two names are in the main data, as numbers: what the
+   original has in DX from handing DOS a name, and goes on with. */
+#define CpSrcAt  MD_AT(TmpBuf)
+#define CpDestAt ((u16)(MD_AT(TmpBuf) + 130))
 #define CpDev1  md.TmpBuf[86]           /* Source is a device */
 #define CpCase  md.TmpBuf[87]           /* Case: pathname, filename or none */
 #define CpTree1 md.TmpBuf[88]           /* Source tree was changed */
@@ -189,7 +193,11 @@ static u16 C00_30(const u8 *path)
    the path names the drive, or begins at the root. A full stop that the
    name ends with is left out.
 
-   A path on another drive than the current one is taken as it is. */
+   A path on another drive than the current one is taken as it is. Where
+   the buffer holds no characters, the byte in front of it is looked at
+   for the full stop: `buffer` is the main data as bytes for that, as
+   the original has it, and the byte is the last of TmpBuf for the
+   source. */
 static void C40_05(const u8 *path, u8 *buffer)
 {
     u8 *to;
@@ -226,8 +234,8 @@ static bool C40_00(i32 *left)
     const u8 *source = md.TmpErr, *target = md.TmpErr + 100;
     i32 count;
 
-    C40_05(CpSrc, md.TmpErr);
-    C40_05(CpDest, md.TmpErr + 100);
+    C40_05(CpSrc, MD_BYTES + MD_AT(TmpErr));
+    C40_05(CpDest, MD_BYTES + MD_AT(TmpErr) + 100);
     count = LenName;
     count = C00_End(target, &count);
     do {
@@ -429,7 +437,7 @@ static bool C00_01(void)
             /* The assembly goes on with DX as it is, which DOS has not
                set if it would not say: the address of the name. */
             if (device.failed)
-                info = MD_PLACE(CpDest);
+                info = CpDestAt;
             FileClose(opened.value);
             if (info & 0x80) {
                 CpDev2 = 1;
@@ -680,7 +688,7 @@ static u16 C20_00(i32 fits)
        would not say what the handle is: the address of the name, here
        and for the target. */
     if (device.failed)
-        info = MD_PLACE(CpSrc);
+        info = CpSrcAt;
     if ((info & 0x81) == 0x81)
         goto no_source;
     CpDev1 = (u8)(info & 0x80);
@@ -703,7 +711,7 @@ static u16 C20_00(i32 fits)
            to, as FileTime has them; for a device they are what comparing
            the two names left and the address of the name. */
         stamp.time = (u16)count;
-        stamp.date = MD_PLACE(CpSrc);
+        stamp.date = CpSrcAt;
     }
     CpDate = stamp.date;
     CpTime = stamp.time;
@@ -818,7 +826,7 @@ opened:
     device = FileDevice(CpHndl2);
     info = device.kind;
     if (device.failed)
-        info = MD_PLACE(CpDest);
+        info = CpDestAt;
     if ((info & 0x82) != 0x82)
         goto write;
     error = 0;
@@ -871,7 +879,7 @@ append:
         /* CX and DX as they are, again: the attributes that were last
            kept or set, and the address of the name. */
         stamp.time = attributes;
-        stamp.date = MD_PLACE(CpDest);
+        stamp.date = CpDestAt;
     }
     CpDate = stamp.date;
     CpTime = stamp.time;

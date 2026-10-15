@@ -1666,13 +1666,32 @@ struct Paged PgDn(i32 cursor, i32 first, i32 rows, i32 lines);
 #define MD_PLACE(pointer) ((u16)((const u8 *)(pointer) - (const u8 *)&md))
 #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
 
+/* Where in the main data a field is, as a number: in a table, the word
+   that the assembly has for the name of a field of MainDat; in the code,
+   a place of the main data that a field gives, as the original leaves
+   in a register or hands DOS. A field of a field is written with a dot,
+   MD_AT(DTA.FilAttr). */
+#define MD_AT(field) OFFSET_IN(struct MainDat, field)
+
+/* The main data as bytes. Where the program reads or copies the main
+   data across its fields, as the original reads its main data as one
+   block, in front of a field, behind its end or from one field into the
+   next, it reads these bytes at the place of the field, MD_AT, and the
+   number of bytes from there: C says nothing of what lies next to a
+   field, and of the bytes of the structure it does. A field that is read
+   within its bounds is read as the field. */
+#define MD_BYTES ((u8 *)&md)
+
 /* Where in a panel's block its list of files begins, DskBuf, an offset
    in the panel; and the list of the tree's directories in the main
    data, TreeBuf.TreList, a pointer to its first entry, the root. The
-   assembly keeps places in both as addresses, not as numbers. */
+   assembly keeps places in both as addresses, not as numbers. The list
+   begins inside the tree's header, where its last field is, and goes on
+   behind it: it is the bytes of the main data from there. */
 #define DSKBUF  ((i32)(sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT)))
 #define TRELIST \
-    ((struct DIRENT *)&((struct DIRTREE *)md.TreeBuf)->TreSum2)
+    ((struct DIRENT *)(MD_BYTES + MD_AT(TreeBuf) \
+                       + offsetof(struct DIRTREE, TreSum2)))
 
 /* An entry of the tree's list as an offset in the list, in bytes, and
    the entry at such an offset. What moves a cursor through a panel's

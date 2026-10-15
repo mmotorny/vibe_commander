@@ -164,10 +164,11 @@ static void StRdPages(u16 handle, u8 *buffer)
     for (i = 0; i < LenHead; i++)       /* is it a help file of this */
         if (buffer[16 + i] != StHelp_F[HlpHead + i])    /* version? */
             return;
-    if (SeekDsk(handle, 0x194)          /* where the index is */
-        || ReadDsk(handle, (u8 *)&index->HlpOffsLo, 4))
+    if (SeekDsk(handle, 0x194)          /* where the index is: two */
+        || ReadDsk(handle,              /* fields as one block */
+                   buffer + offsetof(struct StHlpData, HlpOffsLo), 4))
         return;
-    DeCode((u8 *)&index->HlpOffsLo, 4);
+    DeCode(buffer + offsetof(struct StHlpData, HlpOffsLo), 4);
     if (SeekDsk(handle, (u32)index->HlpOffsHi << 16 | index->HlpOffsLo)
         || ReadDsk(handle, buffer, HlpInfo))
         return;                         /* what the index begins with, */

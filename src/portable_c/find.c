@@ -554,7 +554,9 @@ u16 FindFil(u16 attributes)
             break;
     if (length >= LenFnf)
         return 0;
-    end = md.TmpBuf + length;
+    /* The byte in front of the end, which is in front of TmpBuf where
+       the path is empty: the main data as bytes. */
+    end = MD_BYTES + MD_AT(TmpBuf) + length;
     if (end[-1] != ':' && end[-1] != '\\')
         *end++ = '\\';
 

@@ -385,7 +385,7 @@ static void StMain00(void)
         DialBox(0x528, &StMain_P, 0, &md, &where);
         Window(where.begin, where.size);
         item = sd.MnItem;
-        last = (u8)((where.size >> 8) - 6);     /* the item Exit */
+        last = ((where.size >> 8) - 6) & 0xFF;  /* the item Exit */
         md.MousTim |= 0xFFFF0000UL;
         md.MousEnt = 0;
         for (;;) {                      /* Main01: Set cursor */

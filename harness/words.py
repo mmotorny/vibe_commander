@@ -136,6 +136,9 @@ WORDS = [
                             "a number: it rests on the main data's layout, "
                             "not on the megabyte"),
     _word("MD_POINTER", None, "and the number made the pointer again"),
+    _word("MD_BYTES", None, "the main data as bytes, where the program "
+                            "reads it across its fields, as the original "
+                            "reads it as one block: the piece MD"),
     _word("TRELIST", None, "the tree's list: a pointer since F7"),
     _word("TREE_OFFSET", None, "an entry of the tree's list as an offset "
                                "in it, where one routine moves a cursor "
@@ -152,7 +155,9 @@ WORDS = [
     _word("PANEL_AS_MAIN", None, "a panel where the main data is asked "
                                  "for, the other way round: one place, "
                                  "ClsLine for Run_00"),
-    _word("MD_AT", None, "in a table: an offset in the main data"),
+    _word("MD_AT", None, "an offset in the main data by its field: in a "
+                         "table, and in the code with MD_BYTES or for a "
+                         "place that a field gives"),
     _word("WCB_AT", None, "in a table: an offset in a panel"),
     _word("NUMBER", None, "in a table: a number where a name could be"),
 ]

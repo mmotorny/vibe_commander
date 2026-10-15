@@ -73,7 +73,7 @@ extern const u8 Vers_S[];
    paragraphs. */
 #define COMNINI_WAS 0x25E5
 #define WAS(place)  ((u16)((place) + COMNINI_WAS))
-#define EPB_WAS     WAS(MD_PLACE(&md.EPB))
+#define EPB_WAS     WAS(MD_AT(EPB))
 #define RESPARS_WAS 0x031A
 
 /*------------------- Execute commands ------------------*/

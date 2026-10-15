@@ -464,7 +464,7 @@ static u16 M30_50(u16 attributes)
                has not set then: the attributes that it has just set, and
                the address of the name. */
             stamp.time = old & 0xFFFE;
-            stamp.date = MD_PLACE(md.TmpBuf);
+            stamp.date = MD_AT(TmpBuf);
         }
         if (AttrDat != 0xFFFF)
             stamp.date = AttrDat;

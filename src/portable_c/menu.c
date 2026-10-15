@@ -31,8 +31,8 @@
 
 /* The byte of MnuList for an item, numbered from 1. The assembly makes a
    word of the number with its sign, so an item of 80h or more, which no
-   menu has, is looked for before the list. */
-#define LIST(item) MnuList[(short)(signed char)(item) - 1]
+   menu has, is looked for before the list: the main data as bytes. */
+#define LIST(item) MD_BYTES[MD_AT(TmpBuf) + (short)(signed char)(item) - 1]
 /* Whether an item cannot be chosen, where the assembly holds its byte
    against the high byte of that word: 0 for every item there is. */
 #define DARK(item) (LIST(item) == ((item) & 0x80 ? 0xFF : 0))
