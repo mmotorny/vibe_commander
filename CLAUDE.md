@@ -4368,7 +4368,10 @@ waiting for the user between its steps.
   derived again with it. In the portable C there is no unsorted order:
   the order of a directory means something on DOS alone, so it goes,
   as a thing that only made sense on DOS, declared, and a panel sorts
-  by name unless the user picks another order.
+  by name unless the user picks another order. Since the scenarios move the
+  cursor by places in a list, their steps are rewritten for it, each
+  to go to the files that it meant, the user choosing that on the
+  same day over keeping the bench unsorted (`TODO.md`, "SORT").
 - The countries tested are the United States and Russia.
 - Russian text is typed on the Russian keyboard of the Russian bench. Its
   Cyrillic letters are selected in a step that types text into an input
