@@ -75,7 +75,7 @@ N3, N4          56          0    13              0      67     2     7    23    
 N5              71          0     0              0      64     7     3     4    48  find.c
 N6 to N8        69          0     4              0      73     0    13    38   152  edit.c
 N9              50          0     6              0      48     8     2     9    47  copy.c
-N10             45          0     0              0      40     5     4     9    38  dirfunc.c
+N10             55          0     0              0      50     5     4    10    42  dirfunc.c
 N11             24          0     1              0      23     2     4    12    60  files.c read.c place.c
 N12             47          0     4              0      51     0     9     3    35  panel.c info.c drive.c
 N13             45          0     0              0      45     0     1    16    51  tree.c treebox.c extfile.c
@@ -91,7 +91,7 @@ N20             61          0     0              0      58     3     0     3    
 N21             60          0     3              0      46     7     0     5    34  stmain.c sthelp.c
 as a whole     647          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
 headers        338         94    15              0     210     5     0     0     0  vc.h sys.h tables.h
-all           2048         94   116              0    1222    68    62   212  1092
+all           2058         94   116              0    1232    68    62   213  1096
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               218          0    11              0     180     5     0     0     0
@@ -105,7 +105,7 @@ commands.c          22          0     0              0      22     0     0     5
 copy.c              50          0     6              0      48     8     2     9    47
 dialog.c            89          0     0              0      76    13     0     4    33
 digits.c             2          0     1              0       3     0     0     0     4
-dirfunc.c           45          0     0              0      40     5     4     9    38
+dirfunc.c           55          0     0              0      50     5     4    10    42
 drive.c             17          0     0              0      17     0     2     2    11
 edit.c              69          0     4              0      73     0    13    38   152
 enter.c              9          0     0              0       9     0     0     1    18
@@ -1839,6 +1839,31 @@ dirfunc.c, F38_10: returns, u16
     The answer for the dialog to go by, as Dialog answers it: what
     was handed in, or its high byte alone for Delete.
 
+dirfunc.c, F38_43: parameter error, u16
+    system: AX as DOS left it, the error to report
+
+dirfunc.c, F38_43: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, F38_54: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, DeleteFile: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, DeleteFile: variable error, u16
+    system: AX as DOS left it, the error to report
+
+dirfunc.c, RemoveDir: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, RemoveDir: variable error, u16
+    system: AX as DOS left it, the error to report
+
 dirfunc.c, F38_40: parameter attributes, u16
     attributes: in the low byte; above it what DirFunc hands on of AX
     as DOS left it, which only C00_00 reads.
@@ -1851,8 +1876,17 @@ dirfunc.c, F38_40: variable answer, u16
     bits: what a routine of FncAddr answers, 1 or 0 in the low byte
     for done or not, and something above it to stop.
 
-dirfunc.c, F38_40: variable error, u16
-    system: AX as DOS left it, the error to report
+dirfunc.c, F38_72: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, F38_72: variable answer, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop; first what DOS
+    left in AL, of which one more, as a byte, is the low byte.
+
+dirfunc.c, F38_72: variable kept, u8
+    character
 
 dirfunc.c, F38_70: returns, u16
     bits: what a routine of FncAddr answers, 1 or 0 in the low byte
@@ -1860,14 +1894,24 @@ dirfunc.c, F38_70: returns, u16
 
 dirfunc.c, F38_70: variable answer, u16
     bits: what a routine of FncAddr answers, 1 or 0 in the low byte
-    for done or not, and something above it to stop; first what DOS
-    left in AL, of which one more, as a byte, is the low byte.
-
-dirfunc.c, F38_70: variable kept, u8
-    character
+    for done or not, and something above it to stop.
 
 dirfunc.c, F38_70: variable letter, u8
     character: the letter of the drive, as typed
+
+dirfunc.c, M30_56: parameter error, u16
+    system: AX as DOS left it, the error to report
+
+dirfunc.c, M30_56: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, M30_51: returns, u16
+    bits: what a routine of FncAddr answers, 1 or 0 in the low byte
+    for done or not, and something above it to stop.
+
+dirfunc.c, M30_51: variable old, u16
+    attributes
 
 dirfunc.c, M30_50: parameter attributes, u16
     attributes: in the low byte; above it what DirFunc hands on of AX
@@ -1880,12 +1924,6 @@ dirfunc.c, M30_50: returns, u16
 dirfunc.c, M30_50: variable answer, u16
     bits: what a routine of FncAddr answers, 1 or 0 in the low byte
     for done or not, and something above it to stop.
-
-dirfunc.c, M30_50: variable error, u16
-    system: AX as DOS left it, the error to report
-
-dirfunc.c, M30_50: variable old, u16
-    attributes
 
 dirfunc.c, Figure: variable read, u16
     What TxtNum reads a number into, through a pointer of 16 bits, so

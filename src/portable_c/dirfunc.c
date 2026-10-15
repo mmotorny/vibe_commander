@@ -136,6 +136,7 @@ extern const u8 Tree_F[];
 #define DONE 1                          /* what a routine of FncAddr */
 #define NOT_DONE 0                      /* answers with */
 #define STOP 0x100
+#define WALK 0xFFFE                     /* RemoveDir: its files first */
 
 #define BOX_PLACE 0x528                 /* where the boxes have their middle */
 
@@ -170,6 +171,114 @@ u16 F38_10(u16 answer)
     return answer & 0xFF00;
 }
 
+/* F38_43 of F38_40: what could not be deleted said in the box
+   `report`, but for a drive that is not ready, by the error `error`.
+   Returns NOT_DONE if it was answered with Ok, else STOP. */
+static u16 F38_43(u16 error, const struct BOXHD *report)
+{
+    if (error != ERR_NOT_READY
+        && (u8)Dialog(report, Del_S, 0, 0, &md) == 0)
+        return NOT_DONE;                /* F38_44 */
+    return STOP;
+}
+
+/* F38_54 of F38_40: a directory is gone. The first that the command
+   removes has the tree's file marked as out of date. Returns DONE, or
+   STOP for a drive that is not ready. */
+static u16 F38_54(void)
+{
+    struct Answer marked;
+
+    FNC_CHANGE = 1;
+    if (DEL_TREE == 0) {
+        DEL_TREE = 1;
+        /* DelTree */
+        if (md.ChgTree != 0) {
+            marked = DelTr0(md.TmpBuf);
+            if (marked.failed && marked.value == ERR_NOT_READY)
+                return STOP;
+        }
+    }
+    return DONE;                        /* F38_55 */
+}
+
+/* F38_41 of F38_40, with its box on the screen: the file at TmpBuf
+   deleted, and a read-only one asked about. Returns DONE, NOT_DONE or
+   STOP, as F38_40. */
+static u16 DeleteFile(void)
+{
+    struct FileAttr had;
+    struct Answer asked;
+    u16 error;
+    i32 count, button;
+
+    if (ChgDisk(md.TmpBuf))
+        return STOP;
+    asked = FileDelete(md.TmpBuf);
+    if (!asked.failed)
+        return DONE;
+    error = asked.value;
+    if (error == ERR_NO_ACCESS) {
+        had = FileAttributes(md.TmpBuf);
+        error = had.value;
+        if (!had.failed) {
+            /* What is reported if it is not read-only: not the error
+               of a drive that is not ready, whatever DOS left. */
+            error &= 0xFF00;
+            if (had.attributes & 1) {
+                button = (u8)Dialog(&RdOnl_B, Del_S,
+                                    0, 0, &md);
+                if (button == 1)
+                    return NOT_DONE;
+                if (button > 1)
+                    return STOP;
+                asked = FileSetAttributes(md.TmpBuf, 0x20);
+                error = asked.value;
+                if (!asked.failed) {
+                    FNC_CHANGE = 1;
+                    asked = FileDelete(md.TmpBuf);
+                    if (!asked.failed)
+                        return DONE;
+                    error = asked.value;
+                }
+            }
+        }
+    }
+    /* F38_42 */
+    for (count = 0; count < LenPath + 13; count++)
+        md.TmpBuf[130 + count] = md.TmpBuf[count];
+    return F38_43(error, &DelEr_B);
+}
+
+/* F38_50 of F38_40, with its box on the screen: the directory at TmpBuf
+   removed. One that is not empty is asked about, unless All was the
+   answer once. Returns DONE, NOT_DONE or STOP, as F38_40, or WALK where
+   its files are to be deleted first. */
+static u16 RemoveDir(void)
+{
+    struct Answer removed;
+    u16 error;
+    i32 button;
+
+    if (ChgDisk(md.TmpBuf))
+        return STOP;
+    removed = F38_60();
+    if (!removed.failed)
+        return F38_54();
+    error = removed.value;
+    if (error < 100 && (u8)error != ERR_NO_ACCESS)
+        return F38_43(error, &CntDi_B);
+    /* F38_51: it is not empty */
+    if (DEL_ALL == 0) {
+        button = (u8)Dialog(&NoEmp_B, Del_S, 0, 0, &md);
+        if (button > 1)
+            return NOT_DONE;
+        if (button == 1)
+            DEL_ALL = 1;
+    }
+    return WALK;
+}
+
 /* Delete the file or the directory at TmpBuf, by the attributes it has.
 
    A read-only file is asked about, and deleted if the answer is Delete.
@@ -186,123 +295,49 @@ static u16 F38_40(u16 attributes)
 {
     struct Box box;
     u8 *end;
-    struct FileAttr had;
-    struct Answer asked, removed, marked;
-    const struct BOXHD *report;
-    u16 answer, error;
-    i32 count, button;
+    struct Answer removed;
+    u16 answer;
+    i32 count;
 
     if (!(attributes & ATTR_DIRECTORY)) {
         OncZoom(BOX_PLACE, &DelFl_P, Empty_S, &box);
-        if (ChgDisk(md.TmpBuf))
-            goto stop;
-        asked = FileDelete(md.TmpBuf);
-        if (!asked.failed)
-            goto done;
-        error = asked.value;
-        if (error == ERR_NO_ACCESS) {
-            had = FileAttributes(md.TmpBuf);
-            error = had.value;
-            if (!had.failed) {
-                /* What is reported if it is not read-only: not the error
-                   of a drive that is not ready, whatever DOS left. */
-                error &= 0xFF00;
-                if (had.attributes & 1) {
-                    button = (u8)Dialog(&RdOnl_B, Del_S,
-                                        0, 0, &md);
-                    if (button == 1)
-                        goto not_done;
-                    if (button > 1)
-                        goto stop;
-                    asked = FileSetAttributes(md.TmpBuf, 0x20);
-                    error = asked.value;
-                    if (!asked.failed) {
-                        FNC_CHANGE = 1;
-                        asked = FileDelete(md.TmpBuf);
-                        if (!asked.failed)
-                            goto done;
-                        error = asked.value;
-                    }
-                }
-            }
-        }
-        /* F38_42 */
-        for (count = 0; count < LenPath + 13; count++)
-            md.TmpBuf[130 + count] = md.TmpBuf[count];
-        report = &DelEr_B;
-        goto failed;
-    }
-
-    /* F38_50 */
-    OncZoom(BOX_PLACE, &DelDr_P, Del_S, &box);
-    if (ChgDisk(md.TmpBuf))
-        goto stop;
-    removed = F38_60();
-    if (removed.failed) {
-        error = removed.value;
-        if (error < 100 && (u8)error != ERR_NO_ACCESS) {
-            report = &CntDi_B;
-            goto failed;
-        }
-        /* F38_51: it is not empty */
-        if (DEL_ALL == 0) {
-            button = (u8)Dialog(&NoEmp_B, Del_S, 0, 0, &md);
-            if (button > 1)
-                goto not_done;
-            if (button == 1)
-                DEL_ALL = 1;
-        }
-        /* F38_52 */
-        Close(&box);
-        end = md.TmpBuf;
-        for (count = LenPath + 13; count != 0; count--)
-            if (*end++ == 0)
-                break;
-        end--;
-        for (count = 0; count < 5; count++)
-            end[count] = Mask_S[count];
-        answer = F38_70();
-        *end = 0;
-        if (answer >> 8)
-            goto out;
-        answer = DirFunc();
-        if (answer >> 8)
-            goto out;
+        answer = DeleteFile();
+    } else {
+        /* F38_50 */
         OncZoom(BOX_PLACE, &DelDr_P, Del_S, &box);
-        removed = F38_60();
-        if (removed.failed) {
-            if (removed.value == ERR_NOT_READY)
-                goto stop;
-            goto not_done;
+        answer = RemoveDir();
+        if (answer == WALK) {
+            /* F38_52: its files first, with the box off the screen */
+            Close(&box);
+            end = md.TmpBuf;
+            for (count = LenPath + 13; count != 0; count--)
+                if (*end++ == 0)
+                    break;
+            end--;
+            for (count = 0; count < 5; count++)
+                end[count] = Mask_S[count];
+            answer = F38_70();
+            *end = 0;
+            if (answer >> 8 == 0)
+                answer = DirFunc();
+            if (answer >> 8 != 0) {
+                /* F38_57, as below, with no box to close */
+                FNC_CHANGE |= (u8)answer;
+                return answer;
+            }
+            OncZoom(BOX_PLACE, &DelDr_P, Del_S, &box);
+            removed = F38_60();
+            if (!removed.failed)
+                answer = F38_54();
+            else if (removed.value == ERR_NOT_READY)
+                answer = STOP;
+            else
+                answer = NOT_DONE;
         }
     }
-    /* F38_54 */
-    FNC_CHANGE = 1;
-    if (DEL_TREE == 0) {
-        DEL_TREE = 1;
-        /* DelTree */
-        if (md.ChgTree != 0) {
-            marked = DelTr0(md.TmpBuf);
-            if (marked.failed && marked.value == ERR_NOT_READY)
-                goto stop;
-        }
-    }
-done:
-    answer = DONE;
-    goto close;
-failed:
-    /* F38_43 */
-    if (error != ERR_NOT_READY
-        && (u8)Dialog(report, Del_S, 0, 0, &md) == 0) {
-not_done:
-        answer = NOT_DONE;
-        goto close;
-    }
-stop:
-    answer = STOP;
-close:
+    /* F38_56 */
     Close(&box);
-out:
+    /* F38_57 */
     FNC_CHANGE |= (u8)answer;
     return answer;
 }
@@ -333,6 +368,63 @@ static struct Answer F38_60(void)
     return DirRemove(md.TmpBuf);
 }
 
+/* F38_72 of F38_70, with its box on the screen: the files deleted by
+   the FCB `fcb`, with the directory of `name`, where the mask is in
+   TmpBuf, the current one for the call. Returns what F38_70 does. */
+static u16 F38_72(u8 *fcb, u8 *name)
+{
+    struct Answer asked;
+    u8 *back = md.TmpBuf + 100;
+    u8 *end;
+    u16 answer;
+    i32 drive;
+    bool carry = false;
+    u8 kept;
+
+    if (ChgDisk(md.TmpBuf))
+        return STOP;
+    *back = 0;
+    if (name > md.TmpBuf) {
+        if (name[-1] != '\\') {
+            carry = name[-1] < '\\';
+        } else {
+            drive = fcb[7];
+            if (drive != 0) {
+                *back++ = (u8)(drive + 'A' - 1);
+                *back++ = ':';
+            }
+            *back++ = '\\';
+            asked = DirCurrent((u16)drive, back);
+            if (!asked.failed) {
+                end = name;
+                if (end > md.TmpBuf + 1 && end[-2] != ':')
+                    end--;
+                kept = *end;
+                *end = 0;
+                asked = DirChange(md.TmpBuf);
+                *end = kept;
+            }
+            if (asked.failed) {
+                /* F38_75 */
+                if (asked.value == ERR_NOT_READY)
+                    return STOP;
+                return NOT_DONE;
+            }
+        }
+    }
+    /* F38_77 */
+    FNC_CHANGE = 1;
+    answer = FcbDelete(fcb, carry).value;
+    if (md.TmpBuf[100] != 0 && DirChange(md.TmpBuf + 100).failed)
+        return STOP;
+    /* What DOS left in AL: 0 for deleted, 0FFh for not, or the low byte
+       of the error that it was asked about, below 7Fh. One more, as a
+       byte: 1 or 0, or the error and one. The original makes a word of
+       the byte with its sign, whose high byte, which stops the command,
+       is 0 for each of those. */
+    return (u8)(answer + 1);
+}
+
 /* Delete the files that the mask at TmpBuf names, at one call of DOS:
    by an FCB, which is made at TmpBuf + 200 and takes hidden and system
    files too. An FCB has no path, so the directory of the mask is made
@@ -350,15 +442,11 @@ static struct Answer F38_60(void)
    "Can't find files" for such a mask. */
 static u16 F38_70(void)
 {
-    struct Answer asked;
     struct Box box;
     u8 *fcb = md.TmpBuf + 200;
-    u8 *back = md.TmpBuf + 100;
-    u8 *name, *end;
+    u8 *name;
     u16 answer;
-    i32 drive;
-    bool carry = false;
-    u8 letter, kept;
+    u8 letter;
 
     fcb[0] = 0xFF;                      /* an extended one, */
     fcb[6] = 0x26;                      /* for these attributes */
@@ -370,94 +458,52 @@ static u16 F38_70(void)
     if ((u8)FcbParse(name, fcb + 7, 2) != 1)
         return NOT_DONE;
     OncZoom(BOX_PLACE, &DelFl_P, DelFs_S, &box);
-    if (ChgDisk(md.TmpBuf))
-        goto stop;
-    *back = 0;
-    if (name > md.TmpBuf) {
-        if (name[-1] != '\\') {
-            carry = name[-1] < '\\';
-        } else {
-            drive = fcb[7];
-            if (drive != 0) {
-                *back++ = (u8)(drive + 'A' - 1);
-                *back++ = ':';
-            }
-            *back++ = '\\';
-            asked = DirCurrent((u16)drive, back);
-            if (asked.failed)
-                goto failed;
-            end = name;
-            if (end > md.TmpBuf + 1 && end[-2] != ':')
-                end--;
-            kept = *end;
-            *end = 0;
-            asked = DirChange(md.TmpBuf);
-            *end = kept;
-            if (asked.failed) {
-failed:
-                /* F38_75 */
-                if (asked.value == ERR_NOT_READY)
-                    goto stop;
-                answer = NOT_DONE;
-                goto close;
-            }
-        }
-    }
-    /* F38_77 */
-    FNC_CHANGE = 1;
-    answer = FcbDelete(fcb, carry).value;
-    if (md.TmpBuf[100] != 0 && DirChange(md.TmpBuf + 100).failed)
-        goto stop;
-    /* What DOS left in AL: 0 for deleted, 0FFh for not, or the low byte
-       of the error that it was asked about, below 7Fh. One more, as a
-       byte: 1 or 0, or the error and one. The original makes a word of
-       the byte with its sign, whose high byte, which stops the command,
-       is 0 for each of those. */
-    answer = (u8)(answer + 1);
-    goto close;
-stop:
-    answer = STOP;
-close:
+    answer = F38_72(fcb, name);
     Close(&box);
     return answer;
 }
 
-/* Set the attributes of the file at TmpBuf, and its date and time if
-   either is to change, for which the file is opened; read-only is taken
-   off first. For a directory, do it to what is in it.
-
-   Ported as it is: DOS is not asked whether it could read the date and
-   the time of the file, or set them. */
-static u16 M30_50(u16 attributes)
+/* M30_56 of M30_50: what could not be done said in a box, but for a
+   drive that is not ready, by the error `error`. Returns NOT_DONE if
+   the box was answered with Ok, else STOP. */
+static u16 M30_56(u16 error)
 {
-    struct Box box;
+    const u8 *include;
+
+    if (error != ERR_NOT_READY) {
+        include = NoAtr_S;
+        if (error <= ERR_NO_PATH)
+            include = NoFnd_S;
+        if ((u8)Dialog(&AtrEr_B, include, 0, 0, &md) == 0)
+            return NOT_DONE;
+    }
+    return STOP;                        /* M30_55 */
+}
+
+/* M30_51 of M30_50, with its box on the screen: the attributes of the
+   file at TmpBuf set, and its date and time. Returns what M30_50
+   does. */
+static u16 M30_51(void)
+{
     struct FileAttr had;
     struct FileStamp stamp;
     struct Answer opened, asked;
-    const u8 *include;
-    u16 answer, old, error;
+    u16 old;
 
-    if (attributes & ATTR_DIRECTORY)
-        return DirFunc();
-    /* None of its lines has ^I: no include line. */
-    OncZoom(BOX_PLACE, &StAtr_P, 0, &box);
     if (ChgDisk(md.TmpBuf))
-        goto stop;
+        return STOP;
     had = FileAttributes(md.TmpBuf);
-    error = had.value;
     if (had.failed)
-        goto failed;
+        return M30_56(had.value);
     old = had.attributes;
     if ((AttrDat & AttrTim) != 0xFFFF) {
         asked = FileSetAttributes(md.TmpBuf, old & 0xFFFE);
-        error = asked.value;
         if (asked.failed)
-            goto failed;
+            return M30_56(asked.value);
         FNC_CHANGE = 1;
         opened = OpenFil(md.TmpBuf, 0x41);
-        error = opened.value;
         if (opened.failed)
-            goto failed;
+            return M30_56(opened.value);
         stamp = FileTime(opened.value);
         if (stamp.failed) {
             /* The assembly goes on with CX and DX as they are, which DOS
@@ -472,32 +518,34 @@ static u16 M30_50(u16 attributes)
             stamp.time = AttrTim;
         FileSetTime(opened.value, stamp.time, stamp.date);
         asked = FileClose(opened.value);
-        error = asked.value;
         if (asked.failed)
-            goto failed;
+            return M30_56(asked.value);
     }
     /* M30_54 */
     asked = FileSetAttributes(md.TmpBuf, (old & 0xFF00)
                               | ((u8)old & ATTR_KEEP) | ATTR_SET);
-    error = asked.value;
-    if (!asked.failed) {
-        answer = DONE;
-        goto close;
-    }
-failed:
-    /* M30_56 */
-    if (error != ERR_NOT_READY) {
-        include = NoAtr_S;
-        if (error <= ERR_NO_PATH)
-            include = NoFnd_S;
-        if ((u8)Dialog(&AtrEr_B, include, 0, 0, &md) == 0) {
-            answer = NOT_DONE;
-            goto close;
-        }
-    }
-stop:
-    answer = STOP;
-close:
+    if (asked.failed)
+        return M30_56(asked.value);
+    return DONE;
+}
+
+/* Set the attributes of the file at TmpBuf, and its date and time if
+   either is to change, for which the file is opened; read-only is taken
+   off first. For a directory, do it to what is in it.
+
+   Ported as it is: DOS is not asked whether it could read the date and
+   the time of the file, or set them. */
+static u16 M30_50(u16 attributes)
+{
+    struct Box box;
+    u16 answer;
+
+    if (attributes & ATTR_DIRECTORY)
+        return DirFunc();
+    /* None of its lines has ^I: no include line. */
+    OncZoom(BOX_PLACE, &StAtr_P, 0, &box);
+    answer = M30_51();
+    /* M30_58 */
     FNC_CHANGE |= (u8)answer;
     Close(&box);
     return answer;
@@ -530,6 +578,19 @@ static struct Checked Accepted(u16 answer)
     return checked;
 }
 
+/* M30_75 of M30_60: a line is no date or no time, which a box says.
+   Returns what the box was answered with, and that the line was
+   refused. */
+static struct Checked M30_75(void)
+{
+    struct Checked checked;
+
+    /* None of its lines has ^I: no include line. */
+    checked.answer = Dialog(&NoDat_B, 0, 0, 0, &md);
+    checked.refused = true;
+    return checked;
+}
+
 /* What the dialog of attributes has Dialog call when it is answered:
    with Set, 0, the date and the time are read from the two lines that
    were typed, and put where M30_50 takes them, AttrDat and AttrTim. A
@@ -549,7 +610,6 @@ static struct Checked Accepted(u16 answer)
    is refused, and so is anything behind the letter, but spaces. */
 struct Checked M30_60(u16 answer)
 {
-    struct Checked checked;
     const u8 *text;
     i32 month, day, year, days, swap;
     i32 hours, minutes = 0, seconds = 0, add = 0, limit;
@@ -562,19 +622,19 @@ struct Checked M30_60(u16 answer)
     text = FndLet(md.DosBuf + LenCmd + 10 + 3);
     if (*text != 0) {
         if (!Figure(&text, &month))
-            goto refused;
+            return M30_75();
         if (*text != md.Country.DateSep[0])
-            goto refused;
+            return M30_75();
         text = FndLet(text + 1);
         if (!Figure(&text, &day))
-            goto refused;
+            return M30_75();
         if (*text != md.Country.DateSep[0])
-            goto refused;
+            return M30_75();
         text = FndLet(text + 1);
         if (!Figure(&text, &year))
-            goto refused;
+            return M30_75();
         if (*text != 0)
-            goto refused;
+            return M30_75();
         if (md.Country.DateFmt != 0) {
             swap = month;
             month = day;
@@ -590,14 +650,14 @@ struct Checked M30_60(u16 answer)
             year -= 1980;
         } else {
             if (year >= 100)
-                goto refused;
+                return M30_75();
             if (year >= 80)
                 year -= 80;
             else
                 year += 20;
         }
         if (year >= 128 || month > 12 || month < 1)
-            goto refused;
+            return M30_75();
         days = month;
         if (days > 7)
             days++;
@@ -608,7 +668,7 @@ struct Checked M30_60(u16 answer)
                 days++;
         }
         if (day > days || day == 0)
-            goto refused;
+            return M30_75();
         /* Below 64K, by the tests above: a year below 128, a month to 12
            and a day to 31. */
         AttrDat = (u16)((year << 9) + (month << 5) + day);
@@ -619,19 +679,19 @@ struct Checked M30_60(u16 answer)
     if (*text == 0)
         return Accepted(0);
     if (!Figure(&text, &hours))
-        goto refused;
+        return M30_75();
     if (*text == md.Country.TimeSep[0]) {
         text = FndLet(text + 1);
         if (!Figure(&text, &minutes))
-            goto refused;
+            return M30_75();
         if (minutes >= 60)
-            goto refused;
+            return M30_75();
         if (*text == md.Country.TimeSep[0]) {
             text = FndLet(text + 1);
             if (!Figure(&text, &seconds))
-                goto refused;
+                return M30_75();
             if (seconds >= 60)
-                goto refused;
+                return M30_75();
         }
     }
     /* M30_71 */
@@ -639,7 +699,7 @@ struct Checked M30_60(u16 answer)
         letter = (u8)UpCase(*text);
         text = FndLet(text + 1);
         if (*text != 0)
-            goto refused;
+            return M30_75();
     }
     limit = 24;
     if (letter != 0) {
@@ -647,23 +707,17 @@ struct Checked M30_60(u16 answer)
         if (letter != 'A') {
             add = 12;
             if (letter != 'P')
-                goto refused;
+                return M30_75();
         }
     }
     if (hours > limit)
-        goto refused;
+        return M30_75();
     if (hours == limit)
         hours = 0;
     /* Below 64K, by the tests above: hours to 23, minutes and seconds to
        59. */
     AttrTim = (u16)(((hours + add) << 11) + (minutes << 5) + (seconds >> 1));
     return Accepted(0);
-
-refused:
-    /* None of its lines has ^I: no include line. */
-    checked.answer = Dialog(&NoDat_B, 0, 0, 0, &md);
-    checked.refused = true;
-    return checked;
 }
 
 /* Call what FncAddr names, for a file with these attributes at TmpBuf. */
@@ -849,6 +903,18 @@ struct Answer DelTr0(const u8 *path)
     return marked;
 }
 
+/* F47_03 of F47_01: the directory at TmpBuf could not be made, which a
+   box says. Returns where the loop goes on. */
+static i32 F47_03(void)
+{
+    i32 i;
+
+    for (i = 0; i < LenPath + 13; i++)
+        md.TmpBuf[130 + i] = md.TmpBuf[i];
+    Dialog(&MkErr_B, MkDir_S, 0, 0, &md);
+    return TO_FUNC04;                   /* F47_04 */
+}
+
 /* Shift-F7, and F7 where no tree is under the cursor: ask for a path and
    make the directory. A name without a path is added to the list of the
    current panel, as a directory, with the cursor on it, and the panels
@@ -885,7 +951,7 @@ static i32 F47_01(const struct BOXHD *box)
     UnConv(name, md.TmpBuf + 100);
     if (box == &MkDi2_B) {
         if (CutPath(md.TmpBuf) != md.TmpBuf)
-            goto failed;
+            return F47_03();
         path = md.TmpBuf + 100;
         end = MvzLine(path, md.CrnPath + 2, LenPath);
         end = AddFile(end);
@@ -899,12 +965,7 @@ static i32 F47_01(const struct BOXHD *box)
     if (made.failed) {
         if (made.value == ERR_NOT_READY)
             return TO_FUNC04;
-failed:
-        /* F47_03 */
-        for (i = 0; i < LenPath + 13; i++)
-            md.TmpBuf[130 + i] = md.TmpBuf[i];
-        Dialog(&MkErr_B, MkDir_S, 0, 0, &md);
-        return TO_FUNC04;
+        return F47_03();
     }
     /* F47_05 */
     if (box == &MkDi2_B) {
@@ -1030,6 +1091,7 @@ i32 F48_00(void)
     const u8 *include;
     i32 i;
     u16 answer;
+    bool every;                         /* the mask names every file */
 
     /* None of its lines has ^I: no include line. */
     if ((u8)Dialog(&DlMas_B, 0, 0, 0, &md) != 0)
@@ -1041,26 +1103,31 @@ i32 F48_00(void)
     if (md.TmpBuf[0] == 0)
         return TO_FUNC04;
     name = CUT_PATH(md.TmpBuf);
+    every = true;
     if (*(u16 *)name != '.') {
         /* Every file, if DOS makes eleven question marks of it. */
         if ((u8)FcbParse(name, md.TmpBuf + 100, 0) != 1)
-            goto delete;
-        for (i = 1; i <= 11; i++)
-            if (md.TmpBuf[100 + i] != '?')
-                goto delete;
+            every = false;
+        else
+            for (i = 1; i <= 11; i++)
+                if (md.TmpBuf[100 + i] != '?') {
+                    every = false;
+                    break;
+                }
     }
-    /* F48_01 */
-    for (i = 0; i < 4; i++)
-        name[i] = Mask_S[1 + i];
-    from = md.TmpBuf;
-    if (CutPath(md.TmpBuf) == md.TmpBuf)
-        from = DlWr4_S;
-    for (i = 0; i < LenPath + 13; i++)
-        md.TmpBuf[100 + i] = from[i];
-    /* No ^I here either. */
-    if ((u8)Dialog(&DlWrn_B, 0, 0, 0, &md) != 0)
-        return TO_FUNC04;
-delete:
+    if (every) {
+        /* F48_01 */
+        for (i = 0; i < 4; i++)
+            name[i] = Mask_S[1 + i];
+        from = md.TmpBuf;
+        if (CutPath(md.TmpBuf) == md.TmpBuf)
+            from = DlWr4_S;
+        for (i = 0; i < LenPath + 13; i++)
+            md.TmpBuf[100 + i] = from[i];
+        /* No ^I here either. */
+        if ((u8)Dialog(&DlWrn_B, 0, 0, 0, &md) != 0)
+            return TO_FUNC04;
+    }
     /* F48_04 */
     md.ZoomOne = 0;
     DEL_ALL = 0;
@@ -1156,7 +1223,8 @@ i32 M30_00(struct WCBdef *panel)
             bits = M30_82(md.TmpBuf);
             ATTR_KEEP = (u8)bits;
             ATTR_SET = (u8)bits;
-            goto set;
+            md.FncAddr = FNC_M30_50;    /* M30_07, as below */
+            return TO_FNCSEL;
         }
     }
     /* M30_01 */
@@ -1166,7 +1234,6 @@ i32 M30_00(struct WCBdef *panel)
         return TO_FUNC04;
     ATTR_SET = (u8)M30_82(md.TmpBuf);
     ATTR_KEEP = (u8)~M30_82(md.TmpBuf + 10);
-set:
     /* M30_07 */
     md.FncAddr = FNC_M30_50;
     return TO_FNCSEL;

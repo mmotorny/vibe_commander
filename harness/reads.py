@@ -161,6 +161,10 @@ REVIEWED = {
     ("dirfunc.c", "Tree_F"): (14, "copied as 14 bytes"),
     ("dirfunc.c", "MkDi1_B"): (TABLE, "a dialog, for F47_01"),
     ("dirfunc.c", "MkDi2_B"): (TABLE, "a dialog, for F47_01"),
+    ("dirfunc.c", "DelEr_B"): (TABLE, "a dialog, handed to F38_43 for "
+                                      "Dialog"),
+    ("dirfunc.c", "CntDi_B"): (TABLE, "a dialog, handed to F38_43 for "
+                                      "Dialog"),
     ("dirfunc.c", "NoAtr_S"): (ZERO, "an include line"),
     ("dirfunc.c", "NoFnd_S"): (ZERO, "an include line"),
     ("dirfunc.c", "Empty_S"): (ZERO, "an include line"),
