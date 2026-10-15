@@ -19363,12 +19363,12 @@ blue panels in the VGA's own colours where `COLORTERM` is `truecolor`
 colours elsewhere. Tab, the arrows, F3 on a file and Esc, F9 and the
 menus, Alt-F1 for the drives (where the desktop keeps Alt-F1 for
 itself, the key does not come), Ctrl-Z the tree, Alt with a letter the
-speed search; Ctrl-O does nothing yet (L6); F10 and Enter leave, with the shell's
+speed search; Ctrl-O shows the terminal's own screen (L6); F10 and Enter leave, with the shell's
 screen as it was and `~/.config/vc/vc.ini` saved. Made smaller than 80
 by 25, the window shows the three lines that ask for more, and the
 screen again when it is made larger. From another terminal, `kill -TSTP
 PID` gives the shell back with the job stopped, and `fg` draws the
-program again. A command typed at its prompt fails for now (L6), and a
+program again. A command typed at its prompt runs in `$SHELL` (L6), and a
 Ctrl key that the terminal or the desktop takes (Ctrl-S without `IXON`
 is the program's; Ctrl-Alt-F keys are the desktop's) does not come.
 
@@ -19542,6 +19542,118 @@ the characters, which are then the main keyboard's.
 - `MouseFromTerminal` of `sys_posix.c` takes the terminal's mouse at
   `Idle`, `KeyWaiting`, `KeyRead` and `MouseWhere`; a new place where
   the program waits wants it too.
+
+### L6, commands: half done, three questions open
+
+What runs a command on Linux, in `sys_posix.c`, `term_posix.c` and a
+file of the emulation of its own, `command_posix.c`; the common code
+and `VC.EXE` are as they were (the same bytes). Built and held so far:
+
+- **The shell.** The program runs COMMAND.COM by the name that COMSPEC
+  has, with /C and the command for its tail (`Exec02` of `exec.c`). On
+  Linux the environment that the program is handed begins with
+  `COMSPEC=` and the path of DOS's of the host's shell, `$SHELL` where
+  it is a path from the root, else `/bin/sh` (`ShellOf`: `R:\USR\BIN\DASH`
+  for Ubuntu's `/bin/sh`, its link followed; COMMAND.COM where DOS
+  cannot name it); a COMSPEC of the host is left out. `ProgramRun` of
+  that name with a tail that begins with `/C` runs `$SHELL -c` with the
+  rest, made a command of the host (`DosCommandToHost`). Any other name
+  is led to the host and run by the shell, quoted, with its tail, where
+  the user may execute it: the external viewer and editor of the setup
+  (`Aexec0` of `view.c`), whose tail has bytes of the original's own
+  protocol, which go as far as a zero byte.
+- **What DOS answers.** That the program ran, whatever it ended with,
+  `value` its code: the shell's 127 for a command that it did not find
+  is a run, as COMMAND.COM saying "Bad command or file name" is. The
+  shell that cannot be executed is DOS's 2, which has the program say
+  what the original says of a COMSPEC that names no file, with the name
+  and Enter to try again (`NotFind`): one of the questions below.
+- **The command line made one of the host's** (`DosCommandToHost`,
+  emulate_posix.h has the rules): UTF-8 for the code page; a path of
+  DOS's that begins with R: or H: at the start of a word (or behind `=`)
+  made the host's path that it leads to, aliases followed, in single
+  quotes, or escaped inside double quotes; a last name with `*` or `?`
+  behind the quoted directory, in small letters, for the shell's
+  pattern; what is in single quotes, a path that leads nowhere and a
+  drive that there is not left as typed. The command runs in the host's
+  directory that DOS's current one leads to (`DosCurrentHost`). The
+  user menu's `!:!\!.!` gives such a path; `!.!` alone, a name of DOS's
+  form, does not: a question below.
+- **The terminal.** The first command of a round gives the terminal back
+  (`TermGive`: the alternate screen left, the kitty protocol's flags
+  popped, the mouse's reports off, its modes as they were) and writes on
+  its own screen what DOS would show there: the row of the grid where
+  the program then types, which holds the prompt and the command that
+  `F21_31` drew, and what it has typed by the BIOS since (`Typed`, kept
+  by `ScreenType` since the terminal last drew); commands behind it in
+  one round, `Exec08`, write their prompt and command the same way.
+  The command's process group gets the terminal (`TermHandTo`, SIGTTOU
+  blocked around `tcsetpgrp`), with the terminal for its standard error
+  too; it ends or is stopped (`waitpid`, `WUNTRACED`), and the program
+  takes the group back (`TermHandBack`). The terminal stays given until
+  the program next draws (`Show`), which takes it with the frame drawn
+  whole and the kitty protocol asked for again; what the program types
+  after the last command, `Init40`'s line feed, is not written there.
+  Ctrl-C and Ctrl-Z are the command's: a command stopped stays so, as
+  behind a shell without job control, and goes when the program does
+  (an orphaned group that is stopped is sent SIGHUP). Under the test
+  channel a command has `/dev/null` for its three files.
+- **Ctrl-O**, typed at a terminal (`OwnScreen` in `KeyWaiting` and
+  `KeyRead`, `TermOwnScreen`): the terminal's own screen until a key,
+  which is dropped, the modes kept raw meanwhile; the program receives
+  neither. Panels on/off by the menu, and Esc where the setup has it,
+  are still the program's, and show its copy of DOS's screen, which on
+  Linux has the prompts but not what the commands wrote. Under the test
+  channel Ctrl-O is the program's key as on DOS.
+
+The check: `harness/posixcheck.c`, `ServiceCommands`, holds
+`DosCommandToHost` and `DosCurrentHost`; `harness/terminal.py` has a
+seventh run, `commands`, three commands typed and run, each screen held
+to the channel's grid and the trace to the channel's, the terminal's
+own screen held to the prompts and what the commands wrote (the test
+divides what the program writes between two pyte screens by `?1049h`
+and `?1049l`, as xterm has them), Ctrl-O and a key behind it, and
+`sleep 9` ended by Ctrl-C and stopped by Ctrl-Z with the program still
+there and taking keys. A text typed in a step goes in pieces of eight,
+since the program's buffer of keys, as the BIOS's, drops what is beyond
+16.
+
+**The questions, for the user** (each changes what a user sees; nothing
+of them is built):
+
+1. Enter on a file of a panel. The original types the name of a file
+   that DOS runs by its name, `.COM`, `.EXE`, `.BAT`, into the command
+   line and runs it; any other file it runs by the extension file's
+   command for its kind, or does nothing (`F21_10` of `enter.c`,
+   `TstExe` of `files.c`). That is the common code, so on Linux an
+   executable without such an extension does nothing, and `xdg-open`,
+   which the user decided for a file that the program cannot run, is
+   never reached. Recommended: a function of `sys.h` asked where
+   `TstExe` is and where nothing is found in the extension file: on DOS
+   what it is now (the same behaviour; `VC.EXE` other bytes), on Linux
+   a regular file that the user may execute, whatever its name, run as
+   `./name`, the three extensions nothing special, and any other file
+   handed to `xdg-open`, not waited for, the panels staying. Or: keep
+   the common code, and neither.
+2. A name of DOS's form in a command that has no drive in front, as
+   Enter types it and the user menu's `!.!` makes it, `README.TXT` or
+   the alias `LONGFI~1.TXT`: the shell does not find `README.TXT` where
+   the host has `readme.txt`. Recommended: a word of the command that
+   names a file or directory of DOS's current directory by DOS's name
+   and is not as the host names it, made the host's name, quoted; or:
+   paths with a drive alone, as now. The list of `!@` is a file of
+   DOS's names either way.
+3. The shell that cannot be run (`SHELL` naming no file). Built:
+   the original's "Can't find file", the name that COMSPEC has, and
+   Enter to try again or Esc. Or: a line of the program's own on the
+   terminal's screen, and back to the panels.
+
+**What L7 should know.** `Typed` and `CommandShown` of `sys_posix.c`
+are the state between a command and the next frame. A new place where
+the program waits for a key on a terminal calls `OwnScreen` as
+`KeyRead` does. `posixrun.py` of L3b runs the program under the test
+channel, where commands run with `/dev/null` and Ctrl-O is the
+program's.
 
 ### SAN, what the sanitizers found in the scenarios: done
 

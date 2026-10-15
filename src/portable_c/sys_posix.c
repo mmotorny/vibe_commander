@@ -44,7 +44,10 @@
  *     beside its file.
  *   - What the system asks the program never comes: the host has no
  *     critical error, and Ctrl-Break and Ctrl-C are keys of a terminal,
- *     L5. Another program run fails for now: that is L6.
+ *     L5.
+ *   - A program run is a command of the host's shell, $SHELL -c, which
+ *     COMSPEC names, on the terminal's own screen, which Ctrl-O shows:
+ *     "A command" below, the piece L6.
  *
  * The drives are R:, the root of the host's file system, and H:, the
  * home directory, as $HOME names it, where that is a directory other
@@ -59,7 +62,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -710,6 +715,26 @@ void ScreenFill(u16 page, u16 character, u16 color, i32 count)
         Display[at + i] = cell;
 }
 
+/* What the program has typed by the BIOS since the terminal last drew
+   the screen, and where the first of it went: what a command run writes
+   on the terminal's own screen in front of what the command writes
+   (Typed below, L6). */
+#define TYPED_ROOM 1024
+
+static u8 TypedBytes[TYPED_ROOM];
+static i32 TypedCount = 0;
+static i32 TypedRow = -1, TypedColumn = 0;
+
+static void Type(u8 c)
+{
+    if (TypedCount == 0) {
+        TypedRow = Row();
+        TypedColumn = Column();
+    }
+    if (TypedCount < TYPED_ROOM)
+        TypedBytes[TypedCount++] = c;
+}
+
 /* The lines move up a row when the cursor goes beyond the last, the
    new one in the colour of the cell at the cursor, as the BIOS has it. */
 static void LineFeed(void)
@@ -718,6 +743,8 @@ static void LineFeed(void)
         Place(Row() + 1, Column());
         return;
     }
+    if (TypedRow > 0)
+        TypedRow--;
     ScreenScroll(false, 1, (u16)(ScreenCell(0) >> 8), 0,
                  (ROWS - 1) << 8 | (COLUMNS - 1));
 }
@@ -733,6 +760,7 @@ void ScreenType(u16 character, u16 page, u16 color)
 
     (void)page;
     (void)color;
+    Type(c);
     switch (c) {
     case '\r':
         Place(Row(), 0);
@@ -1226,10 +1254,38 @@ static void Due(bool reading)
 #define IDLE_WAIT 50                    /* milliseconds, under a tick */
 
 static bool OnTerminal = false;
+static bool CommandShown = false;              /* to a command, which has run: the
+                                           terminal's own screen shows */
 
+/* The screen drawn, the terminal taken again first where a command had
+   it. */
 static void Show(void)
 {
+    if (CommandShown) {
+        CommandShown = false;
+        TermTake();
+    }
+    TypedCount = 0;
     TermDraw(Display, CursorPlace, Shape);
+}
+
+/* Ctrl-O typed at the terminal, as many times as it waits: the
+   terminal's own screen, which has what the commands wrote, shown until
+   the next key, which is dropped, and the program's again. The program
+   does not get the key (TODO.md, "L6, commands"). */
+#define CTRL_O 0x180F
+
+static void OwnScreen(void)
+{
+    struct Keys keys = TermKeyWaiting();
+
+    while (!keys.none && keys.key == CTRL_O) {
+        TermKeyTake();
+        TermOwnScreen();
+        Show();
+        TermInput(0);
+        keys = TermKeyWaiting();
+    }
 }
 
 /* The mouse as the terminal has reported it, taken as the driver takes
@@ -1310,6 +1366,7 @@ struct Keys KeyWaiting(void)
         Show();
         TermInput(0);
         MouseFromTerminal(false);
+        OwnScreen();
         return TermKeyWaiting();
     }
     keys.key = KeyThere ? KeyWord : 0;
@@ -1323,7 +1380,10 @@ u16 KeyRead(void)
     u16 key;
 
     if (OnTerminal) {
-        while (TermKeyWaiting().none) {
+        for (;;) {
+            OwnScreen();
+            if (!TermKeyWaiting().none)
+                break;
             MouseFromTerminal(false);
             Show();
             TermInput(-1);
@@ -1477,15 +1537,223 @@ u32 Ticks(void)
  * Other programs, and the end of this one.
  */
 
-/* Not yet: the piece L6. */
+/* A command, the piece L6 (TODO.md, "L6, commands"). What the program
+   runs is COMMAND.COM, by the name that COMSPEC has in its environment,
+   with /C and the command for its tail: COMSPEC names the host's shell,
+   $SHELL or /bin/sh where that is not set (ShellOf), and the shell is
+   run with -c and the command made one of the host's
+   (DosCommandToHost). Any other program is run by the shell too, by its
+   path of the host and its tail.
+
+   On the terminal, the command has it as the user has it, with its
+   own screen and its modes as they were before the program took it, in
+   the foreground, so that Ctrl-C and Ctrl-Z are its signals and not the
+   program's; in front of what it writes, what DOS would have shown
+   there: the line of the prompt and the command, which the program has
+   on its screen, and what it has typed by the BIOS since (Typed). The
+   terminal stays so until the program next draws its screen, so that
+   commands run one behind the other are on one screen, as on DOS. A
+   command that is stopped, Ctrl-Z, stays so when the program goes on,
+   as behind a shell without job control. Under the test channel the
+   command has nothing of standard input and writes nowhere.
+
+   DOS's answer is that the program ran, whatever it ended with: the
+   shell's 127 for a command that it did not find is a run, as COMMAND.COM
+   that says "Bad command or file name" is. `value` is the code that the
+   command ended with, which DOS would answer to 4Dh. The shell that
+   cannot be run is DOS's 2, file not found, as a COMSPEC that names no
+   file is. */
+#define FILE_NOT_FOUND 2
+#define SHELL_DEFAULT "/bin/sh"
+#define COMMAND_ROOM 0x10000
+#define TAIL_ROOM 256                   /* a count of a byte, and what it
+                                           counts */
+
+static char Shell[HOST_PATH_ROOM];      /* of the host */
+static u8 ShellDos[DOS_PATH_ROOM] = "COMMAND.COM";  /* what COMSPEC names */
+
+/* The shell: $SHELL where it is a path from the root, else /bin/sh; and
+   the path of DOS's that COMSPEC names it by, or COMMAND.COM where DOS
+   cannot name it. */
+static void ShellOf(void)
+{
+    const char *shell = getenv("SHELL");
+    char real[PATH_MAX];
+
+    if (shell == 0 || shell[0] != '/' || strlen(shell) >= sizeof Shell)
+        shell = SHELL_DEFAULT;
+    memcpy(Shell, shell, strlen(shell) + 1);
+    if (realpath(Shell, real) != 0)
+        DosPathOfHost(&Emulated.directories, &Emulated.drives, real,
+                      ShellDos);
+}
+
+/* Whether two names of DOS's are one, by their capitals. */
+static bool SameName(const u8 *one, const u8 *other)
+{
+    for (; *one != 0 && *other != 0; one++, other++)
+        if (CodePageUpper(*one) != CodePageUpper(*other))
+            return false;
+    return *one == *other;
+}
+
+/* What the program has typed, written on the terminal's own screen, and
+   forgotten: in front of the first command, the row that the typing
+   began in, as far as it began, or all of it where the typing began
+   with a new line, which is the prompt and the command that the program
+   drew there. */
+static void Typed(bool first)
+{
+    char text[TYPED_ROOM * 4 + COLUMNS * 4];
+    i32 length = 0, end = COLUMNS, i;
+    bool whole = true;
+    u8 c;
+
+    if (first && TypedCount > 0 && TypedRow >= 0) {
+        for (i = 0; i < TypedCount && TypedBytes[i] != '\n'; i++)
+            if (TypedBytes[i] >= ' ')
+                whole = false;
+        if (!whole)
+            end = TypedColumn;
+        while (end > 0 && (u8)Display[TypedRow * COLUMNS + end - 1] == ' ')
+            end--;
+        for (i = 0; i < end; i++)
+            length += Utf8Encode(TermGlyph((u8)Display[TypedRow * COLUMNS
+                                                       + i]),
+                                 text + length);
+    }
+    for (i = 0; i < TypedCount; i++) {
+        c = TypedBytes[i];
+        if (c == '\r' || c == '\n' || c == '\b')
+            text[length++] = (char)c;
+        else if (c != 7)
+            length += Utf8Encode(TermGlyph(c), text + length);
+    }
+    TypedCount = 0;
+    TermWrite(text, length);
+}
+
+/* The command run, in UTF-8, in the directory of the host that DOS's
+   current one is: how it ended, the code in `value`. */
+static struct Answer Run(const char *command)
+{
+    char directory[HOST_PATH_ROOM];
+    struct Answer answer;
+    sigset_t none;
+    pid_t child;
+    int status = 0, null;
+
+    answer.failed = false;
+    answer.value = 0;
+    if (DosCurrentHost(&Emulated, directory, (i32)sizeof directory).failed)
+        memcpy(directory, "/", 2);
+    if (OnTerminal) {
+        if (!CommandShown) {
+            CommandShown = true;
+            TermGive();
+            Typed(true);
+        } else {
+            Typed(false);
+        }
+    }
+    if (Trace != 0)
+        fflush(Trace);
+    child = fork();
+    if (child == 0) {
+        if (OnTerminal) {
+            /* Its group, which the terminal is handed to; and what it
+               says of errors on the terminal too, whatever the program's
+               own standard error is. */
+            setpgid(0, 0);
+            TermHandTo(getpid());
+            dup2(1, 2);
+        } else {
+            null = open("/dev/null", O_RDWR);
+            if (null >= 0) {
+                dup2(null, 0);
+                dup2(null, 1);
+                dup2(null, 2);
+            }
+        }
+        sigemptyset(&none);
+        sigprocmask(SIG_SETMASK, &none, 0);
+        if (chdir(directory) != 0 && chdir("/") != 0)
+            _exit(127);
+        execl(Shell, Shell, "-c", command, (char *)0);
+        _exit(127);
+    }
+    if (child < 0) {
+        answer.failed = true;
+        answer.value = NO_MEMORY;
+        return answer;
+    }
+    if (OnTerminal) {
+        setpgid(child, child);
+        TermHandTo(child);
+    }
+    while (waitpid(child, &status, WUNTRACED) < 0 && errno == EINTR)
+        ;
+    if (OnTerminal)
+        TermHandBack();
+    if (WIFEXITED(status))
+        answer.value = (u16)WEXITSTATUS(status);
+    return answer;
+}
+
 struct Answer ProgramRun(const u8 *name, const u8 *tail)
 {
+    u8 dos[DOS_PATH_ROOM + 1 + TAIL_ROOM + 1], full[DOS_PATH_ROOM];
+    char host[HOST_PATH_ROOM];
+    char *command;
     struct Answer answer;
+    i32 length = 0, start = 0, count = tail[0], made;
 
-    (void)name;
-    (void)tail;
-    answer.value = INVALID_FUNCTION;
     answer.failed = true;
+    answer.value = FILE_NOT_FOUND;
+    if (access(Shell, X_OK) != 0)
+        return answer;
+    if (SameName(name, ShellDos)) {
+        while (length < count && tail[1 + length] != 0)
+            length++;
+        if (length < 2 || tail[1] != '/' || CodePageUpper(tail[2]) != 'C')
+            return answer;              /* the shell is run for /C alone */
+        start = 3;
+        if (start < length && tail[1 + start] == ' ')
+            start++;
+        memcpy(dos, tail + 1 + start, (size_t)(length - start));
+        length -= start;
+    } else {
+        /* Another program, by its full path, which leads to a file of the
+           host that the user may run. */
+        if (DosPathFull(name, &Emulated.drives, full).failed)
+            return answer;
+        answer = HostPathOfDos(&Emulated.directories, &Emulated.drives,
+                               full, host, (i32)sizeof host);
+        if (answer.failed || answer.value != 1 || access(host, X_OK) != 0) {
+            answer.failed = true;
+            answer.value = FILE_NOT_FOUND;
+            return answer;
+        }
+        length = (i32)strlen((const char *)full);
+        memcpy(dos, full, (size_t)length);
+        while (start < count && tail[1 + start] != 0)
+            dos[length++] = tail[1 + start++];
+    }
+    command = malloc(COMMAND_ROOM);
+    if (command == 0) {
+        answer.failed = true;
+        answer.value = NO_MEMORY;
+        return answer;
+    }
+    made = DosCommandToHost(&Emulated, dos, length, command, COMMAND_ROOM);
+    if (made < 0) {
+        free(command);
+        answer.failed = true;
+        answer.value = NO_MEMORY;
+        return answer;
+    }
+    answer = Run(command);
+    free(command);
     return answer;
 }
 
@@ -1577,7 +1845,16 @@ static void EnvironmentOf(const u8 *program)
     Environment = calloc(ENVIRONMENT_MOST + 2 + length + PATH_READ, 1);
     if (Environment == 0)
         Fail("the environment");
+    /* COMSPEC first, the host's shell (ShellOf); one that the host has
+       is left out. */
+    made = (i32)strlen("COMSPEC=") + (i32)strlen((const char *)ShellDos);
+    memcpy(Environment, "COMSPEC=", strlen("COMSPEC="));
+    memcpy(Environment + strlen("COMSPEC="), ShellDos,
+           strlen((const char *)ShellDos));
+    at = made + 1;
     for (text = environ; *text != 0; text++) {
+        if (strncmp(*text, "COMSPEC=", strlen("COMSPEC=")) == 0)
+            continue;
         made = InCodePage(*text, Environment + at, room - at - 1);
         if (made < (i32)strlen(*text) && at + made + 1 >= room) {
             memset(Environment + at, 0, (size_t)made);
@@ -1734,6 +2011,7 @@ int main(int count, char **arguments)
         Fail("the current directory");
     StartIn(here);
     ProgramPath(program);
+    ShellOf();
     EnvironmentOf(program);
     TailOf(count, arguments);
     ScreenSetMode(3);

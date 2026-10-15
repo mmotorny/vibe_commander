@@ -1635,6 +1635,57 @@ static void ServiceHome(void)
     HomeChecked(path, real);
 }
 
+/* A command of DOS's made one for the host's shell (L6): the text in
+   UTF-8, each path of DOS's at the start of a word on a drive that there
+   is made the host's path, quoted for the shell where it stands, and
+   nothing else changed. */
+static void Command(const char *dos, const char *want)
+{
+    char to[2048];
+    i32 made = DosCommandToHost(&Emulated, (const u8 *)dos,
+                                (i32)strlen(dos), to, (i32)sizeof to);
+
+    CHECK(made == (i32)strlen(want));
+    SAME(to, want);
+}
+
+static void ServiceCommands(void)
+{
+    char real[PATH_MAX], want[2048], dos[256], to[64];
+    u8 tree[DOS_PATH_ROOM];
+
+    CHECK(realpath(Tree, real) != NULL);
+    CHECK(!DosPathOfHost(&Emulated.directories, &Emulated.drives, real,
+                         tree).failed);
+    Command("echo hi", "echo hi");
+    Command("echo \x80\xE0", "echo \xC3\x87\xCE\xB1");   /* Ç, α */
+    Command("type HELLO.TXT", "type HELLO.TXT");
+    snprintf(dos, sizeof dos, "cat %s\\HELLO.TXT>x", tree);
+    snprintf(want, sizeof want, "cat '%s/hello.txt'>x", real);
+    Command(dos, want);
+    snprintf(dos, sizeof dos, "cat %s\\LONGFI~1.TXT", tree);
+    snprintf(want, sizeof want, "cat '%s/Long File Name.txt'", real);
+    Command(dos, want);
+    snprintf(dos, sizeof dos, "ls %s\\DOCS\\*.TXT", tree);
+    snprintf(want, sizeof want, "ls '%s/docs/'*.txt", real);
+    Command(dos, want);
+    snprintf(dos, sizeof dos, "echo \"%s\\HELLO.TXT\" a=%s", tree, tree);
+    snprintf(want, sizeof want, "echo \"%s/hello.txt\" a='%s'", real, real);
+    Command(dos, want);
+    snprintf(dos, sizeof dos, "echo '%s' x%s", tree, tree);
+    Command(dos, dos);
+    Command("echo C:\\X", "echo C:\\X");
+    snprintf(want, sizeof want, "cd '%s'", Emulated.drives.drive[
+                 DriveIndex(&Emulated.drives, 'H')].root);
+    Command("cd h:\\", want);
+    snprintf(dos, sizeof dos, "cat %s\\NOWHERE\\X", tree);
+    Command(dos, dos);
+    CHECK(DosCommandToHost(&Emulated, (const u8 *)"echo hi", 7, to, 7)
+          == -1);
+    CHECK(!DosCurrentHost(&Emulated, want, (i32)sizeof want).failed);
+    SAME(want, real);
+}
+
 static void Services(void)
 {
     const char *base = getenv("TMPDIR");
@@ -1679,6 +1730,7 @@ static void Services(void)
     ServiceFinds();
     ServiceDrives();
     ServiceHome();
+    ServiceCommands();
     DosEnd(&Emulated);
     nftw(Tree, Removed, 16, FTW_DEPTH | FTW_PHYS);
 }

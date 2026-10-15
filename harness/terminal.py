@@ -89,6 +89,7 @@ STAMP = 1760443200              # the time of the test's files: 14 October
 # sends for it. A terminal of these has no kitty protocol: it sends the
 # keys as xterm does, and the mouse in SGR's form.
 ESC = b"\x1b"
+SWITCH = ESC + b"[?1049"        # h the alternate screen, l the own one
 QUESTION = ESC + b"[?u"         # whether the kitty protocol is there
 PUSH = ESC + b"[>31u"           # the flags that the program asks for
 POP = ESC + b"[<u"
@@ -138,6 +139,43 @@ KEYS = [
 # flags the program has pushed: every key an escape code, with Shift,
 # Ctrl and Alt pressed and let go as keys of their own, the key of a US
 # layout behind a key and the text that it types.
+# The scan codes of a US keyboard for printable ASCII, from 20h, as the
+# program makes them of what a terminal types (Scan of term_posix.c).
+US_SCAN = bytes.fromhex(
+    "39 02 28 04 05 06 08 28 0A 0B 09 0D 33 0C 34 35"
+    "0B 02 03 04 05 06 07 08 09 0A 27 27 33 0D 34 35"
+    "03 1E 30 2E 20 12 21 22 23 17 24 25 26 32 31 18"
+    "19 10 13 1F 14 16 2F 11 2D 15 2C 1A 2B 1B 07 0C"
+    "29 1E 30 2E 20 12 21 22 23 17 24 25 26 32 31 18"
+    "19 10 13 1F 14 16 2F 11 2D 15 2C 1A 2B 1B 29")
+
+
+def typed(text):
+    """The BIOS's words of a text typed on a US keyboard, and its bytes,
+    with Enter behind it: in pieces of eight, which the program takes
+    one after the other, since its buffer, as the BIOS's, drops what is
+    beyond 16 keys."""
+    words = [f"{US_SCAN[ord(c) - 0x20]:02X}{ord(c):02X}" for c in text]
+    data = text.encode() + b"\r"
+    return words + ["1C0D"], [data[i:i + 8] for i in range(0, len(data), 8)]
+
+
+# Commands (L6), each typed at the command line and run by Enter, as the
+# steps above: what the terminal's own screen is to show of them, in
+# order, is OWN_LINES, the prompt and the command, and what the command
+# writes.
+COMMANDS = [
+    ("a command", *typed("echo hello")),
+    ("a path of DOS's in a command",
+     *typed(r"test -f H:\HERE\README.TXT && echo found")),
+    ("a command that the shell does not find", *typed("nosuchcmd")),
+]
+OWN_LINES = [
+    "H:\\HERE>echo hello", "hello",
+    r"H:\HERE>test -f H:\HERE\README.TXT && echo found", "found",
+    "H:\\HERE>nosuchcmd", "nosuchcmd: not found",
+]
+
 CSI = ESC + b"["
 KITTY = [
     ("Alt alone, pressed and let go at once: the menu bar",
@@ -415,8 +453,15 @@ class Terminal:
         self.master, slave = os.openpty()
         winsize(slave, columns, rows)
         self.before = termios.tcgetattr(slave)
+        # The terminal's two screens, as xterm has them: its own, and the
+        # alternate one, which the program draws in and which ?1049h
+        # clears; pyte has the one, so the stream is divided between two.
         self.screen = pyte.Screen(columns, rows)
         self.stream = pyte.ByteStream(self.screen)
+        self.own = pyte.Screen(columns, rows)
+        self.own_stream = pyte.ByteStream(self.own)
+        self.alternate = False
+        self.pending = b""
         self.written = b""
         told_r, told_w = os.pipe()
         ended_r, ended_w = os.pipe()
@@ -455,12 +500,43 @@ class Terminal:
             if not data:
                 return
             self.written += data
-            self.stream.feed(data)
+            self.feed(data)
             last = time.monotonic()
             asked = self.written.count(QUESTION)
             if self.kitty and asked > self.answered:
                 self.answered = asked
                 os.write(self.master, ESC + b"[?0u")
+
+    def feed(self, data):
+        """What the program writes, into the screen that shows: the
+        alternate one from ?1049h, cleared there, and the terminal's own
+        from ?1049l. A sequence that the read has cut waits for the
+        rest."""
+        data = self.pending + data
+        self.pending = b""
+        while data:
+            at = data.find(SWITCH)
+            if at < 0:
+                keep = 0
+                for length in range(1, len(SWITCH) + 1):
+                    if data.endswith(SWITCH[:length]):
+                        keep = length
+                if keep:
+                    self.pending = data[-keep:]
+                    data = data[:-keep]
+                (self.stream if self.alternate
+                 else self.own_stream).feed(data)
+                return
+            end = at + len(SWITCH) + 1
+            (self.stream if self.alternate else self.own_stream).feed(
+                data[:at])
+            if end > len(data):
+                self.pending = data[at:]
+                return
+            self.alternate = data[end - 1:end] == b"h"
+            if self.alternate:
+                self.screen.reset()
+            data = data[end:]
 
     def type(self, data, quiet=QUIET):
         os.write(self.master, data)
@@ -473,6 +549,7 @@ class Terminal:
     def resize(self, columns, rows):
         winsize(self.master, columns, rows)
         self.screen.resize(rows, columns)
+        self.own.resize(rows, columns)
         os.kill(self.pid, signal.SIGWINCH)
         self.read()
 
@@ -536,7 +613,10 @@ def held_to(name, terminal, steps, records, trace, failures):
     words, and the same changes of what is held and of the mouse."""
     for number, (what, _, typed) in enumerate(
             [("the first screen", None, None)] + steps):
-        if typed is not None:
+        if isinstance(typed, list):
+            for piece in typed:
+                terminal.type(piece, 0.1)
+        elif typed is not None:
             terminal.type(typed)
         failures += compare(f"{name}, step {number + 1}, {what}",
                             terminal.pyte, terminal.screen, records[number],
@@ -648,6 +728,77 @@ def run_kitty(pyte, program, home, here, work, channelled, failures):
                         "at SIGTERM")
 
 
+def run_commands(pyte, program, home, here, work, channelled, failures):
+    """Commands (L6): COMMANDS typed and run, each screen held to the
+    channel's grid and what the program received to what it received
+    there, and what the terminal's own screen has of them to OWN_LINES;
+    Ctrl-O, which is to show that screen until a key and give the program
+    neither; and a command ended by Ctrl-C and one stopped by Ctrl-Z,
+    which are to be the command's and not the program's."""
+    records, trace = channelled
+    name = "commands"
+    terminal = Terminal(pyte, program, home, here, work, 80, 25, name)
+    terminal.colours24 = False
+    terminal.read()
+    held_to(name, terminal, COMMANDS, records, trace, failures)
+    own = [line.rstrip() for line in terminal.own.display]
+    at = 0
+    for line in own:
+        if at < len(OWN_LINES) and OWN_LINES[at] in line:
+            at += 1
+    if at < len(OWN_LINES):
+        failures.append(f"{name}: the terminal's own screen does not have "
+                        f"{OWN_LINES[at]!r} where it is to:\n"
+                        + "\n".join(own))
+    if not terminal.alternate:
+        failures.append(f"{name}: the program does not take the terminal "
+                        "again behind a command")
+    received = len(terminal.traced())
+    terminal.type(b"\x0f")
+    if terminal.alternate or not terminal.written.endswith(LEFT):
+        failures.append(f"{name}: Ctrl-O does not show the terminal's own "
+                        "screen")
+    terminal.type(b"x")
+    if not terminal.alternate:
+        failures.append(f"{name}: a key behind Ctrl-O does not give the "
+                        "program the terminal again")
+    failures += compare(f"{name}, behind Ctrl-O", pyte, terminal.screen,
+                        records[-1], False)[:10]
+    if len(terminal.traced()) != received:
+        failures.append(f"{name}: the program receives Ctrl-O, or the key "
+                        f"behind it: {terminal.traced()[received:]}")
+    for key, what, state in ((b"\x03", "Ctrl-C", None),
+                             (b"\x1a", "Ctrl-Z", "T")):
+        terminal.type(b"sleep 9\r")
+        child = [line.split()[0] for line in subprocess.run(
+            ["ps", "-o", "pid=,args=", "--ppid", str(terminal.pid)],
+            stdout=subprocess.PIPE, text=True).stdout.splitlines()
+            if "sleep" in line]
+        if terminal.alternate or not child:
+            failures.append(f"{name}: a command does not have the terminal "
+                            f"before {what}")
+            break
+        terminal.type(key)
+        if not terminal.alternate:
+            failures.append(f"{name}: the program does not come back "
+                            f"behind {what}")
+        if terminal.state() != "S":
+            failures.append(f"{name}: {what} reaches the program, which "
+                            f"is {terminal.state()}")
+        gone = not Path(f"/proc/{child[0]}").exists()
+        have = None if gone else Path(f"/proc/{child[0]}/stat") \
+            .read_text().rsplit(")", 1)[1].split()[0]
+        if have != state:
+            failures.append(f"{name}: {what} leaves the command "
+                            f"{'gone' if gone else have}, where it is to "
+                            f"be {state or 'gone'}")
+    terminal.type(ESC + b"[B")
+    if terminal.traced()[-1:] != ["key 5000"]:
+        failures.append(f"{name}: the program does not have its keys "
+                        "behind the commands")
+    ended(name, terminal, failures)
+
+
 def decode(pyte, program, home, here, work, kitty, failures):
     """The keys of DECODE_KITTY or DECODE_LEGACY, each with Esc twice
     behind it, held to the words that the program reads."""
@@ -686,20 +837,24 @@ def main():
     with dos.workdir() as top:
         work = Path(top)
         channelled = {}
-        for name, steps in (("channel", KEYS), ("channel-kitty", KITTY)):
+        for name, steps in (("channel", KEYS), ("channel-kitty", KITTY),
+                            ("channel-commands", COMMANDS)):
             (work / name).mkdir()
             home, here = lay_out(work / name)
             channelled[name] = channel(program, home, here, work, steps,
                                        name)
         pointer(channelled["channel"][0], failures)
         for run_name in ("24", "16", "kitty", "decode-kitty",
-                         "decode-legacy"):
+                         "decode-legacy", "commands"):
             run_dir = work / ("run-" + run_name)
             run_dir.mkdir()
             home, here = lay_out(run_dir)
             if run_name == "kitty":
                 run_kitty(pyte, program, home, here, work,
                           channelled["channel-kitty"], failures)
+            elif run_name == "commands":
+                run_commands(pyte, program, home, here, work,
+                             channelled["channel-commands"], failures)
             elif run_name.startswith("decode"):
                 decode(pyte, program, home, here, work,
                        run_name == "decode-kitty", failures)
@@ -714,7 +869,8 @@ def main():
           f"{len(KITTY) + 1} with the kitty protocol; "
           f"{len(DECODE_KITTY)} keys of kitty's and {len(DECODE_LEGACY)} "
           "of other terminals; a terminal too small, SIGTSTP, SIGCONT and "
-          "SIGTERM")
+          f"SIGTERM; {len(COMMANDS)} commands, Ctrl-O, and Ctrl-C and "
+          "Ctrl-Z in a command")
 
 
 if __name__ == "__main__":

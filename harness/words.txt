@@ -11,6 +11,7 @@ blank.c           none
 box.c             none
 cmdline.c         TRELIST 1, TREE_OFFSET 2, ENTRY 4, DSKBUF 3
 codepage_posix.c  none
+command_posix.c   none
 commands.c        ENTRY 2, DSKBUF 4, MAIN_AS_PANEL 1
 commands_t.c      MD_AT 45, WCB_AT 3, NUMBER 17
 compiler.h        none

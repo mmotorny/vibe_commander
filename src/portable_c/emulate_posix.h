@@ -464,6 +464,30 @@ void DosEnd(struct Dos *dos);
    changed then. */
 struct Answer DosStartIn(struct Dos *dos, const char *path);
 
+/*
+ * Commands, command_posix.c, the piece L6 (TODO.md, "L6, commands").
+ */
+
+/* A command of DOS's, `length` bytes of the code page at `command`, as
+   the program hands it to COMMAND.COM behind /C, made one for the host's
+   shell at `to`, which has room for `room` bytes, with a zero byte
+   behind it: in UTF-8, and each path of DOS's in it that begins with a
+   drive that there is, R: or H:, at the start of a word, made the path of
+   the host that it leads to (HostPathOfDos), in single quotes, or with
+   what is special escaped where it stands in double quotes; a name with
+   * or ? in it, the last of such a path, behind its directory as it is,
+   in small letters and not quoted, for the shell to take as a pattern.
+   What is in single quotes is left as it is, and so is a path that leads
+   nowhere. Answers how many bytes it wrote, or -1 where the room is not
+   enough. */
+i32 DosCommandToHost(struct Dos *dos, const u8 *command, i32 length,
+                     char *to, i32 room);
+
+/* The current directory of the current drive, as the path of the host
+   that it leads to, at `to`, which has room for `room` bytes: as
+   HostPathOfDos answers. */
+struct Answer DosCurrentHost(struct Dos *dos, char *to, i32 room);
+
 /* Files. */
 struct Answer DosFileCreate(struct Dos *dos, const u8 *name,
                             u16 attributes);
@@ -552,6 +576,20 @@ bool TermBegin(void);
    which draws the screen whole at the next frame. */
 void TermGive(void);
 void TermTake(void);
+
+/* Write a text of UTF-8 on the terminal as it is, where it is given
+   back: what DOS would have shown of the program's lines there. */
+void TermWrite(const char *text, i32 length);
+
+/* While the terminal is given back: hand it to the process group of a
+   command, which then has its keys and the signals that they make, and
+   take it for the program's own group again. */
+void TermHandTo(pid_t group);
+void TermHandBack(void);
+
+/* Show the terminal's own screen until a key is typed, which is dropped,
+   and take the terminal again: Ctrl-O, L6. */
+void TermOwnScreen(void);
 
 /* Draw what has changed of the 2,000 cells at `cells`, a character and
    its colour each, and the cursor at `place`, the row above the column,

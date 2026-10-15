@@ -63,8 +63,11 @@
  *   - The mouse is the terminal's reports in SGR's form, of every motion
  *     too, the cell and the buttons; sys_posix.c makes of them what a
  *     mouse driver of DOS answers, and draws its pointer in the cells.
- *   - Ctrl-O's screen, the terminal's own with what a command wrote, is
- *     L6 (TermGive and TermTake are what it calls around a command).
+ *   - A command (L6) has the terminal given back, its own screen and its
+ *     modes, and handed to the command's process group (TermHandTo), so
+ *     that Ctrl-C and Ctrl-Z are the command's; the program writes the
+ *     prompt and the command there first (TermWrite). Ctrl-O shows that
+ *     screen until a key (TermOwnScreen).
  *
  * What is async-signal-safe is said at each function that a handler of a
  * signal calls: those use write, tcsetattr, sigaction, sigprocmask and
@@ -299,6 +302,66 @@ void TermGive(void)
 
 void TermTake(void)
 {
+    Take();
+}
+
+void TermWrite(const char *text, i32 length)
+{
+    if (length > 0)
+        Put(text, (size_t)length);
+}
+
+/* tcsetpgrp from a group that is not the terminal's foreground one has
+   the kernel send it SIGTTOU, which stops it: blocked around the call,
+   as a shell does. */
+static void Foreground(pid_t group)
+{
+    sigset_t ttou, before;
+
+    sigemptyset(&ttou);
+    sigaddset(&ttou, SIGTTOU);
+    sigprocmask(SIG_BLOCK, &ttou, &before);
+    while (tcsetpgrp(TERM_IN, group) != 0 && errno == EINTR)
+        ;
+    sigprocmask(SIG_SETMASK, &before, 0);
+}
+
+void TermHandTo(pid_t group)
+{
+    Foreground(group);
+}
+
+void TermHandBack(void)
+{
+    Foreground(getpgrp());
+}
+
+/* Ctrl-O: the terminal given back as for a command, but for its modes,
+   which stay raw so that a key is a key and is not echoed; the first
+   that comes, and what comes with it within OWN_WAIT milliseconds, an
+   escape sequence, is dropped. */
+#define OWN_WAIT 50
+
+void TermOwnScreen(void)
+{
+    char bytes[64];
+    struct pollfd input;
+    ssize_t count;
+    int ready;
+
+    Give();
+    tcsetattr(TERM_IN, TCSADRAIN, &Raw);
+    input.fd = TERM_IN;
+    input.events = POLLIN;
+    do
+        count = read(TERM_IN, bytes, sizeof bytes);
+    while (count < 0 && errno == EINTR);
+    do {
+        input.revents = 0;
+        ready = poll(&input, 1, OWN_WAIT);
+        if (ready > 0 && read(TERM_IN, bytes, sizeof bytes) <= 0)
+            break;
+    } while (ready > 0 || (ready < 0 && errno == EINTR));
     Take();
 }
 
