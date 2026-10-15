@@ -6,15 +6,15 @@ code page 437
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -25,7 +25,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -37,12 +37,12 @@ cursor 15 6 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x4 3Fx70 1Bx5
 |║DOCS   ╔═══════════════════════ Configuration ════════════════════════╗       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║SRC    ║  ┌ Screen colors ──────┐  ┌ Panel options ────────────────┐  ║       ║| 1Bx5 3Fx8 3Ex13 3Fx12 3Ex13 3Fx24 03x2 1Bx3
-|║read   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║hell   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║note   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║data   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
-|║run    ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
-|║empt   ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║data   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║empt   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║hell   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║note   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║read   ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
+|║run    ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
 |║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
@@ -65,12 +65,12 @@ cursor 15 7 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x4 3Fx70 1Bx5
 |║DOCS   ╔═══════════════════════ Configuration ════════════════════════╗       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║SRC    ║  ┌ Screen colors ──────┐  ┌ Panel options ────────────────┐  ║       ║| 1Bx5 3Fx8 3Ex13 3Fx12 3Ex13 3Fx24 03x2 1Bx3
-|║read   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║hell   ║  │  ( ) Color          │  │  [x] Auto change directory    │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║note   ║  │  (•) Laptop         │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║data   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
-|║run    ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
-|║empt   ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║data   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║empt   ║  │  ( ) Color          │  │  [x] Auto change directory    │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║hell   ║  │  (•) Laptop         │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║note   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║read   ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
+|║run    ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
 |║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
@@ -90,15 +90,15 @@ cursor 15 7 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x1 70x12 07x67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x1 70x12 07x67
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │            │            ║║            │            │            ║| 07x80
-|║readme   txt│            │            ║║            │            │            ║| 07x80
+|║data     bin│            │            ║║            │            │            ║| 07x80
+|║empty    dat│            │            ║║            │            │            ║| 07x80
 |║hello    txt│            │            ║║            │            │            ║| 07x80
 |║notes    doc│            │            ║║            │            │            ║| 07x80
-|║data     bin│            │            ║║            │            │            ║| 07x80
+|║readme   txt│            │            ║║            │            │            ║| 07x80
 |║run      bat│            │            ║║            │            │            ║| 07x80
-|║empty    dat│            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x40 70x1 07x39
 |║            │            │            ║║            │            │            ║| 07x80
@@ -109,24 +109,24 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
 
-== 4: Down Down Down
+== 4: Down Down Down Down Down Down Down
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │            │            ║║            │            │            ║| 07x80
-|║readme   txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
+|║data     bin│            │            ║║            │            │            ║| 07x80
+|║empty    dat│            │            ║║            │            │            ║| 07x80
 |║hello    txt│            │            ║║            │            │            ║| 07x80
 |║notes    doc│            │            ║║            │            │            ║| 07x80
-|║data     bin│            │            ║║            │            │            ║| 07x80
+|║readme   txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
 |║run      bat│            │            ║║            │            │            ║| 07x80
-|║empty    dat│            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x40 70x1 07x39
 |║            │            │            ║║            │            │            ║| 07x80
@@ -137,7 +137,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║readme.txt          40  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x80
+|║readme.txt          40  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
@@ -146,15 +146,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 28 8 lines 0 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │                                                    │            ║| 07x80
-|║readme   txt│          ╔═════════ Attributes ═════════╗          │            ║| 07x1 70x12 07x67
-|║hello    txt│          ║  Change file attributes for  ║          │            ║| 07x80
-|║notes    doc│          ║         "readme.txt"         ║          │            ║| 07x80
-|║data     bin│          ║  [ ] Read only    Date       ║          │            ║| 07x80
-|║run      bat│          ║  [x] Archive      6-16-2000  ║          │            ║| 07x44 70x10 07x26
-|║empty    dat│          ║  [ ] Hidden       Time       ║          │            ║| 07x80
+|║data     bin│          ╔═════════ Attributes ═════════╗          │            ║| 07x80
+|║empty    dat│          ║  Change file attributes for  ║          │            ║| 07x80
+|║hello    txt│          ║         "readme.txt"         ║          │            ║| 07x80
+|║notes    doc│          ║  [ ] Read only    Date       ║          │            ║| 07x80
+|║readme   txt│          ║  [x] Archive      6-16-2000  ║          │            ║| 07x1 70x12 07x31 70x10 07x26
+|║run      bat│          ║  [ ] Hidden       Time       ║          │            ║| 07x80
 |║            │          ║  [ ] System       12:00:00p  ║          │            ║| 07x44 70x10 07x26
 |║            │          ╟──────────────────────────────╢          │            ║| 07x40 70x1 07x39
 |║            │          ║     [ Set ]   [ Cancel ]     ║          │            ║| 07x80
@@ -165,7 +165,7 @@ cursor 28 8 lines 0 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║readme.txt          40  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x80
+|║readme.txt          40  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
@@ -174,15 +174,15 @@ cursor 28 8 lines 0 7 mode 3
 cursor 28 10 lines 0 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │                                                    │            ║| 07x80
-|║readme   txt│          ╔═════════ Attributes ═════════╗          │            ║| 07x1 70x12 07x67
-|║hello    txt│          ║  Change file attributes for  ║          │            ║| 07x80
-|║notes    doc│          ║         "readme.txt"         ║          │            ║| 07x80
-|║data     bin│          ║  [ ] Read only    Date       ║          │            ║| 07x80
-|║run      bat│          ║  [x] Archive      6-16-2000  ║          │            ║| 07x44 70x10 07x26
-|║empty    dat│          ║  [x] Hidden       Time       ║          │            ║| 07x80
+|║data     bin│          ╔═════════ Attributes ═════════╗          │            ║| 07x80
+|║empty    dat│          ║  Change file attributes for  ║          │            ║| 07x80
+|║hello    txt│          ║         "readme.txt"         ║          │            ║| 07x80
+|║notes    doc│          ║  [ ] Read only    Date       ║          │            ║| 07x80
+|║readme   txt│          ║  [x] Archive      6-16-2000  ║          │            ║| 07x1 70x12 07x31 70x10 07x26
+|║run      bat│          ║  [x] Hidden       Time       ║          │            ║| 07x80
 |║            │          ║  [ ] System       12:00:00p  ║          │            ║| 07x44 70x10 07x26
 |║            │          ╟──────────────────────────────╢          │            ║| 07x40 70x1 07x39
 |║            │          ║     [ Set ]   [ Cancel ]     ║          │            ║| 07x80
@@ -193,7 +193,7 @@ cursor 28 10 lines 0 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║readme.txt          40  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x80
+|║readme.txt          40  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
@@ -202,15 +202,15 @@ cursor 28 10 lines 0 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │            │            ║║            │            │            ║| 07x80
-|║readme  ░txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
+|║data     bin│            │            ║║            │            │            ║| 07x80
+|║empty    dat│            │            ║║            │            │            ║| 07x80
 |║hello    txt│            │            ║║            │            │            ║| 07x80
 |║notes    doc│            │            ║║            │            │            ║| 07x80
-|║data     bin│            │            ║║            │            │            ║| 07x80
+|║readme  ░txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
 |║run      bat│            │            ║║            │            │            ║| 07x80
-|║empty    dat│            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x40 70x1 07x39
 |║            │            │            ║║            │            │            ║| 07x80
@@ -221,7 +221,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║readme.txt          40  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x80
+|║readme.txt          40  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
@@ -230,15 +230,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │            │            ║║            │            │            ║| 07x80
-|║readme  █txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
-|║hello    txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
-|║notes    doc│            │            ║║            │            │            ║| 07x80
 |║data     bin│            │            ║║            │            │            ║| 07x80
-|║run      bat│            │            ║║            │            │            ║| 07x80
 |║empty    dat│            │            ║║            │            │            ║| 07x80
+|║hello    txt│            │            ║║            │            │            ║| 07x80
+|║notes    doc│            │            ║║            │            │            ║| 07x80
+|║readme  █txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
+|║run      bat│            │            ║║            │            │            ║| 07x1 70x12 07x67
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x40 70x1 07x39
 |║            │            │            ║║            │            │            ║| 07x80
@@ -249,7 +249,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║     40 bytes in 1 selected file      ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx27 07x47
+|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx27 07x47
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
@@ -258,15 +258,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │            │            ║║            │            │            ║| 07x80
-|║readme  █txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
-|║hello   ▐txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
-|║notes    doc│            │            ║║            │            │            ║| 07x1 70x12 07x67
 |║data     bin│            │            ║║            │            │            ║| 07x80
-|║run      bat│            │            ║║            │            │            ║| 07x80
 |║empty    dat│            │            ║║            │            │            ║| 07x80
+|║hello    txt│            │            ║║            │            │            ║| 07x80
+|║notes    doc│            │            ║║            │            │            ║| 07x80
+|║readme  █txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
+|║run     ▐bat│            │            ║║            │            │            ║| 07x1 70x12 07x67
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x40 70x1 07x39
 |║            │            │            ║║            │            │            ║| 07x80
@@ -277,7 +277,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║     55 bytes in 2 selected files     ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx28 07x46
+|║     61 bytes in 2 selected files     ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx28 07x46
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
@@ -286,15 +286,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │            │            ║║            │            │            ║| 07x80
-|║readme  █txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
-|║hello   ▐txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
-|║notes    doc│            │            ║║            │            │            ║| 07x80
 |║data     bin│            │            ║║            │            │            ║| 07x80
-|║run      bat│            │            ║║            │            │            ║| 07x80
 |║empty    dat│            │            ║║            │            │            ║| 07x80
+|║hello    txt│            │            ║║            │            │            ║| 07x80
+|║notes    doc│            │            ║║            │            │            ║| 07x80
+|║readme  █txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
+|║run     ▐bat│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x40 70x1 07x39
 |║            │            │            ║║            │            │            ║| 07x80
@@ -305,24 +305,24 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║     55 bytes in 2 selected files     ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx28 07x46
+|║     61 bytes in 2 selected files     ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx28 07x46
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
 
-== 11: Up
+== 11: Down
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 07x15 70x9 07x56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x10 0Fx8 07x1 0Fx12 07x1 0Fx8 07x5
-|║..          │            │            ║║WORK        │            │            ║| 07x80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 07x80
+|║..          │            │            ║║STAMPS      │            │            ║| 07x80
+|║DOCS        │            │            ║║WORK        │            │            ║| 07x80
 |║SRC         │            │            ║║            │            │            ║| 07x80
-|║readme  █txt│            │            ║║            │            │            ║| 07x1 70x12 07x67
-|║hello   ▐txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
-|║notes    doc│            │            ║║            │            │            ║| 07x80
 |║data     bin│            │            ║║            │            │            ║| 07x80
-|║run      bat│            │            ║║            │            │            ║| 07x80
 |║empty    dat│            │            ║║            │            │            ║| 07x80
+|║hello    txt│            │            ║║            │            │            ║| 07x80
+|║notes    doc│            │            ║║            │            │            ║| 07x80
+|║readme  █txt│            │            ║║            │            │            ║| 07x1 0Fx12 07x67
+|║run     ▐bat│            │            ║║            │            │            ║| 07x1 70x12 07x67
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x40 70x1 07x39
 |║            │            │            ║║            │            │            ║| 07x80
@@ -333,7 +333,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 07x80
 |║            │            │            ║║            │            │            ║| 07x80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 07x80
-|║     55 bytes in 2 selected files     ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx28 07x46
+|║     61 bytes in 2 selected files     ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 07x6 0Fx28 07x46
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
@@ -363,7 +363,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  d09acbec75a63963
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

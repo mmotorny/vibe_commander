@@ -19711,6 +19711,64 @@ order, which `sort` still runs. The C translation passes all fifteen
   `stamps-russia`, is theirs alone, and goes to STAMPS by "Up Enter".
 ||||||| parent of 11bbf68 (Rewrite the scenarios of the editor and the viewer for the bench sorted by name)
 
+### S4: done
+
+The eighteen scenarios of Enter, the command line, the user menu and
+the drives go to the files that they meant, each with its number of
+steps, and their goldens are derived on the new bench. `python3
+harness/sortcheck.py` loses no instruction of the batches in any of
+them but the two of the unsorted order. The C translation passes all
+eighteen (`harness/compare.py build/c/VC.EXE`). By scenario:
+
+- As before, every screen: `command-edit`, `russian`.
+- The same file under the cursor, which the tool names otherwise
+  because it is no longer the first entry shown, or now is: `command`
+  and `second-copy`, WORK at the root after Ctrl+PgUp; `clock-path` and
+  `clock-path-russia`, screen 1, the same; `enter`, screens 43 to 46,
+  the same, and 57 to 64, FREEDOS of A:, its fourth entry before and
+  its first now, reached by Home where it was "Down Down Down".
+- A file of A: shown in the mini status again: in A:\ and B:\ the
+  first entry was kernel.sys, a file, and is FREEDOS, a directory, so
+  that nothing showed a file's size and `PutSize` and `Number` were
+  not run in four scenarios. Each now has End behind the key that
+  shows the drive, onto kernel.sys, the last entry: `diskette-command`
+  screen 3, `history-drives` screens 60 to 64, `phantom` screen 13,
+  `asked` screens 21 to 24. The tool names those as differing, by
+  kernel.sys not being the first entry; it is the file that was shown
+  before.
+- Another file or another order on purpose:
+  - `enter-many`, screen 24: Up from the last of the 288 files goes to
+    the one before it, vtest.d where it was vstr.e.
+  - `enter-many-selected`, screens 24 to 26: the 256 files that are
+    kept while a command runs are the first 256 by name, so what stays
+    selected has another sum, 564,872 bytes where it was 576,277.
+  - `command-line`, screen 34: Alt+d finds DOCS, as its comment always
+    said, where it found data.bin, which stood after the cursor; and
+    36, Up from data.bin goes to SRC, where it went to notes.doc. The
+    two selected files are readme.txt and hello.txt as before, by "Ins
+    Up Up Up Ins", since they are no longer neighbours.
+  - `user-menu`, screens 62 to 68, and `device`, screens 4 and 5: the
+    row that the tool reads is the right panel's first row in C:\,
+    STAMPS where it was WORK. `device`, screen 7: Down from readme.txt
+    goes to run.bat, where it went to hello.txt.
+  - `user-menu-run`, screen 59: the list of the selected files is in
+    the panel's order, DOCS, hello.txt, readme.txt, where it was DOCS,
+    readme.txt, hello.txt; the same three files are selected, and the
+    cursor is put back on notes.doc for the commands that name it.
+  - `laptop`, screens 9 to 11: the file that is only selected is
+    run.bat, behind readme.txt, where it was hello.txt; Ins leaves the
+    cursor on it, the last file, so the step behind "Up" is "Down",
+    and the screens show the cursor on each of the two as before.
+- Steps that changed in kind: `enter` runs run.bat by End alone, and
+  goes into STAMPS by Up; `command-edit` goes to readme.txt by seven
+  Downs, to notes.doc by Up, and to noext by "End Up Up Up Up", which
+  keeps Down and End in it; `user-menu` goes into DOCS behind the
+  directory D.MNU that it made; `_CLOCK_PATH_STEPS`, which is theirs
+  alone, goes to STAMPS by Up on the left and by Enter alone on the
+  right, where the cursor is on it.
+- What the end has to know: the header of `harness/scenarios.py` was
+  not touched. None of the eighteen rests on a new file coming last.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes

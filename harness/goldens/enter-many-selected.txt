@@ -6,15 +6,15 @@ code page 437
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -25,7 +25,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -34,16 +34,16 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║BIG         │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║BIG         │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -53,7 +53,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║BIG          ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║BIG          ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -62,8 +62,8 @@ cursor 8 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║WORK        │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -81,7 +81,7 @@ cursor 12 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -90,8 +90,8 @@ cursor 12 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║WORK        │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║                                                                              ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
@@ -109,7 +109,7 @@ cursor 8 8 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -118,8 +118,8 @@ cursor 8 8 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │vtest    com│            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│            │            ║║WORK        │            │            ║| 1Bx80
 |║vchoice  com│            │            ║║            │            │            ║| 1Bx80
 |║vcls     com│            │            ║║            │            │            ║| 1Bx80
 |║vcursor  com│            │            ║║            │            │            ║| 1Bx80
@@ -137,7 +137,7 @@ cursor 12 23 lines 6 7 mode 3
 |║vprogres com│            │            ║║            │            │            ║| 1Bx80
 |║vstr     com│            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -146,8 +146,8 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx1 1Ex12 1Bx54
-|║vask     com│            │            ║║STAMPS      │            │            ║| 1Bx1 1Ex12 1Bx67
+|║..          │vtest    com│            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx1 1Ex12 1Bx54
+|║vask     com│            │            ║║WORK        │            │            ║| 1Bx1 1Ex12 1Bx67
 |║vchoice  com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
 |║vcls     com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
 |║vcursor  com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
@@ -165,7 +165,7 @@ cursor 12 23 lines 6 7 mode 3
 |║vprogres com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
 |║vstr     com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║  40,937 bytes in 18 selected files   ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx3 1Ex33 1Bx44
+|║  40,937 bytes in 18 selected files   ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx3 1Ex33 1Bx44
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -174,26 +174,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │            ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │            ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │            ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │            ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │            ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │            ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │            ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │            ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │            ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │            ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │            ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │            ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │            ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │            ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │            ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │            ║║            │            │            ║| 1Bx80
+|║..          │vfdutil  com│vtest    com║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vfont    0  │            ║║WORK        │            │            ║| 1Bx80
+|║vask     com│vfont    com│            ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vframe   0  │            ║║            │            │            ║| 1Bx80
+|║vchoice  com│vframe   com│            ║║            │            │            ║| 1Bx80
+|║vcls     0  │vgotoxy  0  │            ║║            │            │            ║| 1Bx80
+|║vcls     com│vgotoxy  com│            ║║            │            │            ║| 1Bx80
+|║vcursor  0  │vinfo    0  │            ║║            │            │            ║| 1Bx80
+|║vcursor  com│vinfo    com│            ║║            │            │            ║| 1Bx80
+|║vdelay   0  │vline    0  │            ║║            │            │            ║| 1Bx80
+|║vdelay   com│vline    com│            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║veach    0  │vpause   0  │            ║║            │            │            ║| 1Bx80
+|║veach    com│vpause   com│            ║║            │            │            ║| 1Bx80
+|║vecho    0  │vprogres 0  │            ║║            │            │            ║| 1Bx80
+|║vecho    com│vprogres com│            ║║            │            │            ║| 1Bx80
+|║verrlvl  0  │vstr     0  │            ║║            │            │            ║| 1Bx80
+|║verrlvl  com│vstr     com│            ║║            │            │            ║| 1Bx80
+|║vfdutil  0  │vtest    0  │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -202,26 +202,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │veach    com│vgotoxy  com║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vecho    0  │vinfo    0  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vecho    1  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vask     com│vecho    com│vinfo    com║║            │            │            ║| 1Bx80
+|║vchoice  0  │verrlvl  0  │vline    0  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │verrlvl  1  │vline    1  ║║            │            │            ║| 1Bx80
+|║vchoice  com│verrlvl  com│vline    com║║            │            │            ║| 1Bx80
+|║vcls     0  │vfdutil  0  │vpause   0  ║║            │            │            ║| 1Bx80
+|║vcls     1  │vfdutil  1  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vfdutil  com│vpause   com║║            │            │            ║| 1Bx80
+|║vcursor  0  │vfont    0  │vprogres 0  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vcursor  1  │vfont    1  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vfont    com│vprogres com║║            │            │            ║| 1Bx80
+|║vdelay   0  │vframe   0  │vstr     0  ║║            │            │            ║| 1Bx80
+|║vdelay   1  │vframe   1  │vstr     1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vframe   com│vstr     com║║            │            │            ║| 1Bx80
+|║veach    0  │vgotoxy  0  │vtest    0  ║║            │            │            ║| 1Bx80
+|║veach    1  │vgotoxy  1  │vtest    1  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -230,26 +230,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vdelay   1  │vfdutil  com║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vdelay   2  │vfont    0  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vdelay   com│vfont    1  ║║            │            │            ║| 1Bx80
+|║vask     2  │veach    0  │vfont    2  ║║            │            │            ║| 1Bx80
+|║vask     com│veach    1  │vfont    com║║            │            │            ║| 1Bx80
+|║vchoice  0  │veach    2  │vframe   0  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │veach    com│vframe   1  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vecho    0  │vframe   2  ║║            │            │            ║| 1Bx80
+|║vchoice  com│vecho    1  │vframe   com║║            │            │            ║| 1Bx80
+|║vcls     0  │vecho    2  │vgotoxy  0  ║║            │            │            ║| 1Bx80
+|║vcls     1  │vecho    com│vgotoxy  1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vcls     2  │verrlvl  0  │vgotoxy  2  ║║            │            │            ║| 1Bx80
+|║vcls     com│verrlvl  1  │vgotoxy  com║║            │            │            ║| 1Bx80
+|║vcursor  0  │verrlvl  2  │vinfo    0  ║║            │            │            ║| 1Bx80
+|║vcursor  1  │verrlvl  com│vinfo    1  ║║            │            │            ║| 1Bx80
+|║vcursor  2  │vfdutil  0  │vinfo    2  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vfdutil  1  │vinfo    com║║            │            │            ║| 1Bx80
+|║vdelay   0  │vfdutil  2  │vline    0  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -258,26 +258,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vcursor  2  │verrlvl  0  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vcursor  3  │verrlvl  1  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vcursor  com│verrlvl  2  ║║            │            │            ║| 1Bx80
+|║vask     2  │vdelay   0  │verrlvl  3  ║║            │            │            ║| 1Bx80
+|║vask     3  │vdelay   1  │verrlvl  com║║            │            │            ║| 1Bx80
+|║vask     com│vdelay   2  │vfdutil  0  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vdelay   3  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vdelay   com│vfdutil  2  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │veach    0  │vfdutil  3  ║║            │            │            ║| 1Bx80
+|║vchoice  3  │veach    1  │vfdutil  com║║            │            │            ║| 1Bx80
+|║vchoice  com│veach    2  │vfont    0  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vcls     0  │veach    3  │vfont    1  ║║            │            │            ║| 1Bx80
+|║vcls     1  │veach    com│vfont    2  ║║            │            │            ║| 1Bx80
+|║vcls     2  │vecho    0  │vfont    3  ║║            │            │            ║| 1Bx80
+|║vcls     3  │vecho    1  │vfont    com║║            │            │            ║| 1Bx80
+|║vcls     com│vecho    2  │vframe   0  ║║            │            │            ║| 1Bx80
+|║vcursor  0  │vecho    3  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vcursor  1  │vecho    com│vframe   2  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -286,26 +286,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vcls     com│veach    com║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vcursor  0  │vecho    0  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vcursor  1  │vecho    1  ║║            │            │            ║| 1Bx80
+|║vask     2  │vcursor  2  │vecho    2  ║║            │            │            ║| 1Bx80
+|║vask     3  │vcursor  3  │vecho    3  ║║            │            │            ║| 1Bx80
+|║vask     4  │vcursor  4  │vecho    4  ║║            │            │            ║| 1Bx80
+|║vask     com│vcursor  com│vecho    com║║            │            │            ║| 1Bx80
+|║vchoice  0  │vdelay   0  │verrlvl  0  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vdelay   1  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vdelay   2  │verrlvl  2  ║║            │            │            ║| 1Bx80
+|║vchoice  3  │vdelay   3  │verrlvl  3  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vchoice  4  │vdelay   4  │verrlvl  4  ║║            │            │            ║| 1Bx80
+|║vchoice  com│vdelay   com│verrlvl  com║║            │            │            ║| 1Bx80
+|║vcls     0  │veach    0  │vfdutil  0  ║║            │            │            ║| 1Bx80
+|║vcls     1  │veach    1  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vcls     2  │veach    2  │vfdutil  2  ║║            │            │            ║| 1Bx80
+|║vcls     3  │veach    3  │vfdutil  3  ║║            │            │            ║| 1Bx80
+|║vcls     4  │veach    4  │vfdutil  4  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -314,26 +314,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vcls     3  │veach    0  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vcls     4  │veach    1  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vcls     5  │veach    2  ║║            │            │            ║| 1Bx80
+|║vask     2  │vcls     com│veach    3  ║║            │            │            ║| 1Bx80
+|║vask     3  │vcursor  0  │veach    4  ║║            │            │            ║| 1Bx80
+|║vask     4  │vcursor  1  │veach    5  ║║            │            │            ║| 1Bx80
+|║vask     5  │vcursor  2  │veach    com║║            │            │            ║| 1Bx80
+|║vask     com│vcursor  3  │vecho    0  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcursor  4  │vecho    1  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcursor  5  │vecho    2  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vcursor  com│vecho    3  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vchoice  3  │vdelay   0  │vecho    4  ║║            │            │            ║| 1Bx80
+|║vchoice  4  │vdelay   1  │vecho    5  ║║            │            │            ║| 1Bx80
+|║vchoice  5  │vdelay   2  │vecho    com║║            │            │            ║| 1Bx80
+|║vchoice  com│vdelay   3  │verrlvl  0  ║║            │            │            ║| 1Bx80
+|║vcls     0  │vdelay   4  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vcls     1  │vdelay   5  │verrlvl  2  ║║            │            │            ║| 1Bx80
+|║vcls     2  │vdelay   com│verrlvl  3  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -342,26 +342,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vcls     1  │vdelay   3  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vcls     2  │vdelay   4  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vcls     3  │vdelay   5  ║║            │            │            ║| 1Bx80
+|║vask     2  │vcls     4  │vdelay   6  ║║            │            │            ║| 1Bx80
+|║vask     3  │vcls     5  │vdelay   com║║            │            │            ║| 1Bx80
+|║vask     4  │vcls     6  │veach    0  ║║            │            │            ║| 1Bx80
+|║vask     5  │vcls     com│veach    1  ║║            │            │            ║| 1Bx80
+|║vask     6  │vcursor  0  │veach    2  ║║            │            │            ║| 1Bx80
+|║vask     com│vcursor  1  │veach    3  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcursor  2  │veach    4  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcursor  3  │veach    5  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vchoice  2  │vcursor  4  │veach    6  ║║            │            │            ║| 1Bx80
+|║vchoice  3  │vcursor  5  │veach    com║║            │            │            ║| 1Bx80
+|║vchoice  4  │vcursor  6  │vecho    0  ║║            │            │            ║| 1Bx80
+|║vchoice  5  │vcursor  com│vecho    1  ║║            │            │            ║| 1Bx80
+|║vchoice  6  │vdelay   0  │vecho    2  ║║            │            │            ║| 1Bx80
+|║vchoice  com│vdelay   1  │vecho    3  ║║            │            │            ║| 1Bx80
+|║vcls     0  │vdelay   2  │vecho    4  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -370,26 +370,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  com│vcursor  com║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vcls     0  │vdelay   0  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vcls     1  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║vask     2  │vcls     2  │vdelay   2  ║║            │            │            ║| 1Bx80
+|║vask     3  │vcls     3  │vdelay   3  ║║            │            │            ║| 1Bx80
+|║vask     4  │vcls     4  │vdelay   4  ║║            │            │            ║| 1Bx80
+|║vask     5  │vcls     5  │vdelay   5  ║║            │            │            ║| 1Bx80
+|║vask     6  │vcls     6  │vdelay   6  ║║            │            │            ║| 1Bx80
+|║vask     7  │vcls     7  │vdelay   7  ║║            │            │            ║| 1Bx80
+|║vask     com│vcls     com│vdelay   com║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcursor  0  │veach    0  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vchoice  1  │vcursor  1  │veach    1  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vcursor  2  │veach    2  ║║            │            │            ║| 1Bx80
+|║vchoice  3  │vcursor  3  │veach    3  ║║            │            │            ║| 1Bx80
+|║vchoice  4  │vcursor  4  │veach    4  ║║            │            │            ║| 1Bx80
+|║vchoice  5  │vcursor  5  │veach    5  ║║            │            │            ║| 1Bx80
+|║vchoice  6  │vcursor  6  │veach    6  ║║            │            │            ║| 1Bx80
+|║vchoice  7  │vcursor  7  │veach    7  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -398,26 +398,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  7  │vcursor  5  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vchoice  8  │vcursor  6  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vchoice  com│vcursor  7  ║║            │            │            ║| 1Bx80
+|║vask     2  │vcls     0  │vcursor  8  ║║            │            │            ║| 1Bx80
+|║vask     3  │vcls     1  │vcursor  com║║            │            │            ║| 1Bx80
+|║vask     4  │vcls     2  │vdelay   0  ║║            │            │            ║| 1Bx80
+|║vask     5  │vcls     3  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║vask     6  │vcls     4  │vdelay   2  ║║            │            │            ║| 1Bx80
+|║vask     7  │vcls     5  │vdelay   3  ║║            │            │            ║| 1Bx80
+|║vask     8  │vcls     6  │vdelay   4  ║║            │            │            ║| 1Bx80
+|║vask     com│vcls     7  │vdelay   5  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vchoice  0  │vcls     8  │vdelay   6  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcls     com│vdelay   7  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vcursor  0  │vdelay   8  ║║            │            │            ║| 1Bx80
+|║vchoice  3  │vcursor  1  │vdelay   com║║            │            │            ║| 1Bx80
+|║vchoice  4  │vcursor  2  │veach    0  ║║            │            │            ║| 1Bx80
+|║vchoice  5  │vcursor  3  │veach    1  ║║            │            │            ║| 1Bx80
+|║vchoice  6  │vcursor  4  │veach    2  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -426,26 +426,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  6  │vcursor  2  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vchoice  7  │vcursor  3  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vchoice  8  │vcursor  4  ║║            │            │            ║| 1Bx80
+|║vask     2  │vchoice  9  │vcursor  5  ║║            │            │            ║| 1Bx80
+|║vask     3  │vchoice  com│vcursor  6  ║║            │            │            ║| 1Bx80
+|║vask     4  │vcls     0  │vcursor  7  ║║            │            │            ║| 1Bx80
+|║vask     5  │vcls     1  │vcursor  8  ║║            │            │            ║| 1Bx80
+|║vask     6  │vcls     2  │vcursor  9  ║║            │            │            ║| 1Bx80
+|║vask     7  │vcls     3  │vcursor  com║║            │            │            ║| 1Bx80
+|║vask     8  │vcls     4  │vdelay   0  ║║            │            │            ║| 1Bx80
+|║vask     9  │vcls     5  │vdelay   1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vask     com│vcls     6  │vdelay   2  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcls     7  │vdelay   3  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcls     8  │vdelay   4  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vcls     9  │vdelay   5  ║║            │            │            ║| 1Bx80
+|║vchoice  3  │vcls     com│vdelay   6  ║║            │            │            ║| 1Bx80
+|║vchoice  4  │vcursor  0  │vdelay   7  ║║            │            │            ║| 1Bx80
+|║vchoice  5  │vcursor  1  │vdelay   8  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -454,26 +454,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  5  │vcls     com║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vchoice  6  │vcursor  0  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vchoice  7  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vask     2  │vchoice  8  │vcursor  2  ║║            │            │            ║| 1Bx80
+|║vask     3  │vchoice  9  │vcursor  3  ║║            │            │            ║| 1Bx80
+|║vask     4  │vchoice  a  │vcursor  4  ║║            │            │            ║| 1Bx80
+|║vask     5  │vchoice  com│vcursor  5  ║║            │            │            ║| 1Bx80
+|║vask     6  │vcls     0  │vcursor  6  ║║            │            │            ║| 1Bx80
+|║vask     7  │vcls     1  │vcursor  7  ║║            │            │            ║| 1Bx80
+|║vask     8  │vcls     2  │vcursor  8  ║║            │            │            ║| 1Bx80
+|║vask     9  │vcls     3  │vcursor  9  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vask     a  │vcls     4  │vcursor  a  ║║            │            │            ║| 1Bx80
+|║vask     com│vcls     5  │vcursor  com║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcls     6  │vdelay   0  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcls     7  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vcls     8  │vdelay   2  ║║            │            │            ║| 1Bx80
+|║vchoice  3  │vcls     9  │vdelay   3  ║║            │            │            ║| 1Bx80
+|║vchoice  4  │vcls     a  │vdelay   4  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -482,26 +482,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  4  │vcls     9  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vchoice  5  │vcls     a  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vchoice  6  │vcls     b  ║║            │            │            ║| 1Bx80
+|║vask     2  │vchoice  7  │vcls     com║║            │            │            ║| 1Bx80
+|║vask     3  │vchoice  8  │vcursor  0  ║║            │            │            ║| 1Bx80
+|║vask     4  │vchoice  9  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vask     5  │vchoice  a  │vcursor  2  ║║            │            │            ║| 1Bx80
+|║vask     6  │vchoice  b  │vcursor  3  ║║            │            │            ║| 1Bx80
+|║vask     7  │vchoice  com│vcursor  4  ║║            │            │            ║| 1Bx80
+|║vask     8  │vcls     0  │vcursor  5  ║║            │            │            ║| 1Bx80
+|║vask     9  │vcls     1  │vcursor  6  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vask     a  │vcls     2  │vcursor  7  ║║            │            │            ║| 1Bx80
+|║vask     b  │vcls     3  │vcursor  8  ║║            │            │            ║| 1Bx80
+|║vask     com│vcls     4  │vcursor  9  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcls     5  │vcursor  a  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcls     6  │vcursor  b  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vcls     7  │vcursor  com║║            │            │            ║| 1Bx80
+|║vchoice  3  │vcls     8  │vdelay   0  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -510,26 +510,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  3  │vcls     7  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vchoice  4  │vcls     8  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vchoice  5  │vcls     9  ║║            │            │            ║| 1Bx80
+|║vask     2  │vchoice  6  │vcls     a  ║║            │            │            ║| 1Bx80
+|║vask     3  │vchoice  7  │vcls     b  ║║            │            │            ║| 1Bx80
+|║vask     4  │vchoice  8  │vcls     c  ║║            │            │            ║| 1Bx80
+|║vask     5  │vchoice  9  │vcls     com║║            │            │            ║| 1Bx80
+|║vask     6  │vchoice  a  │vcursor  0  ║║            │            │            ║| 1Bx80
+|║vask     7  │vchoice  b  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vask     8  │vchoice  c  │vcursor  2  ║║            │            │            ║| 1Bx80
+|║vask     9  │vchoice  com│vcursor  3  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vask     a  │vcls     0  │vcursor  4  ║║            │            │            ║| 1Bx80
+|║vask     b  │vcls     1  │vcursor  5  ║║            │            │            ║| 1Bx80
+|║vask     c  │vcls     2  │vcursor  6  ║║            │            │            ║| 1Bx80
+|║vask     com│vcls     3  │vcursor  7  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcls     4  │vcursor  8  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcls     5  │vcursor  9  ║║            │            │            ║| 1Bx80
+|║vchoice  2  │vcls     6  │vcursor  a  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -538,26 +538,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  2  │vcls     5  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vchoice  3  │vcls     6  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vchoice  4  │vcls     7  ║║            │            │            ║| 1Bx80
+|║vask     2  │vchoice  5  │vcls     8  ║║            │            │            ║| 1Bx80
+|║vask     3  │vchoice  6  │vcls     9  ║║            │            │            ║| 1Bx80
+|║vask     4  │vchoice  7  │vcls     a  ║║            │            │            ║| 1Bx80
+|║vask     5  │vchoice  8  │vcls     b  ║║            │            │            ║| 1Bx80
+|║vask     6  │vchoice  9  │vcls     c  ║║            │            │            ║| 1Bx80
+|║vask     7  │vchoice  a  │vcls     com║║            │            │            ║| 1Bx80
+|║vask     8  │vchoice  b  │vcls     d  ║║            │            │            ║| 1Bx80
+|║vask     9  │vchoice  c  │vcursor  0  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vask     a  │vchoice  com│vcursor  1  ║║            │            │            ║| 1Bx80
+|║vask     b  │vchoice  d  │vcursor  2  ║║            │            │            ║| 1Bx80
+|║vask     c  │vcls     0  │vcursor  3  ║║            │            │            ║| 1Bx80
+|║vask     com│vcls     1  │vcursor  4  ║║            │            │            ║| 1Bx80
+|║vask     d  │vcls     2  │vcursor  5  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcls     3  │vcursor  6  ║║            │            │            ║| 1Bx80
+|║vchoice  1  │vcls     4  │vcursor  7  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -566,26 +566,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
-|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
-|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
-|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
-|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
-|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|║..          │vchoice  1  │vcls     3  ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     0  │vchoice  2  │vcls     4  ║║WORK        │            │            ║| 1Bx80
+|║vask     1  │vchoice  3  │vcls     5  ║║            │            │            ║| 1Bx80
+|║vask     2  │vchoice  4  │vcls     6  ║║            │            │            ║| 1Bx80
+|║vask     3  │vchoice  5  │vcls     7  ║║            │            │            ║| 1Bx80
+|║vask     4  │vchoice  6  │vcls     8  ║║            │            │            ║| 1Bx80
+|║vask     5  │vchoice  7  │vcls     9  ║║            │            │            ║| 1Bx80
+|║vask     6  │vchoice  8  │vcls     a  ║║            │            │            ║| 1Bx80
+|║vask     7  │vchoice  9  │vcls     b  ║║            │            │            ║| 1Bx80
+|║vask     8  │vchoice  a  │vcls     c  ║║            │            │            ║| 1Bx80
+|║vask     9  │vchoice  b  │vcls     com║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vask     a  │vchoice  c  │vcls     d  ║║            │            │            ║| 1Bx80
+|║vask     b  │vchoice  com│vcls     e  ║║            │            │            ║| 1Bx80
+|║vask     c  │vchoice  d  │vcursor  0  ║║            │            │            ║| 1Bx80
+|║vask     com│vchoice  e  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vask     d  │vcls     0  │vcursor  2  ║║            │            │            ║| 1Bx80
+|║vask     e  │vcls     1  │vcursor  3  ║║            │            │            ║| 1Bx80
+|║vchoice  0  │vcls     2  │vcursor  4  ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -594,26 +594,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx1 30x38 1Bx41
-|║vask     com│     3159│ 9-19-22│ 9:21a║║STAMPS      │            │            ║| 1Bx80
-|║vchoice  com│     2904│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
-|║vcls     com│     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vcursor  com│     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vdelay   com│     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║veach    com│     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vecho    com│     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
-|║verrlvl  com│     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vfdutil  com│     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
-|║vfont    com│     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx80
-|║vgotoxy  com│     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vinfo    com│     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
-|║vline    com│     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vpause   com│     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vprogres com│     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vstr     com│     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║STAMPS      │            │            ║| 1Bx1 30x38 1Bx41
+|║vask     0  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
+|║vask     1  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     2  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     3  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     4  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     5  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     6  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     7  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     8  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     9  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vask     a  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     b  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     c  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     com│     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     d  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vask     e  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx80
+|║vchoice  0  │     2904│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -622,26 +622,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
-|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|║vstr     d  │     2387│ 1-10-22│ 2:17p║║STAMPS      │            │            ║| 1Bx80
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║WORK        │            │            ║| 1Bx80
+|║vtest    0  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    1  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    2  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    3  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    4  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    5  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    6  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    7  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    8  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vtest    9  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    a  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    b  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    c  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    com│     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    d  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
 |║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║vtest.e           2791  6-24-23 11:41a║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║vtest.e           2791  6-24-23 11:41a║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -650,26 +650,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx1 1Ex38 1Bx1 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vstr     d  │     2387│ 1-10-22│ 2:17p║║STAMPS      │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║WORK        │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    0  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    1  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    2  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    3  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    4  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    5  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    6  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    7  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    8  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx1 6Cx1 1Bx39
+|║vtest    9  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    a  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    b  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    c  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    com│     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vtest    d  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
 |║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 3Ex38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║ 654,992 bytes in 288 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
+|║ 654,992 bytes in 288 selected files  ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -678,26 +678,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
-|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|║vstr     d  │     2387│ 1-10-22│ 2:17p║║STAMPS      │            │            ║| 1Bx80
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║WORK        │            │            ║| 1Bx80
+|║vtest    0  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    1  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    2  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    3  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    4  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    5  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    6  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    7  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    8  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vtest    9  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    a  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    b  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    c  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    com│     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    d  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
 |║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║ 576,277 bytes in 253 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
+|║ 564,872 bytes in 253 selected files  ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -706,26 +706,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │►UP--DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx1 30x38 1Bx41
-|║vask     com│     3159│ 9-19-22│ 9:21a║║STAMPS      │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vchoice  com│     2904│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vcls     com│     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vcursor  com│     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vdelay   com│     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║veach    com│     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vecho    com│     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║verrlvl  com│     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vfdutil  com│     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vfont    com│     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx1 6Cx1 1Bx39
-|║vframe   com│     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vgotoxy  com│     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vinfo    com│     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vline    com│     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vpause   com│     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vprogres com│     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
-|║vstr     com│     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║STAMPS      │            │            ║| 1Bx1 30x38 1Bx41
+|║vask     0  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     1  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     2  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     3  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     4  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     5  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     6  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     7  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     8  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     9  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx1 6Cx1 1Bx39
+|║vask     a  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     b  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     c  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     com│     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     d  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vask     e  │     3159│ 9-19-22│ 9:21a║║            │            │            ║| 1Bx1 1Ex38 1Bx41
+|║vchoice  0  │     2904│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx1 1Ex38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║ 576,277 bytes in 253 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
+|║ 564,872 bytes in 253 selected files  ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -734,26 +734,26 @@ cursor 12 23 lines 6 7 mode 3
 cursor 12 23 lines 6 7 mode 3
 |╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
 |║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
-|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|║vstr     d  │     2387│ 1-10-22│ 2:17p║║STAMPS      │            │            ║| 1Bx80
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║WORK        │            │            ║| 1Bx80
+|║vtest    0  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    1  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    2  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    3  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    4  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    5  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    6  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    7  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    8  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vtest    9  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    a  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    b  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    c  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    com│     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|║vtest    d  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
 |║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║ 576,277 bytes in 253 selected files  ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
+|║ 564,872 bytes in 253 selected files  ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx2 1Ex35 1Bx43
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1072,7 +1072,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  d09acbec75a63963
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

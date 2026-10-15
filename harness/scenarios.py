@@ -1686,13 +1686,15 @@ _NAMES_STEPS = (
 # one when the menu bar is above it.
 _CLOCK_PATH_STEPS = (
     "Ctrl+PgUp",
-    "Down Enter",                         # the left panel in C:\\STAMPS
+    "Up Enter",                           # the left panel in C:\\STAMPS,
+                                          # before WORK
     "F9 l l",
     '"????????.???"',                     # a mask, and only programs:
     "Tab Tab Space",                      # both are shown with the path,
     "Enter",                              # which is 30 characters now
     "Tab",                                # to the files on the right
-    "Down Enter",                         # the right one in C:\\STAMPS
+    "Enter",                              # the right one in C:\\STAMPS,
+                                          # its first entry
     "Down Enter",                         # and in its directory SUB
     "F9 o l",                             # the clock: this path is short
     "F9 r l",
@@ -2205,7 +2207,7 @@ SCENARIOS = {
         "is wide and until it is full; the key bar off; and a file run by "
         "what the extension file says for its kind",
         steps=(
-            "Down Down Down",             # onto readme.txt
+            " ".join(["Down"] * 7),       # onto readme.txt
             " ".join(["Ctrl+Enter"] * 7), # its name seven times: the line
                                           # is too long and moves to the left
             " ".join(["Ctrl+Left"] * 7),  # back by words, ^A
@@ -2227,7 +2229,7 @@ SCENARIOS = {
             "Ctrl+y",
             "Ctrl+b",                     # the key bar off
             "Ctrl+b",                     # and on
-            "Down Down",
+            "Up",
             "Enter",                      # notes.doc: no command for doc
             "F5",
             '"noext" Enter',              # a file without an extension
@@ -2244,7 +2246,8 @@ SCENARIOS = {
             "Ctrl+Backspace",             # and the word before deleted
             "F2",
             "Esc",
-            "End Up",
+            "End Up Up Up Up",            # noext, in front of notes.doc,
+                                          # readme.txt, run.bat and vc.ext
             "Enter",                      # noext is run by it
             "Ctrl+o",                     # what the command printed
             "Ctrl+o",
@@ -2354,7 +2357,10 @@ SCENARIOS = {
             '"b:"',
             "Enter",                      # the command: Insert diskette
                                           # for drive B:
-            "Enter",                      # Ok: the panels show B:
+            "Enter End",                  # Ok: the panels show B:, and
+                                          # the cursor goes to kernel.sys,
+                                          # last of all where FREEDOS is
+                                          # first
             '"a:" Enter Esc',             # back: DOS asks for the diskette
                                           # itself, and takes any key
             '"b:" Enter Esc',             # and again, not given: the disk
@@ -2486,7 +2492,7 @@ SCENARIOS = {
         "copied to COM2, which the machine has not. The box names the "
         "device, tried again and then given up",
         steps=(
-            "Down Down Down",             # onto readme.txt
+            " ".join(["Down"] * 7),       # onto readme.txt
             "F5",
             '"com2" Enter',               # Error on device COM2:
             "Enter",                      # Retry: the same again
@@ -2565,7 +2571,7 @@ SCENARIOS = {
             "F2 Enter",
             "Esc",
             "Alt+F9",
-            "Home Down Enter",            # into DOCS
+            "Home Down Down Enter",       # into DOCS, behind D.MNU
             "F7", '"vc.mnu" Enter',       # a directory where a menu is
             "F2",                         # looked for: the main one
             "Esc",
@@ -2597,13 +2603,15 @@ SCENARIOS = {
             "F2",
             "a",                          # on "..": the name is two dots
             "Ctrl+o", "Ctrl+o",
-            "Down Down Down",             # onto a file
+            " ".join(["Down"] * 7),       # onto a file: readme.txt
             "F2 a",
             "Ctrl+o", "Ctrl+o",
             "F2 F3",                      # the list file, of this one
             "Ctrl+o", "Ctrl+o",
-            "Up Up Ins",                  # a directory selected,
-            "Down Ins Ins",               # and two files
+            "Home Down Ins",              # a directory selected, DOCS,
+            "Down Down Down Ins Down Ins Up Up",  # and two files,
+                                          # hello.txt and readme.txt, the
+                                          # cursor back on notes.doc
             "F2 F3",                      # the list of them
             "Ctrl+o", "Ctrl+o",
             '"type" Space "d:\\vc\\vc.lst"',
@@ -2621,7 +2629,7 @@ SCENARIOS = {
             '"vcview.ext" Enter',
             '"txt:" Tab "echo" Space "!.!" Space "!"',
             "F2 Esc",
-            "Up Up",
+            "Down",                       # readme.txt
             "F3",                         # the file, as it is viewed
             "Ctrl+o", "Ctrl+o",
             "Shift+F3",                   # and one named with a path
@@ -2654,8 +2662,8 @@ SCENARIOS = {
             "Esc",                        # and come back
             "Ctrl+i",                     # the file of the cursor: not ".."
             "Down Ctrl+i",                # a directory, with a mask
-            "Down Down Ctrl+i",           # a file
-            "Ins Ins",
+            " ".join(["Down"] * 6) + " Ctrl+i",   # a file, readme.txt
+            "Ins Up Up Up Ins",           # readme.txt and hello.txt
             "Ctrl+i",                     # the two that are selected
             "Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i",
             "Ctrl+m",                     # until no room; selected again
@@ -2745,7 +2753,8 @@ SCENARIOS = {
             "Alt+F1",
             "Enter",                      # the drive it has
             "Alt+F1",
-            "a",                          # by its letter
+            "a End",                      # by its letter; kernel.sys,
+                                          # the last
             "Alt+F2",                     # the right panel
             "Right Enter",                # D:
             "Tab",
@@ -2765,7 +2774,7 @@ SCENARIOS = {
         "them than are kept; the keys that change the directory, on "
         "another drive, and on one whose disk the user will not put in",
         steps=(
-            "End Up",                     # onto run.bat
+            "End",                        # onto run.bat, the last file
             "Enter",                      # its name is the command
             "Ctrl+o", "Ctrl+o",           # what it printed
             '"ver" Shift+Enter',          # with Shift: all of the program
@@ -2807,8 +2816,9 @@ SCENARIOS = {
             "Ctrl+PgDn",                  # and into it again
             "Ctrl+PgUp Ctrl+PgUp",        # the root
             "Ctrl+PgUp",                  # which has nothing above it
-            "Down Ctrl+PgDn",             # into STAMPS
-            "Down Down Ctrl+PgDn",        # a file is no directory
+            "Up Ctrl+PgDn",               # into STAMPS, before WORK
+            "Down Down Down Ctrl+PgDn",   # first.dat: a file is no
+                                          # directory
             "Ctrl+\\",                    # the root at once
             "Ctrl+l",                     # the Info off: it would say
                                           # what is free on the floppy
@@ -2819,7 +2829,8 @@ SCENARIOS = {
             '"b:\\freedos\\version.fdi" Enter',   # for the viewer:
             "Enter",                      # the disk is "put in"
             "Esc",
-            "Down Down Down",             # onto FREEDOS, of A:
+            "Home",                       # onto FREEDOS, the first entry
+                                          # of A:
             "Enter",                      # whose disk is asked for now
             "Esc",                        # and refused
             "Ctrl+PgDn", "Esc",
@@ -2872,7 +2883,7 @@ SCENARIOS = {
         "A file with a Russian name, typed on the Russian keyboard",
         country="ru",
         steps=(
-            "Down Down Down",             # onto a file
+            " ".join(["Down"] * 7),       # onto a file, readme.txt
             "F5",                         # a copy of it
             # The keyboard's Cyrillic letters are selected here, where Alt
             # by itself means nothing: at the panels it brings up the
@@ -2925,14 +2936,15 @@ SCENARIOS = {
             "F9 o Enter",
             "Down Space",                 # laptop
             "Enter",
-            "Down Down Down",             # onto readme.txt
+            " ".join(["Down"] * 7),       # onto readme.txt
             "Ctrl+a",
             "Tab Tab Space",              # hidden: a mark before its
             "Enter",                      # extension
             "Ins",                        # selected too: another mark
-            "Ins",                        # hello.txt only selected
+            "Ins",                        # run.bat only selected: the
+                                          # last file, the cursor stays
             "Up",                         # the cursor on the one
-            "Up",                         # and on the other
+            "Down",                       # and on the other
         )),
 
     "columns": Scenario(
@@ -3291,7 +3303,7 @@ SCENARIOS = {
             "F9 r b",                     # and files again: in A:\\
             "Esc",                        # no: the Info stays
             "F9 r b",
-            "Enter",                      # yes
+            "Enter End",                  # yes; kernel.sys, the last
         )),
 
     "memory-map": Scenario(
@@ -3457,7 +3469,8 @@ SCENARIOS = {
             "Ctrl+o",                     # *C*C*>: the drive of either
             "Ctrl+o",                     # panel's path, and a colour
             "Alt+F1",
-            "a",                          # the left panel on A:
+            "a End",                      # the left panel on A:, on
+                                          # kernel.sys, the last
             '"c:\\work\\a" Enter',
             "Ctrl+o",                     # *A*C*>
             "Ctrl+o",
