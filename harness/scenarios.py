@@ -1669,7 +1669,7 @@ _NAMES_STEPS = (
     '"..\\work\\..\\work\\..\\work\\..\\work\\hello.txt"',
     "Enter",                              # shortened from its start
     "Esc",
-    "Down Down Down",                     # onto a file
+    "Down Down Down Down Down Down Down", # onto readme.txt
     "F5",                                 # a copy of it
     '"under_sc.tx"',                      # an underscore, a short extension
     "Enter",                              # the panel lists it
@@ -4750,9 +4750,9 @@ SCENARIOS = {
         "files in it, the current one from the tree, by a mask, and what "
         "cannot be deleted",
         steps=(
-            "Down Down Down",             # readme.txt
+            "Down Down Down Down Down Down Down",  # readme.txt
             "F8",
-            "Enter",                      # gone
+            "Enter Up Up",                # gone; up to hello.txt
             "Ctrl+a Space Enter",         # hello.txt read-only
             "F8",
             "Enter",                      # which is asked about
@@ -4764,12 +4764,12 @@ SCENARIOS = {
             "Enter",
             "Enter",                      # Delete
             'F5 "docs\\" Enter',          # notes.doc and data.bin into DOCS
-            "Down",
+            "Up Up",
             'F5 "docs\\" Enter',
-            "Down",
+            "Down Down Down",
             'F5 "src\\" Enter',           # and run.bat into SRC
             "Home Down Enter",
-            "Down",
+            "Down Down",                  # past data.bin
             "Ctrl+a Space Enter",         # DOCS\\notes.doc read-only
             "Ctrl+PgUp",                  # the cursor on DOCS
             "F8",
@@ -4861,7 +4861,8 @@ SCENARIOS = {
         "Shift+F8 with a name that no file has, with masks that mean "
         "every file, and on a drive whose disk is not put in",
         steps=(
-            "Down Down Down Ins",         # readme.txt selected
+            # readme.txt selected, and back up to hello.txt
+            "Down Down Down Down Down Down Down Ins Up Up Up",
             "Ctrl+F8",                    # is for the file under the
             "Enter",                      # cursor all the same: hello.txt
             "Shift+F8",
@@ -5208,12 +5209,12 @@ SCENARIOS = {
         steps=(
             "Ctrl+l",                     # the Info on the right: no panel's
                                           # directory is offered as a target
-            "Down Down Down",             # onto readme.txt
+            "Down Down Down Down Down Down Down",  # onto readme.txt
             "Shift+F6",                   # no name
             "Esc",
-            "Up Shift+F6",                # nor behind Up,
+            "Up Up Up Up Up Shift+F6",    # nor behind Up, on SRC,
             "Esc",
-            "End Shift+F6",               # End,
+            "End Shift+F6",               # End, onto run.bat,
             "Esc",
             "PgUp Shift+F6",              # PgUp, on ..
             "Esc",
@@ -5237,10 +5238,11 @@ SCENARIOS = {
                                           # target, and no panel's directory
             "F5",                         # on ..: nothing
             "Ctrl+F5",                    # nor for that one entry
-            "Down Down Down",             # onto readme.txt
+            "Down Down Down Down Down Down Down",  # onto readme.txt
             "Ctrl+F6",                    # offers its own name
             '"r.txt" Enter',
-            "Ins Ins",                    # two files selected
+            "Ins Up Up Up Ins",           # two files selected, r.txt and
+                                          # hello.txt; on notes.doc
             "Ctrl+F5",                    # the file under the cursor all
             '"one.txt" Enter',            # the same
             "F5",                         # the two
@@ -5378,11 +5380,11 @@ SCENARIOS = {
             "Shift+F5",
             '"a:\\freedos\\bin\\command.com" Tab "big"',
             "Enter",
-            "End",                        # onto it
+            "Home Down Down Down",        # onto it, behind SRC
             "F5",
             '"huge" Enter',
             *("F5", "Enter", "p") * 5,    # itself appended five times
-            "End",
+            "End Up Up Up",               # onto huge, behind hello.txt
             "F5",
             '"huge2" Enter',              # read and written in two parts
             "F5",
