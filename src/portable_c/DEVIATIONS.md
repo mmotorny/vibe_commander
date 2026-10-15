@@ -2726,8 +2726,10 @@ host's file system, are masked in the Info panel. `find` is not run on
 Linux and `view-window` is cut at step 6, because the bench's files of
 STAMPS, which have only their sizes there, are as long as they say on
 the host. `editor-full` and `copy-big`, which take the original to the
-end of its memory, are not run. `harness/posixcheck.c` holds what the
-emulation answers for a large file and a full disk.
+end of its memory, are not run, and nor is `copy-full`, a disk that is
+full, which a test on the host cannot make without a file system of
+its own to mount. `harness/posixcheck.c` holds what the emulation
+answers for a large file and a full disk.
 
 ### L8. A command is run by the host's shell
 

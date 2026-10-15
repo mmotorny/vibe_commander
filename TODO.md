@@ -19906,7 +19906,16 @@ The last piece of step 6, a commit for each part:
    in it and not a `prog.com` that the user may not execute, and all
    files again behind it (`FILTERED` of `harness/terminal.py`).
    Declared in L8 of `DEVIATIONS.md`.
-3. (below)
+3. **What is not run on Linux, or cut, is named by an entry**:
+   `check_linux_declared` of `harness/ported.py`, which
+   `harness/compare.py` runs before any scenario for the program for
+   Linux, as it looks for its stray patches, holds every scenario of
+   `LINUX_NOT_RUN` and of `LINUX_CUT` of `harness/deviations.py` to be
+   one, and to be named as `NAME` by an entry of Linux of
+   `DEVIATIONS.md` (`linux_entries`, "### L1. " to the next heading),
+   as `check_declared` holds those of the trees of DOS; it fails the
+   test `portable_c-posix-scenarios` with each that is not. `copy-full`
+   was not named, and L7 names it now.
 4. **Ctrl-C and Ctrl-Z of a command, the program's state**:
    `portable_c-terminal` read the program's state from `/proc` once,
    right behind the key, and once under the load of `-j4` read R, the

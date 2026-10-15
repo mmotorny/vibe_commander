@@ -1873,9 +1873,8 @@ def deviation_entries(tree):
     of a part, "## ". The entries of the program for Linux, "### L1. "
     and on in a part of their own, are not among them: they declare
     what that program does otherwise than the portable C, and what the
-    portable C is declared to do is named in an entry of its own.
-    Nothing holds the scenarios that the program for Linux is not run
-    for (deviations.LINUX_NOT_RUN) to an entry that names them."""
+    portable C is declared to do is named in an entry of its own; those
+    of Linux are linux_entries()."""
     file = deps.ROOT / "src" / tree / "DEVIATIONS.md"
     if not file.exists():
         return {}
@@ -1884,6 +1883,42 @@ def deviation_entries(tree):
     return {int(number): text
             for number, text in zip(parts[1::2], parts[2::2])
             if number is not None and number.isdigit()}
+
+
+def linux_entries():
+    """The entries of the program for Linux in the portable C's
+    DEVIATIONS.md, number -> text: each from its heading, "### L1. ", to
+    the next heading of an entry or of a part."""
+    file = deps.ROOT / "src" / "portable_c" / "DEVIATIONS.md"
+    parts = re.split(r"^(?:### (\w+)\. |## )",
+                     file.read_text(encoding="utf-8"), flags=re.MULTILINE)
+    return {number: text
+            for number, text in zip(parts[1::2], parts[2::2])
+            if number is not None and re.fullmatch(r"L\d+", number)}
+
+
+def check_linux_declared():
+    """Report on whether every scenario that the program for Linux is not
+    taken through (deviations.LINUX_NOT_RUN), and every one that it is
+    taken through only as far as a step (deviations.LINUX_CUT), is named
+    by an entry of Linux of the portable C's DEVIATIONS.md, as `NAME`,
+    as check_declared holds a tree's scenarios that are not run; return
+    success."""
+    entries = linux_entries()
+    passed = True
+    for kind, table in (("not run", deviations.LINUX_NOT_RUN),
+                        ("cut", deviations.LINUX_CUT)):
+        for name in sorted(table):
+            if name not in scenarios.SCENARIOS:
+                passed = False
+                print(f"  {kind} on Linux, and no scenario: {name}")
+            elif not any(f"`{name}`" in entry for entry in entries.values()):
+                passed = False
+                print(f"  {kind} on Linux, and no entry of Linux in "
+                      f"src/portable_c/DEVIATIONS.md names the scenario, as "
+                      f"`{name}`: what is not run, or cut, is declared "
+                      "there, or is run")
+    return passed
 
 
 def check_comparison(outcomes, program):

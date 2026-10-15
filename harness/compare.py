@@ -298,6 +298,12 @@ def main():
             print(f"{', '.join(stray)}: no patch of a scenario that "
                   f"{program.tree} is taken through")
             sys.exit(1)
+        # And what the program for Linux is not taken through, or only
+        # so far, each named by an entry of Linux of DEVIATIONS.md
+        # (ported.py imports this module, so it is imported here).
+        import ported
+        if program.tree == "posix" and not ported.check_linux_declared():
+            sys.exit(1)
     failed, _ = compare(names, program, together=args.together,
                         limits=dict.fromkeys(names, args.limit),
                         first=args.first)
