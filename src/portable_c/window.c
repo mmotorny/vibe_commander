@@ -130,33 +130,39 @@ u16 SftEGA(u16 place)
 /* Keep what the screen buffer has in a window, at `buffer`, which is a
    buffer of the main data: `begin` is where the window begins, the row in the high byte,
    and `size` its rows and columns likewise. A window of no rows has
-   65536 of them. */
-void SavWin(u16 begin, u16 size, u16 *buffer)
+   65536 of them. A box names a buffer by its place in the main data,
+   which may be odd, MenuBuf+500 for the copy's: a cell is kept as its
+   two bytes, by PUT16, and put back by GET16. */
+void SavWin(u16 begin, u16 size, void *buffer)
 {
     const u16 *row = BasAdr(begin);
-    u16 *to = buffer;
+    u8 *to = buffer;
     u16 rows = size >> 8;
     i32 columns = size & 0xFF, column;
 
     do {
-        for (column = 0; column != columns; column++)
-            *to++ = row[column];
+        for (column = 0; column != columns; column++) {
+            PUT16(to, row[column]);
+            to += 2;
+        }
         row += 80;
     } while (--rows);
 }
 
 /* Put back what SavWin kept, and have the next character typed taken as
    it is no longer. */
-void ResWin(u16 begin, u16 size, const u16 *buffer)
+void ResWin(u16 begin, u16 size, const void *buffer)
 {
     u16 *row = BasAdr(begin);
-    const u16 *from = buffer;
+    const u8 *from = buffer;
     u16 rows = size >> 8;
     i32 columns = size & 0xFF, column;
 
     do {
-        for (column = 0; column != columns; column++)
-            row[column] = *from++;
+        for (column = 0; column != columns; column++) {
+            row[column] = GET16(from);
+            from += 2;
+        }
         row += 80;
     } while (--rows);
     md.Quote = 0;

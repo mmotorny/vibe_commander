@@ -157,8 +157,8 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
              const void *data, struct Box *where)
 {
     const struct BOXTX *put = (const struct BOXTX *)(head + 1);
-    const u8 * const *lines;
-    const u8 * const *line;
+    const struct BOXLINE *lines;
+    const struct BOXLINE *line;
     struct LineArgs args;
     i32 texts, count, width, length;
     u16 size, begin, row;
@@ -175,7 +175,7 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
     }
 
     /* As wide as its longest line. */
-    lines = (const u8 * const *)(put + texts);
+    lines = (const struct BOXLINE *)(put + texts);
     args.value = 0;
     args.screen = 0;
     args.colors = head->colors;
@@ -184,8 +184,8 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
     line = lines;
     count = head->lines;
     do {
-        if (*line != 0) {
-            args.line = *line;
+        if (line->line != 0) {
+            args.line = line->line;
             length = LnStr(&args);
             if (length > width)
                 width = length;
@@ -198,7 +198,7 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
     where->begin = begin;
     where->size = size;
     /* The box names a buffer of the main data by its offset there. */
-    where->saved = (u16 *)((u8 *)&md + head->saved);
+    where->saved = (u8 *)&md + head->saved;
     SavWin(begin, size, where->saved);
     MinBox(begin, size, (u16)(Color(head->colors[0]) << 8));
 
@@ -207,9 +207,9 @@ void DialBox(u16 place, const struct BOXTOP *head, const u8 *include,
     count = head->lines;
     do {
         row += 0x100;
-        if (*line != 0) {
+        if (line->line != 0) {
             args.value = row;
-            args.line = *line;
+            args.line = line->line;
             CntLine(&args);
         } else {
             screen = BasAdr(row) - ((((size & 0xFF) - 1) & 0xFFFE) >> 1);

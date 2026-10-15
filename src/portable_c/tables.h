@@ -110,6 +110,13 @@ struct BOXTX {
 #define BOX_HEAD u8 colors[4]; u8 lines; u8 texts; u16 saved
 struct BOXTOP { BOX_HEAD; };
 
+/* A line of a box, as DialBox reads the lines behind the texts, where
+   it does not know the box's shape: a structure of the one word, so
+   that the word is read as a member of a packed structure, where it
+   is, which may be a place that the size of a pointer does not
+   divide. */
+struct BOXLINE { const u8 *line; };
+
 /* Each shape is a type of its own with a tag, Box4 for BOX(4), so that
    a file of tables can declare a box in front of where it defines it,
    with the type that it defines it with, which clang asks of every

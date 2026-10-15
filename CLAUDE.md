@@ -3450,6 +3450,26 @@ in "The portable C".
     place fails the test, and so does one of those that is gone.
   - The test takes a minute and a half; `python3 harness/stubcheck.py
     --compiled build/portable_c/stub/compiled.txt` runs it by itself.
+- What making a word of a buffer of its bytes met (AL; `TODO.md`, "AL,
+  words made of their bytes"):
+  - A cast of a pointer is not the only way to an unaligned read. The
+    structures of `vc.h` and of the tables are packed and lie at any
+    place, and a member read as a member is right; a pointer taken of
+    one, or of a buffer of the main data, and read through its own
+    type, is not: `MenuBuf` and `TmpBuf` begin at odd places, and a box
+    may name `MenuBuf+500` for what it covers. The lines of a box,
+    pointers behind its texts, were such a read too, eight bytes on
+    Linux at a place that eight does not divide. The sanitized build
+    for Linux finds them only where a run gets to them: give it a run
+    with files, dialogs and the editor, not only the panels.
+  - A word read through `GET16` is its bytes the low one first; where
+    a buffer only keeps what it is handed and gives it back, as `SavWin`
+    and `ResWin` do with cells, `PUT16` and `GET16` keep it so on any
+    machine, and on DOS they are the bytes that were kept before.
+  - Four functions that put their instructions in place, some two
+    hundred times, made the code of the program for DOS 4K longer:
+    every image differs in the room, and the padded build of `main` is
+    what holds them.
 
 ### Moving a file to the system's functions
 

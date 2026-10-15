@@ -621,13 +621,10 @@ endif()
 #   posix/vc        the program, with the hardening of the stub's first
 #                   build
 #   posix-asan/vc   with the sanitizers of the stub's second, each fatal,
-#                   but for the alignment of what is read: the common code
-#                   reads a word or a double word at any place of its bytes
-#                   through a cast pointer, as DOS does, which x86-64 does
-#                   as DOS does and C does not promise (TODO.md, "5a, the
-#                   split"); how that is read is the layer's to decide, and
-#                   until then the sanitizer would stop at the first such
-#                   read (TODO.md, "L3a")
+#                   the alignment of what is read among them: a word in
+#                   a buffer of bytes is made of its bytes, GET16 and its
+#                   like of vc.h (TODO.md, "AL, words made of their
+#                   bytes")
 if(clang)
     add_portable_c_host(portable_c-posix ${CMAKE_BINARY_DIR}/portable_c/posix
         posix
@@ -639,7 +636,7 @@ if(clang)
         ${CMAKE_BINARY_DIR}/portable_c/posix-asan posix
         COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer
                 -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
-                -fno-sanitize=alignment -fno-sanitize-recover=all)
+                -fno-sanitize-recover=all)
 endif()
 
 # What the program for Linux emulates of DOS without input or output of

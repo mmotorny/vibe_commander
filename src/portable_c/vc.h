@@ -1023,7 +1023,8 @@ void PutInf(struct WCBdef *panel);                      /* info.c */
 struct Box {
     u16 begin;                          /* the row in the high byte */
     u16 size;                           /* the rows in the high byte */
-    u16 *saved;                         /* where what it covers is kept */
+    u8  *saved;                         /* where what it covers is kept,
+                                           its cells as bytes */
 };
 /* What the files of the commands call of each other: see each in its
    file. */
@@ -1639,8 +1640,8 @@ void HidCur(void);
 void Scroll(bool down, u16 color, u16 upper, u16 lower);
 u16 ScrOffs(void);
 u16 SftEGA(u16 place);
-void SavWin(u16 begin, u16 size, u16 *buffer);
-void ResWin(u16 begin, u16 size, const u16 *buffer);
+void SavWin(u16 begin, u16 size, void *buffer);
+void ResWin(u16 begin, u16 size, const void *buffer);
 void ResUser(u16 begin, u16 size);
 void Window(u16 begin, u16 size);
 void SavScr(void);

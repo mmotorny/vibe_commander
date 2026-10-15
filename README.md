@@ -675,21 +675,21 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 288,967 bytes, of which the extender's stub is 27,536 |
-| as a multiple of the original's 65,090 bytes | 4.44 |
-| more than the C translation's 133,056 bytes | 155,911 bytes |
-| Its code, and what the file has of its data | 120,294 and 104,503 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 225,546 bytes |
-| The addresses in it that the extender sets when it loads it | 4,482 |
-| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, as long as each is when it holds the original's 64K, `PANEL_LEAST`, each block with the extender's 16 bytes in front | 15,240,784 bytes |
-| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 364,784 bytes |
+| `VC.EXE` | 294,331 bytes, of which the extender's stub is 27,536 |
+| as a multiple of the original's 65,090 bytes | 4.52 |
+| more than the C translation's 133,056 bytes | 161,275 bytes |
+| Its code, and what the file has of its data | 124,466 and 104,503 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 229,718 bytes |
+| The addresses in it that the extender sets when it loads it | 4,644 |
+| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, as long as each is when it holds the original's 64K, `PANEL_LEAST`, each block with the extender's 16 bytes in front | 15,236,608 bytes |
+| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 368,960 bytes |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
-| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 383,927 bytes, 214,045 of them code |
+| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 396,303 bytes, 228,057 of them code |
 | Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `sys_dos.c` |
 | Lines of `#pragma aux` | 12 |
 | Intrinsic functions | 2: `_disable`, `_enable` |
-| Pairs of `#pragma pack` | 7 |
+| Pairs of `#pragma pack` | 8 |
 | Calls outside the file of the system's functions that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
