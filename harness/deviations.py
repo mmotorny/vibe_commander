@@ -1461,8 +1461,7 @@ LINUX_NOT_RUN = {
     # itself or comes behind a command of DOS's that the host's shell has
     # not, DEL, RD, TIME, ATTRIB (TODO.md, "L3b"): the others are run
     # with what DOS has shown masked behind a command (DosShown), or as
-    # far as a step, LINUX_CUT. `enter` and `user-menu-run` wait on the
-    # questions of L6 as well, Enter on a file and `!.!`.
+    # far as a step, LINUX_CUT.
     "enter": "Enter on a file that DOS runs, and the commands before and "
              "after it: what it holds is DOS running them",
     "user-menu-run": "the commands of the user menu, whose parameters "
@@ -1492,9 +1491,7 @@ _ORDER = ("the order of a directory's entries, the tree's and the file "
           "search's, which waits on the user (TODO.md, L3b)")
 _NUL = "DOS's device NUL, which waits on the user (TODO.md, L3b)"
 LINUX_CUT = {
-    "editor-save": (20, f"the editor's errors on saving: at step 20 {_NUL}; "
-                        "at step 23 a command of the extension file with "
-                        "!.!, a question of L6's for the user"),
+    "editor-save": (20, f"the editor's errors on saving: at step 20 {_NUL}"),
     "help-broken": (24, "a help file that cannot be read: at step 24 "
                         "DOS's DEL"),
     "menu-files": (24, "the menu and extension files edited: at step 24 "

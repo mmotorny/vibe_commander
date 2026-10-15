@@ -33,7 +33,8 @@ is: the program ends where DOS cannot name the directory of its setup
 file (TODO.md, L3a).
 
 The environment has TZ=UTC, under which the host's times of the files
-are the bench's, PATH, and the channel's two variables: VC_TEST and
+are the bench's, PATH with a stub of xdg-open in front that does
+nothing, and the channel's two variables: VC_TEST and
 VC_TEST_CLOCK, the bench's clock when the program starts (CLOCK), from
 which the program's clock goes on only while the test waits, as the
 machine's does on the bench.
@@ -429,8 +430,16 @@ def run(scenario, program, setup=..., limit=60):
         channel = bench / "channel"
         channel.mkdir()
         (channel / "keys").write_text(keys(own(scenario.steps, bench)))
+        # Enter on a file that is no program and that no extension file
+        # has a command for hands it to xdg-open (L6b): a stub of it in
+        # front of PATH, which does nothing, so that a scenario never
+        # starts the desktop's opener.
+        stubs = bench / "bin"
+        stubs.mkdir()
+        (stubs / "xdg-open").write_text("#!/bin/sh\nexit 0\n")
+        (stubs / "xdg-open").chmod(0o755)
         environment = {
-            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "PATH": f"{stubs}:" + os.environ.get("PATH", "/usr/bin:/bin"),
             "TZ": "UTC", "HOME": str(bench / "home"),
             "XDG_CONFIG_HOME": str(bench),
             "VC_TEST": str(channel), "VC_TEST_CLOCK": CLOCK,

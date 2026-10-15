@@ -169,11 +169,24 @@ COMMANDS = [
     ("a path of DOS's in a command",
      *typed(r"test -f H:\HERE\README.TXT && echo found")),
     ("a command that the shell does not find", *typed("nosuchcmd")),
+    # L6b: Enter on a file that the user may execute and that has no
+    # extension of DOS's, which is run as ./name; Enter on a text, which
+    # no extension file has a command for, handed to xdg-open, which is
+    # the stub of lay_out here; and a name of DOS's in a command, which
+    # the shell is handed as the host's.
+    ("End, on zrun", ["4F00"], ESC + b"[F"),
+    ("Enter on zrun, which is run", ["1C0D"], b"\r"),
+    ("Up", ["4800"], ESC + b"[A"),
+    ("Up, on readme.txt", ["4800"], ESC + b"[A"),
+    ("Enter on readme.txt, which goes to xdg-open", ["1C0D"], b"\r"),
+    ("a name of DOS's in a command", *typed("wc -c README.TXT")),
 ]
 OWN_LINES = [
     "H:\\HERE>echo hello", "hello",
     r"H:\HERE>test -f H:\HERE\README.TXT && echo found", "found",
     "H:\\HERE>nosuchcmd", "nosuchcmd: not found",
+    "H:\\HERE>.\\zrun", "zrun ran",
+    "H:\\HERE>wc -c README.TXT", "1240 readme.txt",
 ]
 
 CSI = ESC + b"["
@@ -330,10 +343,14 @@ def glyph(byte):
     return bytes([byte]).decode("cp437")
 
 
-def lay_out(top):
+def lay_out(top, commands=False):
     """A run's directory: HOME, with the setup file's directory there and
     nothing in it, and HERE in it with the files, every time fixed. Each
-    run has one of its own, since a run may save the setup there."""
+    run has one of its own, since a run may save the setup there. For
+    the commands, HERE has a program besides, zrun, a script of the
+    shell's that the user may execute; and the run's directory has BIN,
+    which environment() puts in front of PATH, with a stub of xdg-open
+    that writes what it is handed into OPENED there."""
     home = top / "home"
     here = home / "here"
     (home / ".config" / "vc").mkdir(parents=True)
@@ -342,14 +359,41 @@ def lay_out(top):
         b"Vibe Commander in a terminal.\r\n" * 40)
     (here / "data.bin").write_bytes(bytes(range(256)) * 8)
     (here / "zero").write_bytes(b"")
-    for path in [here / "readme.txt", here / "data.bin", here / "zero",
-                 home / ".config" / "vc", home / ".config", here, home]:
+    files = [here / "readme.txt", here / "data.bin", here / "zero"]
+    if commands:
+        (here / "zrun").write_text("#!/bin/sh\necho zrun ran\n")
+        (here / "zrun").chmod(0o755)
+        files.append(here / "zrun")
+        (top / "bin").mkdir()
+        (top / "bin" / "xdg-open").write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" >> "$(dirname "$0")/opened"\n')
+        (top / "bin" / "xdg-open").chmod(0o755)
+    for path in files + [home / ".config" / "vc", home / ".config", here,
+                         home]:
         os.utime(path, (STAMP, STAMP))
     return home, here
 
 
+def opened(top, here, name, failures):
+    """What the stub of xdg-open of lay_out has been handed by the end of
+    a run, which is to be readme.txt once: the opener is not waited for,
+    so it is given a second to write."""
+    record = top / "bin" / "opened"
+    for _ in range(20):
+        if record.exists():
+            break
+        time.sleep(0.05)
+    have = record.read_text() if record.exists() else None
+    if have != f"{here / 'readme.txt'}\n":
+        failures.append(f"{name}: Enter on readme.txt hands xdg-open "
+                        f"{have!r}, where it is to hand it "
+                        f"{str(here / 'readme.txt')!r} once")
+
+
 def environment(home, **more):
-    env = {"HOME": str(home), "PATH": os.environ.get("PATH", "/usr/bin"),
+    env = {"HOME": str(home),
+           "PATH": f"{home.parent / 'bin'}:"
+                   f"{os.environ.get('PATH', '/usr/bin')}",
            "LANG": "C.UTF-8", "TERM": "xterm-256color",
            "ASAN_OPTIONS": "detect_leaks=0"}
     env.update(more)
@@ -840,21 +884,25 @@ def main():
         for name, steps in (("channel", KEYS), ("channel-kitty", KITTY),
                             ("channel-commands", COMMANDS)):
             (work / name).mkdir()
-            home, here = lay_out(work / name)
+            home, here = lay_out(work / name, name == "channel-commands")
             channelled[name] = channel(program, home, here, work, steps,
                                        name)
+            if name == "channel-commands":
+                opened(work / name, here, "the test channel, commands",
+                       failures)
         pointer(channelled["channel"][0], failures)
         for run_name in ("24", "16", "kitty", "decode-kitty",
                          "decode-legacy", "commands"):
             run_dir = work / ("run-" + run_name)
             run_dir.mkdir()
-            home, here = lay_out(run_dir)
+            home, here = lay_out(run_dir, run_name == "commands")
             if run_name == "kitty":
                 run_kitty(pyte, program, home, here, work,
                           channelled["channel-kitty"], failures)
             elif run_name == "commands":
                 run_commands(pyte, program, home, here, work,
                              channelled["channel-commands"], failures)
+                opened(run_dir, here, "commands", failures)
             elif run_name.startswith("decode"):
                 decode(pyte, program, home, here, work,
                        run_name == "decode-kitty", failures)

@@ -29,9 +29,11 @@
    SavMous, CurMous, Quit and Window. What is asked of the system is
    asked by the functions of sys.h. */
 
-/* Routines of other files, which vc.h has: TstExe is true for
-   a name that DOS can run: com, exe or bat. TrCr10 finds the current
-   directory in the tree again. */
+/* Routines of other files, which vc.h has: TrCr10 finds the current
+   directory in the tree again. Whether a file is a program, which the
+   original asks of its name, com, exe or bat (TstExe), is asked of the
+   system, ProgramOfFile of sys.h: on DOS by the same three, on Linux by
+   whether the user may execute the file. */
 
 /* The dialog that asks whether to quit, and the name of the program for
    it: constants of keys_t.c. */
@@ -182,14 +184,17 @@ struct Onward F21_25(void)
    In the tree DOS goes to the directory under the cursor, CrnPath, if it
    is still there. In a panel of files a directory is gone into, a file
    that DOS can run has its name put into the command line and is run,
-   and any other file is run by the command that the extension file of
-   the directory has for its kind, if it has one. The extension file is in
-   the panel's block; LenMenu bytes are taken from there, though it has
-   LenExt. */
+   behind what the system has typed in front of it, and any other file
+   is run by the command that the extension file of the directory has
+   for its kind, if it has one, or else handed to what the system opens
+   files with, if it has anything of the kind, which DOS has not. The
+   extension file is in the panel's block; LenMenu bytes are taken from
+   there, though it has LenExt. */
 struct Onward F21_10(struct WCBdef *panel)
 {
     const struct FILENT *file;
     const u8 *from;
+    const u8 *before;
     u8 *command;
     struct Edited edited;
     i32 address, cursor, i;
@@ -221,14 +226,17 @@ struct Onward F21_10(struct WCBdef *panel)
     file = ENTRY(panel, address);
     if (file->AttrF & ATTR_DIRECTORY)
         return F23_02(panel, address);
-    if (!TstExe(file->NameF)) {
+    before = ProgramOfFile(file->NameF);
+    if (before == 0) {
         from = panel->ExtBuf;
         for (i = 0; i < LenMenu - 1; i++)
             md.MenuBuf[i] = from[i];
         md.MenuBuf[LenMenu - 1] = 0x1A;
         command = FindExt(ENTRY(panel, PLACES(panel)->CurAdr)->NameF);
-        if (command == 0)
+        if (command == 0) {
+            ProgramOpenFile(file->NameF);
             return To(NEXT_FUNC04);
+        }
         command--;
         *command = ' ';
         if (Run_00(command, 0))
@@ -239,6 +247,10 @@ struct Onward F21_10(struct WCBdef *panel)
     file = ENTRY(panel, PLACES(panel)->CurAdr);
     cursor = 0;
     md.DosBuf[0] = 0;
+    for (; (c = *before) != 0; before++) {
+        edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
+        cursor = edited.cursor;
+    }
     for (i = 0; (c = file->NameF[i]) != 0; i++) {
         edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
         cursor = edited.cursor;

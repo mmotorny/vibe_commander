@@ -909,6 +909,11 @@ static void Others(void)
     FileRead(asked.value, SMALL, 16);
     FileClose(asked.value);
     SAY("the command wrote "); Quoted(SMALL, 16);
+    if (ProgramOfFile(Ran_S) == 0)
+        SAY("no program; ")
+    else
+        SAY("a program; ")
+    ANSWER("ProgramOpenFile of that:", ProgramOpenFile(Ran_S));
     ANSWER("FileDelete of that:", FileDelete(Ran_S));
     Line();
     ANSWER("ProgramRun of a file that is not there:",

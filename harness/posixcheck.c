@@ -1637,8 +1637,9 @@ static void ServiceHome(void)
 
 /* A command of DOS's made one for the host's shell (L6): the text in
    UTF-8, each path of DOS's at the start of a word on a drive that there
-   is made the host's path, quoted for the shell where it stands, and
-   nothing else changed. */
+   is made the host's path, and each name of the current directory the
+   host's name (L6b), quoted for the shell where it stands, and nothing
+   else changed. */
 static void Command(const char *dos, const char *want)
 {
     char to[2048];
@@ -1647,6 +1648,8 @@ static void Command(const char *dos, const char *want)
 
     CHECK(made == (i32)strlen(want));
     SAME(to, want);
+    if (strcmp(to, want) != 0)
+        fprintf(stderr, "  of %s: %s, where %s was wanted\n", dos, to, want);
 }
 
 static void ServiceCommands(void)
@@ -1659,7 +1662,19 @@ static void ServiceCommands(void)
                          tree).failed);
     Command("echo hi", "echo hi");
     Command("echo \x80\xE0", "echo \xC3\x87\xCE\xB1");   /* Ç, α */
-    Command("type HELLO.TXT", "type HELLO.TXT");
+    /* A name of the current directory by DOS's name, where the host's
+       is another, alone or behind .\ (L6b). */
+    Command("type HELLO.TXT", "type 'hello.txt'");
+    Command("type hello.txt", "type hello.txt");
+    Command("type README.TXT", "type README.TXT");
+    Command("type LONGFI~1.TXT|wc", "type 'Long File Name.txt'|wc");
+    Command(".\\HELLO.TXT", "'./hello.txt'");
+    Command(".\\README.TXT x", "'./README.TXT' x");
+    Command("echo \"HELLO.TXT\" 'HELLO.TXT'",
+            "echo \"hello.txt\" 'HELLO.TXT'");
+    Command("cd DOCS;cd ..;cd .", "cd 'docs';cd ..;cd .");
+    Command("echo NOWHERE HELLO.TXTX DOCS\\INSIDE.TXT",
+            "echo NOWHERE HELLO.TXTX DOCS\\INSIDE.TXT");
     snprintf(dos, sizeof dos, "cat %s\\HELLO.TXT>x", tree);
     snprintf(want, sizeof want, "cat '%s/hello.txt'>x", real);
     Command(dos, want);

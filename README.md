@@ -679,17 +679,17 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 294,327 bytes, of which the extender's stub is 27,536 |
+| `VC.EXE` | 294,371 bytes, of which the extender's stub is 27,536 |
 | as a multiple of the original's 65,090 bytes | 4.52 |
-| more than the C translation's 133,056 bytes | 161,271 bytes |
-| Its code, and what the file has of its data | 124,637 and 104,495 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 229,881 bytes |
-| The addresses in it that the extender sets when it loads it | 4,645 |
-| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, as long as each is when it holds the original's 64K, `PANEL_LEAST`, each block with the extender's 16 bytes in front | 15,236,464 bytes |
-| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 369,104 bytes |
+| more than the C translation's 133,056 bytes | 161,315 bytes |
+| Its code, and what the file has of its data | 124,778 and 104,511 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 230,038 bytes |
+| The addresses in it that the extender sets when it loads it | 4,650 |
+| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, as long as each is when it holds the original's 64K, `PANEL_LEAST`, each block with the extender's 16 bytes in front | 15,236,304 bytes |
+| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 369,264 bytes |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
-| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 396,295 bytes, 228,760 of them code |
+| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 396,363 bytes, 229,095 of them code |
 | Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `sys_dos.c` |
 | Lines of `#pragma aux` | 12 |
 | Intrinsic functions | 2: `_disable`, `_enable` |
@@ -935,7 +935,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 97 functions
+In the portable C that place is `src/portable_c/sys.h`: 99 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test
 `portable_c-host` has the file clean. `sys_dos.c` is those functions for
@@ -957,7 +957,7 @@ second implementation's files will end in its own, `_stub.c`.
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
 | Memory: a block taken, given back, made another size, where the system looks for one, and the program's own block made as long as the program | 6 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
-| Other programs: one run, with what it is told behind its name; this one ended, on an old DOS too; what this one was told when it was started, and its environment | 6 |
+| Other programs: one run, with what it is told behind its name; whether a file is one, and a file handed to what opens its kind; this one ended, on an old DOS too; what this one was told when it was started, and its environment | 8 |
 | What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; what the system is to put back when it has ended the program, said, taken and given back | 11 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
@@ -1231,8 +1231,11 @@ services, where DOSBox emulates the processor:
   as on DOS; and the mouse from the terminal's reports, with its
   pointer drawn as DOS's mouse driver draws it.
 - A command, run by `$SHELL -c` (`/bin/sh` where that is not set) on
-  the terminal's own screen, with the paths of DOS's in it made the
-  host's; Ctrl-O shows that screen until a key.
+  the terminal's own screen, with the paths of DOS's in it, and the
+  names of DOS's of the current directory, made the host's; Ctrl-O shows
+  that screen until a key. Enter on a file that the user may execute
+  runs it, whatever its name, and on any other file that the extension
+  file has no command for hands it to `xdg-open`.
 
 What it does otherwise than the original for all that is declared in
 `src/portable_c/DEVIATIONS.md`, under "The program for Linux".

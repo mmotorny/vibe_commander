@@ -438,6 +438,18 @@ struct Answer ProgramRunBare(const u8 *name, const u8 *tail)
     return ProgramRun(name, tail);
 }
 
+const u8 *ProgramOfFile(const u8 *name)
+{
+    (void)name;
+    return 0;
+}
+
+struct Answer ProgramOpenFile(const u8 *name)
+{
+    (void)name;
+    return Fails();
+}
+
 void ProgramEnd(u16 code)
 {
     _Exit(code);

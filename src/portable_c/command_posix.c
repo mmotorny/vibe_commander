@@ -4,7 +4,9 @@
  * COMMAND.COM behind /C: a line of the code page, with paths of DOS's in
  * it. The shell is handed the same line in UTF-8, each path of DOS's that
  * begins with a drive that there is, R: or H:, made the path of the host
- * that it leads to (HostPathOfDos), quoted for the shell. See
+ * that it leads to (HostPathOfDos), and each name of the current
+ * directory, as Enter types it and the user menu's !.! makes it, the
+ * host's name (L6b), quoted for the shell. See
  * emulate_posix.h for what each answers.
  */
 #include <string.h>
@@ -111,6 +113,69 @@ static bool Path(struct Dos *dos, const u8 *from, i32 length, char *to,
     return written >= 0 && Add(to, room, made, pattern, written);
 }
 
+/* A name of DOS's of the current directory, `length` bytes at `from`,
+   alone or behind .\, added as the host's name of the file or the
+   directory that it names, quoted, ./ in front where .\ was; or false
+   where it is no such name, or is the host's name as it stands: then it
+   is added as text. A name that begins with a full stop is none, so
+   that . and .. stay as they are. The piece L6b, on the user's word of
+   15 October 2026 (CLAUDE.md, step 6). */
+static bool Name(struct Dos *dos, const u8 *from, i32 length, char *to,
+                 i32 room, i32 *made, bool double_quoted)
+{
+    u8 path[DOS_PATH_ROOM], full[DOS_PATH_ROOM];
+    char host[HOST_PATH_ROOM], typed[DOS_PATH_ROOM * 3];
+    const char *last;
+    const u8 *named;
+    bool here = false;
+    i32 i, written;
+    struct Answer led;
+
+    if (length >= 2 && from[0] == '.' && from[1] == '\\') {
+        here = true;
+        from += 2;
+        length -= 2;
+    }
+    if (length < 1 || length > 12 || from[0] == '.')
+        return false;
+    for (i = 0; i < length; i++)
+        if (strchr("\\/:*?", from[i]) != 0)
+            return false;
+    memcpy(path, from, (size_t)length);
+    path[length] = 0;
+    led = DosPathFull(path, &dos->drives, full);
+    if (led.failed)
+        return false;
+    /* The name as it was typed, and not one that DOS makes of it, cut
+       to eight and three. */
+    named = (const u8 *)strrchr((const char *)full, '\\') + 1;
+    for (i = 0; i < length; i++)
+        if (named[i] != CodePageUpper(from[i]))
+            return false;
+    if (named[length] != 0)
+        return false;
+    led = HostPathOfDos(&dos->directories, &dos->drives, full, host,
+                        (i32)sizeof host);
+    if (led.failed || led.value != 1)
+        return false;
+    last = strrchr(host, '/');
+    last = last == 0 ? host : last + 1;
+    if (here) {
+        memmove(host + 2, last, strlen(last) + 1);
+        host[0] = '.';
+        host[1] = '/';
+        return Quoted(to, room, made, host, double_quoted);
+    }
+    written = CodePageToUtf8(from, length, false, typed,
+                             (i32)sizeof typed - 1);
+    if (written < 0)
+        return false;
+    typed[written] = 0;
+    if (strcmp(typed, last) == 0)
+        return false;
+    return Quoted(to, room, made, last, double_quoted);
+}
+
 i32 DosCommandToHost(struct Dos *dos, const u8 *command, i32 length,
                      char *to, i32 room)
 {
@@ -133,6 +198,18 @@ i32 DosCommandToHost(struct Dos *dos, const u8 *command, i32 length,
                 ;
             before = made;
             if (Path(dos, command + at, end - at, to, room, &made,
+                     double_quoted)) {
+                at = end;
+                continue;
+            }
+            made = before;
+            to[made] = 0;
+        }
+        if (!single && Begins(command, at) && !Ends(byte)) {
+            for (end = at; end < length && !Ends(command[end]); end++)
+                ;
+            before = made;
+            if (Name(dos, command + at, end - at, to, room, &made,
                      double_quoted)) {
                 at = end;
                 continue;

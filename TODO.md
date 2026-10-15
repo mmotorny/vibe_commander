@@ -19543,7 +19543,7 @@ the characters, which are then the main keyboard's.
   `Idle`, `KeyWaiting`, `KeyRead` and `MouseWhere`; a new place where
   the program waits wants it too.
 
-### L6, commands: half done, three questions open
+### L6, commands: done, by L6b
 
 What runs a command on Linux, in `sys_posix.c`, `term_posix.c` and a
 file of the emulation of its own, `command_posix.c`; the common code
@@ -19647,6 +19647,78 @@ of them is built):
    the original's "Can't find file", the name that COMSPEC has, and
    Enter to try again or Esc. Or: a line of the program's own on the
    terminal's screen, and back to the panels.
+
+**The user's answers, of 15 October 2026:** Q1 and Q2 as recommended
+(A); Q3 stays as built, the original's "Can't find file". Built by L6b,
+below.
+
+### L6b: done
+
+Enter on a file and names of DOS's form in a command, by the user's
+answers above (`DEVIATIONS.md`, L8).
+
+- **Two functions of `sys.h`**, in the group of other programs:
+  `ProgramOfFile(name)`, whether a file of the current directory is a
+  program that a command runs by naming it, answering the text typed in
+  front of its name or 0; and `ProgramOpenFile(name)`, the file handed to
+  what the system opens its kind with, not waited for. `F21_10` of
+  `enter.c` asks the first where it asked `TstExe`, types what it answers
+  in front of the name, and asks the second where the extension file has
+  no command. In `sys_dos.c` the first is the extension test, a copy of
+  `TstExe` (which the panel's filter of programs still asks: it stays by
+  the three extensions on Linux too, and that is said in L8), since the
+  toy of `harness/trial32/sys.c`, which links `sys_dos.c` without the
+  program, found that the system's file cannot call the program's; the
+  second answers DOS's 1 and does nothing. So the program for DOS does
+  what it did; `VC.EXE` other bytes, the scenarios judge. `sys_stub.c`
+  answers none and fails.
+- **On Linux** (`sys_posix.c`): a program is a regular file that the user
+  may execute (`access`, `X_OK`), whatever its name; `.\` is typed in
+  front of it, `.\zrun`, which the command made the host's has as
+  `'./zrun'`. Any other regular file goes to `xdg-open` by a child that
+  starts it and ends at once, so that nothing waits for the opener and
+  no zombie stays; it has `/dev/null` for its three files and a session
+  of its own, under the test channel too. A pipe or a device goes
+  nowhere. Typing `.\` was chosen over making the first word of every
+  command a program of the current directory, as COMMAND.COM does: that
+  would have had a file `ls` of the directory run in place of the
+  shell's `ls`; the user sees what is run on the command line.
+- **Names in a command** (`Name` of `command_posix.c`): a word, at the
+  start of a word as the paths are, outside single quotes, that is a name
+  of DOS's of the current directory, alone or behind `.\`, at most 12
+  bytes, no `\ / : * ?`, not beginning with a full stop (`.` and `..`
+  stay), and that DOS names exactly so (a name that DOS would cut to
+  eight and three, `HELLO.TXTX`, is none), is the host's name quoted
+  where it differs from the host's, and `./` and the host's name behind
+  `.\` always. A word that is a command of the shell and also names a
+  file of the directory by another case, `Echo` for `echo`, is made the
+  file's name: the rule is the user's, a word that names a file.
+  `harness/posixcheck.c` has nine checks of it, and says what it got
+  where a command is not as wanted.
+- **The test** `portable_c-terminal`, run `commands`: a script `zrun`
+  that the user may execute and Enter on it, Enter on `readme.txt`, with a
+  stub of `xdg-open` in a directory in front of PATH that notes what it
+  is handed (held to `readme.txt` once, in the channel's run and in the
+  terminal's), and `wc -c README.TXT`, held on the terminal's own screen
+  as `1240 readme.txt`. The three other runs are laid out as before.
+- **The scenarios.** `enter` and `user-menu-run` stay not run, with
+  their reasons: what they hold is DOS running run.bat, `ver` and the
+  like, and what the commands print. `editor-save` stays cut at step
+  20, NUL; its reason no longer names step 23. Nothing else in
+  `LINUX_NOT_RUN` or `LINUX_CUT` waited on these. `harness/posixrun.py`
+  puts a stub of `xdg-open` that does nothing in front of PATH, so that
+  no scenario starts the desktop's opener.
+- **The data's test** wants the copy of the extensions in `sys_dos.c`,
+  `ProgramExtensions`, in `OWN_OF` of `harness/datacheck.py`; the width's
+  record counts its two numbers.
+- Under the load of `-L portable_c -j4` the terminal's test once said
+  "Ctrl-C reaches the program, which is R" (the program running when
+  its state was read), and passed alone and again: a flaw of the test
+  under load, which the session may want looked at.
+
+What the next piece should know: the reason of a scenario that names a
+question of the user's is to be read again when the question is
+answered: `grep` the question's piece in `harness/deviations.py`.
 
 **What L7 should know.** `Typed` and `CommandShown` of `sys_posix.c`
 are the state between a command and the next frame. A new place where

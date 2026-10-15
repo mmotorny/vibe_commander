@@ -482,9 +482,13 @@ struct Answer DosStartIn(struct Dos *dos, const char *path);
    the host that it leads to (HostPathOfDos), in single quotes, or with
    what is special escaped where it stands in double quotes; a name with
    * or ? in it, the last of such a path, behind its directory as it is,
-   in small letters and not quoted, for the shell to take as a pattern.
-   What is in single quotes is left as it is, and so is a path that leads
-   nowhere. Answers how many bytes it wrote, or -1 where the room is not
+   in small letters and not quoted, for the shell to take as a pattern;
+   and a word that is a name of DOS's of a file or a directory of the
+   current directory, as DOS names it, alone or behind .\, made the
+   host's name of it, quoted as a path is, ./ in front where .\ was, but
+   where it is the host's name already (L6b). What is in single quotes
+   is left as it is, and so is a path that leads nowhere, a name that
+   begins with a full stop and one that DOS would cut. Answers how many bytes it wrote, or -1 where the room is not
    enough. */
 i32 DosCommandToHost(struct Dos *dos, const u8 *command, i32 length,
                      char *to, i32 room);

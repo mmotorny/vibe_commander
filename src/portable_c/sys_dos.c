@@ -1571,6 +1571,44 @@ struct Answer ProgramRunBare(const u8 *name, const u8 *tail)
     return ran;
 }
 
+/* A program, by the three characters behind the first full stop of its
+   name, as the original has it: TstExe of files.c, which the panel's
+   filter of programs asks, and which this is a copy of, since the
+   functions of the system are the system's alone. The names of a panel
+   are in small letters. DOS is asked nothing. */
+static const u8 ProgramExtensions[9] = {
+    'c', 'o', 'm', 'e', 'x', 'e', 'b', 'a', 't'
+};
+
+const u8 *ProgramOfFile(const u8 *name)
+{
+    i32 i;
+    u8 c;
+
+    do {
+        c = *name++;
+        if (c == 0)
+            return 0;
+    } while (c != '.');
+    for (i = 0; i < (i32)sizeof ProgramExtensions; i += 3)
+        if (name[0] == ProgramExtensions[i]
+            && name[1] == ProgramExtensions[i + 1]
+            && name[2] == ProgramExtensions[i + 2])
+            return (const u8 *)"";
+    return 0;
+}
+
+/* DOS has nothing that opens a file by its kind. */
+struct Answer ProgramOpenFile(const u8 *name)
+{
+    struct Answer answer;
+
+    (void)name;
+    answer.failed = true;
+    answer.value = 1;                   /* DOS's invalid function */
+    return answer;
+}
+
 /* The end of the program. The extender takes the call for its own end
    too, and leaves the machine as it found it.
 

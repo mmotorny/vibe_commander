@@ -1950,6 +1950,86 @@ struct Answer ProgramRunBare(const u8 *name, const u8 *tail)
     return ProgramRun(name, tail);
 }
 
+/* Enter on a file, the piece L6b (TODO.md, "L6, commands"): a program is
+   a regular file of the host that the user may execute, whatever its
+   name, the extensions of DOS's meaning nothing here; it is run as
+   ./name, typed .\NAME, which the command made one of the host's has
+   as './name' (DosCommandToHost). Any other regular file is handed to
+   xdg-open, the desktop's opener, which is not waited for and has none
+   of the program's terminal: the panels stay. */
+static const u8 ProgramBefore[] = ".\\";
+
+/* The path of the host that the name of the current directory leads to,
+   with what the host says of it, or false where it leads to nothing. */
+static bool HostFile(const u8 *name, char *host, i32 room,
+                     struct stat *status)
+{
+    u8 full[DOS_PATH_ROOM];
+    struct Answer led;
+
+    if (DosPathFull(name, &Emulated.drives, full).failed)
+        return false;
+    led = HostPathOfDos(&Emulated.directories, &Emulated.drives, full, host,
+                        room);
+    return !led.failed && led.value == 1 && stat(host, status) == 0;
+}
+
+const u8 *ProgramOfFile(const u8 *name)
+{
+    char host[HOST_PATH_ROOM];
+    struct stat status;
+
+    if (HostFile(name, host, (i32)sizeof host, &status)
+        && S_ISREG(status.st_mode) && access(host, X_OK) == 0)
+        return ProgramBefore;
+    return 0;
+}
+
+struct Answer ProgramOpenFile(const u8 *name)
+{
+    char host[HOST_PATH_ROOM];
+    struct stat status;
+    struct Answer answer;
+    sigset_t none;
+    pid_t child, opener;
+    int null, ended = 0;
+
+    answer.failed = true;
+    answer.value = FILE_NOT_FOUND;
+    if (!HostFile(name, host, (i32)sizeof host, &status)
+        || !S_ISREG(status.st_mode))
+        return answer;
+    /* A child that starts the opener and ends at once, so that the
+       opener is nobody's to wait for. */
+    child = fork();
+    if (child == 0) {
+        setsid();
+        null = open("/dev/null", O_RDWR);
+        if (null >= 0) {
+            dup2(null, 0);
+            dup2(null, 1);
+            dup2(null, 2);
+        }
+        sigemptyset(&none);
+        sigprocmask(SIG_SETMASK, &none, 0);
+        opener = fork();
+        if (opener == 0) {
+            execlp("xdg-open", "xdg-open", host, (char *)0);
+            _exit(127);
+        }
+        _exit(opener < 0 ? 1 : 0);
+    }
+    if (child < 0) {
+        answer.value = NO_MEMORY;
+        return answer;
+    }
+    while (waitpid(child, &ended, 0) < 0 && errno == EINTR)
+        ;
+    answer.failed = false;
+    answer.value = 0;
+    return answer;
+}
+
 void ProgramEnd(u16 code)
 {
     Record("end ", code & 0xFF);

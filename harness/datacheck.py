@@ -207,6 +207,10 @@ OWN_OF = {
                      "original's Aloc_S, which the tree has in exec.c "
                      "and which is held there, in a copy that ends as DOS "
                      "takes a text and not as the original's does",
+        "ProgramExtensions": "the extensions of a program that "
+                             "ProgramOfFile of sys_dos.c asks, a copy of "
+                             "the original's Ext_S, which the tree has in "
+                             "files.c and which is held there (L6b)",
     },
 }
 

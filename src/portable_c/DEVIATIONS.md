@@ -2740,24 +2740,36 @@ name, `.COM`, `.EXE` or `.BAT`, runs it.
 command runs as `$SHELL -c` with the command made one of the host's: in
 UTF-8, a path of DOS's that begins with R: or H: made the host's path
 that it leads to, quoted, and in the host's directory that DOS's
-current one leads to. DOS's own commands, DEL, RD, ATTRIB, TIME, CLS
-and their like, are not the shell's. A command has the
+current one leads to. A word of a command that names a file or a
+directory of DOS's current directory by DOS's name, `README.TXT` or the
+alias `LONGFI~1.TXT`, alone or behind `.\`, is handed to the shell as
+the host's name of it, quoted, `./` in front where `.\` was, wherever
+DOS's name is not the host's already; a name that DOS would cut to
+eight and three is left as typed, and so are `.` and `..`. DOS's own
+commands, DEL, RD, ATTRIB, TIME, CLS and their like, are not the
+shell's. A command has the
 terminal while it runs, Ctrl-C and Ctrl-Z being its own, and writes on
 the terminal's own screen (L9). The external viewer and editor of the
 setup are run by the shell as well.
 
-**Why.** The user's decisions of 14 October 2026: a command runs
-through `$SHELL -c`, on the terminal's own screen.
+Enter on a file asks the system whether the file is a program, where the
+original asks its extension (`ProgramOfFile` of `sys.h`; on DOS the
+three extensions still): on Linux a program is a regular file that the
+user may execute, whatever its name, and `.COM`, `.EXE` and `.BAT` mean
+nothing of their own. Its name is typed into the command line behind
+`.\`, `.\zrun`, and the shell runs it as `./zrun`. A file that is no
+program and that the extension file has no command for is handed to
+`xdg-open`, which is not waited for and has none of the terminal, and
+the panels stay, where the original does nothing. The panel's
+filter of programs still goes by the three extensions. A shell that
+cannot be run is asked for as the original asks for a COMSPEC that
+names no file, "Can't find file" with its name.
 
-Three things are **open** with the user (`TODO.md`, "L6, commands"):
-Enter on a file, which on Linux runs only what the original runs, so
-that an executable without such an extension does nothing and
-`xdg-open`, which the user decided for a file that the program cannot
-run, is never reached; a name of DOS's form without a drive in a
-command, as Enter types it and the user menu's `!.!` makes it, which
-the shell does not find where the host's name is in small letters or
-has an alias; and a shell that cannot be run, for which the program
-asks as the original asks for a COMSPEC that names no file.
+**Why.** The user's decisions of 14 October 2026: a command runs
+through `$SHELL -c`, on the terminal's own screen; and of 15 October
+2026, Enter on a file and a name of DOS's form in a command (`TODO.md`,
+"L6, commands", Q1 and Q2); the shell that cannot be run stays as it
+was built (Q3).
 
 **Which scenarios show it.** What DOS showed behind the panels after a
 command is masked. Not run on Linux, being about a program or a command
@@ -2769,8 +2781,13 @@ whose value is the command or comes behind one that the shell has not:
 `setup-missing-saved`, `setup-save-fails`, `setup-new` and
 `clock-morning`. Cut at such a command: `help-broken`, `menu-files`,
 `setup-help-file`, `setup-damaged`, `user-menu` and `view-commands`.
-The test `portable_c-terminal` runs three commands and holds the
-terminal's own screen to what they wrote.
+The test `portable_c-terminal` runs four commands, one of them with a
+name of DOS's form, and Enter on a program without an extension and on
+a text, with a stub of `xdg-open` on PATH that notes what it is handed,
+and holds the terminal's own screen to what they wrote;
+`harness/posixcheck.c` holds the names made the host's. `enter` and
+`user-menu-run` stay not run: what they show is DOS running its
+programs and commands, and what those print.
 
 ### L9. The terminal's own screen, and Ctrl-O
 

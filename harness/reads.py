@@ -83,7 +83,7 @@ NONE = "not read"               # only its address or its size is taken
 NAMED = ("FileCreate", "FileOpen", "FileOpenBare", "FileDelete",
          "FileRename", "FileAttributes", "FileSetAttributes",
          "FileTrueName", "FindFirst", "DirMake", "DirRemove", "DirChange",
-         "ProgramRun", "ProgramRunBare")
+         "ProgramRun", "ProgramRunBare", "ProgramOfFile", "ProgramOpenFile")
 
 # What a call reads of a constant that is handed to it, by its offset
 # or as a pointer.

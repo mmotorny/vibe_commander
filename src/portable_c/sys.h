@@ -396,6 +396,19 @@ void Idle(void);
 struct Answer ProgramRun(const u8 *name, const u8 *tail);
 struct Answer ProgramRunBare(const u8 *name, const u8 *tail);
 
+/* Whether the file `name` of the current directory is a program that a
+   command runs by naming it: where it is, the text that is typed in
+   front of its name for that, which may be empty; where it is not, 0.
+   On DOS a program is a file whose extension is COM, EXE or BAT, and
+   nothing is typed in front of it. */
+const u8 *ProgramOfFile(const u8 *name);
+
+/* The file `name` of the current directory handed to what the system
+   opens a file of its kind with, which is not waited for. Answers
+   whether that failed; a system that has nothing of the kind answers so
+   and does nothing. */
+struct Answer ProgramOpenFile(const u8 *name);
+
 /* End the program, with a number for whoever started it. Does not
    return. */
 void ProgramEnd(u16 code);
