@@ -100,7 +100,7 @@ out what is gone, and writes what is new without a reason: that is then
 written into the file by whoever has read the place, under its line.
 
 What is read: every file of code and of tables that the build for DOS
-takes, which is all but sys_stub.c (OTHER_SYSTEMS). sys_dos.c, the system's
+takes, which is all but the files of Linux (OTHER_SYSTEMS). sys_dos.c, the system's
 functions, was written for an int of 32 bits and never compiled for
 another, so a place there has nothing to be the same as: its reason
 says that the number is meant as it is. What a macro makes is a place
@@ -174,10 +174,11 @@ SKIPPED = 77
 
 # The files of an implementation of sys.h for another system than DOS,
 # by the ending of their names, as add_portable_c of CMakeLists.txt
-# knows them: sys_stub.c, and sys_posix.c to come. They were never
+# knows them: the *_posix.c of the program for Linux (sys_stub.c was one
+# until it went, TODO.md, "L7"). They were never
 # compiled by Open Watcom nor for an int of 16 bits, and include the C
 # library of this computer, which clang for the 386 has no headers of.
-OTHER_SYSTEMS = ("_stub.c", "_posix.c")
+OTHER_SYSTEMS = ("_posix.c",)
 
 
 def dos_files(source):

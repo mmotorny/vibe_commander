@@ -19872,6 +19872,24 @@ and are compared, where 27 were stopped; no sanitizer says anything
 more in any of them. What they still differ in is L3b's: the order of
 the files and the setup file.
 
+### L7, the last of Linux: half done
+
+The last piece of step 6, a commit for each part:
+
+1. **The stub went** (on the user's word of 14 October 2026, `CLAUDE.md`,
+   step 5): `sys_stub.c` and its three builds, `stub/vc`, `stub-asan/vc`
+   and `stub-msan/vc`, are gone. What its test held is held over the
+   program for Linux: the test is `portable_c-tidy`,
+   `harness/tidycheck.py` (which was `portable_c-stub`,
+   `harness/stubcheck.py`), which reads the common code and `sys_posix.c`
+   with the command of `posix/vc` and the files of the emulation with
+   their test, `harness/posixcheck.c`, with that of `posix-unit`, the
+   warnings again and clang-tidy: 69 files, nothing named. The host's
+   and the words' records lost their line for `sys_stub.c`; `int16.py`
+   leaves out the files of Linux alone. `VC.EXE` the same bytes. The
+   sections above that name the stub and its test are history and stay
+   as they were written.
+
 ## SORT, the bench sorted by name: the plan
 
 On the user's word of 15 October 2026 the panels of the bench sort

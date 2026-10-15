@@ -241,7 +241,7 @@ program built for WebAssembly and drawn as text, and then iOS.
 |---|---|
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
-| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original. What it asks of the system is `sys.h`; the files whose names end in `_dos.c` answer it for DOS, `sys_stub.c` by nothing, and those that end in `_posix.c`, with `emulate_posix.h`, for Linux. Every other file is common to all of them |
+| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original. What it asks of the system is `sys.h`; the files whose names end in `_dos.c` answer it for DOS, and those that end in `_posix.c`, with `emulate_posix.h`, for Linux. Every other file is common to all of them |
 | `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README; `stub.c` switches the banner of [the extender](#the-extender) off in the program of the portable C; `calls.py` counts the calls that hand registers to an interrupt, outside the file of the system's functions |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/`, and those of `harness/goldens/posix/` on top of them for the program for Linux |
@@ -251,8 +251,8 @@ program built for WebAssembly and drawn as text, and then iOS.
 
 Needs CMake 3.24 or later, a C compiler and `git`. Clang is optional:
 where the build finds it, it also builds [the program for
-Linux](#the-program-for-linux) and the stub, and without it the
-program for DOS is built all the same.
+Linux](#the-program-for-linux), and without it the program for DOS
+is built all the same.
 
 ```sh
 cmake -B build
@@ -295,8 +295,8 @@ for finding a fault, `build/portable_c/debug/VC.EXE`. [The portable
 C](#the-portable-c) says what the two are.
 
 Where it finds clang, the build also compiles the portable C for Linux,
-`build/portable_c/posix/vc` with its sanitized builds beside it, and the
-stub: see [The program for Linux](#the-program-for-linux).
+`build/portable_c/posix/vc` with its sanitized builds beside it: see
+[The program for Linux](#the-program-for-linux).
 
 ### Changes to the source
 
@@ -969,12 +969,10 @@ of a service, or an interrupt that it calls. The same functions for
 another system are other files beside it, and the build picks the files
 of an implementation by the end of their names, beside the common code,
 every file that ends in no implementation's name. Those of DOS end in
-`_dos.c`: `sys_dos.c` and the stack, `stack_dos.c`. `sys_stub.c` is
-the stub of step 5 of the road, `sys.h` answered by nothing, which
-builds and is not meant to run. And `sys_posix.c` is the program for
-Linux, with the files that emulate DOS there beside it, each ending in
-`_posix.c`, and their own header, `emulate_posix.h`: see [The program
-for Linux](#the-program-for-linux).
+`_dos.c`: `sys_dos.c` and the stack, `stack_dos.c`. And `sys_posix.c`
+is the program for Linux, with the files that emulate DOS there beside
+it, each ending in `_posix.c`, and their own header, `emulate_posix.h`:
+see [The program for Linux](#the-program-for-linux).
 
 | What | Functions |
 |---|---|
@@ -1297,10 +1295,6 @@ a list of clang's warnings written out, each an error:
 | `build/portable_c/posix-asan/vc` | The same with the sanitizers of addresses, of undefined behaviour, of integers and of implicit conversions, each fatal: the one that the tests run |
 | `build/portable_c/posix-msan/vc` | The same with the sanitizer of memory, which goes with no other: built only by its name, `cmake --build build --target portable_c-posix-msan`, run by no test, and kept for audits (`TODO.md`, "L3b, the scenarios on Linux", says how) |
 
-The stub of step 5, `build/portable_c/stub/vc` with its sanitized
-builds beside it, is `sys.h` answered by nothing: it builds, and is not
-meant to run.
-
 **Running it by hand.** In a terminal of 80 columns by 25 rows or more:
 
 ```sh
@@ -1337,7 +1331,7 @@ is no clang:
 | `portable_c-posix-unit` | What the program emulates of DOS without input or output of its own, the files `*_posix.c` but `sys_posix.c`: names and aliases, the code page and UTF-8, drives and paths, dates, DOS's errors, and the services on files and directories of the host's, by `harness/posixcheck.c`, built with the sanitizers |
 | `portable_c-terminal` | What `posix-asan/vc` draws in a pseudo-terminal, replayed through pyte, a terminal emulator in Python that the harness fetches pinned, held cell by cell to the grid that the program writes for the same keys through its test channel, in 24 bits and in 16 colours; a terminal too small, SIGTSTP and SIGCONT, the kitty protocol and the keys that the program reads held to the BIOS's words, the mouse, and commands with Ctrl-O. `harness/terminal.py` |
 | `portable_c-posix-scenarios` | `posix-asan/vc` through the scenarios, by `harness/posixrun.py`: on a bench of the host's in `/tmp`, its home directory laid out as the machine's C:, driven through the test channel, `VC_TEST`, which takes the scenarios' keys as the BIOS's words and writes the grid whenever the program waits for a key, on the clock of the machine of the tests, `VC_TEST_CLOCK`. Its screens and its files are held to the original's goldens with what is declared for the portable C and, on top of that, for Linux. It starts a machine of DOS once, for the bench's setup file, and keeps that in `build/posix-bench` |
-| `portable_c-stub` | The stub, the files of Linux and their test held to clang's warnings, with the commands that the build compiles them with, and to clang-tidy by `.clang-tidy`. `harness/stubcheck.py` |
+| `portable_c-tidy` | The common code, the files of Linux and their test held to clang's warnings, with the commands that the build compiles them with, and to clang-tidy by `.clang-tidy`. `harness/tidycheck.py` |
 
 What is declared for Linux is `ON_LINUX` of `harness/deviations.py`,
 each part with its reason there. Masks: what the comparison leaves out
@@ -1368,9 +1362,9 @@ the scenarios on Linux", has every cut with its step.
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
 One test, `portable_c-host`, asks `gcc`, and those of the source's
 numbers and of the program for Linux ask `clang`: each is skipped where
-there is none. `portable_c-stub` also asks `clang-tidy`, of version 23,
+there is none. `portable_c-tidy` also asks `clang-tidy`, of version 23,
 which the checks of `.clang-tidy` were judged with (`VERSION` of
-`harness/stubcheck.py`): it is skipped without one, and fails with
+`harness/tidycheck.py`): it is skipped without one, and fails with
 another version, which has other checks.
 
 ```sh
@@ -1383,9 +1377,9 @@ portable C, of which `portable_c-data` and `portable_c-scenarios` are the
 C translation's checks made of it, `portable_c-host`, `portable_c-int16`,
 `portable_c-words`, `portable_c-width` and `portable_c-cut` are of its
 source, `portable_c-layout` and `portable_c-debug-layout` of its two
-programs for DOS as the linker wrote them, and `portable_c-stub`,
+programs for DOS as the linker wrote them, and `portable_c-tidy`,
 `portable_c-posix-unit`, `portable_c-terminal` and
-`portable_c-posix-scenarios` of the stub and [the program for
+`portable_c-posix-scenarios` of [the program for
 Linux](#the-program-for-linux), which that section has; and one of the
 harness itself, `harness-le`. The two trees are held against the same
 goldens. The tests that run no machine take seconds, the terminal's

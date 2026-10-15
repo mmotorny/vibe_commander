@@ -8,7 +8,7 @@
  * Built by CMakeLists.txt with clang, its full list of warnings and the
  * sanitizers of addresses, of undefined behaviour, of integers and of
  * implicit conversions, all fatal, and read by clang-tidy in the test
- * portable_c-stub (harness/stubcheck.py). It prints each check that
+ * portable_c-tidy (harness/tidycheck.py). It prints each check that
  * fails and exits with 1 if any did.
  *
  * The sources named:

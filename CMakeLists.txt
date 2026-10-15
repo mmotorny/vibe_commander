@@ -335,7 +335,7 @@ function(add_portable_c target directory)
     # out; a file of a new implementation is named here when it is
     # added, or it is taken for common code. (A file of tables ends in
     # _t.c, which is common code and no implementation.)
-    set(implementations dos stub posix)
+    set(implementations dos posix)
     foreach(implementation ${implementations})
         if(NOT implementation STREQUAL "dos")
             list(FILTER c_files EXCLUDE REGEX "_${implementation}\\.c$")
@@ -470,9 +470,9 @@ function(add_portable_c target directory)
 endfunction()
 
 # --- clang --------------------------------------------------------------------
-# The builds of src/portable_c/ for this computer, with clang: step 5 of
-# the portable C's road, the stub, and what step 6 builds for Linux. clang
-# is the one that the path has; without it they are not made, and their
+# The builds of src/portable_c/ for this computer, with clang: the program
+# for Linux, step 6 of the portable C's road. clang is the one that the
+# path has; without it they are not made, and their
 # test is skipped. Every warning of the list below is an error, on the
 # user's word of 14 October 2026: a list written out, close to curl's,
 # and not -Weverything.
@@ -504,22 +504,22 @@ set(clang_warnings -std=c99 -Werror -Wall -Wextra -Wpedantic -Wconversion
 find_program(clang NAMES clang)
 find_program(clang_tidy NAMES clang-tidy)
 if(NOT clang)
-    message(STATUS "No clang: the stub of the portable C is not built, and "
-                   "the test portable_c-stub is skipped")
+    message(STATUS "No clang: the program for Linux is not built, and its "
+                   "tests are skipped")
 endif()
 
 # add_portable_c_host(<target> <directory> <implementation> [BY_NAME]
 #                     [COMPILE <option>...] [LINK <option>...])
 # builds src/portable_c/ for this computer with clang, as
 # <directory>/vc, of the common code and the files of <implementation>
-# (stub, posix), with the warnings above and the options given: those of
+# (posix), with the warnings above and the options given: those of
 # COMPILE to the compiler and the linker alike, those of LINK to the
 # linker alone. -fno-strict-aliasing is every such build's: the common
 # code reads a word of 16 or 32 bits out of bytes through a cast pointer,
 # as DOS does, which C promises nothing of without it (TODO.md, "5a, the
 # split"). The command of the compiler is written into
 # <directory>/compiled.txt, which every object follows, as add_portable_c
-# has it, and which the test portable_c-stub reads. With BY_NAME the
+# has it, and which the test portable_c-tidy reads. With BY_NAME the
 # target is not of the default one: it is built when it is named,
 # `cmake --build build --target <target>`.
 function(add_portable_c_host target directory implementation)
@@ -527,7 +527,7 @@ function(add_portable_c_host target directory implementation)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
-    foreach(other dos stub posix)
+    foreach(other dos posix)
         if(NOT other STREQUAL implementation)
             list(FILTER c_files EXCLUDE REGEX "_${other}\\.c$")
         endif()
@@ -593,41 +593,16 @@ add_c_tree(c "the C translation" s
 add_portable_c(portable_c ${CMAKE_BINARY_DIR}/portable_c -os)
 add_portable_c(portable_c-debug ${CMAKE_BINARY_DIR}/portable_c/debug
     -od -d2 -dCHECKED)
-# The stub, step 5 of the road: src/portable_c/sys_stub.c for sys.h, a
-# program for this computer that builds and is not meant to run
-# (TODO.md, "5b, the stub"). Three builds, each its own directory of
-# build/portable_c/:
-#   stub/vc        with the usual hardening of a program of Linux, the
-#                  options that the distributions build with
-#   stub-asan/vc   with the sanitizers of addresses, of undefined
-#                  behaviour (the alignment of what is read among it),
-#                  of integers and of implicit conversions, each fatal
-#   stub-msan/vc   with the sanitizer of memory, which goes with no other
-if(clang)
-    add_portable_c_host(portable_c-stub ${CMAKE_BINARY_DIR}/portable_c/stub
-        stub
-        COMPILE -O2 -D_FORTIFY_SOURCE=3 -fstack-protector-strong
-                -fstack-clash-protection -fcf-protection=full -fPIE
-        LINK -pie -Wl,-z,relro,-z,now,-z,noexecstack)
-    add_portable_c_host(portable_c-stub-asan
-        ${CMAKE_BINARY_DIR}/portable_c/stub-asan stub
-        COMPILE -O1 -g -fno-omit-frame-pointer
-                -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
-                -fno-sanitize-recover=all)
-    add_portable_c_host(portable_c-stub-msan
-        ${CMAKE_BINARY_DIR}/portable_c/stub-msan stub
-        COMPILE -O1 -g -fno-omit-frame-pointer -fsanitize=memory
-                -fsanitize-memory-track-origins -fno-sanitize-recover=all)
-endif()
 # The program for Linux, step 6 of the road: src/portable_c/*_posix.c for
 # sys.h, sys_posix.c with the emulation of DOS of the pieces L1 and L2
 # behind it (TODO.md, "L3a, the program runs on Linux"). Three builds,
 # each its own directory of build/portable_c/, all with
 # -D_XOPEN_SOURCE=700, as the test of the emulation below has it:
-#   posix/vc        the program, with the hardening of the stub's first
-#                   build
-#   posix-asan/vc   with the sanitizers of the stub's second, each fatal,
-#                   the alignment of what is read among them: a word in
+#   posix/vc        the program, with the usual hardening of a program of
+#                   Linux, the options that the distributions build with
+#   posix-asan/vc   with the sanitizers of addresses, of undefined
+#                   behaviour, of integers and of implicit conversions,
+#                   each fatal, the alignment of what is read among them: a word in
 #                   a buffer of bytes is made of its bytes, GET16 and its
 #                   like of vc.h (TODO.md, "AL, words made of their
 #                   bytes"); the one that the tests run
@@ -663,7 +638,7 @@ endif()
 # fatal, and -D_XOPEN_SOURCE=700, which gives the files of Linux the
 # functions of POSIX and X/Open beside C's (a #define in a file is a name
 # that C reserves, which clang-tidy names). Its compiled.txt is what the
-# test portable_c-stub reads these files with.
+# test portable_c-tidy reads these files with.
 if(clang)
     set(unit_dir ${CMAKE_BINARY_DIR}/portable_c/posix-unit)
     set(unit_source ${CMAKE_SOURCE_DIR}/src/portable_c)
@@ -814,26 +789,28 @@ add_test(NAME portable_c-cut
             --compiled ${CMAKE_BINARY_DIR}/portable_c/compiled.txt
             --out ${CMAKE_BINARY_DIR}/cutcheck)
 set_tests_properties(portable_c-cut PROPERTIES SKIP_RETURN_CODE 77)
-# The stub of the portable C held to clang's warnings, with the command
-# that the build compiles it with, and to clang-tidy, by .clang-tidy at
-# the top of the checkout, with clang-tidy 23: every place that it names
-# fails the test, but those that a piece of their own is to mend, which
-# the test lists. The files of Linux, *_posix.c, and their test,
-# harness/posixcheck.c, are held so too, with the command of the build of
-# that test. See harness/stubcheck.py. It runs no machine, and is skipped
-# where there is no clang.
+# The program for Linux held to clang's warnings, with the commands that
+# the build compiles it with, and to clang-tidy, by .clang-tidy at the top
+# of the checkout, with clang-tidy 23: every place that it names fails the
+# test, but those that a piece of their own is to mend, which the test
+# lists. The common code and sys_posix.c are read with the command of
+# posix/vc, the files of the emulation and their test,
+# harness/posixcheck.c, with that of the build of that test. It held the
+# stub of step 5 so until the stub went (TODO.md, "L7"). See
+# harness/tidycheck.py. It runs no machine, and is skipped where there is
+# no clang.
 if(clang_tidy)
-    set(stub_tidy ${clang_tidy})
+    set(host_tidy ${clang_tidy})
 else()
-    set(stub_tidy clang-tidy)
+    set(host_tidy clang-tidy)
 endif()
-add_test(NAME portable_c-stub
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/stubcheck.py
-            --compiled ${CMAKE_BINARY_DIR}/portable_c/stub/compiled.txt
+add_test(NAME portable_c-tidy
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/tidycheck.py
+            --compiled ${CMAKE_BINARY_DIR}/portable_c/posix/compiled.txt
             --posix-compiled
             ${CMAKE_BINARY_DIR}/portable_c/posix-unit/compiled.txt
-            --clang-tidy ${stub_tidy})
-set_tests_properties(portable_c-stub PROPERTIES SKIP_RETURN_CODE 77)
+            --clang-tidy ${host_tidy})
+set_tests_properties(portable_c-tidy PROPERTIES SKIP_RETURN_CODE 77)
 # What the program for Linux emulates of DOS without input or output, the
 # piece L1 of step 6, held by harness/posixcheck.c, built above with the
 # sanitizers: it prints every check that fails. It runs no machine, and is
@@ -910,7 +887,7 @@ endforeach()
 set_tests_properties(asm-bytes c-data c-arith
     PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-data portable_c-host portable_c-int16
-    portable_c-words portable_c-width portable_c-cut portable_c-stub
+    portable_c-words portable_c-width portable_c-cut portable_c-tidy
     portable_c-posix-unit portable_c-terminal
     portable_c-layout portable_c-debug-layout
     PROPERTIES LABELS portable_c)

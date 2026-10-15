@@ -2,10 +2,11 @@
 # (CLAUDE.md, "The portable C", the road, step 6): a broad set, the
 # analyser, bugprone-* and misc-* and a few of readability-*, every
 # check that is turned off with its reason above it, and every place
-# that a check names an error. The test portable_c-stub runs it over the
-# common code and sys_stub.c (harness/stubcheck.py). It is written for
-# clang-tidy 23, which the test holds the version to: another version
-# has other checks, which are judged before they are taken.
+# that a check names an error. The test portable_c-tidy runs it over the
+# common code and the files of Linux (harness/tidycheck.py). It is
+# written for clang-tidy 23, which the test holds the version to:
+# another version has other checks, which are judged before they are
+# taken.
 Checks:
   - "-*"
   - "clang-analyzer-*"

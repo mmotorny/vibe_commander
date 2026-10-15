@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
-"""Hold the portable C to clang's warnings and to clang-tidy.
+"""Hold the program for Linux to clang's warnings and to clang-tidy.
 
-Step 5 of the portable C's road is a stub, `sys_stub.c` behind `sys.h`,
-so that the common code is built for this computer by clang; and from
-then on every build with clang has a high level of warnings and
-clang-tidy, a warning of either an error, on the user's word of 14
-October 2026 (CLAUDE.md, "The portable C", the road, step 6). The build
-of the stub stops for a warning already. This test says so where the
-build is not looked at, and runs clang-tidy, which the build does not:
+From step 5 of the portable C's road on, every build with clang has a
+high level of warnings and clang-tidy, a warning of either an error, on
+the user's word of 14 October 2026 (CLAUDE.md, "The portable C", the
+road, step 6). The builds stop for a warning already. This test says so
+where the build is not looked at, and runs clang-tidy, which the build
+does not:
 
-  1. Every file of the stub, the common code and `sys_stub.c`, is
-     compiled again by the command that the build compiles it with,
-     `compiled.txt` of the stub's directory, which has the full list of
-     warnings and -Werror, to see nothing more: -fsyntax-only. Anything
-     that clang says fails the test.
+  1. Every file of the program for Linux, the common code and the files
+     of Linux, is compiled again by the command that the build compiles
+     it with, which has the full list of warnings and -Werror, to see
+     nothing more: -fsyntax-only. Anything that clang says fails the
+     test.
   2. clang-tidy reads the same files with the same options and
      `.clang-tidy` at the top of the checkout: the broad set that the
      user decided, each check that is turned off with its reason there.
      Every place that it names fails the test, but those of EXPECTED.
 
-The files of Linux, `*_posix.c`, are held so too, and with them their
-test, `harness/posixcheck.c`, by the command of the build of that test,
+The common code and `sys_posix.c`, the program's binding of sys.h, are
+read with the command of the program's build, `compiled.txt` of
+`build/portable_c/posix`, which `--compiled` names: its sanitized builds
+differ in what they make and not in what clang is to say. The files of
+the emulation, the other `*_posix.c`, are read with their test,
+`harness/posixcheck.c`, by the command of the build of that test,
 `compiled.txt` of `build/portable_c/posix-unit` (CMakeLists.txt, the
-piece L1 of step 6), which `--posix-compiled` names. `sys_posix.c`, the
-program's binding of sys.h, which that build leaves out for its `main`,
-is read with that command too: it has no option of its own but those of
-the program's builds, `build/portable_c/posix`, which differ in what
-they make and not in what clang is to say. The common code is read once,
-with the stub's command: the program for Linux is built of the same
-files with the same warnings.
+piece L1 of step 6), which `--posix-compiled` names.
+
+The test was `portable_c-stub`, `harness/stubcheck.py`, which read the
+common code with the stub of step 5, `sys_stub.c`, until the stub went
+with the program for Linux done, on the user's word of 14 October 2026
+(TODO.md, "L7").
 
 EXPECTED is the analyser's places where the program reads its main data
 as one block across its fields, as the original does: a read in front of
@@ -48,8 +50,8 @@ checks under `bugprone-*` and `misc-*`, which are judged before they are
 taken, and the test fails for it.
 
 The test exits with 77, which the build takes for a test that is
-skipped, where there is no clang: the build makes no stub then, and
-writes no `compiled.txt`. It runs no machine and takes some two minutes
+skipped, where there is no clang: the build makes no program for Linux
+then, and writes no `compiled.txt`. It runs no machine and takes some two minutes
 on four processors.
 """
 
@@ -90,23 +92,26 @@ PLACE = re.compile(r"^(?P<path>[^:\n]+):(?P<line>\d+):(?P<column>\d+): "
 
 
 def files():
-    """The files of the stub: every C file of the tree but those of the
-    other implementations, as add_portable_c_host of CMakeLists.txt
-    takes them."""
+    """The files that are read with the program's command: the common
+    code, every C file of the tree but those of an implementation, and
+    sys_posix.c, as add_portable_c_host of CMakeLists.txt takes them for
+    posix/vc."""
     return sorted(path for path in SOURCE.glob("*.c")
-                  if not re.search(r"_(dos|posix)\.c$", path.name))
+                  if not re.search(r"_(dos|posix)\.c$", path.name)
+                  or path.name == "sys_posix.c")
 
 
 def posix_files():
-    """The files of Linux and their test: those that the build of
-    portable_c-posix-unit in CMakeLists.txt takes, and sys_posix.c, which
-    it leaves out."""
-    return sorted(SOURCE.glob("*_posix.c")) + [ROOT / "harness" /
-                                                "posixcheck.c"]
+    """The files of the emulation and their test: those that the build of
+    portable_c-posix-unit in CMakeLists.txt takes, which leaves out
+    sys_posix.c for its main."""
+    return sorted(path for path in SOURCE.glob("*_posix.c")
+                  if path.name != "sys_posix.c") + [ROOT / "harness" /
+                                                    "posixcheck.c"]
 
 
 def compiled(path):
-    """The command that the build compiles the stub's files with: the
+    """The command that the build compiles a set of files with: the
     compiler, then its options."""
     words = path.read_text().strip().split(";")
     return words[0], words[1:]
@@ -152,7 +157,8 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("--compiled", type=pathlib.Path, required=True,
-                        help="compiled.txt of the stub's build")
+                        help="compiled.txt of the build of the program for "
+                             "Linux, posix/vc")
     parser.add_argument("--posix-compiled", type=pathlib.Path,
                         help="compiled.txt of the build of the test of the "
                              "files of Linux")
@@ -164,7 +170,7 @@ def main():
 
     if not args.compiled.exists():
         print(f"{args.compiled} is not there: the build had no clang, and "
-              "made no stub. Skipped.")
+              "made no program for Linux. Skipped.")
         sys.exit(SKIPPED)
     compiler, options = compiled(args.compiled)
     clang_tidy = shutil.which(args.clang_tidy)
@@ -176,7 +182,7 @@ def main():
         print(f"{clang_tidy} is of version {found}, and the checks of "
               f".clang-tidy were judged with version {VERSION}: another "
               "version has other checks, which are judged before they are "
-              "taken. See harness/stubcheck.py.")
+              "taken. See harness/tidycheck.py.")
         sys.exit(1)
 
     passed = True
@@ -184,14 +190,14 @@ def main():
     sources = [(path, options) for path in files()]
     if args.posix_compiled is not None:
         if not args.posix_compiled.exists():
-            print(f"{args.posix_compiled} is not there, where the stub's "
-                  "build is: the build of the test of the files of Linux "
-                  "is missing.")
+            print(f"{args.posix_compiled} is not there, where the "
+                  "program's build is: the build of the test of the files "
+                  "of Linux is missing.")
             sys.exit(1)
         posix_compiler, posix_options = compiled(args.posix_compiled)
         if posix_compiler != compiler:
             print(f"{args.posix_compiled} has another compiler than the "
-                  f"stub's, {posix_compiler}.")
+                  f"program's, {posix_compiler}.")
             sys.exit(1)
         sources += [(path, posix_options) for path in posix_files()]
     with concurrent.futures.ThreadPoolExecutor(args.jobs) as pool:
@@ -228,7 +234,7 @@ def main():
             passed = False
             file, check, text = key
             print(f"{file}: {text} [{check}]: listed {count} times in "
-                  f"EXPECTED of harness/stubcheck.py, and named "
+                  f"EXPECTED of harness/tidycheck.py, and named "
                   f"{counted[key]} times")
     expected = sum(EXPECTED.values())
     print(f"clang-tidy named {len(unexpected)} places that are not "

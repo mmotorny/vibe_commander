@@ -67,7 +67,6 @@ string.c          none
 sys.h             none
 sys_dos.c         none
 sys_posix.c       none
-sys_stub.c        none
 system.c          none
 system_t.c        MD_AT 3
 tables.h          none
