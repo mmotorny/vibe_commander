@@ -919,6 +919,19 @@ add_test(NAME portable_c-terminal
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/terminal.py
             ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
 set_tests_properties(portable_c-terminal PROPERTIES SKIP_RETURN_CODE 77)
+# The modules of the web page, the piece W3a of step 7: render.js, which
+# draws the program's grid as text, and keys.js and mouse.js, which make
+# the browser's events the escape codes of a terminal with the kitty
+# protocol, run in Node with the grids that the program for Linux writes
+# through its test channel, the HTML read back and held to the cells, and
+# their keys and reports typed into that program in a pseudo-terminal and
+# held to what it reads. See harness/webrender.py. Nothing is downloaded
+# for it, and it runs no machine; it is skipped where there is no clang or
+# no Node.
+add_test(NAME portable_c-web-render
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webrender.py
+            ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
+set_tests_properties(portable_c-web-render PROPERTIES SKIP_RETURN_CODE 77)
 # The program for Linux through the scenarios, the piece L3b of step 6:
 # the sanitized build run on a bench of the host's laid out as the DOS
 # bench's, its screens and its disks held to the goldens of the original
@@ -982,7 +995,7 @@ endif()
 set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-tidy
-    portable_c-posix-unit portable_c-terminal
+    portable_c-posix-unit portable_c-terminal portable_c-web-render
     PROPERTIES LABELS portable_c)
 if(VC_DOS)
     set_tests_properties(c-data c-arith PROPERTIES LABELS frozen)

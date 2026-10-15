@@ -874,6 +874,74 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   so the warnings are on. Of wasm32: `size_t` is `unsigned long` there,
   32 bits.
 
+### W3a, the pure JS: done
+
+The piece W3a of the plan above: done.
+
+- Where: `src/portable_c/web/`, `render.js`, `keys.js` and `mouse.js`.
+  They are the program's platform for the web as `term_posix.c` is for a
+  terminal, so they are of the portable C and nowhere else (CLAUDE.md,
+  "The portable C"); a directory of their own, since the build takes
+  every C file of `src/portable_c/` by its suffix and these are no C,
+  and since the page's other files (W3b, the shell HTML and the glue)
+  go beside them. Each is a plain ES module, with nothing of the
+  browser's in it but `apply` of `render.js`, which writes into elements
+  that it is handed.
+- `render.js`: `new Screen(codePoints)` takes the table of the 256
+  glyphs as code points, which W3b makes of the program's
+  `CodePageGlyph`; `draw(cells, place, shape)` takes the 2000 words of
+  the grid (character low, attribute high), the cursor's place (row
+  above column) and the BIOS's shape (first line above last), and
+  answers `{ rows: [[row, html]...], cursor }`, the rows that changed
+  since the last draw (all at the first, and after `forget()`), each a
+  span per run of one attribute of the class `vc-aXX`, with `vc-b` for
+  bit 7; `cursor` is null or `{ row, column, block }` by the rule of
+  `ShapeOf` of the terminal's code. `css()` is the style sheet of the 256
+  classes, the VGA's colours exactly. The blink is not an animation per
+  span, which would go out of step as rows are made anew: the page turns
+  `BLINK_CLASS`, `vc-off`, on its `<pre>` every `BLINK_HALF` ms (16 of
+  the VGA's 70.086 frames), and `.vc-off .vc-b` makes the character
+  transparent. `CURSOR_HALF` is the cursor's, twice as fast; W3b blinks
+  its overlay by it. `apply(drawn, rowElements, cursorElement, cell)`
+  writes a draw into the 25 row spans and places the overlay, a line
+  being the lowest 2 of the cell's 16 lines.
+- `keys.js`: `keyEvent(event)` takes a KeyboardEvent, keydown or keyup,
+  and answers `{ bytes, prevent }`: the escape code that kitty sends
+  with the flags that the program pushes, as a string of bytes, or null
+  for a key that the program has nothing to do with (then the browser
+  keeps it). `kittyOf` gives the tuple, `{ code, shifted, base, mods,
+  event, text, final }`, and `sequence` writes it. So the shared decoder
+  is fed bytes, through its own reader of CSI, exactly as a terminal
+  feeds it: W2 hands the bytes to the decoder (TermInput's path, which
+  W1 moves into `keyboard_posix.c`) and needs nothing of kitty's tuples
+  in C. `FOCUS_OUT` is what to feed on blur, which lets go what is
+  held. AltGraph is a shift of the layout, not Ctrl and Alt: its text
+  is typed. A dead key or an input method's character comes by no
+  keydown and is dropped (W3b may take `compositionend`; it was not
+  asked).
+- `mouse.js`: `new Mouse()`, and `event(pointerEvent, rect)` answers
+  the SGR reports, one per button that changed, from
+  `PointerEvent.buttons`, which has the driver's bits; a motion where
+  nothing changed. `cellOf` keeps the cell to 80 by 25. The wheel has
+  no report, as in the terminal.
+- The test `portable_c-web-render`, `harness/webrender.py` with
+  `harness/webrender.mjs`: Node runs the modules (no download, no
+  jsdom), skipped with 77 where there is no Node or no build for Linux.
+  It draws the 43 grids of the test channel for terminal.py's KEYS and
+  KITTY and eight of its own, reads the HTML back and holds it to the
+  cells and to the rows that changed; it types the keys and the
+  mouse's reports of keys.js and mouse.js into the program for Linux in
+  a pseudo-terminal with the kitty protocol (terminal.Terminal) and
+  holds what the program reads to the bench's BIOS's words, so the
+  decoder that judges keys.js is the program's own and not a model of
+  it. Each mutation tried of the three modules (escaping, the rows
+  made, the base key, the cell, the cursor's shape, its hiding, the
+  background's bits) failed it. Some 30 seconds.
+- For W3b: the reserved keys of the browser (Ctrl-W and the others of
+  the plan) never reach `keyEvent`; `prevent` is true for every key
+  that the program takes, Alt alone included, which keeps Firefox's
+  menu bar away.
+
 ## A patch with a line for a cell that blinks: untried
 
 What no scenario has yet, and was tried by hand only: a patch with a
