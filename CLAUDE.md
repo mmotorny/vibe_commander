@@ -190,7 +190,8 @@ These held while `src/c/` was made, and they say what it is.
      run: a stub. Done on 14 October 2026, `sys_stub.c` with the test
      `portable_c-stub`; on the user's word of that day it goes once
      `sys_posix.c` is done, its test's checks moving to the build for
-     Linux.
+     Linux. It went on 15 October 2026, with Linux done, and those
+     checks are the test `portable_c-tidy`.
   6. The implementation for Linux, of 64 bits, built with clang, a
      program that runs in a terminal, emulating DOS as step 3 says;
      whatever of the x86 is still in the common code goes behind
@@ -199,8 +200,8 @@ These held while `src/c/` was made, and they say what it is.
      way. What the user decided of steps 5 and 6 on 14 October 2026:
      one `CMakeLists.txt` builds every implementation, and finds clang
      for those that want it; the files are `sys_dos.c` (which
-     `dos32.c` becomes), `stack_dos.c` (`stack.c`), `sys_stub.c` and
-     `sys_posix.c`. On Linux there are two drives, R:, the root of the
+     `dos32.c` becomes), `stack_dos.c` (`stack.c`), `sys_stub.c` (gone
+     since) and `sys_posix.c`. On Linux there are two drives, R:, the root of the
      file system, labelled ROOT, and H:, the user's home directory,
      labelled HOME, always, the program starting on H: where it is
      started under the home directory and on R: otherwise (the user,
