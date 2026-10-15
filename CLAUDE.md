@@ -256,7 +256,9 @@ These held while `src/c/` was made, and they say what it is.
      Enter on a file that the program cannot run hands it to
      `xdg-open`, the program asking `sys.h` whether a file runs where it
      asked its extension, so that on Linux a file that the user may
-     execute runs whatever its name, and a name of DOS's form in a
+     execute runs whatever its name, the panel's filter of programs
+     showing then what Enter would run (the user, on 15 October 2026),
+     and a name of DOS's form in a
      command, a word that names a file of the current directory, is
      handed to the shell as the host's name (the user, on 15 October
      2026); the PC's sixteen colours are drawn as DOS has them,
@@ -316,8 +318,17 @@ These held while `src/c/` was made, and they say what it is.
      15 October 2026. The room of the editor and the viewer on Linux
      is as much as the machine has; a cap comes with iOS, where the
      system ends a program that takes too much.
-  7. iOS, when Linux is done. Windows and macOS are not targets for now,
-     on the user's word of 14 October 2026.
+  7. A static web page, when Linux is done, on the user's word of 15
+     October 2026: the program built to WebAssembly by Emscripten,
+     which is the download that this allows, fetched and pinned as any
+     other, its key loop made to wait by Emscripten's Asyncify so that
+     any static host serves it; behind `sys.h` a file of its own; the
+     screen drawn as text, the 80 by 25 cells as lines of a `<pre>`
+     with the colours of DOS in spans, not on a canvas. It comes before
+     iOS as a rehearsal of what iOS has too: no shell, a file system of
+     the program's own, an event loop.
+  8. iOS, when the web page is done. Windows and macOS are not targets
+     for now, on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
   of 13 October 2026, since it no longer is what the original is. Its
   title and the first line of its banner are "Vibe Commander 0.1", the
@@ -4284,6 +4295,10 @@ facts row for row and what the piece F9 goes by):
 Work that can be divided is done by several agents at a time, without
 waiting for the user between its steps.
 
+- Work is run side by side wherever it can be, within what the machine
+  takes, on the user's word of 15 October 2026: a piece that need not
+  wait for another starts at once, in a checkout of its own, and a plan
+  or a reading that is cheap goes beside the heavy work.
 - Each piece is the work of an agent of its own, started fresh, so that a
   run does not fill one context. The session that runs them does not do
   the work: it starts each agent, checks what the agent left, which is
