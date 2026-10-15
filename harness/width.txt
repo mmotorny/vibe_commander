@@ -86,12 +86,12 @@ N17a            19          0     0              0      17     2     0     3    
 N17b            22          0     0              0      22     0     0     5    47  commands.c
 N18             75          0     1              0      55     1     0     7    45  menu.c help.c
 N19a            54          0     1              0      52     3     2    10    44  bars.c window.c system.c setup.c
-N19b            21          0     0              0      20     1     3     1    24  start.c
+N19b            21          0     0              0      20     1     3     2    24  start.c
 N20             61          0     0              0      58     3     0     3    49  stcolor.c stopts.c
 N21             60          0     3              0      46     7     0     5    34  stmain.c sthelp.c
 as a whole     647          0    59              0       0     0     0    13    25  the tables, stack_dos.c sys_dos.c
 headers        338         94    15              0     210     5     0     0     0  vc.h sys.h tables.h
-all           2048         94   116              0    1222    68    62   205  1088
+all           2048         94   116              0    1222    68    62   206  1088
 
 file           8 or 16 not sorted   u32 u32 not sorted by word  kept  sign  bool   i32
 vc.h               218          0    11              0     180     5     0     0     0
@@ -129,7 +129,7 @@ place.c              2          0     0              0       2     0     2     1
 read.c              12          0     1              0      12     1     1     7    20
 screen.c            12          0     0              0      10     2     0     0     3
 setup.c              3          0     0              0       3     0     0     0     5
-start.c             21          0     0              0      20     1     3     1    24
+start.c             21          0     0              0      20     1     3     2    24
 stcolor.c           43          0     0              0      43     0     0     3    39
 sthelp.c            43          0     3              0      30     6     0     2    16
 stmain.c            17          0     0              0      16     1     0     3    18

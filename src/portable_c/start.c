@@ -304,11 +304,13 @@ void Init00(void)
     i32 length, i;
     u16 sum, drive;
     bool wrong;
+    bool taken;                         /* the setup file read is the setup */
 
     end = MnPth0(path, env, NcEnv, sizeof NcEnv, 0);
     length = ReadOne(path, end, Init_F, image,
                      INI_LEN + 1);
     wrong = false;
+    taken = false;
     if (length == INI_LEN) {
         sum = 0;
         for (i = 0; i < INI_LEN - 2; i++)       /* Init01 */
@@ -317,34 +319,36 @@ void Init00(void)
             && image[0] == 'V' && image[1] == 'V' && image[2] == 'V') {
             for (i = 0; i < CmnIni; i++)
                 ((u8 *)&md)[i] = image[3 + 2 * WCBini + i];
-            goto Init04;
+            taken = true;
         }
     }
-    if (length != FAILED)
-        wrong = true;                   /* Init02: a file, but not one of
+    if (!taken) {
+        if (length != FAILED)
+            wrong = true;               /* Init02: a file, but not one of
                                            the program's */
 
-    /* Init03: the defaults, with both panels on the current directory
-       and the first one switched off. */
-    for (i = 0; i < (i32)sizeof Palets; i++)
-        ((u8 *)&md)[i] = Palets[i];
-    for (; i < CmnIni; i++)
-        ((u8 *)&md)[i] = 0;
-    for (i = 0; i < (i32)sizeof DefWCB; i++)
-        ((u8 *)first)[i] = DefWCB[i];
-    for (; i < WCBini; i++)
-        ((u8 *)first)[i] = 0;
-    drive = DriveCurrent();
-    first->WinPath[0] = (u8)(drive + 'A');
-    first->WinPath[1] = ':';
-    first->WinPath[2] = '\\';
-    first->WinPath[3] = 0;
-    DirCurrentBare(drive + 1, &first->WinPath[3]);
-    for (i = 0; i < WCBini; i++)
-        ((u8 *)second)[i] = ((u8 *)first)[i];
-    first->Visible = 0;
+        /* Init03: the defaults, with both panels on the current
+           directory and the first one switched off. */
+        for (i = 0; i < (i32)sizeof Palets; i++)
+            ((u8 *)&md)[i] = Palets[i];
+        for (; i < CmnIni; i++)
+            ((u8 *)&md)[i] = 0;
+        for (i = 0; i < (i32)sizeof DefWCB; i++)
+            ((u8 *)first)[i] = DefWCB[i];
+        for (; i < WCBini; i++)
+            ((u8 *)first)[i] = 0;
+        drive = DriveCurrent();
+        first->WinPath[0] = (u8)(drive + 'A');
+        first->WinPath[1] = ':';
+        first->WinPath[2] = '\\';
+        first->WinPath[3] = 0;
+        DirCurrentBare(drive + 1, &first->WinPath[3]);
+        for (i = 0; i < WCBini; i++)
+            ((u8 *)second)[i] = ((u8 *)first)[i];
+        first->Visible = 0;
+    }
 
-Init04:                                 /* Output Report */
+    /* Init04: Output Report */
     if (!ChkMode(&screen))
         ScreenSetMode(3);               /* 80 columns, in colour */
     to = MvzTxt(md.ExtMain, Title_S + 2);     /* Init05 */
