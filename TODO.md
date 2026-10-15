@@ -20379,6 +20379,67 @@ commits are on top of the two above, none landed):
   screen that differs in more than the pointer's cell; `show.py` prints
   a scenario's screens of such a run.
 
+**Stage 4, where it stands** (a fourth agent, on 15 October 2026; on
+top of the three stages' commits, rebased onto L5, none landed):
+
+- The rebase onto L5 met one conflict, `TakeEvent` of `sys_posix.c`:
+  L5's form (one event a call, `true` while something is due) kept, with
+  the test's clock's wait and `WaitTicks` of stage 2 in it.
+- 35 of the 86 that run pass under `posix-asan/vc` (`python3
+  harness/compare.py --together 4 build/portable_c/posix-asan/vc`, five
+  seconds). The 31 of stage 3 did with L5's pointer; `user-menu`,
+  `setup-help-pages`, `setup-help-screens` and `compare` came with this
+  stage.
+- The sanitizers: no scenario is stopped any more. `stamps`
+  (`panel.c`, the sum of what is selected) and `view-window` (`info.c`,
+  the sizes in clusters and their sum) wrap at 4 GB by `Plus32`, which
+  went from `copy.c` into `vc.h` with `Minus32`; `view-keys` (`view.c`,
+  PgDn) keeps a place of the main data where a pointer went in front of
+  `TmpBuf`. The scenarios of the portable C pass.
+- Two things of the bench that the emulation lacked, both in
+  `sys_posix.c`: the BIOS types with the cursor below the last row,
+  where the program hides it (row 127), by moving the lines up a row,
+  so the beep of an error moves the screen (`view-keys`); and the
+  pointer is put back only where the cell still has what was drawn
+  there, as CuteMouse's TECHNOTE.TXT says (the same screen).
+- The mask of a directory's time, `deviations.WrittenTimes`: a mask that
+  goes by the run (`run.written`, from `posixrun`, the directories whose
+  time at the end is not as laid out, the root among them) and by the
+  panel's title above a line of `..` or of a subdirectory.
+  `goldens.screen_departs` takes `written`. Not seen by it: a directory
+  written into and then removed (`delete`, step 22, DOCS), since the
+  disks at the end have it not. To see it, the emulation would say on
+  the channel which directories it changed, or posixrun would look after
+  every step; not built.
+- What the 51 that differ differ in first (`build/l3b/s7.txt` of the
+  run, `summ.py` there):
+  - The tree's order, the open question (not this piece's): `tree`,
+    `command-line`, `make-directory`, `copy-tree`, `tree-choose`,
+    `tree-box` (from step 14), `tree-deep` (step 14), `menu-items` (step
+    24), `stamps` (the file search lists C:\STAMPS before C:\WORK on the
+    bench, step 18), and more behind other differences.
+  - The drive's letter where the golden has it alone: the prompt cut by
+    a panel's mini status after the beep moved the screen (`view-keys`
+    step 9, a "C" in column 0), the Info panel under a dialog with the
+    colon showing and the letter not (`view-window` step 5, `move`,
+    `rename-keys`, `copy-ask` step 3 to 5: two cells, rows 6 and 7), the
+    drive menu's letters (`panels`, `cursor`, `attributes-directory`,
+    `label`), the prompt behind `quit`. None built.
+  - A: and `D:\VC` for files (`view-keys` from step 59: format.exe and
+    xcopy.exe of A:\FREEDOS\BIN; `help-broken`, `editor-keys`,
+    `setup-delay-file`, `setup-damaged`, `setup-help-file`), and the
+    setup file saved (`setup`, `setup-colors-*`): the FILES layout, not
+    made.
+  - The disks of `editor-hex`, `editor-lines` and `editor-dirinfo`: a
+    file written in place keeps the bench's time on Linux, where the
+    original's is "during the run": the emulation stamps a file that it
+    closes after writing with the test's clock only where it made it,
+    by the look of it; not read further.
+  - Not looked at: `sort`, `filter`, `names`, `clock`, `laptop`, `menu`,
+    `dialog-keys`, `keys-waiting`, `view-parts`, `view-search`,
+    `editor-search`, `editor-save`, `delete-mask`, `copy`, `reread`
+    (step 9, Ctrl+F4), `setup-config`, `dirinfo`.
+
 **Left.**
 
 - What stage 3 lists above; the mouse scenarios once L5 has landed.
