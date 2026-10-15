@@ -240,7 +240,17 @@ These held while `src/c/` was made, and they say what it is.
      a short name, the alias leading back to the name as it is; what
      the program makes on the host is named in lower case; aliases are
      numbered in the order of the host's names by their bytes and kept
-     for the run; and a directory is never shown read-only. Once the stub compiles on Linux, on the user's
+     for the run; and a directory is never shown read-only. Of what
+     the second piece asked, the same day: a file of four gigabytes or
+     more shows the most that DOS can say, and is never copied or moved
+     cut short, the program refusing it with an error instead; the free
+     room of a disk shows at most four gigabytes less 64K, in clusters
+     of up to 64K; a file whose name begins with a dot may be
+     overwritten; hidden, system and archive are taken when set and not
+     kept, the host having nowhere for them; a pipe, a socket or a
+     device is listed as an empty file that cannot be opened; there is
+     no volume label, and making one is refused; and an error of the
+     host's with no number of DOS's is DOS's general failure. Once the stub compiles on Linux, on the user's
      word of 14 October 2026, every build with clang has the
      sanitizers that fit it, a high level of warnings and clang-tidy,
      and a warning of any of them stops the build; which warnings and
