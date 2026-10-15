@@ -392,42 +392,41 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
     FND->FndCur = line;
     FND->FndFrst = first;
     moved = first - wasFirst;
-    if (moved == 0) {
-        if (!(FND->FndMode & MODE_CURSOR))
-            goto cursor;
-        if (wasLine == line) {
-            if (!(old & MODE_CURSOR))
-                goto cursor;
-            return 0;
+    /* Where the list has not moved, FnMv24 is passed by if the cursor
+       follows the search, or if it is on the line where it was; and in
+       the second case nothing is drawn at all if a key had moved the
+       cursor before as well. */
+    if (moved != 0
+        || ((FND->FndMode & MODE_CURSOR) != 0 && wasLine != line)) {
+        /* FnMv24: the line that had the cursor, where it was. */
+        FndCurs(Conf_C, wasLine, wasFirst, place, size);
+        if (moved != 0) {
+            count = ROWS(size);
+            at = place + 0x205;
+            number = FND->FndFrst;
+            do {
+                FndLine(number, at);
+                number++;
+                at += 0x100;
+            } while (--count);
+            /* By one line the BIOS scrolls the screen, and only the line
+               that came in is put there from the buffer. */
+            at = place + 0x205;
+            rows = ROWS(size);
+            if (moved == 1 || moved == -1) {
+                scroll = 0x600 | ((rows - 1) & 0xFF);
+                if (moved != 1)
+                    scroll = 0x700;
+                Scroll(scroll >> 8 == 7, Color(Conf_C), at,
+                       (u16)((((rows - 1) & 0xFF) << 8 | 63) + at));
+                at += (scroll & 0xFF) << 8;
+                rows = 1;
+            }
+            Window(at, (u16)(rows << 8 | 64));    /* the rows of a box */
         }
-    }
-    /* FnMv24: the line that had the cursor, where it was. */
-    FndCurs(Conf_C, wasLine, wasFirst, place, size);
-    if (moved != 0) {
-        count = ROWS(size);
-        at = place + 0x205;
-        number = FND->FndFrst;
-        do {
-            FndLine(number, at);
-            number++;
-            at += 0x100;
-        } while (--count);
-        /* By one line the BIOS scrolls the screen, and only the line
-           that came in is put there from the buffer. */
-        at = place + 0x205;
-        rows = ROWS(size);
-        if (moved == 1 || moved == -1) {
-            scroll = 0x600 | ((rows - 1) & 0xFF);
-            if (moved != 1)
-                scroll = 0x700;
-            Scroll(scroll >> 8 == 7, Color(Conf_C), at,
-                   (u16)((((rows - 1) & 0xFF) << 8 | 63) + at));
-            at += (scroll & 0xFF) << 8;
-            rows = 1;
-        }
-        Window(at, (u16)(rows << 8 | 64));    /* the rows of a box */
-    }
-cursor:
+    } else if ((FND->FndMode & MODE_CURSOR) != 0
+               && (old & MODE_CURSOR) != 0)
+        return 0;       /* the cursor has not moved, and is shown */
     /* FnMv28 */
     if (FND->FndNumb == 0)
         return 0;
@@ -541,6 +540,14 @@ static bool FndBack(void)
     return go;
 }
 
+/* FnFl48 of FindFil: the file that is searched for a text is closed,
+   and the search stopped. */
+static u16 FnFl48(u16 handle)
+{
+    FileClose(handle);
+    return 0x100;
+}
+
 /* Search the directory at TmpBuf, and those below it, for the files that
    FindStr names and, if SrchStr is a text, that contain it; DirFunc
    calls this for every file of a directory, and for all but directories
@@ -589,150 +596,145 @@ u16 FindFil(u16 attributes)
     UnConv(end, md.TmpErr);
     FND->FndDir = 0;
 
-next:
-    /* FnFl40 */
-    if (!FndBack())
-        return 0x100;
-    if (ChgDisk(md.TmpBuf))
-        return 0x100;
-    if (!(FND->FndDir & DIR_BEGUN)) {
-        FND->FndDir |= DIR_BEGUN;
-        SetDTA();
-        entry = FindFirst(md.TmpBuf, 0x37);
-    } else {
-        SetDTA();
-        entry = FindNext();
-    }
-    if (entry.failed) {
-        if (entry.value == ERR_NOT_READY)
+    for (;;) {
+        /* FnFl40 */
+        if (!FndBack())
             return 0x100;
-        /* FnFl50: no more files here. On to the directories. */
-        *CUT_PATH(md.TmpBuf) = 0;
-        return DirFunc();
-    }
-    /* FnFl44 */
-    if (md.DTA.FilName[0] == '.')
-        goto next;
-    if (md.SrchStr[0] != 0) {
-        /* The file is read a part at a time, into the memory behind the
-           list, and the text looked for in each; a part begins 80 bytes
-           before the end of the one before. */
-        V81_00();
-        name = CUT_PATH(md.TmpBuf);
-        for (i = 0; i < 13; i++)
-            name[i] = md.DTA.FilName[i];
-        FndStat();
-        opened = OpenFil(md.TmpBuf, 0x40);
-        if (opened.failed) {
-            if (opened.value == ERR_NOT_READY)
-                return 0x100;
-            goto next;
+        if (ChgDisk(md.TmpBuf))
+            return 0x100;
+        if (!(FND->FndDir & DIR_BEGUN)) {
+            FND->FndDir |= DIR_BEGUN;
+            SetDTA();
+            entry = FindFirst(md.TmpBuf, 0x37);
+        } else {
+            SetDTA();
+            entry = FindNext();
         }
-        handle = opened.value;
-        /* Where a part is read to: the paragraph that the line behind
-           the next one begins in. The assembly has DS there from FndAdr
-           and reads at 0 of it, not at the line: up to 15 bytes in front
-           of that, the end of the line that is still free. */
-        part = Line(FND->FndNumb + 1);
-        part -= InParagraph(part);
-        /* A part is as long as what is left of the room behind that, or
-           8000h and 80 bytes, the shorter, and with less than 4,000
-           bytes there the search stops. The original takes the part's
-           length from the whole room, not from what is left of it, and
-           with the list within that many bytes of the room's end reads
-           a part behind the end: a bug of the original, fixed on the
-           user's word (DEVIATIONS.md, 16). What is left may be below 0,
-           a line or two behind the end where the list is full. */
-        left = (i32)(RoomEnd - part);
-        chunk = 0x8000 + 80;
-        if (left < chunk)
-            chunk = left;
-        found = false;
-        if (chunk < 4000)
-            goto stopped;
-        for (;;) {
-            /* FnFl46 */
-            if (!FndBack())
-                goto stopped;
-            read = FileRead(handle, part, chunk);   /* 8050h at most */
-            if (read.failed)
-                goto stopped;
-            count = read.count;
-            if (V82_00(part, 0, count).found != 0x100) {
-                found = true;
-                break;
+        if (entry.failed) {
+            if (entry.value == ERR_NOT_READY)
+                return 0x100;
+            /* FnFl50: no more files here. On to the directories. */
+            *CUT_PATH(md.TmpBuf) = 0;
+            return DirFunc();
+        }
+        /* FnFl44 */
+        if (md.DTA.FilName[0] == '.')
+            continue;
+        if (md.SrchStr[0] != 0) {
+            /* The file is read a part at a time, into the memory behind the
+               list, and the text looked for in each; a part begins 80 bytes
+               before the end of the one before. */
+            V81_00();
+            name = CUT_PATH(md.TmpBuf);
+            for (i = 0; i < 13; i++)
+                name[i] = md.DTA.FilName[i];
+            FndStat();
+            opened = OpenFil(md.TmpBuf, 0x40);
+            if (opened.failed) {
+                if (opened.value == ERR_NOT_READY)
+                    return 0x100;
+                continue;
             }
-            if (count < chunk)
-                break;
-            FileStep(handle, 1, -80);
+            handle = opened.value;
+            /* Where a part is read to: the paragraph that the line behind
+               the next one begins in. The assembly has DS there from FndAdr
+               and reads at 0 of it, not at the line: up to 15 bytes in front
+               of that, the end of the line that is still free. */
+            part = Line(FND->FndNumb + 1);
+            part -= InParagraph(part);
+            /* A part is as long as what is left of the room behind that, or
+               8000h and 80 bytes, the shorter, and with less than 4,000
+               bytes there the search stops. The original takes the part's
+               length from the whole room, not from what is left of it, and
+               with the list within that many bytes of the room's end reads
+               a part behind the end: a bug of the original, fixed on the
+               user's word (DEVIATIONS.md, 16). What is left may be below 0,
+               a line or two behind the end where the list is full. */
+            left = (i32)(RoomEnd - part);
+            chunk = 0x8000 + 80;
+            if (left < chunk)
+                chunk = left;
+            found = false;
+            if (chunk < 4000)
+                return FnFl48(handle);
+            for (;;) {
+                /* FnFl46 */
+                if (!FndBack())
+                    return FnFl48(handle);
+                read = FileRead(handle, part, chunk);   /* 8050h at most */
+                if (read.failed)
+                    return FnFl48(handle);
+                count = read.count;
+                if (V82_00(part, 0, count).found != 0x100) {
+                    found = true;
+                    break;
+                }
+                if (count < chunk)
+                    break;
+                FileStep(handle, 1, -80);
+            }
+            /* FnFl49 */
+            FileClose(handle);
+            if (!found)
+                continue;
         }
-        /* FnFl49 */
-        FileClose(handle);
-        if (!found)
-            goto next;
-    }
 
-    /* FnFl20: a file to list. Before the first one of a directory, the
-       directory, and before that an empty line if it is not the first. */
-    if (!(FND->FndDir & DIR_LISTED)) {
-        FND->FndDir |= DIR_LISTED;
-        if (FND->FndNumb != 0) {
-            if (FND->FndNumb + 2 >= FND->FndSize)
-                return 0x100;
-            for (i = 0; i < LenFnf; i++)
-                md.TmpErr[i] = 0;
+        /* FnFl20: a file to list. Before the first one of a directory, the
+           directory, and before that an empty line if it is not the first. */
+        if (!(FND->FndDir & DIR_LISTED)) {
+            FND->FndDir |= DIR_LISTED;
+            if (FND->FndNumb != 0) {
+                if (FND->FndNumb + 2 >= FND->FndSize)
+                    return 0x100;
+                for (i = 0; i < LenFnf; i++)
+                    md.TmpErr[i] = 0;
+                FndStuf();
+            }
+            for (i = 0; i < LenPath + 13; i++)
+                md.TmpErr[i] = md.TmpBuf[i];
+            name = CUT_PATH(md.TmpErr);
+            if ((u16)(name - md.TmpErr) > 3)
+                name--;
+            *name = 0;
+            PathLin(md.TmpErr);
+            FilZero(md.TmpErr, LenFnf);
             FndStuf();
         }
-        for (i = 0; i < LenPath + 13; i++)
-            md.TmpErr[i] = md.TmpBuf[i];
-        name = CUT_PATH(md.TmpErr);
-        if ((u16)(name - md.TmpErr) > 3)
-            name--;
-        *name = 0;
-        PathLin(md.TmpErr);
-        FilZero(md.TmpErr, LenFnf);
-        FndStuf();
+        /* FnFl30: the line of the file. */
+        for (i = 0; i < LenFnf; i++)
+            md.TmpErr[i] = ' ';
+        to = md.TmpErr + 3;
+        kind = md.DTA.FilAttr;
+        for (i = 0; (c = md.DTA.FilName[i]) != 0; i++) {
+            if (!(kind & ATTR_DIRECTORY))
+                c = (u8)LowCase(c);
+            *to++ = c;
+        }
+        to = md.TmpErr + 3 + 14;
+        if (kind & ATTR_DIRECTORY) {
+            to += 6;
+            for (i = 0; i < 7; i++)
+                *to++ = SubDir[i];
+        } else {
+            to = Number(to, (u16)(md.DTA.FilSize >> 16), (u16)md.DTA.FilSize,
+                        NUM_SEPARATED | NUM_PADDED);
+            *to = ' ';
+        }
+        to += 3;
+        *to++ = (kind & 0x20) ? 'A' : '.';
+        *to++ = (kind & ATTR_SYSTEM) ? 'S' : '.';
+        *to++ = (kind & ATTR_HIDDEN) ? 'H' : '.';
+        *to++ = (kind & 0x01) ? 'R' : '.';
+        to += 3;
+        PutDate(md.DTA.FilDate, &date);
+        to = BufDate(&date, to);
+        to += 3;
+        PutTime(md.DTA.FilTime, &time);
+        BufTime(&time, to);
+        if (FndStuf())
+            return 0x100;
+        FND->FndFls++;
     }
-    /* FnFl30: the line of the file. */
-    for (i = 0; i < LenFnf; i++)
-        md.TmpErr[i] = ' ';
-    to = md.TmpErr + 3;
-    kind = md.DTA.FilAttr;
-    for (i = 0; (c = md.DTA.FilName[i]) != 0; i++) {
-        if (!(kind & ATTR_DIRECTORY))
-            c = (u8)LowCase(c);
-        *to++ = c;
-    }
-    to = md.TmpErr + 3 + 14;
-    if (kind & ATTR_DIRECTORY) {
-        to += 6;
-        for (i = 0; i < 7; i++)
-            *to++ = SubDir[i];
-    } else {
-        to = Number(to, (u16)(md.DTA.FilSize >> 16), (u16)md.DTA.FilSize,
-                    NUM_SEPARATED | NUM_PADDED);
-        *to = ' ';
-    }
-    to += 3;
-    *to++ = (kind & 0x20) ? 'A' : '.';
-    *to++ = (kind & ATTR_SYSTEM) ? 'S' : '.';
-    *to++ = (kind & ATTR_HIDDEN) ? 'H' : '.';
-    *to++ = (kind & 0x01) ? 'R' : '.';
-    to += 3;
-    PutDate(md.DTA.FilDate, &date);
-    to = BufDate(&date, to);
-    to += 3;
-    PutTime(md.DTA.FilTime, &time);
-    BufTime(&time, to);
-    if (FndStuf())
-        return 0x100;
-    FND->FndFls++;
-    goto next;
-
-stopped:
-    /* FnFl48 */
-    FileClose(handle);
-    return 0x100;
 }
 
 /* What the box of the command shows. The colours are those of Find_P in
@@ -780,6 +782,107 @@ static struct Searched Shows(struct WCBdef *panel)
     return searched;
 }
 
+/* F67_25 of F67_00: the box taken off the screen, and back to the
+   panels. */
+static struct Searched F67_25(u16 place, u16 size)
+{
+    ResWin(place, size, md.WinBuf);
+    Window(place, size);
+    return To(TO_FUNC04);
+}
+
+/* F67_08 to F67_17 of F67_00: the search, from the path that FindStr
+   names, on every drive that has files if that is "*:". Returns where
+   F67_00 goes on: */
+enum {
+    SEARCH_CLOSED,                      /* F67_25, the box closed */
+    SEARCH_OVER,                        /* F67_18, the search is over */
+    SEARCH_LISTED                       /* F67_19, the menu of the list */
+};
+
+static i32 F67_08(void)
+{
+    const u8 *rest;
+    u8 *end;
+    u16 first, drive;
+    i32 count, unit, i;
+    u8 letter;
+    struct Answer fixed;
+    struct Device remote;
+
+    for (;;) {
+        /* F67_08: the path to search, at TmpErr, with a name of one
+           letter in place of what is looked for */
+        rest = md.FindStr + 2;
+        end = md.TmpErr + 2;
+        *(u16 *)md.TmpErr = *(u16 *)md.FindStr;
+        if (*(u16 *)md.FindStr == ALL_DRIVES
+            && CutPath(rest) == rest)
+            *end++ = '\\';
+        for (i = 0; i < LenPath + 13 - 2; i++)
+            *end++ = *rest++;
+        NormStr(md.TmpErr);
+        if (md.TmpErr[0] == 0)
+            return SEARCH_CLOSED;       /* F67_25 */
+        *(u16 *)CUT_PATH(md.TmpErr) = 'A';
+        first = *(u16 *)md.TmpErr;
+        if (first == ALL_DRIVES) {
+            for (;;) {
+                /* F67_10: the next drive that is searched */
+                letter = FND->FndDrv;
+                md.TmpErr[0] = letter;
+                FND->FndDrv++;
+                unit = letter - 'A';
+                if (!DriveCd((u16)unit)) {
+                    /* F67_11: no CD-ROM */
+                    remote = DriveRemote((u16)(unit + 1));
+                    if (!remote.failed && (remote.kind & 0x1000))
+                        break;
+                    fixed = DriveFixed((u16)(unit + 1));
+                    if (!fixed.failed && (u8)fixed.value == 1)
+                        break;
+                }
+                /* F67_13 */
+                if (FND->FndDrv > 'Z')
+                    return SEARCH_OVER; /* F67_18 */
+            }
+        }
+        /* F67_15: the path made whole, at TmpBuf */
+        if (ChgDisk(md.TmpErr))
+            return SEARCH_CLOSED;       /* F67_25 */
+        rest = md.TmpErr + 2;
+        drive = *(u16 *)md.TmpErr;
+        if ((drive >> 8) != ':') {
+            rest = md.TmpErr;
+            drive = *(u16 *)md.DosPth;
+        }
+        drive = UpCase(drive);
+        *(u16 *)md.TmpBuf = drive;
+        end = md.TmpBuf + 2;
+        count = LenPath + 13;
+        if (*rest != '\\') {
+            *end++ = '\\';
+            if (DirCurrent(drive - ('A' - 1), end).failed)
+                return SEARCH_LISTED;   /* F67_19 */
+            while (count != 0) {
+                count--;
+                if (*end++ == 0)
+                    break;
+            }
+            end = AddFile(end - 1);
+        }
+        /* F67_17 */
+        for (; count != 0; count--)
+            *end++ = *rest++;
+        *end = 0;
+        *CUT_PATH(md.TmpBuf) = 0;
+        md.FncAddr = FNC_FINDFIL;
+        if ((FindFil(ATTR_DIRECTORY) >> 8) != 0 || first != ALL_DRIVES
+            || FND->FndDrv > 'Z')
+            return SEARCH_OVER;         /* F67_18 */
+    }
+}
+
 /* Alt-F7, the file search: a box over the panels, in which a dialog asks
    for a name, with a path or without, and for a text; then the search,
    from the directory that the name gives, or the current one, down; and
@@ -812,19 +915,15 @@ struct Searched F67_00(void)
     struct WCBdef *wcb;
     const u8 *from;
     u8 *to;
-    const u8 *rest;
     u8 *end;
     u16 *screen;
     u16 place = 0x203;
     u16 size = (u16)((u8)(md.Lines - 3) << 8 | 76);
-    u16 color, row, answer, first, drive, cell;
-    i32 count, unit, i, number;
-    u8 letter;
+    u16 color, row, answer, cell;
+    i32 count, i, number, went;
     struct WCBdef *panel;
     u16 key, mode;
     struct Buttons chosen;
-    struct Answer fixed;
-    struct Device remote;
     struct Mouse pointer;
 
     HidCur();
@@ -838,203 +937,126 @@ struct Searched F67_00(void)
     line.line = Find0_S;
     CntLine(&line);
 
-again:
-    /* F67_01: the box empty, with the two questions */
-    color = (u16)(Color(Conf_C) << 8);
-    row = place + 0x200;
-    for (count = (u8)((size >> 8) - 5); count != 0; count--)
-        row = StdLine(row, color | SPACE, BOTH_SIDES, size);
-    row = StdLine(row - 0x500, color | LINE, LEFT_RIGHT, size);
-    row = ADD_LOW(row, 5);
-    line.value = color | 25;
-    line.screen = BasAdr(row);
-    line.line = Find1_S;
-    NgLine(&line);
-    row += 0x200;
-    line.screen = BasAdr(row);
-    line.line = Find2_S;
-    NgLine(&line);
-    Window(place, size);
-    /* The dialog has its box there already: its nine lines. */
-    answer = Dialog(&Find_B, 0, place + (size & 0xFF00) - 0x900,
-                    9 << 8 | (size & 0xFF), &md);
-    if ((u8)answer != 0)
-        goto close;
-
-    /* F67_03: what is searched, and the menu, in their place */
-    color = (u16)(Color(Conf_C) << 8);
-    row = place + (size & 0xFF00) - 0x800;
-    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
-    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
-    row += 0x100;
-    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
-    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
-    row = StdLine(row - 0x300, color | LINE, LEFT_RIGHT, size);
-    row = ADD_LOW(row, 5);
-    line.value = color | 25;
-    line.screen = BasAdr(row);
-    line.line = Find3_S;
-    NgLine(&line);
-    line.value = (row + 0x100 & 0xFF00) | 40;
-    line.line = Find5_S;
-    CntLine(&line);
-    Window(place, size);
-    FND->FndBg = place;
-    FND->FndSz = size;
-    FND->FndCur = 0;
-    FND->FndFrst = 0;
-    FND->FndNumb = 0;
-    FND->FndFls = 0;
-    FND->FndMode = 0;
-    FND->FndMenu = 0;
-    md.WinMous = 0;
-    md.MousEnt = 0;
-    ((u16 *)&md.MousTim)[1] = 0xFFFF;
-    ViTxHex = 0;
-    /* As many lines as the memory behind the program has room for. */
-    FND->FndSize = RoomBytes() / LenFnf - 1;
-    FND->FndDrv = 'A';
-
-    for (;;) {
-        /* F67_08: the path to search, at TmpErr, with a name of one
-           letter in place of what is looked for */
-        rest = md.FindStr + 2;
-        end = md.TmpErr + 2;
-        *(u16 *)md.TmpErr = *(u16 *)md.FindStr;
-        if (*(u16 *)md.FindStr == ALL_DRIVES
-            && CutPath(rest) == rest)
-            *end++ = '\\';
-        for (i = 0; i < LenPath + 13 - 2; i++)
-            *end++ = *rest++;
-        NormStr(md.TmpErr);
-        if (md.TmpErr[0] == 0)
-            goto close;
-        *(u16 *)CUT_PATH(md.TmpErr) = 'A';
-        first = *(u16 *)md.TmpErr;
-        if (first == ALL_DRIVES) {
-            for (;;) {
-                /* F67_10: the next drive that is searched */
-                letter = FND->FndDrv;
-                md.TmpErr[0] = letter;
-                FND->FndDrv++;
-                unit = letter - 'A';
-                if (!DriveCd((u16)unit)) {
-                    /* F67_11: no CD-ROM */
-                    remote = DriveRemote((u16)(unit + 1));
-                    if (!remote.failed && (remote.kind & 0x1000))
-                        break;
-                    fixed = DriveFixed((u16)(unit + 1));
-                    if (!fixed.failed && (u8)fixed.value == 1)
-                        break;
-                }
-                /* F67_13 */
-                if (FND->FndDrv > 'Z')
-                    goto searched;
-            }
-        }
-        /* F67_15: the path made whole, at TmpBuf */
-        if (ChgDisk(md.TmpErr))
-            goto close;
-        rest = md.TmpErr + 2;
-        drive = *(u16 *)md.TmpErr;
-        if ((drive >> 8) != ':') {
-            rest = md.TmpErr;
-            drive = *(u16 *)md.DosPth;
-        }
-        drive = UpCase(drive);
-        *(u16 *)md.TmpBuf = drive;
-        end = md.TmpBuf + 2;
-        count = LenPath + 13;
-        if (*rest != '\\') {
-            *end++ = '\\';
-            if (DirCurrent(drive - ('A' - 1), end).failed)
-                goto found;
-            while (count != 0) {
-                count--;
-                if (*end++ == 0)
-                    break;
-            }
-            end = AddFile(end - 1);
-        }
-        /* F67_17 */
-        for (; count != 0; count--)
-            *end++ = *rest++;
-        *end = 0;
-        *CUT_PATH(md.TmpBuf) = 0;
-        md.FncAddr = FNC_FINDFIL;
-        answer = FindFil(ATTR_DIRECTORY);
-        if ((answer >> 8) != 0 || first != ALL_DRIVES || FND->FndDrv > 'Z')
-            break;
-    }
-
-searched:
-    /* F67_18 */
-    if ((FND->FndMode & MODE_ANSWER) && FND->FndMenu != 0) {
-        answer = FND->FndMenu;
-        goto answered;
-    }
-
-found:
-    /* F67_19: "N files found", and the menu of a search that is over */
-    end = Number(md.TmpBuf, (u16)(FND->FndFls >> 16), (u16)FND->FndFls,
-                 NUM_SEPARATED);
-    end = MvzLine(end, FnFl6_S, 15);
-    if (FND->FndFls == 1)
-        end--;
-    for (i = 0; i < 15; i++)
-        end[i] = FnFl7_S[i];
-    place = FND->FndBg;
-    size = FND->FndSz;
-    row = MOVED(place, (size >> 8) - 5, 5);
-    screen = BasAdr(row);
-    count = (u8)(size - 12);
-    cell = *screen & 0xFF00;            /* in the colour that is there */
-    for (i = 0; i < count; i++)
-        screen[i] = cell;
-    line.value = (u16)count;
-    line.screen = screen;
-    line.line = md.TmpBuf;
-    NgLine(&line);
-    Window(row, (u16)(0x100 | count));
-    line.value = (MOVED(place, (size >> 8) - 4, 0) & 0xFF00) | 40;
-    line.line = Find6_S;
-    CntLine(&line);
-    FND->FndMenu = 1;
-    if (FND->FndCur != 0)
-        FndCurs(CnfRe_C, FND->FndCur, FND->FndFrst, place, size);
     do {
-        /* F67_21: a key for the menu, and then for the list. With a
-           button of the mouse down, the list alone. */
-        pointer = GetMous(0);
-        key = pointer.buttons;
-        mode = pointer.place;
-        if (key != 0) {
-            key = KEY_MOUSE << 8 | (key & 0xFF);
-        } else {
-            md.WinMous = 0;
-            md.MousEnt = 0;
-            chosen = MinMnu(Find6_D,
-                          MOVED(place, (size >> 8) - 4, 18), 0x125,
-                          FnFl_P, KEY_MOUSE << 8 | FIND_BAR,
-                          FND->FndMenu);
-            key = chosen.key;
-            mode = chosen.chosen;
-            FND->FndMenu = (u8)mode;
-        }
-        answer = FndMove(key, (mode & 0xFF00) | MODE_CURSOR, place, size);
-    } while ((answer >> 8) == 0);
-
-answered:
-    /* F67_23 */
-    if ((u8)answer == 0)
-        goto again;
-    if ((u8)answer != 1) {
-close:
-        /* F67_25 */
-        ResWin(place, size, md.WinBuf);
+        /* F67_01: the box empty, with the two questions */
+        color = (u16)(Color(Conf_C) << 8);
+        row = place + 0x200;
+        for (count = (u8)((size >> 8) - 5); count != 0; count--)
+            row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+        row = StdLine(row - 0x500, color | LINE, LEFT_RIGHT, size);
+        row = ADD_LOW(row, 5);
+        line.value = color | 25;
+        line.screen = BasAdr(row);
+        line.line = Find1_S;
+        NgLine(&line);
+        row += 0x200;
+        line.screen = BasAdr(row);
+        line.line = Find2_S;
+        NgLine(&line);
         Window(place, size);
-        return To(TO_FUNC04);
-    }
+        /* The dialog has its box there already: its nine lines. */
+        answer = Dialog(&Find_B, 0, place + (size & 0xFF00) - 0x900,
+                        9 << 8 | (size & 0xFF), &md);
+        if ((u8)answer != 0)
+            return F67_25(place, size);
+
+        /* F67_03: what is searched, and the menu, in their place */
+        color = (u16)(Color(Conf_C) << 8);
+        row = place + (size & 0xFF00) - 0x800;
+        row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+        row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+        row += 0x100;
+        row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+        row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+        row = StdLine(row - 0x300, color | LINE, LEFT_RIGHT, size);
+        row = ADD_LOW(row, 5);
+        line.value = color | 25;
+        line.screen = BasAdr(row);
+        line.line = Find3_S;
+        NgLine(&line);
+        line.value = (row + 0x100 & 0xFF00) | 40;
+        line.line = Find5_S;
+        CntLine(&line);
+        Window(place, size);
+        FND->FndBg = place;
+        FND->FndSz = size;
+        FND->FndCur = 0;
+        FND->FndFrst = 0;
+        FND->FndNumb = 0;
+        FND->FndFls = 0;
+        FND->FndMode = 0;
+        FND->FndMenu = 0;
+        md.WinMous = 0;
+        md.MousEnt = 0;
+        ((u16 *)&md.MousTim)[1] = 0xFFFF;
+        ViTxHex = 0;
+        /* As many lines as the memory behind the program has room for. */
+        FND->FndSize = RoomBytes() / LenFnf - 1;
+        FND->FndDrv = 'A';
+
+        went = F67_08();
+        if (went == SEARCH_CLOSED)
+            return F67_25(place, size);
+        if (went == SEARCH_OVER
+            && (FND->FndMode & MODE_ANSWER) && FND->FndMenu != 0)
+            /* F67_18 */
+            answer = FND->FndMenu;
+        else {
+            /* F67_19: "N files found", and the menu of a search that is
+               over */
+            end = Number(md.TmpBuf, (u16)(FND->FndFls >> 16),
+                         (u16)FND->FndFls, NUM_SEPARATED);
+            end = MvzLine(end, FnFl6_S, 15);
+            if (FND->FndFls == 1)
+                end--;
+            for (i = 0; i < 15; i++)
+                end[i] = FnFl7_S[i];
+            place = FND->FndBg;
+            size = FND->FndSz;
+            row = MOVED(place, (size >> 8) - 5, 5);
+            screen = BasAdr(row);
+            count = (u8)(size - 12);
+            cell = *screen & 0xFF00;    /* in the colour that is there */
+            for (i = 0; i < count; i++)
+                screen[i] = cell;
+            line.value = (u16)count;
+            line.screen = screen;
+            line.line = md.TmpBuf;
+            NgLine(&line);
+            Window(row, (u16)(0x100 | count));
+            line.value = (MOVED(place, (size >> 8) - 4, 0) & 0xFF00) | 40;
+            line.line = Find6_S;
+            CntLine(&line);
+            FND->FndMenu = 1;
+            if (FND->FndCur != 0)
+                FndCurs(CnfRe_C, FND->FndCur, FND->FndFrst, place, size);
+            do {
+                /* F67_21: a key for the menu, and then for the list.
+                   With a button of the mouse down, the list alone. */
+                pointer = GetMous(0);
+                key = pointer.buttons;
+                mode = pointer.place;
+                if (key != 0) {
+                    key = KEY_MOUSE << 8 | (key & 0xFF);
+                } else {
+                    md.WinMous = 0;
+                    md.MousEnt = 0;
+                    chosen = MinMnu(Find6_D,
+                                    MOVED(place, (size >> 8) - 4, 18), 0x125,
+                                    FnFl_P, KEY_MOUSE << 8 | FIND_BAR,
+                                    FND->FndMenu);
+                    key = chosen.key;
+                    mode = chosen.chosen;
+                    FND->FndMenu = (u8)mode;
+                }
+                answer = FndMove(key, (mode & 0xFF00) | MODE_CURSOR, place,
+                                 size);
+            } while ((answer >> 8) == 0);
+        }
+        /* F67_23 */
+    } while ((u8)answer == 0);
+    if ((u8)answer != 1)
+        return F67_25(place, size);
 
     /* F67_30: Go to */
     ResWin(place, size, md.WinBuf);
