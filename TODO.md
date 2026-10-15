@@ -17051,6 +17051,113 @@ in the room with code of another layout, and `start-memory`,
 `ViewSeg` and `FreMem2` naming nothing known. Nothing is declared as
 changed.
 
+### G4, the jumps of treebox.c, dialog.c and input.c: done
+
+The piece G4 of the sweep of jumps (`CLAUDE.md`, "The portable C", the
+bullet on `goto`), four commits, one for `dialog.c`, two for `input.c`
+and one for `treebox.c`. All 165 `goto` went, none stays:
+
+- `dialog.c`, 61: `MnMn11` 14, `InpStr` 6, `Select` 17, `Dialog` 24.
+  `Dialog` is two loops, the keys of the fields, `Dial31`, inside, and
+  the routine that the dialog names, `Dial71`, around them, which sends
+  it back to the keys where it refuses; F10 and Alt-F10 are tested in
+  front of the switch of the scan codes, so that they can leave the
+  loop. `Select` chooses the line of the cursor, `Slct07`, behind its
+  loop of keys, by a flag that Up and Down clear. Ctrl-Q in `InpStr`
+  calls `EdLin` itself, a line, where it jumped past the first key's
+  test.
+- `input.c`, 34: `EdLin` 20, `Input0` 14. `EdLin`'s cases return; a
+  key behind Ctrl-Q goes on to the character by `else`. Ctrl-Left and
+  Ctrl-A, Ctrl-Right and Ctrl-F are a line each, written in both
+  switches, and Ctrl-K's line is its own where Ctrl-Y ran into it.
+- `treebox.c`, 70: `ReadTre` 32, `ChTree` 38.
+
+The assessment had `ReadTre`, `ChTree` and `Input0` among the functions
+whose loops are entered in the middle. Read, none is of that kind once
+the code that several places entered is a helper that hands on what it
+does by the main data or by what it returns, and each was rewritten:
+
+- `ChTree`: what the loop was entered at, `ChTr10`, `ChTr11` and
+  `ChTr12`, is the cursor moved and the lines drawn, and hands on
+  nothing but `TreeCursor` and `TreeFirst`, from which `ChTr20` takes
+  the cursor anew. So they are three helpers, and the loop of keys is
+  `ChTr20` alone, entered at its top, with the mouse inside it and the
+  disk read again, `ChTr55`, behind it in the loop of `ChTr59`. Up and
+  Down, `ChTr35` and `ChTr37`, are a line each where the keys and the
+  mouse go to them.
+- `ReadTre`: the reading of the disk is `RdTr10`, one loop for each new
+  entry, `RdTr11`, around one for each entry of a directory, `RdTr16`,
+  in which `RdTr22` goes on to the next directory; `RdTr15`, which two
+  places entered, is two lines, `SetDTA` and the flag, where each is.
+- `Input0`: `Inpt41`, what is done with the key that was had, which
+  the key waiting at once entered in the middle of the round, is a
+  helper that says whether the round begins anew at `Inpt02`; `Inpt04`
+  and `Inpt03`, which six places went back to, are a helper for when
+  the screen is blanked and two lines, written where each place is, in
+  front of the top of the round, `Inpt10`; `Inpt12`, the blanker, is a
+  helper that both places call.
+
+Functions that cross in that way can still go where what is shared
+hands nothing on but by memory or a return: that is what to read for in
+the others that the bullet and the assessment leave.
+
+23 static helpers, each named for its label in the assembly where it is
+the code there, or for what it does, and each said at its head:
+`MnMn12`, `MnMn16`, `InSt08`, `Slct13`, `Dial70`, `Dial82` in
+`dialog.c`; `E01_00`, `E02_00`, `E00_05`, `E08_00`, `Inpt04`, `Inpt12`,
+`Inpt41` in `input.c`; `RdTr01`, `RdTr10`, `RdTr18`, `RdTr40`,
+`TreeFileRight`, `ChTr10`, `ChTr11`, `ChTr12`, `ChTr45`, `ChTr46` in
+`treebox.c`. A label's name stands in a comment where the label was.
+
+**What no scenario runs.** The batches of `harness/ported.py` have no
+instruction of the original's `dialog.c` and `input.c` out of reach;
+of `treebox.c` they have `ReadTre` for a disk that is not there, with
+hidden directories left out, for a tree that is full, and for a drive
+that stops being ready. What ran of the build was kept by a run of the
+scenarios' test that wrote down the instructions it saw
+(`build/g4/cover.py`, not kept), and held against the listings:
+
+- In `ReadTre`: `RdTr01`, the root alone, all of it, and the three
+  ways out of `RdTr16` that the batch has out of reach. Each was read
+  against the old code once more: `RdTr01` is the old lines word for
+  word, and the three call `RdTr18` with the error that the old code
+  set before it jumped there.
+- In `EdLin`: Ctrl-A, Ctrl-F, Ctrl-G and Ctrl-K, whose lines ran under
+  the other key of the label before, and Left at the first column and
+  Del at the end of the text, in `E01_00` and `E08_00`, which `InpStr`
+  does not hand on and the command line was not taken to.
+- In `Dialog`, a field of a kind that no dialog has; and in `InpStr`,
+  `Select`, `Dialog` and `ChTree` a few jumps of a switch's search for
+  a key that no case has, whose end is the default.
+
+An instruction that ran says nothing of which way a jump went, so the
+paths that a key or a click takes were read side by side with the old
+code as well.
+
+The records of `harness/width.py` and `harness/int16.py` have the
+helpers' numbers, the reasons of the lines that moved into them carried
+across. The records of `hostcheck.py` and `words.py` did not move.
+
+**What judged it.** The whole suite, fourteen tests, 158 scenarios, no
+golden and no patch changed. The code was 1,163 bytes longer than
+`main`'s at 8f70ea8, on which the piece was made and judged (324 of
+`dialog.c`, 429 of `input.c`, 410 of `treebox.c`, most of it the
+helpers that return a structure through room in the caller's frame,
+and calls written twice), so against `main`'s build every scenario
+differs in all of the room. Against `main`'s build padded to the same
+length of code, a function of 286 stores through a parameter behind
+the last of `sys_dos.c`, not kept (`_TEXT` 1CDE0h in both, every other
+segment where it is): 2 of 158 scenarios with nothing that differs,
+150 with nothing but what may differ, and the six that S, N22 and G3
+met, `comspec`, `ended`, `second-copy`, `start-screen`, `start-setup`,
+whose second copy of the program lives in the room with code of
+another layout, and `start-memory`, `ViewSeg` and `FreMem2` naming
+nothing known. What may differ in the 150 is `Rand1` and `Rand2`, which
+`Input0` stirs once a round and which follow the time, and the stack
+pointer at the last call of DOS, `sys_dos.Below`, 20 bytes higher:
+`Input0`'s frame is smaller by the variables that went to `Inpt41`.
+Nothing is declared as changed.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on
