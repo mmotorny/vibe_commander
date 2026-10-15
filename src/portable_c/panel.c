@@ -481,20 +481,21 @@ u8 *FilDir(u8 *buffer, i32 directories, i32 files)
             *buffer++ = FilDi_S[i];
         if (files == 1)
             buffer--;                   /* 1 file */
-        if (directories == 0)
-            goto end;
-        for (; i < 11; i++)
+        if (directories != 0)
+            for (; i < 11; i++)
+                *buffer++ = FilDi_S[i];
+    }
+    if (files == 0 || directories != 0) {
+        buffer = Number(buffer, (u16)(directories >> 16),
+                        (u16)directories, NUM_SEPARATED);
+        for (i = 11; i < 23; i++)
             *buffer++ = FilDi_S[i];
+        if (directories == 1) {
+            buffer -= 3;
+            *buffer++ = FilDi_S[23];    /* 1 directory */
+        }
     }
-    buffer = Number(buffer, (u16)(directories >> 16), (u16)directories,
-                    NUM_SEPARATED);
-    for (i = 11; i < 23; i++)
-        *buffer++ = FilDi_S[i];
-    if (directories == 1) {
-        buffer -= 3;
-        *buffer++ = FilDi_S[23];        /* 1 directory */
-    }
-end:
+    /* FilDi3 */
     *buffer++ = 0;
     return buffer;
 }

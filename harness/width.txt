@@ -3543,7 +3543,7 @@ panel.c, FilDir: sign
     files is a count of what is selected, 0 or more: TotSel.
 
 panel.c, FilDir: sign
-    | buffer = Number(buffer, (u16)(directories >> 16), (u16)directories,
+    | buffer = Number(buffer, (u16)(directories >> 16),
     directories is a count of what is selected, 0 or more: TotSel.
 
 place.c, BegBX: returns, u16
