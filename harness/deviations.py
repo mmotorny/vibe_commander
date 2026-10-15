@@ -612,8 +612,9 @@ class Declared:
     # rules of the tree are not made to what is its own already.
     own: dict = field(default_factory=dict)
     # Scenarios that the tree is taken through only as far as a step:
-    # scenario -> (the first step that it is not taken through, and none
-    # behind it; why). For a scenario of which what comes before that
+    # scenario -> (the number of the first step that it is not taken
+    # through, and none behind it, counted from 1 among the scenario's
+    # own steps; why). For a scenario of which what comes before that
     # step is worth holding the tree to, and what comes from there on
     # rests on what the tree cannot do yet, or at all.
     cut: dict = field(default_factory=dict)
@@ -634,9 +635,10 @@ class Declared:
                 instead.update(zip(places[at:at + len(some)], others,
                                    strict=True))
         if name in self.cut:
+            # The step's number, counted from 1 as a golden counts them,
+            # in the scenario's own steps.
             first = self.cut[name][0]
-            places = [at for at in places
-                      if at < steps.index(first)]
+            places = [at for at in places if at < first - 1]
         return [(at, instead.get(at) or
                  self.in_place_of.get(steps[at], (steps[at],))[0])
                 for at in places if instead.get(at, "") is not None]
@@ -1158,6 +1160,10 @@ LINUX_NOT_RUN = {
               "program for Linux is never entered for (L3a)",
     "copy-full": "a disk that is full, which a test on the host cannot "
                  "make without a file system of its own to mount",
+    "find": "a text looked for in every file of the drive, those of "
+            "STAMPS among them, which have their sizes on the bench in "
+            "their directory alone and nothing to read, and on the host "
+            "are as long as they say, up to four gigabytes",
     "find-drives": "every fixed drive, where R: is the host's root: the "
                    "search would go through the host's whole file system",
     "editor-full": "memory that runs out, where Linux gives what the "
@@ -1168,17 +1174,49 @@ LINUX_NOT_RUN = {
         ["command", "comspec", "ended", "stay-left", "start-screen",
          "start-memory", "second-copy", "lost", "enter-many",
          "enter-many-selected", "start-setup", "setup-defaults"], _DOS),
-    # Of the 18 that run a command, those whose value is the command
-    # itself (TODO.md, "L3b"): the rest are to be run up to the step
-    # before their first command, `cut`, which waits for a way to know
-    # that step.
+    # Of those that run a command, those whose value is the command
+    # itself or comes behind it (TODO.md, "L3b"): the others are taken as
+    # far as their first command, LINUX_CUT.
     "enter": "Enter on a file that DOS runs, and the commands before and "
              "after it: what it holds is DOS running them",
     "user-menu-run": "the commands of the user menu, whose parameters "
                      "show only in what the command run prints",
+    "history-drives": "the history of commands, which its first command "
+                      "at step 4 begins",
+    "menu-panel": "a panel's menu after a command, the first at step 3",
+    "setup-missing": "its setup file taken away by a command, its first "
+                     "step",
+    "setup-missing-saved": "its setup file taken away by a command, its "
+                           "first step",
+    "setup-save-fails": "its setup file made read-only by a command of "
+                        "DOS, ATTRIB, its first step",
+    "setup-new": "a command at step 2, behind which all of it is",
+    "clock-morning": "the time of day set by DOS's TIME, at step 2",
+    "blank-timed": "the time of day set by DOS's TIME, at step 3",
 }
 
-ON_LINUX = Declared(not_run=LINUX_NOT_RUN, rules=LINUX_MASKS)
+# The scenarios that run a command and are worth holding the program for
+# Linux to before it, taken as far as their first command (CLAUDE.md,
+# step 6; L6 runs commands): scenario -> (the number of the step of the
+# first command, counted from 1; what is held before it). The step is the
+# one at which the program, given a COMSPEC, asks for a program to be run
+# (ProgramRun of sys_posix.c, which says so on standard error).
+LINUX_CUT = {
+    "command-edit": (37, "the command line edited"),
+    "editor-save": (23, "the editor's errors on saving"),
+    "help-broken": (24, "a help file that cannot be read"),
+    "menu-files": (24, "the menu and extension files edited, the setup "
+                       "saved"),
+    "panel-keys": (18, "masks, the panels off and on"),
+    "setup-help-file": (22, "the setup's help file"),
+    "sizes": (8, "the sizes of directories"),
+    "user-menu": (77, "the user menu's lines"),
+    "view-commands": (17, "F3 and F4 and their extension files"),
+    "editor-keys": (33, "the editor's keys"),
+}
+
+ON_LINUX = Declared(not_run=LINUX_NOT_RUN, rules=LINUX_MASKS,
+                    cut=LINUX_CUT)
 
 TREES["posix"] = _on_top(TREES["portable_c"], ON_LINUX)
 

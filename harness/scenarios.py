@@ -7666,8 +7666,7 @@ def run(scenario, program, bench, trace=False, blinking=False,
         # The program for Linux runs on the host, with no machine and no
         # driver: see posixrun.py. Nothing is traced or looked at in its
         # memory there.
-        return posixrun.run(scenario, program, posixrun.bench_setup(),
-                         limit=limit)
+        return posixrun.run(scenario, program, limit=limit)
     steps = ("",) + scenario.steps
     beside = setups.beside(program) if scenario.setup else None
     if beside and scenario.setup_clock:

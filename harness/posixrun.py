@@ -49,6 +49,7 @@ one, 04h for Ctrl, 08h for Alt, as the BIOS keeps them at 40:17h. The
 mouse has no event in the channel yet (L5): a scenario with a step of it
 is not run.
 """
+import dataclasses
 import hashlib
 import os
 import subprocess
@@ -95,7 +96,8 @@ SPECIAL = {
     "Down": (0x5000, 0x5000, 0x9100, 0xA000),
     "PgDn": (0x5100, 0x5100, 0x7600, 0xA100),
     "Ins": (0x5200, 0x5200, 0x9200, 0xA200),
-    "Del": (0x5300, 0x5300, 0x9300, 0xA300),
+    # The bench's BIOS makes no word of Alt-Del.
+    "Del": (0x5300, 0x5300, 0x9300, None),
 }
 for _number in range(1, 11):
     SPECIAL[f"F{_number}"] = tuple((code + _number - 1) << 8 for code in
@@ -301,14 +303,18 @@ def _screens(data):
     return out
 
 
-def run(scenario, program, setup, limit=60):
+def run(scenario, program, setup=..., limit=60):
     """Take the program for Linux, `program` (a setups.Program of the
     tree "posix"), through `scenario` (its
     steps as the tree "posix" is taken through them) with `setup` as the
-    bench's setup file, and return the scenarios.Run. Raises
+    setup file that it starts from, linux_setup()'s unless another is
+    given, and return the scenarios.Run, with what is then in the setup
+    file's place as `saved`, None if nothing. Raises
     MachineError where the program ends otherwise than the scenario has
     it, or does not end within `limit` seconds."""
     import scenarios
+    if setup is ...:
+        setup = linux_setup(program)
     steps = ("",) + scenario.steps
     with tempfile.TemporaryDirectory(prefix="vc", dir="/tmp") as bench:
         bench = Path(bench)
@@ -350,6 +356,20 @@ def run(scenario, program, setup, limit=60):
                  "D": {"VC": fat.Entry("VC", fat.DIRECTORY,
                                        *_dos_stamp(setups.EPOCH), 0, ""),
                        **read_tree(bench / "vc", "VC\\", laid)}}
+        # The setup file that the program for Linux started from stands
+        # for the bench's where the run has left it as it was: the bench
+        # of DOS has that one in its place.
+        ini = "VC\\" + setups.SETUP_FILE
+        left = disks["D"].get(ini)
+        bench_file = bench_setup()
+        if left is not None and \
+                left.sha256 == hashlib.sha256(setup).hexdigest():
+            disks["D"][ini] = dataclasses.replace(
+                left,
+                size=len(bench_file),
+                sha256=hashlib.sha256(bench_file).hexdigest())
+        saved = bench / "vc" / setups.SETUP_FILE.lower()
+        saved = saved.read_bytes() if saved.exists() else None
         # Where the bench has the program under test, which the goldens
         # say no more of.
         disks["D"]["VC\\" + program.filename] = fat.Entry(
@@ -357,6 +377,7 @@ def run(scenario, program, setup, limit=60):
     ran = scenarios.Run(shown, disks)
     # What the program said on standard error, for whoever looks.
     ran.said = said
+    ran.saved = saved
     return ran
 
 
@@ -366,11 +387,50 @@ def run(scenario, program, setup, limit=60):
 # build/ beside the bench's other things. Every golden has its sum.
 SETUP = ROOT / "build" / "posix-bench" / "VC.INI"
 
+# The setup file that the program for Linux starts from in a scenario,
+# the one that it saves itself, once for a bench, after its own keys have
+# taken the panels from the bench's setup file to H:\WORK and H:\, where
+# that file has C:\WORK and C:\ (CLAUDE.md, step 6; the user, on 15
+# October 2026). Started on the bench's file, it finds no C: and has both
+# panels on H:\WORK, where it was started (TODO.md, L3b); the right panel
+# is taken to the root and the setup saved. Made again when the program
+# is newer than it, and kept beside the bench's.
+LINUX_SETUP = ROOT / "build" / "posix-bench" / "vc.ini"
+LINUX_SETUP_STEPS = ("Tab", "Ctrl+\\", "Tab", "Shift+F9 Enter")
+
+
+class _Steps:
+    """A scenario of no name with `steps`, for run()."""
+    name = "the setup file of the program for Linux"
+
+    def __init__(self, steps):
+        self.steps = steps
+
+
+def linux_setup(program):
+    """The setup file that the program for Linux, `program` (a
+    setups.Program), starts from in a scenario: see LINUX_SETUP."""
+    bench_file = bench_setup()
+    if not LINUX_SETUP.exists() or \
+            LINUX_SETUP.stat().st_mtime < program.path.stat().st_mtime or \
+            LINUX_SETUP.stat().st_mtime < SETUP.stat().st_mtime:
+        ran = run(_Steps(LINUX_SETUP_STEPS), program, bench_file)
+        if ran.saved is None:
+            raise MachineError("the program for Linux saved no setup file")
+        LINUX_SETUP.parent.mkdir(parents=True, exist_ok=True)
+        LINUX_SETUP.write_bytes(ran.saved)
+    return LINUX_SETUP.read_bytes()
+
 
 def bench_setup():
     """The bench's setup file, made on the bench of DOS where build/ has
-    none yet."""
-    if not SETUP.exists():
+    none, or one that is not the file that the goldens have (the golden
+    of `start` has its sum): the bench's setup changes now and then, as
+    when it came to sort by name."""
+    import goldens
+    known = goldens.read("start").disks["D"]["VC\\" + setups.SETUP_FILE]
+    if not SETUP.exists() or hashlib.sha256(
+            SETUP.read_bytes()).hexdigest()[:16] != known.split()[-1]:
         with setups.Benches() as benches:
             setup = benches["us"].setup
         SETUP.parent.mkdir(parents=True, exist_ok=True)

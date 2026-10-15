@@ -1500,8 +1500,6 @@ struct Keys KeyWaiting(void)
     }
     keys.key = KeyThere ? KeyWord : 0;
     keys.none = !KeyThere;
-    if (keys.none)
-        Due();
     return keys;
 }
 

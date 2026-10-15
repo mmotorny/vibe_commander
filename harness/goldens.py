@@ -1063,7 +1063,10 @@ def departures(golden, run, programs):
         if lines:
             found.append((f"after step {number}: {step}"
                           + _in_golden(golden, number), lines))
-    if run.cut:
+    tree = deviations.TREES.get(golden.tree)
+    if run.cut or (tree is not None and golden.scenario in tree.cut):
+        # A scenario that the tree is taken through only as far as a step
+        # (deviations.Declared.cut) leaves its disks as they are then.
         return found
     want, got = golden.disks, disk_lines(run.disks, programs)
     if golden.tree == "posix":
