@@ -230,7 +230,7 @@ info.c, PutInf: widen
     ends short of it (ReDr00); here a panel's block is longer, and the
     list ends before its end, PanelBytes of start.c, as vc.h says.
 
-input.c, Input0: widen
+input.c, Inpt41: widen
     | outside = InWind(mouse, (u16)((md.Lines - 1) << 8 | column),
     md.Lines is the rows of the screen, 25 to 50 by Init29 of start.c,
     so the row above the last is 0 or more; column is the mouse's

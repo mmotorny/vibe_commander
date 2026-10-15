@@ -89,188 +89,56 @@ static struct Key Pressed(u16 key, bool clicked)
     return pressed;
 }
 
-/* Wait for a key with the key bar `bar` on the screen, of which only the
-   low byte counts, and return it, and whether the key was clicked on the
-   key bar with the mouse: the assembly has the carry flag for that. */
-struct Key Input0(i32 bar)
+/* Inpt04: when to blank the screen, now and the minutes of the setup,
+   the hours in the high byte, with the seconds in `*low`. Without any,
+   FFFFh, and `*low` as it is: the assembly keeps there what it has in DX,
+   which it does not read. */
+static u16 Inpt04(u16 *low)
 {
-    u16 ClkBuf[CLOCK_CELLS];            /* what the clock covers */
-    u16 KbdFlgs;                        /* Shift, Ctrl, Alt and the locks */
-    bool AltLock;                       /* Alt went down, and nothing else
-                                           has since */
-    u16 ClkFlag;                        /* what the clock has between hours
-                                           and minutes: it blinks */
-    bool BlMouse;                       /* the mouse has been outside the
-                                           corner that blanks the screen */
-    u16 BlHigh, BlLow = 0;              /* when to blank the screen */
-    u32 AltTime;                        /* the ticks one round before */
-    u32 pair, now;
     struct Time moment;
+    u16 time;
+    i32 hour, minute;
+
+    if (md.BlDelay == 0)
+        return 0xFFFF;
+    moment = TimeOfDay();
+    *low = moment.seconds;
+    time = moment.clock;
+    minute = (time + md.BlDelay) & 0xFF;
+    hour = time >> 8;
+    if (minute >= 60) {
+        minute -= 60;
+        hour = hour + 1 & 0xFF;
+    }
+    return (u16)(hour << 8 | minute);
+}
+
+/* Inpt12: the screen blanked until a key or the mouse, and drawn again.
+   The round goes on at Inpt03 then. */
+static void Inpt12(void)
+{
+    Blank();
+    Window(0, (u16)(md.Lines << 8 | 80));
+    while (GetMous(0).buttons != 0)
+        ;
+}
+
+/* Inpt41: what Input0 does with the key `key` that it has, with the key
+   bar `bar`, a byte. Returns true with what Input0 returns in `*pressed`,
+   or false where a button of the mouse was let go on the key bar
+   elsewhere than on a key: the round then begins anew, at Inpt02. */
+static bool Inpt41(u16 key, i32 bar, struct Key *pressed)
+{
     struct Mouse seen;
-    u16 key, time, flags, was, mouse;
-    i32 hour, minute, i, shift, column;
-    u16 hour_digits, minute_digits, color;
-    u16 separator, suffix = 0;
-    u16 held, buttons, look, shown;
+    u16 held, buttons, look, shown, mouse;
+    i32 shift, column;
     bool tracking, outside;
-    u16 *screen;
 
-    bar &= 0xFF;
-    if (!KeyWaiting().none) {
-        key = KeyRead();
-        goto Inpt41;
-    }
-Inpt02:
-    key = KEY_MOUSE | GetMous(0).buttons;
-    if ((key & 0xFF) != 0)
-        goto Inpt41;
-    AltTime = Timer();
-    for (i = 0; i < CLOCK_CELLS; i++)
-        ClkBuf[i] = CLOCK_AT[i];
-    KbdFlgs = KeysHeld();
-    AltLock = false;
-Inpt03:
-    ClkFlag = 0;
-    BlMouse = false;
-Inpt04:
-    /* The time to blank the screen at: now and the minutes of the setup.
-       Without any, the assembly keeps here what it has in DX, which it
-       does not read. */
-    BlHigh = 0xFFFF;
-    if (md.BlDelay != 0) {
-        moment = TimeOfDay();
-        BlLow = moment.seconds;
-        time = moment.clock;
-        minute = (time + md.BlDelay) & 0xFF;
-        hour = time >> 8;
-        if (minute >= 60) {
-            minute -= 60;
-            hour = hour + 1 & 0xFF;
-        }
-        BlHigh = (u16)(hour << 8 | minute);
-    }
-Inpt10:
-    PutKey((u16)bar);                   /* a byte, as the top of the
-                                           function makes it */
-    LeaveTm();
-    if (md.BlDelay != 0) {
-        moment = TimeOfDay();
-        time = moment.clock;
-        /* Past midnight an hour of 24 or more is the hour 0. */
-        if (time >> 8 == 0 && BlHigh >> 8 >= 24)
-            BlHigh &= 0xFF;
-        if (time > BlHigh || (time == BlHigh && moment.seconds >= BlLow)) {
-Inpt12:
-            Blank();
-            Window(0, (u16)(md.Lines << 8 | 80));
-            while (GetMous(0).buttons != 0)
-                ;
-            goto Inpt03;
-        }
-    }
-    if (md.Clock != 0) {                /* Inpt20 */
-        screen = CLOCK_AT + 1;
-        moment = TimeOfDay();
-        time = moment.clock;
-        hour = time >> 8;
-        if (md.Country.TimeFmt == 0) {
-            screen--;
-            suffix = hour / 12 == 0 ? 'a' : 'p';
-            hour %= 12;
-            if (hour == 0)
-                hour = 12;
-        }
-        separator = ' ';
-        if ((moment.seconds & 0xFF) >= 50)
-            separator = md.Country.TimeSep[0];
-        if (separator != ClkFlag) {
-            ClkFlag = separator;
-            hour_digits = HexDec(hour);
-            minute_digits = HexDec(time);
-            color = (u16)(Color(Clock_C) << 8);
-            *screen++ = color | ((hour_digits & 0xFF) == '0'
-                                 ? ' ' : hour_digits & 0xFF);
-            *screen++ = color | hour_digits >> 8;
-            *screen++ = color | separator;
-            *screen++ = color | (minute_digits & 0xFF);
-            *screen++ = color | minute_digits >> 8;
-            if (md.Country.TimeFmt == 0)
-                *screen++ = color | suffix;
-            Window(74, 0x106);
-        }
-    }
-    key = KEY_TIMER;                    /* Inpt30 */
-    if ((u16)md.AutoTim != 0xFFFF) {
-        /* AutoTim has the hours and the minutes in its low word. */
-        moment = TimeOfDay();
-        time = moment.clock;
-        if (time > (u16)md.AutoTim
-            || (time == (u16)md.AutoTim
-               && moment.seconds >= (u16)(md.AutoTim >> 16)))
-            goto Inpt40;
-    }
-    Rnd();                              /* Inpt31 */
-    if (!KeyWaiting().none) {
-        key = KeyRead();
-        goto Inpt40;
-    }
-    key = KEY_MOUSE | GetMous(0).buttons;  /* Inpt33 */
-    if ((key & 0xFF) != 0)
-        goto Inpt40;
-    flags = KeysHeld();
-    was = KbdFlgs;
-    KbdFlgs = flags;
-    if (md.AltBar != 0) {               /* and not under DESQview, in
-                                           the original */
-        /* A tap on Alt: Alt is all that has changed since the round
-           before, and that was less than three ticks ago. The assembly
-           tests the time in 16 bits, twice the high word of the
-           difference and 1 for a low word of 3 or more. */
-        now = Timer();
-        pair = now - AltTime;
-        AltTime = now;
-        if ((u16)(HIGH(pair) * 2 + (LOW(pair) >= 3 ? 1 : 0)) == 0
-            && (was ^ flags) == 8) {
-            if (flags & 8) {
-                AltLock = true;
-                goto Inpt04;
-            }
-            if (AltLock) {
-                key = KEY_ALT;
-                goto Inpt40;
-            }
-        }
-    }
-    flags ^= was & 0xF0;                /* Inpt34 */
-    if (flags != 0) {
-        /* A key among Shift, Ctrl and Alt is held, or a lock has changed:
-           anything but Alt alone is no tap on Alt any more. */
-        if ((flags & 0xF7) != 0)
-            AltLock = false;
-        goto Inpt04;
-    }
-    /* The mouse in the top right corner blanks the screen at once, when
-       it has been elsewhere since; in the bottom right corner it keeps
-       the screen from being blanked. */
-    mouse = GetMous(0).place;
-    if (InWind(mouse, 78, 0x102))
-        BlMouse = true;
-    else if (BlMouse)
-        goto Inpt12;
-    if (!InWind(mouse, (u16)((md.Lines - 1) << 8 | 78), 0x102))
-        goto Inpt04;
-    goto Inpt10;
-
-Inpt40:
-    if (md.Clock != 0) {
-        for (i = 0; i < CLOCK_CELLS; i++)
-            CLOCK_AT[i] = ClkBuf[i];
-        Window(74, 0x106);
-    }
-Inpt41:
     *(u16 *)&md.AutoTim = 0xFFFF;
-    if ((key & 0xFF00) != KEY_MOUSE || md.KeyBar == 0)
-        return Pressed(key, false);
+    if ((key & 0xFF00) != KEY_MOUSE || md.KeyBar == 0) {
+        *pressed = Pressed(key, false);
+        return true;
+    }
     /* A button of the mouse is down: on the key bar it is held for a
        key, the left one as the key is, the middle one with Shift and the
        right one with Alt. The bar shows what the keys are then, the
@@ -280,8 +148,10 @@ Inpt41:
     buttons = seen.buttons;
     mouse = seen.place;
     key = KEY_MOUSE | buttons;
-    if ((u8)((mouse >> 8) + 1) != md.Lines)
-        return Pressed(key, false);
+    if ((u8)((mouse >> 8) + 1) != md.Lines) {
+        *pressed = Pressed(key, false);
+        return true;
+    }
     column = mouse & 0xF8;              /* where the key begins: BL */
     held = 0;                           /* the buttons one round before:
                                            DH */
@@ -310,7 +180,7 @@ Inpt41:
         } else {
             /* Inpt56: let go. */
             if (look == 0)
-                goto Inpt02;
+                return false;
             TypMous(0);
             if (held & 2)
                 key = 0x6800;           /* Alt-F1 */
@@ -319,12 +189,12 @@ Inpt41:
             else if (held & 1)
                 key = KEY_F1;
             else
-                goto Inpt02;
-            return Pressed((u16)(key + (column >> 3 << 8)), true);
+                return false;
+            *pressed = Pressed((u16)(key + (column >> 3 << 8)), true);
+            return true;
         }
         PutKey0((u16)bar, (u16)shift);  /* Inpt54; the bar is a byte, as
-                                           the top of the function makes
-                                           it */
+                                           Input0 makes it */
         held = buttons;
         seen = GetMous(0);
         buttons = seen.buttons;
@@ -333,10 +203,187 @@ Inpt41:
             /* A key without a name is none: the click is the caller's. */
             if ((*BasAdr((u16)((mouse & 0xFF00)
                                | column + 1 + (column >= 72 ? 1 : 0)))
-                 & 0xFF) == ' ')
-                return Pressed(KEY_MOUSE | buttons, false);
+                 & 0xFF) == ' ') {
+                *pressed = Pressed(KEY_MOUSE | buttons, false);
+                return true;
+            }
             tracking = true;
         }
+    }
+}
+
+/* Wait for a key with the key bar `bar` on the screen, of which only the
+   low byte counts, and return it, and whether the key was clicked on the
+   key bar with the mouse: the assembly has the carry flag for that. */
+struct Key Input0(i32 bar)
+{
+    u16 ClkBuf[CLOCK_CELLS];            /* what the clock covers */
+    u16 KbdFlgs;                        /* Shift, Ctrl, Alt and the locks */
+    bool AltLock;                       /* Alt went down, and nothing else
+                                           has since */
+    u16 ClkFlag;                        /* what the clock has between hours
+                                           and minutes: it blinks */
+    bool BlMouse;                       /* the mouse has been outside the
+                                           corner that blanks the screen */
+    u16 BlHigh, BlLow = 0;              /* when to blank the screen */
+    u32 AltTime;                        /* the ticks one round before */
+    u32 pair, now;
+    struct Time moment;
+    struct Key pressed;
+    u16 key, time, flags, was, mouse;
+    i32 hour, i;
+    u16 hour_digits, minute_digits, color;
+    u16 separator, suffix = 0;
+    u16 *screen;
+
+    bar &= 0xFF;
+    if (!KeyWaiting().none) {
+        key = KeyRead();
+        if (Inpt41(key, bar, &pressed))
+            return pressed;
+    }
+    for (;;) {                          /* Inpt02 */
+        key = KEY_MOUSE | GetMous(0).buttons;
+        if ((key & 0xFF) == 0) {
+            AltTime = Timer();
+            for (i = 0; i < CLOCK_CELLS; i++)
+                ClkBuf[i] = CLOCK_AT[i];
+            KbdFlgs = KeysHeld();
+            AltLock = false;
+            ClkFlag = 0;                /* Inpt03 */
+            BlMouse = false;
+            BlHigh = Inpt04(&BlLow);
+            for (;;) {                  /* Inpt10 */
+                PutKey((u16)bar);       /* a byte, as the top of the
+                                           function makes it */
+                LeaveTm();
+                if (md.BlDelay != 0) {
+                    moment = TimeOfDay();
+                    time = moment.clock;
+                    /* Past midnight an hour of 24 or more is the hour
+                       0. */
+                    if (time >> 8 == 0 && BlHigh >> 8 >= 24)
+                        BlHigh &= 0xFF;
+                    if (time > BlHigh
+                        || (time == BlHigh && moment.seconds >= BlLow)) {
+                        Inpt12();
+                        ClkFlag = 0;    /* Inpt03 */
+                        BlMouse = false;
+                        BlHigh = Inpt04(&BlLow);
+                        continue;
+                    }
+                }
+                if (md.Clock != 0) {            /* Inpt20 */
+                    screen = CLOCK_AT + 1;
+                    moment = TimeOfDay();
+                    time = moment.clock;
+                    hour = time >> 8;
+                    if (md.Country.TimeFmt == 0) {
+                        screen--;
+                        suffix = hour / 12 == 0 ? 'a' : 'p';
+                        hour %= 12;
+                        if (hour == 0)
+                            hour = 12;
+                    }
+                    separator = ' ';
+                    if ((moment.seconds & 0xFF) >= 50)
+                        separator = md.Country.TimeSep[0];
+                    if (separator != ClkFlag) {
+                        ClkFlag = separator;
+                        hour_digits = HexDec(hour);
+                        minute_digits = HexDec(time);
+                        color = (u16)(Color(Clock_C) << 8);
+                        *screen++ = color | ((hour_digits & 0xFF) == '0'
+                                             ? ' ' : hour_digits & 0xFF);
+                        *screen++ = color | hour_digits >> 8;
+                        *screen++ = color | separator;
+                        *screen++ = color | (minute_digits & 0xFF);
+                        *screen++ = color | minute_digits >> 8;
+                        if (md.Country.TimeFmt == 0)
+                            *screen++ = color | suffix;
+                        Window(74, 0x106);
+                    }
+                }
+                key = KEY_TIMER;        /* Inpt30 */
+                if ((u16)md.AutoTim != 0xFFFF) {
+                    /* AutoTim has the hours and the minutes in its low
+                       word. */
+                    moment = TimeOfDay();
+                    time = moment.clock;
+                    if (time > (u16)md.AutoTim
+                        || (time == (u16)md.AutoTim
+                           && moment.seconds >= (u16)(md.AutoTim >> 16)))
+                        break;
+                }
+                Rnd();                  /* Inpt31 */
+                if (!KeyWaiting().none) {
+                    key = KeyRead();
+                    break;
+                }
+                key = KEY_MOUSE | GetMous(0).buttons;  /* Inpt33 */
+                if ((key & 0xFF) != 0)
+                    break;
+                flags = KeysHeld();
+                was = KbdFlgs;
+                KbdFlgs = flags;
+                if (md.AltBar != 0) {   /* and not under DESQview, in
+                                           the original */
+                    /* A tap on Alt: Alt is all that has changed since the
+                       round before, and that was less than three ticks
+                       ago. The assembly tests the time in 16 bits, twice
+                       the high word of the difference and 1 for a low
+                       word of 3 or more. */
+                    now = Timer();
+                    pair = now - AltTime;
+                    AltTime = now;
+                    if ((u16)(HIGH(pair) * 2 + (LOW(pair) >= 3 ? 1 : 0)) == 0
+                        && (was ^ flags) == 8) {
+                        if (flags & 8) {
+                            AltLock = true;
+                            BlHigh = Inpt04(&BlLow);
+                            continue;
+                        }
+                        if (AltLock) {
+                            key = KEY_ALT;
+                            break;
+                        }
+                    }
+                }
+                flags ^= was & 0xF0;    /* Inpt34 */
+                if (flags != 0) {
+                    /* A key among Shift, Ctrl and Alt is held, or a lock
+                       has changed: anything but Alt alone is no tap on
+                       Alt any more. */
+                    if ((flags & 0xF7) != 0)
+                        AltLock = false;
+                    BlHigh = Inpt04(&BlLow);
+                    continue;
+                }
+                /* The mouse in the top right corner blanks the screen at
+                   once, when it has been elsewhere since; in the bottom
+                   right corner it keeps the screen from being blanked. */
+                mouse = GetMous(0).place;
+                if (InWind(mouse, 78, 0x102))
+                    BlMouse = true;
+                else if (BlMouse) {
+                    Inpt12();
+                    ClkFlag = 0;        /* Inpt03 */
+                    BlMouse = false;
+                    BlHigh = Inpt04(&BlLow);
+                    continue;
+                }
+                if (!InWind(mouse, (u16)((md.Lines - 1) << 8 | 78), 0x102))
+                    BlHigh = Inpt04(&BlLow);    /* and Inpt10 */
+            }
+            /* Inpt40 */
+            if (md.Clock != 0) {
+                for (i = 0; i < CLOCK_CELLS; i++)
+                    CLOCK_AT[i] = ClkBuf[i];
+                Window(74, 0x106);
+            }
+        }
+        if (Inpt41(key, bar, &pressed))  /* Inpt41 */
+            return pressed;
     }
 }
 
