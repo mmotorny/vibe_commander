@@ -382,7 +382,9 @@ These held while `src/c/` was made, and they say what it is.
   comparison follows. One scenario may be held to an expectation of
   the portable C's own, where the original cannot go: `editor-huge`,
   a file larger than the original's room, when the memory comes from
-  the extender. On DOS, Alt with a letter goes on naming the letter of
+  the extender; and a second, `menu-none`, allowed the same day, where
+  the original never comes back to wait for a key: the bar left by
+  the way to the menu that is none. On DOS, Alt with a letter goes on naming the letter of
   a US keyboard, as the BIOS gives it. The menu that is none, the
   bar pressed beside the names of the menus and the mouse moved onto
   one, which in the original makes the menu 0 and reads in front of
