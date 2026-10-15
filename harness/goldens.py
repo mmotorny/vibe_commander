@@ -1068,7 +1068,8 @@ def departures(golden, run, programs):
         return [(None, ["the golden was derived for other steps than the "
                         "scenario has now: derive it again"])]
     for number, step in enumerate(steps[:len(run.screens)]):
-        lines = screen_departs(golden, number, run.screens[number])
+        lines = screen_departs(golden, number, run.screens[number],
+                               getattr(run, "written", None))
         if lines:
             found.append((f"after step {number}: {step}"
                           + _in_golden(golden, number), lines))
@@ -1117,10 +1118,11 @@ def on_the_host(disks, golden=None):
     return out
 
 
-def screen_departs(golden, number, screen):
+def screen_departs(golden, number, screen, written=None):
     """How `screen`, which a build showed after step `number` of the
     scenario that `golden` is of, the start being 0, departs from the
-    golden's, as text lines: none if it does not."""
+    golden's, as text lines: none if it does not. `written` is what the
+    run wrote into, where the tree's masks go by it (posixrun)."""
     # Both are blanked, the golden's screen as well: one derived before
     # a figure was left out of the comparison still holds it. The
     # golden's is without what any tree leaves out, as it was derived,
@@ -1130,7 +1132,7 @@ def screen_departs(golden, number, screen):
     expected, actual = deviations.masked(
         deviations.compared(golden.screens[number]),
         deviations.compared(screen, golden.tree),
-        deviations.declared(golden.tree).rules)
+        deviations.declared(golden.tree).rules, written)
     return screen_differences(
         expected, actual, made.get(place),
         mine="its own" if golden.own else "original")

@@ -229,6 +229,8 @@ def expected(screen, rules=None):
         if isinstance(rule, Part):
             rule.made(screen, cells)
             continue
+        if isinstance(rule, WrittenTimes):
+            continue                    # a mask of the run's: masked()
         pattern, text, below = rule
         if text is None:
             continue                    # a mask: see masked()
@@ -247,7 +249,64 @@ def expected(screen, rules=None):
     return replace(screen, cells=bytes(cells))
 
 
-def masked(golden, screen, rules):
+@dataclass(frozen=True)
+class WrittenTimes:
+    """A mask that goes by the run as well as by the golden: the date and
+    the time of a directory that the run has written into, where a panel
+    shows them on a line of that directory, `..` or a subdirectory's, on
+    the golden's screen. The host moves a directory's time whenever an
+    entry is made or removed in it, and DOS does not (the user's word of
+    15 October 2026, CLAUDE.md, step 6). Which directory a line is of is
+    read from the panel's title above it, the path in its top frame: a
+    line whose panel has no title on the screen is left out wherever the
+    run has written into any directory. Where the run has written into
+    none, nothing is left out."""
+    what: str = "the time of a directory that the run wrote into"
+
+    # A line of a directory in a panel, between its frames: in a brief
+    # panel's status line, the name and ►SUB-DIR◄ or ►UP--DIR◄, its
+    # date and its time; in a full panel, the same between upright lines.
+    LINE = re.compile(r"(?:(?<=║)|^)([^║]*(?:UP--DIR|SUB-DIR)[^║]*)")
+    # The space in front of each as well: a month or an hour of one digit
+    # has one there, which another of two digits takes.
+    WHEN = re.compile(r" ?\d{1,2}-\d\d-\d\d| ?\d{1,2}:\d\d[ap]")
+    TITLE = re.compile(r"═ ([A-Za-z]:\\[^ ]*) ═")
+
+    def cells(self, lines, written):
+        """The places, (row, column), that the mask leaves out of a
+        screen whose rows are `lines`, of a run that wrote into the
+        directories `written`, paths of the bench in capitals."""
+        if not written:
+            return
+        for row, line in enumerate(lines):
+            for match in self.LINE.finditer(line):
+                start, end = match.span(1)
+                words = match.group(1).replace("│", " ").split()
+                if not words or self.of(lines, row, start, end, words[0],
+                                        written):
+                    for when in self.WHEN.finditer(line, start, end):
+                        for column in range(*when.span()):
+                            yield row, column
+
+    def of(self, lines, row, start, end, name, written):
+        """Whether the line at `row`, columns `start` to `end`, of the
+        entry `name`, is of a directory in `written`: true where its
+        panel's title is not to be seen above it."""
+        for above in range(row - 1, -1, -1):
+            for title in self.TITLE.finditer(lines[above]):
+                if start - 1 <= title.start() and title.end() <= end + 1:
+                    path = title.group(1).upper().rstrip("\\")
+                    if name == "..":
+                        path = path.rsplit("\\", 1)[0]
+                    else:
+                        path += "\\" + name.upper()
+                    if ":" in path and "\\" not in path:
+                        path += "\\"
+                    return path in written
+        return True
+
+
+def masked(golden, screen, rules, written=None):
     """The screen `golden` of a golden and the screen `screen` of a
     build, with the cells that a mask among `rules` finds on the
     golden's left out of both, character and colour: a mask is a rule
@@ -255,13 +314,21 @@ def masked(golden, screen, rules):
     shows there what nothing can expect, a thing of the host's. Every
     match of its pattern on a row is found, and every group of a match
     is left out; with a pattern for the line below, only a row whose
-    next one has that."""
+    next one has that. A WrittenTimes among them goes by `written` as
+    well, the directories that the run wrote into."""
     masks = [rule for rule in rules
-             if not isinstance(rule, Part) and rule[1] is None]
-    if not masks:
+             if not isinstance(rule, (Part, WrittenTimes))
+             and rule[1] is None]
+    by_run = [rule for rule in rules if isinstance(rule, WrittenTimes)]
+    if not masks and not by_run:
         return golden, screen
     out = [bytearray(golden.cells), bytearray(screen.cells)]
     lines = golden.lines()
+    for rule in by_run:
+        for row, column in rule.cells(lines, written):
+            for cells in out:
+                at = (row * COLUMNS + column) * 2
+                cells[at:at + 2] = MASKED
     for pattern, _, below in masks:
         for row, line in enumerate(lines):
             if below and not (row + 1 < ROWS
@@ -1125,6 +1192,8 @@ LINUX_MASKS = (
     (re.compile(r"║(.*total bytes on drive.*)║"), None, None),
     (re.compile(r"║(.*bytes free on drive.*)║"), None, None),
     (re.compile(r"║(.*files? uses? .* bytes in.*)║"), None, None),
+    # The time of a directory that the run wrote into.
+    WrittenTimes(),
 )
 
 # The scenarios that the program for Linux is not taken through, not on

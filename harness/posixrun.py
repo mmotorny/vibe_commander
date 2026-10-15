@@ -356,6 +356,8 @@ def run(scenario, program, setup=..., limit=60):
                  "D": {"VC": fat.Entry("VC", fat.DIRECTORY,
                                        *_dos_stamp(setups.EPOCH), 0, ""),
                        **read_tree(bench / "vc", "VC\\", laid)}}
+        root_written = int((bench / "home").stat().st_mtime) \
+            != laid[bench / "home"][0]
         # The setup file that the program for Linux started from stands
         # for the bench's where the run has left it as it was: the bench
         # of DOS has that one in its place.
@@ -375,6 +377,14 @@ def run(scenario, program, setup=..., limit=60):
         disks["D"]["VC\\" + program.filename] = fat.Entry(
             "VC\\" + program.filename, 0x20, 0, 0, 0, "")
     ran = scenarios.Run(shown, disks)
+    # The directories that the run wrote into, by their paths on the
+    # bench, the drive's root among them: the mask of a directory's time
+    # (deviations.WrittenTimes) goes by it.
+    ran.written = {f"{drive}:\\{name}" for drive, entries in disks.items()
+                   for name, entry in entries.items()
+                   if entry.time == WRITTEN_INTO}
+    if root_written:
+        ran.written.add("C:\\")
     # What the program said on standard error, for whoever looks.
     ran.said = said
     ran.saved = saved
