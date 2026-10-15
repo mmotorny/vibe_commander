@@ -1301,8 +1301,6 @@ LINUX_MASKS = (
 # 2026: a scenario that rests on what only DOS has is not run on Linux).
 _RUSSIA = ("Russia, code page 866: the program for Linux has the code "
            "page 437, always (CLAUDE.md, step 6)")
-_MOUSE = ("the mouse, which has no event in the test channel until the "
-          "piece L5")
 _FLOPPY = ("the diskette drive, which Linux has not: the drives are R: "
            "and H: (CLAUDE.md, step 6)")
 _DOS = ("a program of DOS or a command of DOS is what it is about, its "
@@ -1312,17 +1310,6 @@ LINUX_NOT_RUN = {
         ["stamps-russia", "russian", "clock-russia", "clock-path-russia",
          "clock-night-russia", "attributes-russia", "setup-options-russia"],
         _RUSSIA),
-    **dict.fromkeys(
-        ["mouse-panel", "mouse-list", "mouse-bars", "mouse-dialog",
-         "mouse-left-hand", "mouse-select", "mouse-fields", "mouse-line",
-         "mouse-filter", "mouse-keys", "mouse-menu", "mouse-user-menu",
-         "mouse-history", "mouse-drive", "mouse-middle",
-         "mouse-drag-dialog", "mouse-drag-menu", "menu-none",
-         "mouse-drag-lists", "mouse-help", "mouse-find", "mouse-tree",
-         "mouse-view", "mouse-edit", "blank", "setup-config-mouse",
-         "setup-screen", "setup-panels", "setup-country",
-         "setup-colors-mouse", "setup-help-mouse", "setup-mouse",
-         "setup-left-handed"], _MOUSE),
     **dict.fromkeys(["drive-b", "not-ready", "phantom",
                      "diskette-command"], _FLOPPY),
     "device": "a device of DOS's and DOS's critical error, which the "

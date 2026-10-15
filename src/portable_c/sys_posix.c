@@ -885,6 +885,9 @@ void ConsoleText(const u8 *text)
  *
  *     XXXX     a key, the BIOS's word in four hex digits: the scan code
  *              above the character
+ *     XXXX+    the same, with the next key put into the BIOS's buffer
+ *              in the same round, as the driver puts the keys of one
+ *              chord: a program that empties the buffer loses it
  *     held=XX  what KeysHeld answers from then on, two hex digits
  *     wait=N   nothing until the timer has ticked N times more
  *     mouse=C,R,B  the mouse moved to column C of row R, in decimal from
@@ -959,8 +962,11 @@ static i32 StepsRoom = 0;
 static i32 StepNow = 0;                 /* the step that is going on */
 static i32 EventNow = 0;                /* its next event, of its own */
 static int ScreensFd = -1;
-static bool KeyThere = false;           /* a key waits: the BIOS's buffer */
-static u16 KeyWord = 0;
+#define KEY_WITH_NEXT 0x10000           /* a key word's +, in its value */
+#define KEYS_ROOM 15                    /* the BIOS's buffer */
+static u16 KeysWaiting[KEYS_ROOM];      /* the keys that wait, the first
+                                           first */
+static i32 KeysCount = 0;
 static u16 Held = 0;
 static bool Waiting = false;            /* for the timer, by wait= */
 static int64_t WaitUntil = 0;           /* by Elapsed */
@@ -1051,8 +1057,10 @@ static void ClockBegin(void)
     TestDay.tm_mon = (int)month - 1;
     TestDay.tm_mday = (int)day;
     TestDay.tm_isdst = -1;
-    TestTicks = (u32)((hour * 3600 + minute * 60 + second) * 1193180
-                      / 65536);
+    /* The first tick at the time or after it: of the tick before, DOS
+       makes a time of a second before, 11:59:59 of 12:00:00. */
+    TestTicks = (u32)(((hour * 3600 + minute * 60 + second) * 1193180
+                       + 65535) / 65536);
     Clocked = true;
 }
 
@@ -1161,6 +1169,11 @@ static bool Event(const char *word, struct Due *due)
     }
     value = strtoul(word, &end, 16);
     due->value = (u32)value;
+    if (due->event == EVENT_KEY && end != word && *end == '+'
+        && end[1] == 0) {
+        due->value |= KEY_WITH_NEXT;
+        end++;
+    }
     return end != word && *end == 0 && value <= 0xFFFF
            && (due->event != EVENT_HELD || value <= 0xFF);
 }
@@ -1309,7 +1322,7 @@ static bool TakeEvent(bool reading)
     struct Due *due;
 
     Polled = 0;
-    if (KeyThere)
+    if (KeysCount > 0)
         return true;
     if (reading)
         Asks = 0;
@@ -1334,8 +1347,19 @@ static bool TakeEvent(bool reading)
     IdleRounds = 0;
     switch (due->event) {
     case EVENT_KEY:
-        KeyWord = (u16)due->value;
-        KeyThere = true;
+        /* A key that has the next with it, a word with +, has it put
+           into the buffer in the same round, as the driver puts the
+           keys of one chord. */
+        for (;;) {
+            if (KeysCount < KEYS_ROOM)
+                KeysWaiting[KeysCount++] = (u16)due->value;
+            if ((due->value & KEY_WITH_NEXT) == 0
+                || EventNow == Steps[StepNow].count
+                || Events[Steps[StepNow].first + EventNow].event
+                   != EVENT_KEY)
+                break;
+            due = &Events[Steps[StepNow].first + EventNow++];
+        }
         break;
     case EVENT_HELD:
         /* The program goes round once with each change of what is
@@ -1514,8 +1538,8 @@ struct Keys KeyWaiting(void)
         OwnScreen();
         return TermKeyWaiting();
     }
-    keys.key = KeyThere ? KeyWord : 0;
-    keys.none = !KeyThere;
+    keys.key = KeysCount > 0 ? KeysWaiting[0] : 0;
+    keys.none = KeysCount == 0;
     return keys;
 }
 
@@ -1536,10 +1560,11 @@ u16 KeyRead(void)
         MouseFromTerminal(false);
         key = TermKeyTake();
     } else {
-        while (!KeyThere)
+        while (KeysCount == 0)
             Due(true);
-        KeyThere = false;
-        key = KeyWord;
+        key = KeysWaiting[0];
+        memmove(KeysWaiting, KeysWaiting + 1,
+                (size_t)--KeysCount * sizeof *KeysWaiting);
     }
     snprintf(line, sizeof line, "key %04X\n", key);
     Traced(line);

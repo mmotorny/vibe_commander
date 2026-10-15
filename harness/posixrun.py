@@ -58,6 +58,7 @@ import time
 from pathlib import Path
 
 import deps
+import driver
 import fat
 import setups
 from dos import COLUMNS, ROWS, Screen, MachineError
@@ -156,6 +157,39 @@ def word(name, held):
     return found
 
 
+def pointer(name):
+    """The words of the channel for a step of the mouse, as
+    driver._pointer() has its events: "Move@column,row" a move, and
+    "Click@column,row*asked>column,row*asked", a button down at the
+    first place for as many times as the program asks where the mouse
+    is, ASKED unless the step says, moved with it down to each place
+    after, and let go at the last."""
+    what, _, places = name.partition("@")
+    try:
+        button = driver.BUTTONS[what]
+        stops = []
+        for place in places.split(">"):
+            place, _, asked = place.partition("*")
+            column, row = (int(number) for number in place.split(","))
+            asked = int(asked or driver.ASKED)
+            if not (0 <= column < COLUMNS and 0 <= row < driver.POINTER_ROWS
+                    and 0 < asked < 256):
+                raise ValueError
+            stops.append((column, row, asked))
+        if button is None and (len(stops) > 1 or "*" in places):
+            raise ValueError
+    except (KeyError, ValueError):
+        raise ValueError(f"unknown step of the mouse {name!r}") from None
+    if button is None:
+        column, row, _ = stops[0]
+        return [f"mouse={column},{row},0"]
+    out = []
+    for column, row, asked in stops:
+        out += [f"mouse={column},{row},{button:X}", f"asks={asked}"]
+    column, row, _ = stops[-1]
+    return out + [f"mouse={column},{row},0"]
+
+
 def events(step):
     """The words of the channel's `keys` for one step of a scenario, as
     driver.events() has its events: Shift, Ctrl and Alt down first, one
@@ -165,8 +199,8 @@ def events(step):
     out = []
     for name in step.split():
         if "@" in name and not name.startswith('"'):
-            raise ValueError(f"the mouse has no event in the channel: "
-                             f"{name!r}")
+            out += pointer(name)
+            continue
         if name.startswith("Wait*"):
             out.append(f"wait={int(name.partition('*')[2])}")
             continue
@@ -182,8 +216,11 @@ def events(step):
             for key in mods:
                 held |= HELD[key]
                 out.append(f"held={held:02X}")
-            for key in keys:
-                out.append(f"{word(key, held):04X}")
+            # The keys of one chord are put into the buffer at once, as
+            # the driver puts them: a word with + has the next with it.
+            for at, key in enumerate(keys):
+                out.append(f"{word(key, held):04X}"
+                           + ("+" if at < len(keys) - 1 else ""))
             for key in mods[::-1]:
                 held &= ~HELD[key]
                 out.append(f"held={held:02X}")
