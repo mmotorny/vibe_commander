@@ -1351,11 +1351,18 @@ def _on_top(base, more):
     followed by those of `more`."""
     def joined(name):
         return {**getattr(base, name), **getattr(more, name)}
+
+    def by_scenario(name):
+        # A scenario that both declare steps of has the steps of both.
+        mine, others = getattr(base, name), getattr(more, name)
+        return {scenario: {**mine.get(scenario, {}),
+                           **others.get(scenario, {})}
+                for scenario in {**mine, **others}}
     return replace(
         base, not_run=joined("not_run"), left_out=joined("left_out"),
-        left_out_of=joined("left_out_of"), rules=base.rules + more.rules,
-        in_place_of=joined("in_place_of"), in_place_in=joined("in_place_in"),
-        cut=joined("cut"))
+        left_out_of=by_scenario("left_out_of"), rules=base.rules + more.rules,
+        in_place_of=joined("in_place_of"),
+        in_place_in=by_scenario("in_place_in"), cut=joined("cut"))
 
 
 # What the program for Linux shows that nothing can expect, a thing of
@@ -1476,8 +1483,6 @@ LINUX_NOT_RUN = {
     "setup-new": "a command at step 2, behind which all of it is",
     "clock-morning": "the time of day set by DOS's TIME, at step 2, "
                      "which the host's shell has not",
-    "tree": "the tree, whose order of the directories waits on the user "
-            "from its first step (TODO.md, L3b)",
 }
 
 # The scenarios that the program for Linux is taken through only as far
@@ -1487,17 +1492,18 @@ LINUX_NOT_RUN = {
 # before it). Most stop at a command that the host's shell has not, the
 # step at which the program asks for a program to be run (ProgramRun of
 # sys_posix.c, which says so on standard error).
-_ORDER = ("the order of a directory's entries, the tree's and the file "
-          "search's, which waits on the user (TODO.md, L3b)")
-_NUL = "DOS's device NUL, which waits on the user (TODO.md, L3b)"
+# DOS's names of devices are ordinary names of files on Linux, and the
+# steps that use them as devices are not run there (CLAUDE.md, step 6,
+# the user's word of 15 October 2026).
+_DEVICE = ("DOS's names of devices, NUL and CON, which are ordinary names "
+           "of files on Linux (CLAUDE.md, step 6)")
 LINUX_CUT = {
-    "editor-save": (20, f"the editor's errors on saving: at step 20 {_NUL}"),
+    "editor-save": (14, f"the editor's errors on saving: at step 14 the "
+                        f"text saved to NUL, {_DEVICE}"),
     "help-broken": (24, "a help file that cannot be read: at step 24 "
                         "DOS's DEL"),
     "menu-files": (24, "the menu and extension files edited: at step 24 "
                        "DOS's ATTRIB"),
-    "panel-keys": (38, f"masks, the panels off and on, and commands: at "
-                       f"step 38 {_ORDER}"),
     "history-drives": (60, "the history of commands and the drive box: "
                            "at step 60 the diskette in A:, which Linux has "
                            "not"),
@@ -1505,8 +1511,10 @@ LINUX_CUT = {
                             "CLS"),
     "setup-damaged": (21, "the setup file damaged: at step 21 DOS's "
                           "CLS, and COPY behind it"),
-    "user-menu": (77, "the user menu's lines: from step 77 its file, "
-                      "which DOS's DEL takes away at step 80"),
+    "user-menu": (62, f"the user menu's lines: at step 62 the menu of a "
+                      f"line whose file is NUL.MNU, the device, {_DEVICE}; "
+                      "from step 77 its file, which DOS's DEL takes away "
+                      "at step 80"),
     "view-commands": (17, "F3 and F4 and their extension files: at step "
                           "17 DOS's DEL"),
     "delete-mask": (19, "a mask of files deleted: at step 19 B:, the "
@@ -1515,14 +1523,31 @@ LINUX_CUT = {
                        "a file of STAMPS shown in the Info panel, which on "
                        "the bench has nothing to read and on the host its "
                        "size in zeros, as for `find`"),
-    "copy": (7, _NUL), "copy-dirs": (15, _NUL),
-    **{name: (step, _ORDER) for name, step in (
-        ("command-line", 42), ("stamps", 18), ("menu", 30),
-        ("menu-items", 24), ("tree-deep", 14), ("tree-box", 14),
-        ("tree-choose", 4), ("delete", 38), ("make-directory", 3),
-        ("dialog-keys", 32), ("copy-ask", 29), ("copy-tree", 4),
-        ("mouse-dialog", 5), ("mouse-tree", 12), ("mouse-find", 5),
-        ("cursor", 41))},
+    "copy-dirs": (14, f"directories copied, renamed and moved: at step 14 "
+                      f"the files of one copied to NUL, {_DEVICE}, after "
+                      "which the original's screen is a row higher"),
+    "tree-choose": (15, "a directory chosen from the tree: at step 15 the "
+                        "diskette in A:, which Linux has not"),
+    "copy-ask": (31, "a copy that asks: at step 31 the tree of D:, which "
+                     "Linux has not"),
+    "panel-keys": (46, "masks, the panels off and on, and commands: at "
+                       "step 46 D:, which Linux has not"),
+    "copy-tree": (15, "a directory of the tree renamed: at step 15 SRC "
+                      "made SRC1, which keeps its place in the directory "
+                      "on DOS and goes to its end in the program for "
+                      "Linux, whose emulation of DOS keeps a directory's "
+                      "names in the order in which it first met each"),
+    "stamps": (18, "the time stamps of files: at step 18 the file "
+                   "search through C:, which lists a directory as it "
+                   "stands on the disk, where the bench has made the "
+                   "directories in front of the files, and the program "
+                   "for Linux, whose emulation of DOS lists a directory "
+                   "by its names when it first reads it, has SUB behind "
+                   "the files of STAMPS"),
+    "mouse-find": (14, "the mouse in the list of the file search: at step "
+                       "14 a search of A:, which Linux has not"),
+    "copy": (62, f"a file copied: from step 62 a file of NUL's and one "
+                 f"to CON, {_DEVICE}"),
     # Of those that went to A: or to D:\VC, the ones that went there for
     # more than files to work on, which the others find in C:\FILES,
     # H:\FILES on Linux (CLAUDE.md, step 6).
@@ -1533,6 +1558,25 @@ LINUX_CUT = {
                                  "Linux has neither of"),
     "mouse-drive": (5, "the letter A: chosen in the drive box by the "
                        "mouse, where the box of Linux has H and R"),
+}
+
+# The steps that the program for Linux is not taken through in one
+# scenario, where a scenario uses a name of DOS's devices as the device
+# on the way to something else, and leaves no trace of it on DOS: the
+# screens after them are the original's (CLAUDE.md, step 6, the user's
+# word of 15 October 2026). Where the original's screen is a row higher
+# after such a step, as when the BIOS beeps, the steps are not left out
+# but the scenario is cut there (LINUX_CUT).
+LINUX_LEFT_OUT_OF = {
+    "copy": {
+        ("F5", '"nul" Enter', "F5", '"con" Enter', "Enter"):
+            f"a file copied to NUL, and to CON, refused: {_DEVICE}",
+    },
+    "delete": {
+        ("Shift+F8", '"nul"', "Enter", "Esc"):
+            f"NUL deleted by a mask, which DOS finds and cannot delete: "
+            f"{_DEVICE}",
+    },
 }
 
 # What the program for Linux is expected to show otherwise than the
@@ -1553,6 +1597,9 @@ LINUX_RULES = (
 # typed (the design of L3b, which the user decided on 15 October 2026).
 _ON_H = "the bench's C: is H: on Linux, the home directory"
 LINUX_IN_PLACE_IN = {
+    "copy": {
+        ('"c:readme.txt" Enter',): (('"h:readme.txt" Enter',), _ON_H),
+    },
     "names": {
         ('Space Space "c:hello.txt" Space',):
             (('Space Space "h:hello.txt" Space',), _ON_H),
@@ -1563,7 +1610,8 @@ LINUX_IN_PLACE_IN = {
 }
 
 ON_LINUX = Declared(not_run=LINUX_NOT_RUN, rules=LINUX_MASKS + LINUX_RULES,
-                    cut=LINUX_CUT, in_place_in=LINUX_IN_PLACE_IN)
+                    cut=LINUX_CUT, in_place_in=LINUX_IN_PLACE_IN,
+                    left_out_of=LINUX_LEFT_OUT_OF)
 
 TREES["posix"] = _on_top(TREES["portable_c"], ON_LINUX)
 

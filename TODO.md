@@ -18908,6 +18908,59 @@ that reads a word of bytes, a piece of its own across the 23 files.
   with the command of `posix-unit` (its top says why), and the build of
   `posix-unit` leaves it out, for its `main`.
 
+### TREE, the bench's directories in name order: done
+
+On the user's word of 15 October 2026 (`CLAUDE.md`, "Scenarios", the
+bullet on the bench sorted by name, and step 6 for the devices).
+
+- The bench's C: is made with its directories in the order of their
+  names, FILES, STAMPS, WORK in the root (`setups._work_disk`; DOCS and
+  SRC, SUB and BIN were so already), and its files too, DATA.BIN to
+  RUN.BAT and EVENING.DAT to NOON.DAT: the file search lists a
+  directory as it stands on the disk, and the program for Linux lists
+  one by its names. A directory still stands in front of the files of
+  its directory, as the bench made them: interleaving them by name was
+  tried and dropped, since `move` then moves WORK otherwise at its end
+  and no scenario reads a tree file any more (eight instructions of
+  `ReadTre`). FILES keeps its order, its files in front of BIN, which
+  `sort` is about.
+- The goldens were derived again twice, one commit each, and held by
+  `harness/sortcheck.py --before HEAD`: screens moved only where the
+  tree or a list in the disk's order shows, and no instruction of the
+  batches is run by no scenario. With the files in order a list is
+  sorted with less of Sort's swap, which eleven scenarios still run
+  whole, those with FILES or files of their own. `mouse-history`'s
+  `.ran` has a block of two or three bytes, 60C6 or 5E52 or none, that
+  comes and goes with the load: a flaw of the recording, not looked
+  into.
+- Rewritten to go where they meant: `copy-tree` (DOCS and WORK by two
+  Downs more), `cursor` (step 42 one Down, so that the tree moves when
+  it did), `command-line` (the speed search's comments). The others
+  that move through the tree go by places, and stay.
+- Patches of the portable C made again and read: `menu`, `move` (the
+  tree's cursor on another row, the same cells), `setup-defaults` and
+  `start-setup` (the rows of the distribution's unsorted panels gone,
+  the original's list being the sorted one now).
+- On Linux (`deviations.py`): `tree` is run, and the cuts of the
+  tree's order are gone. `tree`, `command-line`, `make-directory`,
+  `tree-box`, `tree-deep`, `menu-items`, `delete`, `menu`,
+  `dialog-keys`, `mouse-dialog`, `mouse-tree` and `cursor` pass whole.
+  What still stops one, each with its reason in `LINUX_CUT`: A: or D:
+  (`tree-choose` 15, `copy-ask` 31, `panel-keys` 46, `mouse-find` 14);
+  `copy-tree` 15, a directory renamed, which keeps its place in its
+  directory on DOS and goes to the end in the emulation's table
+  (`names_posix.c`, `Add`): keeping the place there would lift it, a
+  change of the program for Linux; `stamps` 18, the file search, where
+  the bench has SUB in front of STAMPS's files and Linux behind them.
+- DOS's names of devices (`_DEVICE`): steps that use NUL or CON as the
+  device and leave no trace are left out (`LINUX_LEFT_OUT_OF`: `copy`
+  6 to 10, `delete` 53 to 56); where the original beeps for one, which
+  moves the screen up a row, the scenario is cut there (`copy` 62,
+  `copy-dirs` 14, `editor-save` 14, `user-menu` 62, the menu of
+  NUL.MNU). `copy` 29 types `h:readme.txt` for `c:readme.txt`
+  (`LINUX_IN_PLACE_IN`). `_on_top` joins what the portable C and Linux
+  each leave out of one scenario, where it took Linux's alone.
+
 ### L3c, the drives R: and H:: done
 
 What the user decided on 15 October 2026 (`CLAUDE.md`, step 6), in
