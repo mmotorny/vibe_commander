@@ -17274,6 +17274,110 @@ the rebase onto 5b's second half, and is the root's bytes at
 `offsetof` now. Hold a mend to the test, not to a run of the checks by
 hand. EXPECTED of `harness/stubcheck.py` is empty since.
 
+### G6, the jumps of the remaining files: done
+
+The piece G6 of the sweep of jumps (`CLAUDE.md`, "The portable C", the
+bullet on `goto`), a commit for each file. 137 `goto` went, of 143 in
+the eleven files; 6 stay:
+
+| file | function | went | how |
+|---|---|---|---|
+| `blank.c` | `Blank` | 9 | `if` round a star that comes out, a `break` of the loop that looks for its place; the wait a loop that a `break` leaves, with a flag that the timer ticked for the sky's `do ... while` |
+| `keys.c` | `F20_02` | 2 | a flag that DOS is on the other panel's directory |
+| `extfile.c` | `FindExt` | 2 | a flag that the extension is the entry's |
+| `panel.c` | `FilDir` | 1 | a test of the two counts |
+| `enter.c` | `F27_00` | 2 | `F27_05`, a helper, called at the three places |
+| `start.c` | `Init00` | 1 | a flag that the setup file was taken |
+| `stopts.c` | `StF04_10` | 6 | `StF04_17` and `StF04_18`, the delay taken and the line refused |
+| `read.c` | `ReDr00` | 9 | a number, `READ_` of the file, for which of ReDr26, ReDr27, ReDr34 and ReDr35 the search ends at; `ReDr24`, the current directory of the drive, a helper; the extension file read whole returns, two lines written twice |
+| `main.c` | `Init50` | 3 | `Init52`, three lines, a helper called before the loop and where another drive is chosen, so that the loop has one way in, at Init53 |
+| | `Func21` | 4 | `Func30` and `Func40`, helpers |
+| | `ErrRdy` | 4 | `break`, the drive cleared first for ErRdy6 |
+| | `FtErr1` | 1 | a flag, `fatal` |
+| `cmdline.c` | `F68_00` | 24 | two `do ... while`, F68_01 and F68_04; the cursor drawn at the top of a loop, F68_07, round the loop of the keys and the mouse, F68_08, which ends where the cursor goes elsewhere, F68_12, or the box goes, a flag |
+| | `F77_00` | 11 | the loop begins at F77_02, with the key that began the search, and reads the next at its end, F77_01 |
+| | `F80_00` | 6 | `F80_05`, the name typed if there is room, a helper, for the file under the cursor and in the loop over the selected ones |
+| | `F68_25` | 2 | `break` |
+| `dirfunc.c` | `F38_40` | 16 | the box opened and closed round `DeleteFile` and `RemoveDir`, which return where the jumps went, `WALK` for a directory whose files go first; `F38_43` and `F38_54` helpers; F38_57, two lines, written twice where the command stops with no box open |
+| | `F38_70` | 6 | the box round `F38_72` |
+| | `M30_50` | 7 | the box round `M30_51`, with `M30_56` |
+| | `M30_60` | 17 | `return M30_75()` |
+| | `F47_01` | 1 | `F47_03` |
+| | `F48_00` | 2 | a flag that the mask names every file |
+| | `M30_00` | 1 | the two lines of M30_07 written twice |
+
+Stay: `Loop` of `main.c`, 4, the main loop, a state machine that
+mirrors the assembly on purpose; and `FncSel` of `dirfunc.c`, 2, whose
+loop over the selected files is entered in the middle, at `one`, for
+the file under the cursor, and goes on from there when nothing is
+selected and the command is not for one file: a loop with two ways in.
+
+Read and judged otherwise than the assessment: `F68_00`, which it named
+among the hard ones, has loops with one way in each once Up and Down
+fall into End and Home as the second line of their cases and the
+search for a letter leaves its loop with the row or without it;
+`F77_00`, whose loop was entered at F77_02 with the first key, is that
+loop with the reading of a key at its end; `F80_00`'s file under the
+cursor went into the loop and out of it at once, so what both do is a
+helper and the loop has one way in; `Init50` is the same with three
+lines. A loop that is entered in the middle and goes round from there,
+as `FncSel`'s, kept its jumps.
+
+Seventeen static helpers, each named for its label in the assembly
+where it is the code there, `DeleteFile` and `RemoveDir` for what they
+do, each said at its head. Four flags and one number, `READ_` of
+`read.c`, say which way a jump went: an `enum` held in an `i32`, since
+`int16.py` takes a variable of an `enum` type for a number of either
+width. `key` of `F68_00` has a value from the start, as 5b gave three:
+clang's `-Wconditional-uninitialized` cannot tell that it is read only
+where `Input` has set it. A label's name stands in a comment where the
+label was; where the C's label had a name of its own, `same`, `end`,
+`older`, `shown`, `wake`, the assembly's stands in its place.
+
+What no scenario runs, by the original's instructions that
+`harness/ported.py` lists as out of reach, each read once more side
+by side with the old code: in `F20_02` a current directory that DOS
+has not told, PathEr, and the other panel's directory that DOS will
+not go to, the `else` that marks the drive unknown; in
+`M30_56` the box for attributes that DOS refuses for another reason
+than a drive that is not ready; in `FtErr1` an error of the FAT, the
+flag `fatal`; in `Init50` the drive chosen where none was noted, and
+in `ErrRdy` the middle button, lines that did not change. Every other
+instruction of the original's routines ran. That an instruction ran
+says nothing of which way a jump went: the jumps to a shared end,
+ReDr26, F38_43, M30_56, M30_75, F47_03 and F38_57, were each read
+against the old code.
+
+The harness: `DelEr_B` and `CntDi_B` are handed to `F38_43`, which no
+form of `harness/reads.py` knows, and have entries of `REVIEWED`
+there. `harness/width.txt` has the helpers' numbers, with the reasons
+of the numbers they came from, carried by a script (the record keyed
+by its first line, the place of a sign by its line, from the committed
+record to the one `--record` writes, by name or by the function the
+entry came from), and `--record` run again behind it for the counts;
+the places of a sign whose lines changed in `Blank`, `FilDir` and
+`F80_00` (the last in `harness/int16.txt`) keep their reasons. The
+records of `hostcheck.py` and `words.py` did not move.
+
+**What judged it.** The whole suite, fourteen tests, 158 scenarios, no
+golden and no patch changed (the whole suite, `reads.py` being shared;
+a piece that touches only the portable C and its records runs `-R
+portable_c`). The code is 536 bytes longer than `main`'s at aedea88,
+on which the images were held before the rebase, so against `main`'s build
+every scenario differs in all of the room. Against `main`'s build
+padded to the same length of code, a function of 133 byte stores to a
+`volatile` pointer behind the last of `sys_dos.c`, not kept (`_TEXT`
+1D186h in both, every segment of the map where this build has it):
+150 of 158 scenarios with nothing that differs, `blank-timed` and
+`mouse-tree` with nothing but what may differ, and the six that S,
+N22, G3 and G2 met, `comspec`, `ended`, `second-copy`, `start-screen`,
+`start-setup`, whose second copy of the program lives in the room with
+code of another layout, and `start-memory`, `ViewSeg` and `FreMem2`
+naming nothing known. Nothing is declared as changed. The padded build
+was built by `cmake` from `git archive` of `main` in `build/`, with the
+two `FETCHCONTENT_SOURCE_DIR_` of `build/_deps`, so that the stub is
+put on as the build does.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on
