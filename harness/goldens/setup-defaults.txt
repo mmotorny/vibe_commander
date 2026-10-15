@@ -429,12 +429,12 @@ cursor 8 23 lines 6 7 mode 3
 |Copyright (C) 1991-2000 Vsevolod V. Volk║..          │            │            ║| 07x40 1Bx1 30x12 1Bx27
 |                                        ║DOCS        │            │            ║| 07x40 1Bx40
 |                                        ║SRC         │            │            ║| 07x40 1Bx40
-|                                        ║readme   txt│            │            ║| 07x40 1Bx40
+|                                        ║data     bin│            │            ║| 07x40 1Bx40
+|                                        ║empty    dat│            │            ║| 07x40 1Bx40
 |                                        ║hello    txt│            │            ║| 07x40 1Bx40
 |                                        ║notes    doc│            │            ║| 07x40 1Bx40
-|                                        ║data     bin│            │            ║| 07x40 1Bx40
+|                                        ║readme   txt│            │            ║| 07x40 1Bx40
 |                                        ║run      bat│            │            ║| 07x40 1Bx40
-|                                        ║empty    dat│            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 6Cx1 1Bx39
 |                                        ║            │            │            ║| 07x40 1Bx40
@@ -457,12 +457,12 @@ cursor 8 23 lines 6 7 mode 3
 |║STAMPS      │            │            ║║..          │            │            ║| 1Bx41 30x12 1Bx27
 |║WORK        │            │            ║║DOCS        │            │            ║| 1Bx80
 |║            │            │            ║║SRC         │            │            ║| 1Bx80
-|║            │            │            ║║readme   txt│            │            ║| 1Bx80
+|║            │            │            ║║data     bin│            │            ║| 1Bx80
+|║            │            │            ║║empty    dat│            │            ║| 1Bx80
 |║            │            │            ║║hello    txt│            │            ║| 1Bx80
 |║            │            │            ║║notes    doc│            │            ║| 1Bx80
-|║            │            │            ║║data     bin│            │            ║| 1Bx80
+|║            │            │            ║║readme   txt│            │            ║| 1Bx80
 |║            │            │            ║║run      bat│            │            ║| 1Bx80
-|║            │            │            ║║empty    dat│            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80

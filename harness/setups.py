@@ -80,30 +80,32 @@ RIGHT_PANEL_KEYS = "F9 r b"
 BY_NAME_KEYS = ["F9 l n", "F9 r n"]
 SAVE_SETUP_KEYS = "Shift+F9 Enter"
 # The contents of C:\WORK on the test bench, in the order of the
-# directory, which the panels do not show since the bench sorts them by
-# name.
+# directory, which is that of their names: the panels sort them by name
+# on the bench, and what lists a directory as it stands on the disk, the
+# file search, has them so too (CLAUDE.md, "Scenarios").
 WORK_DIRECTORIES = ["DOCS", "SRC"]
 WORK_FILES = [
-    ("README.TXT", b"Files for exercising Volkov Commander.\r\n"),
+    ("DATA.BIN", bytes(range(256)) * 4),
+    ("EMPTY.DAT", b""),
     ("HELLO.TXT", b"Hello, world!\r\n"),
     ("NOTES.DOC", b"Line one\r\nLine two\r\nLine three\r\n"),
-    ("DATA.BIN", bytes(range(256)) * 4),
+    ("README.TXT", b"Files for exercising Volkov Commander.\r\n"),
     ("RUN.BAT", b"@ECHO OFF\r\nECHO run\r\n"),
-    ("EMPTY.DAT", b""),
 ]
 
 # The contents of C:\STAMPS: files whose sizes and time stamps cover what
-# the program has to cope with when it shows them. Name, size, time stamp.
+# the program has to cope with when it shows them. Name, size, time stamp,
+# in the order of their names, as WORK's are.
 # The sizes are only written into the directory; the files are empty.
 STAMPS_DIRECTORIES = ["SUB"]
 STAMPS_FILES = [
-    ("FIRST.DAT", 0, timestamp(1980, 1, 1, 0, 0, 0)),
-    ("NIGHT.DAT", 9, timestamp(1999, 12, 31, 0, 0, 58)),
-    ("MORNING.DAT", 1234, timestamp(2001, 2, 3, 9, 5, 6)),
-    ("NOON.DAT", 1048576, timestamp(2010, 10, 10, 12, 30, 0)),
     ("EVENING.DAT", 999999999, timestamp(2099, 11, 30, 23, 59, 58)),
-    ("LAST.DAT", 4294967295, timestamp(2107, 12, 31, 13, 1, 2)),
+    ("FIRST.DAT", 0, timestamp(1980, 1, 1, 0, 0, 0)),
     ("HUGE.DAT", 1000000000, timestamp(2000, 6, 16, 12)),
+    ("LAST.DAT", 4294967295, timestamp(2107, 12, 31, 13, 1, 2)),
+    ("MORNING.DAT", 1234, timestamp(2001, 2, 3, 9, 5, 6)),
+    ("NIGHT.DAT", 9, timestamp(1999, 12, 31, 0, 0, 58)),
+    ("NOON.DAT", 1048576, timestamp(2010, 10, 10, 12, 30, 0)),
 ]
 
 # C:\FILES: files to work on that are not the bench's own, for the

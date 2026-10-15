@@ -317,12 +317,12 @@ cursor 8 23 lines 6 7 mode 3
 |                                        ║..          │            │            ║| 07x40 1Bx1 30x12 1Bx27
 |                                        ║DOCS        │            │            ║| 07x40 1Bx40
 |                                        ║SRC         │            │            ║| 07x40 1Bx40
-|                                        ║readme   txt│            │            ║| 07x40 1Bx40
+|                                        ║data     bin│            │            ║| 07x40 1Bx40
+|                                        ║empty    dat│            │            ║| 07x40 1Bx40
 |                                        ║hello    txt│            │            ║| 07x40 1Bx40
 |                                        ║notes    doc│            │            ║| 07x40 1Bx40
-|                                        ║data     bin│            │            ║| 07x40 1Bx40
+|                                        ║readme   txt│            │            ║| 07x40 1Bx40
 |                                        ║run      bat│            │            ║| 07x40 1Bx40
-|                                        ║empty    dat│            │            ║| 07x40 1Bx40
 |                                        ║s        bat│            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 6Cx1 1Bx39
 |                                        ║            │            │            ║| 07x40 1Bx40
@@ -373,12 +373,12 @@ cursor 8 23 lines 6 7 mode 3
 |                                        ║..          │            │            ║| 07x40 1Bx1 30x12 1Bx27
 |                                        ║DOCS        │            │            ║| 07x40 1Bx40
 |                                        ║SRC         │            │            ║| 07x40 1Bx40
-|                                        ║readme   txt│            │            ║| 07x40 1Bx40
+|                                        ║data     bin│            │            ║| 07x40 1Bx40
+|                                        ║empty    dat│            │            ║| 07x40 1Bx40
 |                                        ║hello    txt│            │            ║| 07x40 1Bx40
 |                                        ║notes    doc│            │            ║| 07x40 1Bx40
-|                                        ║data     bin│            │            ║| 07x40 1Bx40
+|                                        ║readme   txt│            │            ║| 07x40 1Bx40
 |                                        ║run      bat│            │            ║| 07x40 1Bx40
-|                                        ║empty    dat│            │            ║| 07x40 1Bx40
 |                                        ║s        bat│            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 6Cx1 1Bx39
 |                                        ║            │            │            ║| 07x40 1Bx40
@@ -1017,12 +1017,12 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>set vc=c:\work                  ║..          │            │            ║| 07x40 1Bx1 30x12 1Bx27
 |C:\WORK>set comspec=                    ║DOCS        │            │            ║| 07x40 1Bx40
 |C:\WORK>d:\vc\vc                        ║SRC         │            │            ║| 07x40 1Bx40
-|The Volkov Commander, Version 4.05 freew║readme   txt│            │            ║| 07x40 1Bx40
-|Copyright (C) 1991-2000 Vsevolod V. Volk║hello    txt│            │            ║| 07x40 1Bx40
-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
-|C:\WORK>s                               ║data     bin│            │            ║| 07x40 1Bx40
-|C:\WORK>set vc=c:\work                  ║run      bat│            │            ║| 07x40 1Bx40
-|C:\WORK>set comspec=                    ║empty    dat│            │            ║| 07x40 1Bx40
+|The Volkov Commander, Version 4.05 freew║data     bin│            │            ║| 07x40 1Bx40
+|Copyright (C) 1991-2000 Vsevolod V. Volk║empty    dat│            │            ║| 07x40 1Bx40
+|                                        ║hello    txt│            │            ║| 07x40 1Bx40
+|C:\WORK>s                               ║notes    doc│            │            ║| 07x40 1Bx40
+|C:\WORK>set vc=c:\work                  ║readme   txt│            │            ║| 07x40 1Bx40
+|C:\WORK>set comspec=                    ║run      bat│            │            ║| 07x40 1Bx40
 |C:\WORK>d:\vc\vc                        ║s        bat│            │            ║| 07x40 1Bx40
 |The Volkov Commander, Version 4.05 freew║vc       ini│            │            ║| 07x40 6Cx1 1Bx39
 |Copyright (C) 1991-2000 Vsevolod V. Volk║            │            │            ║| 07x40 1Bx40
@@ -1073,12 +1073,12 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>set vc=c:\work                  ║..          │            │            ║| 07x40 1Bx1 30x12 1Bx27
 |C:\WORK>set comspec=                    ║DOCS        │            │            ║| 07x40 1Bx40
 |C:\WORK>d:\vc\vc                        ║SRC         │            │            ║| 07x40 1Bx40
-|The Volkov Commander, Version 4.05 freew║readme   txt│            │            ║| 07x40 1Bx40
-|Copyright (C) 1991-2000 Vsevolod V. Volk║hello    txt│            │            ║| 07x40 1Bx40
-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
-|C:\WORK>s                               ║data     bin│            │            ║| 07x40 1Bx40
-|C:\WORK>set vc=c:\work                  ║run      bat│            │            ║| 07x40 1Bx40
-|C:\WORK>set comspec=                    ║empty    dat│            │            ║| 07x40 1Bx40
+|The Volkov Commander, Version 4.05 freew║data     bin│            │            ║| 07x40 1Bx40
+|Copyright (C) 1991-2000 Vsevolod V. Volk║empty    dat│            │            ║| 07x40 1Bx40
+|                                        ║hello    txt│            │            ║| 07x40 1Bx40
+|C:\WORK>s                               ║notes    doc│            │            ║| 07x40 1Bx40
+|C:\WORK>set vc=c:\work                  ║readme   txt│            │            ║| 07x40 1Bx40
+|C:\WORK>set comspec=                    ║run      bat│            │            ║| 07x40 1Bx40
 |C:\WORK>d:\vc\vc                        ║s        bat│            │            ║| 07x40 1Bx40
 |The Volkov Commander, Version 4.05 freew║vc       ini│            │            ║| 07x40 6Cx1 1Bx39
 |Copyright (C) 1991-2000 Vsevolod V. Volk║            │            │            ║| 07x40 1Bx40
@@ -1101,12 +1101,12 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>set vc=c:\work                  ║.│√ Brief                │            ║| 07x40 1Bx1 30x2 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx11
 |C:\WORK>set comspec=                    ║D│  Full                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |C:\WORK>d:\vc\vc                        ║S│  Info                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|The Volkov Commander, Version 4.05 freew║r│  Tree                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|Copyright (C) 1991-2000 Vsevolod V. Volk║h│  On/Off       Ctrl-F2 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|                                        ║n│ ───────────────────── │            ║| 07x40 1Bx2 30x25 03x2 1Bx11
-|C:\WORK>s                               ║d│  Name                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|The Volkov Commander, Version 4.05 freew║d│  Tree                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|Copyright (C) 1991-2000 Vsevolod V. Volk║e│  On/Off       Ctrl-F2 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|                                        ║h│ ───────────────────── │            ║| 07x40 1Bx2 30x25 03x2 1Bx11
+|C:\WORK>s                               ║n│  Name                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |C:\WORK>set vc=c:\work                  ║r│  eXtension            │            ║| 07x40 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx11
-|C:\WORK>set comspec=                    ║e│  tiMe                 │            ║| 07x40 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
+|C:\WORK>set comspec=                    ║r│  tiMe                 │            ║| 07x40 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
 |C:\WORK>d:\vc\vc                        ║s│  Size                 │            ║| 07x40 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |The Volkov Commander, Version 4.05 freew║v│√ Unsorted             │            ║| 07x40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |Copyright (C) 1991-2000 Vsevolod V. Volk║ │ ───────────────────── │            ║| 07x40 1Bx2 30x25 03x2 1Bx11
@@ -1129,12 +1129,12 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>set vc=c:\work                  ║..          │            │            ║| 07x40 1Bx1 30x12 1Bx27
 |C:\WORK>set comspec=                    ║DOCS        │            │            ║| 07x40 1Bx40
 |C:\WORK>d:\vc\vc                        ║SRC         │            │            ║| 07x40 1Bx40
-|The Volkov Commander, Version 4.05 freew║readme   txt│            │            ║| 07x40 1Bx40
-|Copyright (C) 1991-2000 Vsevolod V. Volk║hello    txt│            │            ║| 07x40 1Bx40
-|                                        ║notes    doc│            │            ║| 07x40 1Bx40
-|C:\WORK>s                               ║data     bin│            │            ║| 07x40 1Bx40
-|C:\WORK>set vc=c:\work                  ║run      bat│            │            ║| 07x40 1Bx40
-|C:\WORK>set comspec=                    ║empty    dat│            │            ║| 07x40 1Bx40
+|The Volkov Commander, Version 4.05 freew║data     bin│            │            ║| 07x40 1Bx40
+|Copyright (C) 1991-2000 Vsevolod V. Volk║empty    dat│            │            ║| 07x40 1Bx40
+|                                        ║hello    txt│            │            ║| 07x40 1Bx40
+|C:\WORK>s                               ║notes    doc│            │            ║| 07x40 1Bx40
+|C:\WORK>set vc=c:\work                  ║readme   txt│            │            ║| 07x40 1Bx40
+|C:\WORK>set comspec=                    ║run      bat│            │            ║| 07x40 1Bx40
 |C:\WORK>d:\vc\vc                        ║s        bat│            │            ║| 07x40 1Bx40
 |The Volkov Commander, Version 4.05 freew║vc       ini│            │            ║| 07x40 6Cx1 1Bx39
 |Copyright (C) 1991-2000 Vsevolod V. Volk║            │            │            ║| 07x40 1Bx40

@@ -55,36 +55,6 @@ rows 5-11
 +|║run      bat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
 +|║            │            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14
 
-== 15: "d:\vc\vc" Enter
-rows 5-10
--|                                        ║readme   txt│            │            ║| 07x40 1Bx40
--|                                        ║hello    txt│            │            ║| 07x40 1Bx40
--|                                        ║notes    doc│            │            ║| 07x40 1Bx40
--|                                        ║data     bin│            │            ║| 07x40 1Bx40
--|                                        ║run      bat│            │            ║| 07x40 1Bx40
--|                                        ║empty    dat│            │            ║| 07x40 1Bx40
-+|                                        ║data     bin│            │            ║| 07x40 1Bx40
-+|                                        ║empty    dat│            │            ║| 07x40 1Bx40
-+|                                        ║hello    txt│            │            ║| 07x40 1Bx40
-+|                                        ║notes    doc│            │            ║| 07x40 1Bx40
-+|                                        ║readme   txt│            │            ║| 07x40 1Bx40
-+|                                        ║run      bat│            │            ║| 07x40 1Bx40
-
-== 16: Ctrl+F1
-rows 5-10
--|║            │            │            ║║readme   txt│            │            ║| 1Bx80
--|║            │            │            ║║hello    txt│            │            ║| 1Bx80
--|║            │            │            ║║notes    doc│            │            ║| 1Bx80
--|║            │            │            ║║data     bin│            │            ║| 1Bx80
--|║            │            │            ║║run      bat│            │            ║| 1Bx80
--|║            │            │            ║║empty    dat│            │            ║| 1Bx80
-+|║            │            │            ║║data     bin│            │            ║| 1Bx80
-+|║            │            │            ║║empty    dat│            │            ║| 1Bx80
-+|║            │            │            ║║hello    txt│            │            ║| 1Bx80
-+|║            │            │            ║║notes    doc│            │            ║| 1Bx80
-+|║            │            │            ║║readme   txt│            │            ║| 1Bx80
-+|║            │            │            ║║run      bat│            │            ║| 1Bx80
-
 == disks
 -D:\VC\VC.INI  A   during the run  511 bytes  569cee89cebc72d2
 +D:\VC\VC.INI  A   during the run  511 bytes  38fe03b0861f31ee
