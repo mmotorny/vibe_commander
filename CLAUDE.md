@@ -317,8 +317,8 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   row of keys that a phone lacks, F1 to F10, Esc, Tab, the arrows, PgUp
   and PgDn, and Ctrl and Alt that stay held for the next key, stands
   with a button that brings up the phone's keyboard.
-- It is served by a server of the project's own, a script of Python's
-  standard library: the page, and the drives' directories with their
+- It is served by a server of the project's own, a script for Node
+  with Node's own modules and nothing from npm: the page, and the drives' directories with their
   writes, and nothing outside them. It listens on the workstation alone,
   and Tailscale Serve hands it to the user's tailnet over HTTPS: anyone
   on the tailnet may write, the tailnet being the access. The page needs
