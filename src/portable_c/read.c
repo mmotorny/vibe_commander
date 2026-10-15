@@ -76,6 +76,38 @@ static const u8 DrIn_F[] = "DIRINFO";
 #define ERR_NO_MORE   0x12
 #define ERR_NOT_READY 0x53
 
+/* How reading a directory ends, in ReDr00: where the assembly goes on
+   from its search. */
+enum {
+    READ_NOT,           /* ReDr26: not read, and the marks not kept */
+    READ_ON,            /* ReDr27: there are entries to take */
+    READ_WHOLE,         /* ReDr34: read to its end, or as far as there
+                           was room */
+    READ_BROKEN         /* ReDr35: broken off by an error of DOS */
+};
+
+/* ReDr24 of ReDr00: the directory of the panel is not there, so the
+   current one of its drive is taken, or that of the drive of DOS's
+   path where the drive is none. Returns whether one was. */
+static bool ReDr24(struct WCBdef *panel)
+{
+    struct Answer asked;
+    i32 drive;
+
+    for (;;) {
+        drive = (u8)(panel->WinPath[0] - ('A' - 1));
+        if (Fantom(drive))
+            return false;
+        asked = DirCurrent((u16)drive, panel->WinPath + 3);
+        if (!asked.failed)
+            return true;
+        if (asked.value != ERR_NO_DRIVE)
+            return false;
+        panel->WinPath[0] = md.DosPth[0];       /* ReDr23 */
+        panel->WinPath[3] = 0;
+    }
+}
+
 /* Read the directory of a panel of files, and its extension file: ReDir
    of the original from ReDr00 on. What
    the panel had before is left for ReDr50 at Room and in `old`, with
@@ -119,6 +151,7 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
     u16 attributes, found, answer;
     struct Answer opened, asked, closed;
     struct Moved got;
+    i32 reading;                       /* how the reading ends, READ_ */
 
     /* Expand, in the original: it moves the panel behind this one as
        far up as it goes, but no further than 64K from here, and the
@@ -160,6 +193,7 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
     old->first = oldFirst - DSKBUF;
 
     /* Read the directory. */
+    reading = READ_NOT;
     retries = 0;
     for (;;) {
         /* ReDr20 */
@@ -181,39 +215,32 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
         }
         drive = (u8)(panel->WinPath[0] - ('A' - 1));
         if (Fantom(drive))
-            goto unread;
+            break;                      /* ReDr26 */
         SetDTA();
         asked = FindFirst(md.TmpBuf, 0x37);
-        if (!asked.failed)
+        if (!asked.failed) {
+            reading = READ_ON;
             break;
-        if (asked.value == ERR_NO_MORE)
-            goto read;
+        }
+        if (asked.value == ERR_NO_MORE) {
+            reading = READ_WHOLE;       /* ReDr34 */
+            break;
+        }
         if (asked.value != ERR_NO_PATH)
-            goto unread;
+            break;                      /* ReDr26 */
         /* ReDr22: the directory is not there. */
         keep = false;
         retries++;
         if (retries > 2)
-            goto unread;
+            break;                      /* ReDr26 */
         if (retries == 2) {
             panel->WinPath[0] = md.DosPth[0];
             panel->WinPath[3] = 0;
         }
-        for (;;) {
-            /* ReDr24 */
-            drive = (u8)(panel->WinPath[0] - ('A' - 1));
-            if (Fantom(drive))
-                goto unread;
-            asked = DirCurrent((u16)drive, panel->WinPath + 3);
-            if (!asked.failed)
-                break;
-            if (asked.value != ERR_NO_DRIVE)
-                goto unread;
-            panel->WinPath[0] = md.DosPth[0];
-            panel->WinPath[3] = 0;
-        }
+        if (!ReDr24(panel))
+            break;                      /* ReDr26 */
     }
-    for (;;) {
+    while (reading == READ_ON) {
         /* ReDr27 */
         md.BlocEr = 0;
         attributes = md.DTA.FilAttr;
@@ -254,8 +281,10 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
         }
         asked = FindNext();
         if (asked.failed) {
-            if (asked.value != ERR_NO_MORE)
-                goto ended;
+            if (asked.value == ERR_NO_MORE)
+                reading = READ_WHOLE;       /* ReDr34 */
+            else
+                reading = READ_BROKEN;      /* ReDr35 */
             break;
         }
         if (file >= limit) {
@@ -264,6 +293,7 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
             grown = PanelGrow(panel, count);
             if (grown == 0) {
                 Beep();
+                reading = READ_WHOLE;   /* ReDr34 */
                 break;
             }
             panel = grown;
@@ -271,12 +301,10 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
                     - PANEL_TAIL;
         }
     }
-read:
-    panel->ChgFlg = 0;
-    goto ended;
-unread:
-    keep = false;
-ended:
+    if (reading == READ_WHOLE)
+        panel->ChgFlg = 0;              /* ReDr34 */
+    else if (reading == READ_NOT)
+        keep = false;                   /* ReDr26 */
     /* ReDr35 */
     PLACES(panel)->EndFul = file;
     PLACES(panel)->EndBuf = file;
@@ -299,7 +327,8 @@ ended:
             closed = FileClose(opened.value);
             if (!closed.failed && !got.failed) {
                 panel->ExtBuf[got.count] = 0x1A;
-                goto done;
+                old->keep = keep;       /* as at the end */
+                return panel;
             }
             /* A drive that was not ready has the panel read again: for
                the file opened, for the file closed, and, where closing
@@ -324,7 +353,6 @@ ended:
     }
     for (i = 0; i < LenExt; i++)
         panel->ExtBuf[i] = md.ExtMain[i];
-done:
     old->keep = keep;
     return panel;
 }
