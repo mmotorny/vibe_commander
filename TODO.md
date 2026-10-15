@@ -20440,6 +20440,71 @@ top of the three stages' commits, rebased onto L5, none landed):
     `editor-search`, `editor-save`, `delete-mask`, `copy`, `reread`
     (step 9, Ctrl+F4), `setup-config`, `dirinfo`.
 
+**Stage 5, where it stands** (a fifth agent, on 15 October 2026; the
+eight commits of the stages before landed on top of L6, which ran into
+`ProgramRun` of `sys_posix.c`: L6's kept, with the line that says the
+step under the test channel):
+
+- 77 of the 118 that run pass (`python3 harness/compare.py --together 4
+  build/portable_c/posix-asan/vc`, under a minute). The mouse scenarios
+  run: `posixrun.pointer` makes a step of the mouse the channel's
+  `mouse=` and `asks=`, as `driver._pointer` makes its packets; 16 of
+  them passed at once. `label` is not run: making a label is refused on
+  Linux, and from its first label on every screen is another.
+- Masks built (`LINUX_MASKS`): the drive menu's row of letters; DOS's
+  prompt behind the program left, a row of a prompt alone over an empty
+  row, with the cursor (`DosPrompt`, which `masked` hands the golden's
+  cursor to the build's screen for); the letter of `C>`, of a prompt
+  cut by a mini status above the key bar, in front of a name typed,
+  `c:hello.txt`; the label in the box of Ctrl+F4 and where only its end
+  shows; the Info panel's lines of the host's figures under a box
+  (`InfoUnder`, known by the panel's right frame on the row of its
+  title, its name or its label, and left out in the panel's colours and
+  their shadow). A directory of the bench that the run removed counts as
+  written into.
+- A rule of the tree that is no mask, `LINUX_RULES`: the hidden mark in
+  a panel, ░, is none on Linux and █ is ▐, since hidden is not kept (the
+  user's word). And `LINUX_IN_PLACE_IN`: `names` types `h:` for `c:`.
+- The channel: a key word with `+` has the next key put into the BIOS's
+  buffer in the same round, a buffer of 15 keys, as the driver puts the
+  keys of a chord ("Enter+F10": the program that empties the buffer
+  loses the second); posixrun writes chords so. The test's clock starts
+  on the first tick at its time (it began a tick before, 11:59:59), at
+  12:00:05, the bench's when the program starts (`posixrun.CLOCK`: a
+  file written at once had the laid-out time and was taken for one not
+  written), and the count of the timer's reads begins again behind a
+  tick, so the blanker goes idle (`blank` and `mouse-keys` hung).
+- The setup file saved is held by `posixrun.on_the_bench`, the design's
+  rule backwards: the ten scenarios that save it pass.
+- What the 41 that differ differ in first (`build/l3b5/r9.txt` of the
+  run, `summ.py` of stage 3):
+  - The tree's order, waiting on the user: `tree`, `command-line`,
+    `make-directory`, `copy-tree`, `tree-choose`, `tree-box`,
+    `tree-deep`, `menu-items`, `stamps`, `delete` (step 38), `copy-ask`
+    (29), `menu` (30), `dialog-keys`, `mouse-dialog`, `mouse-tree`.
+  - The order of a panel where a file is hidden (`sort` step 10,
+    `filter` step 15): the original lists a hidden file in front of the
+    others, and the program for Linux, which does not keep hidden, by
+    its name. An expectation of the tree's own, a patch of
+    `harness/goldens/posix/` (which then has the portable C's rows too),
+    by what the user decided; how the test holds the header of such a
+    patch was not looked at.
+  - `NUL`, DOS's device, which the emulation makes a file of (`copy`
+    step 7, `copy-dirs` 15, `editor-save` 20): **for the user**, whether
+    the emulation knows DOS's devices by their names, NUL above all.
+  - A: and `D:\VC` for files, the FILES layout not made (`cursor`,
+    `attributes-directory`, `mouse-select`, `mouse-drive`, `view-keys`,
+    `view-parts`, `view-search`, `move`, `mouse-view`, `mouse-edit`,
+    `editor-keys`, `help-broken`, `setup-help-file`, `setup-damaged`,
+    `setup-delay-file`, `menu-files`).
+  - Commands, which L6 runs now: `mouse-history` (the output of `ver`
+    and `echo`), and the cut and not-run of the command scenarios
+    (`LINUX_CUT`, the last of `LINUX_NOT_RUN`) are as before L6; to be
+    looked at again with what DOS has shown masked.
+  - Not looked at: `view-window` step 6, `mouse-find` step 5.
+- Not built: the test `portable_c-posix-scenarios`, the clean asan pass
+  of all, and the FILES layout.
+
 **Left.**
 
 - What stage 3 lists above; the mouse scenarios once L5 has landed.
