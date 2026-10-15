@@ -279,7 +279,16 @@ These held while `src/c/` was made, and they say what it is.
      the main data as one block across its fields, as the original
      does, that read goes through the main data as bytes at an offset,
      by a piece of its own, so that nothing is turned off for it, on
-     the user's word of the same day.
+     the user's word of the same day. A word of 16 or 32 bits read from or
+     written into a buffer of bytes, which the program does at an
+     address that may be odd as the original does, is made of its
+     bytes, `p[0] | p[1] << 8`, by words of `vc.h` (`GET16`, `PUT16`,
+     `GET32`, `PUT32`), not read through a cast of the pointer, so that
+     the sanitizer's check of alignment stays on, fatal, and nothing
+     rests on the order of a processor's bytes, on the user's word of
+     15 October 2026. The room of the editor and the viewer on Linux
+     is as much as the machine has; a cap comes with iOS, where the
+     system ends a program that takes too much.
   7. iOS, when Linux is done. Windows and macOS are not targets for now,
      on the user's word of 14 October 2026.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
