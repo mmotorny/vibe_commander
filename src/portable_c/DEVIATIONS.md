@@ -2695,13 +2695,15 @@ the host is listed as an empty file that cannot be opened. DOS's
 devices are not known by their names: NUL is a file of the directory,
 as on the host, which a copy to NUL makes.
 
-**Why.** The first is the user's decision of 14 October 2026. Whether
-the emulation knows DOS's devices by their names, NUL above all, is
-**open** with the user (`TODO.md`, "L3b, the scenarios on Linux").
+**Why.** The first is the user's decision of 14 October 2026; that
+DOS's names of devices are ordinary names of files on Linux, and the
+steps of scenarios that use them as devices are not run there, the
+user's of 15 October 2026 (`CLAUDE.md`, "The program for Linux").
 
 **Which scenarios show it.** `device` is not run on Linux: it is about
 a device of DOS's and DOS's critical error, which the program for Linux
-is never entered for. Cut at NUL, until the question is answered:
+is never entered for. Cut at NUL, each as `LINUX_CUT` of
+`harness/deviations.py` has it:
 `copy` at step 7, `copy-dirs` at 15, `editor-save` at 20.
 
 ### L7. A file of four gigabytes or more, and the room of a disk
@@ -2885,10 +2887,12 @@ the bench is the order in which they were made.
 **What the program for Linux does.** It lists them in the order of
 their names' bytes. The panels are sorted by name on both (entry 29).
 
-**Why.** It is **open** with the user (`TODO.md`, "L3b, the scenarios
-on Linux"): the bench laid out in the order of the names, the emulation
-listing a directory in the order in which it was made, or this
-declared.
+**Why.** The user decided on 15 October 2026 that the bench makes its
+directories and files in the order of their names (`CLAUDE.md`,
+"Scenarios"), so that the disk's order is the names' on DOS too; what
+still differs, where a scenario renames a directory or the file search
+meets the bench's directories in front of its files, is cut, each with
+its reason in `LINUX_CUT` of `harness/deviations.py`.
 
 **Which scenarios show it.** `tree` is not run on Linux. Cut at the
 first screen where the order shows: `command-line`, `stamps`, `menu`,
