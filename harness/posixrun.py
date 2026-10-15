@@ -58,6 +58,7 @@ import re
 import shutil
 import string
 import subprocess
+import threading
 import time
 from pathlib import Path
 
@@ -566,6 +567,7 @@ LINUX_SETUP_STEPS = ("Tab", "Ctrl+\\", "Tab", "Shift+F9 Enter")
 class _Steps:
     """A scenario of no name with `steps`, for run()."""
     name = "the setup file of the program for Linux"
+    files = False                 # no C:\FILES (lay_out)
 
     def __init__(self, steps):
         self.steps = steps
@@ -573,17 +575,26 @@ class _Steps:
 
 def linux_setup(program):
     """The setup file that the program for Linux, `program` (a
-    setups.Program), starts from in a scenario: see LINUX_SETUP."""
-    bench_file = bench_setup()
-    if not LINUX_SETUP.exists() or \
-            LINUX_SETUP.stat().st_mtime < program.path.stat().st_mtime or \
-            LINUX_SETUP.stat().st_mtime < SETUP.stat().st_mtime:
-        ran = run(_Steps(LINUX_SETUP_STEPS), program, bench_file)
-        if ran.saved is None:
-            raise MachineError("the program for Linux saved no setup file")
-        LINUX_SETUP.parent.mkdir(parents=True, exist_ok=True)
-        LINUX_SETUP.write_bytes(ran.saved)
-    return LINUX_SETUP.read_bytes()
+    setups.Program), starts from in a scenario: see LINUX_SETUP.
+    Scenarios run side by side as threads (compare.py), and the first
+    of them makes the file while the others wait: without the lock one
+    read it half written, and its program said "VC.INI is not
+    correct"."""
+    with _SETUP_LOCK:
+        bench_file = bench_setup()
+        if not LINUX_SETUP.exists() or \
+                LINUX_SETUP.stat().st_mtime < program.path.stat().st_mtime \
+                or LINUX_SETUP.stat().st_mtime < SETUP.stat().st_mtime:
+            ran = run(_Steps(LINUX_SETUP_STEPS), program, bench_file)
+            if ran.saved is None:
+                raise MachineError(
+                    "the program for Linux saved no setup file")
+            LINUX_SETUP.parent.mkdir(parents=True, exist_ok=True)
+            LINUX_SETUP.write_bytes(ran.saved)
+        return LINUX_SETUP.read_bytes()
+
+
+_SETUP_LOCK = threading.Lock()
 
 
 def bench_setup():
