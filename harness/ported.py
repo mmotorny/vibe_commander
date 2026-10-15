@@ -1471,16 +1471,23 @@ def check_translation(link_map, executed, tree, place, batches):
     instructions of its own where the one behind it in its file has the
     same. Such a function counts as run when another of its place did.
 
-    A function of a batch is one that other files call, and is in the
-    map among what is not static. The function that a tree has in its
-    place, under another name, may be static in its file, as an entry
-    that only the system comes to is: that name is looked for among the
-    static ones too, and has to be there once."""
+    A function of a batch is looked for in the map among what is not
+    static, and then among the static ones, where it has to be there
+    once: in the portable C a function that only its file calls is
+    static, by clang-tidy's misc-use-internal-linkage (TODO.md, "5b, the
+    stub"). The function that a tree has in its place, under another
+    name, may be static in its file too, as an entry that only the
+    system comes to is."""
     linked = le.Map(link_map)
     symbols = dict(linked.public)
     gone = GONE.get(tree, {})
     renamed = RENAMED.get(tree, {})
-    for name, _ in renamed.values():
+    wanted = [name for name, _ in renamed.values()]
+    if tree != "c":
+        wanted += [name.removesuffix("_c") + "_" for batch in batches
+                   for name in batch.functions
+                   if name not in gone and name not in renamed]
+    for name in wanted:
         found = linked.named(name)
         if name not in symbols and len(found) == 1:
             symbols[name] = (found[0].first, found[0].offset)

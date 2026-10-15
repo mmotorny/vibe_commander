@@ -11,9 +11,7 @@
  */
 #include "vc.h"
 
-u8 *UnConv(u8 *name, const u8 *buffer);
-
-/* Convert and TstMas are in vc.h. The name is where the assembly has DS,
+/* Convert, TstMas and UnConv are in vc.h. The name is where the assembly has DS,
    and comes as a pointer; the buffer or the mask is in the main
    data. */
 

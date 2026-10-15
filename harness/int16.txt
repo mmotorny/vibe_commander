@@ -333,7 +333,7 @@ tree.c, PutTree: widen
     less 7: this is 11 or more.
 
 tree.c, PutTree: widen
-    | n -= TreeFirst - TRELIST;
+    | n -= (i32)(TreeFirst - TRELIST); /* fewer than 4,096 entries */
     TreeFirst is an entry of the list at or before TreeCursor, which is
     one of the TreeLen entries that n holds, or the list's first while
     the list is empty: TreeCur, TrCr20, ChTree and F00_50 of keys.c set

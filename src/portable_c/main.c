@@ -39,10 +39,9 @@
 /* The registers that go round the loop are struct Regs of vc.h. */
 static i32 CmdEnd(struct Onward next, struct Regs *r);
 static i32 Command(i32 command, struct WCBdef *panel, struct Regs *r);
-u16 ErrRdy(u16 letter);
 static void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
-void RstVc1(void);
+static void RstVc1(void);
 
 
 /* Where the program goes on after a command, which is what Command
@@ -98,12 +97,6 @@ enum {
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
-void Panel(struct WCBdef *panel);                       /* panel.c */
-void PutPath(struct WCBdef *panel);
-void PutFls(struct WCBdef *panel);
-void PutTre(struct WCBdef *panel);                      /* tree.c */
-i32 StrLen(const u8 *text);                             /* string.c */
-const u8 *FndLet(const u8 *text);
 
 /* What this reads or names of other files: the scan codes of Alt with a
    digit or a letter, which begin the speed search; of main_t.c the box
@@ -1448,7 +1441,7 @@ void Quit(void)
 }
 
 /* Give Ctrl-Break back to whoever had it. */
-void RstVc1(void)
+static void RstVc1(void)
 {
     CtrlBreakGive();
 }

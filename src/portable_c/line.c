@@ -27,9 +27,7 @@
  */
 #include "vc.h"
 
-i32 LnStr(const struct LineArgs *args);
-
-/* struct LineArgs, NgLine and CntLine are in vc.h. */
+/* struct LineArgs, NgLine, CntLine and LnStr are in vc.h. */
 
 /* The length of a text that is put into a line, as LnStr counts it: it
    looks at 80 characters, and a text without an end among them counts as

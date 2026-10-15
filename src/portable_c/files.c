@@ -19,8 +19,7 @@
 
 #define SIZE_FILENT ((i32)sizeof(struct FILENT))
 
-bool TstExe(const u8 *name);
-/* SetMask, Sort, FnFile and NearFl are in vc.h. */
+/* SetMask, Sort, FnFile, NearFl and TstExe are in vc.h. */
 
 /* The extensions of programs. Names in a list are in small letters. */
 static const u8 Ext_S[9] = {

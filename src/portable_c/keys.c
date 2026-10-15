@@ -16,18 +16,10 @@
  */
 #include "vc.h"
 
-void F20_02(struct WCBdef *panel);
-
 /* F20_02 is a routine, which other files call too, as F00_50 of vc.h. */
 
-/* Routines of other files that are C. PutFls writes a panel of files,
-   PutTre the tree and PutInf, of vc.h, the Info. */
-i32 NumAdr(struct WCBdef *panel, i32 number);           /* place.c */
-void PutPath(struct WCBdef *panel);                     /* panel.c */
-void PutFls(struct WCBdef *panel);
-void SetCur(struct WCBdef *panel, bool set);
-void PutTre(struct WCBdef *panel);                      /* tree.c */
-i32 StrLen(const u8 *text);                             /* string.c */
+/* Routines of other files, of vc.h: PutFls writes a panel of files,
+   PutTre the tree and PutInf the Info. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -252,9 +244,13 @@ struct Onward F00_60(struct WCBdef *panel, i32 cursor, i32 first, u16 buttons,
     u8 attributes;
 
     if (buttons & 2) {
-        if (panel->WinTyp == 0
-            && (address = NumAdr(panel, cursor)) < PLACES(panel)->EndBuf
-            && (file = ENTRY(panel, address))->NameF[0] != '.') {
+        file = 0;                       /* the file passed over, if any */
+        if (panel->WinTyp == 0) {
+            address = NumAdr(panel, cursor);
+            if (address < PLACES(panel)->EndBuf)
+                file = ENTRY(panel, address);
+        }
+        if (file != 0 && file->NameF[0] != '.') {
             if (!(md.WinMous & MOUSE_PASSED)) {
                 md.WinMous |= MOUSE_PASSED;
                 if (!(file->AttrF & ATTR_SELECTED))

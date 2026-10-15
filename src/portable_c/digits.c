@@ -6,9 +6,7 @@
  */
 #include "vc.h"
 
-const u8 *TxtNum(const u8 *text, u16 *number);
-
-/* HexByt and TstHex are in vc.h. */
+/* HexByt, TstHex and TxtNum are in vc.h. */
 
 /* Write the low byte of `byte` to the screen buffer as two hex digits,
    leaving the colours as they are, and return the address of the cell

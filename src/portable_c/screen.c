@@ -12,12 +12,8 @@
 #define ShadFl 38                       /* the colour that says how shadows
                                            are made */
 
-u8 *ColAddr(u16 number);
-u16 ShadCol(u16 color, u16 how);
-u16 *Shadow(u16 *cell);
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color);
-
-/* Color, BasAdr, MvsColr and MovDz0 are in vc.h. */
+/* Color, BasAdr, MvsColr, MovDz0, ColAddr, ShadCol, Shadow and MvsBw
+   are in vc.h. */
 
 /* Where in the colour table a colour is, for the palette that is set up
    and the display. Only the low byte of `number` counts.

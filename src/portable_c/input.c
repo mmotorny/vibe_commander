@@ -55,10 +55,6 @@
    LeaveTm tells DOS that the program is idle.
  */
 
-/* C routines of other files that vc.h does not have. */
-u16 HexDec(i32 number);                                 /* format.c */
-void Help00(void);                                      /* help.c */
-
 /* The characters that words end at. */
 static const u8 CtEn_T[10] = {
     ' ', '+', ':', '.', ',', '>', '<', '|', '\\', '\t'

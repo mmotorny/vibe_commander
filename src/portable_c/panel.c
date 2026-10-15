@@ -16,13 +16,7 @@
  */
 #include "vc.h"
 
-void Panel(struct WCBdef *panel);
-void PutPath(struct WCBdef *panel);
-void PutFls(struct WCBdef *panel);
-void SetCur(struct WCBdef *panel, bool set);
-u8 *FilDir(u8 *buffer, i32 directories, i32 files);
-
-/* PtPt10 is in vc.h. */
+/* PtPt10, Panel, PutPath, PutFls, SetCur and FilDir are in vc.h. */
 
 /* The titles of the columns, in brief and in full. */
 static const u8 Brief_S[] = {

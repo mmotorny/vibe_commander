@@ -25,8 +25,6 @@
  */
 #include "vc.h"
 
-u16 F32_70(u16 begin, u16 size);
-
 /* Other files call these: the history's box F32_70, in cmdline.c, and
    Enter and the commands of the viewer Run_00, which is declared in vc.h
    with FndItem. F32_00, the command, is declared in vc.h too: see "The
@@ -61,13 +59,6 @@ u16 F32_70(u16 begin, u16 size);
    or whether it is such a name. FndItem returns where the next line of a
    menu is that is neither empty, nor a comment, nor a command, and
    whether there is none, the end of the file. */
-
-/* C routines of other files that vc.h does not have. */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);                                  /* screen.c */
-const u8 *FndLet(const u8 *text);                       /* string.c */
-u8 *MainFil(u8 *to, const u8 *name);
-void Help00(void);                                      /* help.c */
 
 /* What keys_t.c has of the menu: the name of the menu file, which
    F34_40 and the editor have too, with the title of the menu behind it,
@@ -498,7 +489,8 @@ bool F32_00(bool main)
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = Menu_F[i];
     F42_10();
-    include = md.TmpBuf;
+    /* The assembly has DX on TmpBuf here, `include`, which each way on
+       sets anew before it is read. */
     if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);

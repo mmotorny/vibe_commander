@@ -63,7 +63,6 @@ HOLDS(FndData_ends_before_ViewDat, 100 + sizeof(struct FndData) <= 200);
 #define KEY_MOUSE 0xFC                  /* the high byte of a key that is
                                            the mouse */
 
-u16 FindFil(u16 attributes);
 static u16 FndMove(u16 key, u16 mode, u16 place, u16 size);
 static void FndCurs(u16 color, i32 line, i32 first, u16 place, u16 size);
 
@@ -95,26 +94,6 @@ static void FndCurs(u16 color, i32 line, i32 first, u16 place, u16 size);
    between the characters of `ends`; it returns the place a row below.
 
    What is asked of the system is asked through sys.h. */
-void Help00(void);                                      /* help.c */
-
-/* C routines of other files that vc.h does not have. */
-struct DateText {                                       /* format.c */
-    u16 century;
-    u16 first, second, third;
-};
-struct TimeText {
-    u16 hour, minute, second;
-    u8  unused;
-    u8  suffix;
-};
-void PutDate(u16 date, struct DateText *text);
-u8 *BufDate(const struct DateText *text, u8 *buffer);
-void PutTime(u16 time, struct TimeText *text);
-u8 *BufTime(const struct TimeText *text, u8 *buffer);
-void FilZero(u8 *text, i32 length);                     /* string.c */
-void NormStr(u8 *text);
-u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
-void V81_00(void);                                      /* view.c */
 
 /* Tables that the code names, of find_t.c but for
    Mask_S, which is of another file: Mask_S is \*.*, and four bytes are

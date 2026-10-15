@@ -10,13 +10,8 @@
  */
 #include "vc.h"
 
-void FilZero(u8 *text, i32 length);
-i32 StrLen(const u8 *text);
-const u8 *FndLet(const u8 *text);
-void NormStr(u8 *text);
-u8 *MainFil(u8 *to, const u8 *name);
-
-/* AddFile, MvzLine, PathLin, LetLin and ShrtLin are in vc.h. The
+/* AddFile, MvzLine, PathLin, LetLin, ShrtLin, FilZero, StrLen, FndLet,
+   NormStr and MainFil are in vc.h. The
    original has a text at DS:SI or ES:DI, and here it is a pointer. */
 
 /* End a path with a backslash, unless it has one: `end` is where the path

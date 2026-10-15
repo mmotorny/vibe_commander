@@ -40,15 +40,6 @@
    the directories of a panel, and TstInfo has an Info next to a panel
    read again. Help00 is the help of the page HlpPage. MainFil writes the
    path of a file of the program's directory. */
-void PutPath(struct WCBdef *panel);                     /* panel.c */
-void PutFls(struct WCBdef *panel);
-void PutTre(struct WCBdef *panel);                      /* tree.c */
-void F20_02(struct WCBdef *panel);                      /* keys.c */
-bool ChTree(i32 column);                                /* treebox.c */
-void DirSize(struct WCBdef *panel);                     /* read.c */
-void TstInfo(struct WCBdef *panel);
-void Help00(void);                                      /* help.c */
-u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

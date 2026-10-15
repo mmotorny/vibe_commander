@@ -20,9 +20,6 @@
    in decimal digits, 0FFFFh for one that 16 bits do not hold, and
    returns where the digits end; FndLet returns what follows spaces and
    tabs. */
-u16 HexDec(i32 number);                                 /* format.c */
-const u8 *TxtNum(const u8 *text, u16 *number); /* digits.c */
-const u8 *FndLet(const u8 *text);                       /* string.c */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

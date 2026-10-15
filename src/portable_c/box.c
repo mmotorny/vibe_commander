@@ -23,9 +23,6 @@
 #define SIDES       0xBABA              /* its sides */
 #define BOTTOM_CORNERS 0xC8BC           /* and its lower corners */
 
-u8 *ColAddr(u16 number);                                /* screen.c */
-u16 *Shadow(u16 *cell);
-
 /* Write a line of a box to the screen buffer, and return the address of
    the cell behind it: `margin` spaces, the character in the high byte of
    `ends`, `width` times the cell `cell`, the character in the low byte of

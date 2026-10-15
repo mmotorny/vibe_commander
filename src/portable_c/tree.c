@@ -21,12 +21,7 @@
  */
 #include "vc.h"
 
-void PutTre(struct WCBdef *panel);
-void TreeCur(void);
-void TrCr10(void);
-void TrCr20(i32 lines);
-
-/* PutTree is in vc.h. */
+/* PutTree, PutTre, TreeCur, TrCr10 and TrCr20 are in vc.h. */
 
 /* The colours of the tree in a panel: of a directory, of the one under
    the cursor, and of the current directory likewise. */
@@ -63,17 +58,17 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
    are variables to use. */
 #define DESCEND(path, entry, text, i, n) \
     do { \
-        text = (path); \
-        for (i = (entry)->DirLevel; i; i--) \
-            for (n = 20; n; n--) \
-                if (*text++ == '\\') \
+        (text) = (path); \
+        for ((i) = (entry)->DirLevel; (i); (i)--) \
+            for ((n) = 20; (n); (n)--) \
+                if (*(text)++ == '\\') \
                     break; \
-        for (i = 0; i < 13; i++) \
-            text[i] = (entry)->DirName[i]; \
-        for (i = 0; i < 12 && text[i] != 0; i++) \
+        for ((i) = 0; (i) < 13; (i)++) \
+            (text)[(i)] = (entry)->DirName[(i)]; \
+        for ((i) = 0; (i) < 12 && (text)[(i)] != 0; (i)++) \
             ; \
-        text[i] = '\\'; \
-        text[i + 1] = 0; \
+        (text)[(i)] = '\\'; \
+        (text)[(i) + 1] = 0; \
     } while (0)
 
 /* Whether the path `made`, which ends as DESCEND leaves it or is that of
@@ -83,11 +78,11 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
    taken to be 99 long. `i` and `n` are variables to use. */
 #define IS_PATH(result, made, path, i, n) \
     do { \
-        for (n = 0; n < 99 && (path)[n] != 0; n++) \
+        for ((n) = 0; (n) < 99 && (path)[(n)] != 0; (n)++) \
             ; \
-        for (i = 0; i < n && (made)[i] == (path)[i]; i++) \
+        for ((i) = 0; (i) < (n) && (made)[(i)] == (path)[(i)]; (i)++) \
             ; \
-        result = i == n && ((made)[n] == 0 || (made)[n + 1] == 0); \
+        (result) = (i) == (n) && ((made)[(n)] == 0 || (made)[(n) + 1] == 0); \
     } while (0)
 
 /* TrCr11 in the assembly: put the cursor of the tree on the directory
@@ -95,23 +90,23 @@ static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
    whether it was. The paths are made at the start of MenuBuf. */
 #define FIND(found, entry, count, text, i, n) \
     do { \
-        found = false; \
+        (found) = false; \
         if (md.DosPth[0] != md.CrnPath[0]) \
             break; \
         md.MenuBuf[0] = md.DosPth[0]; \
         md.MenuBuf[1] = ':'; \
         md.MenuBuf[2] = '\\'; \
         md.MenuBuf[3] = 0; \
-        entry = TRELIST; \
-        for (count = TREE->TreeLen; count; count--) { \
-            if (entry->DirLevel != 0) \
+        (entry) = TRELIST; \
+        for ((count) = TREE->TreeLen; (count); (count)--) { \
+            if ((entry)->DirLevel != 0) \
                 DESCEND(md.MenuBuf, entry, text, i, n); \
             IS_PATH(found, md.MenuBuf, md.CrnPath, i, n); \
             if (found) { \
-                TreeCursor = entry; \
+                TreeCursor = (entry); \
                 break; \
             } \
-            entry++; \
+            (entry)++; \
         } \
     } while (0)
 
@@ -178,7 +173,7 @@ void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors)
     PATH[2] = '\\';
     PATH[3] = 0;
     screen = BasAdr(place + 0x102);
-    n -= TreeFirst - TRELIST;
+    n -= (i32)(TreeFirst - TRELIST);    /* fewer than 4,096 entries */
     lines = (size >> 8) - 4;
     if (lines > n) {
         lines = n;

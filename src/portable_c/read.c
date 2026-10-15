@@ -53,12 +53,9 @@ static struct WCBdef *ReDr00(struct WCBdef *panel, bool keep,
 static void ReDr45(struct WCBdef *panel);
 static void ReDr50(struct WCBdef *panel, struct OldList *old);
 static void RdInfo(struct WCBdef *panel);
-bool ReadTre(void);                                     /* treebox.c */
-void DirSize(struct WCBdef *panel);
-u16 DiSi10(u16 attributes);
-void TstInfo(struct WCBdef *panel);
 
-/* ReDir and GetVol are in vc.h. */
+/* ReDir, GetVol, DirSize, DiSi10 and TstInfo are in vc.h, and ReadTre
+   of treebox.c. */
 
 /* The names of files: Mask_S is \*.* and Ext_F is VC.EXT. They are
    copied with MvzLine, which takes what follows a text along, so they

@@ -103,20 +103,18 @@ struct Line {
     i32 entry;                          /* BX */
 };
 
-void V80_00(const u8 *include, struct Box *where);
-bool NextLin(const u8 *text, struct Line *line);
-bool PrevLin(const u8 *text, struct Line *line);
-i32 V20_00(const u8 *text);
-void V25_00(void);
-bool V30_00(const u8 *text);
-void V31_00(u16 place);
-void V32_00(const u8 *text, i32 number, i32 at, i32 end);
-bool V40_00(void);
-void V50_00(u8 *text);
-void V51_00(u8 *text);
-void V55_00(u8 *text, i32 to, i32 count, u16 handle);
-void V60_00(u8 *text, i32 at, i32 table);
-void V81_00(void);
+static bool NextLin(const u8 *text, struct Line *line);
+static bool PrevLin(const u8 *text, struct Line *line);
+static i32 V20_00(const u8 *text);
+static void V25_00(void);
+static bool V30_00(const u8 *text);
+static void V31_00(u16 place);
+static void V32_00(const u8 *text, i32 number, i32 at, i32 end);
+static bool V40_00(void);
+static void V50_00(u8 *text);
+static void V51_00(u8 *text);
+static void V55_00(u8 *text, i32 to, i32 count, u16 handle);
+static void V60_00(u8 *text, i32 at, i32 table);
 
 /* V00_02, V00_10, V13_00 and V13_01, which the main loop goes on in, are
    declared in vc.h, with struct Open, which V00_02 fills. The others are
@@ -135,18 +133,11 @@ void V81_00(void);
    floppy drive with another, and is not 0 if the user would not change it.
    ResWin puts back what a box covers. */
 
-/* C routines of other files that vc.h does not have: a panel's frame,
+/* Routines of other files, which vc.h has: a panel's frame,
    the path over it and what it lists, as files or as the tree; characters
    written to the screen buffer in a colour; and the editor's routines
    that clear a line of the window, by its number, and move the lines of
    the window up or down by one (see each). */
-void Panel(struct WCBdef *panel);                       /* panel.c */
-void PutPath(struct WCBdef *panel);
-void PutFls(struct WCBdef *panel);
-void PutTre(struct WCBdef *panel);                      /* tree.c */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);                                  /* screen.c */
-void T71_00(u16 function, u16 place, i32 step);         /* edit.c */
 
 /* Boxes, dialogs and texts of view_t.c, which DialBox and Dialog take
    a pointer to: a box and a dialog are declared here as what each
@@ -278,7 +269,7 @@ static bool NoLine(struct Line *line)
    leaves it there, or true if the part in the memory has no line behind
    this one: the place then stays and the entry is the first of the
    table. */
-bool NextLin(const u8 *text, struct Line *line)
+static bool NextLin(const u8 *text, struct Line *line)
 {
     i32 at = line->at;
     i32 entry = line->entry;
@@ -320,7 +311,7 @@ bool NextLin(const u8 *text, struct Line *line)
 
 /* Find where the line before the one at `line` begins. Returns as
    NextLin does. */
-bool PrevLin(const u8 *text, struct Line *line)
+static bool PrevLin(const u8 *text, struct Line *line)
 {
     i32 at = line->at;
     i32 entry = line->entry;
@@ -384,7 +375,7 @@ bool PrevLin(const u8 *text, struct Line *line)
 /* Find the first line of the screen: where the line begins that ViFirst
    is in, which is returned, and its entry of the table, which goes to
    ViPoint. */
-i32 V20_00(const u8 *text)
+static i32 V20_00(const u8 *text)
 {
     i32 at = ViFirst;
     i32 entry;
@@ -424,7 +415,7 @@ i32 V20_00(const u8 *text)
 
 /* Write the status line: the first column that is shown, and how far
    into the file the screen begins, in per cent. */
-void V25_00(void)
+static void V25_00(void)
 {
     u16 *screen;
     u16 cell;
@@ -483,7 +474,7 @@ void V25_00(void)
 /* Write the screen: the window cleared, and a line of the text in each
    of its rows, from the line that ViFirst is in. Returns whether the part
    in the memory ends before the window is full. */
-bool V30_00(const u8 *text)
+static bool V30_00(const u8 *text)
 {
     struct Line line;
     i32 number, count, at, end;
@@ -528,7 +519,7 @@ bool V30_00(const u8 *text)
 
 /* Clear a line of the window: the one that begins at `place`, the row in
    the high byte. */
-void V31_00(u16 place)
+static void V31_00(u16 place)
 {
     u16 *screen = BasAdr(place);
     i32 count = VI->ViSize & 0xFF;
@@ -553,7 +544,7 @@ void V31_00(u16 place)
    being 0FFE0h bytes at the most; and the editor, which has the shape of
    the cursor in the same word, EdShape, sets that when it opens a
    file. */
-void V32_00(const u8 *text, i32 number, i32 at, i32 end)
+static void V32_00(const u8 *text, i32 number, i32 at, i32 end)
 {
     u8 *screen = (u8 *)BasAdr((u16)(VI->ViBase + (number << 8)));
     u8 *chars;
@@ -648,7 +639,7 @@ void V32_00(const u8 *text, i32 number, i32 at, i32 end)
 /* Whether the part in the memory goes to the end of the file: 0 if it
    does, with 100 written to the status line for the per cent, and 1 if it
    does not. */
-bool V40_00(void)
+static bool V40_00(void)
 {
     if (VI->ViOffset + (u32)ViLoaded < VI->ViLen)
         return true;
@@ -673,7 +664,7 @@ static void Load(u8 *text, u32 position, i32 to, i32 count)
 /* Read the next part: the second half of what is in the memory becomes
    the first, with the lines of the table that are in it, and the file is
    read on behind it, as far as the table leaves room. */
-void V50_00(u8 *text)
+static void V50_00(u8 *text)
 {
     i32 half = ViSpace >> 1;
     i32 from, to, at, count, kept;
@@ -712,7 +703,7 @@ void V50_00(u8 *text)
    the room that leaves, and the table of lines is made again: from the
    start, and from where the second line began before, so that the lines
    behind it are the same as they were. */
-void V51_00(u8 *text)
+static void V51_00(u8 *text)
 {
     i32 space = ViSpace;
     i32 shift = space >> 1;
@@ -754,7 +745,7 @@ void V51_00(u8 *text)
 
 /* Read `count` bytes of the file `handle` to `to` in the text, which is
    filled with zeros first. */
-void V55_00(u8 *text, i32 to, i32 count, u16 handle)
+static void V55_00(u8 *text, i32 to, i32 count, u16 handle)
 {
     u8 *part = text + to;
     u8 *at = part;
@@ -777,7 +768,7 @@ static void V60_06(i32 loaded, i32 table)
 /* Make the table of lines for the text from `at` on: `table` is the
    entry above the one that the line at `at` gets. Where the table meets
    the text, the part that is in the memory ends. */
-void V60_00(u8 *text, i32 at, i32 table)
+static void V60_00(u8 *text, i32 at, i32 table)
 {
     i32 loaded = ViLoaded;
     i32 column;
@@ -1546,7 +1537,8 @@ struct Sought V82_00(const u8 *text, i32 at, i32 count)
             goto none;
         more += count - SRCH_LEN;
         more++;
-        count = 0;
+        /* The assembly has the count 0 here, which bytes_only sets anew
+           before it is read. */
         goto bytes_only;
     }
     for (;;) {
@@ -1607,10 +1599,6 @@ none:
 
 /* The commands are declared in vc.h, and so are F34_30, F34_40, FindExt
    and Run_00. */
-
-/* More C routines of other files that vc.h does not have. */
-const u8 *FndLet(const u8 *text);                       /* string.c */
-u8 *MainFil(u8 *to, const u8 *name);
 
 /* More of them, and two names of other files, those of the menu file
    and of the file that an Info panel shows. The names of the extension

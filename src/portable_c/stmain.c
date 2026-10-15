@@ -84,11 +84,9 @@
    Esc; PutKey shows a key bar, Input waits for a key. What the file asks
    of the system it asks by the functions of sys.h. */
 
-/* A C routine of another file that vc.h does not have: what the mouse
-   does in a list that is in a box, of usermenu.c. The setup program has
-   it for its menu under a name of its own, Main50, and word for word:
-   see StMain00. */
-u16 F32_70(u16 begin, u16 size);
+/* F32_70 of usermenu.c, which vc.h has, is what the mouse does in a
+   list that is in a box. The setup program has it for its menu under a
+   name of its own, Main50, and word for word: see StMain00. */
 
 /* The tables of stmain_t.c that the code names. */
 extern const u8 StPalets[];             /* the setup without a file */

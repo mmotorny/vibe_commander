@@ -19,8 +19,6 @@
  */
 #include "vc.h"
 
-i32 NumAdr(struct WCBdef *panel, i32 number);
-
 /* struct Place, BegBX, SizDX, LnsAX, InvWCB, FilePan, AdrNum and CorPar
    are in vc.h, and so is ChgAdr, with struct Shown. */
 
@@ -92,18 +90,18 @@ bool FilePan(struct WCBdef *panel)
 #define PLACE(wcb, cursor, first, last, lines) \
     do { \
         if ((wcb)->WinTyp == 0) { \
-            cursor = FILE_NUMBER(PLACES(wcb)->CurAdr); \
-            first = FILE_NUMBER(PLACES(wcb)->First); \
-            last = FILE_NUMBER(PLACES(wcb)->EndBuf); \
-            lines = LINES(ROWS()); \
+            (cursor) = FILE_NUMBER(PLACES(wcb)->CurAdr); \
+            (first) = FILE_NUMBER(PLACES(wcb)->First); \
+            (last) = FILE_NUMBER(PLACES(wcb)->EndBuf); \
+            (lines) = LINES(ROWS()); \
         } else { \
-            cursor = TREE_NUMBER(TreeCursor); \
-            first = TREE_NUMBER(TreeFirst); \
-            last = ((struct DIRTREE *)md.TreeBuf)->TreeLen; \
-            lines = ROWS() - 4; \
+            (cursor) = TREE_NUMBER(TreeCursor); \
+            (first) = TREE_NUMBER(TreeFirst); \
+            (last) = ((struct DIRTREE *)md.TreeBuf)->TreeLen; \
+            (lines) = ROWS() - 4; \
         } \
-        if (last != 0) \
-            last--; \
+        if ((last) != 0) \
+            (last)--; \
     } while (0)
 
 void AdrNum(struct WCBdef *panel, struct Place *place)

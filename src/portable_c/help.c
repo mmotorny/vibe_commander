@@ -58,8 +58,6 @@ LAID_OUT(HlpData, LenHelp);
 
 #define hd (*(struct HlpData *)md.HelpBuf)
 
-void Help00(void);
-
 /* This is Help. Its name is from when the assembly called it, under the
    name that the linker had for it then: the assembler took Help_c for
    Help_C, the number of a colour. */
@@ -86,11 +84,6 @@ void Help00(void);
 
    PgUp and PgDn turn a list by a page of `lines`: they return the line of
    the cursor and the first line shown. */
-
-/* C routines of other files that vc.h does not have. */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);                                  /* screen.c */
-u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
 
 /* The tables of the help, in help_t.c: the title of the window, the
    box of the error, which Dialog takes a pointer to, and for MinMnu the

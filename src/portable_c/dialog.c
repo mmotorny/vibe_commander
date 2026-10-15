@@ -118,12 +118,6 @@
    Panel options. F35_61 gets the place of the line that the tree is for
    as well, and is not 0 to go on with the dialog; the answer stays what
    it was. */
-u16 F38_10(u16 answer);                                 /* dirfunc.c */
-bool F35_61(u16 answer, u16 place);                     /* copy.c */
-
-/* C routines of other files that vc.h does not have. */
-i32 LnStr(const struct LineArgs *args);                 /* line.c */
-void NormStr(u8 *text);                                 /* string.c */
 
 /* Copy a text that a box puts into its lines to where the lines have it,
    and write it as the box asks: `entry` is its four bytes in the box. */

@@ -39,11 +39,6 @@
 
    PutMnu, PutKey, Input, EdLin, Search and DosCom are C, of vc.h. */
 
-/* C routines of other files that vc.h does not have. */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);                                  /* screen.c */
-u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
-
 /* The mask that stands behind the name of a directory in the command
    line: the assembly's, which other C code has too. */
 extern const u8 Mask_S[];               /* "\*.*" */

@@ -31,10 +31,6 @@
    another, is C, of vc.h. What the system is asked, it is asked by the
    functions of sys.h. */
 
-/* A C routine of another file that vc.h does not have. */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);                                  /* screen.c */
-
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
@@ -116,7 +112,7 @@ bool F62_01(struct WCBdef *panel, i32 item)
     HidCur();
     PutMnu(item);
     count = 0;
-    for (letter = 'A'; letter <= 'Z'; letter++) {
+    for (letter = 'A'; letter <= (u16)'Z'; letter++) {
         if (!TstDrv(letter))
             continue;
         /* Of A: and B:, where they are one floppy drive, only the letter

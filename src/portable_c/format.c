@@ -11,28 +11,9 @@
 
 #define TIME_12_HOURS 0                 /* the country's time format */
 
-/* A date as PutDate() takes it apart. Each field is two characters, the
-   first in the low byte, as PUT16() writes them. The assembly's PutDate
-   returns this in AX, BX, DX and CX. */
-struct DateText {
-    u16 century;
-    u16 first, second, third;           /* in the country's order */
-};
-
-/* A time as PutTime() takes it apart: BX, DX, AX and CH in the assembly. */
-struct TimeText {
-    u16 hour, minute, second;
-    u8  unused;
-    u8  suffix;                         /* 'a' or 'p', or a space */
-};
-
-u16 HexDec(i32 number);
-void PutDate(u16 date, struct DateText *text);
-u8 *BufDate(const struct DateText *text, u8 *buffer);
-void PutTime(u16 time, struct TimeText *text);
-u8 *BufTime(const struct TimeText *text, u8 *buffer);
-
-/* Number and SzDtTm are in vc.h. */
+/* Number, SzDtTm, HexDec, PutDate, BufDate, PutTime and BufTime are in
+   vc.h, and struct DateText and struct TimeText, what PutDate() and
+   PutTime() take apart. */
 
 static const u32 PowersOfTen[9] = {
     1000000000UL, 100000000UL, 10000000UL, 1000000UL, 100000UL, 10000UL,

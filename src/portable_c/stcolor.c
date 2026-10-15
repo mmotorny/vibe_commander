@@ -37,9 +37,6 @@
 /* Of other files. ColAddr is where the colour table has a colour of the
    palette that is set, and ShadCol what a colour becomes in a shadow.
    MvsBw writes characters in a colour, the colour in the high byte. */
-u8 *ColAddr(u16 number);                                /* screen.c */
-u16 ShadCol(u16 color, u16 how);
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color);
 
 /* The tables, of stcolor_t.c: see there. A picture of StPagTab is two
    words that name what it is made of, which the table has as

@@ -62,9 +62,6 @@
    bar, and returns it, the scan code in the high byte: F1 it answers
    with the help of the page HlpPage itself. */
 
-/* A C routine of another file that vc.h does not have. */
-u16 *Shadow(u16 *cell);                                 /* screen.c */
-
 /* F39_00, the bar itself, is declared in vc.h: see "The commands"
    there. The text of the bar, the names of its menus, is of
    bars_t.c. */

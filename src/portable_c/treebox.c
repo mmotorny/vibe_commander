@@ -20,9 +20,6 @@
  */
 #include "vc.h"
 
-bool ReadTre(void);
-bool ChTree(i32 column);
-
 /* ReDir of read.c calls ReadTre, and the tree in its box and Copy and
    Rename call ChTree: both return what the routines answered in the
    carry flag. */
@@ -51,11 +48,6 @@ bool ChTree(i32 column);
    puts the box `box` on the screen, as the assembly describes it, with
    its middle at `place`; only the first box since ZoomOne was cleared
    grows. */
-
-/* C routines of other files that vc.h does not have. */
-void FilZero(u8 *text, i32 length);                     /* string.c */
-void TreeCur(void);                                     /* tree.c */
-void TrCr20(i32 lines);
 
 /* The tables of the tree, in treebox_t.c: the name of the tree
    file, which DelTr0 has too, and the boxes that are shown while the

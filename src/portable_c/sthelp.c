@@ -37,11 +37,6 @@
  */
 #include "vc.h"
 
-/* C routines of other files that vc.h does not have. */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);                                  /* screen.c */
-u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
-
 /* The tables: of help_t.c, which the setup program has byte for byte,
    the title of the window and the numbers of the colours of the button;
    of sthelp_t.c the button, for MinMnu, and the box that says there is

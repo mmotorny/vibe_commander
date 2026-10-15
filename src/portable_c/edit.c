@@ -161,26 +161,25 @@ static i32 EdLine;                      /* Cursor line */
 static i32 EdCol0;                      /* First column displayed on the screen */
 static i32 EdLin0;                      /* First line displayed on the screen */
 
-void T50_00(void);
-void T51_00(void);
-bool T53_00(struct Where *where);
-struct Ending T53_10(i32 place);
-bool T54_00(struct Where *where);
-i32 T55_00(i32 cursor);
-void T56_00(i32 place, i32 line, i32 target);
-struct Reached T57_00(void);
-struct Reached T57_01(i32 limit);
-i32 T57_02(void);
-i32 T63_01(i32 place);
-bool T64_00(const u8 *name, const u8 *text, i32 count);
-void T71_00(u16 function, u16 place, i32 step);
-void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base);
-void T73_00(void);
-struct Drawn T73_10(void);
-void T74_00(void);
-i32 T75_00(i32 number, u16 *screen, u16 color);
-void T76_00(u16 place, const u8 *text, const u8 *colors);
-bool T80_00(void);
+static void T50_00(void);
+static void T51_00(void);
+static bool T53_00(struct Where *where);
+static struct Ending T53_10(i32 place);
+static bool T54_00(struct Where *where);
+static i32 T55_00(i32 cursor);
+static void T56_00(i32 start, i32 line, i32 target);
+static struct Reached T57_00(void);
+static struct Reached T57_01(i32 limit);
+static i32 T57_02(void);
+static i32 T63_01(i32 place);
+static bool T64_00(const u8 *name, const u8 *text, i32 count);
+static void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base);
+static void T73_00(void);
+static struct Drawn T73_10(void);
+static void T74_00(void);
+static i32 T75_00(i32 number, u16 *screen, u16 color);
+static void T76_00(u16 place, const u8 *text, const u8 *colors);
+static bool T80_00(void);
 
 /* T00_00, the editor itself, is declared in vc.h. Of the others the
    viewer calls T70_00 and T71_00. */
@@ -201,17 +200,11 @@ bool T80_00(void);
    and where it is; what it is given comes back for that if there is no
    mouse. InWind is not 0 if that is outside a window. */
 
-/* C routines of other files that vc.h does not have. */
-u16 *HexByt(u16 *screen, u32 byte);                     /* digits.c */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);                                  /* screen.c */
-void PathLin(u8 *text);                                 /* string.c */
-/* The viewer's search: V80_00 shows the box "Searching for" under the
+/* The viewer's search, of view.c and in vc.h: V80_00 shows the box "Searching for" under the
    title `include`, says where it is, and makes ready what is looked for,
    SrchStr; V82_00, of vc.h, looks for it in `count` bytes, and returns
    where the search ended, behind what it found, and 1 for the text
    found, 0 for the bytes that it names in hex, and 100h for neither. */
-void V80_00(const u8 *include, struct Box *where);      /* view.c */
 
 /* How long the text is that V80_00 has made ready. */
 #define SrchLen (*(u16 *)(md.HelpBuf + 90))
@@ -300,19 +293,19 @@ static struct Reached Column(i32 count, i32 limit)
    has it, but no further than the last that the editor goes to, and how
    many of its characters are behind that; and T57_01, no further than
    `limit`. */
-struct Reached T57_00(void)
+static struct Reached T57_00(void)
 {
     return Column(EdSizLn, LenEdit - 100);
 }
 
-struct Reached T57_01(i32 limit)
+static struct Reached T57_01(i32 limit)
 {
     return Column(EdSizLn, limit);
 }
 
 /* The column of the cursor, counted from 0: in hex mode the number of the
    byte in its line. */
-i32 T57_02(void)
+static i32 T57_02(void)
 {
     if (ed.EdTxHex != 0)
         return EdCursr;
@@ -323,7 +316,7 @@ i32 T57_02(void)
 
 /* Where an offset is in the text: 0 before its end, 1 at the end and 2
    behind it. */
-i32 T63_01(i32 place)
+static i32 T63_01(i32 place)
 {
     if (place != ed.EdLen)
         return place < ed.EdLen ? 0 : 2;
@@ -342,7 +335,7 @@ i32 T63_01(i32 place)
    address, 64K from there less up to 17 bytes, for one that the buffer
    does not hold, without looking how long it is: which a line of that
    length is. */
-void T50_00(void)
+static void T50_00(void)
 {
     struct Ending end;
     const u8 *text;
@@ -405,7 +398,7 @@ static void T51_30(const u8 *source, u8 *target, i32 count, bool down)
    segment of where the text would end against it, a sixteenth of the
    place: which is the place held against the room in bytes, the room
    being whole paragraphs. */
-void T51_00(void)
+static void T51_00(void)
 {
     i32 old, less, end, tail;
     const u8 *buffer;
@@ -486,7 +479,7 @@ static struct Ending NoEnd(i32 start)
    same two characters, the first from the place on, or the end of the
    text. What the two did otherwise, for a line of more than 64K less 17
    bytes, is said at T50_00 and at T00_20. */
-struct Ending T53_10(i32 place)
+static struct Ending T53_10(i32 place)
 {
     i32 start = place;
     u16 word;
@@ -521,7 +514,7 @@ struct Ending T53_10(i32 place)
    the line 0FFFFh on, in text and in hex: the 65,536th line is the
    last that it reaches. Here a line is counted in 32 bits and every
    line of the text is reached (src/portable_c/DEVIATIONS.md, 25). */
-bool T53_00(struct Where *where)
+static bool T53_00(struct Where *where)
 {
     i32 place = where->place;
     struct Ending end;
@@ -555,7 +548,7 @@ bool T53_00(struct Where *where)
    stopped the lines are taken forwards again until the next one would be
    this line. The assembly looks through at most 32K at a time, and then
    takes a segment that is lower. */
-bool T54_00(struct Where *where)
+static bool T54_00(struct Where *where)
 {
     struct Where line;
     i32 place = where->place;
@@ -634,7 +627,7 @@ static bool T55_10(i32 cursor)
    such, and behind those that do not, up to the next one that does or to
    the end of what the buffer has. The first character itself is not
    looked at. */
-i32 T55_00(i32 cursor)
+static i32 T55_00(i32 cursor)
 {
     for (;;) {
         if (!T55_10(cursor))
@@ -653,26 +646,26 @@ i32 T55_00(i32 cursor)
 }
 
 /* Put the cursor on the byte of the text at the offset `target`, given a
-   line that begins at or before it: where it begins and its number. The
-   lines are taken one after the other from there, as far as they begin
-   at or before the byte; the last of them is the cursor's, and goes into
-   the line buffer. In it the cursor is no further than the editor goes
+   line that begins at or before it: where it begins, `start`, and its
+   number. The lines are taken one after the other from there, as far as
+   they begin at or before the byte; the last of them is the cursor's,
+   and goes into the line buffer. In it the cursor is no further than the editor goes
    in a line, and in the last character that it keeps of one if the byte
    is 64K or more into the line. */
-void T56_00(i32 place, i32 line, i32 target)
+static void T56_00(i32 start, i32 line, i32 target)
 {
     struct Where where;
     i32 cursor, last;
 
-    where.place = place;
+    where.place = start;
     where.line = line;
     for (;;) {
-        EdOffst = place;
+        EdOffst = start;
         EdLine = where.line;
         if (T53_00(&where))
             break;
-        place = where.place;
-        if (place > target)
+        start = where.place;
+        if (start > target)
             break;
     }
     T50_00();
@@ -686,7 +679,7 @@ void T56_00(i32 place, i32 line, i32 target)
 }
 
 /* Whether `count` bytes at `name` and at `text` are the same. */
-bool T64_00(const u8 *name, const u8 *text, i32 count)
+static bool T64_00(const u8 *name, const u8 *text, i32 count)
 {
     for (; count; count--)
         if (*name++ != *text++)
@@ -776,7 +769,7 @@ void T71_00(u16 function, u16 place, i32 step)
    is written, but where it stands less than two bytes into its
    segment; and the two bytes before a line that is in the buffer are
    always looked at. */
-void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base)
+static void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base)
 {
     u16 *screen = T70_00(line).screen;
     u16 *cell;
@@ -844,7 +837,7 @@ void T72_00(i32 line, const u8 *from, const u8 *end, const u8 *base)
    the window has columns to the right of it, it is first put back into
    the text and filled again. A line of no characters is cleared and has
    no arrow in its first column. */
-struct Drawn T73_10(void)
+static struct Drawn T73_10(void)
 {
     struct Drawn drawn;
     i32 line = EdLine - EdLin0;         /* a row of the window */
@@ -877,7 +870,7 @@ struct Drawn T73_10(void)
 }
 
 /* Write the line that the cursor is in, and show it. */
-void T73_00(void)
+static void T73_00(void)
 {
     struct Drawn drawn = T73_10();
 
@@ -886,7 +879,7 @@ void T73_00(void)
 
 /* Put the name of the file into the status line, the first row of the
    screen buffer: in 31 columns from the seventh on, shortened to fit. */
-void T74_00(void)
+static void T74_00(void)
 {
     u8 *name = md.TmpBuf;
     u16 *screen = md.ScrBuf + 6;
@@ -913,7 +906,7 @@ void T74_00(void)
    and a line of more than five digits has its cells, T00_20 moving the
    column behind it (src/portable_c/DEVIATIONS.md, 25). A column has
    five digits at the most: 3900 characters of tabs. */
-i32 T75_00(i32 number, u16 *screen, u16 color)
+static i32 T75_00(i32 number, u16 *screen, u16 color)
 {
     u8 *end = Number(md.TmpBuf, (u16)((number + 1) >> 16),
                      (u16)(number + 1), 0);
@@ -931,7 +924,7 @@ i32 T75_00(i32 number, u16 *screen, u16 color)
 /* Write six lines of the help that the editor shows for a menu file or
    an extension file, one below the other from `place` on: texts one
    behind the other at `text`, in the colours `colors`. */
-void T76_00(u16 place, const u8 *text, const u8 *colors)
+static void T76_00(u16 place, const u8 *text, const u8 *colors)
 {
     struct LineArgs line;
     i32 count;
@@ -1160,7 +1153,7 @@ static bool T80_13(struct Box *box, bool failed)
 
    Ported as it is: what follows the saving of the file, T80_14, is done
    whether it was saved or not. */
-bool T80_00(void)
+static bool T80_00(void)
 {
     struct Box box;
     struct Answer answer;

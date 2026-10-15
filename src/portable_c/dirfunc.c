@@ -38,10 +38,9 @@
  */
 #include "vc.h"
 
-u16 F38_10(u16 answer);
-u16 F38_40(u16 attributes);
+static u16 F38_40(u16 attributes);
 static u16 F38_70(void);
-u16 M30_50(u16 attributes);
+static u16 M30_50(u16 attributes);
 static struct Answer F38_60(void);
 static i32 FncMs1(const u8 *include);
 
@@ -64,28 +63,6 @@ static i32 FncMs1(const u8 *include);
    disk of a drive that shares the floppy drive with another, and is not 0
    if the user would not change it. HidCur puts the cursor below the
    screen. */
-
-/* C routines of other files that vc.h does not have. */
-const u8 *FndLet(const u8 *text);                       /* string.c */
-const u8 *TxtNum(const u8 *text, u16 *number); /* digits.c */
-void NormStr(u8 *text);                                 /* string.c */
-u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
-void PutFls(struct WCBdef *panel);                      /* panel.c */
-void PutTre(struct WCBdef *panel);                      /* tree.c */
-u8 *FilDir(u8 *buffer, i32 directories, i32 files);     /* panel.c */
-struct DateText {                                       /* format.c */
-    u16 century;
-    u16 first, second, third;
-};
-struct TimeText {
-    u16 hour, minute, second;
-    u8  unused;
-    u8  suffix;
-};
-void PutDate(u16 date, struct DateText *text);
-u8 *BufDate(const struct DateText *text, u8 *buffer);
-void PutTime(u16 time, struct TimeText *text);
-u8 *BufTime(const struct TimeText *text, u8 *buffer);
 
 /* Boxes and texts, constants of dirfunc_t.c but for Empty_S, which
    OncZoom and Dialog take a pointer to. A box and a dialog are declared
@@ -135,9 +112,6 @@ extern const struct BOXHD NoFnc_B;      /* "Can't find file" */
    routines are a table of functions, all of one kind, and FncAddr has the
    place in it. Those of other files: C00_00 of copy.c, DiSi10 of read.c
    and FindFil of find.c. */
-u16 C00_00(u16 attributes);
-u16 DiSi10(u16 attributes);
-u16 FindFil(u16 attributes);
 typedef u16 FncFn(u16 attributes);
 static FncFn * const Fnc_T[] = {
     C00_00, DiSi10, FindFil, F38_40, M30_50
@@ -208,7 +182,7 @@ u16 F38_10(u16 answer)
    Ported as it is: Cancel for a directory that is not empty leaves that
    one and goes on with the next, where for a read-only file it stops
    the command. */
-u16 F38_40(u16 attributes)
+static u16 F38_40(u16 attributes)
 {
     struct Box box;
     u8 *end;
@@ -454,7 +428,7 @@ close:
 
    Ported as it is: DOS is not asked whether it could read the date and
    the time of the file, or set them. */
-u16 M30_50(u16 attributes)
+static u16 M30_50(u16 attributes)
 {
     struct Box box;
     struct FileAttr had;

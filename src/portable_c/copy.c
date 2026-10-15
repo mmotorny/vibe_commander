@@ -57,9 +57,6 @@ static u8 *CpBgNam;
 
 #define LenName (LenPath + 13)          /* a path and a file name */
 
-u16 C00_00(u16 attributes);
-bool F35_61(u16 answer, u16 place);
-
 /* C00_00 is what FncAddr names, and F35_61 what the dialogs of the
    commands name for F10. The commands, F35_01 and F45_01, are declared in
    vc.h. */
@@ -85,16 +82,11 @@ bool F35_61(u16 answer, u16 place);
    is the number of the answer, 0 for the first, and 0FFh for Esc. */
 #define Ask(box, include) Dialog(box, include, 0, 0, &md)
 
-/* C routines of other files that vc.h does not have. FilDir writes
+/* Routines of other files, which vc.h has: FilDir writes
    "2 files", or what else the numbers of TotSel make, and returns the
    address behind its zero byte; ChTree has a directory chosen from the
    tree, in a box that begins in a column, and returns 0 if one was, with
    its path in TmpBuf. */
-const u8 *FndLet(const u8 *text);                       /* string.c */
-void NormStr(u8 *text);
-u8 *UnConv(u8 *name, const u8 *buffer);                         /* mask.c */
-u8 *FilDir(u8 *buffer, i32 directories, i32 files);     /* panel.c */
-bool ChTree(i32 column);                                /* treebox.c */
 
 /* Boxes and texts, which OncZoom and Dialog take a pointer to: those of
    copy_t.c, and some of deleting. A box and a dialog are declared as

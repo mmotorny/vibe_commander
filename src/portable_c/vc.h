@@ -877,12 +877,19 @@ u16 Color(u16 number);                  /* screen.c */
 u16 *BasAdr(u16 place);
 u16 *MvsColr(u16 *screen, u16 count, u16 color);
 u16 *MovDz0(u16 *screen, const u8 *text);
+u8 *ColAddr(u16 number);
+u16 ShadCol(u16 color, u16 how);
+u16 *Shadow(u16 *cell);
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color);
 u16 *HexByt(u16 *screen, u32 byte);                     /* digits.c */
 i32 TstHex(u16 digit);
+const u8 *TxtNum(const u8 *text, u16 *number);
 void Convert(const u8 *name, u8 *buffer);               /* mask.c */
 bool TstMas(const u8 *name, const u8 *mask);
+u8 *UnConv(u8 *name, const u8 *buffer);
 void NgLine(struct LineArgs *args);                     /* line.c */
 void CntLine(struct LineArgs *args);
+i32 LnStr(const struct LineArgs *args);
 u8 *AddFile(u8 *end);                                   /* string.c */
 u8 *MvzLine(u8 *to, const u8 *from, i32 length);
 u16 LowCase(u16 letter);
@@ -898,10 +905,34 @@ const u8 *CutPath(const u8 *path);
 void PathLin(u8 *text);
 void LetLin(u8 *text);
 void ShrtLin(u8 *text, i32 limit);
+void FilZero(u8 *text, i32 length);
+i32 StrLen(const u8 *text);
+const u8 *FndLet(const u8 *text);
+void NormStr(u8 *text);
+u8 *MainFil(u8 *to, const u8 *name);
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
+u16 HexDec(i32 number);
+/* A date as PutDate() takes it apart. Each field is two characters, the
+   first in the low byte, as PUT16() writes them. The assembly's PutDate
+   returns this in AX, BX, DX and CX. */
+struct DateText {
+    u16 century;
+    u16 first, second, third;           /* in the country's order */
+};
+/* A time as PutTime() takes it apart: BX, DX, AX and CH in the assembly. */
+struct TimeText {
+    u16 hour, minute, second;
+    u8  unused;
+    u8  suffix;                         /* 'a' or 'p', or a space */
+};
+void PutDate(u16 date, struct DateText *text);
+u8 *BufDate(const struct DateText *text, u8 *buffer);
+void PutTime(u16 time, struct TimeText *text);
+u8 *BufTime(const struct TimeText *text, u8 *buffer);
 u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
             u16 *screen, u16 color);
 void SetMask(struct WCBdef *panel);                     /* files.c */
+bool TstExe(const u8 *name);
 void Sort(struct WCBdef *panel);
 i32 FnFile(struct WCBdef *panel, const u8 *name);
 i32 NearFl(struct WCBdef *panel, const u8 *name, i32 end);
@@ -911,6 +942,7 @@ struct Selected {                       /* what is selected in a panel: */
 };
 struct Selected TotSel(struct WCBdef *panel);
 u16 BegBX(struct WCBdef *panel);                        /* place.c */
+i32 NumAdr(struct WCBdef *panel, i32 number);
 u16 SizDX(void);
 i32 LnsAX(void);
 struct WCBdef *InvWCB(struct WCBdef *panel);
@@ -926,9 +958,23 @@ struct Shown {                          /* what a panel shows, as offsets
 };
 struct Shown ChgAdr(struct WCBdef *panel, i32 cursor, i32 first);
 u8 *PtPt10(struct WCBdef *panel);                       /* panel.c */
+void Panel(struct WCBdef *panel);
+void PutPath(struct WCBdef *panel);
+void PutFls(struct WCBdef *panel);
+void SetCur(struct WCBdef *panel, bool set);
+u8 *FilDir(u8 *buffer, i32 directories, i32 files);
 /* The tree in a panel, tree.c: its colours are four numbers in the code,
    which come as a pointer. */
 void PutTree(struct WCBdef *panel, u16 place, u16 size, const u8 *colors);
+void PutTre(struct WCBdef *panel);
+void TreeCur(void);
+void TrCr10(void);
+void TrCr20(i32 lines);
+void DirSize(struct WCBdef *panel);                     /* read.c */
+u16 DiSi10(u16 attributes);
+void TstInfo(struct WCBdef *panel);
+bool ReadTre(void);                                     /* treebox.c */
+bool ChTree(i32 column);
 void PutInf(struct WCBdef *panel);                      /* info.c */
 /* Where a box is on the screen, as DialBox says it: what the assembly
    has in BX, DX and SI then. */
@@ -937,6 +983,18 @@ struct Box {
     u16 size;                           /* the rows in the high byte */
     u16 *saved;                         /* where what it covers is kept */
 };
+/* What the files of the commands call of each other: see each in its
+   file. */
+u16 C00_00(u16 attributes);                             /* copy.c */
+bool F35_61(u16 answer, u16 place);
+u16 F38_10(u16 answer);                                 /* dirfunc.c */
+void T71_00(u16 function, u16 place, i32 step);         /* edit.c */
+u16 FindFil(u16 attributes);                            /* find.c */
+void Help00(void);                                      /* help.c */
+void F20_02(struct WCBdef *panel);                      /* keys.c */
+u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
+void V80_00(const u8 *include, struct Box *where);      /* view.c */
+void V81_00(void);
 
 /*
  * The commands.
@@ -1550,7 +1608,7 @@ u16 *BoxLine(u16 *screen, u16 cell, u16 ends, i32 margin, i32 width);
 u16 *BoxDubl(u16 *screen, u16 color, i32 rows, i32 margin, i32 width);
 void MinBox(u16 begin, u16 size, u16 color);
 u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
-void OncZoom(u16 place, const struct BOXTOP *head, const u8 *include,
+void OncZoom(u16 place, const struct BOXTOP *box, const u8 *include,
              struct Box *where);
 /* The screen blanker, which comes back when a key is pressed or the mouse
    moved, and the word to DOS that the program is idle: see each in
