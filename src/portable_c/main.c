@@ -124,14 +124,15 @@ extern u8 IniSave[];
    too, by the words of the addresses of vc.h: the line in front of it
    names a segment for it alone, of a class of its own, and the linker's
    command says where that class stands (see CMakeLists.txt). The first
-   is the compiler's and the second the linker's, not the language's;
-   the test `portable_c-layout` holds the order.
+   is the compiler's, SEGMENT_BEGIN of compiler.h, and the second the
+   linker's, not the language's; the test `portable_c-layout` holds the
+   order.
 
    It is in the program's file, 62 KB of nothing: a segment that is
    named so has a value to the linker. */
-#pragma data_seg("MAINDATA", "MAIN")
+SEGMENT_BEGIN("MAINDATA", "MAIN")
 struct MainDat md;
-#pragma data_seg()
+SEGMENT_END
 
 /* Where the room begins and where it ends: see vc.h. They are beside
    the main data and not in it, since its layout is the original's, and

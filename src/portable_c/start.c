@@ -173,9 +173,9 @@ static const u8 NoIni_S[] = "VC.INI is not correct.\r\n";
 /* What the environment is searched for, and the mask that the program
    starts with: all of it for the file search, without its backslash for
    Select group. */
-static const u8 Comsp[8]   = "COMSPEC=";
-static const u8 NcEnv[3]   = "VC=";
-static const u8 TempEnv[5] = "TEMP=";
+static const u8 Comsp[8] NONSTRING   = "COMSPEC=";
+static const u8 NcEnv[3] NONSTRING   = "VC=";
+static const u8 TempEnv[5] NONSTRING = "TEMP=";
 static const u8 Mask_S[]   = "\\*.*";
 
 /* Copy a text with its zero byte. Returns where that is in the copy. */

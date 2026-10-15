@@ -14,7 +14,7 @@
    of the title of an error's box, " Error ", without its zero byte. So
    each is written as long as what is copied. */
 const u8 FnFl6_S[15] = " files\0 found.";
-const u8 FnFl7_S[15] = " found.\0 Error ";
+const u8 FnFl7_S[15] NONSTRING = " found.\0 Error ";
 
 /* The colours of the dialog, and those of the menu of a search that is
    over. */

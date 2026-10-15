@@ -32,6 +32,10 @@
 #ifndef VC_H
 #define VC_H
 
+/* What each compiler says in its own way: NO_RETURN, SEGMENT_BEGIN and
+   SEGMENT_END, NONSTRING. */
+#include "compiler.h"
+
 /* Numbers of 8, 16 and 32 bits. An int has 32 bits for every compiler
    that reads this, Open Watcom's for the 386 and the gcc and clang of
    the checks, and a long may have 64. The lines below hold each to its
@@ -121,18 +125,6 @@ HOLDS(a_bool_is_one_byte, sizeof(bool) == 1);
 
 /* Fails to compile when a structure is not laid out as in the assembly. */
 #define LAID_OUT(type, size) typedef char type##_size[sizeof(struct type) == (size) ? 1 : -1]
-
-/* A function that does not return, written in front of it where it is
-   declared: Open Watcom then ends its caller at the call, with nothing
-   behind it, the same instructions as `#pragma aux NAME aborts` made
-   before. Another compiler is told nothing here: _Noreturn of C11 is
-   its word, and the functions of sys.h that end the program would want
-   it too. */
-#ifdef __WATCOMC__
-#define NO_RETURN __declspec(aborts)
-#else
-#define NO_RETURN
-#endif
 
 #define LenColr 40                      /* Length of color table */
 #define LenHist 512                     /* Length of hisory buffer */

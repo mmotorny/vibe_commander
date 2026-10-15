@@ -133,7 +133,7 @@ extern const u8 FnFl6_S[];
 extern const u8 FnFl7_S[];
 
 /* What the size column says for a directory. */
-static const u8 SubDir[7] = "SUB-DIR";
+static const u8 SubDir[7] NONSTRING = "SUB-DIR";
 
 /* The error of a call that the user gave up, when a device was not
    ready. */

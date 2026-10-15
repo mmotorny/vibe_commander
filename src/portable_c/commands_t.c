@@ -403,7 +403,7 @@ const DIALOG(6) Sets_B = {
    the original has behind its 17 as well: the three texts that follow
    it and the first eight letters of the fourth. Each of the four is a
    constant of its own besides. */
-const u8 ExFl_S[80] =
+const u8 ExFl_S[80] NONSTRING =
     " Extension File \0"
     "Do you wish to edit the main,\0"
     "or a local ^I?\0"

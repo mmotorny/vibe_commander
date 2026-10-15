@@ -40,7 +40,7 @@ const u8 Vers_S[] = "\r\nThis program requires DOS 3.20 or later.\r\n";
    bytes, which end in no zero. */
 const u8 Err_S[] = " Error ";
 const u8 OnDr_S[] = "on drive A";
-const u8 OnDv_S[10] = "on device ";
+const u8 OnDv_S[10] NONSTRING = "on device ";
 
 /* What is wrong, by the number that DOS gives: the last is for every
    number that has no text. */

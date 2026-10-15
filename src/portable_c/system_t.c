@@ -20,21 +20,21 @@
    file, the texts of the box of a tree that is read, the start of a
    line of the Info and that of the title below. Nothing is known to
    read those bytes where they get to. */
-const u8 Mask_S[1 + LenPath] =
+const u8 Mask_S[1 + LenPath] NONSTRING =
     "\\*.*\0"
     "VC.EXT\0"
     "\\TREEINFO.NCD\0"
     "PNCI\0"
     "Scanning the directory\0"
     "structure on dr";
-const u8 Ext_F[LenPath] =
+const u8 Ext_F[LenPath] NONSTRING =
     "VC.EXT\0"
     "\\TREEINFO.NCD\0"
     "PNCI\0"
     "Scanning the directory\0"
     "structure on drive ";
-const u8 DrIn_F[13] = "DIRINFO\0 byte";
-const u8 Init_F[13] = "VC.INI\0 Chang";
+const u8 DrIn_F[13] NONSTRING = "DIRINFO\0 byte";
+const u8 Init_F[13] NONSTRING = "VC.INI\0 Chang";
 
 /* The disk of a drive that is none of its own: the box asks for it, with
    the letter of the drive from TmpErr, and has the buttons Ok and

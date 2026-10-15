@@ -45,11 +45,11 @@ u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
 #define CHECK 0xFB                      /* the mouse pointer on what a
                                            click would choose */
 
-static const u8 DrLe_S[14] = " Drive letter ";
-static const u8 Choo_S[7] = "Choose ";
-static const u8 Left_S[4] = "left";
-static const u8 Rght_S[5] = "right";
-static const u8 Driv_S[7] = " drive:";
+static const u8 DrLe_S[14] NONSTRING = " Drive letter ";
+static const u8 Choo_S[7] NONSTRING = "Choose ";
+static const u8 Left_S[4] NONSTRING = "left";
+static const u8 Rght_S[5] NONSTRING = "right";
+static const u8 Driv_S[7] NONSTRING = " drive:";
 
 /* The letters of the drives that the box offers. */
 #define DRIVES (md.TmpBuf)

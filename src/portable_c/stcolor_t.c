@@ -131,7 +131,7 @@ const DIALOG(1) StDfCol_B = {
 /* The four pictures: 25 rows of 58 characters each, with no zero byte
    anywhere. The first is the panels with the boxes of the drives, of
    the tree and of the user menu; */
-static const u8 StPage1_S[25 * 58] =
+static const u8 StPage1_S[25 * 58] NONSTRING =
     "\311\315\315\315\315\315\315\315\315\315\315\315"
         "\315\321\315\315 C:\\DOS \315\315\315\315\315\315"
         "\315\315\321\315 4:55p                  "
@@ -183,7 +183,7 @@ static const u8 StPage1_S[25 * 58] =
 
 /* the second the menu bar with a menu open, over the stars of the
    blanker; */
-static const u8 StPage2_S[25 * 58] =
+static const u8 StPage2_S[25 * 58] NONSTRING =
     "    Left    Files    Commands    Options    Right         "
     "  \332\304\304\304\304\304\304\304\304\304\304\304\304\304\304\304"
         "\304\304\304\304\304\304\304\304\277                               "
@@ -219,7 +219,7 @@ static const u8 StPage2_S[25 * 58] =
 
 /* the third the editor of an extension file, with boxes of errors, of
    a tree, of the deleting and of a dialog over it; */
-static const u8 StPage3_S[25 * 58] =
+static const u8 StPage3_S[25 * 58] NONSTRING =
     "Edit: C:\\VC\\                                              "
     "\033asm:    tas   \311\315\315\315\315\315\315\315\315\315\315\315 "
         "Choose Directory \315\315\315\315\315\315\315\315\315\315\315\273 "
@@ -270,7 +270,7 @@ static const u8 StPage3_S[25 * 58] =
         "\304\304\304\304\304\304\304\304\304\304\304\304\304\304\331 ";
 
 /* and the fourth the help, a page over the index. */
-static const u8 StPage4_S[25 * 58] =
+static const u8 StPage4_S[25 * 58] NONSTRING =
     "                                                          "
     "                                                          "
     "   \311\315\315\315\315\315\315\315\315\315\315\315"

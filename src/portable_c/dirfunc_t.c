@@ -93,7 +93,7 @@ static const u8 CnSb_S[] = "Can't delete the subdirectory";
 static const u8 DlWr1_S[] = "WARNING!";
 static const u8 DlWr2_S[] = "Do you want to delete all the files";
 static const u8 DlWr3_S[] = "^V?";
-const u8 DlWr4_S[81] =
+const u8 DlWr4_S[81] NONSTRING =
     "in the current directory\0" "You are ^uDELETING^u\0" "^V from\0" "^W\0"
     " Delete\377\003Cancel \0" " Delete";
 static const u8 DlSel_S[] = "You are ^uDELETING^u";

@@ -159,7 +159,7 @@ static const u8 MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1] =
 #define MenuLn3 (MenuLn2 + sizeof FILES_S - 1)
 #define MenuLn4 (MenuLn3 + sizeof COMMANDS_S - 1)
 
-static const u8 Ctrl_S[9] = "Ctrl-Alt-";
+static const u8 Ctrl_S[9] NONSTRING = "Ctrl-Alt-";
 #define Alt_S 5                         /* where in it Alt- begins */
 
 /* The pages of the help: for each kind of menu one for the menu itself

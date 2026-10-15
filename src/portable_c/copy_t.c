@@ -38,11 +38,11 @@ static const u8 Cont_D[5];
 /* The titles. The commands copy the title of their dialog into CpVar1 as
    far as CpVar2, 20 bytes whatever its length, so Copy0_S and Ren0_S are
    written with what follows them in the assembly. */
-const u8 Copy0_S[20] = " Copy \000 Move \000 Renam";
+const u8 Copy0_S[20] NONSTRING = " Copy \000 Move \000 Renam";
 const u8 Move0_S[] = " Move ";
-const u8 Ren0_S[20] = " Rename \000Rename \"^V\"";
+const u8 Ren0_S[20] NONSTRING = " Rename \000Rename \"^V\"";
 static const u8 Ren1_S[] = "Rename \"^V\" to";
-const u8 RnMv_S[15] = "Rename or move ";
+const u8 RnMv_S[15] NONSTRING = "Rename or move ";
 const u8 CopTo_S[] = "^V to";
 static const u8 CpTo1_S[] = { 't', 'o', 0xFF, LenStr - 2, 0 };
 static const u8 CoMnu_S[] = "[^I]\377\003[ F10-Tree ]\377\003[ Cancel ]";

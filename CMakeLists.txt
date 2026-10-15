@@ -396,6 +396,7 @@ function(add_portable_c target directory)
             BYPRODUCTS ${directory}/${object}.lst
             DEPENDS ${source_dir}/${source} ${source_dir}/vc.h
                     ${source_dir}/tables.h ${source_dir}/sys.h
+                    ${source_dir}/compiler.h
                     ${directory}/compiled.txt
             COMMENT "Compiling portable_c/${source} (${target})"
             VERBATIM)

@@ -27,8 +27,8 @@ extern const u8 OkMn_D[];
    commands copy 13 bytes of a name, which has 11: the name and the two
    bytes that follow it in the original, the start of the next text. So
    each is written as long as what is copied. */
-const u8 ViewE_F[13] = "VCVIEW.EXT\0VC";
-const u8 EditE_F[13] = "VCEDIT.EXT\0Co";
+const u8 ViewE_F[13] NONSTRING = "VCVIEW.EXT\0VC";
+const u8 EditE_F[13] NONSTRING = "VCEDIT.EXT\0Co";
 
 const u8 Col_S[] = "Col";
 const u8 ViFl_S[] = " View ";
@@ -49,7 +49,7 @@ const u8 Run1_S[] = "Can't run commands for some reason.";
    put in: the text and the 65 bytes that follow it in the original,
    which are the first texts of the editor, the last cut short. So it is
    written as long as what is copied. */
-const u8 Run2_S[80] =
+const u8 Run2_S[80] NONSTRING =
     "Try rebooting.\0"
     "Line\0"
     "Free\0"

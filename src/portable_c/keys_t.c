@@ -84,12 +84,12 @@ const DIALOG(1) Quit_B = {
 /* The user menu. The name of the menu file is copied 13 bytes long, as
    MainFil copies any name, so it is written with what follows it in the
    assembly, the beginning of the title. */
-const u8 Menu_F[13] = "VC.MNU\000 User ";
+const u8 Menu_F[13] NONSTRING = "VC.MNU\000 User ";
 /* Menu file edit copies the title as 80 bytes (M64_02 of
    commands.c), so it is written with the 68 that follow it in the
    original: the line of the box below, the texts of the box of the
    drives, and the beginning of the history's title. */
-const u8 User_S[80] =
+const u8 User_S[80] NONSTRING =
     " User Menu \0"
     "Could not find the menu file\0"
     " Drive letter Choose leftright drive: H";
@@ -119,4 +119,4 @@ const u8 AltSr_T[38] = {
 
 /* The name of the list file, which is copied 13 bytes long too. What
    follows it in the original is the first line of the menus, MenuLn1. */
-const u8 List_F[13] = "vc.lst\000 Brief";
+const u8 List_F[13] NONSTRING = "vc.lst\000 Brief";

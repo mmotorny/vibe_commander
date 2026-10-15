@@ -12,6 +12,7 @@ box.c         clean
 cmdline.c     clean
 commands.c    clean
 commands_t.c  clean
+compiler.h    clean
 copy.c        clean
 copy_t.c      clean
 dialog.c      clean
@@ -35,7 +36,7 @@ input.c       clean
 keys.c        clean
 keys_t.c      clean
 line.c        clean
-main.c        data_seg 2
+main.c        clean
 main_t.c      clean
 mask.c        clean
 menu.c        clean
@@ -46,7 +47,7 @@ place.c       clean
 read.c        clean
 screen.c      clean
 setup.c       clean
-stack_dos.c   data_seg 2
+stack_dos.c   clean
 start.c       clean
 stcolor.c     clean
 stcolor_t.c   clean

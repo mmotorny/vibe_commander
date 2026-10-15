@@ -124,7 +124,7 @@ static const u8 StDefWCB[24] = {
    behind the directory of the program: the name, and what follows it
    there, which is its zero byte, the name of the environment's variable
    and the start of a text that nothing reads. */
-static const u8 StInit_F[13] = "VC.INI\0VC=\0So";
+static const u8 StInit_F[13] NONSTRING = "VC.INI\0VC=\0So";
 
 /* The page of the setup's help for each item of the menu. */
 static const u8 StMainHlp[9] = { 1, 2, 3, 4, 4, 4, 5, 6, 7 };
@@ -132,7 +132,7 @@ static const u8 StMainHlp[9] = { 1, 2, 3, 4, 4, 4, 5, 6, 7 };
 /* What is said, through DOS, when the setup file could not be written:
    the line ends as DOS's call for writing a text has it, with a dollar
    sign, and has no zero byte. */
-static const u8 StStErr_S[49] =
+static const u8 StStErr_S[49] NONSTRING =
     "There was an error while saving the setup file\r\n$";
 
 /*------------- What DOS had on the screen -------------*/

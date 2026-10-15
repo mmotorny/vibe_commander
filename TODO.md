@@ -16374,6 +16374,28 @@ stub, `sys_stub.c`, with its test.
      the module that the map names, `sys_dos` now: an image saved of a
      build from before has them under `dos32`, and is saved anew.
 
+2. `compiler.h` (one commit): the words that each compiler says in its
+   own way, included by `vc.h` at its top, each defined for Open
+   Watcom, for gcc and clang, and as nothing for any other compiler.
+   `NO_RETURN` moved there from `vc.h`, as it was: nothing to another
+   compiler, since `noreturn` on `AlocEr`, `Exit00` and `Main` would have
+   clang ask for it on `ProgramEnd` of `sys.h` as well, which is the
+   layer's (`-Winvalid-noreturn`). `SEGMENT_BEGIN(name, class)` and
+   `SEGMENT_END` are the two `#pragma data_seg` of `main.c` and of
+   `stack_dos.c`, written by `_Pragma` of C99, which `wcc386` takes:
+   nothing to another compiler. `NONSTRING` is behind the name of each
+   of the 36 arrays of characters that have no room for their zero on
+   purpose, `__attribute__((nonstring))` for gcc and clang, of which
+   clang 23 says `-Wunterminated-string-initialization` otherwise: the
+   ones it names, as long as their text, in 16 files. Those that are
+   longer than their text, or are filled by a list of bytes, it does not
+   name and they have no word. `VC.EXE` and `debug/VC.EXE` are the same
+   bytes, `2f2fc833...` and `f6b4a06c...`. The host check has `main.c`
+   and `stack_dos.c` clean, the `data_seg` that it counted being nothing
+   to gcc now, and `compiler.h` is a line of its record and of that of
+   the words. `CMakeLists.txt` has `compiler.h` among the headers that
+   every object follows.
+
 ## The compiler's lost cut: what Open Watcom does, and where
 
 `wcc386 -os` makes `movsx eax,al` of `(u16)(signed char)c` that goes on

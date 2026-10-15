@@ -3332,8 +3332,9 @@ in "The portable C".
 
 - What taking the megabyte down met (F10; `TODO.md`, "F10, the
   megabyte goes"):
-  - A function that does not return is `NO_RETURN` of `vc.h` in front
-    of its declaration, Open Watcom's `__declspec(aborts)`, which is
+  - A function that does not return is `NO_RETURN` of `compiler.h` (of
+    `vc.h` until 5a) in front of its declaration, Open Watcom's
+    `__declspec(aborts)`, which is
     the same instructions as `#pragma aux name aborts` behind it; on a
     static function it goes on the definition, `static NO_RETURN void
     Round(void)`. `_Noreturn` and `__declspec(noreturn)` are taken by

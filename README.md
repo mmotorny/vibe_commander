@@ -637,9 +637,10 @@ The lines that say something of registers still, and why:
 | A function that assembly calls, where the extender enters the program for DOS's critical error, with its arguments in the registers that the assembly has them in | `Arrived` of `sys_dos.c` |
 
 That a function does not return, which lines of `#pragma aux` said
-with `aborts`, is said by a word of `vc.h` in front of it, `NO_RETURN`,
-which is Open Watcom's `__declspec(aborts)` and nothing to another
-compiler; [the figures](#the-figures) have how many lines of `#pragma
+with `aborts`, is said by a word in front of it, `NO_RETURN`, which is
+Open Watcom's `__declspec(aborts)` and nothing to another compiler:
+`src/portable_c/compiler.h` has the words that each compiler says in
+its own way, and `vc.h` includes it; [the figures](#the-figures) have how many lines of `#pragma
 aux` there are in the portable C, where the C translation has 863.
 None of them gives anything a name. In the C translation a constant that another file
 names has a `#pragma aux` wherever it is defined or declared, which
@@ -842,7 +843,9 @@ pack(1)`, each as often as [the figures](#the-figures) say; two
 `sys_dos.c`, which the extender enters where DOS's critical error,
 Ctrl-Break and Ctrl-C arrive; two intrinsic functions, `_disable` and
 `_enable`; and, which the C translation has not, `#pragma data_seg`,
-for the main data and for the stack. It has no `__interrupt` and no
+for the main data and for the stack, which `SEGMENT_BEGIN` and
+`SEGMENT_END` of `compiler.h` write, and which are nothing to another
+compiler. It has no `__interrupt` and no
 `__loadds` function, and no routine for arithmetic on 32 bits, which
 the compiler for 32 bits does by itself. The test `portable_c-host`
 counts these by their kinds, and `TODO.md` has its table. Of what
@@ -853,7 +856,7 @@ What this program rests on is where the linker puts things:
 | | What is relied on | Where it is done | What holds it |
 |---|---|---|---|
 | 1 | The linker's `order` directive: the classes of the segments in the order that its command names, each class linked whole | `CMakeLists.txt`, the linker's command | `portable_c-layout`, in each of the rows below |
-| 2 | `#pragma data_seg` makes a segment of the name and of the class that it names: the main data is of a class of its own, `MAIN`, and the stack of the class `STACK`, which the linker takes for the stack, naming its end in the file's header | `src/portable_c/main.c`, `src/portable_c/stack_dos.c` | `portable_c-layout`: the stack is the segment that ends where the header has the stack's top, and is in the file as zeros, by which the scenarios' test tells how much of it a scenario has left |
+| 2 | `#pragma data_seg` makes a segment of the name and of the class that it names: the main data is of a class of its own, `MAIN`, and the stack of the class `STACK`, which the linker takes for the stack, naming its end in the file's header | `SEGMENT_BEGIN` of `src/portable_c/compiler.h`, in `main.c` and `stack_dos.c` | `portable_c-layout`: the stack is the segment that ends where the header has the stack's top, and is in the file as zeros, by which the scenarios' test tells how much of it a scenario has left |
 | 3 | What has no value is of the class `BSS`, the last, and is not in the file; everything in front of it is | `CMakeLists.txt` | `portable_c-layout` |
 | 4 | The compiler puts nothing between the fields of a box or a dialog, nor between two objects of a file | `src/portable_c/tables.h`, by `#pragma pack(1)` | `portable_c-data`: an object is as long as its declaration makes it |
 | 5 | Compiled code takes ES to be on the data and the direction flag to be clear, and the extender enters the program with ES on the PSP: the first thing that the program does settles both | `Entered`, in `Start` of `src/portable_c/sys_dos.c` | every scenario |
