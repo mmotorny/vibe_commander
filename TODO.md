@@ -19616,6 +19616,53 @@ build/c/VC.EXE`). By scenario:
 The header of `harness/scenarios.py` still says that a new file comes
 last; none of the ten rests on that line, which is the end's to mend.
 
+### S3: done
+
+The fifteen scenarios of the panels and their keys go to the files that
+they meant, each with its number of steps, and their goldens are
+derived on the new bench. `python3 harness/sortcheck.py` loses no
+instruction of the batches in any of them but the two of the unsorted
+order, which `sort` still runs. The C translation passes all fifteen
+(`harness/compare.py build/c/VC.EXE`). By scenario:
+
+- As before, every screen: `panels`, `panel-keys`, `sort`, `compare`,
+  `tree-choose`, `attributes`, `attributes-russia`.
+- The same file under the cursor, which the tool names otherwise
+  because it is no longer the first entry shown, or now is: `stamps`
+  and `stamps-russia`, screen 1, WORK after Ctrl+PgUp, behind STAMPS
+  now; `sizes`, screens 3 and 4, WORK and then STAMPS at the root;
+  `reread`, screen 7, WORK; `attributes-directory`, screens 20 and 21,
+  kernel.sys of A:\, which was its first entry and is its fourth.
+- Another file on purpose, by the order:
+  - `cursor`, 14 screens: the cursor goes through A:\FREEDOS\BIN by
+    columns, pages, End and Home, and lands on whatever entry is at
+    that place of the list, which is another one in the sorted list.
+    What it moves through is the same, 44 entries, and so is the code
+    it runs.
+  - `scroll`, screens 16 and 18: End goes to the last file, run.bat,
+    where it was the copy made last, hello.bak.
+  - `filter`, screens 15 to 20: the file behind readme.txt, where the
+    cursor goes when that is hidden, is run.bat now; and the last file,
+    which is hidden next so that the cursor goes to the one before it,
+    is run.bat, where it was noext, made last, and the one before it
+    is notes.doc. A file that is not the last, hidden, has the cursor
+    go to the one behind it instead, which is other code: so it is the
+    last file that is hidden, as the comment says, and not noext.
+  - `reread`, screen 25: when SRC is deleted, the cursor stays at its
+    place in the list, which has WORK there now and had readme.txt.
+- Steps that changed in kind, not only in how many keys: `stamps`
+  selects huge.dat and last.dat by "Up Ins Ins", huge.dat being in
+  front of last.dat now; `reread` selects C:\WORK, the last entry of
+  the root, by "Ins Enter", where Ins does not move; `sizes` keeps End
+  in "End Up Up Up Up Up Up Enter" to a.zip, since End is run nowhere
+  else in it; `filter` keeps Up in "End Up" to readme.txt, for the same
+  reason; `panel-keys` selects two pairs that are not neighbours now,
+  hello.txt and readme.txt, then data.bin and notes.doc, and puts the
+  cursor back where the old keys left it.
+- What the end has to know: the header of `harness/scenarios.py` was
+  not touched. `_STAMPS`, the first two steps of `stamps` and
+  `stamps-russia`, is theirs alone, and goes to STAMPS by "Up Enter".
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes

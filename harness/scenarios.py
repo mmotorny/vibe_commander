@@ -1606,7 +1606,7 @@ class Run:
 # menu.
 _STAMPS = (
     "Ctrl+PgUp",
-    "Down Down Enter",
+    "Up Enter",                           # STAMPS, before WORK
     "F9",
     "Enter",                              # the menu of the left panel
     "Down Enter",                         # Full
@@ -1628,16 +1628,20 @@ _MANY_FILES = (
 )
 
 _STAMPS_STEPS = _STAMPS + (
-    "Down Down Down",                     # the status line of a file
+    "Down Down Down Down Down Down Down",  # night.dat: the status line of
+                                          # a file
     "Ctrl+a",                             # its date and time in full
     "Esc",
-    "Down",                               # a date and a time before ten
+    "Up",                                 # morning.dat: a date and a time
+                                          # before ten
     "Ctrl+a",
     "Esc",
-    "Down Down Down",                     # the last date DOS can express
+    "Up",                                 # last.dat: the last date DOS
+                                          # can express
     "Ctrl+a",
     "Esc",
-    "Ins Ins",                            # the size of the selected files
+    "Up Ins Ins",                         # huge.dat and last.dat: the size
+                                          # of the selected files
     "Alt+F6",                             # the sizes of directories
     "Alt+F7",                             # the file search and its list
     "Enter",
@@ -1737,9 +1741,11 @@ SCENARIOS = {
         "The file panel in its other modes, the status line and the "
         "drive menu",
         steps=(
-            "Down Down Down",             # onto a file: the status line
-            "Down Down Down",             # onto the 1 KB file
-            "End",
+            "Down Down Down Down Down Down Down",  # onto readme.txt: the
+                                          # status line
+            "Up Up Up Up",                # onto data.bin, the 1 KB file
+            "End Up Up Up Up",            # the last file, and back onto
+                                          # empty.dat
             "Alt+F1",                     # the drive menu of the left panel
             "Esc",
             "Tab",
@@ -1876,7 +1882,7 @@ SCENARIOS = {
     "attributes": Scenario(
         "The date and the time of a file, set by hand",
         steps=(
-            "Down Down Down",             # onto a file
+            "Down Down Down Down Down Down Down",  # onto readme.txt
             "Ctrl+a",
             "Tab Tab Tab Tab",            # past the attributes, to the date
             '"1-2-99"',
@@ -1915,7 +1921,7 @@ SCENARIOS = {
         "The files of a panel in each order: by name, extension, time and "
         "size, with system files first, and unsorted again",
         steps=(
-            "Down Down Down Down",        # onto hello.txt
+            "Down Down Down Down Down",   # onto hello.txt
             "F5",                         # a copy with the same name and
             '"hello.doc"',                # another extension
             "Enter",
@@ -1925,7 +1931,9 @@ SCENARIOS = {
             "Tab Tab",
             '"3:04:05"',                  # of the same day at another time
             "Enter",
-            "Down Down",                  # onto run.bat
+            "End",                        # onto run.bat, the last: notes.doc,
+                                          # a system file, is first of the
+                                          # files now
             "Ctrl+a",
             "Tab Tab Tab Space",          # another system file
             "Enter",
@@ -1942,7 +1950,7 @@ SCENARIOS = {
         "The files of a panel chosen: without the hidden ones, by a mask, "
         "and only programs",
         steps=(
-            "Down Down Down Down",        # onto hello.txt
+            "Down Down Down Down Down",   # onto hello.txt
             "F5",                         # copies of it that are programs
             '"hello.com"',
             "Enter",
@@ -1953,17 +1961,20 @@ SCENARIOS = {
             '"noext"',
             "Enter",
             "Ctrl+h",                     # hidden files off: none is hidden
-            "Up",                         # onto readme.txt
+            "End Up",                     # onto readme.txt
             "Ctrl+a",
             "Tab Tab Space",              # hidden: it goes, and the cursor
-            "Enter",                      # to the file behind it
-            "End",                        # onto the last file
+            "Enter",                      # to the file behind it, run.bat
+            "End",                        # onto the last file, where it is
             "Ctrl+a",
             "Tab Tab Space",              # hidden too: the cursor goes to
             "Enter",                      # the file before it
             "Ctrl+h",                     # hidden files on again
             "Home",
-            "Down Down Down Down Down Ins",   # notes.doc selected
+            "Down Down Down Down Down Down Down Down Down Ins Down",
+                                          # notes.doc selected, the cursor
+                                          # on run.bat, which the mask
+                                          # leaves out
             "F9 l l",
             '"*.t?t"',                    # by a mask
             "Enter",
@@ -1988,7 +1999,7 @@ SCENARIOS = {
             "Alt+F9",
             "F9 o f",                     # panels half the screen high
             "F9 l f",                     # and of one column: ten files
-            "Down Down Down Down",        # onto hello.txt
+            "Down Down Down Down Down",   # onto hello.txt
             "F5",
             '"hello.doc"',
             "Enter",
@@ -2000,7 +2011,7 @@ SCENARIOS = {
             "Down Down Down Down Down Down Down Down Down Down",
             "Home",
             "Down Ins",                   # a directory selected
-            "Down Down Ins",              # and a file
+            "Down Down Down Down Down Ins",   # and a file, hello.txt
             "F8",                         # counted
             "Esc",
         )),
@@ -2011,7 +2022,7 @@ SCENARIOS = {
         steps=(
             "F9 o f",                     # panels half the screen high
             "Alt+F1 a",
-            "Down Down Down Enter",       # A:\\FREEDOS
+            "Enter",                      # A:\\FREEDOS, the first entry
             "Down Enter",                 # and its BIN: 44 entries, in
                                           # three columns of ten
             "Right",                      # a column on
@@ -2070,7 +2081,9 @@ SCENARIOS = {
         "panels switched off and on, swapped, of another kind, and the "
         "key bar; the keys of the panels with the panels off",
         steps=(
-            "Down Down Down Ins Ins",     # two files selected
+            # Two files selected, hello.txt and readme.txt, and back onto
+            # notes.doc between them.
+            "Down Down Down Down Down Ins Down Ins Up Up",
             "GrayStar",                   # the selection turned round,
             '"*.txt"',                    # for a mask
             "Enter",
@@ -2078,7 +2091,9 @@ SCENARIOS = {
             '"*.zzz"',
             "Enter",                      # no file like that
             "Enter",
-            "Ins Ins",                    # two files again
+            "Up Up Up Ins Down Down Ins Down",    # two files again,
+                                          # data.bin and notes.doc, and
+                                          # onto run.bat
             "Ctrl+a",                     # their attributes: none is set,
             "Enter",                      # and they are selected no more
             "Ctrl+m",                     # but they are again
@@ -2115,7 +2130,7 @@ SCENARIOS = {
             "Ctrl+z",                     # and the Info, which it was
             "F9 l b",                     # the Info a panel of files
             "Tab",
-            "Enter",                      # both in C:\\WORK
+            "Down Enter",                 # both in C:\\WORK, behind STAMPS
             "Tab",                        # there is nowhere to change to
             "Alt+F2 d",                   # the right panel on D:, whose
             "Ctrl+z",                     # tree is kept in no file
@@ -3104,17 +3119,19 @@ SCENARIOS = {
             "Ctrl+l",                     # the Info on the right
             "Ctrl+c",                     # not with the Info next to it
             'F7 "1" Enter',               # a directory named 1
-            'Home Down Down Down F5 "src\\" Enter',  # readme.txt into SRC,
+            'Home Down Down Down Down Down Down Down Down F5 "src\\" Enter',
+                                          # readme.txt into SRC,
             'F5 "src\\1" Enter',           # and again as a file named 1
-            'Down F5 "src\\" Enter',       # hello.txt, and here an hour
+            'Up Up F5 "src\\" Enter',      # hello.txt, and here an hour
             'Ctrl+a Tab Tab Tab Tab Tab "1:00:00p" Enter',     # later
             'Down F5 "src\\" Enter',       # notes.doc, and here a day
             'Ctrl+a Tab Tab Tab Tab "6-17-00" Enter',          # later
             "Ctrl+l",                     # two panels of files
-            "Tab Enter",                  # both in C:\\WORK
+            "Tab Down Enter",             # both in C:\\WORK
             "Tab Ctrl+c",                 # the same: a box says so
             "Enter",
-            "Tab Down Down Enter",        # the right one in SRC
+            "Tab Down Down Down Enter",   # the right one in SRC, behind 1
+                                          # and DOCS
             "F9 c c",                     # five files here that are not
                                           # there or are newer, and one
                                           # there that is a directory here
@@ -3895,7 +3912,8 @@ SCENARIOS = {
         "A directory chosen from the tree, of a disk with few directories "
         "and of one whose tree cannot be saved",
         steps=(
-            "Down Ins Ins F8",            # DOCS and SRC
+            "Down Ins Ins Down Down Down Down F8",  # DOCS and SRC, from
+                                          # readme.txt
             "Enter",
             "Enter",                      # deleted: three directories left
             "Alt+F10",                    # too few for a tree file
@@ -3925,23 +3943,24 @@ SCENARIOS = {
         "and where it goes when its directory is gone",
         steps=(
             "Ctrl+l",                     # the Info panel on the right
-            "Down Down Down Ins",         # a file selected
+            "Down Down Down Down Down Down Down Ins",  # readme.txt
+                                          # selected
             'F7 "dirinfo" Enter',         # the list is read again, with a
                                           # directory more: the file stays
                                           # selected. The Info cannot open
                                           # a directory for its text, and
                                           # says nothing of the label
-            "Home Down Ins Up Enter",     # a directory selected, and into
+            "Home Down Down Ins Up Enter",    # DOCS selected, and into
                                           # it: its list has nothing of
                                           # the one before
             "Ctrl+PgUp",
             'F7 "work" Enter',            # C:\\WORK\\WORK
             "Ctrl+PgUp",
-            "Ins Up Enter",               # C:\\WORK selected, and into it:
+            "Ins Enter",                  # C:\\WORK selected, and into it:
                                           # the WORK in there is not
             "Ctrl+F4",                    # the label of the disk, to change
             "Esc",
-            "Down Down Down",
+            "Down Down Down Down Down Down Down Down Down",  # readme.txt
             'F5 "src\\" Enter',           # a file into C:\\WORK\\SRC
             "Ctrl+l",                     # two panels of files
             "Ctrl+u",                     # which change places: the one
@@ -3949,10 +3968,11 @@ SCENARIOS = {
             "Tab",                        # the right one now
             "Ctrl+r",
             "Tab",
-            "Home Down Down Enter Down",  # the right one in C:\\WORK\\SRC,
+            "Home Down Down Down Enter Down",     # the right one in
+                                          # C:\\WORK\\SRC,
             "Tab",                        # on the file
-            "Enter",
-            "Down Down",
+            "Down Enter",                 # the left one in C:\\WORK
+            "Down Down Down",             # onto SRC
             "F8",                         # the left one deletes SRC with
             "Enter",                      # what is in it: the right one
             "Enter",                      # shows the current directory
@@ -3967,11 +3987,13 @@ SCENARIOS = {
             "F9 o d",                     # Auto directory sizes
             "Down",                       # a directory with nothing in it
             "Ctrl+PgUp",                  # one with files
-            "Down",                       # and one with more than 4 GB
-            "Up Enter",
-            "Down Down Down",
+            "Up",                         # and one with more than 4 GB
+            "Down Enter",
+            "Down Down Down Down Down Down Down",     # readme.txt
+            # Its copy a.zip goes in front of the other files, six above
+            # the last.
             'F5 "a.zip" Enter',           # a file of a kind that the main
-            "End Enter",                  # extension file has a command
+            "End Up Up Up Up Up Up Enter",    # extension file has a command
             "Ctrl+o",                     # for, which DOS does not find
             "Ctrl+o",
             "F9 o n",                     # the mini status off: it would
@@ -3985,7 +4007,9 @@ SCENARIOS = {
             '"txt:" Tab "echo" Space "!.!"',
             "F2",
             "Esc",                        # the directory is read again,
-            "Home Down Down Down Enter",  # and its vc.ext with it
+            "Home Down Down Down Down Down Down Down Down Enter",
+                                          # and its vc.ext with it: on
+                                          # readme.txt
             "Ctrl+o",                     # what the command printed
             "Ctrl+o",
         )),
@@ -4948,7 +4972,7 @@ SCENARIOS = {
         "what is in a directory, and of a file on a disk that cannot be "
         "written",
         steps=(
-            "Down Down Down",             # readme.txt
+            "Down Down Down Down Down Down Down",  # readme.txt
             "Ctrl+a",
             "Tab Tab Tab Tab",            # to the date
             '"5"',                        # a month and nothing else
@@ -4967,7 +4991,7 @@ SCENARIOS = {
             "Enter",
             "Right Right Enter",
             "Alt+F1 a",                   # the floppy, write-protected
-            "Ctrl+a",
+            "Down Down Down Ctrl+a",      # its kernel.sys
             "Space",
             "Enter",                      # DOS's critical error, in a box
             "Esc",                        # Abort: nothing more is said
@@ -4977,7 +5001,7 @@ SCENARIOS = {
         "A date set where the day comes first, in a month after July",
         country="ru",
         steps=(
-            "Down Down Down",
+            "Down Down Down Down Down Down Down",  # readme.txt
             "Ctrl+a",
             "Tab Tab Tab Tab",
             '"31.8.99"',
