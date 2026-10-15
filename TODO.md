@@ -20191,6 +20191,193 @@ each stage:
   of the tree, so nothing there changes for the portable C.
 - The branch `sort` can be deleted.
 
+### L3b, the scenarios on Linux: the design, waiting for the user
+
+Stage 1 of the piece: how the program for Linux is taken through the
+scenarios and held to the original's goldens with masks (`CLAUDE.md`,
+step 6). Nothing of it is built; the questions at the end are the
+user's. The counts are of the 159 scenarios that the portable C is
+taken through, by scripts kept in the piece's checkout, and of their
+goldens.
+
+**What was tried.** A bench laid out by hand, `posix/vc` run through the
+channel of L3a with the bench's setup file, and its first screen held
+against the golden of `start`. With `HOME` a directory of the bench
+that has `WORK` and `STAMPS` as the bench's C: has them, the program
+started in `$HOME/WORK`, every file and directory given its time by
+`utime` and `TZ=UTC`, the setup file with `H` for `C` in its two paths
+and its sum made again, and the help and the other files in
+`$XDG_CONFIG_HOME/vc` outside the home directory, the screen is the
+golden's but for two things: `H:` where the golden has `C:`, and the
+order of the entries. `H:\WORK` is as long as `C:\WORK`, and HOME as
+WORK, so a path of the bench's C: and its label are the same cells but
+for one letter and the label. The order is the question below: the
+bench's panels are unsorted, as its setup file has them, and show a
+directory in the order of DOS's table, which is the order in which the
+bench made its entries (`readme txt` before `hello txt`, `WORK` before
+`STAMPS`); the emulation lists a directory in the order of its names'
+bytes when it first reads it (L1), so every list of files differs.
+
+**The bench of a run.** A directory of the harness's work directory for
+each scenario, removed behind it: `HOME` there, with `WORK` and
+`STAMPS` made in the bench's order from `setups.WORK_FILES` and
+`STAMPS_FILES` (the large sizes as sparse files, which cost nothing),
+every time as the bench's (`EPOCH`, the stamps of `STAMPS_FILES`), and
+the program started in `$HOME/WORK`, so on `H:\WORK`. `TZ=UTC`, `PATH`
+and the variables below and nothing else of the host's environment.
+The files that the bench has in `D:\VC` beside the program, `VC.HLP`
+and the rest of `setups.SUPPORT_FILES`, from the pinned distribution
+with their dates, in `$XDG_CONFIG_HOME/vc`, named in small letters as
+the program names what it makes; the setup file is the original's, as
+the DOS bench makes it (question 7). Where `$XDG_CONFIG_HOME` is, is
+question 2: not in the home directory, whose root is the bench's C:\
+and is on nearly every screen in the right panel, where `.config` would
+be a line more (`CONFIG~1`, hidden, and the bench shows hidden files).
+
+**The keys.** A scenario's steps are made into lines of the channel's
+`keys` by the harness: a key into the BIOS's word for it, with
+`held=` around a key that has Shift, Ctrl or Alt, `Wait*N` into
+`wait=N`, a text into a word for each character. The table of the
+BIOS's words is written from what the BIOS is documented to make of a
+key (RBIL, INT 16h; the IBM BIOS's INT 9) and held against the bench's
+BIOS by a toy on the bench that prints the word of every key that the
+scenarios press, once, as `drivercheck.py` holds the driver: no new
+download. The mouse has no event in the channel until L5.
+
+**Which scenarios, and how** (those of the first and the fourth row by
+name: those of Russia are the seven whose `country` is `ru`, those of
+the mouse every one with a step of `Click@` or `Move@`, `blank` and
+`menu-none` among them, the setup program's eight of the mouse too; the
+lists go into `deviations.TREES` when
+it is built):
+
+| Kind | Scenarios | Screens of the original |
+|---|---|---|
+| Not run: Russia, code page 866; the program for Linux is 437 always | 7 | 95 |
+| Not run: what it is about is not on Linux: the floppy drive and its second letter (`drive-b`, `not-ready`, `phantom`, `diskette-command`), a device and DOS's critical error (`device`), a full disk (`copy-full`), every fixed drive, R: being the host's root (`find-drives`), memory that runs out where Linux gives what the machine has (`editor-full`, `copy-big`) | 9 | 259 |
+| Not run: a program of DOS or a command of DOS is what it is about, its output or the program coming back from it (`command`, `comspec`, `ended`, `stay-left`, `start-screen`, `start-memory`, `second-copy`, `lost`, `enter-many`, `enter-many-selected`, `start-setup`, `setup-defaults`) | 12 | 346 |
+| Not run until L5: the mouse | 33 | 706 |
+| Run, every step as it is (`copy`, `delete` and `names` with `h:` typed for `c:`) | 65 | 1,560 |
+| Run, the clock given at the start in place of DOS's `time`, which the step runs (`blank-timed`, `clock-morning`) | 2 | 10 |
+| Run, a path of `D:\VC` typed as the path of the files beside the program (`copy-ask`, `copy-dirs`, `editor-keys`, `move`, `setup-delay-file`) | 5 | 230 |
+| Run, `A:` as a directory of R: (question 3) (`attributes-directory`, `cursor`, `find`, `sort`, `tree-choose`, `view-keys`, `view-parts`, `view-search`) | 8 | 251 |
+| Run up to the step before its first command, the rest when L6 runs commands (`command-edit`, `editor-save`, `enter`, `help-broken`, `history-drives`, `menu-files`, `menu-panel`, `panel-keys`, `setup-damaged`, `setup-help-file`, `setup-missing`, `setup-missing-saved`, `setup-new`, `setup-save-fails`, `sizes`, `user-menu`, `user-menu-run`, `view-commands`) | 18 | up to 670 |
+
+So 98 run and 61 not, 28 of those for good (as long as the decisions
+on the code page and the drives stand) and 33 until the mouse. Which
+original scenarios ran a command was read from their `.ran`: the 30 of
+the main program whose code ran `Exec05`, 4B00h, and the six of the
+setup program that type `cls`, `del`, `copy` or `attrib`. Of a
+command run on Linux (L6) through `$SHELL -c`, what it prints is not
+DOS's, and `ver`, `cls` and `del` are none of the host's: those steps
+will want other commands in their place, as `in_place_in` has it, and
+the mask of what DOS has shown behind the panels behind them. A step
+that goes to A: by the drive menu, `Alt+F1 a`, is left out with its
+screens where the scenario goes on without it.
+
+`label` is run as it is and wants a patch for the box of Ctrl+F4,
+making and deleting a label being refused on Linux (the user's word on
+the labels); `quit` wants its last screen's line where DOS writes its
+prompt behind the program left out, the one place where DOS writes
+over what the program left in a scenario that is run.
+
+**The masks, each a rule of the tree found on the golden's screen**,
+blanked there and on the build's (the form that the comment at `rules`
+of `deviations.Declared` has for a rule with `None` for its text), with
+what it is held by whole:
+
+| Element | Rule | Screens (scenarios), of some 2,780 of the scenarios that run |
+|---|---|---|
+| The drive of a path of the bench's C:, and the label WORK | not a mask: an expectation, `H` where the golden has `C` in front of `:\` and `HOME` for `WORK` behind "Volume in drive" (question 6) | 2,040 (99); the label 211 (21) |
+| The room of the drive in the Info: the lines of the total and of what is free | the two lines of the Info panel that end in "total bytes on drive X:" and "bytes free on drive X:", whole, since the line is centred and the figure has another length | 232 (22); held whole by nothing, as the figure is the host's file system's (L2): a scenario of its own would want a file system of a known size, which wants a mount the harness cannot make |
+| What the files of a directory use in the Info | the figure of "N files use N bytes in", and its line, as above: clusters of the host's size | 170 (21); held by the count of files, which the rule keeps where it can |
+| A directory's date and time in a panel | the date and the time behind `►SUB-DIR◄` or `►UP--DIR◄`, in the mini status and in Full, in a scenario that writes into a directory of the bench: DOS keeps a directory's time, the host moves it at every entry made or removed | 1,221 screens show one, 802 in the 45 scenarios that write; held whole in the others |
+| The drive menu | the box of "Choose left drive" or "right drive" as the original draws it, its frame included: the letters are others and the box narrower | 21 (3); held whole by nothing: an expectation of the tree's own would do it, which the user's word allows only where a mask cannot |
+| A path of R:, of the files beside the program (`D:\VC` in the golden) or of A:'s directory | the path where the golden has `D:\` or `A:\` in a title, the prompt, a dialog's line or the editor's and the viewer's first line, and on a row that the path's length moves, the rest of the row | 118 (18) and 104 (12) |
+| What DOS has shown behind the panels | only behind a command that L6 runs; nothing of it in the 98 as they are run here, the program for Linux starting with the screen empty and writing its banner where the bench's DOS has its screen cleared | 0 now |
+| The clock | none, if the test gives the clock (question 4) | |
+
+**The disks at the end.** `fat.read_tree` of the bench's images becomes
+a walk of the host's directories with the same entries: `HOME` as the
+golden's C:, `$XDG_CONFIG_HOME/vc` as D:\VC (but the line of the program
+under test), each name as DOS has it, in capitals; sizes and the sums of
+the contents compared, the stamps by `disk_lines`' "during the run" for
+what the program wrote. Masks there: the attributes but read-only and
+directory (the host has nowhere for hidden, system and archive, L2),
+and the time of a directory that the run wrote into. The setup file:
+the golden has only its sum, so a saved `vc.ini` is held by the rule
+backwards, its drive letters made `C` where the bench's paths are and
+its sum made again, and then its sum of SHA-256 against the golden's: 11
+scenarios save it.
+
+**In the harness.** A tree `posix` beside `portable_c`, of the same
+source: what `TREES["portable_c"]` declares holds for it, its rules,
+its steps and its patches (read from `harness/goldens/portable_c/`), and
+`posix` declares what is Linux's: `not_run`, `masks` (the rules with no
+text), the cut of a scenario at its first command, its own patches in
+`harness/goldens/posix/`, and its steps in place of others. The
+scenarios' runner gets a second kind of machine, the host's process in
+its bench, in `harness/posix.py`, with the same `scenarios.Run` out of
+it, so that `compare.py`, `goldens.py patch` and `changes` take the tree
+as they take the others; the test `portable_c-posix-scenarios`, labelled
+`portable_c`, runs `posix-asan/vc`. No trace of what ran: the batches'
+functions are held by the DOS tree, and `ported.py`'s checks of them are
+not run for this one.
+
+**Questions for the user, with what this piece recommends:**
+
+1. The order of a directory. (a) The emulation lists a directory in the
+   order in which its entries were made, as DOS's table has them: by
+   the host's time of birth of each (`statx`), the names of one time by
+   their bytes, where the host has such a time, and by bytes where it
+   has not; and a name made later takes the place of one that has gone
+   from the run's table, as a new entry takes the first free one on a
+   disk of DOS's. Aliases stay numbered by the bytes of the names, as
+   decided. (b) Keep the order of the bytes, and hold the program for
+   Linux to an expectation of its own on every screen that lists files:
+   nearly all of 2,783. (c) Leave the lists of files out of the
+   comparison. Recommended: (a); without it nearly nothing compares.
+2. Where the files beside the program are, the bench's D:\VC. (a)
+   `$XDG_CONFIG_HOME` a directory of `/tmp` with a name of DOS's form,
+   `R:\TMP\VC123456\VC`, so that its path fits DOS's 63 characters
+   whatever the checkout's path is, and the paths shown masked. (b) The
+   default, `~/.config/vc`: the root of H:, on nearly every screen, then
+   lists `CONFIG~1`. (c) The bench's home in `/tmp` as a whole.
+   Recommended: (a); the files are small, some 70 KB a scenario.
+3. A:, the FreeDOS diskette, which eight scenarios take files from. (a)
+   The same files, from the pinned FreeDOS download that the bench boots
+   from, in a directory of R: beside the files of 2, and `a:\` typed as
+   its path; `Alt+F1 a` left out. (b) Every step that touches A: left
+   out. Recommended: (a).
+4. The clock. (a) The channel is given the clock to start from, the
+   bench's at the program's start, and under the channel it moves only
+   by the steps' waits, as the bench's moves by what the machine
+   executes; and a file or a directory that the program makes or writes
+   is stamped at its close with that clock, as DOS stamps it, so that
+   the disks' "during the run" holds. (b) The clock given to start from,
+   real time behind it, and the kernel's stamps: the dates of what is
+   made masked. (c) Nothing given: the clock and those dates masked.
+   Recommended: (a). `blank-timed` waits 1,300 ticks, 71 seconds of
+   real time under (b).
+5. A directory's time after the run has written into it: (a) masked by
+   the rule above, held whole where nothing is written; (b) the
+   emulation puts a directory's time back after it changes what is in
+   it, as DOS keeps it, which changes what a user's host shows.
+   Recommended: (a).
+6. The bench's C: is H: on Linux. (a) An expectation, `H` for `C` and
+   `HOME` for `WORK`, found by rule, nothing left out. (b) A mask of the
+   path and of the label, as step 6 words it. Recommended: (a), which
+   compares more for nothing.
+7. The bench's setup file. (a) The original's, as the DOS bench makes
+   it, with its two drive letters made `H` and its sum made again. (b)
+   Made by the program for Linux through the same menus from the
+   distribution's. Recommended: (a), and (b) as a check of it once.
+8. The 18 scenarios that run a command: (a) run up to the step before
+   their first command until L6; (b) not run until L6. Recommended: (a).
+9. Which program the test runs: (a) `posix-asan/vc`, the sanitizers
+   being what Linux adds; (b) both, a test each. Recommended: (a), with
+   `compare.py` taking either.
+
 ## A deviation held by a patch: done, and what comes behind it
 
 Done: what the portable C is expected to show where a deviation changes
