@@ -1869,14 +1869,21 @@ def check_declared(tree, names):
 
 def deviation_entries(tree):
     """The entries of the tree's DEVIATIONS.md, number -> text: each
-    from its heading, "### 7. ...", to the next."""
+    from its heading, "### 7. ...", to the next heading of an entry or
+    of a part, "## ". The entries of the program for Linux, "### L1. "
+    and on in a part of their own, are not among them: they declare
+    what that program does otherwise than the portable C, and what the
+    portable C is declared to do is named in an entry of its own.
+    Nothing holds the scenarios that the program for Linux is not run
+    for (deviations.LINUX_NOT_RUN) to an entry that names them."""
     file = deps.ROOT / "src" / tree / "DEVIATIONS.md"
     if not file.exists():
         return {}
-    parts = re.split(r"^### (\d+)\. ", file.read_text(encoding="utf-8"),
-                     flags=re.MULTILINE)
+    parts = re.split(r"^(?:### (\w+)\. |## )",
+                     file.read_text(encoding="utf-8"), flags=re.MULTILINE)
     return {int(number): text
-            for number, text in zip(parts[1::2], parts[2::2])}
+            for number, text in zip(parts[1::2], parts[2::2])
+            if number is not None and number.isdigit()}
 
 
 def check_comparison(outcomes, program):
