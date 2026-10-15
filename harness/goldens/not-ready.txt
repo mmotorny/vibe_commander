@@ -6,15 +6,15 @@ code page 437
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -25,7 +25,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -34,15 +34,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║                                      ║| 1Bx45 70x29 1Bx6
-|║hello    txt│            │            ║║       ╔════ Drive letter ═══╗        ║| 1Bx45 70x29 03x2 1Bx4
-|║notes    doc│            │            ║║       ║ Choose right drive: ║        ║| 1Bx45 70x12 7Ex5 70x12 03x2 1Bx4
-|║data     bin│            │            ║║       ║      A   C   D      ║        ║| 1Bx45 70x13 30x3 70x13 03x2 1Bx4
-|║run      bat│            │            ║║       ╚═════════════════════╝        ║| 1Bx45 70x29 03x2 1Bx4
-|║empty    dat│            │            ║║                                      ║| 1Bx45 70x29 03x2 1Bx4
+|║data     bin│            │            ║║                                      ║| 1Bx45 70x29 1Bx6
+|║empty    dat│            │            ║║       ╔════ Drive letter ═══╗        ║| 1Bx45 70x29 03x2 1Bx4
+|║hello    txt│            │            ║║       ║ Choose right drive: ║        ║| 1Bx45 70x12 7Ex5 70x12 03x2 1Bx4
+|║notes    doc│            │            ║║       ║      A   C   D      ║        ║| 1Bx45 70x13 30x3 70x13 03x2 1Bx4
+|║readme   txt│            │            ║║       ╚═════════════════════╝        ║| 1Bx45 70x29 03x2 1Bx4
+|║run      bat│            │            ║║                                      ║| 1Bx45 70x29 03x2 1Bx4
 |║            │            │            ║║            │            │            ║| 1Bx47 03x29 1Bx4
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -53,7 +53,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -62,15 +62,15 @@ cursor 0 127 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║..          │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║SRC         │            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║readme   txt│            │            ║║FREEDOS     │            │            ║| 1Bx80
+|║data     bin│            │            ║║kernel   sys│            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -81,7 +81,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -90,15 +90,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║..          │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║SRC         │            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║readm                                 ║║FREEDOS     │            │            ║| 1Bx6 70x28 1Bx46
-|║hello   ╔═══ Drive letter ═══╗        ║║            │            │            ║| 1Bx6 70x28 03x2 1Bx44
-|║notes   ║ Choose left drive: ║        ║║            │            │            ║| 1Bx6 70x12 7Ex4 70x12 03x2 1Bx44
-|║data    ║     A   C   D      ║        ║║            │            │            ║| 1Bx6 70x12 30x3 70x13 03x2 1Bx44
-|║run     ╚════════════════════╝        ║║            │            │            ║| 1Bx6 70x28 03x2 1Bx44
-|║empty                                 ║║            │            │            ║| 1Bx6 70x28 03x2 1Bx44
+|║data                                  ║║kernel   sys│            │            ║| 1Bx6 70x28 1Bx46
+|║empty   ╔═══ Drive letter ═══╗        ║║            │            │            ║| 1Bx6 70x28 03x2 1Bx44
+|║hello   ║ Choose left drive: ║        ║║            │            │            ║| 1Bx6 70x12 7Ex4 70x12 03x2 1Bx44
+|║notes   ║     A   C   D      ║        ║║            │            │            ║| 1Bx6 70x12 30x3 70x13 03x2 1Bx44
+|║readm   ╚════════════════════╝        ║║            │            │            ║| 1Bx6 70x28 03x2 1Bx44
+|║run                                   ║║            │            │            ║| 1Bx6 70x28 03x2 1Bx44
 |║            │            │            ║║            │            │            ║| 1Bx8 03x28 1Bx44
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -109,7 +109,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -118,10 +118,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx80
+|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -137,7 +137,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -146,10 +146,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
@@ -165,7 +165,7 @@ cursor 8 8 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -174,10 +174,10 @@ cursor 8 8 lines 6 7 mode 3
 cursor 21 8 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ b:\fdauto.bat                                                    ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
@@ -193,7 +193,7 @@ cursor 21 8 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -202,10 +202,10 @@ cursor 21 8 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║FREEDOS     │            │                          │            │            ║| 1Bx27 70x26 1Bx27
+|║kernel   sys│            │                          │            │            ║| 1Bx27 70x26 1Bx27
 |║            │            │   ╔══════ View ══════╗   │            │            ║| 1Bx27 70x26 03x2 1Bx25
 |║            │            │   ║ Reading the file ║   │            │            ║| 1Bx27 70x26 03x2 1Bx25
 |║            │            │   ║  B:\fdauto.bat   ║   │            │            ║| 1Bx27 70x26 03x2 1Bx25
@@ -221,7 +221,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -258,10 +258,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx80
+|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -277,7 +277,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -286,10 +286,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║fdconfig sys│            │            ║| 1Bx80
-|║FREEDOS     │            │            ║║FREEDOS     │            │            ║| 1Bx80
+|║kernel   sys│            │            ║║kernel   sys│            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -305,7 +305,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -314,7 +314,7 @@ cursor 0 127 lines 6 7 mode 3
 cursor 58 9 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║            │            │            ║║kernel   sys│            │            ║| 1Bx80
+|║            │            │            ║║FREEDOS     │            │            ║| 1Bx80
 |║            │            │            ║║fdauto   bat│            │            ║| 1Bx80
 |║            │            │            ║║fdconfig sys│            │            ║| 1Bx80
 |║            │                                                    │            ║| 1Bx14 4Fx51 1Bx15
@@ -333,7 +333,7 @@ cursor 58 9 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║                                      ║║kernel.sys       46485  5-14-21  3:32a║| 1Bx80
+|║                                      ║║FREEDOS      ►SUB-DIR◄  4-02-25  2:23p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\?>                                                                           | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -398,10 +398,10 @@ cursor 5 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernel   sys│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║FREEDOS     │            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║kernel   sys│            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║            │            │            ║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
 |║            │            │            ║║    840,704 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
 |║            │            │            ║║     3 files use 47,616 bytes in      ║| 1Bx46 1Ex1 1Bx11 1Ex6 1Bx16
@@ -417,7 +417,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -426,10 +426,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernel   sys│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ b:\fdauto.bat                                                    ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
@@ -445,7 +445,7 @@ cursor 8 8 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -454,10 +454,10 @@ cursor 8 8 lines 6 7 mode 3
 cursor 21 8 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernel   sys│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ b:\fdauto.bat                                                    ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
@@ -473,7 +473,7 @@ cursor 21 8 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -482,10 +482,10 @@ cursor 21 8 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernel   sys│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║FREEDOS     │            │                           drive A: is FD14-BOOT    ║| 1Bx27 70x26 1Bx7 1Ex2 1Bx4 1Ex9 1Bx5
+|║kernel   sys│            │                           drive A: is FD14-BOOT    ║| 1Bx27 70x26 1Bx7 1Ex2 1Bx4 1Ex9 1Bx5
 |║            │            │   ╔══════ View ══════╗   total bytes on drive A:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
 |║            │            │   ║ Reading the file ║   bytes free on drive A:    ║| 1Bx27 70x26 03x2 1Bx18 1Ex2 1Bx5
 |║            │            │   ║  B:\fdauto.bat   ║    use 47,616 bytes in      ║| 1Bx27 70x26 03x2 1Bx3 1Ex6 1Bx16
@@ -501,7 +501,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -538,10 +538,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernel   sys│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║FREEDOS     │            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║kernel   sys│            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║            │            │            ║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
 |║            │            │            ║║    840,704 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
 |║            │            │            ║║     3 files use 47,616 bytes in      ║| 1Bx46 1Ex1 1Bx11 1Ex6 1Bx16
@@ -557,7 +557,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -566,10 +566,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernel   sys│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║FREEDOS     │            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║kernel   sys│            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║            │            │            ║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
 |║            │            │            ║║    840,704 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
 |║            │            │            ║║     3 files use 47,616 bytes in      ║| 1Bx46 1Ex1 1Bx11 1Ex6 1Bx16
@@ -585,7 +585,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -594,10 +594,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernel   sys│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║FREEDOS     │            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║kernel   sys│            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║            │            │            ║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
 |║            │            │            ║║    840,704 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
 |║            │            │            ║║     3 files use 47,616 bytes in      ║| 1Bx46 1Ex1 1Bx11 1Ex6 1Bx16
@@ -613,7 +613,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -678,10 +678,10 @@ cursor 5 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -697,7 +697,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║A:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║A:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -706,10 +706,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ b:\fdauto.bat                                                    ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
@@ -725,7 +725,7 @@ cursor 8 8 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║A:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║A:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -734,10 +734,10 @@ cursor 8 8 lines 6 7 mode 3
 cursor 21 8 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ b:\fdauto.bat                                                    ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
@@ -753,7 +753,7 @@ cursor 21 8 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║A:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║A:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -762,10 +762,10 @@ cursor 21 8 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │                          GS                        ║| 1Bx27 70x26 1Bx27
+|║kernel   sys│            │                          GS                        ║| 1Bx27 70x26 1Bx27
 |║            │            │   ╔══════ View ══════╗                             ║| 1Bx27 70x26 03x2 1Bx25
 |║            │            │   ║ Reading the file ║                             ║| 1Bx27 70x26 03x2 1Bx25
 |║            │            │   ║  B:\fdauto.bat   ║                             ║| 1Bx27 70x26 03x2 1Bx25
@@ -781,7 +781,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║A:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║A:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -818,10 +818,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -837,7 +837,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║A:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║A:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -846,10 +846,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -865,7 +865,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║A:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║A:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -874,10 +874,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ A:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -893,7 +893,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║A:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║A:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |A:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1185,12 +1185,12 @@ cursor 8 23 lines 6 7 mode 3
 |║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
 |║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║readme   txt│            │            ║║ └──STAMPS                            ║| 1Bx80
-|║hello    txt│            │            ║║    └──SUB                            ║| 1Bx80
-|║notes    doc│            │            ║║                                      ║| 1Bx80
-|║data     bin│            │            ║║                                      ║| 1Bx30 6Cx1 1Bx49
+|║data     bin│            │            ║║ └──STAMPS                            ║| 1Bx80
+|║empty    dat│            │            ║║    └──SUB                            ║| 1Bx80
+|║hello    txt│            │            ║║                                      ║| 1Bx80
+|║notes    doc│            │            ║║                                      ║| 1Bx30 6Cx1 1Bx49
+|║readme   txt│            │            ║║                                      ║| 1Bx80
 |║run      bat│            │            ║║                                      ║| 1Bx80
-|║empty    dat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1213,12 +1213,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..          │            │            ║║ ├─▌WORK        ▐                    ◄║| 1Bx1 30x12 1Bx31 1Ex14 1Bx20 1Ex1 1Bx1
 |║DOCS        │            │            ║║ │  ├──DOCS                           ║| 1Bx80
 |║SRC         │            │            ║║ │  └──SRC                            ║| 1Bx80
-|║readm                                 ║║ └──STAMPS                            ║| 1Bx6 70x28 1Bx46
-|║hello   ╔═══ Drive letter ═══╗        ║║    └──SUB                            ║| 1Bx6 70x28 03x2 1Bx44
-|║notes   ║ Choose left drive: ║        ║║                                      ║| 1Bx6 70x12 7Ex4 70x12 03x2 1Bx44
-|║data    ║     B   C   D      ║        ║║                                      ║| 1Bx6 70x12 30x3 70x9 07x1 70x3 03x2 1Bx44
-|║run     ╚════════════════════╝        ║║                                      ║| 1Bx6 70x28 03x2 1Bx44
-|║empty                                 ║║                                      ║| 1Bx6 70x28 03x2 1Bx44
+|║data                                  ║║ └──STAMPS                            ║| 1Bx6 70x28 1Bx46
+|║empty   ╔═══ Drive letter ═══╗        ║║    └──SUB                            ║| 1Bx6 70x28 03x2 1Bx44
+|║hello   ║ Choose left drive: ║        ║║                                      ║| 1Bx6 70x12 7Ex4 70x12 03x2 1Bx44
+|║notes   ║     B   C   D      ║        ║║                                      ║| 1Bx6 70x12 30x3 70x9 07x1 70x3 03x2 1Bx44
+|║readm   ╚════════════════════╝        ║║                                      ║| 1Bx6 70x28 03x2 1Bx44
+|║run                                   ║║                                      ║| 1Bx6 70x28 03x2 1Bx44
 |║            │            │            ║║                                      ║| 1Bx8 03x28 1Bx44
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1238,10 +1238,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx30 6Cx1 1Bx49
@@ -1257,7 +1257,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║B:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║B:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1266,10 +1266,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ b:\fdauto.bat                                                    ║     ║| 1Bx3 70x5 30x22 47x1 30x41 70x5 03x2 1Bx1
@@ -1285,7 +1285,7 @@ cursor 8 8 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║B:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║B:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1294,10 +1294,10 @@ cursor 8 8 lines 6 7 mode 3
 cursor 21 8 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FR                                                                            ║| 1Bx3 70x74 1Bx3
+|║ke                                                                            ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ a:\fdauto.bat                                                    ║     ║| 1Bx3 70x5 30x22 47x1 30x41 70x5 03x2 1Bx1
@@ -1313,7 +1313,7 @@ cursor 21 8 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║B:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║B:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1322,10 +1322,10 @@ cursor 21 8 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │                          GS                        ║| 1Bx27 70x26 1Bx27
+|║kernel   sys│            │                          GS                        ║| 1Bx27 70x26 1Bx27
 |║            │            │   ╔══════ View ══════╗                             ║| 1Bx27 70x26 03x2 1Bx25
 |║            │            │   ║ Reading the file ║                             ║| 1Bx27 70x26 03x2 1Bx25
 |║            │            │   ║  A:\fdauto.bat   ║                             ║| 1Bx27 70x3 07x1 70x22 03x2 1Bx25
@@ -1341,7 +1341,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║B:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║B:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1378,10 +1378,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx30 6Cx1 1Bx49
@@ -1397,7 +1397,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║B:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║B:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1406,10 +1406,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx30 6Cx1 1Bx49
@@ -1425,7 +1425,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║B:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║B:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1462,10 +1462,10 @@ cursor 58 9 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║▌\▐                                  ◄║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx6 1Ex3 1Bx34 1Ex1 1Bx1
-|║kernel   sys│            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║ └──FREEDOS                           ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║    ├──BIN                            ║| 1Bx80
 |║fdconfig sys│            │            ║║    ├──NLS                            ║| 1Bx80
-|║FREEDOS     │            │            ║║    └──CONFIGS                        ║| 1Bx80
+|║kernel   sys│            │            ║║    └──CONFIGS                        ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx30 6Cx1 1Bx49
@@ -1481,7 +1481,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟──────────────────────────────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║B:\                                   ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║B:\                                   ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1490,10 +1490,10 @@ cursor 4 23 lines 6 7 mode 3
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════╤════════════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║            │            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║            │            │            ║| 1Bx80
-|║FREEDOS     │            │            ║║            │            │            ║| 1Bx80
+|║kernel   sys│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx30 6Cx1 1Bx49
@@ -1509,7 +1509,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1518,10 +1518,10 @@ cursor 0 127 lines 6 7 mode 3
 cursor 58 9 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║            │            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║            │            │            ║| 1Bx80
-|║FREEDOS     │                                                    │            ║| 1Bx14 4Fx51 1Bx15
+|║kernel   sys│                                                    │            ║| 1Bx14 4Fx51 1Bx15
 |║            │   ╔══════════════════ Error ══════════════════╗    │            ║| 1Bx14 4Fx51 03x2 1Bx13
 |║            │   ║      Can't read the disk in drive A:      ║    │            ║| 1Bx14 4Fx51 03x2 1Bx13
 |║            │   ║  Press ENTER to try again, ESC to abort,  ║    │            ║| 1Bx14 4Fx16 38x1 4Fx34 03x2 1Bx13
@@ -1537,7 +1537,7 @@ cursor 58 9 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1546,10 +1546,10 @@ cursor 58 9 lines 6 7 mode 3
 cursor 58 9 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════╤═══ A:\ ════╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║            │            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║            │            │            ║| 1Bx80
-|║FREEDOS     │                                                    │            ║| 1Bx14 4Fx51 1Bx15
+|║kernel   sys│                                                    │            ║| 1Bx14 4Fx51 1Bx15
 |║            │   ╔══════════════════ Error ══════════════════╗    │            ║| 1Bx14 4Fx51 03x2 1Bx13
 |║            │   ║      Can't read the disk in drive A:      ║    │            ║| 1Bx14 4Fx51 03x2 1Bx13
 |║            │   ║  Press ENTER to try again, ESC to abort,  ║    │            ║| 1Bx14 4Fx16 38x1 4Fx34 03x2 1Bx13
@@ -1565,7 +1565,7 @@ cursor 58 9 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║                                      ║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1574,15 +1574,15 @@ cursor 58 9 lines 6 7 mode 3
 cursor 4 23 lines 6 7 mode 3
 |╔════════════╤═══ B:\ ════╤════════════╗╔════════════╤═ C:\WORK ══╤════════════╗| 1Bx17 30x5 1Bx58
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║kernel   sys│            │            ║║..          │            │            ║| 1Bx1 30x12 1Bx67
+|║FREEDOS     │            │            ║║..          │            │            ║| 1Bx1 30x12 1Bx67
 |║fdauto   bat│            │            ║║DOCS        │            │            ║| 1Bx80
 |║fdconfig sys│            │            ║║SRC         │            │            ║| 1Bx80
-|║FREEDOS     │            │            ║║readme   txt│            │            ║| 1Bx80
-|║            │            │            ║║hello    txt│            │            ║| 1Bx80
-|║            │            │            ║║notes    doc│            │            ║| 1Bx80
-|║            │            │            ║║data     bin│            │            ║| 1Bx30 6Cx1 1Bx49
-|║            │            │            ║║run      bat│            │            ║| 1Bx80
+|║kernel   sys│            │            ║║data     bin│            │            ║| 1Bx80
 |║            │            │            ║║empty    dat│            │            ║| 1Bx80
+|║            │            │            ║║hello    txt│            │            ║| 1Bx80
+|║            │            │            ║║notes    doc│            │            ║| 1Bx30 6Cx1 1Bx49
+|║            │            │            ║║readme   txt│            │            ║| 1Bx80
+|║            │            │            ║║run      bat│            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1593,7 +1593,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║kernel.sys       46485  5-14-21  3:32a║║..           ►UP--DIR◄  6-16-00 12:00p║| 1Bx80
+|║FREEDOS         543311  4-02-25  2:23p║║..           ►UP--DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |B:\>                                                                            | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1624,7 +1624,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  d09acbec75a63963
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

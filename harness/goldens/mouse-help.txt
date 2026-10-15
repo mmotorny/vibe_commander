@@ -6,15 +6,15 @@ code page 437
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -25,7 +25,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -37,12 +37,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -65,12 +65,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x5 0Fx11 78x1 0Fx50 30x5 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x5 0Fx11 78x1 0Fx50 30x5 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -93,12 +93,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x5 0Fx21 78x1 0Fx40 30x5 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -121,12 +121,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -149,12 +149,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║       View                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║       View                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Edit                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Copy                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Rename or move                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -177,12 +177,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x16 47x1 30x55 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Re-read a panel                                          ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║not   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Re-read a panel                                          ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
+|║hel   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       View                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Edit                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Copy                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -205,12 +205,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x16 47x1 30x55 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Re-read a panel                                          ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║not   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Re-read a panel                                          ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
+|║hel   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       View                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Edit                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Copy                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -233,12 +233,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x1 47x1 30x73 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Re-read a panel                                          ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║not   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Re-read a panel                                          ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
+|║hel   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  Files menu                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       View                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Edit                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Copy                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -261,12 +261,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  Files menu                                                    ║      ║| 1Bx4 30x5 0Fx62 30x4 47x1 03x2 1Bx2
-|║emp   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║       Filter...                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║       Drive...                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  Files menu                                                    ║      ║| 1Bx4 30x5 0Fx62 30x4 47x1 03x2 1Bx2
+|║run   ║       User menu                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       View                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Edit                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Copy                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -289,12 +289,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View                                              F3, Shift-F3 ║      ║| 1Bx4 30x5 3Fx4 30x46 3Ex2 30x2 3Ex8 30x5 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  This  command displays the contents of a file on the screen.  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║  The view screen is placed over the main Commander screen.     ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║    Notes:                                                      ║      ║| 1Bx4 30x8 3Fx6 30x58 03x2 1Bx2
-|║emp   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  This  command displays the contents of a file on the screen.  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║  The view screen is placed over the main Commander screen.     ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║    Notes:                                                      ║      ║| 1Bx4 30x8 3Fx6 30x58 03x2 1Bx2
+|║run   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         vcview.ext, which  associates  different viewers with  ║      ║| 1Bx4 30x13 3Ex10 30x3 47x1 30x45 03x2 1Bx2
 |║      ║         file  extensions.  Use  the  Viewer...  item  in  the  ║      ║| 1Bx4 30x42 3Ex9 30x21 03x2 1Bx2
 |║      ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
@@ -317,12 +317,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View                                              F3, Shift-F3 ║      ║| 1Bx4 30x5 3Fx4 30x46 3Ex2 30x2 3Ex8 30x5 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║      •  In general, you can use the cursor, PgUp, PgDn, Home,  ║      ║| 1Bx4 30x41 3Ex6 30x2 3Ex4 30x2 3Ex4 30x2 3Ex4 30x7 03x2 1Bx2
-|║dat   ║         and End keys to move through  file's contents.         ║      ║| 1Bx4 30x17 3Ex3 30x52 03x2 1Bx2
-|║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║      •  Pressing Shift-F3, or  holding  down the Shift key as  ║      ║| 1Bx4 30x22 3Ex8 30x24 3Ex5 30x13 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║      •  In general, you can use the cursor, PgUp, PgDn, Home,  ║      ║| 1Bx4 30x41 3Ex6 30x2 3Ex4 30x2 3Ex4 30x2 3Ex4 30x7 03x2 1Bx2
+|║not   ║         and End keys to move through  file's contents.         ║      ║| 1Bx4 30x17 3Ex3 30x52 03x2 1Bx2
+|║rea   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║      •  Pressing Shift-F3, or  holding  down the Shift key as  ║      ║| 1Bx4 30x22 3Ex8 30x24 3Ex5 30x13 03x2 1Bx2
 |║      ║         you select this menu item, brings  up  a  dialog  box  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         into which you can type the name of the file you want  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         to view:                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -345,12 +345,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View                                              F3, Shift-F3 ║      ║| 1Bx4 30x5 3Fx4 30x46 3Ex2 30x2 3Ex8 30x5 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║         vcview.ext, which  associates  different viewers with  ║      ║| 1Bx4 30x13 3Ex10 30x49 03x2 1Bx2
-|║dat   ║         file  extensions.  Use  the  Viewer...  item  in  the  ║      ║| 1Bx4 30x26 47x1 30x15 3Ex9 30x21 03x2 1Bx2
-|║run   ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
-|║emp   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║         vcview.ext, which  associates  different viewers with  ║      ║| 1Bx4 30x13 3Ex10 30x49 03x2 1Bx2
+|║not   ║         file  extensions.  Use  the  Viewer...  item  in  the  ║      ║| 1Bx4 30x26 47x1 30x15 3Ex9 30x21 03x2 1Bx2
+|║rea   ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
+|║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  In general, you can use the cursor, PgUp, PgDn, Home,  ║      ║| 1Bx4 30x41 3Ex6 30x2 3Ex4 30x2 3Ex4 30x2 3Ex4 30x7 03x2 1Bx2
 |║      ║         and End keys to move through  file's contents.         ║      ║| 1Bx4 30x17 3Ex3 30x52 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -373,12 +373,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View                                              F3, Shift-F3 ║      ║| 1Bx4 30x5 3Fx4 30x46 3Ex2 30x2 3Ex8 30x5 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║         vcview.ext, which  associates  different viewers with  ║      ║| 1Bx4 30x13 3Ex10 30x49 03x2 1Bx2
-|║dat   ║         file  extensions.  Use  the  Viewer...  item  in  the  ║      ║| 1Bx4 30x42 3Ex9 30x21 03x2 1Bx2
-|║run   ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
-|║emp   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║         vcview.ext, which  associates  different viewers with  ║      ║| 1Bx4 30x13 3Ex10 30x49 03x2 1Bx2
+|║not   ║         file  extensions.  Use  the  Viewer...  item  in  the  ║      ║| 1Bx4 30x42 3Ex9 30x21 03x2 1Bx2
+|║rea   ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
+|║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  In general, you can use the cursor, PgUp, PgDn, Home,  ║      ║| 1Bx4 30x41 3Ex6 30x2 3Ex4 30x2 3Ex4 30x2 3Ex4 30x7 03x2 1Bx2
 |║      ║         and End keys to move through  file's contents.         ║      ║| 1Bx4 30x17 3Ex3 30x6 47x1 30x45 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -401,12 +401,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View                                              F3, Shift-F3 ║      ║| 1Bx4 30x5 3Fx4 30x46 3Ex2 30x2 3Ex8 30x5 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
-|║not   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║      •  In general, you can use the cursor, PgUp, PgDn, Home,  ║      ║| 1Bx4 30x41 3Ex6 30x2 3Ex4 30x2 3Ex4 30x2 3Ex4 30x7 03x2 1Bx2
-|║run   ║         and End keys to move through  file's contents.         ║      ║| 1Bx4 30x17 3Ex3 30x52 03x2 1Bx2
-|║emp   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
+|║hel   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║      •  In general, you can use the cursor, PgUp, PgDn, Home,  ║      ║| 1Bx4 30x41 3Ex6 30x2 3Ex4 30x2 3Ex4 30x2 3Ex4 30x7 03x2 1Bx2
+|║rea   ║         and End keys to move through  file's contents.         ║      ║| 1Bx4 30x17 3Ex3 30x52 03x2 1Bx2
+|║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  Pressing Shift-F3, or  holding  down the Shift key as  ║      ║| 1Bx4 30x22 3Ex8 30x24 3Ex5 30x13 03x2 1Bx2
 |║      ║         you select this menu item, brings  up  a  dialog  box  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         into which you can type the name of the file you want  ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -429,12 +429,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x29 47x1 30x45 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View                                              F3, Shift-F3 ║      ║| 1Bx4 30x5 3Fx4 30x46 3Ex2 30x2 3Ex8 30x5 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║    Notes:                                                      ║      ║| 1Bx4 30x8 3Fx6 30x58 03x2 1Bx2
-|║dat   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║         vcview.ext, which  associates  different viewers with  ║      ║| 1Bx4 30x13 3Ex10 30x49 03x2 1Bx2
-|║emp   ║         file  extensions.  Use  the  Viewer...  item  in  the  ║      ║| 1Bx4 30x42 3Ex9 30x21 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║    Notes:                                                      ║      ║| 1Bx4 30x8 3Fx6 30x58 03x2 1Bx2
+|║not   ║      •  You can create and maintain the extension file called  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║         vcview.ext, which  associates  different viewers with  ║      ║| 1Bx4 30x13 3Ex10 30x49 03x2 1Bx2
+|║run   ║         file  extensions.  Use  the  Viewer...  item  in  the  ║      ║| 1Bx4 30x42 3Ex9 30x21 03x2 1Bx2
 |║      ║         Options menu to do it.                                 ║      ║| 1Bx4 30x13 3Ex7 30x52 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  In general, you can use the cursor, PgUp, PgDn, Home,  ║      ║| 1Bx4 30x41 3Ex6 30x2 3Ex4 30x2 3Ex4 30x2 3Ex4 30x7 03x2 1Bx2
@@ -454,15 +454,15 @@ cursor 0 127 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx30 6Cx1 1Bx49
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -473,7 +473,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -485,12 +485,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x26 47x1 30x45 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -510,15 +510,15 @@ cursor 0 127 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx30 6Cx1 1Bx49
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx30 6Cx1 1Bx49
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -529,7 +529,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -541,12 +541,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x26 47x1 30x45 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x26 47x1 30x45 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -566,15 +566,15 @@ cursor 0 127 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x1 47x1 30x10 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x1 47x1 30x10 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -585,7 +585,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -594,15 +594,15 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 48 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x1 47x1 30x10 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x1 47x1 30x10 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -625,12 +625,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -653,12 +653,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -681,12 +681,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -709,12 +709,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Menu file edit                                                 ║      ║| 1Bx4 30x5 3Fx14 30x53 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  This  command  allows to create  and  maintain  user-defined  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║not   ║  menus, which  you  access  with  the  F2  key (or  User menu  ║      ║| 1Bx4 30x44 3Ex2 30x11 3Ex9 30x6 03x2 1Bx2
-|║dat   ║  command in the Files menu):                                   ║      ║| 1Bx4 30x21 3Ex5 30x46 03x2 1Bx2
-|║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║                      ╔════ User Menu ════╗                     ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  This  command  allows to create  and  maintain  user-defined  ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║hel   ║  menus, which  you  access  with  the  F2  key (or  User menu  ║      ║| 1Bx4 30x44 3Ex2 30x11 3Ex9 30x6 03x2 1Bx2
+|║not   ║  command in the Files menu):                                   ║      ║| 1Bx4 30x21 3Ex5 30x46 03x2 1Bx2
+|║rea   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║                      ╔════ User Menu ════╗                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                      ║ A    Command 1    ║                     ║      ║| 1Bx4 30x32 0Fx13 30x27 03x2 1Bx2
 |║      ║                      ║ F1   Command 2    ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                      ║      Command 3    ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -737,12 +737,12 @@ cursor 0 127 lines 6 7 mode 3
 |║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Menu file edit                                                 ║      ║| 1Bx4 30x5 3Fx14 30x53 03x2 1Bx2
-|║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║                      ║ A    Command 1    ║                     ║      ║| 1Bx4 30x32 0Fx13 30x27 03x2 1Bx2
-|║not   ║                      ║ F1   Command 2    ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║dat   ║                      ║      Command 3    ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║run   ║                      ║ F10  Another menu ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║                      ╚═══════════════════╝                     ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║dat   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║                      ║ A    Command 1    ║                     ║      ║| 1Bx4 30x32 0Fx13 30x27 03x2 1Bx2
+|║hel   ║                      ║ F1   Command 2    ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║not   ║                      ║      Command 3    ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║rea   ║                      ║ F10  Another menu ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
+|║run   ║                      ╚═══════════════════╝                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                        ▲                                       ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                        └─── Hot-key                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -762,15 +762,15 @@ cursor 0 127 lines 6 7 mode 3
 cursor 8 48 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -790,15 +790,15 @@ cursor 8 48 lines 6 7 mode 3
 cursor 8 48 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -818,15 +818,15 @@ cursor 8 48 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -837,7 +837,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x1 70x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -867,7 +867,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  d09acbec75a63963
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

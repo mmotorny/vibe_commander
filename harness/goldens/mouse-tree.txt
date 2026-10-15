@@ -6,15 +6,15 @@ code page 437
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -25,7 +25,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -34,16 +34,16 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -53,7 +53,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║A            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║A            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -62,17 +62,17 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -81,7 +81,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║B            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║B            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -90,18 +90,18 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
+|║C           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║hello    txt│            │            ║║            │            │            ║| 1Bx80
 |║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║C           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -109,7 +109,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║C            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║C            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -118,26 +118,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║D            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║D            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -146,26 +146,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║E            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║E            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -174,26 +174,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx80
 |║F           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║F            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║F            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -202,26 +202,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx80
 |║F           │            │            ║║            │            │            ║| 1Bx80
 |║G           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║G            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║G            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -230,26 +230,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx80
 |║F           │            │            ║║            │            │            ║| 1Bx80
 |║G           │            │            ║║            │            │            ║| 1Bx80
 |║H           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║SRC         │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║H            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║H            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -258,26 +258,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx80
 |║F           │            │            ║║            │            │            ║| 1Bx80
 |║G           │            │            ║║            │            │            ║| 1Bx80
 |║H           │            │            ║║            │            │            ║| 1Bx80
-|║I           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║I           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║I            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║I            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -286,26 +286,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J           │            ║║WORK        │            │            ║| 1Bx14 30x12 1Bx54
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │run      bat│            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │            │            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx80
 |║F           │            │            ║║            │            │            ║| 1Bx80
 |║G           │            │            ║║            │            │            ║| 1Bx80
 |║H           │            │            ║║            │            │            ║| 1Bx80
-|║I           │            │            ║║            │            │            ║| 1Bx80
+|║I           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║J           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║J            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║J            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -314,26 +314,26 @@ cursor 8 23 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J           │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │K           │            ║║STAMPS      │            │            ║| 1Bx14 30x12 1Bx54
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║..          │readme   txt│            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │run      bat│            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx80
 |║F           │            │            ║║            │            │            ║| 1Bx80
 |║G           │            │            ║║            │            │            ║| 1Bx80
 |║H           │            │            ║║            │            │            ║| 1Bx80
-|║I           │            │            ║║            │            │            ║| 1Bx80
+|║I           │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║J           │            │            ║║            │            │            ║| 1Bx80
+|║K           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║K            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║K            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -342,24 +342,24 @@ cursor 8 23 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx24 48x1 3Fx23 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK                                ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx24 48x1 3Fx23 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK                                ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -370,24 +370,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├─ A                               ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK\A                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├─ A                               ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\A                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -398,24 +398,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├─ C                               ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK\C                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├─ C                               ║     │            ║| 1Bx16 3Fx11 0Fx3 78x1 0Fx10 3Fx23 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\C                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -426,24 +426,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║hello    txt│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  └──K                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║     └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\STAMPS\SUB                          ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║D           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──J                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  └──K                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  └──STAMPS                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║     └─ SUB                             ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\STAMPS\SUB                          ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx14 48x1 3Fx4 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -454,24 +454,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx14 48x1 3Fx33 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx5 0Fx3 3Fx40 03x2 1Bx14
-|║readme   txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\                                    ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx14 48x1 3Fx33 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx5 0Fx3 3Fx40 03x2 1Bx14
+|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\                                    ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -482,24 +482,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx4 6Cx1 1Bx9
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx4 6Cx1 1Bx9
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -510,24 +510,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx14 48x1 3Fx33 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx14 48x1 3Fx33 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -538,24 +538,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx1 6Cx1 1Bx3 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├─ DOCS                            ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\DOCS                           ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -566,24 +566,24 @@ cursor 35 20 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├─ B                               ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx4 6Cx1 1Bx9
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK\B                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├──WORK                             ◄ ║     │            ║| 1Bx16 3Fx9 3Ex12 3Fx21 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├─ B                               ║     │            ║| 1Bx16 3Fx11 0Fx14 3Fx23 03x2 1Bx4 6Cx1 1Bx9
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK\B                              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -594,26 +594,26 @@ cursor 35 20 lines 6 7 mode 3
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J           │            ║║WORK        │            │            ║| 1Bx80
-|║DOCS        │K           │            ║║STAMPS      │            │            ║| 1Bx14 30x12 1Bx54
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║A           │            │            ║║            │            │            ║| 1Bx80
-|║B           │            │            ║║            │            │            ║| 1Bx30 6Cx1 1Bx49
+|║..          │readme   txt│            ║║STAMPS      │            │            ║| 1Bx80
+|║A           │run      bat│            ║║WORK        │            │            ║| 1Bx80
+|║B           │            │            ║║            │            │            ║| 1Bx80
 |║C           │            │            ║║            │            │            ║| 1Bx80
 |║D           │            │            ║║            │            │            ║| 1Bx80
+|║DOCS        │            │            ║║            │            │            ║| 1Bx80
 |║E           │            │            ║║            │            │            ║| 1Bx80
 |║F           │            │            ║║            │            │            ║| 1Bx80
 |║G           │            │            ║║            │            │            ║| 1Bx80
 |║H           │            │            ║║            │            │            ║| 1Bx80
-|║I           │            │            ║║            │            │            ║| 1Bx80
+|║I           │            │            ║║            │            │            ║| 1Bx30 6Cx1 1Bx49
+|║J           │            │            ║║            │            │            ║| 1Bx80
+|║K           │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║K            ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║K            ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -622,24 +622,24 @@ cursor 8 23 lines 6 7 mode 3
 cursor 35 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │J                                                   │            ║| 1Bx16 3Fx48 1Bx16
-|║DOCS        │K    ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx14 30x2 3Fx48 03x2 1Bx14
-|║SRC         │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║readme   txt│     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
-|║hello    txt│     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║notes    doc│     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║data     bin│     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║run      bat│     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║empty    dat│     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║A           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║B           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx14 48x1 3Fx33 03x2 1Bx14
-|║C           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║D           │     ║  │  ├──G                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║E           │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║F           │     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║G           │     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║H           │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
-|║I           │     ║ C:\WORK                                ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║..          │re                                                  │            ║| 1Bx16 3Fx48 1Bx16
+|║A           │ru   ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║B           │     ║  \                                     ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║C           │     ║  ├─ WORK                             ◄ ║     │            ║| 1Bx16 3Fx8 0Ex14 3Fx20 3Ex1 3Fx5 03x2 1Bx14
+|║D           │     ║  │  ├──DOCS                            ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║DOCS        │     ║  │  ├──SRC                             ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║E           │     ║  │  ├──A                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║F           │     ║  │  ├──B                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║G           │     ║  │  ├──C                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║H           │     ║  │  ├──D                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║I           │     ║  │  ├──E                               ║     │            ║| 1Bx16 3Fx14 48x1 3Fx33 03x2 1Bx14
+|║J           │     ║  │  ├──F                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║K           │     ║  │  ├──G                               ║     │            ║| 1Bx1 30x12 1Bx3 3Fx48 03x2 1Bx14
+|║SRC         │     ║  │  ├──H                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║data     bin│     ║  │  ├──I                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║empty    dat│     ║  │  ├──J                               ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║hello    txt│     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+|║notes    doc│     ║ C:\WORK                                ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
 |╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
 |║K            ►S   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
 |╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
@@ -650,8 +650,8 @@ cursor 35 20 lines 6 7 mode 3
 cursor 10 23 lines 6 7 mode 3
 |╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x11 1Bx55
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║WORK        │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -669,7 +669,7 @@ cursor 10 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\A>                                                                      | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -706,8 +706,8 @@ cursor 35 20 lines 6 7 mode 3
 cursor 10 23 lines 6 7 mode 3
 |╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x11 1Bx55
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx1 6Cx1 1Bx3 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║WORK        │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -725,7 +725,7 @@ cursor 10 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\A>                                                                      | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -734,8 +734,8 @@ cursor 10 23 lines 6 7 mode 3
 cursor 10 23 lines 6 7 mode 3
 |╔════════════╤ C:\WORK\A ═╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx14 30x11 1Bx55
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx1 6Cx1 1Bx3 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║WORK        │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -745,7 +745,7 @@ cursor 10 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1075,7 +1075,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  d09acbec75a63963
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3
