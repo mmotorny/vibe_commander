@@ -200,9 +200,16 @@ These held while `src/c/` was made, and they say what it is.
      one `CMakeLists.txt` builds every implementation, and finds clang
      for those that want it; the files are `sys_dos.c` (which
      `dos32.c` becomes), `stack_dos.c` (`stack.c`), `sys_stub.c` and
-     `sys_posix.c`. On Linux there is one drive, C:, the root of the
-     file system, always, and a path that DOS's 67 characters do not
-     hold is reached through the aliases; the code page, and the
+     `sys_posix.c`. On Linux there are two drives, R:, the root of the
+     file system, labelled ROOT, and H:, the user's home directory,
+     labelled HOME, always, the program starting on H: where it is
+     started under the home directory and on R: otherwise (the user,
+     on 15 October 2026, in place of one drive C: at the root, as a
+     way round DOS's 67 characters of a path, which stay: a plan to
+     let paths grow on Linux was made and dropped as deeper than
+     wanted); a directory whose path does not fit even so is reached
+     through the aliases, or not, the program starting then in the
+     deepest one above it that fits; the code page, and the
      country with it, is 437, always; nothing of it is a setting, for
      now (the user, later the same day, taking back a file of settings
      and the code page by `LANG`). The terminal is driven by the program's own escape
@@ -210,7 +217,7 @@ These held while `src/c/` was made, and they say what it is.
      the keyboard where the terminal offers it. A command runs on the
      terminal's own screen, which Ctrl-O shows, as on DOS. The program
      for Linux is judged by scenarios driven as those of DOS are, with
-     C: the root of the file system in its tests too, and held to the
+     its own drives in its tests too, and held to the
      goldens of the original with masks: named elements of the screen
      that the comparison leaves out for that tree, each declared with
      its reason (the path in a panel's title, on the prompt and the
