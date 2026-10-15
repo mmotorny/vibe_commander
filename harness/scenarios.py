@@ -5032,7 +5032,7 @@ SCENARIOS = {
         "that is there, onto one that is read-only, onto itself, to a "
         "device and from one",
         steps=(
-            "Down Down Down",             # onto readme.txt
+            "Down Down Down Down Down Down Down",  # onto readme.txt
             "F5",                         # offers the directory of the
                                           # other panel, C:\\
             "Enter",
@@ -5069,11 +5069,11 @@ SCENARIOS = {
             "F5",
             '".." Enter',                 # the directory above, where it
             "Enter",                      # is already: overwrite
-            "End",                        # readme.bak
+            "End Up Up",                  # readme.bak
             "Ctrl+a",
             "Space Enter",                # read-only
             "Home",
-            "Down Down Down",
+            "Down Down Down Down Down Down Down Down",  # readme.txt
             "F5",
             '"readme.bak" Enter',
             "p",                          # append: asks once more
@@ -5090,9 +5090,11 @@ SCENARIOS = {
             '"readme.bak" Enter',
             "Enter",
             "Enter",                      # yes
-            "Ins Ins",                    # two files into DOCS, where
-            "F5",
-            '"docs" Enter',               # the first is already
+            "Ins Up Up Up Up Ins",        # two files into DOCS, readme.txt
+            "F5",                         # and hello.txt, where the first
+            '"docs" Enter',               # is already: it is asked about
+                                          # when hello.txt, which comes
+                                          # before it, has been copied
             "a",                          # all
             "Shift+F5",                   # a file named by hand
             '"nul" Tab "x"',              # a device that gives nothing
@@ -5112,8 +5114,9 @@ SCENARIOS = {
                                           # next to files their directory
             "Down Down",                  # onto SRC, which is empty
             "F6",
-            '"d:\\" Enter',               # made there and removed here
-            "F6",                         # readme.txt: offers its name
+            '"d:\\" Enter Down Down Down Down',  # made there and removed
+                                          # here; down to readme.txt
+            "F6",                         # which offers its name
             "Enter",                      # onto itself: nothing
             "F6",
             '"first.txt" Enter',          # renamed
@@ -5129,10 +5132,10 @@ SCENARIOS = {
             "F6",
             '"data.bin" Enter',
             "a",                          # all
-            "Down",                       # run.bat
+            "Down Down",                  # run.bat
             "Ctrl+a",
             "Space Enter",                # read-only
-            "Up",
+            "Up Up",
             "F6",
             '"run.bat" Enter',
             "Enter",                      # overwrite: asks once more
@@ -5156,7 +5159,7 @@ SCENARIOS = {
             "Esc",
             "F5",
             '"nul." Enter',               # a device with a full stop
-            "End",                        # empty.dat
+            "End Up",                     # empty.dat
             "Ctrl+a",
             "Down Space Enter",           # no attribute at all
             "Home Down Down",
@@ -5168,8 +5171,8 @@ SCENARIOS = {
             '"nodir\\x" Enter',           # no such directory
             "Esc",
             "F6",
-            '"d:\\" Enter',               # to another drive
-            "Ctrl+a",                     # run.bat
+            '"d:\\" Enter Down',          # to another drive; down past
+            "Ctrl+a",                     # empty.dat to run.bat
             "Space Enter",                # read-only
             "F6",
             '"d:\\" Enter',               # copied; asks before deleting
