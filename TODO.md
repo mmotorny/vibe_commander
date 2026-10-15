@@ -20300,9 +20300,88 @@ in:
    - `stcolor.c:709`, 65,656 put into a `u16` (9 of the setup);
    - `sthelp.c:506` and `help.c:586`, an implicit conversion.
 
+**Stage 3, where it stands** (a third agent, on 15 October 2026; its
+commits are on top of the two above, none landed):
+
+- The setup file: `posixrun.linux_setup` has the program for Linux
+  make its own once for a bench, from the bench's file, by Tab, Ctrl-\,
+  Tab and Shift-F9 Enter (both panels start on H:\WORK, where it is
+  started, since the bench's file names C:), kept in
+  `build/posix-bench/vc.ini` and made again when the program or the
+  bench's file is newer. Where a run leaves it as it was, it stands on
+  the disks for the bench's file. `bench_setup` makes the bench's file
+  again where its sum is not that of the golden of `start`: the one in
+  `build/` was of before the bench sorted by name.
+- KeyWaiting with no key is not idle under the channel any more: the
+  driver takes INT 16h 00h and 10h and INT 28h for idle, not 01h
+  (`DRIVER.ASM`, "INT 16h"). Taken for idle, a step ended in the middle
+  of what the program did, before the viewer drew its key bar, after a
+  dialog had gone: some forty screens. No loop spun without it.
+- The test's clock was never the emulation's: `DosBegin` set
+  `Emulated.clock` to none behind `TestBegin`, so what the program wrote
+  had the host's time. It is set behind `DosBegin` now, and a directory
+  that the program makes is stamped with it too (`DosDirMake`).
+- `cut` is by the step's number, counted from 1 among the scenario's
+  own steps (a step's text is found more than once in a scenario), and
+  a patch borrowed from the portable C says nothing of the screens
+  behind it; a cut run's disks are not held (`goldens.compare`). The
+  step of the first command was found by giving the program a COMSPEC,
+  so that it gets to `ProgramRun`, which says the step: the probe is not
+  kept. `LINUX_CUT`: `command-edit` 37, `editor-save` 23, `help-broken`
+  24, `menu-files` 24, `panel-keys` 18, `setup-help-file` 22, `sizes` 8,
+  `user-menu` 77, `view-commands` 17, `editor-keys` 33. Not run, the
+  value being the command or behind it: `history-drives` (4),
+  `menu-panel` (3), `setup-missing`, `setup-missing-saved`,
+  `setup-save-fails` (1), `setup-new` (2), `clock-morning` (2),
+  `blank-timed` (3). `setup-damaged` runs no command (it is about the
+  setup file in `D:\VC`). And `find`: it reads every file of the drive,
+  those of STAMPS too, which on the host are as long as their sizes,
+  sparse, up to 4 GB, where the bench's have nothing to read; it ran for
+  minutes.
+- Alt-Del is None in `SPECIAL`.
+- Of the 95 run, 31 pass but for the mouse's pointer in the middle of
+  the screen, which the bench's mouse driver draws and the program for
+  Linux will with L5 (one cell on every screen; nothing is masked for
+  it). The rest, by kind:
+  - The tree's order (`tree`, `command-line`, `make-directory`,
+    `copy-tree`, `tree-choose`, and more behind): the tree lists a
+    directory's subdirectories in the order of the disk, which on the
+    bench is WORK before STAMPS, DOCS before SRC, and on the host by
+    their bytes. No mask can mend it; for the user: lay the bench's C:
+    out in the order of the names (goldens derived again), or have the
+    emulation list a directory in the order of creation, or declare it.
+  - A directory's time after the run wrote into it, `..` above all
+    (`tree-box`, `tree-deep`, `reread`, `delete`, `copy-dirs`, `compare`,
+    `attributes-directory`, `menu-items`): the mask that the user
+    decided is not built. A mask is found on the golden alone, so it
+    would leave out every directory's time in a panel's line; to leave
+    out only those that the run wrote into, `masked` needs the run's.
+  - The drive menu's letters (`panels`, `cursor`, `label`, ...): A C D
+    on the bench, H R on Linux; not built.
+  - What is about `D:\VC` and the setup file in it (`setup-damaged`,
+    `setup-delay-file`, `editor-keys`, `setup-help-*`, `help-broken`)
+    and the setup file saved (`setup`, `setup-colors-*`: its bytes have
+    H:): the layout of C:\FILES and H:\FILES is not made, and no golden
+    was derived again.
+  - The Info panel in part under a dialog (`dirinfo`): the masks of its
+    lines want enough of a line to be seen; the label HOME where the
+    golden has WORK cut short.
+  - `quit`: the prompt behind it, `filter`, `sort`, `columns`,
+    `keys-waiting`, `clock`, `laptop`, `menu`, `dialog-keys`: not looked
+    at.
+  - Three still stopped by the sanitizers, in the common code:
+    `stamps` (`panel.c:332`, unsigned overflow), `view-keys`
+    (`view.c:1181`, index -2), `view-window` (`info.c:127`).
+  - Disks: a file written in place (`editor-hex`, `editor-lines`,
+    `editor-dirinfo`) to be looked at again after the clock's mend.
+- `build/l3b/` of that checkout has the scripts of the stage: `summ.py`
+  makes one line of each scenario of a run of `compare.py`, the first
+  screen that differs in more than the pointer's cell; `show.py` prints
+  a scenario's screens of such a run.
+
 **Left.**
 
-- The user's answer to 2, then the order (SORT), then the findings of 3.
+- What stage 3 lists above; the mouse scenarios once L5 has landed.
 - `cut`: which step of the 16 that run a command is the first that
   does. `ProgramRun` is not reached: the program for Linux finds no
   shell in its environment (no `COMSPEC`) and says so before it asks,

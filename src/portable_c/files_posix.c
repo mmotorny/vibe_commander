@@ -1308,6 +1308,16 @@ struct Answer DosDirMake(struct Dos *dos, const u8 *name)
         return Failed(dos, ACCESS_DENIED);
     if (mkdir(host, 0777) != 0)
         return Failed(dos, DosErrorOf(errno, true));
+    /* DOS gives a new directory the time of day, which a test has of its
+       own clock, as it stamps a file that is written. */
+    if (dos->clock != NULL) {
+        int fd = open(host, O_RDONLY | O_DIRECTORY);
+
+        if (fd >= 0) {
+            Stamp(fd, dos->clock());
+            close(fd);
+        }
+    }
     return Done(AX_DIR_MAKE);
 }
 

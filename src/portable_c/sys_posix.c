@@ -1037,7 +1037,6 @@ static void ClockBegin(void)
     TestTicks = (u32)((hour * 3600 + minute * 60 + second) * 1193180
                       / 65536);
     Clocked = true;
-    Emulated.clock = TestStamp;
 }
 
 /* A wait of the program's that is no busy one: a millisecond. */
@@ -1484,9 +1483,9 @@ static void Traced(const char *line)
  * KeyRead waits for a key, which is idle as Idle is.
  */
 
-/* Asked with no key there, the program is idle as with Idle: the bench's
-   driver takes INT 16h with none waiting so, and the key that it then
-   makes due is there at the next asking. */
+/* Asked with no key there, the program is not idle: the bench's driver
+   takes only INT 16h 00h and 10h and INT 28h for the program's idle
+   call, not 01h, and makes no key due for it. */
 struct Keys KeyWaiting(void)
 {
     struct Keys keys;
@@ -2147,6 +2146,10 @@ int main(int count, char **arguments)
     StartMs = TodayMs();
     clock_gettime(CLOCK_MONOTONIC, &StartedAt);
     DosBegin(&Emulated, getenv("HOME"));
+    /* DosBegin has the host's clock for what is written; the test's
+       clock, which TestBegin has set, takes its place. */
+    if (Clocked)
+        Emulated.clock = TestStamp;
     if (getcwd(here, sizeof here) == 0)
         Fail("the current directory");
     StartIn(here);

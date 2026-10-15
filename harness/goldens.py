@@ -215,6 +215,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import deps
+import dataclasses
 import deviations
 import scenarios
 import setups
@@ -491,6 +492,14 @@ def read(name, tree=None, patched=True):
         golden.patch = patched
     elif patched and file.exists():
         golden.patch = read_patch(file, file.parent.name)
+    if golden.patch and name in declared.cut:
+        # A scenario that the tree is taken through only as far as a
+        # step: what the patch says of the screens behind it is not held.
+        first = declared.cut[name][0]
+        golden.patch = dataclasses.replace(golden.patch, screens={
+            key: stated for key, stated in golden.patch.screens.items()
+            if key.partition(": ")[0].isdigit()
+            and int(key.partition(": ")[0]) < first})
     if golden.patch:
         fit(golden.patch, golden, kept)
     golden.places = kept
