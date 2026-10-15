@@ -1702,9 +1702,14 @@ u32 Ticks(void)
         /* A second read with no round idle between is the program
            waiting for the next tick by itself, as the zooming boxes do,
            which the machine's clock on the bench gets to by what the
-           machine executes meanwhile: the test's clock ticks then. */
-        if (++Polled > 1)
+           machine executes meanwhile: the test's clock ticks then, and
+           the count begins again, so that a loop that reads the timer
+           once a round and goes idle when it has not ticked, as the
+           blanker's does, gets to its idle round. */
+        if (++Polled > 1) {
             TestTicks++;
+            Polled = 0;
+        }
         return TestTicks % TICKS_A_DAY;
     }
     return (u32)((StartMs + Elapsed()) % MS_A_DAY * 1193180 / 65536000
