@@ -339,6 +339,21 @@ tree.c, PutTree: widen
     the list is empty: TreeCur, TrCr20, ChTree and F00_50 of keys.c set
     it so, and Init92 of main.c to the first. n is 0 or more.
 
+treebox.c, ChTr12: widen
+    | count = (size >> 8) - 8;
+    size has the rows of the screen less 3, as ChTree makes it at its
+    top, of a screen of 25 to 50 lines: 14 to 39.
+
+treebox.c, ChTr12: widen
+    | n = ((size >> 8) - 9) << 4;
+    size has the rows of the screen less 3, as ChTree makes it at its
+    top: 13 to 38 lines, in bytes.
+
+treebox.c, ChTr12: widen
+    | row = (inner >> 8) - 1; /* the line that is new */
+    inner has the rows of the lines in the box, the screen's less 11:
+    14 to 39, and this 13 to 38.
+
 treebox.c, ChTree: widen
     | click = DoublMo((u16)(begin + 0x204 + (under << 8)), /* on the
     under is the line of the list that the mouse is on, by InWind just
@@ -351,11 +366,6 @@ treebox.c, ChTree: widen
     the number is of 16 bits, and the cast cuts nothing.
 
 treebox.c, ChTree: widen
-    | count = (size >> 8) - 8;
-    size has the rows of the screen less 3, at the top of the function,
-    of a screen of 25 to 50 lines: 14 to 39.
-
-treebox.c, ChTree: widen
     | cursor += (size >> 8) - 9;
     13 to 38, by size at the top of the function, added to first, a
     line of the list: the line that ChTr37 holds against TreeLen.
@@ -366,8 +376,8 @@ treebox.c, ChTree: widen
     and below the list's length.
 
 treebox.c, ChTree: widen
-    | cursor = TREE->TreeLen - 1; /* the list has the root */
-    ReadTre, at the top of the function, leaves a list of one entry or
+    | cursor = TREE->TreeLen - 1;
+    ReadTre, at the top of the loop, leaves a list of one entry or
     more, the root at least: a file that says none is refused.
 
 treebox.c, ChTree: widen
@@ -380,25 +390,18 @@ treebox.c, ChTree: widen
     size has the rows of the screen less 3, at the top of the function,
     of a screen of 25 to 50 lines: 14 to 39.
 
-treebox.c, ChTree: widen
-    | n = ((size >> 8) - 9) << 4;
-    size has the rows of the screen less 3, at the top of the function:
-    13 to 38 lines, in bytes.
-
-treebox.c, ChTree: widen
-    | row = (inner >> 8) - 1; /* the line that is new */
-    inner has the rows of the lines in the box, the screen's less 11:
-    14 to 39, and this 13 to 38.
-
-treebox.c, ReadTre: widen, 2 times
+treebox.c, ReadTre: widen
     | count = TREE->TreeLen << 4;
     TreeLen is what RdTr11 has counted while the disk was read, which
     the test at RdTr16 keeps within the room of TreeBuf: the bytes of
     the list, in TreeBuf.
-    The other is of a file, whose count is anything: it is held against
-    the bytes that were read, fewer than TreeBuf has, and a count of
-    4,096 entries or more is refused there, as the comment says. 32
-    bits keep it whole, which is what refuses it.
+
+treebox.c, TreeFileRight: widen
+    | count = TREE->TreeLen << 4;
+    Of a file, whose count is anything: it is held against the bytes
+    that were read, fewer than TreeBuf has, and a count of 4,096
+    entries or more is refused there, as the comment says. 32 bits
+    keep it whole, which is what refuses it.
 
 usermenu.c, F32_00: widen
     | room = (u8)(size - 14 - keys);
