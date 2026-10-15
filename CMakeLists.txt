@@ -832,6 +832,17 @@ else()
                 "print('No clang: the test of the emulation of DOS for Linux is skipped.'); raise SystemExit(77)")
 endif()
 set_tests_properties(portable_c-posix-unit PROPERTIES SKIP_RETURN_CODE 77)
+# The program for Linux in a terminal, the piece L4 of step 6: the
+# sanitized build run in a pseudo-terminal with a few keys, what it draws
+# replayed through pyte, fetched pinned (harness/deps.py), and held cell by
+# cell to the grid that the test channel writes for the same keys, in 24
+# bits and in 16 colours, with a terminal too small, SIGTSTP, SIGCONT and
+# SIGTERM. See harness/terminal.py. It runs no machine, and is skipped
+# where there is no clang.
+add_test(NAME portable_c-terminal
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/terminal.py
+            ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
+set_tests_properties(portable_c-terminal PROPERTIES SKIP_RETURN_CODE 77)
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see
@@ -863,7 +874,7 @@ set_tests_properties(asm-bytes c-data c-arith
     PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-data portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-cut portable_c-stub
-    portable_c-posix-unit
+    portable_c-posix-unit portable_c-terminal
     portable_c-layout portable_c-debug-layout
     PROPERTIES LABELS portable_c)
 set_tests_properties(portable_c-scenarios PROPERTIES LABELS "portable_c;machine")

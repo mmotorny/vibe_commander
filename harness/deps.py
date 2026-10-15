@@ -52,7 +52,21 @@ FREEDOS_LITE = Download(
     "857dcd2ebf9d3d094320154db5fb5b830acba6fb98f981a95a0ca7ab3350338b",
     "FreeDOS 1.4 Lite USB image")
 
-ALL = [VC_SHAREWARE, FREEDOS, FREEDOS_LITE]
+# pyte 0.8.2, a terminal emulator in Python, the wheel from the Python
+# Package Index, as its authors publish it there (LGPL 3). The test
+# portable_c-terminal replays through it what the program for Linux draws
+# in a terminal, on the user's word of 14 October 2026 (CLAUDE.md, step
+# 6), which allowed this download. It wants wcwidth, which is not
+# fetched: harness/terminal.py says what stands in its place and why.
+PYTE = Download(
+    "pyte-0.8.2-py3-none-any.whl",
+    "https://files.pythonhosted.org/packages/59/d0/"
+    "bb522283b90853afbf506cd5b71c650cf708829914efd0003d615cf426cd/"
+    "pyte-0.8.2-py3-none-any.whl",
+    "85db42a35798a5aafa96ac4d8da78b090b2c933248819157fc0e6f78876a0135",
+    "pyte 0.8.2")
+
+ALL = [VC_SHAREWARE, FREEDOS, FREEDOS_LITE, PYTE]
 
 
 def sha256(path):
