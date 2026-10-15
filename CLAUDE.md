@@ -242,8 +242,8 @@ These held while `src/c/` was made, and they say what it is.
      original goes when a directory that it names is not there; a
      scenario that rests on what only DOS has is not run on Linux,
      with its reason, as a tree's scenarios are declared not run; and
-     the tests run the build with the sanitizers that go together, the
-     sanitizer of memory a build and a run of its own): told so by a variable of the environment, it
+     the tests run the build with the sanitizers that go together, the sanitizer of memory a build of its own, run once and
+     then kept for audits, not by every test (the user, the same day)): told so by a variable of the environment, it
      writes its grid of cells whenever it waits for a key, a harness
      drives it in a pseudo-terminal with the scenarios' keys, and what
      it draws in the terminal is held to that grid by replaying it
