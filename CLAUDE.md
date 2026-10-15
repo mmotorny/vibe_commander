@@ -279,8 +279,8 @@ name this section as "CLAUDE.md, step 6".
 - A file of the panel's size stays 32 bits on every platform: a file of
   four gigabytes or more is shown and copied as DOS would.
 - How it is judged: see "The scenarios of the program for Linux" under
-  "How the portable C is judged". What the surveys of Linux found is in
-  `TODO.md`, "What the surveys of the layer found that step 6 needs".
+  "How the portable C is judged". What step 6 left is in
+  `TODO.md`, "Step 6, the program for Linux: what is left".
 
 ### The web page
 
