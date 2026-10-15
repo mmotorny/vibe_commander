@@ -73,7 +73,7 @@ The planned stages:
    DOS's services, and every other system emulates DOS behind them.
 
 Where it stands: the first stage is done. Outside the reserved room, both
-programs come out identical to the originals. The second stage is nearly
+programs come out identical to the originals. The second stage is
 done: the program builds as `VC.EXE`, and every routine of it runs as
 C. In the order in which they were translated: those that write
 numbers, sizes, dates and times, those
@@ -217,15 +217,23 @@ such file said, in what order the program's segments lie and which of
 them count from the PSP, is said by options of the compiler and by the
 linker's command (see [The C translation](#the-c-translation)).
 
-The third stage has begun, in a tree of its own, `src/portable_c/`,
+The third stage is under way, in a tree of its own, `src/portable_c/`,
 which started as a copy of that program. Its functions no longer take
-their arguments in the registers of the assembly, what it asks of DOS it
-asks in one file, the original's setup program is a part of it, and it
-is a program of 32 bits, which a DOS extender starts. It behaves
-otherwise than the original where a thing only made sense on DOS, and
-the first such thing was that it stays in the memory whole while a
-command runs, with no option for that (see [The portable
-C](#the-portable-c)).
+their arguments in the registers of the assembly, the original's setup
+program is a part of it, and it is a program of 32 bits, which a DOS
+extender starts. It uses what 32 bits give: pointers where there were
+segments and offsets, numbers as wide as what they count, and the
+memory of its panels and its texts from the extender, as much as the
+machine has. What it asks of the system it asks through one header,
+`sys.h`, in DOS's terms, and each system has its own files behind it:
+those for DOS, and those of [the program for
+Linux](#the-program-for-linux), `vc`, which runs in a terminal and
+emulates DOS's services there. It behaves otherwise than the original
+where a thing only made sense on DOS, and the first such thing was that
+it stays in the memory whole while a command runs, with no option for
+that (see [The portable C](#the-portable-c)). What comes after Linux,
+on the user's word of 15 October 2026, is a static web page, the
+program built for WebAssembly and drawn as text, and then iOS.
 
 ## Layout
 
@@ -233,15 +241,18 @@ C](#the-portable-c)).
 |---|---|
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
-| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README; `stub.c` switches the banner of [the extender](#the-extender) off in the program of the portable C |
+| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original. What it asks of the system is `sys.h`; the files whose names end in `_dos.c` answer it for DOS, `sys_stub.c` by nothing, and those that end in `_posix.c`, with `emulate_posix.h`, for Linux. Every other file is common to all of them |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README; `stub.c` switches the banner of [the extender](#the-extender) off in the program of the portable C; `calls.py` counts the calls that hand registers to an interrupt, outside the file of the system's functions |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
-| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/` |
+| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/`, and those of `harness/goldens/posix/` on top of them for the program for Linux |
 | `docs/` | Pictures for this README |
 
 ## Building
 
-Needs CMake 3.24 or later, a C compiler and `git`.
+Needs CMake 3.24 or later, a C compiler and `git`. Clang is optional:
+where the build finds it, it also builds [the program for
+Linux](#the-program-for-linux) and the stub, and without it the
+program for DOS is built all the same.
 
 ```sh
 cmake -B build
@@ -660,6 +671,18 @@ defined, of a second copy of the file that calls DOS and of the main
 data, and the registers where one part called the other, went with the
 two parts.
 
+The jumps that the translation kept from the assembly, `goto`, are gone
+where that was easy: in a function that only jumps forward, or whose
+jumps back make a loop with one way in, they became `if`, loops,
+`break`, `continue` and `return`. A label that went leaves the
+assembly's name in a comment where it stood, so that the code can still
+be held against `src/c/` and `src/asm/`. Nine functions keep theirs,
+where loops are entered in the middle or paths cross, until one is
+rewritten for another reason: `C20_00` of `copy.c`, `FncSel` of
+`dirfunc.c`, `Loop` of `main.c`, `F39_00` of `menu.c`, `F32_00`,
+`FileLst` and `Run_00` of `usermenu.c`, and `V00_10` and `V82_00` of
+`view.c`.
+
 ### The figures
 
 What can be measured of the portable C, or counted in its source, and
@@ -943,11 +966,15 @@ DOS on a PC, for a program of 32 bits under [the
 extender](#the-extender), and the one file that knows how DOS is asked:
 no other file of the portable C has a structure of registers, the number
 of a service, or an interrupt that it calls. The same functions for
-another system will be another file beside it. A file whose name ends
-in `_dos.c` is of the implementation for DOS, `sys_dos.c` and the
-stack, `stack_dos.c`, and the build for DOS takes those beside the
-common code, every file that ends in no implementation's name; a
-second implementation's files will end in its own, `_stub.c`.
+another system are other files beside it, and the build picks the files
+of an implementation by the end of their names, beside the common code,
+every file that ends in no implementation's name. Those of DOS end in
+`_dos.c`: `sys_dos.c` and the stack, `stack_dos.c`. `sys_stub.c` is
+the stub of step 5 of the road, `sys.h` answered by nothing, which
+builds and is not meant to run. And `sys_posix.c` is the program for
+Linux, with the files that emulate DOS there beside it, each ending in
+`_posix.c`, and their own header, `emulate_posix.h`: see [The program
+for Linux](#the-program-for-linux).
 
 | What | Functions |
 |---|---|
@@ -1088,16 +1115,36 @@ steps that went there, against the original's golden without them:
 |---|---|---|
 | 7 | The map of the memory, Alt+F5, Memory info of the Commands menu: `memory.c` and `memory_t.c`. And the watch on DOS that it rested on, in `exec.c`: the entry of INT 27h, `New27` with `Int27`; in the entry of INT 21h the three calls by which a program is run, stays in the memory or gives a block back; the list of the programs that have stayed and their records, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk`, `Release`; `GetStat`; and the programs released when the program is left | Listing what DOS has given to whom, and getting a program out of the memory again that was run from here and has stayed, which DOS had no way to do |
 | 11 | The two lines on the memory in the Info panel, "Bytes Memory" and "Bytes Free": the part of `PutInf` of `info.c` that wrote them, with their three texts; and for the first, `MemEnd` of `sys.h`, which read in the PSP where the memory ends, with its call in `IniData` of `start.c` | Saying how much memory DOS has for programs and how much of it the next command gets. The panel is no row shorter for it: what the program is based on stands below its title, the line under the title a row further down, and the row below that is empty |
-| 12 | EGA lines, Alt+F9, of the Commands menu: `F69_00` of `commands.c`; its name in the key bar with Alt held, and the key bar that the panels had on a display without such lines; and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`, with their bodies in `dos32.c` | Giving the screen 43 rows on an EGA or 50 on a VGA, and 25 again, by having the BIOS load a font of 8 lines, and telling the Print Screen key of the rows. The program still asks how many rows the screen has, when it starts and behind every command, and draws on as many as it finds, up to 50: the rows are to come from the system that it runs on. No scenario has it on more than 25 for now |
-| 14 | Quick execute commands, of the Advanced options and of the setup's Configuration, where it was the last of the Execute options: the way through the shell in `Exec02` of `exec.c`; the command that went to the current drive first, which `F21_31` of `enter.c` left for it, with DOS asked for the drive there and in `IniData` of `start.c`; and `ShellRun` of `sys.h`, which `dos32.c` made in real mode, by 26 bytes of instructions that it put below the megabyte | Handing a command to the COMMAND.COM that the program was started from, by that shell's INT 2Eh, in place of running a COMMAND.COM for each: sooner, and with what the command set there kept. Every command is run the second way. The Advanced options are a row shorter, with Clear keyboard buffer the one line of Other options, and the right half of the setup's Configuration begins with the Keyboard options |
+| 12 | EGA lines, Alt+F9, of the Commands menu: `F69_00` of `commands.c`; its name in the key bar with Alt held, and the key bar that the panels had on a display without such lines; and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`, with their bodies in `sys_dos.c` | Giving the screen 43 rows on an EGA or 50 on a VGA, and 25 again, by having the BIOS load a font of 8 lines, and telling the Print Screen key of the rows. The program still asks how many rows the screen has, when it starts and behind every command, and draws on as many as it finds, up to 50: the rows are to come from the system that it runs on. No scenario has it on more than 25 for now |
+| 14 | Quick execute commands, of the Advanced options and of the setup's Configuration, where it was the last of the Execute options: the way through the shell in `Exec02` of `exec.c`; the command that went to the current drive first, which `F21_31` of `enter.c` left for it, with DOS asked for the drive there and in `IniData` of `start.c`; and `ShellRun` of `sys.h`, which `sys_dos.c` made in real mode, by 26 bytes of instructions that it put below the megabyte | Handing a command to the COMMAND.COM that the program was started from, by that shell's INT 2Eh, in place of running a COMMAND.COM for each: sooner, and with what the command set there kept. Every command is run the second way. The Advanced options are a row shorter, with Clear keyboard buffer the one line of Other options, and the right half of the setup's Configuration begins with the Keyboard options |
 | 24 | The editor's count of free bytes in its status line, with the word "Free" behind it: the block of `T00_20` of `edit.c` that wrote the figure, and `FrBuf_S` of `edit_t.c` | Saying how much of the memory that the editor took is left for the text. The editor still says when its room is full, as before |
+| 29 | Unsorted, the fifth order of the Left and the Right menu: its line in both menus, the branch of `CmpPar` of `files.c` for the order in which the files were read, and the tick of `F40_00` of `menu.c` for it. A panel is sorted by name unless the user picks another order, and a setup file that says Unsorted, as the distribution's does, is read as by name | Listing the files in the order in which DOS lists the directory, which on DOS was the order in which they were made. On the systems that the program is carried to that order is of the file system and says nothing to a user. The menus are a row shorter |
 
 Quick execute commands is not of DOS alone by what it gave, only by
 how it was done, and was taken out on the user's word of 13 October
 2026, as EGA lines was, and not by the rule, as the two above them
 were: `DEVIATIONS.md` has it under 14 as it has those. The editor's count
 of free bytes went on the user's word of 14 October 2026, that every
-figure of free memory goes, on DOS too: entry 24.
+figure of free memory goes, on DOS too: entry 24. Unsorted went on the
+user's word of 15 October 2026, with the bench's panels sorted by name:
+entry 29.
+
+Besides what has gone, `DEVIATIONS.md` declares what the user has had
+done otherwise than the original, one thing at a time, as the work on
+the numbers and the memory came to it, entries 15 to 28. Most are bugs
+of the original that are fixed: Go to of the file search asks for the
+disk of the drive that its line is on, the search reads no part of a
+file behind the end of its room, a copy from a device counts its room
+down by every read, a tree's file or a help file that is broken is
+refused, and the menu bar no longer goes on with the menu that is none.
+The others are limits of the original that went when a number was
+widened: the viewer finds a text beyond column 65,535, the editor
+reaches every line of a text of more than 65,535, the Info panel counts
+clusters of 64K, and a panel keeps all of its files while a command
+runs. Above all a panel holds as many entries of a directory as there
+is memory for, where the original stops at 2,703, and stops for good
+at 65,536, the most that a directory of DOS holds, since an entry keeps
+the original's number of 16 bits: entry 27.
 
 What was left of the watch then was what was not for the map: the
 program still took INT 21h, for its own call, by which a setup program
@@ -1303,8 +1350,15 @@ showed behind the panels after a command. Every other cell is
 compared. The scenarios that rest on what only DOS has, Russia, the
 diskette, a program or a command of DOS's, are not run, each with its
 reason; others are cut, taken only as far as a step, where what follows
-is DOS's alone or waits on a question of the user's, the order of the
-tree's directories and NUL above all. Where a mask cannot do, a patch
+is DOS's alone, a diskette or the original's directory, or is otherwise
+on Linux for a reason that is written there. Two decisions of the
+user's of 15 October 2026 took most of the cuts away. The bench makes
+its directories and its files in the order of their names, so that the
+tree and the file search, which list a directory as it stands on the
+disk, list it alphabetically on DOS as on Linux. And DOS's names of
+devices, NUL, CON and the like, are ordinary names of files on Linux:
+the steps of a scenario that use them as devices are left out there,
+or the scenario is cut where the original beeps for one. Where a mask cannot do, a patch
 of its own, in `harness/goldens/posix/`, says what the program for
 Linux is expected to show, by what the user decided. `TODO.md`, "L3b,
 the scenarios on Linux", has every cut with its step.
@@ -1314,7 +1368,10 @@ the scenarios on Linux", has every cut with its step.
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
 One test, `portable_c-host`, asks `gcc`, and those of the source's
 numbers and of the program for Linux ask `clang`: each is skipped where
-there is none.
+there is none. `portable_c-stub` also asks `clang-tidy`, of version 23,
+which the checks of `.clang-tidy` were judged with (`VERSION` of
+`harness/stubcheck.py`): it is skipped without one, and fails with
+another version, which has other checks.
 
 ```sh
 ctest --test-dir build --output-on-failure
@@ -1334,9 +1391,13 @@ harness itself, `harness-le`. The two trees are held against the same
 goldens. The tests that run no machine take seconds, the terminal's
 some forty; `c-scenarios` and `portable_c-scenarios` each run every
 scenario on the machine, so all of them take four to eight minutes on a
-machine that does nothing else. Every test of the portable C has the
-label `portable_c`, and those that start a machine the label `machine`
-too: `ctest --test-dir build -L portable_c -LE machine` runs the rest.
+machine that does nothing else. Every test has a label for what it
+judges: `portable_c` for those of the portable C, `frozen` for those of
+the assembly and the C translation, and `harness` for `harness-le`. The
+three that start a machine, `c-scenarios`, `portable_c-scenarios` and
+`portable_c-posix-scenarios`, have the label `machine` too: `ctest
+--test-dir build -LE machine` runs the other fifteen, and `-L
+portable_c -LE machine` those of the portable C among them.
 
 | Test | What it checks |
 |---|---|
@@ -1405,9 +1466,11 @@ has less, by more with every routine translated, and the numbers are not
 worth an expectation that follows the size of the build. Both screens
 have `#` in their place when a build is held against a golden, so a
 golden that was derived with a number still in it need not be derived
-again. The Info's number is left out for the C translation alone: the
-portable C has no such line, and the row that the original has it in is
-expected empty there, every cell of it.
+again. The editor's and the Info's numbers are left out for the C
+translation alone: the portable C shows no figure of free memory
+(`src/portable_c/DEVIATIONS.md`, 11 and 24), and where the original has
+one it is expected to show what the declaration says, every cell of
+it. What `mem` says is left out for every tree.
 
 What the portable C is declared to do otherwise than the original is
 another matter, since the original cannot be made to show it. The
@@ -1599,7 +1662,8 @@ takes 40 KB, so this machine shows less memory free than the other. The
 other machine has the keyboard a PC has by itself, and no way to type a
 letter beyond ASCII: Alt with the numeric keypad types nothing there.
 
-The program is set up as its distribution sets it up, with two exceptions.
+The program is set up as its distribution sets it up, with three
+exceptions.
 The clock in the corner of the screen is off. It would put the time of day
 on every screen, and the machine's time is counted in the instructions it
 executes (see below), of which the translation takes more than the original
@@ -1614,6 +1678,31 @@ to make the right panel one of files in its Right menu, and to save its
 setup, and the `VC.INI` it writes is what every scenario
 starts from. One scenario, `clock`, switches the clock on again, and a
 scenario that is about the Info panel switches that on.
+
+The third is that the panels of the bench list their files sorted by
+name, where the distribution has them unsorted, on the user's word of
+15 October 2026:
+the same setup file is saved with Name chosen in the Left and the Right
+menu. The order of a directory is that of its entries on the disk,
+which the portable C no longer shows ([entry
+29](#what-a-user-sees-no-more)), so the scenarios move the cursor to
+the files that they mean in a sorted list. The tree of directories and
+the file search have no order of their own and list a directory as it
+stands on the disk; on the user's word of the same day the bench makes
+its directories and its files in the order of their names, so that
+those lists are alphabetical on DOS too, as they are on Linux. A
+directory still stands in front of the files of its directory, as the
+bench makes them.
+
+A scenario that wants files to work on that are not the bench's own has
+them in `C:\FILES`, on its bench alone, since the bench's disks are on
+every golden: the files of FreeDOS's boot diskette's `FREEDOS\BIN` in
+`BIN`, and three files in front of it, two of the diskette's and one of
+the distribution's, with their times (`files_layout` of
+`harness/setups.py`). Such a scenario went to `A:`, the diskette, or to
+`D:\VC`, the original's directory, for them before; the program for
+Linux has the same files in `H:\FILES`, so that the scenario runs alike
+on every platform, and its golden was derived again from the original.
 
 ### When a step is finished
 
@@ -1852,6 +1941,7 @@ SHA-256 sums pinned in `harness/deps.py`, and never stored in the repository:
 | Volkov Commander 4.05 shareware distribution | The author's site, <https://vc.vvv.kyiv.ua/download/vc405sw.zip> |
 | FreeDOS 1.4 Floppy Edition, for its boot floppy | The FreeDOS project's download host, <https://download.freedos.org/1.4/FD14-FloppyEdition.zip> |
 | FreeDOS 1.4 Lite USB image, for the keyboard driver and its layouts, which are among its packages | <https://download.freedos.org/1.4/FD14-LiteUSB.zip> |
+| pyte 0.8.2, a terminal emulator in Python, under the LGPL 3, through which the test `portable_c-terminal` replays what the program for Linux draws; the wheel as its authors publish it on the Python Package Index | The Python Package Index, <https://pypi.org/project/pyte/0.8.2/>, from its host of files |
 
 ### What the build downloads
 

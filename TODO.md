@@ -19814,6 +19814,27 @@ What the next piece should know:
 - When a question of the user's is answered, its entry here and its
   cut or not-run in `ON_LINUX` change together.
 
+### DOC, the README brought up to date: done
+
+The README after an audit of 15 October, documentation only: the
+second stage done and the third with step 2, `sys.h` and the program
+for Linux, and the road after it (WebAssembly, then iOS); the layout's
+`_dos`, `_stub` and `_posix` files, `harness/goldens/posix/` and
+`tools/calls.py`; clang optional, clang-tidy 23; the files that the
+build picks by their names' ends; entry 29 among what a user sees no
+more, and a paragraph on entries 15 to 28; the goto sweep with the nine
+functions that keep theirs; the bench sorted by name, its directories
+made in the order of their names, and `C:\FILES`; the two decisions of
+15 October in the masks paragraph of Linux; the labels `frozen` and
+`harness`, fifteen tests by `-LE machine`; pyte among the downloads;
+the figures of free memory as the C translation's alone.
+
+What the next piece should know: TREE landed while this was made, and
+the README has the bench's directories and files in the order of their
+names and the cuts of Linux as TREE left them. L7 mends the lines
+on the stub (the layout's row, "The system in one place", "Building it"
+and the table of tests of Linux) when it deletes it.
+
 ### SAN, what the sanitizers found in the scenarios: done
 
 What `posix-asan` stopped at when L3b took the program for Linux
