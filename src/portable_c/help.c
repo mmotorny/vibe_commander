@@ -286,6 +286,209 @@ static const u8 *Help77(u16 place, const u8 *text)
     return line.line;
 }
 
+/* Where the window goes on from a key or the mouse: shown again from
+   the line that the cursor is to be on and the first line, a line up or
+   down, Enter on the button with the cursor, the next key, the title
+   and the buttons anew for an entry that has been read, the box for one
+   that could not be, or out. The assembly jumps to each of those. */
+enum {
+    HELP_SHOW,                          /* Help10 */
+    HELP_UP,                            /* Help50 */
+    HELP_DOWN,                          /* Help53 */
+    HELP_ENTER,                         /* Help60 */
+    HELP_KEY,                           /* Help25 */
+    HELP_PAGE,                          /* Help06 */
+    HELP_FAILED,                        /* Help65 */
+    HELP_LEAVE                          /* Help66 */
+};
+
+/* The mouse, Help30 of the assembly: a button is down. Where it goes
+   on to the window, the cursor and the first line are in `at`. */
+static i32 Help30(u16 item, u16 size, struct Paged *at)
+{
+    u16 buttons, mouse, held;
+    i32 count, third, clicked;
+    bool outside;
+    struct Mouse pointer;
+
+    pointer = GetMous(item);
+    buttons = pointer.buttons;
+    mouse = pointer.place;
+    for (;;) {                          /* Help31 */
+        ClrKbd();
+        held = mouse;
+        if (buttons & 4) {              /* the middle button, until it is */
+            TypMous('x');               /* let go: leaves, unless another */
+            do {                        /* is down too */
+                pointer = GetMous(mouse);
+                buttons = pointer.buttons;
+                mouse = pointer.place;
+                ClrKbd();
+            } while (buttons & 4);
+            TypMous(0);
+            if ((buttons & 3) == 0)
+                return HELP_LEAVE;
+        }
+        outside = InWind(mouse, BEGIN + 0x404, size - 0x90A);
+        if (!outside || md.WinMous != 0)
+            break;
+        /* Not where the text is, and the button did not go down there:
+           leaves when it is let go outside the window. */
+        if ((buttons & 1) == 0)
+            return HELP_KEY;
+        pointer = GetMous(mouse);
+        buttons = pointer.buttons;
+        mouse = pointer.place;
+        if (buttons == 0) {
+            if (!InWind(held, BEGIN, size - 0x102))
+                return HELP_KEY;
+            return HELP_LEAVE;
+        }
+    }
+    if (outside) {
+        /* Not where the text is. */
+        third = 0;
+        if (hd.HlpMode != 0)
+            third = ((size >> 8) - 9) / 3;
+    } else {
+        md.WinMous |= 1;
+        if (hd.HlpMode == 0) {          /* a line of the index */
+            at->first = hd.HlpFrst;
+            /* Both wrap, marked: the last line of an index without
+               lines is 65,535. */
+            at->cursor = (u16)((u8)((mouse >> 8) - (BEGIN >> 8) - 4)
+                               + at->first);
+            count = (u16)(hd.HlpLins - 1);
+            if (at->cursor > count) {
+                at->cursor = count;
+                return HELP_SHOW;
+            }
+            clicked = DoublMo((mouse & 0xFF00) | (u8)(BEGIN + 4),
+                              0x100 | (u8)(size - 10), at->cursor);
+            if (clicked == 2)
+                return HELP_SHOW;
+            if (clicked == 0)
+                return HELP_KEY;
+            md.MousEnt = 0;
+            ((u16 *)&md.MousTim)[1] = 0xFFFF;
+            TypMous(0);
+            return HELP_ENTER;
+        }
+        third = ((size >> 8) - 9) / 3;
+    }
+    /* Held above the text, or in its first third on a page: up; below it
+       or in the last third: down. */
+    if ((u8)(mouse >> 8) < (u8)((BEGIN >> 8) + 4 + third))
+        return HELP_UP;
+    if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
+        return HELP_DOWN;
+    return HELP_KEY;
+}
+
+/* A key, Help25 of the assembly, or the mouse, until one of them moves
+   the window, chooses a button or leaves. The button with the cursor is
+   in `item`; where the window goes on to, in `at`. */
+static i32 Help25(u16 size, u16 *item, struct Paged *at)
+{
+    const u8 *control;                  /* the buttons */
+    u16 key;
+    i32 go;
+    struct Buttons menu;
+
+    for (;;) {                          /* Help25 */
+        key = 0xFC00;                   /* the mouse, as MinMnu answers it */
+        if (GetMous(*item).buttons == 0) {
+            md.WinMous = 0;
+            md.MousEnt = 0;
+            if (NO_INDEX())
+                control = HlMn1_D;
+            else
+                control = HlMn2_D;
+            menu = MinMnu(control, BEGIN + (size & 0xFF00) - 0x400 + 12,
+                          0x130, HlpMn_P, 2, *item);
+            key = menu.key;
+            *item = menu.chosen;
+        }
+        if (key >> 8 == 0xFC) {
+            go = Help30(*item, size, at);
+            if (go != HELP_KEY)
+                return go;
+            continue;
+        }
+        if (key >> 8 == 0)              /* Case takes none without */
+            continue;                   /* a scan code */
+        if ((key & 0xFF) == 0x0D)
+            return HELP_ENTER;
+        if ((key & 0xFF) == 0x1B)
+            return HELP_LEAVE;
+        if ((key & 0xFF) != 0)
+            continue;
+        switch (key >> 8) {
+        case 0x48: return HELP_UP;
+        case 0x50: return HELP_DOWN;
+        case 0x47:                      /* Home */
+            /* The assembly goes on with the first line as a register
+               happens to have it, and that is made 0 at Help10 whatever
+               it is. */
+            at->cursor = 0;
+            at->first = 0;
+            return HELP_SHOW;
+        case 0x4F:                      /* End */
+            at->first = 0;
+            at->cursor = hd.HlpLins;
+            if (at->cursor != 0)
+                at->cursor--;
+            return HELP_SHOW;
+        case 0x49:                      /* PgUp */
+            *at = PgUp(hd.HlpCur, hd.HlpFrst, SHOWN());
+            return HELP_SHOW;
+        case 0x51:                      /* PgDn */
+            *at = PgDn(hd.HlpCur, hd.HlpFrst, SHOWN(), hd.HlpLins);
+            return HELP_SHOW;
+        case 0x44: return HELP_LEAVE;   /* F10 */
+        }
+    }
+}
+
+/* Enter on a button, Help60 of the assembly: the page of the line, the
+   page in front or behind, the index, or Cancel. Where it goes on to the
+   window, the cursor and the first line are in `at`. */
+static i32 Help60(u16 item, struct Paged *at)
+{
+    i32 count;
+
+    if (NO_INDEX()) {
+        if ((item & 0xFF) != 0)         /* Cancel */
+            return HELP_LEAVE;
+        if (hd.HlpMode != 0) {
+            at->cursor = hd.HlpCur;
+            at->first = hd.HlpFrst;
+            return HELP_SHOW;
+        }
+        Help70(hd.HlpCur);              /* the page of the line */
+    } else {
+        *(u8 *)&hd.HlpMode = 1;
+        if ((item & 0xFF) != 2) {       /* Index: on to Help64 */
+            if ((item & 0xFF) > 2)      /* Cancel */
+                return HELP_LEAVE;
+            if (RdEntry())              /* the index, for the page behind */
+                return HELP_FAILED;     /* this one in it or before it */
+            count = hd.HlpCur;
+            if ((item & 0xFF) == 0) {
+                count++;
+                if (count >= hd.HlpLins)
+                    count = 0;
+            } else if (count-- == 0) {
+                count = (u16)(hd.HlpLins - 1);  /* wraps, marked */
+            }
+            Help70(count);
+        }
+    }
+    if (RdEntry())                      /* Help64 */
+        return HELP_FAILED;
+    return HELP_PAGE;
+}
+
 /* Show the entry that is in the memory in a window, and go on from there:
    move in it, and read and show others, until a key or the mouse leaves
    the help or an entry cannot be read.
@@ -299,15 +502,11 @@ static void Help05(void)
     const u8 *text;
     u16 size = (u16)((u8)(md.Lines - 3) << 8 | 74);
     u16 item = 0;                       /* CX: the button with the cursor */
-    i32 cursor, first;                  /* SI and DI: where to go */
+    struct Paged at;                    /* SI and DI: where to go */
     i32 was, shown, moved;              /* and where the screen is */
     u16 *screen;
-    const u8 *control;                  /* the buttons */
-    u16 color, place, key, buttons, mouse, held;
-    i32 count, lines, third, clicked;
-    struct Buttons menu;
-    struct Paged paged;
-    struct Mouse pointer;
+    u16 color, place, key;
+    i32 count, lines, go;
 
     SavWin(BEGIN, size, md.ErrBuf1);
     color = (u16)(Color(Help_C) << 8);
@@ -324,256 +523,138 @@ static void Help05(void)
     md.MousEnt = 0;
     ((u16 *)&md.MousTim)[1] = 0xFFFF;
 
-Help06:                                 /* the title and the buttons */
-    if (hd.HlpMode != 0)
-        text = hd.HlpInfo;
-    else
-        text = Title_S;
-    Help77(BEGIN + AT_TITLE, text);
-    Window(BEGIN + AT_TITLE, 0x100 | WIDTH);
-    if (NO_INDEX()) {
-        item &= 0xFF00;
-        text = HlMn1_S;
-    } else {
-        text = HlMn2_S;
-    }
-    Help77(BEGIN + AT_TITLE + (size & 0xFF00) - 0x600, text);
-    cursor = hd.HlpCur;
-    first = hd.HlpFrst;
-    hd.HlpFrst = 0xFFF0;                /* nothing is shown yet */
-
-Help10:                                 /* the cursor within the window */
-    if (cursor < first)
-        first = cursor;
-    lines = (size >> 8) - 9;
-    if (cursor >= (u16)(lines + first))         /* wraps, marked */
-        first = cursor - lines + 1;
-    was = hd.HlpCur;
-    hd.HlpCur = (u16)cursor;            /* both of 16 bits, by the cuts */
-    shown = hd.HlpFrst;
-    hd.HlpFrst = (u16)first;
-    moved = first - shown;
-    if (moved != 0 || (hd.HlpMode == 0 && was != hd.HlpCur)) {
-        if (shown != 0xFFF0) {          /* the line that had the cursor */
-            place = (u16)(BEGIN + ((was - shown) << 8) + AT_TEXT);
-            Help77(place, Help72(was));
-            Window(place, 0x100 | WIDTH);
-        }
-        if (moved != 0) {               /* the lines */
-            text = Help72(hd.HlpFrst);
-            place = BEGIN + AT_TEXT;
-            count = (u8)((size >> 8) - 9);
-            do {
-                /* Behind the text there are only empty lines. How far
-                   into it the line is wraps at 16 bits, as the
-                   original's difference of two offsets, marked: it is
-                   never below 0, even for a text of no bytes, since
-                   Help77 answers at least a byte behind what it is
-                   handed, which is at most a byte in front. */
-                if ((u16)(text - hd.HlpInfo) >= hd.HlpSize)
-                    text--;
-                text = Help77(place, text);
-                place += 0x100;
-            } while (--count);
-            /* On the screen: all of them, or the screen moved by a line
-               and the one that is new. */
-            place = BEGIN + AT_TEXT;
-            count = SHOWN();
-            if (moved == 1 || moved == -1) {
-                key = moved == 1 ? 0x600 | (count - 1 & 0xFF) : 0x700;
-                Scroll(key >> 8 == 7, Color(Help_C), place,
-                       (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1) + place));
-                place += key << 8;
-                count = 1;
-            }
-            Window(place, (u16)(count << 8 | WIDTH));
-        }
-        if (hd.HlpMode == 0) {          /* the cursor */
-            place = (u16)(BEGIN + ((hd.HlpCur - hd.HlpFrst) << 8) + AT_TEXT);
-            MvsColr(BasAdr(place), WIDTH, Color(HlpRe_C));
-            Window(place, 0x100 | WIDTH);
-        }
-    }
-
-Help25:                                 /* a key */
-    if (GetMous(item).buttons != 0)
-        goto Help30;
-    md.WinMous = 0;
-    md.MousEnt = 0;
-    if (NO_INDEX())
-        control = HlMn1_D;
-    else
-        control = HlMn2_D;
-    menu = MinMnu(control, BEGIN + (size & 0xFF00) - 0x400 + 12, 0x130,
-                  HlpMn_P, 2, item);
-    key = menu.key;
-    item = menu.chosen;
-    if (key >> 8 == 0xFC)
-        goto Help30;
-    if (key >> 8 == 0)                  /* Case takes none without a scan code */
-        goto Help25;
-    if ((key & 0xFF) == 0x0D)
-        goto Help60;
-    if ((key & 0xFF) == 0x1B)
-        goto Help66;
-    if ((key & 0xFF) != 0)
-        goto Help25;
-    switch (key >> 8) {
-    case 0x48: goto Help50;
-    case 0x50: goto Help53;
-    case 0x47:                          /* Home */
-        /* The assembly goes on with the first line as a register happens
-           to have it, and that is made 0 at Help10 whatever it is. */
-        cursor = 0;
-        first = 0;
-        goto Help10;
-    case 0x4F:                          /* End */
-        first = 0;
-        cursor = hd.HlpLins;
-        if (cursor != 0)
-            cursor--;
-        goto Help10;
-    case 0x49:                          /* PgUp */
-        paged = PgUp(hd.HlpCur, hd.HlpFrst, SHOWN());
-        cursor = paged.cursor;
-        first = paged.first;
-        goto Help10;
-    case 0x51:                          /* PgDn */
-        paged = PgDn(hd.HlpCur, hd.HlpFrst, SHOWN(), hd.HlpLins);
-        cursor = paged.cursor;
-        first = paged.first;
-        goto Help10;
-    case 0x44: goto Help66;             /* F10 */
-    }
-    goto Help25;
-
-Help30:                                 /* the mouse */
-    pointer = GetMous(item);
-    buttons = pointer.buttons;
-    mouse = pointer.place;
-Help31:
-    ClrKbd();
-    held = mouse;
-    if (buttons & 4) {                  /* the middle button, until it is */
-        TypMous('x');                   /* let go: leaves, unless another */
-        do {                            /* is down too */
-            pointer = GetMous(mouse);
-            buttons = pointer.buttons;
-            mouse = pointer.place;
-            ClrKbd();
-        } while (buttons & 4);
-        TypMous(0);
-        if ((buttons & 3) == 0)
-            goto Help66;
-    }
-    if (InWind(mouse, BEGIN + 0x404, size - 0x90A)) {
-        /* Not where the text is. */
-        if (md.WinMous == 0) {
-            /* And the button did not go down there: leaves when it is
-               let go outside the window. */
-            if ((buttons & 1) == 0)
-                goto Help25;
-            pointer = GetMous(mouse);
-            buttons = pointer.buttons;
-            mouse = pointer.place;
-            if (buttons != 0)
-                goto Help31;
-            if (!InWind(held, BEGIN, size - 0x102))
-                goto Help25;
-            goto Help66;
-        }
-        third = 0;
+    /* Help06: the title and the buttons */
+    do {
         if (hd.HlpMode != 0)
-            third = ((size >> 8) - 9) / 3;
-    } else {
-        md.WinMous |= 1;
-        if (hd.HlpMode == 0) {          /* a line of the index */
-            first = hd.HlpFrst;
-            /* Both wrap, marked: the last line of an index without
-               lines is 65,535. */
-            cursor = (u16)((u8)((mouse >> 8) - (BEGIN >> 8) - 4) + first);
-            count = (u16)(hd.HlpLins - 1);
-            if (cursor > count) {
-                cursor = count;
-                goto Help10;
+            text = hd.HlpInfo;
+        else
+            text = Title_S;
+        Help77(BEGIN + AT_TITLE, text);
+        Window(BEGIN + AT_TITLE, 0x100 | WIDTH);
+        if (NO_INDEX()) {
+            item &= 0xFF00;
+            text = HlMn1_S;
+        } else {
+            text = HlMn2_S;
+        }
+        Help77(BEGIN + AT_TITLE + (size & 0xFF00) - 0x600, text);
+        at.cursor = hd.HlpCur;
+        at.first = hd.HlpFrst;
+        hd.HlpFrst = 0xFFF0;            /* nothing is shown yet */
+
+        /* Help10: the cursor within the window */
+        do {
+            if (at.cursor < at.first)
+                at.first = at.cursor;
+            lines = (size >> 8) - 9;
+            if (at.cursor >= (u16)(lines + at.first))  /* wraps, marked */
+                at.first = at.cursor - lines + 1;
+            was = hd.HlpCur;
+            hd.HlpCur = (u16)at.cursor; /* both of 16 bits, by the cuts */
+            shown = hd.HlpFrst;
+            hd.HlpFrst = (u16)at.first;
+            moved = at.first - shown;
+            if (moved != 0 || (hd.HlpMode == 0 && was != hd.HlpCur)) {
+                if (shown != 0xFFF0) {  /* the line that had the cursor */
+                    place = (u16)(BEGIN + ((was - shown) << 8) + AT_TEXT);
+                    Help77(place, Help72(was));
+                    Window(place, 0x100 | WIDTH);
+                }
+                if (moved != 0) {       /* the lines */
+                    text = Help72(hd.HlpFrst);
+                    place = BEGIN + AT_TEXT;
+                    count = (u8)((size >> 8) - 9);
+                    do {
+                        /* Behind the text there are only empty lines. How
+                           far into it the line is wraps at 16 bits, as the
+                           original's difference of two offsets, marked: it
+                           is never below 0, even for a text of no bytes,
+                           since Help77 answers at least a byte behind what
+                           it is handed, which is at most a byte in front. */
+                        if ((u16)(text - hd.HlpInfo) >= hd.HlpSize)
+                            text--;
+                        text = Help77(place, text);
+                        place += 0x100;
+                    } while (--count);
+                    /* On the screen: all of them, or the screen moved by a
+                       line and the one that is new. */
+                    place = BEGIN + AT_TEXT;
+                    count = SHOWN();
+                    if (moved == 1 || moved == -1) {
+                        key = moved == 1 ? 0x600 | (count - 1 & 0xFF) : 0x700;
+                        Scroll(key >> 8 == 7, Color(Help_C), place,
+                               (u16)(((count - 1 & 0xFF) << 8 | WIDTH - 1)
+                                     + place));
+                        place += key << 8;
+                        count = 1;
+                    }
+                    Window(place, (u16)(count << 8 | WIDTH));
+                }
+                if (hd.HlpMode == 0) {  /* the cursor */
+                    place = (u16)(BEGIN + ((hd.HlpCur - hd.HlpFrst) << 8)
+                                  + AT_TEXT);
+                    MvsColr(BasAdr(place), WIDTH, Color(HlpRe_C));
+                    Window(place, 0x100 | WIDTH);
+                }
             }
-            clicked = DoublMo((mouse & 0xFF00) | (u8)(BEGIN + 4),
-                              0x100 | (u8)(size - 10), cursor);
-            if (clicked == 2)
-                goto Help10;
-            if (clicked == 0)
-                goto Help25;
-            md.MousEnt = 0;
-            ((u16 *)&md.MousTim)[1] = 0xFFFF;
-            TypMous(0);
-            goto Help60;
-        }
-        third = ((size >> 8) - 9) / 3;
-    }
-    /* Held above the text, or in its first third on a page: up; below it
-       or in the last third: down. */
-    if ((u8)(mouse >> 8) < (u8)((BEGIN >> 8) + 4 + third))
-        goto Help50;
-    if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
-        goto Help53;
-    goto Help25;
 
-Help50:                                 /* Up */
-    cursor = hd.HlpCur;
-    first = hd.HlpFrst;
-    count = hd.HlpMode != 0 ? first : cursor;
-    if (count != 0)
-        cursor = count - 1;
-    goto Help10;
+            go = Help25(size, &item, &at);
+            switch (go) {
+            case HELP_UP:               /* Help50: Up */
+                at.cursor = hd.HlpCur;
+                at.first = hd.HlpFrst;
+                count = hd.HlpMode != 0 ? at.first : at.cursor;
+                if (count != 0)
+                    at.cursor = count - 1;
+                break;
+            case HELP_DOWN:             /* Help53: Down */
+                at.cursor = hd.HlpCur;
+                at.first = hd.HlpFrst;
+                count = (u16)(SHOWN() + at.first);      /* both wrap, marked */
+                if (hd.HlpMode == 0)
+                    count = (u16)(at.cursor + 1);
+                if (count < hd.HlpLins)
+                    at.cursor = count;
+                break;
+            case HELP_ENTER:            /* Help60 */
+                go = Help60(item, &at);
+                break;
+            }
+        } while (go == HELP_SHOW || go == HELP_UP || go == HELP_DOWN);
+    } while (go == HELP_PAGE);
 
-Help53:                                 /* Down */
-    cursor = hd.HlpCur;
-    first = hd.HlpFrst;
-    count = (u16)(SHOWN() + first);     /* both wrap, marked */
-    if (hd.HlpMode == 0)
-        count = (u16)(cursor + 1);
-    if (count < hd.HlpLins)
-        cursor = count;
-    goto Help10;
+    if (go == HELP_FAILED)              /* Help65: it could not be read */
+        Dialog(&HlpEr_B, 0, 0, 0, &md);
 
-Help60:                                 /* Enter */
-    if (NO_INDEX()) {
-        if ((item & 0xFF) != 0)         /* Cancel */
-            goto Help66;
-        if (hd.HlpMode != 0) {
-            cursor = hd.HlpCur;
-            first = hd.HlpFrst;
-            goto Help10;
-        }
-        count = hd.HlpCur;              /* the page of the line */
-    } else {
-        *(u8 *)&hd.HlpMode = 1;
-        if ((item & 0xFF) == 2)         /* Index */
-            goto Help64;
-        if ((item & 0xFF) > 2)          /* Cancel */
-            goto Help66;
-        if (RdEntry())                  /* the index, for the page behind */
-            goto Help65;                /* this one in it or before it */
-        count = hd.HlpCur;
-        if ((item & 0xFF) == 0) {
-            count++;
-            if (count >= hd.HlpLins)
-                count = 0;
-        } else if (count-- == 0) {
-            count = (u16)(hd.HlpLins - 1);      /* wraps, marked */
-        }
-    }
-    Help70(count);
-Help64:
-    if (!RdEntry())
-        goto Help06;
-
-Help65:                                 /* it could not be read */
-    Dialog(&HlpEr_B, 0, 0, 0, &md);
-
-Help66:                                 /* Esc */
+    /* Help66: Esc */
     ResWin(BEGIN, size, md.ErrBuf1);
     Window(BEGIN, size);
+}
+
+/* Read the header of the help file that HelpFil has opened, where its
+   index is, the index and the page that HlpPage names: true where the
+   file is not a help file of this version or cannot be read. */
+static bool HelpBad(void)
+{
+    i32 i;
+
+    if (SeekDsk(0, 8) || ReadDsk(md.HelpBuf + 16, LenHead))
+        return true;
+    for (i = 0; i < LenHead; i++)
+        if (md.HelpBuf[16 + i] != Help_F[HlpHead + i])
+            return true;
+    if (SeekDsk(0, 0x194) || ReadDsk((u8 *)&hd.HlpOffsLo, 4))
+        return true;
+    DeCode((u8 *)&hd.HlpOffsLo, 4);
+    hd.HlpBkLn = 0;
+    if (RdEntry())                      /* the index */
+        return true;
+    if (md.HlpPage != 0 && hd.HlpMode == 0) {
+        Help70(md.HlpPage - 1);
+        if (RdEntry())
+            return true;
+    }
+    return false;
 }
 
 /* Open the help file and show the page that HlpPage names, or the index;
@@ -582,7 +663,6 @@ Help66:                                 /* Esc */
 static void HelpFil(void)
 {
     struct Answer opened;
-    i32 i;
 
     HidCur();
     MainFil(md.HelpBuf, Help_F);
@@ -592,31 +672,13 @@ static void HelpFil(void)
     if (opened.failed)
         return;
     hd.HlpHndl = opened.value;
-    if (SeekDsk(0, 8) || ReadDsk(md.HelpBuf + 16, LenHead))
-        goto Help01;
-    for (i = 0; i < LenHead; i++)
-        if (md.HelpBuf[16 + i] != Help_F[HlpHead + i])
-            goto Help01;
-    if (SeekDsk(0, 0x194) || ReadDsk((u8 *)&hd.HlpOffsLo, 4))
-        goto Help01;
-    DeCode((u8 *)&hd.HlpOffsLo, 4);
-    hd.HlpBkLn = 0;
-    if (RdEntry())                      /* the index */
-        goto Help01;
-    if (md.HlpPage != 0 && hd.HlpMode == 0) {
-        Help70(md.HlpPage - 1);
-        if (RdEntry())
-            goto Help01;
-    }
-    Help05();
-    goto Help67;
-
-Help01:
-    Dialog(&HlpEr_B, 0, 0, 0, &md);
-
-Help67:
-    FileClose(hd.HlpHndl);
+    if (HelpBad())
+        Dialog(&HlpEr_B, 0, 0, 0, &md); /* Help01 */
+    else
+        Help05();
+    FileClose(hd.HlpHndl);              /* Help67 */
 }
+
 
 /* The help, for F1: on the page that HlpPage names. While it is shown
    DOS's critical errors bring up no box, and F1 does nothing. */

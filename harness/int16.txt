@@ -154,20 +154,21 @@ find.c, FindFil: widen
     below it is for. It is no number of 16 bits: the room may be
     megabytes long, and the list with it.
 
-help.c, Help05: divide, 2 times
-    | third = ((size >> 8) - 9) / 3;
-    size has the rows of the screen less 3, at the top of the function,
-    of a screen of 25 to 50 lines: what is divided is 13 to 38.
-
-help.c, Help05: widen
-    | if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
-    Cut to a byte; third is 4 to 12, a third of the box's rows less 9,
-    and less than the rows less 5.
-
 help.c, Help05: widen
     | lines = (size >> 8) - 9;
     size has the rows of the screen less 3, at the top of the function,
     of a screen of 25 to 50 lines: 13 to 38.
+
+help.c, Help30: divide, 2 times
+    | third = ((size >> 8) - 9) / 3;
+    size has the rows of the screen less 3, as Help05 makes it and
+    hands it on, of a screen of 25 to 50 lines: what is divided is 13
+    to 38.
+
+help.c, Help30: widen
+    | if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
+    Cut to a byte; third is 4 to 12, a third of the box's rows less 9,
+    and less than the rows less 5.
 
 info.c, PutInf: compare
     | (const u8 *)file - (const u8 *)other < other->EndBuf;
