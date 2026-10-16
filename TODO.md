@@ -1131,10 +1131,8 @@ another port:
         --page build/portable_c/web/vc.html \
         --drive-c DIR --drive-d DIR [--demo DIR]
 
-For the iPhone over the tailnet, beside it: `tailscale serve --bg 8437`
-(Tailscale Serve hands `https://<machine>.<tailnet>.ts.net/` to the port;
-`tailscale serve status` shows it, `tailscale serve --https=443 off` takes
-it away). What to look at by hand: the panels drawn in the VGA font and
+For a phone, an HTTPS reverse proxy in front of it, for example
+`tailscale serve --bg 8437`. What to look at by hand: the panels drawn in the VGA font and
 colours, the blink, the cursor in the editor and the command line; the
 keys of W4 of DEVIATIONS.md, in Chrome and Firefox, and the full screen
 with its keyboard lock in Chrome; the mouse, clicks and the right button;
@@ -1325,7 +1323,7 @@ held for the next key, and the phone's keyboard by its button.
 
 - **The README** has a section of its own, "The web page", beside "The
   program for Linux": the two drives, the two ways of serving, building
-  it, the server and Tailscale Serve, the phone, the keys that a browser
+  it, the server and a reverse proxy in front of it, the phone, the keys that a browser
   keeps, what cannot work, the tests of the web and the downloads with
   their licences. The rows of the web's five tests are in its table of
   tests, and the count of the tests in "Testing" has them.
@@ -1354,7 +1352,7 @@ held for the next key, and the phone's keyboard by its button.
   apart from the others: W5 took the credit out of the bar, and the
   font's copyright line is in its licence's heading on the page, below.
 - **The pass by hand**, the user's, which nothing else can make, in
-  Chrome, in Firefox and in Safari on the iPhone. In a checkout
+  Chrome, in Firefox and in Safari on an iPhone. In a checkout
   configured with `cmake -B build -DVC_WEB=ON` (and
   `-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=<build>/_deps/emscripten-src`
   to take the download of another build):
@@ -1362,19 +1360,18 @@ held for the next key, and the phone's keyboard by its button.
       cmake --build build --target portable_c-web-serve
 
   serves the page with its server on `http://127.0.0.1:8437/`, and for
-  the phone, beside it,
+  the phone, beside it, an HTTPS reverse proxy in front of it, for
+  example
 
       tailscale serve --bg 8437
 
-  hands it to the tailnet as `https://<machine>.<tailnet>.ts.net/`
-  (`tailscale serve status` shows it, `tailscale serve --https=443 off`
-  takes it away). The static page:
+  The static page:
 
       cmake --build build --target portable_c-web-static
       python3 -m http.server -d build/portable_c/web/static 8438
 
-  and `http://127.0.0.1:8438/`; for the phone, `tailscale serve --bg
-  8438` in place of the other. What to look at:
+  and `http://127.0.0.1:8438/`; for the phone, the proxy on 8438 in
+  place of the other. What to look at:
   - [ ] The panels in the VGA's font and colours, the blink, the cursor
     in the editor and on the command line.
   - [ ] The keys: F1 to F10 with Shift, Ctrl and Alt and the key bar
@@ -1390,7 +1387,7 @@ held for the next key, and the phone's keyboard by its button.
   - [ ] Upload and a file dragged onto the page: written into the
     current directory, the question before one is written over, the
     panel read anew.
-  - [ ] On the iPhone: the fit, again when it turns; pinch-zoom; a tap
+  - [ ] On an iPhone: the fit, again when it turns; pinch-zoom; a tap
     as a click; the row of keys, with Ctrl and Alt held for the next
     key; the phone's keyboard by its button, typing and Backspace and
     Enter.
@@ -1447,19 +1444,19 @@ held for the next key, and the phone's keyboard by its button.
   dialog does not hold the keys back. `VC.EXE` and `debug/VC.EXE` are
   the same bytes as before.
 - **What is the user's to see by hand**: the dialog in Chrome, Firefox
-  and Safari on the iPhone, scrolled, and closed by Esc and by its
+  and Safari on an iPhone, scrolled, and closed by Esc and by its
   button.
 
 ### W6, the page in a real browser: done
 
 - **The browser** is the machine's own Chromium, found on the path,
   `chromium` or `chromium-browser`, not fetched or pinned (CLAUDE.md,
-  "The web page"); on the workstation that is the snap of Chromium 155.
+  "The web page"); where it was made, that was the snap of Chromium 155.
   A snap reads no hidden directory and not the real /tmp: the profile
   and everything that it opens are in `build/`. The snapshots of
   Chromium's own storage were tried first: they need NSS and NSPR
   (`libnss3`, `libnssutil3`, `libsmime3`, `libnspr4`), which the
-  workstation lacked.
+  machine lacked.
 - **The driver**, `harness/browser.mjs`: Chromium started headless with
   `--remote-debugging-port=0` and its profile in a directory of the
   build, the port read from the profile's `DevToolsActivePort`, CDP over
@@ -1548,13 +1545,9 @@ being credited apart (W5); that the page starts on C:, as it does (W3b,
 "A start on C:"); and that the static page does not ask the browser to
 keep its data, `navigator.storage.persist()` (W3c).
 
-### Left open when the session on the workstation ended, 15 October 2026
+### Left open when the session of 15 October 2026 ended
 
-- **The page in a real browser**: done as W6, above, in Chromium. Firefox and Safari on the iPhone are still the pass by hand of W4.
-- **The private artifact** of the static page (https://claude.ai/artifact/LGs8hcnLh9vm24bL3Hw3yY) has not been opened either. In the Claude app:
-  - `confirm()` answers no at once, so Reset drives and an upload over a file do nothing;
-  - Enter on a file may give only the fallback link;
-  - the bar's bottom may sit under the edge, because the host pads the safe-area insets and `shell.html`'s `body` adds them again with `height:100dvh`. If so, `height:100%` may be the mend; it touches the layout of Safari, so look at both.
+- **The page in a real browser**: done as W6, above, in Chromium. Firefox and Safari on an iPhone are still the pass by hand of W4.
 - **A small fault in `web/drives.js`:** `upload` refuses names that match `/[/\\\0]/`. The minifier writes the `\0` as a raw NUL, which a browser reads as U+FFFD, so the check refuses U+FFFD instead of NUL. It is harmless, since no name has a NUL, but it should say what it means, for example `\u0000` written so that it survives the minifier.
 - **`editor-big`** is run by no tree of the portable C. Running it on the web with a small `VC_MEMORY`, where the cap makes the original's refusal reachable, is a deviation to ask the user ("The cap of the memory: done").
 

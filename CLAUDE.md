@@ -332,9 +332,10 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   with a button that brings up the phone's keyboard.
 - It is served by a server of the project's own, a script for Node
   with Node's own modules and nothing from npm: the page, and the drives' directories with their
-  writes, and nothing outside them. It listens on the workstation alone,
-  and Tailscale Serve hands it to the user's tailnet over HTTPS: anyone
-  on the tailnet may write, the tailnet being the access.
+  writes, and nothing outside them. It listens on the local machine
+  alone, and an HTTPS reverse proxy in front of it, for example Tailscale
+  Serve, hands it on: anyone who can reach it through the proxy may
+  write, the proxy being the access.
 - Beside that, the same page has a second way to be served: as a static
   page, from GitHub Pages, with no server, its two drives then starting
   from what is served with it and what the user changes kept in the

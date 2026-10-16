@@ -7,9 +7,10 @@
 // server before it changes anything there: what the server refuses or
 // cannot do is DOS's error for that call.
 //
-// It listens on 127.0.0.1 alone, on the port that it is told; Tailscale
-// Serve hands it to the user's tailnet over HTTPS, and anyone on the
-// tailnet may write, the tailnet being the access. It never reaches
+// It listens on 127.0.0.1 alone, on the port that it is told; an HTTPS
+// reverse proxy in front of it, for example Tailscale Serve, hands it
+// on, and anyone who can reach it through the proxy may write, the proxy
+// being the access. It never reaches
 // outside the two directories: a path is names of a drive's directory,
 // with no `.`, `..`, absolute path or backslash, and none of the names on
 // the way may be a link of the host's.

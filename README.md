@@ -279,6 +279,9 @@ python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE \
 | [TODO.md](TODO.md) | What is left to do |
 | [DIARY.md](DIARY.md) | How the work got here, day by day |
 
+CLAUDE.md, TODO.md and DIARY.md are the working notes of the AI-driven
+process by which the project is made, kept as they were written.
+
 ## Downloads
 
 Nothing third-party is stored in the repository. The harness fetches
@@ -333,6 +336,10 @@ shows every licence above except DOS/32A's, since the page does not
 carry the extender. What the page may have of LLVM's runtime is under
 Apache-2.0 with the LLVM exception, which asks nothing of a compiled
 program.
+
+The goldens in `harness/goldens/` are recordings of the original
+program's screens, which include its help text, Copyright © Vsevolod V.
+Volkov. They are kept as test data.
 
 JWasm and Open Watcom are open source under the Sybase Open Watcom
 Public License. None of their code ends up in the programs built here:

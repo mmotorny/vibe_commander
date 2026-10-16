@@ -160,9 +160,9 @@ node src/portable_c/web/server.mjs --port 8437 \
     --drive-c DIR --drive-d DIR [--demo DIR]
 ```
 
-For a phone, run `tailscale serve --bg 8437` beside it, which hands
-`https://<machine>.<tailnet>.ts.net/` to the port. `tailscale serve
-status` shows it, and `tailscale serve --https=443 off` removes it.
+For a phone, put an HTTPS reverse proxy in front of it, for example
+`tailscale serve --bg 8437`. Anyone who can reach the page through the
+proxy can write to its drives.
 
 To try the static site locally, run
 `python3 -m http.server -d build/portable_c/web/static 8438` and open

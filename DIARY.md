@@ -30541,3 +30541,12 @@ the tables and what followed the main data.
 
 15 October 2026: the native iOS app (step 8) was dropped on the user's
 word, its pieces I1–I3 removed except the cap, which the web page keeps.
+
+### Make the notes ready for a public repository
+
+15 October 2026: the user made the repository public. The link to a
+private page of the static site went from `TODO.md`, the notes on the
+user's own machines and network were made generic (an HTTPS reverse
+proxy, for example Tailscale Serve, in front of the web page's server),
+and the README says what `CLAUDE.md`, `TODO.md` and `DIARY.md` are and
+what the goldens hold of the original.
