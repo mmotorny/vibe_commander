@@ -61,8 +61,19 @@ jobs:
         run: |
           url=$(grep -A2 'FetchContent_Declare(vga_font' CMakeLists.txt | sed -n 's/^ *URL \(.*\)$/\1/p')
           sum=$(grep -A2 'FetchContent_Declare(vga_font' CMakeLists.txt | sed -n 's/^ *URL_HASH SHA256=\(.*\))$/\1/p')
-          curl -fsSL --retry 3 -o ~/vga_font.zip "$url"
-          echo "$sum  $HOME/vga_font.zip" | sha256sum -c
+          # The host has also sent other bytes to curl at times: the
+          # download is tried again until it is the pinned one.
+          for try in 1 2 3 4 5 6; do
+            curl -fsSL --retry 3 -o ~/vga_font.zip "$url" || true
+            if echo "$sum  $HOME/vga_font.zip" | sha256sum -c --quiet; then
+              break
+            fi
+            echo "try $try: $(stat -c %s ~/vga_font.zip 2>/dev/null) bytes, not the pinned ones"
+            if [ "$try" = 6 ]; then
+              exit 1
+            fi
+            sleep 20
+          done
           mkdir ~/vga_font-src && unzip -q ~/vga_font.zip -d ~/vga_font-src
 
       - name: Configure
