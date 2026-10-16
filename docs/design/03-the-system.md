@@ -28,7 +28,7 @@ Ctrl-C (23h), the address at which DOS goes on when the program ends
 old way of staying resident (27h).
 
 This chapter goes through all of that in the order a reader meets it:
-a refresher on the machine, how the segment registers are used, the
+the one word by which the program finds its data from anywhere, the
 error wrapper and the critical error, Ctrl-Break, the screen, the
 keyboard and the mouse. Then comes the largest piece, the part of the
 program that stays in memory while a command runs: how 1,511 bytes of
@@ -37,90 +37,35 @@ the user's program all but 12,690 bytes of the machine in the
 program's small mode, and how the commander gets back.
 
 The assembly is quoted from `src/asm/` with its labels and its own
-comments. Comments that are not Volkov's are marked by an arrow,
-`<-`, in the excerpt's right margin. Sizes and offsets come from the
-listing of the original's build, `VC.LST`, where an offset counts from
-the start of the PSP; a `.COM` program lives in one segment and its
-first byte is at 100h.
+comments; a comment that starts with `;;` is the book's. Sizes and
+offsets come from the listing of the original's build, `VC.LST`, where
+an offset counts from the start of the PSP; a `.COM` program lives in
+one segment and its first byte is at 100h. The
+[preface](00-preface.md#a-dos-refresher) has a refresher on segments,
+the PSP, memory control blocks and interrupts.
 
-## A refresher: what DOS gives a `.COM` program
+## `SecDat`: the main data from anywhere
 
-**Segments and paragraphs.** The 8086 makes a 20-bit address of two
-16-bit registers, `segment * 16 + offset`. A *paragraph* is 16 bytes,
-and DOS hands out memory in paragraphs, naming each block by the
-segment at which it begins. Four segment registers say where code
-(CS), data (DS, ES) and the stack (SS) are. The one rule to remember:
-an instruction reaches only what those four registers point at, 64 KB
-each, without loading one of them first.
-
-**A `.COM` file.** DOS loads it at offset 100h of a segment, with CS,
-DS, ES and SS all on that segment, SP at its top, FFFEh, and a word
-of 0 pushed there. A near `RET` from the first level therefore jumps
-to offset 0 of the segment, where the PSP begins with `INT 20h`,
-"end the program". The program gets the largest free block of memory,
-which in practice is all of it.
-
-**The PSP.** The Program Segment Prefix is DOS's 256 bytes in front of
-the program. Volkov Commander uses these fields:
-
-```
-PSP:0000  CD 20       INT 20h, the old way to end
-    0002  word        the segment where the program's memory ends
-    000A  dword       where DOS goes on when the program ends (INT 22h)
-    000E  dword       DOS's Ctrl-C handler for this program (INT 23h)
-    0012  dword       DOS's critical error handler (INT 24h)
-    002C  word        segment of the environment
-    005C  16 bytes    FCB 1, parsed from the command tail
-    006C  16 bytes    FCB 2
-    0080  byte        length of the command tail
-    0081  127 bytes   the command tail, ended by a CR
-```
-
-When a program ends, DOS puts INT 22h, 23h and 24h back from the
-PSP's copies. That one fact saves the commander code at its exit, as
-the last section shows.
-
-**Memory control blocks.** DOS keeps a 16-byte header, the MCB, in
-the paragraph in front of every block: `'M'` or, for the last block,
-`'Z'` at byte 0, the owner's PSP at byte 1, the length in paragraphs
-at byte 3. Nothing stops a program from writing one, and the commander
-writes one in its first 256 bytes of code.
-
-**Interrupts as an API.** The first kilobyte of memory is 256 far
-pointers. `INT 21h` is DOS, the function number in AH; `INT 10h` the
-video BIOS, `INT 16h` the keyboard, `INT 33h` the mouse driver. DOS
-reports failure with the carry flag and a number in AX. A program may
-point a vector at its own code (AH 25h) and read who has it now
-(AH 35h).
-
-## Four segment registers, four meanings
-
-Before any of the routines below make sense, the reader needs the
-convention that the whole program follows. It is never written down
-in the source, but every routine obeys it:
-
-| Register | Points at | Why |
-|---|---|---|
-| CS | the program: its code and its constants, one 64K segment | a `.COM` file is code and data in one |
-| SS | the resident part, which begins with the PSP | the 256-byte stack lives there, so every routine can reach the resident part through SS without loading anything |
-| ES | the main data, a structure of 62,603 bytes (`MainDat`) at the start of the block that DOS hands out when the program starts | almost every routine reads a setting, `ES:Mouse`, `ES:Snow`, `ES:Lines` |
-| DS | whatever is being worked on: a panel's segment, the viewer's buffer, the main data | a panel of 256 files and more is a segment of its own (chapter 2) |
-
-Three of the four are fixed for the life of the transient part, so a
-routine pays nothing to reach the settings, the stack or its own
-tables. The cost lands on DS, which moves, and on the few places that
-must find the main data with DS and ES both elsewhere. For those, a
-word in the program's own segment holds the main data's segment:
+The whole program keeps its segment registers to one convention, which
+[chapter 1](01-the-program.md#init11-the-data-block-cut-in-paragraphs)
+sets out: CS on the transient part with every table and text, SS on
+the resident part and its stack, ES on the main data, DS on whatever
+is being worked on. Three of the four are fixed for the life of the
+transient part, so a routine pays nothing to reach the settings, the
+stack or its own tables. The cost lands on DS, which moves, and on the
+few places that must find the main data with DS and ES both elsewhere.
+For those, a word in the program's own segment holds the main data's
+segment:
 
 ```asm
-SecDat  DW      0                       ;                         <- VC.ASM, set once, in Init11
+SecDat  DW      0                       ;; VC.ASM, set once, in Init11
 ```
 
 and code reads it through CS, which is always on the program:
 
 ```asm
         PUSH    DS
-        MOV     DS,CS:SecDat            ;                         <- the main data, from anywhere
+        MOV     DS,CS:SecDat            ;; the main data, from anywhere
         MOV     BYTE PTR DS:[ErrDat],0
         POP     DS
 ```
@@ -140,17 +85,17 @@ spends the three bytes of a near `CALL` on it, one byte more than the
 Intr21  PROC    NEAR
         PUSH    DS
         MOV     DS,CS:SecDat
-        MOV     BYTE PTR DS:[ErrDat],0  ;                         <- no critical error yet
+        MOV     BYTE PTR DS:[ErrDat],0  ;; no critical error yet
         POP     DS
         INT     21h
         PUSHF
         PUSH    DS
         MOV     DS,CS:SecDat
-        CMP     BYTE PTR DS:[ErrDat],0  ;                         <- did the user give up in a box?
+        CMP     BYTE PTR DS:[ErrDat],0  ;; did the user give up in a box?
         POP     DS
         JNE     I21_02
         POPF
-        JNC     I21_01                  ;                         <- no error: as DOS left it
+        JNC     I21_01                  ;; no error: as DOS left it
         PUSH    DS
         PUSH    ES
         PUSH    BP
@@ -160,15 +105,15 @@ Intr21  PROC    NEAR
         PUSH    CX
         PUSH    BX
         XOR     BX,BX
-        MOV     AH,59h                  ;                         <- DOS 3+: the exact reason
+        MOV     AH,59h                  ;; DOS 3+: the exact reason
         INT     21h
         POP     BX
-        ...                             ;                         <- every register back but AX
+        ...                             ;; every register back but AX
         POP     DS
         STC
 I21_01: RET
 I21_02: POPF
-        MOV     AX,53h                  ;                         <- "fail on INT 24h"
+        MOV     AX,53h                  ;; "fail on INT 24h"
         STC
         RET
 Intr21  ENDP
@@ -211,20 +156,20 @@ HookVct PROC    NEAR
         PUSH    DS
         MOV     AX,3524h
         INT     21h
-        MOV     DS:ErrVct.Offs,BX       ;                         <- the critical error, before us
+        MOV     DS:ErrVct.Offs,BX       ;; the critical error, before us
         MOV     DS:ErrVct.Segm,ES
         MOV     AX,351Bh
         INT     21h
-        MOV     DS:BrkVct.Offs,BX       ;                         <- Ctrl-Break, before us
+        MOV     DS:BrkVct.Offs,BX       ;; Ctrl-Break, before us
         MOV     DS:BrkVct.Segm,ES
         PUSH    CS
         POP     DS
-        MOV     DX,OFFSET FatErr        ;                         <- in the transient part
+        MOV     DX,OFFSET FatErr        ;; in the transient part
         MOV     AX,2524h
         INT     21h
         PUSH    SS
         POP     DS
-        MOV     DX,OFFSET CtrlC         ;                         <- in the resident part
+        MOV     DX,OFFSET CtrlC         ;; in the resident part
         MOV     AX,251Bh
         INT     21h
         POP     ES
@@ -261,12 +206,12 @@ main data, by copying fragments of three texts:
 
 ```asm
 Err_S   DB      ' Error ',0
-OnDr_S  DB      'on drive A',0          ;                         <- the A is patched
+OnDr_S  DB      'on drive A',0          ;; the A is patched
 OnDv_S  DB      'on device '
 Errs_S  DB      'Attempt to write on write-protected disk.',0
         DB      'Unknown disk drive.',0
         DB      'Drive or device not ready.',0
-        ...                             ;                         <- 22 messages in all
+        ...                             ;; 22 messages in all
         DB      'Unknown error.',0
 FatEr_S DB      'File allocation table bad.',0
 ```
@@ -279,16 +224,16 @@ without a table of pointers, which would cost two bytes for each of the
 ```asm
 FtErr3: PUSH    CS
         POP     ES
-        POP     CX                      ;                         <- the error code, from DI
+        POP     CX                      ;; the error code, from DI
         XOR     AX,AX
         MOV     DI,OFFSET Errs_S
-        JCXZ    FtErr5                  ;                         <- code 0: the first message
+        JCXZ    FtErr5                  ;; code 0: the first message
         CMP     CX,15h
         JB      FtErr4
-        MOV     CX,15h                  ;                         <- past the end: "Unknown error."
+        MOV     CX,15h                  ;; past the end: "Unknown error."
 FtErr4: PUSH    CX
         MOV     CL,80
-        REPNE   SCASB                   ;                         <- skip to the next zero
+        REPNE   SCASB                   ;; skip to the next zero
         POP     CX
         LOOP    FtErr4
 ```
@@ -306,10 +251,10 @@ The box itself is the program's ordinary dialog, `Dialog`, handed one
 of two descriptions that differ only in their buttons:
 
 ```asm
-FtEr1_B BOXHD   < FtEr1_P, 928h, 0, 2, 0FFh, 0FFh, 7>  ;         <- Retry  Abort
+FtEr1_B BOXHD   < FtEr1_P, 928h, 0, 2, 0FFh, 0FFh, 7>  ;; Retry  Abort
         BOXMN   < 4, 0,0,0,0, 420h, TmpErr, RtAb_D>
         DB      0
-FtEr2_B BOXHD   < FtEr2_P, 928h, 0, 2, 0FFh, 0FFh, 7>  ;         <- Ok, when DOS cannot retry
+FtEr2_B BOXHD   < FtEr2_P, 928h, 0, 2, 0FFh, 0FFh, 7>  ;; Ok, when DOS cannot retry
         BOXMN   < 4, 0,0,0,0, 426h, TmpErr, OkMn_D>
         DB      0
 ```
@@ -320,33 +265,33 @@ the help page:
 
 ```asm
 FtErr5: POP     ES
-        POP     CX                      ;                         <- CH: DOS's flags from AH
+        POP     CX                      ;; CH: DOS's flags from AH
         PUSH    ES
         POP     DS
         XOR     BX,BX
-        XCHG    BL,DS:Clock             ;                         <- clock off
-        XCHG    BH,DS:BlDelay           ;                         <- blanker off
+        XCHG    BL,DS:Clock             ;; clock off
+        XCHG    BH,DS:BlDelay           ;; blanker off
         MOV     CL,DS:HlpPage
         DEC     AX
         MOV     DS:AutoTim.Lo,AX
         MOV     BP,OFFSET FtEr1_B
-        TEST    CH,10h                  ;                         <- may DOS retry?
+        TEST    CH,10h                  ;; may DOS retry?
         JNZ     FtErr6
         MOV     BP,OFFSET FtEr2_B
 FtErr6: MOV     DX,DI
         CALL    Dialog
         TEST    CH,10h
         JZ      FtErr7
-        CMP     AL,0                    ;                         <- the first button, Retry
-        MOV     AL,1                    ;                         <- 1: retry
+        CMP     AL,0                    ;; the first button, Retry
+        MOV     AL,1                    ;; 1: retry
         JE      FtErr8
-FtErr7: MOV     AL,3                    ;                         <- 3: fail the call
+FtErr7: MOV     AL,3                    ;; 3: fail the call
 FtErr8: MOV     DS:Clock,BL
         MOV     DS:BlDelay,BH
         MOV     DS:HlpPage,CL
         CMP     AL,1
         JE      FtErr9
-        MOV     DS:ErrDat,1             ;                         <- tell Intr21
+        MOV     DS:ErrDat,1             ;; tell Intr21
 FtErr9: CBW
         ...
         IRET
@@ -389,9 +334,9 @@ clears it, and `FatErr` tests it first:
 
 ```asm
         MOV     BL,DS:ErrDat
-        OR      BL,DS:BlocEr            ;                         <- or no box wanted at all
+        OR      BL,DS:BlocEr            ;; or no box wanted at all
         JZ      FtErr1
-        MOV     AL,3                    ;                         <- fail at once, silently
+        MOV     AL,3                    ;; fail at once, silently
         JMP     FtErr9
 ```
 
@@ -432,7 +377,7 @@ Ctrl-C during a console call, and with BREAK on during any call. The
 commander answers both with the same byte, in the resident part:
 
 ```asm
-CtrlC:  IRET                            ;                         <- VC.ASM, at PSP:04ABh
+CtrlC:  IRET                            ;; VC.ASM, at PSP:04ABh
 ```
 
 INT 1Bh goes there from `HookVct`. INT 23h and DOS's BREAK are set by
@@ -445,9 +390,9 @@ SetBrk0 PROC    NEAR
         CLD
         PUSH    SS
         POP     ES
-        POP     BP                      ;                         <- a near return address...
+        POP     BP                      ;; a near return address...
         PUSH    CS
-        PUSH    BP                      ;                         <- ...made a far one
+        PUSH    BP                      ;; ...made a far one
 SetBrk0 ENDP
 
 SetBrk  PROC    NEAR
@@ -458,9 +403,9 @@ SetBrk  PROC    NEAR
         POP     DS
         MOV     AX,3300h
         INT     21h
-        MOV     DS:ComnIni.BreakFl,DL   ;                         <- BREAK as the user had it
+        MOV     DS:ComnIni.BreakFl,DL   ;; BREAK as the user had it
         MOV     DL,0
-        MOV     AX,3301h                ;                         <- BREAK OFF
+        MOV     AX,3301h                ;; BREAK OFF
         INT     21h
         MOV     DX,OFFSET CtrlC
         MOV     AX,2523h
@@ -491,98 +436,30 @@ between files and takes four keys for "stop": 0000h, Ctrl-Break;
 
 ## The screen
 
-### A shadow buffer in the main data
+### The display's address
 
-The program composes every screen in memory and copies the result to
-the display. The main data has six buffers for it:
-
-```
-MainDat
-  ScrBuf   DW  MaxLins     * 80   8,000 bytes   the screen as it is to look
-  UserScr  DW  (MaxLins-1) * 80   7,840 bytes   what DOS showed, behind the panels
-  WinBuf   DW  (MaxLins-2) * 77   7,392 bytes   what is under a box
-  ErrBuf   DW  (MaxLins-2) * 77   7,392 bytes   what is under a box on that box
-  ErrBuf1  DW  (MaxLins-2) * 77   7,392 bytes   ...and under the critical error
-  HelpBuf  DB  LenHelp            3,000 bytes   one page of the help
-```
-
-`MaxLins` is 50, so the program supports screens of up to 50 rows, and
-every buffer is sized for the tallest. A box saves what it covers in
-one of `WinBuf`, `ErrBuf` and `ErrBuf1` by `SavWin` and puts it back
-by `ResWin`, a `REP MOVSW` per row each: that is why the critical error
-can open over a dialog that is open over the panels and leave all three
-intact.
-
-A cell's place in `ScrBuf` is `BasAdr`, eleven instructions:
+The program composes every screen in `ScrBuf` of its main data and
+copies rectangles of it to the display by `Window`, whole rows where
+there is more than one, and boxes save and restore what they cover in
+three buffers of their own;
+[chapter 1](01-the-program.md#the-screen) has the routines. What the
+system has to say to that is where the display is. `Screen` is a far
+pointer filled at start: the segment is B000h in mode 7, a monochrome
+card, and B800h otherwise; the offset is the BIOS's word at
+`0040:004Eh`, where the page being shown begins, if the page is not 0.
+Under TopView or DESQview, `INT 10h` AH 0FEh hands the program a buffer
+of the multitasker's in ES, which goes into the same pointer, and AH
+0FFh after each copy tells the multitasker to show it:
 
 ```asm
-BasAdr  PROC    NEAR                    ;          BH,BL - coordinats
-        PUSH    BX                      ;  Return :   DI - address
-        PUSH    AX
-        MOV     AL,80
-        MUL     BH                      ;                         <- row * 80
-        MOV     BH,0
-        ADD     AX,BX                   ;                         <- + column
-        ADD     AX,AX                   ;                         <- two bytes a cell
-        ADD     AX,OFFSET ScrBuf
-        MOV     DI,AX
-        POP     AX
-        POP     BX
-        RET
-BasAdr  ENDP
-```
-
-### `Window`: copying a rectangle to the display
-
-`Window` of `VCSUB1.INC`, 121 bytes, copies a rectangle of `ScrBuf`,
-given by its top left corner in BX and its size in DX, to the same
-place on the display:
-
-```asm
-Window  PROC    NEAR                    ;          BH,BL - begin, DH,DL - size
-        ...
-        MOV     AL,0
-        CALL    CurMous                 ;                         <- hide the mouse pointer
-        PUSH    ES
-        POP     DS
-        MOV     ES,DS:Screen.Segm       ;                         <- B800h or B000h
-        CALL    BasAdr
-        MOV     SI,DI                   ;                         <- source in ScrBuf
-        SUB     DI,OFFSET ScrBuf
-        ADD     DI,DS:Screen.Offs       ;                         <- the same cell on the display
-        MOV     AL,DS:Snow
-        CMP     DH,1
-        JE      Wind1                   ;                         <- one row: by cells
-        MOV     BH,0
-        ADD     BX,BX
-        SUB     SI,BX                   ;                         <- back to column 0
-        SUB     DI,BX
-        PUSH    DI
-        PUSH    DX
-        CALL    MovScr                  ;                         <- whole rows
-        ...
 Wind6:  POP     ES
         CMP     ES:TopView,0
         JZ      Wind7
-        MOV     AH,0FFh                 ;                         <- TopView: show the buffer
+        MOV     AH,0FFh                 ;; TopView: show the buffer
         INT     10h
 Wind7:  MOV     AL,1
-        CALL    CurMous                 ;                         <- the pointer back
-        ...
+        CALL    CurMous                 ;; the pointer back
 ```
-
-A rectangle of more than one row is copied as whole rows of 80 cells,
-from column 0, whatever its width. That costs a few hundred cells more
-than needed, and buys one straight `REP MOVSW` over contiguous memory
-instead of a loop per row. A single row, the clock or a line of a
-menu, is copied cell by cell.
-
-`Screen` is a far pointer filled at start: the segment is B000h in
-mode 7, a monochrome card, and B800h otherwise; the offset is the
-BIOS's word at `0040:004Eh`, where the page being shown begins, if the
-page is not 0. Under TopView or DESQview, `INT 10h` AH 0FEh hands the
-program a buffer of the multitasker's in ES, which goes into the same
-pointer, and AH 0FFh after each copy tells the multitasker to show it.
 
 ### CGA snow, and Volkov's own question marks
 
@@ -604,22 +481,22 @@ MovSc1: CMP     DH,DL
         JAE     MovSc2
         MOV     DL,DH
 MovSc2: MOV     AX,80
-        MUL     DL                      ;                         <- up to 560 cells
+        MUL     DL                      ;; up to 560 cells
         PUSH    AX
         OR      BL,BL
-        JNZ     MovSc6                  ;                         <- no snow: just copy
+        JNZ     MovSc6                  ;; no snow: just copy
         PUSH    DX
         MOV     DX,03DAh
 MovSc3: IN      AL,DX
         TEST    AL,1
-        JNZ     MovSc3                  ;                         <- wait until a retrace ends
+        JNZ     MovSc3                  ;; wait until a retrace ends
 MovSc4: STI
         MOV     CX,10                   ; Const2 ???
         CLI
 MovSc5: IN      AL,DX
         TEST    AL,1
         JZ      MovSc4
-        LOOP    MovSc5                  ;                         <- in a retrace, ten reads running
+        LOOP    MovSc5                  ;; in a retrace, ten reads running
         POP     DX
 MovSc6: POP     CX
         REP     MOVSW
@@ -642,26 +519,26 @@ access"; 2, "Auto detect", the default) and by a test of the port:
 
 ```asm
 Init30: MOV     DS:Lines,AL
-        MOV     AH,1                    ; Snow                    <- 1: copy at once
+        MOV     AH,1                    ; Snow  ;; 1: copy at once
         CMP     DS:ScrMod,7
-        JE      Init33                  ;                         <- monochrome: no snow
+        JE      Init33                  ;; monochrome: no snow
         CMP     DS:SnowMod,1
-        JE      Init33                  ;                         <- the user says no
+        JE      Init33                  ;; the user says no
         MOV     DX,03DAh
         MOV     BX,8000h
-        JB      Init31                  ;                         <- the user says yes: test
+        JB      Init31                  ;; the user says yes: test
         CMP     DS:TstEGA,BL
-        JNE     Init33                  ;                         <- auto, and an EGA or VGA
+        JNE     Init33                  ;; auto, and an EGA or VGA
 Init31: STI
         DEC     BX
-        JE      Init33                  ;                         <- 32,767 tries: no retrace
+        JE      Init33                  ;; 32,767 tries: no retrace
         MOV     CX,7                    ; Const2_1 ???
         CLI
 Init32: IN      AL,DX
         TEST    AL,1
         JZ      Init31
         LOOP    Init32
-        MOV     AH,0                    ;                         <- a retrace seen: wait for it
+        MOV     AH,0                    ;; a retrace seen: wait for it
 Init33: STI
         MOV     DS:Snow,AH
 ```
@@ -705,33 +582,25 @@ tree panel after a pause, and gives time away. It polls:
 ```asm
 Input0  PROC    NEAR C USES DS SI DI DX CX BX
         LOCAL   IKeyBar[2]:BYTE ,\      ; Each byte takes a word of stack
-                BlMouse[2]:BYTE ,\
-                KbdFlgs[2]:BYTE ,\
-                AltLock[2]:BYTE ,\
-                ClkFlag[2]:BYTE ,\
-                ClkBuf[6]:WORD  ,\
-                BlTime  :DWORD  ,\
-                AltTime :DWORD
+        ...                             ;; 30 bytes of locals in all
         PUSH    ES
         POP     DS
         MOV     IKeyBar,AL
         MOV     AH,1
-        INT     16h                     ;                         <- a key waiting?
+        INT     16h                     ;; a key waiting?
         JZ      Inpt02
         MOV     AH,0
-        INT     16h                     ;                         <- take it
+        INT     16h                     ;; take it
 Inpt01: JMP     Inpt41
 Inpt02: XOR     AX,AX
         CALL    GetMous
-        MOV     AH,0FCh                 ;                         <- a button: key FCxxh
+        MOV     AH,0FCh                 ;; a button: key FCxxh
         JNZ     Inpt01
         ...
 ```
 
-The locals are 30 bytes of a 256-byte stack, and Volkov's comment on
-them notes that MASM gives each byte local a word: on this stack every
-byte is counted. `ClkBuf` keeps the six cells under the clock, so that
-they go back when a key arrives and the clock is not drawn into a box.
+[Chapter 1](01-the-program.md#input-and-input0) has the loop round
+it and its locals, the clock's six cells among them.
 
 A key is returned as the BIOS gives it, the scan code in AH and the
 character in AL, and the program makes up two more:
@@ -754,49 +623,27 @@ Only the BIOS's functions 0, 1 and 2 are called, the ones of the
 original 83-key keyboard: F11 and F12, which need functions 10h and
 11h, do not exist for the program.
 
-### The clock and the blanker
-
-The clock is drawn into `ScrBuf` at column 74 of row 0 and copied by
-`Window` as one row of six cells. It asks DOS for the time (AH 2Ch) at
-every round of the loop and redraws only when what it shows has
-changed, which includes the separator: a space in the first half of
-every second and the country's separator in the second, so the colon
-blinks once a second at the cost of a comparison:
-
-```asm
-Inpt22: MOV     BL,' '
-        CMP     DL,50                   ;                         <- hundredths of the second
-        JB      Inpt23
-        MOV     BL,DS:Country.TimeSep
-Inpt23: CMP     BL,ClkFlag
-        JE      Inpt30                  ;                         <- nothing changed: no drawing
-        MOV     ClkFlag,BL
-```
-
-The blanker's time is kept the same way, as an hour, minute and second
-of DOS's clock in `BlTime`, with the wrap past midnight handled.
-
 ### Giving time away
 
 `LeaveTm` runs at every round of the wait:
 
 ```asm
 LeaveTm PROC    NEAR
-        INT     28h                     ;                         <- DOS: we are idle
+        INT     28h                     ;; DOS: we are idle
         CMP     DS:WinLeav,0
         JNZ     Leave1
         MOV     AX,1680h
-        INT     2Fh                     ;                         <- Windows: take the slice
+        INT     2Fh                     ;; Windows: take the slice
         CMP     AL,80h
         JNZ     Leave1
-        MOV     DS:WinLeav,1            ;                         <- nobody answered: stop asking
+        MOV     DS:WinLeav,1            ;; nobody answered: stop asking
 Leave1: CMP     DS:DESQvie,0
         JZ      LvTm1
-        MOV     AX,101Ah                ;                         <- DESQview: its stack,
+        MOV     AX,101Ah                ;; DESQview: its stack,
         INT     15h
-        MOV     AX,1000h                ;                         <-   a pause,
+        MOV     AX,1000h                ;; a pause,
         INT     15h
-        MOV     AX,1025h                ;                         <-   our stack back
+        MOV     AX,1025h                ;; our stack back
         INT     15h
 LvTm1:  RET
 LeaveTm ENDP
@@ -809,8 +656,8 @@ another multitasker that understands it; if nothing answers, AL stays
 80h and the program never asks again. DESQview is found at start by
 its own install check, a call of DOS's "set date" with impossible
 values that only DESQview answers, `INT 21h` AX 2B01h with `'DE'` in CX
-and `'SQ'` in DX. Chapter 4 shows the commander using the same trick
-for an API of its own.
+and `'SQ'` in DX. [Chapter 4](04-the-setup.md#the-private-call-int-21h-ah-2bh-vc-om) shows the
+commander using the same trick for an API of its own.
 
 ## The mouse: eight calls of `INT 33h`
 
@@ -834,9 +681,9 @@ CurMous PROC    NEAR                    ;          AL - set/reset
         CMP     ES:Mouse,0
         JE      CurMo1
         PUSH    AX
-        CMP     AL,1                    ;                         <- carry if AL is 0
+        CMP     AL,1                    ;; carry if AL is 0
         MOV     AX,1
-        ADC     AL,0                    ;                         <- 2 to hide, 1 to show
+        ADC     AL,0                    ;; 2 to hide, 1 to show
         INT     33h
         POP     AX
 CurMo1: RET
@@ -844,6 +691,22 @@ CurMous ENDP
 ```
 
 The pointer is the driver's *software text cursor*, set by `TypMous`:
+
+```asm
+TypMous PROC    NEAR
+        ...
+        MOV     CX,0FFFFh               ;; keep the whole cell ...
+        MOV     DX,7700h                ;; ... and invert its colours
+        CMP     AL,0
+        JE      TypMo1
+        MOV     CL,0                    ;; keep the colours only ...
+        MOV     DL,AL                   ;; ... and show this character
+TypMo1: XOR     BX,BX                   ;; a software text cursor
+        MOV     AX,0Ah
+        INT     33h
+```
+
+
 the driver keeps the cell under the pointer and writes `(cell AND
 screen mask) XOR cursor mask` there. With the masks FFFFh and 7700h
 the cell keeps its character and has its colours inverted. Because the
@@ -852,7 +715,9 @@ undone when the pointer moves, which is why `Window` and `Int10m` hide
 the pointer around every write. With AL not 0, `TypMous` makes the
 pointer a character instead, the screen mask keeping only the colour
 and the cursor mask bringing the character: `'√'` over something that
-a double click would act on.
+a click would act on, `■` while the button is held in the corner that
+switches the panels off, `x` while the middle button is held in the
+help, find file and the memory map.
 
 `GetMous` divides the driver's pixel coordinates by 8 for a cell and,
 for a left-handed mouse, swaps bits 0 and 1 of the buttons:
@@ -862,18 +727,18 @@ for a left-handed mouse, swaps bits 0 and 1 of the buttons:
         INT     33h
         MOV     AX,CX
         MOV     CL,3
-        SHR     AX,CL                   ;                         <- pixels to columns
-        SHR     DX,CL                   ;                         <- pixels to rows
+        SHR     AX,CL                   ;; pixels to columns
+        SHR     DX,CL                   ;; pixels to rows
         MOV     CL,AL
         MOV     CH,DL
         MOV     AX,BX
         CMP     ES:LftMous,0
         JE      GetMo1
         MOV     BH,BL
-        SHR     BL,1                    ;                         <- right to left
-        SHL     BH,1                    ;                         <- left to right
+        SHR     BL,1                    ;; right to left
+        SHL     BH,1                    ;; left to right
         AND     BX,201h
-        AND     AL,4                    ;                         <- the middle stays
+        AND     AL,4                    ;; the middle stays
         OR      AL,BL
         OR      AL,BH
 GetMo1: AND     AX,WORD PTR 7
@@ -905,8 +770,8 @@ source's comment. It is on as the program is distributed.
   paragraphs.
 - **Memory allocation off.** The transient part stays where it is, in
   its own block of 63,344 bytes behind the resident part, and nothing
-  needs to be loaded afterwards. Some 76 KB stay, and the commander
-  returns at once.
+  needs to be loaded afterwards. With its MCB that is 12,690 + 16 +
+  63,344 = 76,050 bytes, some 76 KB, and the commander returns at once.
 
 Shift held with Enter flips the setting for that one command.
 
@@ -950,19 +815,12 @@ first trick of the program is.
 
 ### `ORG LastRes`: the start-up runs where the vectors will go
 
-The start-up code, `Alloc0`, is assembled at the address of `IntTab`,
-the kilobyte for the TSR manager's copy of the interrupt vectors:
-
-```asm
-;--------------------- Main module ---------------------
-        .CODE
-        ORG     LastRes
-
-Alloc0: CLD
-```
-
-`Alloc0` is 256 bytes, runs once, and is then written over by the
-first copy of the vectors. Behind it, at 7E7h, is `Init00`, where the
+The start-up code, `Alloc0`, is assembled by `ORG LastRes` at the
+address of `IntTab`, the kilobyte for the TSR manager's copy of the
+interrupt vectors, and the transient part behind it over the rest of
+the resident buffers ([chapter 1](01-the-program.md#the-parts-of-vccom)
+has the source). `Alloc0` is 256 bytes, runs once, and is then written
+over by the first copy of the vectors. Behind it, at 7E7h, is `Init00`, where the
 transient part begins, and the transient part overlaps the rest of the
 resident data in the file as well. So the start-up's first job is to
 move the transient part out of the way: 63,323 bytes, from `Init00` to
@@ -1000,10 +858,10 @@ Alloc0: CLD
         XOR     DX,DX
         MOV     AH,0
 Alloc1: LODSB
-        ADD     BX,AX                   ;                         <- the sum of the file
+        ADD     BX,AX                   ;; the sum of the file
         LOOP    Alloc1
-        MOV     SI,80h                  ;                         <- the command tail:
-        MOV     DI,OFFSET OvlPrm        ;                         <-   are we the loader?
+        MOV     SI,80h                  ;; the command tail:
+        MOV     DI,OFFSET OvlPrm        ;; are we the loader?
         ...
 Alloc3: MOV     DS:ChkFile,BX
         MOV     AH,30h                  ; Check DOS version
@@ -1011,14 +869,14 @@ Alloc3: MOV     DS:ChkFile,BX
         CMP     AL,3
         JB      Alloc4
         XCHG    AL,AH
-        CMP     AX,314h                 ;                         <- 3.20
+        CMP     AX,314h                 ;; 3.20
         JAE     Alloc5
         MOV     SI,OFFSET Vers_S
         PUSH    CS
         CALL    OutStr0
         MOV     AX,4C02h
         INT     21h
-Alloc4: RETN                            ;                         <- DOS 1 or 2: PSP:0, INT 20h
+Alloc4: RETN                            ;; DOS 1 or 2: PSP:0, INT 20h
 ```
 
 **The version, in one byte for an old DOS.** On DOS 1 or 2, function
@@ -1040,8 +898,8 @@ Alloc6: STD
         CLI
         PUSH    CS
         POP     SS
-        MOV     SP,OFFSET VcStack       ;                         <- the resident stack, at once
-        REP     MOVSB                   ;                         <- 63,330 bytes, top first
+        MOV     SP,OFFSET VcStack       ;; the resident stack, at once
+        REP     MOVSB                   ;; from paragraph 7E0h: 63,330 bytes, top first
         CLD
 ```
 
@@ -1057,19 +915,19 @@ transient part and shortening its own:
 ;-------- Split into resident and transit parts --------
         MOV     AX,ES
         DEC     AX
-        PUSH    AX                      ;                         <- the new MCB's paragraph
+        PUSH    AX                      ;; the new MCB's paragraph
         MOV     AX,CS
         DEC     AX
-        MOV     DS,AX                   ;                         <- our own MCB
+        MOV     DS,AX                   ;; our own MCB
         MOV     AL,'M'
-        XCHG    AL,DS:[0]               ;                         <- not the last any more
-        XCHG    BX,DS:[3]               ;                         <- 794 paragraphs
+        XCHG    AL,DS:[0]               ;; not the last any more
+        XCHG    BX,DS:[3]               ;; 794 paragraphs
         SUB     BX,DS:[3]
-        DEC     BX                      ;                         <- what is left, less the MCB
+        DEC     BX                      ;; what is left, less the MCB
         POP     DS
-        MOV     DS:[0],AL               ;                         <- 'M' or 'Z', as ours was
-        MOV     DS:[1],CS               ;                         <- owned by us
-        MOV     DS:[3],BX               ;                         <- its length
+        MOV     DS:[0],AL               ;; 'M' or 'Z', as ours was
+        MOV     DS:[1],CS               ;; owned by us
+        MOV     DS:[3],BX               ;; its length
         STI
 ```
 
@@ -1085,12 +943,12 @@ address it by the new segment but by that segment less 7Eh:
 ```asm
 Alloc7: MOV     AX,ES
         SUB     AX,WORD PTR ((Init00-Zero) SHR 4)
-        MOV     DS:RunPar,AX            ;                         <- CS of the transient part
+        MOV     DS:RunPar,AX            ;; CS of the transient part
         PUSH    AX
         CALL    SetStat
         MOV     AX,OFFSET Init00
         PUSH    AX
-        RETF                            ;                         <- far into RunPar:Init00
+        RETF                            ;; far into RunPar:Init00
 ```
 
 With CS at `RunPar`, every offset in 63 KB of code and tables is the
@@ -1103,20 +961,22 @@ SS, which still holds the PSP.
 ### Entering the transient part
 
 `Init00` runs once, on the first start. It reads `VC.INI` straight
-into the resident copy of the main data (chapter 4 has the format),
+into the resident copy of the main data
+([chapter 4](04-the-setup.md#vcini-a-dump-of-the-main-data) has the
+format),
 prints the banner through DOS, reads the main extension file, and
 takes three addresses:
 
 ```asm
         MOV     AX,OFFSET SetBrk
-        CALL    CallPSP                 ;                         <- BREAK off, INT 23h ours
+        CALL    CallPSP                 ;; BREAK off, INT 23h ours
         MOV     AX,OFFSET Exit01
-        XCHG    AX,DS:[0Ah].Offs        ;                         <- the PSP's INT 22h
+        XCHG    AX,DS:[0Ah].Offs        ;; the PSP's INT 22h
         MOV     DS:Vect22.Offs,AX
         MOV     AX,DS
         XCHG    AX,DS:[0Ah].Segm
         MOV     DS:Vect22.Segm,AX
-        CMP     DS:[BX].ChkTSR,0        ;                         <- TSR manager on?
+        CMP     DS:[BX].ChkTSR,0        ;; TSR manager on?
         JZ      Init11
         MOV     AX,3521h
         INT     21h
@@ -1125,12 +985,12 @@ takes three addresses:
         XOR     AX,AX
         MOV     ES,AX
         CLI
-        MOV     ES:[4*21h].Offs,OFFSET New21    ; <- straight into the table
+        MOV     ES:[4*21h].Offs,OFFSET New21    ;; straight into the table
         MOV     ES:[4*21h].Segm,DS
         STI
         MOV     AX,3527h
         INT     21h
-        ...                             ;                         <- and INT 27h, by AH 25h
+        ...                             ;; and INT 27h, by AH 25h
 ```
 
 `Init11` is where every start after a command comes in. It gives the
@@ -1138,8 +998,8 @@ transient block exactly its length, asks DOS how long the largest free
 block is (AH 48h with BX FFFFh, which fails and says) and takes all of
 it (AH 48h again) for the main data, the two panels and the viewer.
 It needs at least the main data, two panels of 256 entries and 8,000
-bytes for the viewer; the rest is divided as chapter 2 has it. It
-writes the segment into `SecDat`, copies `ComnIni` from the resident
+bytes for the room; [chapter 1](01-the-program.md#init11-the-data-block-cut-in-paragraphs)
+has how it cuts the block. It writes the segment into `SecDat`, copies `ComnIni` from the resident
 part to offset 0 of the new block and each panel's saved header and
 names into the panel's segment, and calls `HookVct`.
 
@@ -1167,21 +1027,21 @@ run. Then it calls `F21_40` for each panel:
 
 ```asm
 F21_42: XOR     SI,SI
-        MOV     CX,WCBsave              ;                         <- the panel's 94-byte header
+        MOV     CX,WCBsave              ;; the panel's 94-byte header
         REP     MOVSB
-        MOV     SI,OFFSET DskBuf        ;                         <- then the list of files
+        MOV     SI,OFFSET DskBuf        ;; then the list of files
         SUB     AX,SI
         XOR     DX,DX
-        MOV     CX,SIZE FilEnt          ;                         <- 24 bytes an entry
+        MOV     CX,SIZE FilEnt          ;; 24 bytes an entry
         DIV     CX
         MOV     CX,AX
         JCXZ    F21_44
 F21_43: PUSH    SI
         PUSH    CX
         MOV     CX,12
-        REP     MOVSB                   ;                         <- the name, without its zero
+        REP     MOVSB                   ;; the name, without its zero
         INC     SI
-        MOVSB                           ;                         <- and the attribute byte
+        MOVSB                           ;; and the attribute byte
         POP     CX
         POP     SI
         ADD     SI,SIZE FilEnt
@@ -1194,7 +1054,14 @@ selected. That is enough to find the cursor and the selection again in
 the list that the panel reads anew after the command. Only the first
 256 entries fit; if the cursor is further down, the code in front of
 `F21_42` moves its entry, and the first one shown, into the last
-places, so that the cursor at least is found again.
+places, with their marks of selection cleared, so that the cursor at
+least is found again. A name of DOS has at most 12 characters, so the
+thirteenth byte of `NameF` is always its zero, and the copy skips it:
+94 + 13 x 256 = 3,422 bytes a panel, where the panel had 6,754 and
+more. Coming back, `Expand` of `VC.ASM`, 46 bytes, makes each entry 24
+bytes again with the name's zero put back, and `ReDir` finds the
+cursor and the marks in it as in any old list; the sizes and the dates
+come back with the directory, which is read again.
 
 Then it restores the critical error and Ctrl-Break, writes the prompt
 line and the command onto DOS's screen, frees the block of the main
@@ -1204,10 +1071,10 @@ data (AH 49h) and goes into the resident part by a far return to
 ### Running: `Exec`, `DosBuf` and four bytes in front of each command
 
 ```asm
-Exec:   TEST    DS:ComnIni.LoadFl,7Fh   ;                         <- the small mode?
+Exec:   TEST    DS:ComnIni.LoadFl,7Fh   ;; the small mode?
         JZ      Exec01
         CALL    GetStat
-        MOV     AH,49h                  ;                         <- the transient part, gone
+        MOV     AH,49h                  ;; the transient part, gone
         INT     21h
         CALL    SetStat
 ```
@@ -1228,28 +1095,28 @@ the end of the command before, which has already run:
 ```asm
 Exec02: CLD
         MOV     DL,DS:ComnIni.BreakFl
-        MOV     AX,3301h                ;                         <- BREAK as the user had it
+        MOV     AX,3301h                ;; BREAK as the user had it
         INT     21h
-        MOV     DI,DS:ComnIni.BatAdr    ;                         <- this command
-        LEA     SI,[DI-4]               ;                         <- four bytes in front of it
+        MOV     DI,DS:ComnIni.BatAdr    ;; this command
+        LEA     SI,[DI-4]               ;; four bytes in front of it
         PUSH    DI
         MOV     CX,0FFFFh
         MOV     AL,0
         REPNE   SCASB
-        MOV     DS:ComnIni.BatAdr,DI    ;                         <- the next one
+        MOV     DS:ComnIni.BatAdr,DI    ;; the next one
         POP     DI
-        MOV     CX,LenCmd               ;                         <- 124 at most
+        MOV     CX,LenCmd               ;; 124 at most
         REPNE   SCASB
         DEC     DI
-        MOV     BYTE PTR DS:[DI],0Dh    ;                         <- its zero becomes a CR
+        MOV     BYTE PTR DS:[DI],0Dh    ;; its zero becomes a CR
         LEA     CX,[DI-1]
         CMP     AL,DS:ComnIni.ExecTyp
         JE      Exec04
-        ...                             ;                         <- INT 2Eh, below
+        ...                             ;; INT 2Eh, below
 Exec04: SUB     CX,SI
         MOV     CH,'/'
-        MOV     DS:[SI],CX              ;                         <- length, '/'
-        MOV     WORD PTR DS:[SI+2],' C' ;                         <- 'C', ' '
+        MOV     DS:[SI],CX              ;; length, '/'
+        MOV     WORD PTR DS:[SI+2],' C' ;; 'C', ' '
         MOV     BX,OFFSET ComnIni.EPB
         MOV     DS:[BX].CmdLine.Offs,SI
         MOV     DS:[BX].CmdLine.Segm,DS
@@ -1295,9 +1162,9 @@ register lost, the stack included:
 ```asm
 Exec03: INT     2Eh
         CLI
-        MOV     SP,CS                   ;                         <- CS is the PSP here
+        MOV     SP,CS                   ;; CS is the PSP here
         MOV     SS,SP
-        MOV     SP,OFFSET VcStack       ;                         <- the stack, from nothing
+        MOV     SP,OFFSET VcStack       ;; the stack, from nothing
         STI
         CALL    SetBrk0
         JMP     Exec07
@@ -1339,25 +1206,25 @@ Exec11: CALL    GetStat                 ; Load VC.COM
         MOV     BX,OFFSET Last-1
         SHR     BX,CL
         SUB     BX,((Init00-Zero) SHR 4)-1
-        MOV     AH,48h                  ;                         <- a block for the transient part
+        MOV     AH,48h                  ;; a block for the transient part
         INT     21h
         CALL    SetStat
         SUB     AX,WORD PTR (((Init00-Zero) SHR 4))
-        MOV     CS:RunPar,AX            ;                         <- its CS, as at the start
+        MOV     CS:RunPar,AX            ;; its CS, as at the start
         JNC     Exec12
         JMP     AlocEr
 Exec12: XOR     AX,AX
-        MOV     DS:ComnIni.LoadSiz,OFFSET Last  ; <- the length that we expect
+        MOV     DS:ComnIni.LoadSiz,OFFSET Last  ;; the length that we expect
         MOV     SI,OFFSET OvlPrm
         MOV     BL,CS:[SI]
         MOV     BH,0
-        MOV     CS:[SI+BX-1],CS         ;                         <- our segment into the tail
+        MOV     CS:[SI+BX-1],CS         ;; our segment into the tail
         MOV     BX,OFFSET ComnIni.EPB
         MOV     ES:[BX].CmdLine.Offs,SI
         MOV     ES:[BX].CmdLine.Segm,CS
-        MOV     DX,ES:ComnIni.OvlPth    ;                         <- our path, in the environment
+        MOV     DX,ES:ComnIni.OvlPth    ;; our path, in the environment
         MOV     DS,CS:[2Ch]
-        MOV     AX,4B00h                ;                         <- run VC.COM VVV...
+        MOV     AX,4B00h                ;; run VC.COM VVV...
         INT     21h
 ```
 
@@ -1371,23 +1238,23 @@ file, finds `VVV` and five zeros in its tail, takes the first copy's
 segment from behind them, and does the work:
 
 ```asm
-        REPE    CMPSB                   ;                         <- "VVV" and the zeros?
-        JNE     Alloc3                  ;                         <-   no: an ordinary start
-        LODSW                           ;                         <- the first copy's segment
+        REPE    CMPSB                   ;; "VVV" and the zeros?
+        JNE     Alloc3                  ;; no: an ordinary start
+        LODSW                           ;; the first copy's segment
         CMP     BYTE PTR DS:[SI],0Dh
         JNE     Alloc3
         MOV     ES,AX
-        XCHG    BX,ES:ComnIni.LoadSiz   ;                         <- give our sum, take the length
-        MOV     ES,ES:RunPar            ;                         <- the block it has made
+        XCHG    BX,ES:ComnIni.LoadSiz   ;; give our sum, take the length
+        MOV     ES,ES:RunPar            ;; the block it has made
         MOV     SI,OFFSET Init00
         MOV     DI,SI
         MOV     CX,BX
         SUB     CX,SI
-        REP     MOVSB                   ;                         <- the transient part, delivered
+        REP     MOVSB                   ;; the transient part, delivered
         MOV     AX,4C00h
         SUB     BX,OFFSET Last
         JE      Alloc2
-        INC     AX                      ;                         <- exit code 1: not my length
+        INC     AX                      ;; exit code 1: not my length
 Alloc2: INT     21h
 ```
 
@@ -1399,17 +1266,17 @@ then holds the exit code (AH 4Dh) and the sum against its `ChkFile`:
 ```asm
 Exec14: MOV     AH,4Dh
         INT     21h
-        OR      AX,AX                   ;                         <- exit code 0?
+        OR      AX,AX                   ;; exit code 0?
         JNE     Exec13
         PUSH    ES
         POP     DS
         MOV     AX,DS:ComnIni.LoadSiz
-        CMP     AX,DS:ChkFile           ;                         <- the same file?
+        CMP     AX,DS:ChkFile           ;; the same file?
         JNE     Exec13
 Exec15: PUSH    CS:RunPar
         MOV     AX,OFFSET Init11
         PUSH    AX
-        RETF                            ;                         <- the panels again
+        RETF                            ;; the panels again
 ```
 
 If either is wrong, because the user has swapped diskettes or replaced
@@ -1438,7 +1305,10 @@ sequenceDiagram
 ```
 
 A command run so costs a second load of 64 KB from the disk, and costs
-the resident part no file code at all.
+the resident part no file code at all: some 55 bytes in `Alloc0` and
+137 in `Exec11` to `Exec15`. It also asks that DOS can load all 65,090
+bytes of the second copy for a moment, which it can, since the
+commander has just given back more than that.
 
 ### Where DOS puts the blocks: `GetStat` and `SetStat`
 
@@ -1449,18 +1319,18 @@ memory blocks in and asks for "first fit, upper memory first":
 ```asm
 GetStat PROC    NEAR
         MOV     CX,0FFFFh
-        MOV     AX,5802h                ;                         <- upper memory linked?
+        MOV     AX,5802h                ;; upper memory linked?
         INT     21h
-        JC      GetSt1                  ;                         <- DOS before 5: leave it
+        JC      GetSt1                  ;; DOS before 5: leave it
         MOV     CL,AL
-        MOV     AX,5800h                ;                         <- the strategy
+        MOV     AX,5800h                ;; the strategy
         INT     21h
         MOV     CH,AL
         MOV     BX,1
-        MOV     AX,5803h                ;                         <- link upper memory
+        MOV     AX,5803h                ;; link upper memory
         INT     21h
         MOV     BX,80h
-        MOV     AX,5801h                ;                         <- first fit, high first
+        MOV     AX,5801h                ;; first fit, high first
         INT     21h
 GetSt1: MOV     BP,CX
         RET
@@ -1484,19 +1354,19 @@ INT 21h at `New21`, 80 bytes:
 ```asm
 New21   PROC    FAR                     ; INT 21h
         CMP     AH,4Bh
-        JE      Fnc4B                   ;                         <- a program run
+        JE      Fnc4B                   ;; a program run
         CMP     AH,31h
-        JE      Fnc31                   ;                         <- one that stays
+        JE      Fnc31                   ;; one that stays
         CMP     AH,49h
-        JE      Fnc49                   ;                         <- a block freed
+        JE      Fnc49                   ;; a block freed
         CMP     AH,2Bh
-        JE      VCapi                   ;                         <- set date, or our API
+        JE      VCapi                   ;; set date, or our API
 Old21:  JMP     CS:Vect21
 Fnc4B:  CALL    ExeProg
         JMP     Old21
 Fnc31:  CALL    AddProg
         JNC     Old21
-        MOV     AH,4Ch                  ;                         <- refused: end it instead
+        MOV     AH,4Ch                  ;; refused: end it instead
         JMP     Old21
 Fnc49:  CALL    FreeBlk
         JMP     Old21
@@ -1504,7 +1374,7 @@ VCapi:  CMP     CX,'VC'
         JNE     Old21
         CMP     DX,'OM'
         JNE     Old21
-        ...                             ;                         <- chapter 4
+        ...                             ;; chapter 4
 New21   ENDP
 ```
 
@@ -1559,51 +1429,45 @@ from `PrgList` the program whose PSP is being freed and every note
 whose sum no longer holds, so that a TSR that unloads itself leaves no
 stale entry.
 
-<!-- SCREENSHOT: golden stay step 42 -->
-
-*The memory map with two programs that stayed, each with the one
-vector that it took, and the commander itself with INT 1Bh, 21h, 22h,
-23h and 27h.*
-
 ### The ways out
 
 F10 ends at `Exit` of `VC.ASM`, which restores INT 1Bh by `RstVc1`,
 clears the screen's last rows, and jumps far into the resident part:
 
 ```asm
-Exit00: MOV     BX,CS:Vect22.Offs       ;                         <- the PSP's INT 22h back
+Exit00: MOV     BX,CS:Vect22.Offs       ;; the PSP's INT 22h back
         MOV     CS:[0Ah].Offs,BX
         XOR     BX,BX
-        XCHG    BX,CS:Vect22.Segm       ;                         <- ...and its segment 0
+        XCHG    BX,CS:Vect22.Segm       ;; ...and its segment 0
         MOV     CS:[0Ah].Segm,BX
 Exit01: PUSH    AX
         PUSH    CS
         POP     ES
         MOV     DL,ES:ComnIni.BreakFl
-        MOV     AX,3301h                ;                         <- BREAK as it was
+        MOV     AX,3301h                ;; BREAK as it was
         INT     21h
         MOV     CX,ES:Counter
         JCXZ    Exit03
 Exit02: MOV     SI,ES:Counter
         SHL     SI,1
-        MOV     DS,ES:PrgList[SI-2]     ;                         <- the last program noted
+        MOV     DS,ES:PrgList[SI-2]     ;; the last program noted
         PUSH    CS
         CALL    Release
         LOOP    Exit02
 Exit03: CMP     ES:ComnIni.ChkTSR,0
         JZ      Exit04
         LDS     DX,ES:Vect21
-        MOV     AX,2521h                ;                         <- INT 21h back
+        MOV     AX,2521h                ;; INT 21h back
         INT     21h
         LDS     DX,ES:Vect27
-        MOV     AX,2527h                ;                         <- INT 27h back
+        MOV     AX,2527h                ;; INT 27h back
         INT     21h
 Exit04: POP     AX
         CMP     ES:Vect22.Segm,0
         JNE     Exit05
-        MOV     AH,4Ch                  ;                         <- our own exit
+        MOV     AH,4Ch                  ;; our own exit
         INT     21h
-Exit05: JMP     ES:Vect22               ;                         <- DOS ended us: go on
+Exit05: JMP     ES:Vect22               ;; DOS ended us: go on
 ```
 
 `Exit01` is also where DOS goes when it ends the commander in any other
@@ -1627,10 +1491,10 @@ not restored here: DOS takes them from the PSP when the program ends.
 | Messages found by counting zeros | `FatErr` | 44 bytes of pointers |
 | One `IRET` for two interrupts | `CtrlC` | a handler that can never go wrong |
 | One routine called near and far | `SetBrk0`, 6 bytes | a second copy of `SetBrk` |
-| Whole rows to the display | `Window` | a loop per row, for a few hundred cells more |
-| Start-up code in the TSR manager's buffer | `ORG LastRes` | 256 bytes of the resident part |
 | No relocation of the moved part | `RunPar` | a relocation table and its code |
 | An MCB written by hand | `Alloc0` | a second block, and a second load at start |
+| The data, and in the small mode the code, given back while a command runs | `F21_31`, `Exec` | 62,603 bytes of data, the panels and 63,323 of code free for the command; 12,690 stay |
+| A panel kept in 13 bytes a file across a command | `F21_40`, `Expand` | 3,422 bytes a panel instead of 6,754 |
 | A command's prefix over the one before | `Exec02` | a buffer for the command tail |
 | The prompt built in the copy of the vectors | `Exec08` | a buffer for the prompt |
 | DOS's loader as the file reader | `Exec10`, `Alloc0` | open, read and find the path, in the part that stays |
@@ -1655,5 +1519,4 @@ already does, DOS is made to do.
   for the panels' memory and the features that make most of the calls
   of DOS, and [chapter 4](04-the-setup.md) for the setup program and
   the API of `New21`.
-- [Chapter 5](05-the-port.md) for how all of this is carried into C
-  and onto other systems.
+- [Chapter 5](05-into-c.md) for how all of this is carried into C.

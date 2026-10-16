@@ -1,9 +1,9 @@
 # 2. Working with files: the commander's features
 
-Chapter 1 has the skeleton of `VC.COM`: the main data, the main loop,
-the screen and the dialogs. This chapter is about the flesh: what the
-program does with files, and how each feature is built out of a few
-routines that the others use too. Everything here is in Volkov's
+[Chapter 1](01-the-program.md) has the skeleton of `VC.COM`: the main
+data, the main loop, the screen and the dialogs. This chapter is about
+the flesh: what the program does with files, and how each feature is
+built out of a few routines that the others use too. Everything here is in Volkov's
 assembly in `src/asm/`, mostly in these include files:
 
 | File | Lines | What it holds |
@@ -29,112 +29,36 @@ size, an editor, a copier that splits files across floppies, a file
 search that reads inside files, and a tree of the disk fit into a
 65,090-byte `.COM` and one 64K data segment.
 
-A note on registers, which every excerpt below takes for granted: in
-the commands, **ES is the main data** and **DS is the current panel's
-segment**. `MOV DS:CurAdr,SI` writes the panel; `MOV ES:FncAddr,AX`
-writes the main data. Many routines swap the two with `PUSH ES / POP
-DS` when they want to work in the main data alone.
+Every excerpt below takes the convention of the segment registers for
+granted ([chapter 1](01-the-program.md#init11-the-data-block-cut-in-paragraphs)):
+in the commands, **ES is the main data** and **DS is the current
+panel's segment**. `MOV DS:CurAdr,SI` writes the panel; `MOV
+ES:FncAddr,AX` writes the main data. Many routines swap the two with
+`PUSH ES / POP DS` when they want to work in the main data alone.
 
-## The memory: one block, cut in four
+## The room
 
-`Init11` in `VC.ASM` asks DOS for the largest free block in the classic
-way: ask for `0FFFFh` paragraphs, which always fails and leaves the size
-of the largest block in BX, then ask again for exactly that.
-
-```asm
-	MOV	BX,0FFFFh
-	MOV	AH,48h			; allocate 1 MB: fails,
-	INT	21h			; BX = paragraphs of the largest block
-	MOV	AH,48h			; allocate that
-	INT	21h
-	MOV	ES,AX			; ES = the new main data
-	MOV	DX,((SIZE MainDat-1) SHR 4)+1	; 3,913 paragraphs
-	MOV	DI,((SIZE WCBdef -1) SHR 4)+1	;   423 paragraphs a panel
-	MOV	AX,((   MinView  -1) SHR 4)+1	;   500 paragraphs, 8,000 bytes
-	ADD	AX,DX
-	ADD	AX,DI
-	ADD	AX,DI
-	CMP	AX,BX			; less than 5,259 paragraphs?
-	JBE	Init13
-	...				; "Program too big to fit in memory"
-Init13:	MOV	ES:FreMem2,BX		; the block's length
-	...
-	MOV	AX,ES
-	ADD	AX,DX
-	MOV	ES:WCB1seg,AX		; left panel behind the main data
-	ADD	AX,DI
-	MOV	ES:WCB2seg,AX		; right panel behind that
-	ADD	AX,DI
-	MOV	ES:ViewSeg,AX		; the room: all the rest
-```
-
-Everything is a segment number. A panel is not a pointer to a
-structure; it *is* a segment, and its fields are at fixed offsets in it.
-The room is not a buffer with a length; it is `ViewSeg`, and its end is
-the main data's segment plus `FreMem2`.
-
-```
- the block from DOS                                         paragraphs
- SecDat = ES ->  +-------------------------------------+
-                 | MainDat           62,603 bytes      |    3,913
- WCB1seg     ->  +-------------------------------------+
-                 | left panel: WCBdef                  |    423 at the least,
-                 |   610-byte header + DskBuf          |    up to 0FFFh
- WCB2seg     ->  +-------------------------------------+
-                 | right panel: the same               |    423 .. 0FFFh
- ViewSeg     ->  +-------------------------------------+
-                 | the room                            |    500 at the least
-                 |   viewer, editor, copy, find file,  |
-                 |   the old list while a panel is read|
- ES+FreMem2  ->  +-------------------------------------+
-```
-
-The least the program will start in is 5,259 paragraphs, 84,144 bytes,
-on top of `VC.COM`'s own. Whatever DOS has beyond that goes to the
-room. No feature reserves any of it: each one works out `FreMem2 -
-ViewSeg` again when it starts, and has what is there.
-
-While a command runs, all of this block is given back to DOS, and
-with Memory allocation in its small mode the code goes too, all but a
-resident part of 12,690 bytes ([chapter 1](01-the-program.md)). Kept
-there, of each panel, are the header and **13 bytes for each of the
-first 256 files**, so that the cursor and the selection survive the
-command: see [Enter, and running a program](#enter-and-running-a-program).
+`Init11` takes the largest block that DOS has and cuts it into the main
+data, the two panels and, behind them, everything that is left
+([chapter 1](01-the-program.md#init11-the-data-block-cut-in-paragraphs)
+has the arithmetic and the map). That last piece is the room. It is not
+a buffer with a length: it is a segment, `ViewSeg`, and its end is the
+main data's segment plus `FreMem2`, the length of the whole block. The
+program will not start with less than 500 paragraphs of it, 8,000
+bytes, and whatever DOS has beyond the least that the program needs
+goes to it. No feature reserves any of it: each one works out
+`FreMem2 - ViewSeg` again when it starts, and has what is there.
 
 ## A panel: `WCBdef`
 
 The panel's segment starts with a header of 610 bytes, `WCBsize`, and
-the list of files follows it. `VC.ASM` declares the structure with three
-`=` marks inside it, each the length of a prefix that some other code
-copies:
-
-```
- WCBdef, at offset 0 of the panel's segment                VC.ASM
- +0    WinTyp   0 files, 1 tree, 2 info         \
- +1    BrfFul   brief / full                     |
- +2    Visible                                   |
- +3    Hidden   show hidden and system files     |  WCBini = 88:
- +4    MasTyp   0 the mask, 1 programs only      |  saved in VC.INI
- +5    SortTyp  0 name 1 ext 2 time 3 size 4 none|
- +6    Ctrl_L                                    |
- +7    DskMas   [13]  the filter mask            |
- +20   WinPath  [68]  the directory             /
- +88   CurAdr   offset of the entry under the cursor   \  WCBsave = 94:
- +90   First    offset of the first entry shown         | kept while a
- +92   EndBuf   end of the entries shown               /  command runs
- +94   ExtBuf   [512] the directory's VC.EXT
- +606  EndFul   end of all entries read
- +608  ChgFlg   1: read the panel again
- +609  SizDir   1: directory sizes were counted
- +610  DskBuf   FILENT[256] declared, more in fact
-```
-
-`CurAdr`, `First`, `EndBuf` and `EndFul` are offsets in the panel's own
-segment, so moving a panel means changing its segment number and nothing
-inside it. `DskBuf` is declared with `MinFls` = 256 entries, which gives
-`SIZE WCBdef` = 6,754 bytes, the panel's least size. A larger directory
-simply runs on behind the declared end; the segment reaches as far as
-64K.
+the list of files follows it ([chapter 1](01-the-program.md#wcbdef-a-header-and-a-list-in-a-segment-of-its-own)
+has every field). `CurAdr`, `First`, `EndBuf` and `EndFul` are offsets
+in the panel's own segment, so moving a panel means changing its
+segment number and nothing inside it. `DskBuf` is declared with
+`MinFls` = 256 entries, which gives `SIZE WCBdef` = 6,754 bytes, the
+panel's least size. A larger directory simply runs on behind the
+declared end; the segment reaches as far as 64K.
 
 An entry is 24 bytes:
 
@@ -546,7 +470,10 @@ scanned. `DelTree` does nothing unless Auto rescan, `ChgTree`, is on;
 delete and copy call it once per command, keeping a flag in `TmpBuf` so
 that the file is written only for the first directory that changes.
 
-<!-- SCREENSHOT: golden tree-box step 14 -->
+![Alt-F10: the tree in a box](img/tree.png)
+
+*Alt-F10 in a directory thirteen levels deep: the tree of
+`TreeBuf` drawn in a box, each entry by its level and its two bits.*
 
 ## Walking the files: `FncAddr`, `FncSel`, `FncMas`, `DirFunc`
 
@@ -752,7 +679,10 @@ M30_54:	MOV	CX,DI
 For a directory, `M30_50` calls `DirFunc` and changes what is inside,
 not the directory itself.
 
-<!-- SCREENSHOT: golden attributes step 2 -->
+![Ctrl-A: the attributes of a file](img/attributes.png)
+
+*Ctrl-A on a file: `StAt1_B`, whose `SubFunc`, `M30_60`, reads the
+date and the time typed in before Set is taken.*
 
 ## Copy, move and rename
 
@@ -782,6 +712,12 @@ which is also `CpAttr` once the copy runs.
 
 `F35_01`, F5 and F6, asks for the target in `Copy1_B`, puts it into
 `ToFile`, sets `CopyMov`, and sets `FncAddr = C00_00` for `FncSel`.
+
+![F5: the copy dialog](img/copy.png)
+
+*F5 on a file: `Copy1_B`, the target typed into the line under the
+name, and F10 for the tree, bit 3 of the dialog's `bFlags`.*
+
 Then for each file:
 
 - **`C00_00`** builds the target's name in `CpDest`. If `ToFile` names
@@ -854,8 +790,6 @@ same in the writing loop, which steps DS by the paragraphs written,
 read on at `ADD DX,AX`, but the room is counted down only by the last
 of them, `SUB SI,AX`, so a slow device can have the loop read past the
 room's end: a bug of the original.
-
-<!-- SCREENSHOT: golden copy step 2 -->
 
 ### The bar: 48-bit arithmetic without `MUL`
 
@@ -1222,8 +1156,6 @@ rows off the window for a pane of help on the file's macros: `T00_03`
 compares the name with the four by `T64_00`, and `AX = 0A01h` gives both
 the kind of help and the ten rows in one load.
 
-<!-- SCREENSHOT: golden editor step 2 -->
-
 ### Save
 
 `T80_00` (432 bytes) puts the line back, asks for the attributes, asks
@@ -1436,113 +1368,16 @@ the command's length with one backwards `REP MOVSB`, puts the command at
 its head unless it is already the newest, and cuts the oldest off at a
 zero.
 
-### Keeping the panels while a command runs
+### Running it
 
-To run a command the program leaves memory, all but the resident part,
-and the panels go with the main data. `F21_31` copies what is to
-survive into the resident part first: `ComnIni`, the first 2,733 bytes
-of the main data (`CmnSave`: the setup, the history, `ExtMain`, the
-paths, `DosBuf`), and for each panel `F21_40`:
-
-```asm
-F21_40	PROC	NEAR
-	MOV	AX,DS:EndBuf
-	MOV	CX,OFFSET DskBuf+MinFls*SIZE FilEnt
-	CMP	AX,CX			; more than 256 entries?
-	JBE	F21_42
-	MOV	AX,CX			; keep 256
-	...				; the cursor's entry (and the first
-	...				; line's) copied into the last places
-F21_42:	XOR	SI,SI
-	MOV	CX,WCBsave
-	REP	MOVSB			; the header's first 94 bytes
-	...
-F21_43:	PUSH	SI
-	PUSH	CX
-	MOV	CX,12
-	REP	MOVSB			; 12 bytes of the name,
-	INC	SI			; not the 13th, which is always 0,
-	MOVSB				; and AttrF, with the marks
-	POP	CX
-	POP	SI
-	ADD	SI,SIZE FilEnt
-	LOOP	F21_43
-```
-
-A name of DOS is at most 12 characters, so the thirteenth byte of
-`NameF` is always the zero, and an entry is kept in 13 bytes, name and
-attributes, where it has 24: the time, the date and the size are read
-again with the directory anyway. `WCB1sav` and `WCB2sav` are each 94 +
-13 x 256 = 3,422 bytes of the resident part, and `Expand` of `VC.ASM`
-(46 bytes) turns them back into entries when the program comes back, so
-that `ReDir`'s `ReDr50` finds the cursor and the marks in the old list.
-A panel of more than 256 files is cut to 256 for that: if the cursor was
-beyond, its entry is copied into the 256th place so that it comes back
-where it was.
-
-The resident part is therefore, by the listing:
-
-| Part | Bytes |
-|---|---:|
-| the PSP and the resident code, up to `WCB1sav` | 2,857 |
-| `WCB1sav`, the left panel | 3,422 |
-| `WCB2sav`, the right panel | 3,422 |
-| `ComnIni`, the first part of the main data | 2,733 |
-| `DataSav`, the stack, `LenStk` | 256 |
-| **all** | **12,690** |
-
-`F21_31` then gives back the main data's block with 49h and goes to
-`Exec` in the resident part with a far return, `PUSH DS`, `PUSH AX`,
-`RETF`.
-
-### `Exec`
-
-`Exec02` of `VC.ASM` runs the commands of `ComnIni.DosBuf` one after
-the other. For each it needs a DOS command tail, a count byte, `/C `,
-the command and a carriage return, and it makes it in place, in the
-four bytes in front of the command. The four in front of the first
-command are the end of `DosChg`, the five bytes in front of `DosBuf`
-that are there for that, "Reserved for change drive or /C_":
-
-```asm
-Exec04:	SUB	CX,SI			; the length,
-	MOV	CH,'/'			; and '/' behind it: one word
-	MOV	DS:[SI],CX		; count, '/'
-	MOV	WORD PTR DS:[SI+2],' C'	; 'C', ' '
-	MOV	BX,OFFSET ComnIni.EPB
-	MOV	DS:[BX].CmdLine.Offs,SI
-	MOV	DS:[BX].CmdLine.Segm,DS
-Exec05:	MOV	DI,OFFSET Command	; 'COMMAND.COM'
-	MOV	DX,DS:ComnIni.ComSpec	; or the COMSPEC= of the environment
-	...
-	MOV	AX,4B00h		; EXEC
-	INT	21h
-```
-
-Between two commands it prints a prompt as COMMAND.COM would, the
-drive, the path if Path prompt is on, and `>`, into `IntTab` of the
-resident part, which is free then. A command that begins with `@` goes
-without it. With Quick execute on, `ExecTyp`, each command goes instead
-to the COMMAND.COM that started the program through INT 2Eh, its
-undocumented entry for running a command line in its own memory, which
-saves loading a second shell; `DosChg` then holds `2, letter, ':',
-0Dh`, a command of its own, `X:`, that `F21_34` writes when DOS's
-current drive is not the one the shell had, and that goes to the shell
-before the first real command. INT 2Eh loses SS and SP, so behind each call
-the stack is set again from CS, `MOV SP,OFFSET VcStack`.
-
-When the commands are done, `Exec10` loads `VC.COM` again with 4B00h,
-if the small mode had given the code back, and the program starts at
-`Init11`, with the main data copied back from `ComnIni` and the panels
-expanded and read again: the stack is as empty after a command as
-before the first one.
-
-![After a command](img/exec-output.png)
-
-*The screen of DOS after a command, with the prompt that `Exec08`
-writes between commands.*
-[Chapter 1](01-the-program.md) has the loading and the resident part
-in full; [chapter 3](03-the-system.md) has the calls of DOS.
+What follows is the resident part's: `F21_31` copies the setup, the
+history, the extension file and `DosBuf` into it, keeps each panel in
+13 bytes a file, gives the main data back to DOS and goes to `Exec`,
+which runs each command of `DosBuf` and then brings the commander back
+at `Init11`, the panels read again and the cursor and the selection
+found in what was kept.
+[Chapter 3](03-the-system.md#the-resident-part-12690-bytes-that-stay)
+has all of it.
 
 ## How the features share the main data
 
@@ -1586,7 +1421,7 @@ room, which is whatever DOS has left.
 ## Where to read next
 
 - `src/asm/VC.ASM`: `MainDat`, `WCBdef`, `FILENT`, `DIRENT`, `DIRTREE`
-  near the top; `Init11` for the memory; `Exec` and `Expand`.
+  near the top; `Init11` for the memory.
 - `src/asm/VCSUB3.INC`: `ReDir`, `ReadTre`, `DirSize`, `NearFl`; and
   `VCSUB2.INC` for `SetMask`, `TstExe`, `Sort`, `CmpPar`, `FnFile`,
   `TotSel`, `FndItem`, `FindExt`.
@@ -1602,6 +1437,8 @@ room, which is whatever DOS has left.
 - `src/asm/VCFUNC.INC`: `F21_00` to `F21_40`, `F32_00`, `Run_00`,
   `FileLst`.
 - [Chapter 1](01-the-program.md) for the main data, the loop, the
-  screen and the resident part; [chapter 3](03-the-system.md) for
-  `Intr21`, the critical error and the calls of DOS; chapter 5 for how
-  these routines were carried into C.
+  screen and the dialogs; [chapter 3](03-the-system.md) for `Intr21`,
+  the critical error, the calls of DOS and the resident part that runs
+  a command; [chapter 4](04-the-setup.md) for `VC.INI`, which keeps each
+  panel's mode, sort order, filter and path; and
+  [chapter 5](05-into-c.md) for how these routines were carried into C.

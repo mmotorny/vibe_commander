@@ -10,13 +10,9 @@ graph LR
     B["src/c: the C translation, 16 bits, Open Watcom wcc"]
     P["src/portable_c: the portable C, 32 bits, wcc386 and DOS/32A"]
     D["sys_dos.c: DOS through the extender"]
-    L["sys_posix.c and the _posix.c files: Linux"]
-    W["sys_web.c: a web page"]
     A -- "routine by routine, bugs included" --> B
     B -- "copied, then made flat and wide" --> P
     P -- "sys.h" --> D
-    P -- "sys.h" --> L
-    P -- "sys.h" --> W
 ```
 
 The C translation, `src/c/`, is the original in C and nothing more: the
@@ -28,13 +24,10 @@ a program of 32 bits with one flat memory, its numbers widened where
 16 bits were a limit and not a choice, and everything that it asks of
 the system behind one header.
 
-Both are judged the same way. A scenario is a list of keystrokes and
-mouse events played into a machine that runs FreeDOS under QEMU; the
-original is run through it once and every screen it draws is recorded
-as a golden. A tree passes when it draws the same screens and leaves
-the same files. For the C translation that is the whole definition of
-right. For the portable C it is the same, except where a difference is
-declared, one by one, in `src/portable_c/DEVIATIONS.md`.
+The measure of the C translation is the original itself: it is right
+when it draws the same screens and leaves the same files, keystroke for
+keystroke. The portable C is held to the same, except where it is meant
+to differ, and each such difference was decided one at a time.
 
 The price of all this, in bytes:
 
@@ -178,8 +171,8 @@ the rest of this section shows.
 
 ### What Open Watcom's 16-bit compiler would not do
 
-`#pragma aux` is powerful and has holes, and the batches that
-translated the program met them one by one. A few that shaped the code:
+`#pragma aux` is powerful and has holes, and the translation met them
+one by one. A few that shaped the code:
 
 | What one writes | What the compiler does | So the C |
 |---|---|---|
@@ -193,8 +186,7 @@ translated the program met them one by one. A few that shaped the code:
 
 There is no C library. The two helpers that the compiler calls for
 32-bit multiplication and division, `__U4M` and `__U4D`, are written
-in C in `src/c/arith.c` and held against Python's arithmetic by the
-test `c-arith`, which runs their bytes on a model of the processor.
+in C in `src/c/arith.c`.
 
 ### Jumps become returns: the commands
 
@@ -455,8 +447,6 @@ DOS. That is the general rule for code between labels: where every
 jump into a stretch arrives with known registers, the stretch is a
 function and those registers are its arguments.
 
-![The original's critical error box, which FtErr1 draws in all three trees](img/critical-error.png)
-
 ### The data, a file at a time
 
 The boxes, dialogs, texts and buttons of the original are `DB` and `DW`
@@ -498,15 +488,14 @@ bytes, so the C object is the same 20 bytes as the assembly's. The
 constants are in a group of their own, `DGROUP`, where a word that
 names one is its offset, as in the original.
 
-That the bytes really are the same is not left to reading. The test
-`c-data` holds every constant of the C against the label of the same
-name in the original's listing, byte for byte, and for a word that
-names something it follows the original's relocations to see that the
-C names the same thing. A table that no screen shows could be wrong in
-every scenario and still pass them all; this is what catches it. The
-moving itself went file by file, `VCHELP.INC` first: each object taken
-out of the assembly as bytes, written into C, built, held against the
-original, until the assembly file held only comments and was removed.
+That the bytes really are the same was not left to reading: every
+constant of the C was held against the label of the same name in the
+original's listing, byte for byte, and for a word that names something,
+that it names the same thing. A table that no screen shows could
+otherwise be wrong unseen. The moving itself went file by file,
+`VCHELP.INC` first: each object taken out of the assembly as bytes,
+written into C, built, held against the original, until the assembly
+file held only comments and was removed.
 
 ### The part that stays: `resident.c`
 
@@ -521,23 +510,23 @@ and its data are one group beginning at the PSP, as the original's
 ```
 offset from the PSP
 0000h  +--------------------------------------+  R_GROUP
-       | RTEXT   the PSP's room, then the      |  CS = DS = SS = PSP
-       |         code of resident.c            |
-       |         (Alloc0, the entry, at 0F49h) |  4,738 bytes
+       | RTEXT   the PSP's room, then the     |  CS = DS = SS = PSP
+       |         code of resident.c           |
+       |         (Alloc0, the entry, 0F49h)   |  4,738 bytes
 1282h  +--------------------------------------+
-       | RCONST2 its constants                 |  183
+       | RCONST2 its constants                |  183
 133Ah  +--------------------------------------+
-       | R_DATA  the words mkexe.c fills in,   |
-       |         then Stays at 1358h           |  10,697
+       | R_DATA  the words mkexe.c fills in,  |
+       |         then Stays at 1358h          |  10,697
 3D04h  +--------------------------------------+
-       | R_BSS   DataSav, the stack            |  4,096
+       | R_BSS   DataSav, the stack           |  4,096
 4D04h  +--------------------------------------+  end: 19,716 bytes
-       | TrnBeg  32 bytes: room for the MCB    |  DGROUP begins
-       |         that splits the block         |
-       | CONST2  the tables of the _t.c files  |  8,943
+       | TrnBeg  32 bytes: room for the MCB   |  DGROUP begins
+       |         that splits the block        |
+       | CONST2  the tables of the _t.c files |  8,943
 6FF4h  +--------------------------------------+
-       | CTEXT   compiled code                 |  54,056
-       | CTEXT2  compiled code                 |  46,898
+       | CTEXT   compiled code                |  54,056
+       | CTEXT2  compiled code                |  46,898
        +--------------------------------------+
 ```
 
@@ -780,9 +769,9 @@ A word of a table that names something is a pointer in C anyway. In
 the portable C it is four bytes, set by the extender at load time, so
 `DelFi_P`, the box that asks before a file is deleted, is 28 bytes
 where the original's and the C translation's are 20. There are 640
-such words in the tables, and `portable_c-data` holds them field by
-field against the original: the bytes where the original has bytes,
-and for a pointer, that it points at what the original's word names.
+such words in the tables, each still held against the original: the
+bytes where the original has bytes, and for a pointer, that it points
+at what the original's word names.
 
 ### Widened numbers and booleans
 
@@ -808,12 +797,11 @@ struct Places {
 
 So a panel grows with its directory, past the original's 2,703 entries,
 up to 65,536, the most a DOS directory can hold and the most an
-entry's 16-bit number can count. Each such lifted limit is a deviation,
-asked of the user and declared; so are the bugs of the original that a
-wider number fixes, such as the editor's count of lines.
+entry's 16-bit number can count. Each such lifted limit, and each bug
+of the original that a wider number fixes, such as the editor's count
+of lines, was decided one at a time.
 
-The rule for every number is written down and held by a test,
-`portable_c-width`: a size, a count, an index is an `i32`; a number
+The rule for every number is written down: a size, a count, an index is an `i32`; a number
 that is only ever 0 or 1 is a `bool`, as `TstBrk` now returns
 (`changed` above is one too); a character, a colour, a cell of the
 screen, a bit mask, and a width that DOS or a file has stay as wide as
@@ -844,8 +832,8 @@ megabyte, and under an extender there is plenty: the program itself is
 above it, and DOS has all of its 640 KB but the stub and 512 bytes for
 a command.
 
-What went with the resident part went as declared removals of things
-that only made sense on DOS: Memory allocation in the Options menu,
+What went with the resident part went as removals of things that only
+made sense on DOS: Memory allocation in the Options menu,
 the TSR manager and the map of memory with the watch on `INT 21h` it
 rested on, Quick execute through COMMAND.COM's `INT 2Eh`, which not
 every shell serves. The setup program, `VCSETUP.COM` in the original,
@@ -953,8 +941,8 @@ void HookVct(void)                      /* main.c, the original's order */
 DOS, the BIOS and the mouse driver are real-mode code, and the
 program is not. It still calls them by `INT`; the extender catches the
 interrupt, switches to real mode, calls, and switches back. What it
-does with the registers on the way was found by toy programs on the
-bench, and splits DOS's services into kinds, which decide how each
+does with the registers on the way was found by small programs run
+under it, and splits DOS's services into kinds, which decide how each
 function of `sys_dos.c` (2,073 lines) is written:
 
 | A call that | Such as | DOS/32A | So `sys_dos.c` |
@@ -1085,8 +1073,7 @@ extender names a block by a handle, `sys.h` names it by its address,
 so `sys_dos.c` keeps a table of eight, `struct Held`, address, length
 and handle. DOS/32A keeps 16 bytes of its own in front of every block
 and ends the program at the next memory call if they have been
-overwritten; the tests check them after every scenario, so a write one
-byte past a block fails.
+overwritten.
 
 #### The critical error, from real mode into C
 
@@ -1123,7 +1110,7 @@ sequenceDiagram
 `Below` is not the stack pointer at the moment of the error but a
 place well under it. The extender was entered on the program's stack
 when the program made its call, and keeps its own state there until
-the call returns; the toys saw it use 190 bytes under the pointer for
+the call returns, and was seen to use 190 bytes under the pointer for
 a call it translates, 130 for one made through 0300h, 74 for others.
 So every call notes `Below = StackNow() - 512` first, and the error
 continues below that. `DeviceEntry` switches SS and ESP in two
@@ -1256,7 +1243,7 @@ it runs on.
 | One 64K segment, no relocations | three segments, relocations applied by `Reloc` | one flat image, relocated by the extender |
 | A 256-byte stack | 4,096 bytes | 16,384 bytes |
 | `MOV BX,0FFFFh` / AH 48h for memory | the same through `Int21d` | `MemTake`, DPMI 0500h and 0501h |
-| A limit of 16 bits, 2,703 files in a panel | the same | widened and declared, up to 65,536 |
+| A limit of 16 bits, 2,703 files in a panel | the same | widened, up to 65,536 |
 
 ## Where to read next
 
@@ -1264,13 +1251,14 @@ it runs on.
   written; `src/c/main.c` for `Loop`, `Func12` and `Command`;
   `src/c/resident.c` and `tools/mkexe.c` for the part that stays;
   `src/c/dos.c` for every interrupt of the 16-bit program.
-- `docs/translation.md` for how the translation was built and what it
-  rests on in Open Watcom.
+- [`docs/translation.md`](../translation.md) for how the translation
+  was built and what it rests on in Open Watcom.
 - `src/portable_c/sys.h`, the contract, each function with what it
   answers when it fails; `src/portable_c/sys_dos.c`, its top comment
   for the kinds of call, then `Ask`, `Real`, `DeviceEntry`, `Ended_T`
   and `Start`.
-- `docs/portable-c.md` for the layout and the figures,
-  `src/portable_c/DEVIATIONS.md` for every place where the portable C
-  does otherwise than the original, and `docs/linux.md` and
-  `docs/web.md` for the other two implementations of `sys.h`.
+- [`docs/portable-c.md`](../portable-c.md) for the layout and the
+  figures of the program of 32 bits.
+- [Chapter 1](01-the-program.md), [chapter 2](02-the-features.md),
+  [chapter 3](03-the-system.md) and [chapter 4](04-the-setup.md) for
+  the original routines that this chapter's tables name.

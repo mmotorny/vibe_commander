@@ -1,6 +1,6 @@
 # 4. The setup program: `VCSETUP.COM`
 
-![The setup program's menu](img/setup-menu.png)
+![VCSETUP.COM: the menu](img/setup-menu.png)
 
 *`VCSETUP.COM` run from the commander's command line: its menu of nine
 items over what DOS shows, and its own key bar.*
@@ -69,7 +69,7 @@ put its stack at the top of the segment:
         MOV     AL,2
         JB      Init01
         PUSH    AX                      ; Allocate segments
-        MOV     BX,1000h                ;                         <- 64 KB, in paragraphs
+        MOV     BX,1000h                ;; 64 KB, in paragraphs
         MOV     AH,4Ah
         INT     21h
         ...
@@ -111,7 +111,7 @@ each other), the number
 of rows from the font (1130h), the display's segment, TopView's buffer
 (AH 0FEh), DESQview (`INT 21h` 2B01h with `'DE'` and `'SQ'`), and
 whether there is snow (`SetSnow`, the commander's test of port 3DAh).
-Chapter 3 has each of those.
+[Chapter 3](03-the-system.md) has each of those.
 
 ### The menus
 
@@ -120,16 +120,16 @@ commander's routine, with a table of keys for `Case`, the commander's
 dispatcher:
 
 ```asm
-Main_T  DW      4800h, Main10           ;                         <- Up
-        DW      5000h, Main11           ;                         <- Down
-        DW      4700h, Main12           ;                         <- Home
-        DW      4F00h, Main13           ;                         <- End
-        DW      4900h, Main12           ;                         <- PgUp
-        DW      5100h, Main13           ;                         <- PgDn
-        DW      000Dh, Main32           ;                         <- Enter
-        DW      001Bh, Main31           ;                         <- Esc
-        DW      4400h, Main31           ;                         <- F10
-        DW      3C00h, Main20           ;                         <- F2 ... F9
+Main_T  DW      4800h, Main10           ;; Up
+        DW      5000h, Main11           ;; Down
+        DW      4700h, Main12           ;; Home
+        DW      4F00h, Main13           ;; End
+        DW      4900h, Main12           ;; PgUp
+        DW      5100h, Main13           ;; PgDn
+        DW      000Dh, Main32           ;; Enter
+        DW      001Bh, Main31           ;; Esc
+        DW      4400h, Main31           ;; F10
+        DW      3C00h, Main20           ;; F2 ... F9
         ...
         DW      4300h, Main27
         DW      0
@@ -155,9 +155,19 @@ table again, by number. The same `Case` serves both.
 | F9 | Country info | the formats of time, date and numbers, and DOS's table of capitals for the code page | `F09_00` |
 | F10 | Exit | "Do you wish to save the current setup?", if anything has changed | `Exit` |
 
-<!-- SCREENSHOT: golden setup-config step 2 -->
-<!-- SCREENSHOT: golden setup-screen step 2 -->
-<!-- SCREENSHOT: golden setup-colors step 2 -->
+![F2: Configuration](img/setup-config.png)
+
+*F2: the Configuration dialog, `Conf_B` below, its fields on the bytes
+of the image of `VC.INI`, Memory allocation and TSR manager among
+them. Behind it, the banner that the setup program printed through
+DOS.*
+
+![F6: the Color palette](img/setup-colors.png)
+
+*F6: the editor of the Color palette. On the left the 40 things that
+the program colours, of which the first 17 show; on the right the grid
+of 16 by 16 colours, and the colour of the line under the cursor named
+in words.*
 
 Each of the dialogs is a table that the commander's `Dialog` reads, a
 `BOXHD` header and a `BOXMN` line for each field: its kind, its four
@@ -262,9 +272,9 @@ display. `ColAddr` of `VCSUB1.INC` finds a colour's byte:
 ColAddr PROC    NEAR
         PUSH    AX
         MOV     AL,6
-        MUL     AH                      ;                         <- the colour's row
+        MUL     AH                      ;; the colour's row
         MOV     DI,AX
-        MOV     AL,ES:ColTyp            ;                         <- 0 B&W, 1 Color, 2 Laptop
+        MOV     AL,ES:ColTyp            ;; 0 B&W, 1 Color, 2 Laptop
         CMP     AL,3
         JB      ColAd1
         MOV     AL,1
@@ -272,7 +282,7 @@ ColAd1: CBW
         ADD     AX,AX
         CMP     ES:ScrMod,7
         JNE     ColAd2
-        INC     AX                      ;                         <- the monochrome column
+        INC     AX                      ;; the monochrome column
 ColAd2: ADD     DI,AX
         ADD     DI,ColTab
         POP     AX
@@ -297,18 +307,18 @@ exactly where they are to be:
 Init00: MOV     ES,DS:[2Ch]
         MOV     DI,OFFSET WCB1sav + WCBsave
         MOV     DX,DI
-        CALL    MainPth                 ;                         <- the path: VC= or our own
+        CALL    MainPth                 ;; the path: VC= or our own
         PUSH    DI
         PUSH    DX
-        MOV     SI,OFFSET Init_F        ;                         <- 'VC.INI'
+        MOV     SI,OFFSET Init_F        ;; 'VC.INI'
         MOV     BP,OFFSET ComnIni - (3 + 2*WCBini)
         MOV     CX, 3 + 2*WCBini + CmnIni + 2 + 1
-        CALL    ReadOne                 ;                         <- one byte more than the file
+        CALL    ReadOne                 ;; one byte more than the file
         MOV     BX,0
-        JC      Init03                  ;                         <- no file: the defaults
+        JC      Init03                  ;; no file: the defaults
         DEC     CX
         SUB     AX,CX
-        JNE     Init02                  ;                         <- not 511 bytes: bad
+        JNE     Init02                  ;; not 511 bytes: bad
         DEC     CX
         DEC     CX
         MOV     SI,BP
@@ -318,14 +328,14 @@ Init01: LODSB
         LOOP    Init01
         LODSW
         CMP     AX,DX
-        JNE     Init02                  ;                         <- the sum: bad
+        JNE     Init02                  ;; the sum: bad
         MOV     DI,BP
         MOV     AL,'V'
         MOV     CL,3
         REPE    SCASB
-        JNE     Init02                  ;                         <- no 'VVV': bad
+        JNE     Init02                  ;; no 'VVV': bad
         MOV     SI,DI
-        MOV     DI,OFFSET WCB1sav       ;                         <- the panels to their places
+        MOV     DI,OFFSET WCB1sav       ;; the panels to their places
         MOV     CL,WCBini
         PUSH    CX
         REP     MOVSB
@@ -333,7 +343,7 @@ Init01: LODSB
         MOV     DI,OFFSET WCB2sav
         REP     MOVSB
         JMP     Init04
-Init02: MOV     BL,1                    ;                         <- "VC.INI is not correct."
+Init02: MOV     BL,1                    ;; "VC.INI is not correct."
 ```
 
 Asking for 512 bytes where the file has 511 is the test of length: a
@@ -392,7 +402,7 @@ everything, so a commander that has it open is no obstacle:
         MOV     AH,3Fh
         INT     21h
         ...
-        INC     DS:IniStat              ;                         <- 1: found
+        INC     DS:IniStat              ;; 1: found
         DEC     CX                      ; Check VC.INI length
         CMP     AX,CX
         JNE     Init17
@@ -408,7 +418,10 @@ not correct.", with the buttons Ok, to go on from the defaults, and
 Exit. Behind a good read it copies the 330 bytes of settings into
 `SrcIni`, so that it knows at the end whether anything has changed.
 
-<!-- SCREENSHOT: golden setup-damaged step 7 -->
+![A broken VC.INI](img/setup-damaged.png)
+
+*The setup program started on a `VC.INI` whose sum does not hold:
+`IniStat` is 2, and Ok goes on from the defaults.*
 
 ### The defaults, and 64 bytes that are not
 
@@ -438,16 +451,16 @@ Default PROC    NEAR
         MOV     SI,OFFSET Palets
         MOV     DI,OFFSET ColTab
         MOV     CX,CmnIni
-        REP     MOVSB                   ;                         <- 330 bytes of settings
+        REP     MOVSB                   ;; 330 bytes of settings
         MOV     SI,OFFSET DefWCB
         MOV     DI,OFFSET WCB1
-        MOV     CX,WCBini               ;                         <- 88, from a table of 24
+        MOV     CX,WCBini               ;; 88, from a table of 24
         PUSH    DI
         PUSH    CX
         REP     MOVSB
         MOV     AH,19h
         INT     21h
-        ADD     DS:WCB1.WinPath[0],AL   ;                         <- 'A' + the current drive
+        ADD     DS:WCB1.WinPath[0],AL   ;; 'A' + the current drive
         ...
 ```
 
@@ -461,7 +474,9 @@ defaults by the shipped setup program cannot be made again from the
 published source.
 
 The commander's own defaults have the same shape, eight bytes of a
-panel and then its table of keys, and its file is clean all the same:
+panel and then its table of keys
+([chapter 1](01-the-program.md#init00-the-setup-file-read-in-place)),
+and its file is clean all the same:
 `MkIni1`, by which it writes a panel into the file, clears what lies
 behind the zero of the mask and of the path first.
 
@@ -469,10 +484,10 @@ behind the zero of the mask and of the path first.
 MkIni1  PROC    NEAR
         MOV     SI,OFFSET DskMas
         MOV     CX,13
-        CALL    FilZero                 ;                         <- zeros behind the mask's end
+        CALL    FilZero                 ;; zeros behind the mask's end
         MOV     SI,OFFSET WinPath
         MOV     CX,LenPath
-        CALL    FilZero                 ;                         <- and behind the path's
+        CALL    FilZero                 ;; and behind the path's
         XOR     SI,SI
         MOV     CX,WCBini
         REP     MOVSB
@@ -502,15 +517,15 @@ Exit2:  MOV     SI,OFFSET IniData       ; Save VC.INI
 Exit3:  LODSB
         ADD     BX,AX
         LOOP    Exit3
-        MOV     DS:[SI],BX              ;                         <- the sum, behind
+        MOV     DS:[SI],BX              ;; the sum, behind
         MOV     DX,OFFSET NcPath        ; Open VC.INI
-        MOV     AX,4300h                ;                         <- its attributes
+        MOV     AX,4300h                ;; its attributes
         INT     21h
         JNC     Exit4
         CMP     AX,WORD PTR 2
         JNE     Exit5
-        XOR     AX,AX                   ;                         <- no file: none
-Exit4:  OR      CL,20h                  ;                         <- and the archive bit
+        XOR     AX,AX                   ;; no file: none
+Exit4:  OR      CL,20h                  ;; and the archive bit
         MOV     AH,3Ch
         INT     21h
         ...
@@ -541,7 +556,8 @@ and left as it is is not offered for saving.
 The setup program is run from the commander's command line like any
 program. The commander that ran it has its settings in its resident
 part, in `ComnIni`, and will copy them into its new main data when the
-command is done (chapter 3). If the setup program only wrote
+command is done ([chapter 3](03-the-system.md#the-resident-part-12690-bytes-that-stay)).
+If the setup program only wrote
 `VC.INI`, a commander that has already read it would go on with the
 old settings until it is started again.
 
@@ -559,25 +575,25 @@ date", and changes nothing. That makes it a classic install check of
 the time, a call that every DOS survives and that a resident program
 can recognise by its registers: DESQview's is AX 2B01h with `'DE'` in
 CX and `'SQ'` in DX, and the commander tests for DESQview with exactly
-that (chapter 3). Its own is `'VC'` in CX and `'OM'` in DX, the year
+that ([chapter 3](03-the-system.md#giving-time-away)). Its own is `'VC'` in CX and `'OM'` in DX, the year
 22,083 and a month of 79:
 
 ```asm
 VCapi:  CMP     CX,'VC'
-        JNE     Old21                   ;                         <- a real "set date"
+        JNE     Old21                   ;; a real "set date"
         CMP     DX,'OM'
         JNE     Old21
         PUSH    CS
-        POP     ES                      ;                         <- ES: the resident part
+        POP     ES                      ;; ES: the resident part
         CMP     AL,1
-        MOV     BX,OFFSET WCB1sav       ;                         <- AL 0: the left panel
+        MOV     BX,OFFSET WCB1sav       ;; AL 0: the left panel
         JB      VCapi1
-        MOV     BX,OFFSET WCB2sav       ;                         <- AL 1: the right panel
+        MOV     BX,OFFSET WCB2sav       ;; AL 1: the right panel
         JE      VCapi1
-        MOV     BX,OFFSET ComnIni       ;                         <- AL 2 and up: the settings
-VCapi1: MOV     AX,VcApiVr*100h         ;                         <- AH 42, the API's version
+        MOV     BX,OFFSET ComnIni       ;; AL 2 and up: the settings
+VCapi1: MOV     AX,VcApiVr*100h         ;; AH 42, the API's version
         CLC
-        RET     2                       ;                         <- a far return, flags dropped
+        RET     2                       ;; a far return, flags dropped
 New21   ENDP
 ```
 
@@ -598,21 +614,21 @@ Exit6:  MOV     CX,'VC'                 ; Save in resident VC
         MOV     AX,2B02h
         INT     21h
         CMP     AX,VcApiVr*100h
-        JNE     Exit7                   ;                         <- no commander: done
+        JNE     Exit7                   ;; no commander: done
         MOV     DI,BX
-        SUB     BX,OFFSET ColTab        ;                         <- ES:Field[BX] is its field
+        SUB     BX,OFFSET ColTab        ;; ES:Field[BX] is its field
         MOV     AL,ES:Active[BX]
-        MOV     DS:Active,AL            ;                         <- keep its active panel
+        MOV     DS:Active,AL            ;; keep its active panel
         MOV     AL,ES:Ctrl_O[BX]
-        MOV     DS:Ctrl_O,AL            ;                         <- and whether the panels show
+        MOV     DS:Ctrl_O,AL            ;; and whether the panels show
         MOV     AL,ES:ChkTSR[BX]
-        MOV     DS:ChkTSR,AL            ;                         <- and its TSR manager
+        MOV     DS:ChkTSR,AL            ;; and its TSR manager
         MOV     AL,ES:LoadFl[BX]
         XCHG    AL,DS:LoadFl
-        MOV     ES:LoadRes[BX],AL       ;                         <- the new Memory allocation
+        MOV     ES:LoadRes[BX],AL       ;; the new Memory allocation
         MOV     SI,OFFSET ColTab
         MOV     CX,CmnIni
-        REP     MOVSB                   ;                         <- 330 bytes into the commander
+        REP     MOVSB                   ;; 330 bytes into the commander
 Exit7:  MOV     AX,4C00h                ; Exit
         INT     21h
 ```
@@ -635,8 +651,8 @@ Four settings are not simply copied:
   was installed or not when the commander started, and a commander
   whose setting said otherwise would, at its end, give back an INT
   21h that it never took.
-- **`LoadFl`**, Memory allocation, goes into `LoadRes`, which chapter 3
-  has as "Original LoadFl". When the command is done, `Exec10` swaps
+- **`LoadFl`**, Memory allocation, goes into `LoadRes`, which the main
+  data's declaration has as "Original LoadFl". When the command is done, `Exec10` swaps
   the two, `LoadRes` into `LoadFl`, and decides by the old `LoadFl`
   whether to load the transient part again. The old value is the mode
   in which this command ran, possibly flipped by Shift-Enter, and is
@@ -675,7 +691,7 @@ file.
 If writing the file has failed, the program still makes the call: the
 running commander gets the settings, and only the file is as it was.
 
-<!-- SCREENSHOT: golden setup step 8 -->
+![Back in the commander](img/setup-back.png)
 
 *Back in the commander after the setup program has switched the key
 bar off and saved: the commander's screen has no key bar at once,
@@ -812,28 +828,28 @@ begins to where page 62 begins:
 
 ```asm
         MOV     DI,DS:HelpBuf.HlpLins   ; Read pages information
-        SUB     DI,BegHlp-1             ;                         <- pages from 55 on
+        SUB     DI,BegHlp-1             ;; pages from 55 on
         JBE     RdHlp1
         MOV     SI,6*(BegHlp-1)
-        MOV     DX,DS:[SI].HelpBuf.HlpInfo[2].Lo  ; <- where page 55 begins
+        MOV     DX,DS:[SI].HelpBuf.HlpInfo[2].Lo  ;; where page 55 begins
         MOV     CX,DS:[SI].HelpBuf.HlpInfo[2].Hi
         CALL    SeekDsk
         JC      RdHlp1
         MOV     DX,OFFSET HelpBuf+2
-        MOV     CX,0FEE0h               ;                         <- as much as there is room for
+        MOV     CX,0FEE0h               ;; as much as there is room for
         SUB     CX,DX
         CMP     DI,NumHlp
         JBE     RdHlp4
         MOV     SI,6*(BegHlp-1+NumHlp)
-        MOV     AX,DS:[SI].HelpBuf.HlpInfo[2].Lo  ; <- where page 62 begins
+        MOV     AX,DS:[SI].HelpBuf.HlpInfo[2].Lo  ;; where page 62 begins
         ...
         CMP     CX,AX
         JBE     RdHlp4
-        MOV     CX,AX                   ;                         <- or the seven pages, if fewer
+        MOV     CX,AX                   ;; or the seven pages, if fewer
 RdHlp4: MOV     AH,3Fh
         INT     21h
         JC      RdHlp1
-        MOV     WORD PTR DS:HelpBuf[0],AX       ; <- how much was read
+        MOV     WORD PTR DS:HelpBuf[0],AX       ;; how much was read
         CALL    DeCode
 ```
 
@@ -848,16 +864,16 @@ wholly within what was read before showing it:
 Help01: MOV     SI,AX
         ADD     AX,WORD PTR (OFFSET HlpInfo)
         JC      Help02
-        CMP     AX,DX                   ;                         <- DX: the end of what was read
+        CMP     AX,DX                   ;; DX: the end of what was read
         JA      Help02
         ADD     AX,DS:[SI].HlpSize
         JC      Help02
         CMP     AX,DX
-        JA      Help02                  ;                         <- the page runs past it
+        JA      Help02                  ;; the page runs past it
         LOOP    Help01
         ...
 Help02: MOV     BP,OFFSET HlpEr_B
-        CALL    Dialog                  ;                         <- "Help contents is not available"
+        CALL    Dialog                  ;; "Help contents is not available"
 ```
 
 With the shipped `VC.HLP` and the shipped binary, pages 55 to 59 fit,
@@ -868,7 +884,7 @@ shareware edition's added code and texts, 691 bytes in all, push
 it. Without them the room would be 8,846 bytes, and all seven pages
 would fit.
 
-<!-- SCREENSHOT: golden setup-help-pages step 20 -->
+![F1 on Country info](img/setup-help.png)
 
 *F1 on Country info in the shipped setup program: the page does not
 fit in what is left of the segment.*
@@ -897,6 +913,8 @@ fit in what is left of the segment.*
 - `src/asm/VC.ASM`: `MainDat` and `WCBdef` for the layout of
   `VC.INI`, `Init00` for its reading, `New21` for the private call;
   `VCSUB3.INC`: `SaveSet`, `MakeIni` and `MkIni1` for its writing.
-- [Chapter 3](03-the-system.md) for the resident part, `New21` and the
-  way back from a command, and [chapter 5](05-the-port.md) for how
-  the setup program became a part of one program in C.
+- [Chapter 1](01-the-program.md) for the main data and the dialogs
+  that the setup program borrows; [chapter 3](03-the-system.md) for the
+  resident part, `New21` and the way back from a command; and
+  [chapter 5](05-into-c.md) for how the setup program became a part of
+  one program in C.

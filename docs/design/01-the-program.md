@@ -18,42 +18,11 @@ the program cuts up its memory when it starts, the structures of its
 data and its panels, the main loop and its commands, the input, the
 screen, the tables that describe every box and menu, the help, and the
 clock and the blanker. The calls of DOS and the BIOS underneath are
-[chapter 3](03-the-system.md). The last section lists the economies in
-one place, with their sizes.
-
-The figures come from the assembler's listing of the source as built
-to the layout of the shipped binary, `VC.LST`, and from the source
-itself. Code is quoted as Volkov wrote it; a comment that starts with
-`;;` is this book's, the others are his.
-
-## A PC refresher, in the terms the program uses
-
-Four facts about real-mode DOS carry most of this chapter.
-
-- **A segment is 64K, and a paragraph is 16 bytes.** An 8086 address
-  is a 16-bit segment and a 16-bit offset, and the physical address is
-  the segment times 16 plus the offset. Two segments one paragraph
-  apart overlap in all but 16 bytes. A program that keeps every
-  pointer as an offset within one segment never has to load a segment
-  register to follow one.
-- **DOS hands out memory in paragraphs.** INT 21h function 48h asks for
-  a block of BX paragraphs and answers with its segment; 49h gives one
-  back; 4Ah makes one longer or shorter. Each block is preceded by a
-  16-byte *memory control block*, the MCB, in the paragraph in front of
-  it: a byte `M` (or `Z` for the last), the segment of the owner's
-  PSP, and the block's length in paragraphs. Asked for FFFFh
-  paragraphs, which no machine has, DOS fails and says in BX how much
-  the largest block holds: that is how a program learns what there is.
-- **A `.COM` file is loaded at offset 100h of its segment and gets all
-  the memory.** The first 256 bytes are the *program segment prefix*,
-  the PSP, which DOS fills in: the command tail at 80h, the segment of
-  the environment at 2Ch, the end of the memory at 2. CS, DS, ES and SS
-  all point at the PSP, and SP at the top of the 64K.
-- **The text screen is memory.** A colour adapter shows the 80 x 25
-  characters of its first page from `B800:0000`, a monochrome one from
-  `B000:0000`: two bytes a cell, the character and then its attribute,
-  80 cells a row. Writing a word there puts a character on the screen
-  with no call at all.
+[chapter 3](03-the-system.md), and so is the resident part that runs a
+command; this chapter has it in outline. The last section lists the
+economies in one place, with their sizes. A reader who wants a reminder
+of segments, the PSP and memory control blocks will find one in the
+[preface](00-preface.md#a-dos-refresher).
 
 ## The source: one file and twelve includes
 
@@ -139,26 +108,26 @@ between procedures that is entered by jumps.
 ```
  offset in the segment                                              bytes
  0000h +--------------------------------------------------+
-       | PSP, made by DOS, not in the file                 |          256
+       | PSP, made by DOS, not in the file                |          256
  0100h +--------------------------------------------------+ <- the file starts
-       | JMP Alloc0, RunPar, ChkFile, 'COMMAND.COM',       |          202
-       | OvlPrm, five messages                             |
- 01CAh | Exec: run the commands of DosBuf                  |
-       | Exit00..Exit05, OutStr, SetBrk, GetStat, CtrlC    |        1,309
-       | New21, New27, ExeProg, AddProg, FreeBlk, Release  |
- 06E7h +-- LastRes -------------------------------------- +
-       | Alloc0..Alloc9: the loader, run once              |          256
- 07E7h +-- Init00 ---------------------------------------- +
-       | the start, Init00..Init33                         |        1,266
- 0CD9h | the main loop, Init40..Func62                     |        1,470
- 1297h | VCFUNC, VCMENU, VCF1, VCCOPY, VCVIEW, VCEDIT,     |
-       | VCHELP, VCMEM, VCFIND, the exit, VCSUB1..3        |       47,491
- CC1Ah +-- _DATA ----------------------------------------- +
-       | colours, defaults, FncTab, boxes, dialogs, tables |        6,214
- E460h +-- CONST ----------------------------------------- +
-       | texts                                             |        6,882
- FF42h +-- Last ------------------------------------------ +
-       | (the stack of a .COM, until Alloc0 moves it)      |          190
+       | JMP Alloc0, RunPar, ChkFile, 'COMMAND.COM',      |          202
+       | OvlPrm, five messages                            |
+ 01CAh | Exec: run the commands of DosBuf                 |
+       | Exit00..Exit05, OutStr, SetBrk, GetStat, CtrlC   |        1,309
+       | New21, New27, ExeProg, AddProg, FreeBlk, Release |
+ 06E7h +-- LastRes ---------------------------------------+
+       | Alloc0..Alloc9: the loader, run once             |          256
+ 07E7h +-- Init00 ----------------------------------------+
+       | the start, Init00..Init33                        |        1,266
+ 0CD9h | the main loop, Init40..Func62                    |        1,470
+ 1297h | VCFUNC, VCMENU, VCF1, VCCOPY, VCVIEW, VCEDIT,    |
+       | VCHELP, VCMEM, VCFIND, the exit, VCSUB1..3       |       47,491
+ CC1Ah +-- _DATA -----------------------------------------+
+       | colours, defaults, FncTab, boxes and dialogs     |        6,214
+ E460h +-- CONST -----------------------------------------+
+       | texts                                            |        6,882
+ FF42h +-- Last ------------------------------------------+
+       | (the stack of a .COM, until Alloc0 moves it)     |          190
  FFFFh +--------------------------------------------------+
 ```
 
@@ -245,149 +214,31 @@ flowchart TD
     K --> M["Init40: the main loop"]
 ```
 
-### The checksum
-
-The first loop of `Alloc0` adds up every byte of the file, 100h to
-`Last`, into BX: 16 bits, no carry kept. The sum goes into `ChkFile`,
-and its use comes later, when the program loads itself again (see
-"A command runs in 12,690 bytes").
-
-```asm
-Alloc0:	CLD
-	MOV	SI,100h
-	MOV	CX,OFFSET Last-100h	;; 65,090
-	XOR	BX,BX
-	XOR	DX,DX
-	MOV	AH,0
-Alloc1:	LODSB
-	ADD	BX,AX			;; the sum of the bytes
-	LOOP	Alloc1
-	MOV	SI,80h			;; the command tail
-	MOV	DI,OFFSET OvlPrm	;; 10,'VVV',0,...
-	MOV	CL,DS:[DI]
-	DEC	CX
-	REPE	CMPSB
-	JNE	Alloc3			;; an ordinary start
-```
-
-### Cutting the block in two by hand
-
-The resident part is `LastDat`, 794 paragraphs. The transient part is
-copied behind it, one paragraph being left for an MCB:
-
-```asm
-Alloc5:	XOR	BP,BP			; Allocate segments
-	MOV	BX,((LastDat-Zero-1) SHR 4)+1	;; 794 paragraphs that stay
-	MOV	DX,DS
-	ADD	DX,BX
-	INC	DX			;; + 1 for the MCB: the transient block
-	PUSH	DX
-	MOV	DX,OFFSET Last-1
-	MOV	SI,DX			;; copy from the last byte down
-	SUB	DX,(Init00-Zero) AND 0FFF0h
-	MOV	DI,DX
-	...
-	MOV	AH,4Ah			;; make our block as long as both parts
-	INT	21h
-	...
-Alloc6:	STD
-	CLI
-	PUSH	CS
-	POP	SS
-	MOV	SP,OFFSET VcStack	;; the program's own 256 bytes
-	REP	MOVSB			;; backwards: source and target overlap
-	CLD
-```
-
-Then the program splits its own DOS block in two without asking DOS:
-it shortens the MCB in front of the PSP to 794 paragraphs, and writes
-a new MCB in the paragraph in front of the transient part, with the
-`M` or `Z` and the remaining length that the old one had, and the PSP
-as its owner:
-
-```asm
-	MOV	AX,ES
-	DEC	AX			;; the paragraph in front of the copy
-	PUSH	AX
-	MOV	AX,CS
-	DEC	AX
-	MOV	DS,AX			;; our own MCB
-	MOV	AL,'M'
-	XCHG	AL,DS:[0]		;; ours is not the last any more
-	XCHG	BX,DS:[3]		;; our length: 794
-	SUB	BX,DS:[3]
-	DEC	BX			;; what is left, less the new MCB
-	POP	DS
-	MOV	DS:[0],AL		;; 'M' or 'Z', as ours was
-	MOV	DS:[1],CS		;; owned by our PSP
-	MOV	DS:[3],BX
-```
-
-Where DOS cannot make the block that long, `Alloc0` asks for a second
-block with 48h, copies into that, and shrinks its own.
-
-### `RunPar`: a `.COM` that needs no relocation
-
-The transient code was assembled for offsets 07E7h and up of a
-segment that begins at the PSP. Copied to a block whose first
-paragraph is P, its first byte is at P:0007h. So the program runs it
-from the segment P - 7Eh, where `Init00` is at offset 07E7h again, and
-every offset of the listing is right without a single relocation:
-
-```asm
-Alloc7:	MOV	AX,ES			;; the transient block
-	SUB	AX,WORD PTR ((Init00-Zero) SHR 4)	;; - 7Eh
-	MOV	DS:RunPar,AX
-	PUSH	AX
-	CALL	SetStat
-	MOV	AX,OFFSET Init00
-	PUSH	AX
-	RETF				;; CS = RunPar, IP = Init00
-```
-
-The first 7E0h bytes of that segment, which lie over the resident
-block and its MCB, are never addressed through CS. The transient
-part's 63,323 bytes take a block of 3,959 paragraphs, 63,344 bytes.
+`Alloc0`, 256 bytes that run once, does four things before anything
+else, and [chapter 3](03-the-system.md#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb)
+has each of them instruction by instruction. It adds up the 65,090
+bytes of its own file into a 16-bit sum, `ChkFile`, by which it will
+know the file again when it loads itself after a command. It refuses a
+DOS older than 3.20. It copies the transient part, `Init00` to the
+end, upward behind the 794 paragraphs that are to stay, and splits its
+one block of DOS's in two by writing a memory control block by hand.
+And it jumps into the copy by a far return to `RunPar:Init00`, where
+`RunPar` is the new block's segment less 7Eh: from that segment
+`Init00` is at offset 07E7h again, the offset that the assembler gave
+it, so not one address of the transient part is relocated. The
+transient part's 63,323 bytes take a block of 3,959 paragraphs, 63,344
+bytes.
 
 ### `Init00`: the setup file, read in place
 
 `VC.INI` is 511 bytes: `VVV`, the first 88 bytes of each panel, the
 first 330 bytes of the main data, and a 16-bit sum of all that. `Init00`
-reads it straight into the resident part, at a place chosen so that the
-330 bytes land on `ComnIni`, the copy of the main data that `Init11`
-will copy down, and the panels' bytes just in front:
-
-```asm
-	MOV	SI,OFFSET Init_F	;; 'VC.INI'
-	MOV	BP,OFFSET ComnIni - (3 + 2*WCBini)	;; read to here
-	MOV	CX, 3 + 2*WCBini + CmnIni + 2 + 1	;; 512: one byte too many
-	CALL	ReadOne
-	MOV	BX,0
-	JC	Init03			;; no file: the defaults
-	DEC	CX
-	SUB	AX,CX			;; exactly 511 read?
-	JNE	Init02
-	DEC	CX
-	DEC	CX
-	MOV	SI,BP
-	XOR	DX,DX
-Init01:	LODSB				;; the sum of 509 bytes
-	ADD	DX,AX
-	LOOP	Init01
-	LODSW
-	CMP	AX,DX
-	JNE	Init02
-	MOV	DI,BP
-	MOV	AL,'V'
-	MOV	CL,3
-	REPE	SCASB			;; and 'VVV' in front
-	JNE	Init02
-```
-
-Asking DOS for 512 bytes and expecting 511 is how a longer file is told
-from a right one with no call to learn its length. The main data's 330
-bytes are then already where they belong; only each panel's 88 go on to
-`WCB1sav` and `WCB2sav`.
+reads it with one call of DOS straight into the resident part, at a
+place chosen so that the 330 bytes land on `ComnIni`, the copy of the
+main data that `Init11` will copy down, and asks for one byte more than
+the file has: only a file of the right length reads one byte less than
+was asked. [Chapter 4](04-the-setup.md#reading-it-the-commander) has the
+code. Only each panel's 88 bytes then go on, to `WCB1sav` and `WCB2sav`.
 
 Without a good file the defaults come from `_DATA`, which begins with
 them laid out exactly as the main data begins: `Palets`, 240 bytes of
@@ -492,130 +343,29 @@ source rarely says so: the convention is the documentation.
 ## A command runs in 12,690 bytes
 
 Enter on a command line ends at `F21_31` of `VCFUNC.INC`, which packs
-up the commander:
+up the commander, and the resident part does the rest. In outline:
 
-1. It puts the critical-error and Ctrl-Break vectors back
-   (`RestVct`), copies the first `CmnSave` = 2,733 bytes of the main
-   data, the setup, the history, the extension file and the command line
-   `DosBuf`, to `ComnIni` in the resident part, and packs each panel into
-   its save area with `F21_40`.
-2. It gives the data block back to DOS (`MOV AH,49h` with ES on it) and
-   jumps, by `PUSH`/`RETF`, to `Exec` in the resident part, with ES on
-   the transient block.
+1. `F21_31` copies the first `CmnSave` = 2,733 bytes of the main data,
+   the setup, the history, the extension file and the command line
+   `DosBuf`, to `ComnIni` in the resident part, keeps each panel in its
+   save area, 13 bytes a file for at most 256 files, and puts the
+   critical-error and Ctrl-Break vectors back (`RestVct`).
+2. It gives the data block back to DOS and jumps, by `PUSH`/`RETF`, to
+   `Exec` in the resident part.
 3. `Exec` gives the transient block back too when `LoadFl`, the small
-   mode of Memory allocation, is set, as it is by default; otherwise
-   the code stays, and only the block of the data and the panels has
-   gone. Then it runs each command of `DosBuf` in turn: through
-   `COMMAND.COM /C` with 4B00h, or with Quick execute (`ExecTyp`)
-   through COMMAND.COM's own INT 2Eh, after which it has to set its own
-   stack again, since INT 2Eh keeps no register.
-4. In the small mode it then loads the transient part again; either way
-   it comes back to `Init11`, which takes the data anew.
+   mode of Memory allocation, is set, as it is by default: then 12,690
+   bytes of the commander are left in memory. Otherwise the code stays
+   with them, 76,050 bytes in all. Then it runs each command of
+   `DosBuf` in turn, through `COMMAND.COM /C`, or with Quick execute
+   through COMMAND.COM's own INT 2Eh.
+4. In the small mode it then loads the transient part again, by running
+   `VC.COM` as its own loader; either way it comes back to `Init11`,
+   which takes the data anew.
 
-### A panel in 13 bytes a file
-
-`F21_40`, 110 bytes, keeps 94 bytes of the panel's header (`WCBsave`:
-the 88 that the setup file keeps, the cursor, the first line shown and
-the end of the list) and, for at most 256 files, 13 bytes of each
-24-byte entry: the first 12 bytes of the name, which a name of 8.3
-never fills, and the attribute byte. A panel saves in 94 + 13 x 256 =
-3,422 bytes. If the cursor was beyond the 256th file, it and the first
-line are moved to the last entries kept, with their marks of selection
-cleared. Coming back, `Expand`, 46 bytes, makes each entry 24 bytes again
-with the name's zero put back; the sizes and dates come back when the
-directory is read again.
-
-### `VC.COM` as its own overlay loader
-
-The program does not reopen its file and read 63,323 bytes from the
-right offset. It **runs itself**. `Exec11` asks DOS for a block as long
-as the transient part, sets `RunPar` for it, and runs `VC.COM` (the
-path that `OvlPth` found in the environment, where DOS puts the
-program's own path behind its strings) with the command tail of
-`OvlPrm`: `VVV`, five zeros, and its own segment written into the last
-word of it:
-
-```asm
-Exec12:	XOR	AX,AX
-	MOV	DS:ComnIni.LoadSiz,OFFSET Last	;; what the child is to copy
-	MOV	SI,OFFSET OvlPrm	;; 10,'VVV',0,0,0,0,0,0,0,0Dh
-	MOV	BL,CS:[SI]
-	MOV	BH,0
-	MOV	CS:[SI+BX-1],CS		;; our segment, into the tail
-	MOV	BX,OFFSET ComnIni.EPB
-	MOV	ES:[BX].CmdLine.Offs,SI
-	MOV	ES:[BX].CmdLine.Segm,CS
-	MOV	DX,ES:ComnIni.OvlPth	;; the path of VC.COM
-	MOV	DS,CS:[2Ch]
-	MOV	AX,4B00h		;; run it
-	INT	21h
-	...
-Exec14:	MOV	AH,4Dh			;; its exit code
-	INT	21h
-	OR	AX,AX
-	JNE	Exec13
-	PUSH	ES
-	POP	DS
-	MOV	AX,DS:ComnIni.LoadSiz	;; the child's checksum
-	CMP	AX,DS:ChkFile		;; is ours?
-	JNE	Exec13			;; "Bad or missing" the file
-Exec15:	PUSH	CS:RunPar
-	MOV	AX,OFFSET Init11
-	PUSH	AX
-	RETF
-```
-
-The child is an ordinary start of `VC.COM`. Its `Alloc0` sums its own
-file, sees `VVV` and a segment in its tail, and becomes a copy loop:
-
-```asm
-	LODSW				;; the parent's segment, from the tail
-	CMP	BYTE PTR DS:[SI],0Dh
-	JNE	Alloc3
-	MOV	ES,AX
-	XCHG	BX,ES:ComnIni.LoadSiz	;; hand back our checksum, take the length
-	MOV	ES,ES:RunPar		;; the parent's new transient block
-	MOV	SI,OFFSET Init00
-	MOV	DI,SI
-	MOV	CX,BX
-	SUB	CX,SI
-	REP	MOVSB			;; our transient part into it
-	MOV	AX,4C00h
-	SUB	BX,OFFSET Last
-	JE	Alloc2
-	INC	AX
-Alloc2:	INT	21h			;; exit, code 0
-```
-
-One word, `LoadSiz` (the first word of the saved `DosBuf`, which has
-been run by now), carries the length to copy one way and the checksum
-of the file the other. A file that has changed since the commander
-started, another version or a damaged copy, gives another sum, and the
-commander says so and asks for Enter or Esc rather than run code that
-is not its own. The whole mechanism costs some 55 bytes in `Alloc0` and
-137 in `Exec11` to `Exec15`. The price is that DOS must be able to load
-all 65,090 bytes of the child for a moment, which it can, since the
-commander has just given back more than that.
-
-```mermaid
-sequenceDiagram
-    participant P as resident part (Exec)
-    participant D as DOS
-    participant C as child VC.COM (Alloc0)
-    P->>D: 48h: a block for the transient part
-    D-->>P: segment, RunPar = it - 7Eh
-    P->>P: LoadSiz = OFFSET Last, segment into the tail
-    P->>D: 4B00h VC.COM 'VVV'
-    D->>C: load and start
-    C->>C: sum own 65,090 bytes
-    C->>P: XCHG checksum with LoadSiz
-    C->>P: REP MOVSB Init00..Last into RunPar
-    C->>D: 4C00h
-    D-->>P: back from 4B00h
-    P->>D: 4Dh: exit code 0?
-    P->>P: LoadSiz = ChkFile?
-    P->>P: RETF to RunPar:Init11
-```
+[Chapter 3](03-the-system.md#the-resident-part-12690-bytes-that-stay)
+has the four steps byte by byte: what stays, how a command line is made
+in place, and how the second copy of `VC.COM` hands the first its code
+and its check sum through one word.
 
 ## The main data
 
@@ -1139,10 +889,8 @@ What the loop does each time round:
 1. `PutKey` reads the shift state, INT 16h AH 2, and draws the key bar
    for Alt, Ctrl, Shift or none; `PutKey0` draws only when the bar it
    picks differs from `BarPrev`, so holding a key costs nothing.
-2. `LeaveTm` gives the time away: INT 28h, which lets DOS's own TSRs
-   such as `PRINT` work; INT 2Fh AX 1680h, Windows' "release the time
-   slice", which it stops calling for good once the call answers that
-   Windows is not there; and DESQview's pause through INT 15h.
+2. `LeaveTm` gives the time away to DOS's background programs, to
+   Windows and to DESQview ([chapter 3](03-the-system.md#giving-time-away)).
 3. With a blank delay set, it compares the time with `BlTime`, now
    plus `BlDelay` minutes, set again whenever something happens.
 4. With the clock on, it draws the clock.
@@ -1163,33 +911,13 @@ pointer a `√` while it is on a key; letting go on a key returns that
 key, 3Bh plus the column divided by 8 for F1 to F10, 54h on for Shift,
 68h on for Alt.
 
-### The mouse driver, in eight calls
+### The mouse driver
 
-The mouse is INT 33h, and the program uses it in a few lines of
-`VCSUB1.INC`. `GetMous` (62 bytes) asks for the position, AX 3, which
-the driver gives in pixels of a virtual screen of 8 x 8 a cell, and
-divides by 8 with `SHR`; with `LftMous` set it exchanges the bits of
-the two buttons. `CurMous` shows and hides the pointer, AX 1 and 2, the
-choice made from the carry of a `CMP`. `TypMous` makes the pointer a
-character:
-
-```asm
-TypMous	PROC	NEAR
-	...
-	MOV	CX,0FFFFh		;; keep the whole cell ...
-	MOV	DX,7700h		;; ... and invert its colours
-	CMP	AL,0
-	JE	TypMo1
-	MOV	CL,0			;; keep the colours only ...
-	MOV	DL,AL			;; ... and show this character
-TypMo1:	XOR	BX,BX			;; a software text cursor
-	MOV	AX,0Ah
-	INT	33h
-```
-
-The driver draws the pointer by ANDing the cell under it with CX and
-XORing it with DX, so the same call makes the ordinary block pointer
-and the `√`, `■` and `x` that tell the user what letting go will do.
+The mouse is INT 33h, eight calls in a few lines of `VCSUB1.INC`, and
+[chapter 3](03-the-system.md#the-mouse-eight-calls-of-int-33h) has them
+all: the position in cells, the buttons exchanged for a left-handed
+mouse, and a pointer that is a character, `√`, `■` or `x`, to tell the
+user what letting go will do.
 
 ## The screen
 
@@ -1260,10 +988,10 @@ Wind7:	MOV	AL,1
 ```
 
 `MovScr` (52 bytes) is the copy, `REP MOVSW`, in pieces of at most
-seven rows. On a CGA, whose memory shows "snow" when the processor
-writes to it while it draws, `Snow` is 0, and `MovScr` waits for the
-vertical retrace, polling port 3DAh, before each piece; the start tells
-such an adapter by timing that bit. `SavScr` is the copy the other way,
+seven rows; on a CGA that would show "snow" it waits for the vertical
+retrace before each piece
+([chapter 3](03-the-system.md#cga-snow-and-volkovs-own-question-marks)).
+`SavScr` is the copy the other way,
 the screen into `ScrBuf`, which `Init40` makes after every command, and
 then keeps in `UserScr`, the 49 rows of what DOS showed: switching the
 panels off with Ctrl-O shows it again, `ResUser`, as does Esc with
@@ -1338,10 +1066,11 @@ and the inverted bit 7 shifted out into the carry, and leaves a run's
 character to the next round of its loop, which counts it as an
 ordinary one.
 
-`NgLine` and `LnStr` disagree in one place. `LnStr` counts `^Cxx` as a
-cell and `^Axx` as none, and `NgLine` writes a character for `^A` and
-changes the colour for `^C`: a line that used either would be measured
-wrong by one cell.
+`NgLine` and `LnStr` disagree in one place, code against code: `LnStr`
+counts `^Cxx` as a cell and `^Axx` as none, where `NgLine` changes the
+colour for `^C` and writes a character for `^A`. A line that used
+either would be measured one cell wrong; none of the program's own
+texts uses either, so it never shows.
 
 ### `DialBox`: a box is 8 bytes and its lines
 
@@ -1454,26 +1183,34 @@ whose answer is a byte; 3 a tick, `FlipFl`; 4 a row of buttons,
 and `mBase` its place in the box. The four links name the field that
 Up, Down, Left and Right go to, by number, so that a dialog of several
 groups is a graph of fields in a few bytes. `bFlags` asks for the
-keyboard to be emptied first (bit 0), a beep (bit 1), the shift of
-`SftErr` (bit 2), and no box at all where the box is on the screen
-already (bit 4); the source's comment on the header has bits 0 and 1
-the other way round, and the code is as here. `SubFunc` is the address
-of a routine that `Dialog` calls on Enter, which may refuse the answer:
-the dialog of attributes checks a typed date so.
+keyboard to be emptied first (bit 0), a beep (bit 1), the box moved
+down by `SftErr` (bit 2), F10 and Alt-F10 for the tree (bit 3), and no
+box at all where the box is on the screen already (bit 4). `SubFunc` is
+the address of a routine that `Dialog` calls on Enter, which may refuse
+the answer: in the dialog of attributes it is `M30_60` of `VCF1.INC`,
+"Test date & time", which reads the date and the time typed in.
+
+Here Volkov's comments and his code disagree, and the code is what
+runs. The comment above `Dialog` lists the flags as "b0 - Beep" and
+"b1 - ClrKbd", where `Dial21` tests bit 0 to empty the keyboard and
+bit 1 to beep, as above; and it names the header's third word
+`SecondBox`, where the `STRUC` calls it `SubFunc` and the code calls
+the routine that it names.
 
 `Dialog`, 1,006 bytes, then draws the bars (`bMenu`, `bKeyBar`), the
 box, every field from its value, sets the help page, and loops on
 `Input` and its table `Dial_T`: Tab and Shift-Tab, the arrows by the
-links, Home, End, PgUp and PgDn, Enter, Esc, F10, and Alt-F10 for the
-tree where `bFlags` bit 3 asks for it. It answers with the button
+links, Home, End, PgUp and PgDn, Enter, Esc, and F10 and Alt-F10, which
+answer for the tree where `bFlags` bit 3 asks for it, F10 being Esc
+otherwise. It answers with the button
 chosen, and Esc with FFh. Every dialog of the program, the error boxes
 included, is a table run by this one routine.
 
-<!-- SCREENSHOT: golden dialog-keys step 1 -->
+![F9, O, Enter: the Configuration dialog](img/config.png)
 
-*F9, O, Enter: the Configuration dialog, `Conf_P` and its fields:
+*F9, O, Enter: the Configuration dialog, `Conf_B` and its fields,
 groups of choices, ticks and buttons, linked by their `mUp` to
-`mRight`.*
+`mRight`. The box is still growing from the middle, `ZoomWin`.*
 
 ### The menu bar: `MnuTab` and a table of commands
 
@@ -1634,7 +1371,7 @@ The separator blinks, and the clock is drawn, one `Window` of six cells,
 only when the separator changes, twice a second, however fast the loop
 goes round.
 
-<!-- SCREENSHOT: golden clock step 2 -->
+![F9, O, L: the clock](img/clock.png)
 
 *F9, O, L: the clock on, in the top right corner, over the panel's
 frame.*
@@ -1717,11 +1454,6 @@ button, or a move of the pointer anywhere but within the four columns
 and two rows of the top right corner end the sky. Between ticks `Blank`
 calls `LeaveTm`, so even the blanker gives its time to DOS and Windows.
 
-<!-- SCREENSHOT: golden blank step 1 -->
-
-*The pointer moved to the top right corner: the screen blanked at
-once, the first stars of `StarTab` coming out.*
-
 ## The economies, in one list
 
 | Economy | Where | What it saves |
@@ -1729,11 +1461,6 @@ once, the first stars of `StarTab` coming out.*
 | One segment for code, tables and texts, the tiny model: every pointer is a 16-bit offset, every table is read through CS, and a table names another by a word | `.MODEL Tiny` | no segment is loaded to follow a pointer; a box's line is a 2-byte word |
 | The loader and the start assembled over the resident part's buffers | `ORG LastRes` | 10,923 bytes of buffers and stack cost no byte of the file |
 | The data are a `STRUC` laid over memory from DOS, not data of the file | `MainDat`, `WCBdef` | 62,603 + 2 x 6,754 bytes that are not in the file |
-| A `.COM` copied to a block and run from its segment less 7Eh, so every offset holds | `Alloc7`, `RunPar` | no relocation, no table of them |
-| The block split by writing an MCB by hand | `Alloc6` | the two parts adjacent, with one call of DOS |
-| The program its own overlay loader: it runs itself, and the child copies its transient part into the parent | `Exec11`, `Alloc0` | no seek and read of its own file; the length one way and the checksum the other in one word |
-| The data, and in the small mode the transient part, given back while a command runs | `F21_31`, `Exec` | 62,603 bytes of data and the panels, and 63,323 of code, free for the command; 12,690 stay |
-| A panel kept in 13 bytes a file across a command | `F21_40`, `Expand` | 3,422 bytes a panel instead of 6,754 |
 | The setup file read straight into its place, one byte more asked for than it has | `Init00` | no copy of the 330 bytes, no call for the length |
 | The defaults laid out in `_DATA` as the main data is, copied with one `REP MOVSB` | `Palets`, `DefInit` | 279 bytes of defaults with no code per option |
 | The setup saved by comparing its image with the last saved one, kept in an idle save area | `Func05`, `IniSave` = `WCB1sav` | no "changed" flag anywhere; no buffer of its own |
@@ -1755,5 +1482,22 @@ once, the first stars of `StarTab` coming out.*
 | A pointer that is a character, by the driver's own masks | `TypMous` | the `√`, `■` and `x` feedback in one call |
 | Code shared by falling through and jumping into other code | 2,486 labels against 305 procedures | 44 percent of the code is entered by jumps, a 2- or 3-byte jump where a call and a copy of a tail would be more |
 
-The C translation of all this, which keeps the layouts and the names,
-is the subject of [chapter 5](05-into-c.md).
+The economies of the resident part, of the hand-made MCB, `RunPar` and
+the program that loads itself, are listed with the rest of the system in
+[chapter 3](03-the-system.md#what-it-adds-up-to).
+
+## Where to read next
+
+- `src/asm/VC.ASM`: the structures near the top, `MainDat`, `WCBdef`,
+  `BOXHD` and `BOXMN`; `Init00` to `Init33` for the start; `Init40` to
+  `Func62` for the main loop, with `FncTab`.
+- `src/asm/VCSUB1.INC`: `Case`, `BasAdr`, `SavWin`, `ResWin`, `Window`,
+  `MovScr`, `DialBox`, `Dialog`, `LnStr` and `NgLine`; `VCSUB2.INC`:
+  `Input`, `Input0`, `PutKey0`, `Blank` and `Rnd`; `VCMENU.INC`: `MnuTab`
+  and the menus; `VCHELP.INC`: `Help`.
+- [Chapter 2](02-the-features.md) for what the panels, the viewer, the
+  editor, copy and find file do on this skeleton;
+  [chapter 3](03-the-system.md) for the calls of DOS and the BIOS and
+  for the resident part; [chapter 4](04-the-setup.md) for `VC.INI` and
+  the setup program; [chapter 5](05-into-c.md) for the C translation,
+  which keeps the layouts and the names.
