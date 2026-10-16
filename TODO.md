@@ -1796,7 +1796,7 @@ deviation is (DEVIATIONS.md), documented in the README and
 `docs/web.md`, and, for the page, published again by `pages.yml` as
 "Open, for the user" above has it.
 
-1. **Running now**, two pieces side by side:
+1. **Done**, two pieces side by side:
    - **(a) The page made truly ephemeral: done**, as W8 above. The page keeps nothing: the
      server's mode goes, so there is one way of serving, the static
      one, and with it the probe of `api/server`; the browser's store goes, IndexedDB and
@@ -1812,13 +1812,18 @@ deviation is (DEVIATIONS.md), documented in the README and
      entry of its own among the L entries of DEVIATIONS.md, "The program
      for Linux", and the scenarios that show the scroll have patches of
      the posix trees. DOS is unchanged.
-2. **One piece of the page: done**, as "C:\VC as it is shipped" below:
+   - **The font kept in the repository: done** (c485030), on the
+     user's word: the one file of the pack that the page takes is in
+     `src/portable_c/web/font/`, and nothing fetches it any more.
+2. **One piece of the page: done** (d23c0e1), as "C:\VC as it is
+   shipped" below:
    - C:\VC holds the project's program for DOS, `VC.EXE`, with
      LICENSE.TXT (Volkov's) and LICENSE.DOS32A beside it; the VC.INI
      that the program saves; a VC.MNU, VC.EXT, VCVIEW.EXT and
      VCEDIT.EXT of the project's own; a README of its own; and the
      project's help, `build/portable_c/VC.HLP` as `vc.hlp` ("The
-     project's own help" above).
+     project's own help" above). (Item 3 changes the licences, and
+     the README gave way to the help.)
    - C:\ has an AUTOEXEC.BAT and a CONFIG.SYS, mock ones, for the look
      of a DOS disk and for something to view.
    - An A: drive, empty, so that changing disks can be tried.
@@ -1826,16 +1831,36 @@ deviation is (DEVIATIONS.md), documented in the README and
      checked in each place: the program's defaults, the VC.INI that is
      distributed, and the first start of the page and of the program
      for Linux. The tests' bench keeps it off (CLAUDE.md, "Scenarios").
+     How that came out is decided and left as it is, below.
    - A strip of the keys that browsers keep for themselves, Ctrl-PgUp,
      Ctrl-PgDn, Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4, on the desktop as
      well as on a phone, beside the row of keys that the phone has, with
      a hint that full screen makes them work from the keyboard, by the
      keyboard lock of Chrome and Edge.
    - Declared, documented and published again.
-3. **Then the README's animated session, shot again from the web page**
-   ("One drive, C:\VC alone" above, "The README's animation, from the
-   web page", has how it is made now). About 30 seconds, at a relaxed
-   pace:
+3. **Running: the page's faults that the user found** in item 2. The
+   three fixes have landed (fa60cea, 285ee3c, 27843e2); the page is
+   then published again.
+   - **The browser's pointer** still showed over the grid, in full
+     screen in Chrome too: find the element that is on top there, and
+     hide the pointer over the whole grid. Landed in fa60cea: the black
+     around the grid, `#stage`, had the arrow, and `cursor: none` is on
+     it now.
+   - **One licence file.** C:\VC ships no separate licence files, but
+     ONE `license.txt`, made at build time of the repository's licence
+     files: the project's own LICENSE first, then Volkov's, DOS/32A's,
+     Emscripten's, musl's and the font's, each under a plain heading.
+     DOS/32A's joins the page's Licences dialog too. Landed in 285ee3c.
+   - **AUTOEXEC.BAT and CONFIG.SYS** written as a real DOS machine of
+     the time would have them, with no comment that breaks the
+     illusion; the shipped menu and extension files have the same
+     review. Landed in 27843e2.
+   - **Then the page is published again**, by `pages.yml`.
+4. **Then, strictly after item 3 is on `main`, the README's animated
+   session, shot again from the web page**, so that it shows the final
+   C:\ and AUTOEXEC.BAT ("One drive, C:\VC alone" above, "The README's
+   animation, from the web page", has how it is made now). About 30
+   seconds, at a relaxed pace, by the user's storyboard:
    1. It opens on both panels, C:\VC on the left and C:\ on the right,
       as the README's screenshot under FreeDOS has them, with no banner
       and no typing.
@@ -1849,6 +1874,22 @@ deviation is (DEVIATIONS.md), documented in the README and
 
    The words "Try it live" stay in the README's caption alone, not in
    the SVG, as the user had it on 16 October 2026.
+5. **Then the README's figures**, beside its paragraph "The project is
+   also an experiment in how far an AI coding agent can take such a
+   recreation on its own. …", which is rephrased as what has been
+   done, not as a hope. The figures, totals only, nothing from the
+   conversations:
+   - the wall time from the first commit to the last;
+   - the agentic time, estimated from Claude Code's session records on
+     the machine where all the work was done, counting the main
+     sessions and their agents, with how it was counted;
+   - the number of the human's own messages;
+   - the model or models used, and the harness, Claude Code, with its
+     versions as the records give them.
+
+**Decided and left as it is:** the clock is on only through the page's
+shipped `vc.ini`; the program's built-in defaults keep the original's,
+with the clock off (and so the program for Linux at its first start).
 
 ### C:\VC as it is shipped: done, and what is left of it
 
@@ -1881,10 +1922,10 @@ Item 2 of the queue above, on the user's word of 16 October 2026
   under Node through `F9 o l`, Ctrl-F1, Ctrl-\, Tab and Shift-F9 from its
   defaults: the clock on, C:\VC on the left and C:\ on the right. The
   defaults are as they were, so the program for DOS is the same bytes
-  and no golden moved. **Open for the user:** the program for Linux still
-  starts with the clock off where it has no setup file; making it on
-  there is a change of its first start, which scenarios that start with
-  no setup file would show.
+  and no golden moved. The program for Linux starts with the clock off
+  where it has no setup file, and stays so: the user decided on 16
+  October 2026 that the clock is on only through the page's shipped
+  `vc.ini` ("Queued, decided by the user on 16 October 2026" above).
 - **A:** is a directory of the page's memory, `/drive/a`, made by the
   page and not served, given as `VC_DRIVE_A` with no label
   (`sys_web.c`, three drives now, `DOS_DRIVES` 3); a test of the
