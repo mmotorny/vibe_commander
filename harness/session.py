@@ -1,46 +1,61 @@
 #!/usr/bin/env python3
-"""A session of the program for Linux, as an animated SVG for the README.
+"""A session of the program, as an animated SVG for the README.
 
 GitHub shows no page of its own in a README, neither a frame nor a
 script, so the README cannot run the program. It shows it in motion
-instead: docs/vibe-commander-session.svg, which this script makes. It
-runs the program for Linux, build/portable_c/posix/vc, in a
-pseudo-terminal of 80 by 25 as harness/terminal.py does, types the keys
-of SESSION as xterm sends them, each when the program has written
-nothing for a while, and takes what the terminal shows behind each,
-replayed through pyte (the pinned download of harness/deps.py), for a
-frame. Each frame is shown for the time that SESSION gives it.
+instead: docs/vibe-commander-session.svg, which this script makes, and
+which the README links to the web page on GitHub Pages, where the
+program runs. Each frame is a screen of the program, shown for the
+time that its step gives it.
+
+The screens are taken one of two ways:
+
+- From the web page, the default, as it is published: SESSION is played
+  by harness/websession.mjs on build/portable_c/web/vc.html, served by
+  its server with its one drive, C:, labelled VC, which holds C:\\VC
+  alone, where the page starts, in the Chromium that the machine has
+  (`chromium` or `chromium-browser` on the path), headless, with the
+  keys as a keyboard sends them to the page. A frame is the page's own
+  cells once the screen has stayed the same for a while. The page's
+  clock starts at STAMP, in UTC, so that what the session makes on C:
+  has the same time at every run.
+- From the program for Linux, with --linux, as the README's animation
+  was first made: SESSION_LINUX is played on build/portable_c/posix/vc
+  in a pseudo-terminal of 80 by 25 as harness/terminal.py does, its keys
+  as xterm sends them, each when the program has written nothing for a
+  while, and a frame is what the terminal shows behind each, replayed
+  through pyte (the pinned download of harness/deps.py). The files that
+  it lists are harness/session_files, copied with fixed times into a
+  home directory of a directory of /tmp of the run's own, as
+  harness/posixrun.py has its bench, with an empty directory for the
+  setup file beside it, so that the program starts with its defaults;
+  their lines are ended as DOS ends them, CR LF.
 
 The frames are drawn as the program draws them: 80 by 25 cells of 8 by
-16 pixels, the colours of the VGA's mode 3 that the program writes in
-24 bits, and the characters in VileR's Web437 IBM VGA 8x16 (CC BY-SA
-4.0, LICENSE.FONT), which the web page's build fetches and pins
-(CMakeLists.txt) and which is put into the SVG as it is, about 13 KB.
-A row that several frames have is drawn once and used by each, and the
-frames stand one under the other on a strip that CSS moves up frame by
-frame: no script, so that GitHub shows it as an image.
-
-The files that the program lists are the session's own,
-harness/session_files, copied with fixed times into a home directory
-of a directory of /tmp of the run's own, as harness/posixrun.py has its
-bench, so that the path of the setup file's directory beside it holds
-in DOS's 63 characters; that directory is empty, so that the program
-starts with its defaults. The files' lines are ended as DOS ends them,
-CR LF, which is how the viewer takes a line's end. They were written
-for the project as the web page's demo drive, which the page has no
-longer, and are kept as they were, byte for byte, readme.txt's words on
-that drive too, so that the SVG is the same bytes.
+16 pixels, the colours of the VGA's mode 3, and the characters in
+VileR's Web437 IBM VGA 8x16 (CC BY-SA 4.0, LICENSE.FONT), which the web
+page's build fetches and pins (CMakeLists.txt) and which is put into
+the SVG as it is, about 13 KB. A row that several frames have is drawn
+once and used by each, and the frames stand one under the other on a
+strip that CSS moves up frame by frame: no script, so that GitHub shows
+it as an image. Below the screen a button says that the program can be
+tried live, which the README's link around the image makes true.
 
     python3 harness/session.py              # docs/vibe-commander-session.svg
     python3 harness/session.py --text       # the frames as text as well
+    python3 harness/session.py --linux      # from the program for Linux
 
-with the project built with -DVC_WEB=ON, which fetches the font.
+with the project built with -DVC_WEB=ON, which fetches the font and
+builds the page.
 """
 
 import argparse
 import base64
 import html
+import json
 import os
+import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -50,6 +65,11 @@ import terminal
 
 ROOT = deps.ROOT
 PROGRAM = ROOT / "build" / "portable_c" / "posix" / "vc"
+PAGE = ROOT / "build" / "portable_c" / "web" / "vc.html"
+WORK = ROOT / "build" / "session"   # Chromium of a snap reads no hidden
+                                    # directory and not the real /tmp
+CHROMIUMS = ("chromium", "chromium-browser")
+LIVE = "https://mmotorny.github.io/vibe_commander/"
 FONT = (ROOT / "build" / "_deps" / "vga_font-src" / "woff - Web (webfonts)"
         / "Web437_IBM_VGA_8x16.woff")
 FILES = ROOT / "harness" / "session_files"
@@ -59,9 +79,57 @@ STAMP = 961156800               # the time of the files: 16 June 2000,
 CELL_W, CELL_H = 8, 16
 ESC = "\x1b"
 
-# The keys of the session, as xterm sends them, and how long the frame
-# behind each is shown, in seconds. The first is the program started.
+# The steps of the session on the web page, and how long the frame behind
+# each is shown, in seconds: a key by the name that harness/browser.mjs
+# gives it, with what it is pressed with, or text typed into the editor a
+# character at a time, a frame behind each. The first is the page as it
+# starts, in C:\VC.
+def key(name, seconds, **held):
+    return dict(press=name, seconds=seconds, **held)
+
+
+def typed(text, seconds=0.07):
+    return [dict(type=character, seconds=seconds) for character in text]
+
+
 SESSION = [
+    dict(seconds=2.0),                      # the page as it starts
+    key("F1", 1.6, ctrl=True),              # Ctrl-F1: the left panel too
+    key("F7", 1.0),                         # F7: a directory made
+    *typed("NOTES", 0.12),
+    key("Enter", 1.4),                      # NOTES in the panel
+    key("F4", 1.0, shift=True),             # Shift-F4: a file to edit
+    *typed("hello.txt", 0.1),
+    key("Enter", 1.2),                      # the question of a new file
+    key("Enter", 1.0),                      # the editor
+    *typed("Hello from Vibe Commander,"),
+    key("Enter", 0.3),
+    *typed("in a web page of 80 by 25."),
+    key("Enter", 0.3),
+    *typed("Its screen is DOS's, cell for cell."),
+    key("F2", 1.2),                         # F2: saved
+    key("Escape", 1.2),                     # Esc: hello.txt in the panel
+    key("Down", 0.8),                       # Down, to hello.txt
+    key("F3", 2.5),                         # F3: the viewer
+    key("Escape", 1.0),                     # Esc
+    key("F9", 1.0),                         # F9: the menu bar, at Right
+    key("Enter", 1.2),                      # Enter: its menu
+    key("Left", 1.2),                       # Left: the menu of Options
+    key("Left", 1.2),                       # Left: of Commands
+    key("Left", 1.2),                       # Left: of Files
+    key("Right", 0.8),                      # Right
+    key("Right", 1.0),                      # Right: of Options again
+    key("Down", 0.5),                       # Down
+    key("Up", 0.8),                         # Up, to Configuration
+    key("Enter", 3.5),                      # Enter: its dialog
+    key("Escape", 1.2),                     # Esc
+    key("F10", 2.5),                        # F10: the question whether to quit
+]
+
+# The keys of the session for Linux, as xterm sends them, and how long
+# the frame behind each is shown, in seconds. The first is the program
+# started.
+SESSION_LINUX = [
     ("", 2.5),                  # the program as it starts
     (ESC + "[1;5P", 1.6),       # Ctrl-F1: the left panel too
     ("\r", 1.2),                # Enter: into CODE
@@ -125,8 +193,47 @@ def snapshot(screen):
     return rows, cursor
 
 
+# The VGA's 16 colours of mode 3, as the program writes them in 24 bits
+# and as the page's render.js has them.
+VGA = ["000000", "0000aa", "00aa00", "00aaaa", "aa0000", "aa00aa", "aa5500",
+       "aaaaaa", "555555", "5555ff", "55ff55", "55ffff", "ff5555", "ff55ff",
+       "ffff55", "ffffff"]
+
+
+def record_web():
+    """The frames of SESSION played on the web page, each with its time,
+    in the form of a frame of the terminal (snapshot)."""
+    if not PAGE.exists():
+        sys.exit(f"{PAGE} is not built: configure with -DVC_WEB=ON")
+    node = shutil.which("node")
+    chromium = next((found for found in map(shutil.which, CHROMIUMS)
+                     if found), None)
+    if node is None or chromium is None:
+        sys.exit("the web page's session wants node and chromium on the path")
+    WORK.mkdir(parents=True, exist_ok=True)
+    steps, frames = WORK / "steps.json", WORK / "frames.json"
+    steps.write_text(json.dumps(SESSION))
+    frames.unlink(missing_ok=True)
+    subprocess.run([node, str(ROOT / "harness" / "websession.mjs"),
+                    "--chromium", chromium, "--page", str(PAGE),
+                    "--work", str(WORK), "--steps", str(steps),
+                    "--stamp", str(STAMP * 1000), "--out", str(frames)],
+                   check=True, timeout=600)
+    taken = []
+    for frame in json.loads(frames.read_text()):
+        rows = tuple(tuple((character, VGA[attribute & 0x0F],
+                            VGA[attribute >> 4 & 0x07],
+                            attribute & 0x80 != 0)
+                           for character, attribute in row)
+                     for row in frame["rows"])
+        cursor = frame["cursor"]
+        taken.append(((rows, None if cursor is None
+                       else (cursor[0], cursor[1])), frame["seconds"]))
+    return taken
+
+
 def record():
-    """The frames of SESSION, each with its time."""
+    """The frames of SESSION_LINUX, each with its time."""
     if not PROGRAM.exists():
         sys.exit(f"{PROGRAM} is not built")
     pyte = terminal.load_pyte()
@@ -142,7 +249,7 @@ def played(pyte, work):
     frames = []
     try:
         term.read(1.0)
-        for keys, seconds in SESSION:
+        for keys, seconds in SESSION_LINUX:
             if keys:
                 term.type(keys.encode(), 0.6)
             frames.append((snapshot(term.screen), seconds))
@@ -203,7 +310,28 @@ def row_svg(cells):
     return "".join(parts)
 
 
-def svg(frames):
+BADGE_H = 40                    # the strip below the screen, for the button
+
+
+def badge(width, top):
+    """The button below the screen that says the program can be tried
+    live: a rounded box with a triangle of play and the words, in the
+    VGA's font, the colours those of the program's panels."""
+    words = "Try it live in your browser"
+    text_w = len(words) * CELL_W
+    box_w = text_w + 3 * CELL_W + 28
+    left = (width - box_w) // 2
+    y = top + (BADGE_H - 28) // 2
+    return [f'<g id="live"><rect y="{top}" width="{width}" '
+            f'height="{BADGE_H}" fill="#000"/>',
+            f'<rect x="{left}" y="{y}" width="{box_w}" height="28" rx="6" '
+            'fill="#0000aa" stroke="#55ffff" stroke-width="2"/>',
+            f'<path d="M{left + 14} {y + 7}v14l12-7z" fill="#ffff55"/>',
+            f'<text x="{left + 14 + 3 * CELL_W}" y="{y + 19}" '
+            f'fill="#ffffff">{words}</text></g>']
+
+
+def svg(frames, title):
     """The animated SVG of the frames."""
     # Frames that are the same one behind the other are one.
     merged = []
@@ -218,13 +346,14 @@ def svg(frames):
         for line in lines:
             rows.setdefault(line, f"r{len(rows):x}")
     width, height = 80 * CELL_W, 25 * CELL_H
+    whole = height + BADGE_H
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" '
            f'xmlns:xlink="http://www.w3.org/1999/xlink" '
-           f'viewBox="0 0 {width} {height}" width="{width}" '
-           f'height="{height}">',
-           "<title>Vibe Commander 0.1 in a terminal</title>",
+           f'viewBox="0 0 {width} {whole}" width="{width}" '
+           f'height="{whole}">',
+           f"<title>{title}</title>",
            "<desc>A session of Vibe Commander 0.1, made by "
-           "harness/session.py. The font is VileR's Web437 IBM VGA 8x16 "
+           f"harness/session.py; the program runs live at {LIVE}. The font is VileR's Web437 IBM VGA 8x16 "
            "of the Ultimate Oldschool PC Font Pack, (c) 2016-2020 VileR, "
            "https://int10h.org/oldschool-pc-fonts/, under the Creative "
            "Commons Attribution-ShareAlike 4.0 International licence, "
@@ -252,10 +381,12 @@ def svg(frames):
     out.append("</style>")
     out.append(f'<rect width="{width}" height="{height}" fill="#000"/>')
     out.append("<defs>")
+    out.append(f'<clipPath id="screen"><rect width="{width}" '
+               f'height="{height}"/></clipPath>')
     for line, name in rows.items():
         out.append(f'<g id="{name}">{row_svg(line)}</g>')
     out.append("</defs>")
-    out.append('<g id="film">')
+    out.append('<g clip-path="url(#screen)"><g id="film">')
     for index, ((lines, cursor), _) in enumerate(merged):
         out.append(f'<g transform="translate(0 {index * height})">')
         for row, line in enumerate(lines):
@@ -266,7 +397,9 @@ def svg(frames):
                        f'y="{cursor[1] * CELL_H + 14}" width="{CELL_W}" '
                        f'height="2" fill="{fore}"/>')
         out.append("</g>")
-    out.append("</g></svg>")
+    out.append("</g></g>")
+    out.extend(badge(width, height))
+    out.append("</svg>")
     return "\n".join(out) + "\n", len(merged), total, len(rows)
 
 
@@ -275,16 +408,23 @@ def main():
     parser.add_argument("--out", type=Path, default=OUT)
     parser.add_argument("--text", action="store_true",
                         help="print the frames as text")
+    parser.add_argument("--linux", action="store_true",
+                        help="take the screens from the program for Linux")
     args = parser.parse_args()
     if not FONT.exists():
         sys.exit(f"{FONT} is not there: configure with -DVC_WEB=ON")
-    frames = record()
+    if args.linux:
+        frames = record()
+        title = "Vibe Commander 0.1 in a terminal"
+    else:
+        frames = record_web()
+        title = "Vibe Commander 0.1 in a web page"
     if args.text:
         for ((lines, cursor), seconds) in frames:
             print(f"--- {seconds}s, the cursor {cursor}")
             print("\n".join("".join(cell[0] for cell in line)
                             for line in lines))
-    text, count, total, rows = svg(frames)
+    text, count, total, rows = svg(frames, title)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(text)
     print(f"{args.out}: {count} frames, {total:.1f} seconds, {rows} rows, "

@@ -817,7 +817,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - `SINGLE_FILE` with a shell HTML gives one `build/portable_c/web/vc.html`, with the wasm, the JS, the CSS and the font inline: an estimated 1–3 MB, with no CDN.
 - The demo tree is preloaded into it (`--preload-file` bundled) or embedded. (There is no demo since the one drive.)
 - The targets are `portable_c-web` and `portable_c-web-node`.
-- Publishing, by GitHub Pages or otherwise, is asked of the user in W4. Nothing is published before that.
+- Publishing, by GitHub Pages or otherwise, was asked of the user in W4. The user had the static page published on GitHub Pages on 16 October 2026 (below, "Open, for the user").
 
 ### Pieces
 - **W0, the toolchain.**
@@ -1306,8 +1306,9 @@ held for the next key, and the phone's keyboard by its button.
   commit of its tag (looked up by `git ls-remote`). The commands of its
   steps were run here in a build directory of their own, with the
   Emscripten of another checkout, and made the same `drives/d.json`;
-  the workflow itself has never run. **For the user**: whether to
-  publish, by setting `VC_PAGES` to `publish` and switching Pages on.
+  the workflow itself had not run then. It has since, on 16 October
+  2026, when the user had the page published: see "Open, for the
+  user".
 - **What W4 should know.** The browser has not seen the static page:
   the user's pass by hand, in a browser, of the page from a static host,
   a reload keeping the changes, Reset drives, and a private window
@@ -1568,6 +1569,21 @@ DEVIATIONS.md). What it changed and met:
   `harness/session_files`, byte for byte, readme.txt's words on D:
   among them, so that `python3 harness/session.py` makes the same
   bytes of `docs/vibe-commander-session.svg`, which it does.
+- **The README's animation, from the web page**, on the user's word of
+  16 October 2026: `python3 harness/session.py` plays its session on
+  the web page as its server serves it, C: labelled VC with C:\VC alone,
+  in the machine's headless Chromium (`harness/websession.mjs`, by
+  `harness/browser.mjs`), the keys as a keyboard sends them: two panels,
+  a directory made with F7, hello.txt written in the editor and viewed
+  with F3, the menu bar walked, the Configuration dialog, F10's question.
+  A frame is the page's cells, read from the classes of its runs, and
+  the cursor's element; the mouse's pointer is moved to the last cell of
+  the key bar first, where the program had it in the middle of the
+  screen. The page's clock is set to 16 June 2000, 12:00 UTC, so two
+  runs give the same bytes, which they did. The SVG has a button below
+  the screen, "Try it live in your browser", and the README links the
+  image and a caption to the published page. `--linux` makes it of the
+  program for Linux and `harness/session_files`, as before.
 
 ### W7, the scenarios through the page
 
@@ -1682,14 +1698,19 @@ runs the program under Node and passes the page by.
 
 ### Open, for the user
 
-- Whether to publish to GitHub Pages: set `VC_PAGES` to `publish` (a
-  variable of the repository's Actions) and switch Pages on, with
-  GitHub Actions as its source; then run the workflow `pages.yml` by
-  hand. Nothing is published before that. The repository is private,
-  and a site of GitHub Pages is public to anyone who has its address
-  unless the account is of GitHub Enterprise Cloud; Pages for a private
-  repository also needs a paid plan. The user holds publishing until
-  the project is public.
+- Publishing to GitHub Pages: done, on the user's word of 16 October
+  2026, the repository being public. `VC_PAGES` is `publish`, Pages has
+  GitHub Actions as its source, and `pages.yml`, run by hand, has
+  published the static page at https://mmotorny.github.io/vibe_commander/,
+  which the README's animation links to. What its first runs met: CMake's
+  download of the font pack came back with another SHA-256 at each try on
+  GitHub's runners, where curl gets the pinned bytes, so the workflow
+  fetches the archive by curl, holds it to the pin of `CMakeLists.txt` and
+  hands it to the build; and its actions warned of Node 20, which GitHub
+  has deprecated, so each is at its release on Node 24 (checkout v7.0.1,
+  cache v6.1.0, upload-pages-artifact v5.0.0 with upload-artifact v7.0.0,
+  deploy-pages v5.0.1), still pinned by commit. A workflow runs by hand
+  only (CLAUDE.md, "Third-party software").
 
 Decided on 15 October 2026, by the user: the font's copyright line,
 which is in its heading among the licences that the page shows, no work

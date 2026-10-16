@@ -4,11 +4,16 @@
      python3 harness/session.py
      with the project built: see "The pictures". -->
 <p align="center">
-  <img src="docs/vibe-commander-session.svg" width="720"
-       alt="An animated recording of Vibe Commander 0.1 in a terminal of 80x25 on Linux: it starts with one panel beside its banner, Ctrl-F1 brings up the second, the panels go into the directories CODE and NOTES, F3 views hello.c, F9 opens the menu bar and walks the menus Commands, Files and Options, the Configuration dialog opens from Options, and F10 asks whether to quit">
+  <a href="https://mmotorny.github.io/vibe_commander/">
+    <img src="docs/vibe-commander-session.svg" width="720"
+         alt="An animated recording of Vibe Commander 0.1 in its web page, with a button to try it live: it starts in C:\VC with one panel beside its banner, Ctrl-F1 brings up the second, F7 makes the directory NOTES, Shift-F4 writes hello.txt in the editor, F3 views it, F9 opens the menu bar and walks the menus Right, Options, Commands and Files, the Configuration dialog opens from Options, and F10 asks whether to quit">
+  </a>
 </p>
 <p align="center">
-  <em>Vibe Commander 0.1 running in a terminal on Linux, recorded from the program's own screens.</em>
+  <a href="https://mmotorny.github.io/vibe_commander/"><strong>▶ Try it live in your browser</strong></a>
+</p>
+<p align="center">
+  <em>Vibe Commander 0.1 in its web page, recorded from the program's own screens.</em>
 </p>
 
 Vibe Commander is a faithful recreation of
@@ -181,10 +186,12 @@ its drive, so the proxy is the access control.
 The static site, `build/portable_c/web/static/`, needs no server: any
 static host serves it, and the page keeps the user's changes in the
 browser. To try it locally:
-`python3 -m http.server -d build/portable_c/web/static 8438`. The
-workflow `.github/workflows/pages.yml` publishes it to GitHub Pages. It
-runs only by hand, and only once the repository variable `VC_PAGES` is
-`publish` and Pages is switched on.
+`python3 -m http.server -d build/portable_c/web/static 8438`. It is
+published at <https://mmotorny.github.io/vibe_commander/> by the
+workflow `.github/workflows/pages.yml`, which runs only by hand
+(`gh workflow run pages.yml`), and only while the repository variable
+`VC_PAGES` is `publish` and Pages is switched on with GitHub Actions as
+its source, as both are.
 
 The page cannot run commands, since a browser has no shell.
 [docs/web.md](docs/web.md) has the details, including the phone's key
@@ -255,10 +262,16 @@ The web tests other than `portable_c-web-render` and
 ## The pictures
 
 The animation at the top is made by `python3 harness/session.py`, with
-the project built with `-DVC_WEB=ON` for the font. It runs the Linux
-program in a pseudo-terminal through a fixed list of keys and draws each
-screen as a frame of an SVG that animates by CSS alone. Two runs give
-the same file.
+the project built with `-DVC_WEB=ON` for the page and its font, and
+Node and Chromium on the path. It plays a fixed list of keys on the web
+page, `build/portable_c/web/vc.html`, as it is served, with its one drive
+C: labelled VC and the page starting in C:\VC, in a headless Chromium
+(`harness/websession.mjs`), takes the page's own cells behind each step,
+and draws each screen as a frame of an SVG that animates by CSS alone,
+with a button below the screen that the README links to the page on
+GitHub Pages. The page's clock is set to a fixed time, so two runs give
+the same file. `--linux` takes the screens from the program for Linux in
+a terminal instead, as the animation was first made.
 
 The DOS screenshot is made by
 
@@ -350,4 +363,5 @@ the C trees are linked without Open Watcom's libraries.
 The shareware distribution of Volkov Commander is proprietary and is not
 part of this repository. The DOS screenshot shows the portable C in its
 directory, with the shareware's files beside it. The animation has none
-of them, only a few files written for it, `harness/session_files`.
+of them: only what its session makes on the web page's drive, and, made
+with `--linux`, a few files written for it, `harness/session_files`.

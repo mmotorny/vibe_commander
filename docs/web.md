@@ -176,10 +176,13 @@ To try the static site locally, run
 `http://127.0.0.1:8438/`. Opened as a `file://` URL, the page cannot
 fetch its drive.
 
-`.github/workflows/pages.yml` publishes the static site to GitHub
-Pages. It does nothing until the repository variable `VC_PAGES` is
-`publish` and Pages is switched on, which is the repository owner's
-choice.
+The static site is published on GitHub Pages, at
+<https://mmotorny.github.io/vibe_commander/>, by
+`.github/workflows/pages.yml`. The workflow runs only by hand, `gh
+workflow run pages.yml`, and only while the repository variable
+`VC_PAGES` is `publish` and Pages has GitHub Actions as its source; a
+run publishes the page of the commit it runs on. The README's animation
+links to it.
 
 ## How it is judged
 
