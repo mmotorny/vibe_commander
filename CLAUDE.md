@@ -326,8 +326,8 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
 - It opens on an iPhone: the grid is scaled to fit the screen and fitted
   again when the screen turns or changes size, pinch-zoom allowed; a tap
   is a click on the cell under the finger; where there is no keyboard, a
-  row of keys that a phone lacks, F1 to F10, Esc, Tab, the arrows, PgUp
-  and PgDn, and Ctrl and Alt that stay held for the next key, stands
+  row of keys that a phone lacks, F1 to F10, Esc, Tab, Enter, the arrows,
+  PgUp and PgDn, and Ctrl and Alt that stay held for the next key, stands
   with a button that brings up the phone's keyboard.
 - It is served by a server of the project's own, a script for Node
   with Node's own modules and nothing from npm: the page, and the drives' directories with their
