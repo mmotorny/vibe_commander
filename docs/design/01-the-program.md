@@ -1,38 +1,69 @@
-# The program: its data, its loop, its screens
+# 1. The program: its data, its loop, its screens
 
-Vibe Commander is a two-panel file manager for an 80-column text
-screen. Under its C it is still Volkov Commander 4.05, a DOS program of
-1991 to 2000 written in 16-bit assembly for a machine with 640 KB, a
-text buffer at `B800:0000` and BIOS calls for keys. It was translated
-routine by routine into C, and the portable C, `src/portable_c/`, grew
-out of that translation. So the program is laid out the way the
-assembly laid it out:
+Volkov Commander 4.05 is 65,090 bytes of 8086 code and tables in one
+`.COM` file. While it waits for a key it holds that file, a block of
+62,603 bytes of data, two panels and a buffer for the viewer, and while a
+DOS command runs it keeps 12,690 bytes of itself and gives the rest
+back. Its shape follows from that:
 
-- one block of global data, `struct MainDat md`, with the original's
-  byte layout;
-- one block per file panel, `struct WCBdef`, which the original reached
-  through a segment register;
-- tables of boxes and dialogs that name each other by address;
-- a main loop that never returns, entered at several labels, and
+- one block of global data, `struct MainDat md`, laid out byte by byte,
+  in which every buffer has one place and most have several users;
+- one segment per file panel, `struct WCBdef`, reached through DS;
+- tables of boxes and dialogs, records of 10 and 11 bytes that name each
+  other by 16-bit offset, run by one routine;
+- a main loop that is not a routine, entered at several labels, and
   commands that are jumps rather than calls.
 
-This chapter covers that skeleton: the files, the start, the data, the
-loop, the input, the screen and what is drawn on it. The layer
-underneath, `sys.h` and its implementations for DOS, Linux and the web,
-has its own chapter. Here it is only the place where a key comes from
-and the cells go to.
+This chapter covers that skeleton: the parts of the file, the start,
+the swap around a command, the data, the loop, the input, the screen
+and what is drawn on it. The code shown is the portable C,
+`src/portable_c/`, the same program in readable form (see the
+[preface](00-preface.md#the-three-versions-of-the-source)); the
+assembly of `src/asm/` is quoted where the trick only shows there. The
+calls of DOS and the BIOS underneath are [chapter 3](03-the-system.md).
 
-Everything below comes from `src/portable_c/`. Line counts, sizes and
-offsets were read from the source on 16 October 2026. The structure
-sizes are held by `LAID_OUT` lines in `vc.h`, which fail to compile if
-they are wrong.
+## The parts of `VC.COM`
+
+The file is one segment, and the assembler's listing says what is in
+it:
+
+| Part | Offsets | Bytes |
+|---|---|---|
+| The PSP, DOS's, not in the file | 0000h-00FFh | 256 |
+| The resident part: `Exec`, the INT 21h hook, the program's end | 0100h-06E7h | 1,511 |
+| The loader, `Alloc0`, run once | 06E7h-07E7h | 256 |
+| The transient part's code, `Init00` on | 07E7h-CC1Ah | 50,227 |
+| Tables: colours, defaults, `FncTab`, dialogs (`_DATA`) | | 6,214 |
+| Texts (`CONST`) | | 6,882 |
+| End of the file, `Last` | FF42h | 65,090 in all |
+
+Code is four fifths of it. By source file, the main loop and the start
+are 3,656 bytes, the commands of the keys (`VCFUNC.INC`) 5,244, the
+editor 6,062, the viewer 4,853, the copy 3,902, the file search 2,489,
+the help 1,403, and the shared routines of `VCSUB1` to `VCSUB3.INC`
+14,639. The largest single procedure is the copy engine, `C00_00`, at
+2,684 bytes; `Dialog`, which runs every dialog of the program, is 1,006.
+The listing has 305 procedures and 2,486 labels: almost half of the code
+lies between procedures, as labels that other code jumps to.
+
+The resident part has 10,923 bytes of buffers behind its code, from
+06E7h to 3192h: a copy of the interrupt table, the saved setup and the
+saved panels, and the stack. None of it is in the file. The source says
+`ORG LastRes` and assembles the loader and the start of the transient
+code over those buffers, so the bytes that hold the start-up code on
+disk become the resident part's data once the program runs.
 
 ## The source tree
 
-`src/portable_c/` holds 78 C files and headers, about 43,600 lines in
-all. About 10,600 of those are the system layer: `sys_dos.c`,
-`sys_posix.c`, `sys_web.c` and the `*_posix.c` files. The other 33,000
-are the program, and it does not know which system it runs on.
+The 27,190 lines of Volkov's assembly for `VC.COM` are `VC.ASM`, which
+holds the data's layout, the start, the main loop and the resident
+part, and eleven include files: `VCFUNC.INC` for the commands of the
+keys, `VCMENU.INC`, `VCF1.INC`, `VCCOPY.INC`, `VCVIEW.INC`,
+`VCEDIT.INC`, `VCHELP.INC`, `VCMEM.INC` and `VCFIND.INC` for the
+features, and `VCSUB1.INC` to `VCSUB3.INC` for the shared routines.
+
+The portable C, `src/portable_c/`, is some 33,000 lines of program in
+C files named for what they do, and the system layer beside them.
 
 There are three kinds of file:
 
@@ -40,10 +71,9 @@ There are three kinds of file:
   assembly's include files. Every file's head comment says which,
   "Translated from VCSUB2.INC".
 - **Tables**, `name_t.c`: the texts, boxes, dialogs and buttons that
-  `name.c` uses, as constants and nothing else. The split comes from the
-  translation, which moved the assembly's data to C one file at a time
-  and checked every byte against the original's binary (the test
-  `portable_c-data`, `harness/datacheck.py`).
+  `name.c` uses, as constants and nothing else, byte for byte the
+  original's `DB` lines. In the assembly they sit in a `.CONST` block
+  of the same include file as the code that uses them.
 - **The platform**, `sys_*.c`, `*_posix.c`, `stack_dos.c`: what is asked
   of the system, behind `sys.h`.
 
@@ -63,7 +93,7 @@ By role:
 | Viewer and editor | `view.c`, `view_t.c`, `edit.c`, `edit_t.c` |
 | Help | `help.c`, `help_t.c`, `help/vc-help.txt` |
 | The setup, folded in | `stmain.c`, `stmain_t.c`, `stopts.c`, `stopts_t.c`, `stcolor.c`, `stcolor_t.c`, `sthelp.c`, `sthelp_t.c` |
-| The system | `sys.h`; `sys_dos.c`, `stack_dos.c` for DOS; `sys_posix.c`, `machine_posix.c`, `emulate_posix.h`, `files_posix.c`, `names_posix.c`, `paths_posix.c`, `codepage_posix.c`, `command_posix.c`, `keyboard_posix.c`, `term_posix.c`, `time_posix.c` for Linux; `sys_web.c` and `web/` for the browser |
+| The system | `sys.h`, with `sys_dos.c` and `stack_dos.c` for DOS, and the files of the other systems ([chapter 3](03-the-system.md)) |
 
 The dependencies are simple, because almost everything goes through
 two shared things: the main data and the screen buffer.
@@ -116,16 +146,40 @@ old name says gets a new name, with the old one in a comment beside it:
 
 ## How the program starts
 
-Each system enters the program in its own place, and each ends up in
-`Main` of `main.c`:
+DOS loads `VC.COM` at offset 100h of a block that holds all of free
+memory, with CS, DS, ES and SS on it, and jumps to 100h, which jumps to
+`Alloc0`. The loader adds up all 65,090 bytes of the file into a
+16-bit checksum, `ChkFile`, and splits the program in two ([chapter
+3](03-the-system.md#splitting-the-block-alloc0) has it step by step):
 
-- On DOS the extender DOS/32A loads the linear executable and jumps to
-  `Start` of `sys_dos.c`. `Start` notes the selectors of code and data,
-  finds the PSP and the environment, takes a block below the megabyte
-  for the calls that have to go through real mode, and calls `Main`.
-- On Linux it is the C `main` of `sys_posix.c`, which takes the terminal
-  (or a test channel), sets up the emulated machine and calls `Main`.
-- On the web it is `sys_web.c`, under Emscripten.
+```
+  as DOS loaded it               as it runs
+  +------------------+ PSP       +------------------+ PSP, SS
+  | PSP 256          |           | PSP 256          |
+  | resident 1,511   |           | resident 1,511   |
+  | loader + Init00..|  ------>  | buffers 10,923   | stack at the top, 256
+  |   transient      |           +------------------+ 794 paragraphs
+  |   63,323         |           | transient 63,344 | CS = RunPar
+  +------------------+           +------------------+ 3,959 paragraphs
+  | free memory      |           | main data 62,603 | DS = ES = SecDat
+                                 | left panel 6,754 |
+                                 | right panel 6,754|
+                                 | the rest: viewer,|
+                                 |  editor, copy    |
+```
+
+The transient part, from `Init00` to the end, is copied upward with
+`STD; REP MOVSB` into a block of its own just above the resident part:
+the loader makes that block by writing a memory control block of DOS's
+into the middle of its own, by hand. Being a `.COM`, the code needs no relocation:
+`RunPar`, the transient's segment, is the block's segment less 7Eh, so
+that every label keeps its offset. From then on CS is the transient
+part, DS and ES the main data, and SS the PSP's segment, where the
+256-byte stack sits at `VcStack`, 3192h.
+
+The C makes the same steps a call each. Every system enters it in its
+own place, `Start` of `sys_dos.c` under DOS/32A ([chapter
+3](03-the-system.md)), and ends up in `Main` of `main.c`.
 
 `Main` never returns:
 
@@ -145,14 +199,14 @@ void Main(void)
 
 ```mermaid
 sequenceDiagram
-    participant S as Start or main()
+    participant S as Start (sys_dos.c)
     participant M as Main (main.c)
     participant X as exec.c
     participant I as start.c
     participant R as Round (main.c)
     participant L as MainLoop
     S->>M: call
-    M->>X: Alloc3: DOS version, memory not used
+    M->>X: Alloc3: DOS version
     M->>I: Init00: read VC.INI or take defaults, banner, VC.EXT
     M->>I: Init11: two panel blocks and the room
     M->>R: Round, never returns
@@ -181,8 +235,8 @@ What each one does:
   each, `WCBini`, stay in `MenuBuf` until `Init11`. Otherwise
   `Init00` takes the defaults: the colour table `Palets`, both panels on
   the current directory, and the left panel switched off. Then it prints
-  the banner through DOS, "Vibe Commander 0.1, based on Volkov Commander
-  4.05" and the copyright line. It reads `VC.EXT`, the main extension
+  the banner through DOS, "The Volkov Commander, Version 4.05" and the
+  copyright line, with INT 21h AH 09h, which writes a text up to a `$`. It reads `VC.EXT`, the main extension
   file, into `ExtMain` and ends it with 1Ah, the way DOS text files end.
   It also sets the masks and notes Ctrl-C (`SetBrk`).
 - **`Init11`** asks the system for two blocks of `PANEL_LEAST` bytes
@@ -202,14 +256,48 @@ What each one does:
   text colour: it has DOS write a space and reads back the colour of
   that cell.
 
-In the original, `Init11` is where the program comes back after every
-command. The original gives its main data back to DOS while a command
-runs. It keeps a copy of the setup and the panels in a small part that
-stays in memory, and builds its data again from that copy. The
-portable C stays in memory whole, a declared deviation. So only the
-room is given back (`GiveMem`, `TakeMem`), and the loop goes back to
-`IniData`. `exec.c` used to be `resident.c`, the part that stayed. It
-is named for `Exec` now and is an ordinary file.
+`Init11` takes all the memory there is. It asks DOS for FFFFh
+paragraphs, which fails with the size of the largest block, and asks
+again for that. Then it carves the block by paragraph arithmetic: 3,913
+paragraphs for the main data, 423 for each panel (`WCBdef`, 6,754 bytes:
+a 610-byte header and 256 entries of 24), and the rest, at least 500
+paragraphs, 8,000 bytes, for the viewer. `WCB1seg` is the block plus
+3,913, `WCB2seg` 423 further, `ViewSeg` 423 further again. The program
+needs 5,259 paragraphs, 84,144 bytes, besides its code; with less it
+says so and ends.
+
+## A command runs in the commander's memory
+
+A program run from the command line wants the 640K too, so the
+commander makes room for it by giving back nearly everything, and
+[chapter 3](03-the-system.md#the-resident-part-12-kb-that-stay) has
+it step by step. In outline:
+
+1. `F21_31` copies the first 2,733 bytes of the main data, the setup,
+   the history and the commands to run, into `ComnIni` of the resident
+   part, and `F21_40` packs each panel into 3,422 bytes there: 94 bytes
+   of its header and, for at most 256 files, 13 bytes each, the name
+   and the attributes.
+2. The main data, with both panels and the viewer's room in it, goes
+   back to DOS, and with Memory allocation on, as the program is
+   distributed, the transient part goes too. What is left of the
+   commander is **12,690 bytes**, 794 paragraphs, PSP and stack
+   included.
+3. The resident `Exec` runs each command of `DosBuf`.
+4. To get its 63,344 bytes of code and tables back, the commander does
+   not open its file and read it: it **runs itself** as a child, with
+   `VVV` in the command tail, and the child copies its own transient
+   part into the parent's block and hands back a checksum ([chapter
+   3](03-the-system.md#coming-back-running-vccom-as-its-own-loader)).
+5. The transient part takes its main data anew, copies `ComnIni` back,
+   and expands each saved panel into full 24-byte entries with
+   `Expand`, 46 bytes of code, before it reads the directories again.
+
+In the C translation of `src/c/` this is `Stay` and `Exec` of
+`resident.c`; the portable C stays in memory whole, a 32-bit program
+under a DOS extender having another way to run a command ([chapter
+3](03-the-system.md)), so only the viewer's room is given back
+(`GiveMem`, `TakeMem`) and the loop goes back to `IniData`.
 
 ## The main data
 
@@ -273,8 +361,8 @@ main regions, with offsets that gcc worked out from `vc.h`:
 
 ### Why the layout stays
 
-A modern program would split this into modules. This one keeps the
-byte layout on purpose, and the code depends on it in four ways:
+The layout is part of the design. A field's place is a number that
+other things hold, and the code depends on it in four ways:
 
 1. **The setup file is a dump of it.** `VC.INI` is three `V`s, the
    first 88 bytes of each panel, the first 330 bytes of `md`, and a
@@ -292,9 +380,9 @@ byte layout on purpose, and the code depends on it in four ways:
    26-byte record into several fields at once. Such reads go through
    `MD_BYTES`, the structure as bytes, so that C is never asked what
    lies beyond a field.
-4. **The tests compare it.** `harness/dataimage.py` dumps the main data
-   at the end of every scenario and compares the dumps between builds,
-   field by field, using the original's listing for the names.
+4. **A command keeps it.** The first 2,733 bytes are what survive a
+   command, copied as one block into the resident part and back, so
+   everything that must outlive a command lies in front of `CmnSave`.
 
 Many fields say in their comment that they are "of the original. Not
 set or read here". `WCBcrn`, `ViewSeg`, `TreAdr`, `ClstSiz` and the
@@ -349,46 +437,30 @@ struct WCBdef {
 };
 ```
 
-A file entry, `struct FILENT`, is 24 bytes: the name as 13 bytes
-(8.3 and a zero), the attributes, DOS's packed time and date, a 32-bit
-size, and `NumbF`. `NumbF` is the entry's place in the directory, which
-nothing reads any more since the unsorted order went. Two high bits of
-the attributes belong to the program: `ATTR_SELECTED` (40h) and "was
-selected" (80h).
+A file entry, `struct FILENT`, is 24 bytes, laid out in
+[chapter 2](02-the-features.md#a-panel-the-block-the-list-the-places):
+the 43 bytes of DOS's search record cut down to what a panel shows.
 
-### One block per panel, places as offsets
+### One segment per panel, places as offsets
 
-In the original a panel is a segment, at most 64K. The list starts at
-`DskBuf`, offset `0x262`, and the cursor, the first line shown and the
-ends of the list are 16-bit offsets in that segment. The C keeps the
-idea and gives up the limit:
+In the original a panel is a segment, at most 64K, and DS points at it
+while a command works on it. The list starts at `DskBuf`, offset 262h,
+and the cursor, the first line shown and the ends of the list are
+16-bit offsets in that segment (`CurAdr`, `First`, `EndBuf`, `EndFul`).
+The two panels and the viewer's room lie one behind the other in the
+main block, so a panel that needs more than its 423 paragraphs pushes
+what lies above it up: `ReDir` moves the other panel with `STD; REP
+MOVSB` to sit just under the viewer's room, and updates the four
+segment words. A panel stops at 64K, which is 2,703 entries.
 
-```
-  block (from the system, MemTake)
-  +--------------------------+ <- block
-  | struct Places  (32 bytes)|   Bytes, Unused[3],
-  |                          |   CurAdr, First, EndBuf, EndFul  (i32 each)
-  +--------------------------+ <- panel = (struct WCBdef *)(block + 32)
-  | WCBdef header            |   0x000 .. 0x057  saved in VC.INI
-  |                          |   0x058 .. 0x261  the rest
-  +--------------------------+ <- panel + DSKBUF (0x262)
-  | FILENT  ..               |   shown: DSKBUF .. EndBuf
-  | FILENT  ..               |   hidden by the filter: EndBuf .. EndFul
-  |   ...                    |
-  +--------------------------+ <- block + Bytes
-```
+Swapping the panels with Ctrl-U is three instructions: the two segment
+words are exchanged.
 
-A place in the list is an `i32` offset from the panel's start, and
-`ENTRY(wcb, place)` turns it into a pointer. `PLACES(wcb)` is the
-`struct Places` just in front of the panel. The places stay offsets
-because the block moves. `ReDir` of `read.c` reads a directory, and
-calls `PanelGrow` of `start.c` whenever the list fills the block. That
-may reallocate the panel elsewhere. At the end `PanelFit` trims the
-block to the list, but never below `PANEL_LEAST`, which holds 2,703
-entries, the original's ceiling. There is no ceiling now but memory,
-and 65,536 entries, because `NumbF` is 16 bits. Both functions update
-the four panel pointers. So the rule is that nothing keeps a pointer
-into a panel across `ReDir`.
+The C keeps the idea and gives each panel a block of its own; how it
+grows past 64K is in [chapter 2](02-the-features.md#a-panel-the-block-the-list-the-places).
+Nothing keeps a pointer into a panel across `ReDir`, which may move
+it, and a place in the list stays an offset, `ENTRY(wcb, place)` making
+it a pointer.
 
 ### Four pointers to two panels
 
@@ -416,9 +488,12 @@ inside the header at `TreSum2`, as in the assembly. Some routines walk
 a file list or the tree with the same code, `F00_50` of `keys.c` and
 the speed search for example. They know a directory by
 `TREE_OFFSET(entry)`, its 16-bit offset in the tree's list, just as
-they know a file by its offset in the panel.
+they know a file by its offset in the panel. The list and its file, `TREEINFO.NCD`,
+are in [chapter 2](02-the-features.md#the-tree-and-its-file).
 
-<!-- SCREENSHOT: the two panels as the program starts on the bench, files on both sides, key bar at the bottom; no keys -->
+![Volkov Commander 4.05 as it starts](img/panels.png)
+
+*Volkov Commander 4.05 as it starts: two panels of files, the command line, the key bar. Every cell is a word of `md.ScrBuf`, copied to `B800:0000`.*
 
 ## The main loop
 
@@ -649,9 +724,10 @@ first matches whole BIOS words, scan code and character: 4800h is Up,
 with any scan code, the Ctrl letters: 0Fh is Ctrl-O, 15h is Ctrl-U.
 Anything else goes to the command line, `CMD_F73_00`. The order matters
 for keys like Tab (0F09h), whose character 09h is also Ctrl-I. The
-table had the full key first, so the first `switch` does too. Alt-F5
-and Alt-F9 are missing: the memory map and EGA lines are gone from the
-portable C.
+table had the full key first, so the first `switch` does too. Two keys
+of the original's table are not in the C: Alt-F5, the map of DOS's
+memory, and Alt-F9, EGA lines, which loads an 8-pixel font into the
+EGA or VGA through the BIOS for 43 or 50 rows.
 
 ```mermaid
 sequenceDiagram
@@ -693,8 +769,8 @@ setup is `CMD_SETUP`, the last number, and `Command` handles it as
 Everything that waits for a key calls `Input(bar)`, or `Input0(bar)`
 where F1 is not to bring up help. A key is a 16-bit BIOS word, scan
 code in the high byte and character in the low byte. That is the form
-on every platform: `keyboard_posix.c` turns terminal escape sequences
-and the kitty keyboard protocol into the same words. `Input0` adds
+the original gets from INT 16h, and the form on every platform the C
+runs on. `Input0` adds
 three scan codes of its own:
 
 | High byte | Meaning |
@@ -733,10 +809,10 @@ nothing.
 1. redraws the key bar for the Shift, Ctrl and Alt keys now held
    (`PutKey(bar)`). `PutKey0` draws only if the row it picks differs
    from `md.BarPrev`;
-2. calls `LeaveTm()`, which calls `Idle()` of `sys.h`. On DOS that is
-   INT 28h, "DOS is idle". On Linux and the web it also draws the
-   screen and waits up to `IDLE_WAIT`, 50 ms, for input, so the loop
-   does not spin the CPU;
+2. calls `LeaveTm()`, which calls `Idle()` of `sys.h`: INT 28h, "DOS is
+   idle", the call by which DOS lets a TSR such as `PRINT` work while
+   the foreground program waits. (On other systems the C draws the
+   screen there and sleeps; see [chapter 3](03-the-system.md).)
 3. checks whether the blank delay has passed, and if so calls `Blank()`;
 4. draws the clock if `md.Clock` is set;
 5. checks `AutoTim`;
@@ -805,6 +881,18 @@ Positions are packed the assembly's way, row in the high byte and
 column in the low byte, so that `0x0528` is row 5, column 40. A size is
 packed the same way, rows and columns.
 
+The original's `BasAdr` (`VCSUB1.INC`) is five instructions:
+
+```asm
+	MOV	AL,80
+	MUL	BH			; the row times 80
+	XOR	BH,BH
+	ADD	AX,BX			; and the column
+	SHL	AX,1			; two bytes a cell
+```
+
+The C writes the same as shifts:
+
 ```c
 u16 *BasAdr(u16 place)
 {
@@ -815,25 +903,25 @@ u16 *BasAdr(u16 place)
 }
 ```
 
-The shifts stand in for `* 80` because on a 286 a multiply cost more
-than shifts. The comments also mention "the program's short stack",
-which was 256 bytes in the original. The portable C has `LenStk =
-0x4000`, but it keeps the arithmetic as written.
+A packed place fits one register, and a row and a column come out of
+it as BH and BL without a shift: that is why every place of the program
+is packed so.
 
 `Window` copies one row cell by cell, or several rows as whole 80-cell
-rows, through `ScreenPut` of `sys.h`. On DOS `ScreenPut` is a loop that
-stores into the video memory at the segment the BIOS mode implies
-(`md.Screen`). On Linux and the web it copies into an emulated video
-memory, and `Idle()` turns that into terminal output or HTML spans.
-The mouse pointer is hidden around every copy (`CurMous(0)` and
-`CurMous(1)`), as the DOS mouse driver needs.
+rows. The original does it with `REP MOVSW` into the video memory: a
+colour adapter's text page is at `B800:0000`, a monochrome one's at
+`B000:0000`, 2 bytes a cell, 4,000 bytes for 80 by 25, and `md.Screen`
+holds which. A write there is on the screen at once, with no call at
+all; the C goes through `ScreenPut` of `sys.h`. The mouse pointer is
+hidden around every copy (`CurMous(0)` and `CurMous(1)`), because the
+mouse driver draws its pointer into the same memory by swapping a
+cell's colours, and would leave a stale cell behind.
 
 ```mermaid
 graph LR
     R["routines: panel.c, line.c, box.c, dialog.c ..."] -- "write cells" --> SB["md.ScrBuf 80x50"]
     SB -- "Window(begin, size)" --> SP["ScreenPut (sys.h)"]
-    SP --> DOS["DOS: video memory B800h / B000h"]
-    SP --> LNX["Linux / web: emulated cells, drawn at Idle"]
+    SP --> DOS["video memory B800h or B000h"]
     SB -- "SavWin" --> SAVE["WinBuf / ErrBuf / ErrBuf1 / MenuBuf+500 ..."]
     SAVE -- "ResWin" --> SB
     US["md.UserScr: what DOS showed"] -- "ResUser" --> SB
@@ -856,9 +944,8 @@ row while the bar is up, or a second box. `ErrBuf1` is for the help
 and the error boxes that can appear over anything. Each box names its
 buffer in its table by its place in `md`, `MD_AT(WinBuf)`. A buffer
 can begin at an odd address (`MenuBuf+500` is one), so cells are
-stored with `PUT16` and read with `GET16`, byte by byte. That keeps
-the alignment check of the Linux sanitizer happy, and it does not
-depend on byte order.
+stored with `PUT16` and read with `GET16`, byte by byte. The 8086 did
+not care where a word began; C does.
 
 `UserScr` is different. It holds what DOS had on the screen when the
 program started or a command ended, which `Init40` reads in with
@@ -891,9 +978,11 @@ Most text on the screen is written by `NgLine` or `CntLine` of `line.c`
 | `FFh n` | n spaces; `FFh 80h+n c`: n copies of c |
 
 `LnStr` counts the cells a line will take, so a box knows how wide to
-be. The original's `NgLine` had `^A` and `^C` the wrong way round
-compared with its own `LnStr`. The portable C puts that right, which
-the harness declares.
+be. One routine and one markup draw every text of every box, menu,
+status line and help page; the texts themselves carry their colours
+and their runs of spaces. `FFh 80h+40, '-'` is a rule of forty
+characters in three bytes. (The original's `NgLine` has `^A` and `^C`
+the wrong way round compared with its own `LnStr`.)
 
 ## Boxes, dialogs and menus
 
@@ -948,16 +1037,14 @@ BOX(n)                                 DIALOG(n)
 ```
 
 In the assembly every reference here is a 16-bit offset in the one
-segment. Here a reference to another table is a real pointer, four
-bytes on DOS and eight on Linux. That makes `BOXHD` 12 bytes rather
-than the original's 10, and `BOXMN` 13 rather than 11, and the data
-test compares them field by field. A reference into the main data
-stays a 16-bit offset, `MD_AT(...)`, because the main data keeps its
-layout. Each shape, `BOX(3)` or `DIALOG(1)`, is its own tagged struct,
-`struct Box3`, made by `BOX_SHAPE(3)`. That lets a table file declare
-an object before it defines it, as clang's
-`-Wmissing-variable-declarations` asks. A file of code sees only the
-common head: `extern const struct BOXHD Quit_B;`.
+segment: a dialog's header is 10 bytes and a field 11, so a dialog of
+one row of buttons costs 22 bytes besides its texts. The C makes a
+reference to another table a real pointer, which makes `BOXHD` 12
+bytes and `BOXMN` 13 on DOS. A reference into the main data stays a
+16-bit offset, `MD_AT(...)`, because the main data keeps its layout.
+Each shape, `BOX(3)` or `DIALOG(1)`, is its own structure, `struct
+Box3`, made by `BOX_SHAPE(3)`; a file of code sees only the common
+head: `extern const struct BOXHD Quit_B;`.
 
 A `struct BOXTX` copies a text into `TmpErr` before the box is drawn,
 from an offset in whatever data the caller passes, the main data or a
@@ -1002,7 +1089,9 @@ A line being typed in lives in `DosBuf`, from offset 124 + 10, behind
 the command line. It is three bytes and then the text: the cursor
 column and a "typed yet" byte. The first key typed replaces the text.
 
-<!-- SCREENSHOT: the F10 quit dialog over the panels, Yes highlighted; keys from the start: F10 -->
+![F10](img/quit.png)
+
+*F10: the quit dialog, `Quit_B` of `keys_t.c`, with its frame, its shadow two cells wide and its buttons; the panels behind it are saved in `WinBuf`.*
 
 ### The menu bar
 
@@ -1029,10 +1118,11 @@ command.
 50 of them. The bar is a state machine whose states are labels:
 `F39_10` waits for input, `F39_41` moves to another item, `F39_85`
 leaves. The original enters loops in the middle and crosses paths
-between them. The project's rule is that such a function keeps its
-`goto`s until it is rewritten for another reason. The labels keep the
-assembly's names, so the C can still be held against `VCMENU.INC`.
-Across the tree, nine functions still have `goto`s, about 440 in all:
+between them, since a shared tail reached by a two-byte jump is the
+cheapest code there is; the C keeps the jumps where untangling them
+would hide the original's shape. The labels keep the assembly's names,
+so the C can still be held against `VCMENU.INC`. Nine functions of the
+C have `goto`s, about 440 in all:
 
 | Function | File | `goto`s |
 |---|---|---|
@@ -1050,7 +1140,9 @@ Everywhere else the jumps became `if`, loops, `break`, `continue` and
 `return`. Where a label went, its name stayed behind as a comment, as
 in `/* Func41 */`.
 
-<!-- SCREENSHOT: the Options menu open from the menu bar, " More setup..." at its bottom; keys from the start: F9 O -->
+![F9, then O](img/options-menu.png)
+
+*F9, then O: the Options menu of the original, a box of `MnuTab` whose lines are one string of `MenuLn`. The ticks are bytes of the setup in the main data.*
 
 ### The key bar
 
@@ -1065,10 +1157,11 @@ panels, 1 for a box, and so on.
 
 ## The help
 
-`help.c` reads `VC.HLP` from the program's directory. The help file
-is the project's own text, `help/vc-help.txt`, which
-`tools/makehelp.py` turns into the original's binary format at build
-time. Nothing of the shareware help is in it. The format:
+`help.c` reads `VC.HLP` from the program's directory. The help is not
+in the program at all: only one entry of it is in memory at a time,
+read from the file when it is asked for. (The C ships a help text of
+its own, `help/vc-help.txt`, made into the original's format at build
+time.) The format:
 
 - a header with a version string;
 - at 194h, the file offset of the first entry, which is the index;
@@ -1085,14 +1178,29 @@ quit dialog, the `bHelp` of its header. `Help00` opens the file on F1,
 shows the page in a window that begins at row 2, column 4 (`BEGIN`,
 0204h), 74 columns wide, and puts back what it covered from `ErrBuf1`.
 
-<!-- SCREENSHOT: the help window on the quit dialog's page; keys from the start: F10 F1 -->
+![F1 at the panels](img/help.png)
 
-## The setup, folded in
+*F1 at the panels: one entry of `VC.HLP`, read from the file into `HelpBuf` when it is asked for.*
 
-In the original, `VCSETUP.COM` is a separate program with copies of
-the shared routines. It edits `VC.INI` on disk and then signals a
-running `VC` through a private DOS call. The portable C makes it one
-item of the Options menu, " More setup...", `CMD_SETUP`. The code is
+## The setup
+
+In the original, `VCSETUP.COM` is a separate program of 24,278 bytes,
+with copies of the shared routines: 68 of them are the main program's
+byte for byte. It is run as a DOS command from the commander, so the
+commander is down to its 12,690 resident bytes while it runs. When it
+saves, it writes `VC.INI` and then tells the running commander through
+a private DOS call: INT 21h AH 2Bh, which is DOS's "set date", with
+`CX = 'VC'` and `DX = 'OM'`, a date no DOS accepts. The commander's
+INT 21h hook, `New21`, which is there when the TSR manager of the
+setup is on, answers it with AX 42 x 100h, its version of
+this interface, and ES:BX on `WCB1sav`, `WCB2sav` or `ComnIni` for AL
+0, 1 or 2. The setup copies its 330 bytes into `ComnIni`, and when it
+ends the commander rebuilds its main data from `ComnIni` as after any
+command: the new settings are on at once. Without the hook the call
+is a date that DOS refuses, and the settings wait for the next start.
+
+The portable C makes the setup one item of the Options menu,
+" More setup...", `CMD_SETUP`. The code is
 the `st*.c` files. Every routine and object there carries the
 assembly's name with `St` in front (`StMain00`, `StF05_00`,
 `StIniEr_B`), because many names clash with the main program's. A
@@ -1123,7 +1231,9 @@ program's version.
 The setup has its own help, `sthelp.c`: seven pages of `VC.HLP`, from
 line 55 of the index, all held in memory, with the same `DeCode`.
 
-<!-- SCREENSHOT: the setup's own menu, entered from Options; keys from the start: F9 O, then Up and Enter on " More setup..." -->
+![The original's `VCSETUP.COM`, a program of its own, with its own key bar and the main program's banner left on the screen.](img/setup-menu.png)
+
+*The original's `VCSETUP.COM`, a program of its own, with its own key bar and the main program's banner left on the screen.*
 
 ## The clock and the blanker
 
@@ -1165,7 +1275,26 @@ The sky follows these rules:
 `Blank` waits between ticks by calling `LeaveTm`, so even the blanker
 idles politely.
 
-## Where the assembly shows through
+## What it saves, in one list
+
+The economies of this chapter, with their sizes:
+
+| Economy | Where | What it saves |
+|---|---|---|
+| Start-up code assembled over the resident buffers, `ORG LastRes` | `VC.ASM` | 10,923 bytes of buffers cost no bytes of the file |
+| The transient part given back for a command, and loaded again by running the program's own file as a child | `F21_31`, `Exec11`, `Alloc0` | 63,344 bytes, and the 62,603 of the main data, free for the command; 12,690 stay |
+| Panels packed to 13 bytes a file across a command | `F21_40`, `Expand` | 3,422 bytes a panel, instead of the panel's segment |
+| One block of data for everything, buffers shared by features that never run together | `struct MainDat` | see [chapter 2](02-the-features.md#how-the-pieces-share-the-main-data) |
+| The setup file as a raw image of the data's first 330 bytes and each panel's first 88 | `MakeIni`, `Init00` | no parser: 511 bytes, read with one copy |
+| A key table walked by one routine, `Case`, that jumps on its return address | `FncTab`, `VCSUB1.INC` | 72 commands in 290 bytes; `Case` serves 18 tables of keys in all |
+| One line routine, `NgLine`, for every text, with its markup and runs of characters | `VCSUB1.INC` | 204 bytes draw every box, menu and help line; about 90 texts use the `FFh` runs |
+| Dialogs as tables of 10- and 11-byte records, run by one `Dialog` | `Dialog`, `*_t.c` | 1,006 bytes of code for every dialog of the program |
+| Three save buffers of 7,392 bytes for nested boxes | `WinBuf`, `ErrBuf`, `ErrBuf1` | no window system |
+| Help kept in its file, one entry in memory | `Help`, `HelpBuf` | the help's text is no part of the file; one entry costs 3,000 bytes of data |
+| Shared tails: code that falls or jumps into other code | 2,486 labels against 305 procedures | a jump of two or three bytes where a call, a return and a copy of the tail would be more |
+| Places packed as row and column in one word | everywhere | a place fits a register, and BH and BL are its row and column |
+
+## Reading the C against the assembly
 
 Some of the original's shape stays even where C would have done it
 differently:
@@ -1192,26 +1321,27 @@ differently:
 - **Faithful bugs.** "Ported as it is" or "Ported as they are" opens a
   paragraph that describes a bug of the original kept on purpose: the
   key bar's 81st cell, the signed row of a mouse click, `MAIN_AS_PANEL`.
-  A bug that was fixed is a numbered entry of `DEVIATIONS.md`, and the
-  code points to it, "(DEVIATIONS.md, 28)".
 - **`goto`** remains in nine functions, where the original's control
   flow is not structured.
 
 ## Where to read next
 
+- [Chapter 2](02-the-features.md) for the features that this skeleton
+  carries, and [chapter 3](03-the-system.md) for the calls of DOS and
+  the BIOS under it, the extender included.
+- `src/asm/VC.ASM`: the `STRUC` of the main data, `Alloc0` for the
+  loader, `Exec` for the resident part, and from the label `Init40` on
+  the loop that the C replaced.
+- `src/c/resident.c`: the resident part and the swap, in 16-bit C.
 - `src/portable_c/vc.h`: `struct MainDat`, `struct WCBdef`,
   `struct Places`, and the section "The commands" with the `CMD_`,
   `NEXT_`, `MNU_`, `TO_` and `GO_` numbers.
 - `src/portable_c/main.c`: from `Main` at the bottom upward through
   `Round`, `MainLoop`, `Command`, `Loop` and `Func12`.
-- `src/portable_c/start.c`: `Init00`, `Init11` and `IniData`, and
-  `PanelGrow` and `PanelFit` for the panel blocks.
+- `src/portable_c/start.c`: `Init00`, `Init11` and `IniData`.
 - `src/portable_c/input.c`: `Input0` and `Inpt41`.
 - `src/portable_c/window.c` and `screen.c`: `Window`, `SavWin`,
   `ResWin`, `BasAdr` and `Color`.
 - `src/portable_c/tables.h` with `keys_t.c`, then `dialog.c`:
   `DialBox`, then `Dialog`.
 - `src/portable_c/menu.c`: `F39_00`, and `bars.c`: `PutKey0`.
-- `src/portable_c/stmain.c`: `StSetup`.
-- `src/asm/VC.ASM`, from the label `Init40` on, to see the loop the C
-  replaced.

@@ -1,4 +1,4 @@
-# Talking to DOS and the PC: the system
+# 3. Talking to DOS and the PC: the system
 
 Volkov Commander 4.05 is a 65,090-byte `.COM` file. In that space it
 has two panels, a tree, a viewer with a hex mode, an editor, a file
@@ -239,7 +239,9 @@ through `Intr21` clears it. `BlocEr` is for calls where the program
 has an answer of its own and wants no box, such as deleting the tree's
 file or closing up after a copy that was stopped.
 
-<!-- SCREENSHOT: the critical error box over the panels: "Error / Drive or device not ready. / Error on drive A / Retry Abort", after Alt-F1 and A with no diskette in the drive; DOS bench -->
+![The critical error box](img/critical-error.png)
+
+*DOS's critical error, reported through `FatErr`: here for the device COM2, which a copy was asked to write to. The box is drawn over whatever was on the screen, a box of the copy included.*
 
 ### Ctrl-Break and Ctrl-C: one `IRET`
 
@@ -643,7 +645,9 @@ It runs a command one of two ways:
   passes a two-byte command (`DosChg`, `X:` and a CR) to switch drives,
   since the shell keeps its own idea of the drive.
 
-<!-- SCREENSHOT: DOS's screen after a user menu item of two commands has run with the panels off (Ctrl-O): the prompt and each command written by Exec between their outputs; DOS bench -->
+![DOS's screen after two commands](img/exec-output.png)
+
+*Ctrl-O after a user menu item of two commands: the resident `Exec` wrote each prompt, `C:\WORK>`, and each command between their outputs.*
 
 #### Coming back: running `VC.COM` as its own loader
 
@@ -885,8 +889,7 @@ the PSP's room and the code, 4,096 the stack and the rest `Stays`. The
 original's 12,690 bytes had a 256-byte stack and code written by hand.
 
 The portable C has no resident part. It stays in memory whole while a
-command runs, and the panels keep all their files
-(`src/portable_c/DEVIATIONS.md`, 1 and 20).
+command runs, and the panels keep all their files.
 
 ## The contract: `sys.h`
 
@@ -910,8 +913,7 @@ Two more rules shape it:
 
 - **One function, one request.** Where the original asks several
   things in a row, the row stays in the calling code, in the original's
-  order, because "what DOS is asked and in which order is behaviour,
-  and the scenarios see it". `OpenFil` of `system.c` opens a file and,
+  order, because "what DOS is asked and in which order is behaviour". `OpenFil` of `system.c` opens a file and,
   on a sharing violation (20h), tries again without the sharing bits:
   that is two calls of `FileOpen`, not one cleverer function.
 - **Asked or bare.** A function "asked with the program's errors" is
@@ -1002,8 +1004,8 @@ DOS, the BIOS and the mouse driver are still real-mode code. The
 program calls them by the same software interrupts. The extender
 catches each `INT`, switches to real mode, makes the call and switches
 back. What it does to the registers on the way decides how each
-function has to be written, and toys on the bench
-(`harness/trial32/`) found four kinds of call:
+function has to be written, and trials of each kind of call found
+four:
 
 | Kind | Example | What the extender does | So `sys_dos.c` |
 |---|---|---|---|
@@ -1043,9 +1045,7 @@ static u32 Dos(struct DosRegs *regs);
 Every register goes in with all 32 bits, because the extender reads all
 of them where it translates. Of what comes back, only the low words
 count. `Set` fills a `DosRegs` with 0 in every register a call does not
-read, where the original left whatever it happened to hold. That
-difference is declared, with a table of every place
-(`DEVIATIONS.md`, 6).
+read, where the original left whatever it happened to hold.
 
 ### `Ask` is `Intr21`
 
@@ -1208,7 +1208,7 @@ BX,0FFFFh` and then AH 48h). First it asks for more than there can be,
 block. Then it asks for that. `MemTake` answers the first request from
 0500h without calling 0501h.
 
-The bench showed two things here. DOS/32A keeps 16 bytes of its own in
+Two things matter here. DOS/32A keeps 16 bytes of its own in
 front of each block and ends the program at the next memory call if a
 write has touched them. And a refused 0503h does not say how large the
 block could have been, where DOS's 4Ah does. `MemOwn`, the original's
@@ -1440,9 +1440,8 @@ The commands themselves go as in the original with Quick execute off.
 `Exec02` of `exec.c` writes `/C ` over the four bytes in front of each
 command of `DosBuf`, prints the prompt between commands as the original
 did, and runs `COMSPEC` by `ProgramRunBare`. Quick execute, the way
-through `INT 2Eh`, was taken out on the user's word: the bench's
-FreeDOS COMMAND.COM does not serve that interrupt, so no scenario could
-judge it (`DEVIATIONS.md`, 14). Nothing of the program is given back
+through `INT 2Eh`, is not there: not every COMMAND.COM serves that
+interrupt, FreeDOS's among them. Nothing of the program is given back
 for a command either, so the resident part, `Exec10` and the second
 copy of `VC.COM` have no counterpart. The program stays whole, and DOS
 has the memory below the megabyte, less the 512-byte low block, for
@@ -1475,7 +1474,7 @@ the original keeps it. `CELLS` turns it into the linear address B8000h
 plus the page's start. `Window` of `window.c` is unchanged in what it
 does: it hides the mouse, copies one row cell by cell or several rows
 whole, calls `IntOn`, and shows the mouse. Only the wait for a CGA's
-retrace is gone (`DEVIATIONS.md`, 5).
+retrace is gone, since no display of a 32-bit machine shows snow.
 
 The BIOS calls go through `Video`, which passes four registers and
 writes back the four that came out. `ScreenState` is 0Fh, `CursorTo`
@@ -1505,8 +1504,6 @@ the left-handed swap and the pseudo-key FC00h stay in the common code,
 `GetMous` of `mouse.c` and `Input0` of `input.c`, as the original had
 them. The pointer is still the driver's: `MousePointer(0xFFFF, 0x7700)`.
 
-<!-- SCREENSHOT: the panels with the mouse pointer on a file name, the pointer's cell drawn with its colours swapped by the driver (keep FFFFh, turn 7700h); DOS bench -->
-
 ### The keyboard
 
 ```c
@@ -1529,8 +1526,7 @@ void KeyForgetIns(void) { *(u8 *)0x418 &= 0x7F; }
 see, so `Keyboard` pushes the flags and returns them above AX.
 `KeyForgetIns` writes the BIOS's byte at `0040:0018h` directly, as the
 original did, so that holding Ins keeps selecting files. `Idle` is
-`INT 28h`. The pause for Windows and DESQview is gone
-(`DEVIATIONS.md`, 3 and 4).
+`INT 28h`. The pause for Windows and DESQview is gone.
 
 ### Start
 
@@ -1578,5 +1574,7 @@ system it runs on.
   does with each kind of call; `Ask`, `Move` and `Real` for the shape
   of every function; `DeviceEntry` and `Ended_T` for the two pieces of
   machine code; `Start`.
-- `src/portable_c/DEVIATIONS.md`, entries 1 to 6 and 14, for what of
-  this the portable C does differently and why.
+- [Chapter 1](01-the-program.md) for how the transient part uses what
+  this chapter provides: the main data, the loop, the screen buffer;
+  [chapter 2](02-the-features.md) for the features that make most of
+  the calls of DOS.

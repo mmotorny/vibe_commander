@@ -1,36 +1,30 @@
-# Working with files: the commander's features
+# 2. Working with files: the commander's features
 
-A file manager is a few lists and a few loops over them. Vibe Commander
-has two lists of files, one per panel, a list of directories for the
-tree, a list of found files for the file search, and one buffer, the
-*room*, that the viewer, the editor, the copy and the search take turns
-to fill. Almost every feature in this chapter is one of three loops: read
-a directory into a list, go through the files of a list or of a
-directory, or move a file through the room a piece at a time.
+A file manager is a few lists and a few loops over them. Volkov
+Commander has two lists of files, one per panel, a list of directories
+for the tree, a list of found files for the file search, and one buffer,
+the *room*, that the viewer, the editor, the copy and the search take
+turns to fill. Almost every feature in this chapter is one of three
+loops: read a directory into a list, go through the files of a list or
+of a directory, or move a file through the room a piece at a time. That
+is how the features fit: the copy, the delete, the attributes, the
+directory sizes and the file search are one walker over the disk with
+five different routines plugged into it, and the viewer, the editor and
+the copy never hold their own buffers.
 
-The code keeps the shape of Volkov Commander 4.05, which was built for a
-PC with 640 KB and a segment of 64 KB. Its routines still have the names
-that the assembly gave them (`ReDr00`, `C20_00`, `V00_10`, `T00_00`), the
-scratch fields of a command still live in `TmpBuf` at the original's
-offsets, and the main data, `struct MainDat` of `src/portable_c/vc.h`, is
-still the original's 62,603 bytes (`LAID_OUT(MainDat, 0xF48B)`), field
-for field. What has changed is where the big things are. A panel and the
-room used to be pieces of one DOS block, cut up by hand and moved about
-whenever a directory grew. Now each is a block of its own that the system
-hands out. That one change is behind most of the limits that are gone:
-a panel used to stop at 2,703 entries, and the file search at what fitted
-behind its list.
+The code shown is the portable C, `src/portable_c/`, which keeps the
+original's routines under their labels (`ReDr00`, `C20_00`, `V00_10`,
+`T00_00`) and the main data, `struct MainDat`, at its 62,603 bytes,
+field for field, with the scratch fields of a command in `TmpBuf` at the
+original's offsets. Where the C has moved something big, a panel or the
+room, out of the original's segments, the original's way comes first.
 
 ```mermaid
 graph TD
     MD["main data: struct MainDat, 62,603 bytes, fixed"]
-    LP["left panel block: struct Places + struct WCBdef + list"]
-    RP["right panel block: struct Places + struct WCBdef + list"]
-    ROOM["the room: Room .. RoomEnd"]
-    SYS["sys.h: MemTake, MemResize, MemGive"]
-    SYS --> LP
-    SYS --> RP
-    SYS --> ROOM
+    LP["left panel: struct WCBdef and its list"]
+    RP["right panel: struct WCBdef and its list"]
+    ROOM["the room: what is left of memory"]
     MD -- "TreeBuf: the tree" --> TREE["tree.c, treebox.c"]
     MD -- "TmpBuf, MenuBuf, HelpBuf: per-command scratch" --> CMDS["copy.c, dirfunc.c, find.c, usermenu.c"]
     LP --> READ["read.c, files.c"]
@@ -42,9 +36,37 @@ graph TD
     ROOM --> OLD["read.c: the old list while a directory is read"]
 ```
 
-## The memory: three blocks and a room
+## The memory: one block cut in four
 
-Everything big that the program holds comes from three calls of `sys.h`:
+The original takes all the memory DOS has left in one block and cuts it
+by paragraph arithmetic ([chapter 1](01-the-program.md#how-the-program-starts)):
+
+```
+ one block from DOS, all that is free                    paragraphs
+ +------------------------------------------+ SecDat
+ | main data, struct MainDat, 62,603 bytes  |  3,913
+ +------------------------------------------+ WCB1seg
+ | left panel: header 610 + 256 x 24        |    423, or up to 4,096
+ +------------------------------------------+ WCB2seg
+ | right panel: the same                    |    423, or up to 4,096
+ +------------------------------------------+ ViewSeg
+ | the room: viewer, editor, copy, search,  |  at least 500, 8,000 bytes
+ |   the old list while a panel is read     |
+ +------------------------------------------+ FreMem2: the block's end
+```
+
+A panel starts with room for 256 files and grows when a directory has
+more: the panel being read may reach to 500 paragraphs short of the
+block's end, but no further than its own 64K. A panel that grows pushes
+the one above it up, and both push the room. Every user of the room
+sizes it as `FreMem2 - ViewSeg` when it starts, so the viewer, the
+editor (`VCEDIT.INC`), the search (`VCFIND.INC`) and the copy
+(`VCCOPY.INC`) each have whatever is left at the time, and nothing is
+reserved for any of them. On a 640K machine with DOS and a mouse driver
+loaded that is some 345K.
+
+The C gives the same four things blocks of their own, from three
+functions of `sys.h` that are DOS's 48h, 49h and 4Ah in DOS's terms:
 
 ```c
 struct Block MemTake(i32 bytes);
@@ -52,11 +74,8 @@ struct Answer MemGive(u8 *block);
 struct Block MemResize(u8 *block, i32 bytes);
 ```
 
-They are DOS's 48h, 49h and 4Ah, kept in DOS's terms (the error is DOS's
-number 8 for no memory, 9 for no block), with one convention borrowed
-from how the original asked DOS: ask for more than any system has,
-`0x7FFFFFFF` bytes, and the refusal says in `largest` how big a block can
-be. `TakeRoom` of `start.c` is two calls for that:
+and asks as the original asked: for more than there is, which is
+refused with the largest size, then for that. `TakeRoom` of `start.c`:
 
 ```c
 largest = MemTake(BYTES_MOST).largest;
@@ -65,61 +84,18 @@ answer.value = Paragraphs(largest);
 answer.failed = LEAST_ROOM > largest;
 ```
 
-`Init11` of `start.c` asks for the two panels first, `PANEL_LEAST` bytes
-each, which is the original's 64K and the 32 bytes of `struct Places`,
-65,568 in all. Then the room takes the largest block that is left. With
-fewer than `LEAST_ROOM` bytes, 8,000, which the viewer needs, the
-program does not start. The order is on purpose. The two panels are
-taken first so that the room has nothing behind it and is as large as it
-can be.
-
-Each implementation keeps a table of what it has handed out, at most
-eight blocks (`BLOCKS_MOST`). The program uses three.
-
-| System | `MemTake` is | Where the limit comes from |
-|---|---|---|
-| DOS, `sys_dos.c` | DPMI 0501h of DOS/32A; 0500h for the largest free block, 0503h to resize, 0502h to free | the machine's extended memory |
-| Linux, `machine_posix.c` | `malloc`, `realloc`, `free` | none: `MachineBegin(0, ...)`, "Linux has no cap" |
-| Web, `sys_web.c` on the same machine | the same, on Emscripten's heap | `MEMORY_CAP`, 256 MB, for all blocks together |
-
-On Linux and the web, `Largest()` finds the largest block by halving
-(`Obtainable`, to 4,096 bytes) when `malloc` refuses the whole request.
-The web page needs its cap because WebAssembly memory, once it has
-grown, never shrinks while the page is open. Before the cap, asking for
-"all there is" grew the page to whatever the browser would give, up to
-2 GB. The variable `VC_MEMORY`, a number with K, M or G behind it, takes
-the place of the cap in a test: `portable_c-cap` sets 512K and holds the
-editor's "too large" box to the original's.
-
-```
- What the program holds while it waits for a key
-
- +-----------------------------------+  main data, md: a variable of main.c,
- | ColTab .. ResIni   (VC.INI part)  |  never moves. Its fixed buffers:
- | HstBuf[512]  ExtMain[512]         |    TmpBuf[256], TmpErr[256]
- | DosBuf[1000]  TmpBuf  TmpErr      |    MenuBuf[4000], HelpBuf[3000]
- | MenuBuf  HelpBuf  ScrBuf ...      |    TreeBuf[12,299]
- | TreeBuf                           |
- +-----------------------------------+
-
- +-------------+   +-------------+   +--------------------------------+
- | left panel  |   | right panel |   | the room                       |
- | >= 65,568 B |   | >= 65,568 B |   | largest block left, >= 8,000 B |
- +-------------+   +-------------+   +--------------------------------+
-   LeftPanel        RightPanel         Room ............... RoomEnd
-   (pointers of main.c, moved by       (pointers of main.c; RoomBytes()
-    PanelGrow and PanelFit)             is RoomEnd - Room)
-```
+`Init11` takes the two panels first, `PANEL_LEAST` bytes each, the
+original's 64K and the 32 bytes of `struct Places`, so that the room,
+taken last, is as large as it can be; with fewer than `LEAST_ROOM`
+bytes, 8,000, the program does not start. The four pointers of `main.c`,
+`LeftPanel`, `RightPanel`, `Room` and `RoomEnd`, take the place of
+`WCB1seg`, `WCB2seg`, `ViewSeg` and `FreMem2`.
 
 The room has no owner. Whoever is working fills it from `Room` on and
 expects nothing to be left in it from before. Nothing keeps a pointer
-into it across `GiveMem` and `TakeMem`, which give the room back around
-a command (`Round` of `main.c`) and around an external viewer or editor
-(`Aexec0` of `view.c`). The same goes for `ReDir`, which may move it.
-The panels keep their blocks for as long as the program runs, through
-commands too. The original gave its whole block back to DOS for a command
-and kept 256 files of each panel in its resident part. That cut, and the
-selection it lost, are gone (`DEVIATIONS.md`, 20).
+into it across a command, or across `ReDir`, which may move it. In the
+original nothing at all survives a command but the setup and 256 names
+of each panel ([chapter 1](01-the-program.md#a-command-runs-in-the-commanders-memory)).
 
 ## A panel: the block, the list, the places
 
@@ -288,20 +264,13 @@ the whole protocol for a moving panel.
 
 ### 65,536
 
-`NumbF`, the order in which DOS gave an entry, stays a `u16`, since an
-entry keeps the original's 24 bytes. A DOS directory holds at most 65,536
-entries, so the number always fits. On the user's word, a panel stops at
-65,536 entries for good, on every system, and a system that is not DOS
-shows at most that many entries of a directory (`DEVIATIONS.md`, 27).
-The 16-bit side shows elsewhere too: `Func40` of `main.c` leaves the
-number of the last line in DX for Rename, as the original does, and a
-panel of more than 65,536 entries is cut there ("wraps").
-
-On DOS, the system's own limit enforces the 65,536. In `read.c` and
-`files_posix.c` I found no check that stops a host directory at 65,536
-entries. The emulation's search keeps its place as a 32-bit entry number
-(`AT_ENTRY` and `AT_ENTRY_HIGH` of `files_posix.c`), so a longer host
-directory looks like it would be read whole.
+`NumbF`, the order in which DOS gave an entry, is a 16-bit word: an
+entry is 24 bytes and not one more. A DOS directory holds at most 65,536
+entries, so the number always fits, and it is the most that a panel of
+the C can hold. The 16-bit side shows elsewhere too: `Func40` of
+`main.c` leaves the number of the last line in DX for Rename, as the
+original does, and a panel of more than 65,536 entries would be cut
+there ("wraps").
 
 ### The filter: `SetMask`
 
@@ -322,11 +291,11 @@ An entry passes if:
   - `TstMas` against the mask `DskMas`, which `Convert` has put into its
     fixed form: eleven characters, 8 + 3, with `?` for wildcards.
 
-`ProgramOfFile` is the hinge between systems. On DOS it compares the
-three characters behind the first full stop with `com`, `exe` and `bat`
-and asks DOS nothing. On Linux it calls `stat` and `access(X_OK)` on the
-host file, so the "programs" filter of a panel shows what Enter would
-run, whatever the names (`DEVIATIONS.md`, L8).
+On DOS `ProgramOfFile` compares the three characters behind the first
+full stop with `com`, `exe` and `bat` and asks DOS nothing: in the
+original that is three `CMP`s of a word and a byte in `TstExe`. It is a
+function of the system layer because another system has another idea of
+a program ([chapter 3](03-the-system.md)).
 
 ### Sorting: `Sort` and `CmpPar`
 
@@ -368,12 +337,15 @@ before. `(gap << 4) + (gap << 3)` is times 24 without a multiply, which a
 `CmpPar` puts directories before files, `.` and `..` first, and system
 files before other files. Then it orders by `SortTyp`: 1 by extension,
 2 by date and time (newest first), 3 by size (largest first), and by
-name for 0 and as the tie-break for the others. The original had a fifth
-order, unsorted, which went in the order DOS gave. The portable C has no
-unsorted order: a directory's order only meant something on DOS
-(`DEVIATIONS.md`, 29).
+name for 0 and as the tie-break for the others. The original has a
+fifth order, unsorted, which is simply the order in which DOS gave the
+entries: `NumbF` exists so that it can be restored without reading the
+disk again. The C has dropped that order, and `NumbF` is written and
+never read.
 
-<!-- SCREENSHOT: a panel of files with several selected (yellow) and the cursor on one, the status line counting the selection; scenario `select`, after the Ins and Gray+ steps -->
+![Gray+ with `*.txt`](img/select.png)
+
+*Gray+ with `*.txt`: two files selected, bit 6 of their attributes set, and the status line counting them in 32 bits.*
 
 ### Selection
 
@@ -424,8 +396,8 @@ ahead.
 `ReadTre` of `treebox.c` tries the file first. `TreeFileRight` checks
 the signature, both sums, and that the length is exactly `16n + 11`. A
 file that claims no entries, or 4,096 or more, counts as broken: the
-original counted the list's bytes in 16 bits, and a bug of the original
-was fixed there (`DEVIATIONS.md`, 21). Otherwise the disk is scanned by
+original counted the list's bytes in 16 bits, so a list of 4,096
+entries of 16 bytes is 0 to it. Otherwise the disk is scanned by
 `RdTr10`:
 
 ```mermaid
@@ -500,15 +472,15 @@ in the high byte (100h) to stop the whole command. Three drivers call it:
 
 ```mermaid
 sequenceDiagram
-    participant Cmd as F38_00 (F8)
-    participant Loop as main loop (F1Next)
+    participant Cmd as F38_00, F8
+    participant ML as main loop, F1Next
     participant Sel as FncSel
     participant R as F38_40 via FncCall
     participant DF as DirFunc
     participant DOS as sys.h FindFirst and FindNext
     Cmd->>Cmd: FncAddr = FNC_F38_40, ask Delete
-    Cmd-->>Loop: TO_FNCSEL
-    Loop->>Sel: FncSel()
+    Cmd-->>ML: TO_FNCSEL
+    ML->>Sel: FncSel()
     Sel->>R: FncCall(attributes) for DIR1
     R->>R: RemoveDir finds it not empty, All, WALK
     R->>DF: DirFunc() with TmpBuf = DIR1
@@ -522,7 +494,7 @@ sequenceDiagram
     R->>R: F38_60 removes DIR1
     R-->>Sel: 1
     Sel->>Sel: AttrF bit 6 off, bit 7 on
-    Sel-->>Loop: FncExt, panels read again if TmpBuf[91]
+    Sel-->>ML: FncExt, panels read again if TmpBuf[91]
 ```
 
 ### One DTA
@@ -539,9 +511,9 @@ That leaves DOS's record exactly where the outer `FindNext` expects it.
 It is quadratic in the size of the parent directory, and it needs no
 memory at all.
 
-A path of 68 characters or more is not entered (`PthEr_B`). DOS's limit
-of 67 stays on every system, which is why the Linux build has drives R:
-and H: rather than one drive at the root (`DEVIATIONS.md`, L1).
+A path of 68 characters or more is not entered (`PthEr_B`): DOS's
+limit is 67, a drive, a colon, a backslash and 64 characters, and every
+path buffer of the program is `LenPath`, 68 bytes with its zero.
 
 ### Delete and attributes
 
@@ -575,9 +547,9 @@ re-reading if `TmpBuf[91]` says that anything on the disk changed.
 
 ## Copy, move and rename
 
-`copy.c` is the longest single routine in the program. `C20_00` runs to
-some 460 lines, with 22 `goto` labels left from the assembly, one of the
-functions the project keeps as it is (`CLAUDE.md`, "The portable C").
+`copy.c` holds the longest single routine in the program. `C20_00` runs
+to some 460 lines of C, with 22 labels left from the assembly, whose
+paths cross too much for `if` and loops: the C keeps the jumps.
 The parts are:
 
 - `F35_01`, F5 and F6, and `F45_01`, the Shift variants, ask for the
@@ -654,7 +626,7 @@ one write, in pieces of 32K (`count = 0x8000`). DOS takes a 16-bit count
 per call, and the original stepped a segment per piece. A device can
 answer a piece in several short reads. The original counted the room
 down by the last of them only, so a slow device could have it read past
-the room's end; every read counts here (`DEVIATIONS.md`, 17). The writes
+the room's end; the C counts every read. The writes
 step the buffer by whole paragraphs only (`buffer += got >> 4 << 4`),
 because the original stepped a segment by the paragraphs written. A
 short write is followed by the disk-full path and never by the next
@@ -664,8 +636,9 @@ The progress bar is `PerCent`. It counts what has been read plus what has
 been written against twice the size, so the bar is half full when the
 file has been read, and full when it has been written. It does that in
 48-bit arithmetic made of 32-bit `Plus32` and `Minus32` with explicit
-carries, a direct transcription of the original's register pairs, so
-that the Linux sanitizers see no unsigned wrap.
+carries, a direct transcription of the original's register pairs: a
+286 had no instruction for a 32-bit sum, so the original chains `ADD`
+and `ADC` over DX:AX, and over a third word for the doubled size.
 
 A full disk is a feature, not just an error. `C20_00` asks `DriveSpace`
 how much is free, writes exactly that much of the piece, closes the
@@ -675,11 +648,6 @@ goes back to `open` with `SplitFl` set. `rest` remembers where in the
 room the unwritten part begins. That is how files larger than a floppy
 were copied in 1991.
 
-On Linux, a file of 4 GB or more is shown with the largest size DOS can
-state, and a copy or a move of it is refused with an error, never cut
-short (`DEVIATIONS.md`, L7). A file's size is a `u32` on every platform.
-
-<!-- SCREENSHOT: the "Copying the file" box with its per cent bar part filled, over the panels; scenario `copy-big`, during the copy -->
 
 ### Errors
 
@@ -755,7 +723,9 @@ cannot grow, so every field that counts is also a 32-bit static of
 `view.c` under the same name (`ViSpace`, `ViLoaded`, `ViFirst`, ...).
 The 16-bit fields keep their bytes but are no longer written.
 
-<!-- SCREENSHOT: the viewer in hex mode over a binary file, the status line with name, size and per cent; scenario `hex` -->
+![F3, then F4](img/viewer-hex.png)
+
+*F3, then F4: the viewer in hex, 16 bytes a line, no table of lines needed.*
 
 ### Search
 
@@ -767,10 +737,10 @@ at +190. `V82_00(text, at, count)` then scans: at each place it tries the
 text, comparing `UpCase` of each byte, then the bytes. The answer says
 which matched: 1 for the text, 0 for the bytes, 100h for neither.
 
-`UpCase` is the country's capital, which DOS knows: `CaseMap` in
-`sys_dos.c` makes a call into real mode for each byte. That makes a text
-search three to four times slower than the original on the bench. It was
-measured, and the user chose to leave it so (`CLAUDE.md`).
+`UpCase` is the country's capital, which DOS knows: DOS hands the
+program a far routine for the capitals of bytes 80h to FFh (INT 21h AX
+3800h gives its address in the country record), and the original calls
+it for every byte that it compares. Below 80h it is a subtraction.
 
 The file search and the editor's search use the same `V82_00`.
 
@@ -791,11 +761,10 @@ if ((u32)ed.EdLen >= (u32)EdSpace) {
 }
 ```
 
-On DOS the room is the extender's memory less the panels; on Linux it is
-whatever `malloc` will give; on the web, 256 MB less the panels. The
-original had some 345K on the bench. The scenario `editor-big`, where the
-original refuses a file, is not run for the portable C, which opens it
-(`DEVIATIONS.md`, 13).
+In the original the room is what DOS has left once the main data and
+the panels are taken, some 345K on a 640K machine with DOS and a mouse
+driver loaded, so "too large for Edit" was a box that users met. In the
+C it is all the memory there is.
 
 The file is read in pieces of `0xFF00` bytes. That is the largest piece
 that fits in one 16-bit count and stays a whole number of paragraphs, and
@@ -831,8 +800,8 @@ Places in the text are `i32` offsets from `Room`, with 32-bit statics
 (`EdOffst`, `EdEndBf`, `EdFirst`, `EdLine`, ...) beside the 16-bit fields
 of `struct EdData` (138 bytes at `TmpBuf+100`), as in the viewer. The
 line count is 32 bits as well, so a text of more than 65,535 lines can be
-reached (`DEVIATIONS.md`, 25), and `Col` moves right only when the line
-number needs a sixth digit.
+reached, where the original's count of lines wrapped at 65,535, and
+`Col` moves right only when the line number needs a sixth digit.
 
 ### Keys
 
@@ -916,7 +885,7 @@ if (chunk < 4000)
 
 The original took the part's length from the whole room rather than
 from what was left behind the list, and with a long list it read past
-its own buffer's end. That is fixed (`DEVIATIONS.md`, 16). `part` is
+its own buffer's end: a bug of the original, which the C mends. `part` is
 rounded back to the paragraph its line starts in, up to 15 bytes into the
 free end of the last line, because the original addressed it by segment.
 
@@ -925,10 +894,12 @@ can take long. It looks at the keyboard and the mouse, lets the cursor
 move in the list while the search runs (`MODE_CURSOR`), and opens the box
 menu `[ Stop ] [ Go to ] [ Quit ]`. Go to changes directory to the
 chosen line's directory and puts the cursor on the file (`TO_F24_02`).
-The original asked DOS for the wrong drive there; that is fixed
-(`DEVIATIONS.md`, 15).
+The original asks DOS for the disk of the wrong drive there, reading
+the drive's letter at the wrong place; the C reads the right one.
 
-<!-- SCREENSHOT: the Find File box with a list of found files grouped under their directories and the menu "New search / Go to / Quit"; scenario `find`, when the search is over -->
+![Alt-F7](img/find-file.png)
+
+*Alt-F7: the file search's list, a line of 65 bytes for each name and one for each directory, kept in the room.*
 
 ## The user menu and the extension files
 
@@ -981,8 +952,8 @@ the list ending in two, and expands the macros on the way:
 
 A first command that starts with `@` runs without the prompt and its echo
 (`LoadFl |= 0x80`). A command is cut at 123 characters (`LenCmd - 1`).
-`Run_00` is a nest of 12 labels in the C too, as in the assembly, and
-the project leaves it so until it is rewritten for another reason.
+`Run_00` is a nest of 12 labels in the C too, as in the assembly: its
+paths cross.
 
 ## Enter, and running a program
 
@@ -999,7 +970,7 @@ flowchart TD
     PF -- "not a program" --> EXT{"FindExt in panel ExtBuf"}
     EXT -- "entry" --> RUN["Run_00: commands into DosBuf"]
     RUN --> X
-    EXT -- "none" --> OPEN["ProgramOpenFile: xdg-open on Linux, a new tab on the web, nothing on DOS"]
+    EXT -- "none" --> OPEN["nothing: the file is not run"]
     H --> X["F21_30 / F21_31: give vectors back, Quit restores the screen, NEXT_EXEC"]
     X --> L["main loop returns END_EXEC to Round"]
     L --> G["GiveMem; Exec; TakeMem"]
@@ -1008,10 +979,7 @@ flowchart TD
 ```
 
 Enter on a program does not run it directly. It *types* it into the
-command line, through the same `EdLin` that a key goes through, behind
-whatever `ProgramOfFile` says goes in front: nothing on DOS, `.\` on
-Linux, where the name then becomes `./name` for the shell. Then it runs
-the command line. So running a program by Enter and by typing its name
+command line, through the same `EdLin` that a key goes through, and then runs the command line. So running a program by Enter and by typing its name
 are one path, and the program lands in the history.
 
 To run, the program leaves its loop. `F21_31` gives the interrupts back
@@ -1028,22 +996,26 @@ front of the first command are the end of `DosChg`, there for that
 purpose. Between commands it prints a prompt the way COMMAND.COM would,
 drive and path and `>`. A command that begins with `@` skips that.
 
-`ProgramRun` of `sys.h` is DOS's 4B00h. On DOS, `sys_dos.c` builds the
-parameter block in `md.EPB` and makes the call in real mode. On Linux,
-`sys_posix.c` recognizes the shell by name and `/C` and runs the rest
-with `$SHELL -c`, in the host directory that the current DOS directory
-maps to. It first converts the DOS names in it, so that a word naming a
-file of the current directory reaches the shell as the host's name
-(`DosCommandToHost`). The terminal is handed to the child's process
-group for the length of the command, and the code it ends with is the
-answer, as DOS would give it to 4Dh.
+`ProgramRun` of `sys.h` is DOS's 4B00h, EXEC: DOS loads `COMMAND.COM`
+into the largest free block, hands it the tail `/C command` and the
+parameter block in `md.EPB` (14 bytes: the environment's segment and far
+pointers to the tail and to two FCBs), and returns when it ends. The
+command needs memory to run in, and on a 640K machine that memory is the
+commander's own. How the original makes room, by giving back everything
+but a few kilobytes and loading itself again afterwards, is in
+[chapter 1](01-the-program.md#a-command-runs-in-the-commanders-memory);
+how the C makes the call, through DOS/32A, in
+[chapter 3](03-the-system.md).
 
-The original could also hand commands to the shell it was started from,
-through INT 2Eh ("Quick execute"), and could give up most of its memory
-while a command ran. Neither exists in the portable C. Both only made
-sense on DOS (`DEVIATIONS.md`, 14 and 1).
+The original has a second way, "Quick execute": it hands each command to
+the copy of `COMMAND.COM` that it was started from, through INT 2Eh, an
+undocumented entry of `COMMAND.COM` that runs a command line in the
+shell's own memory, which saves loading a second shell. The C does not
+have it.
 
-<!-- SCREENSHOT: the user menu box (F2) over the panels, with keys F1, G and X and their titles; scenario `user-menu`, with the menu open -->
+![F2](img/user-menu.png)
+
+*F2: the user menu, read from `VC.MNU` into `MenuBuf`; each entry's hot key is one word at `TmpBuf+100`.*
 
 ## How the pieces share the main data
 
@@ -1067,10 +1039,10 @@ same time is not checked by any type:
 The editor's `EditBuf` is the menu buffer because no menu is open while
 the editor runs. `DirFunc` keeps the name of the directory it is leaving
 in `MenuBuf` because nothing that calls it has a menu open. The program
-is full of such contracts. The original made them to fit 64K, and the
-portable C keeps them because `struct MainDat` is the original's layout,
-which the tests hold the program to field by field (`harness/datacheck.py`,
-`harness/dataimage.py`).
+is full of such contracts. The original made them to fit 64K: every
+buffer that two features never need at the same time is one buffer, and
+the table above is the whole list of who may use what. The C keeps them
+because `struct MainDat` keeps the original's layout.
 
 ## Where to read next
 
@@ -1096,5 +1068,10 @@ which the tests hold the program to field by field (`harness/datacheck.py`,
 - `src/portable_c/enter.c`: `F21_10`, `F21_31`; `exec.c`: `Exec02`;
   `sys.h` with `sys_dos.c` and `sys_posix.c` for `MemTake`,
   `ProgramOfFile` and `ProgramRun`.
-- `src/portable_c/DEVIATIONS.md`, entries 13, 16, 17, 20, 21, 25, 27 and
-  29, for each place where these features differ from the original.
+- The assembly, `src/asm/`: `VCF1.INC` for the group commands,
+  `VCCOPY.INC` for the copy, `VCVIEW.INC` and `VCEDIT.INC` for the
+  viewer and the editor, `VCFIND.INC` for the search.
+- [Chapter 1](01-the-program.md) for the main data, the loop and the
+  screen that these features draw on, and
+  [chapter 3](03-the-system.md) for the calls of DOS behind
+  `FindFirst`, `FileRead` and `ProgramRun`.
