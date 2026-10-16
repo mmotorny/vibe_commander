@@ -408,13 +408,25 @@ export class Tab {
                     { type: "touchEnd", touchPoints: [] });
   }
 
-  async clickAt(x, y, button = "left") {
+  // `count` clicks, 2 for a double click, the second within the 40
+  // hundredths of a second that the program gives it.
+  async clickAt(x, y, button = "left", count = 1) {
     await this.send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
-    await this.send("Input.dispatchMouseEvent",
-                    { type: "mousePressed", x, y, button, buttons: 1, clickCount: 1 });
-    await sleep(40);
-    await this.send("Input.dispatchMouseEvent",
-                    { type: "mouseReleased", x, y, button, buttons: 0, clickCount: 1 });
+    for (let click = 1; click <= count; click++) {
+      if (click > 1)
+        await sleep(60);
+      await this.send("Input.dispatchMouseEvent",
+                      { type: "mousePressed", x, y, button, buttons: 1, clickCount: click });
+      await sleep(40);
+      await this.send("Input.dispatchMouseEvent",
+                      { type: "mouseReleased", x, y, button, buttons: 0, clickCount: click });
+    }
+  }
+
+  // A cell of the screen double clicked.
+  async doubleClickCell(column, row) {
+    const { x, y } = await this.cellAt(column, row);
+    await this.clickAt(x, y, "left", 2);
   }
 
   // A cell of the screen tapped, or clicked where there is no touch.

@@ -251,6 +251,42 @@ async function desktop(browser, mode, served) {
     await tab.press("Tab");
     await tab.until((r) => r[23].startsWith("D:\\>"), 5000, "D:'s prompt");
   });
+  // The mouse, each click followed by a key that has to take effect: the
+  // program waits for a button to be let go by asking the mouse alone,
+  // and the page froze there while that asking did not yield.
+  await step("a click on a file, then Up", async () => {
+    const at = find(await tab.settle(), "NOTES", 40);
+    must(at !== null, "NOTES is not listed");
+    await tab.hitCell(at.column + 1, at.row);
+    await tab.until((r) => rightStatus(r).includes("NOTES"), 5000, "the cursor on NOTES");
+    await tab.press("Up");
+    await tab.until((r) => rightStatus(r).includes("DATA"), 5000, "the cursor on DATA");
+  });
+  await step("a double click on CODE: into it, then Enter on ..: out", async () => {
+    const at = find(await tab.settle(), "CODE", 40);
+    must(at !== null, "CODE is not listed");
+    await tab.doubleClickCell(at.column + 1, at.row);
+    await tab.until((r) => r[0].slice(40).includes("D:\\CODE"), 5000, "D:\\CODE");
+    await tab.press("Enter");
+    await tab.until((r) => !r[0].slice(40).includes("CODE")
+                    && rightStatus(r).includes("CODE"), 5000, "D:\\ with the cursor on CODE");
+  });
+  await step("a click on the menu bar: the menu, then Esc", async () => {
+    await tab.hitCell(45, 0);
+    await tab.until((r) => r[0].includes("Files") && r[0].includes("Commands"), 5000,
+                    "the menu bar");
+    await tab.press("Escape");
+    await tab.until((r) => !r[0].includes("Commands") && r[0].slice(40).includes("D:\\"),
+                    5000, "the menu gone");
+  });
+  await step("a click on the key bar, then Down", async () => {
+    await tab.hitCell(1, 24);
+    await tab.settle();
+    await tab.press("Down");
+    await tab.until((r) => rightStatus(r).includes("DATA"), 5000, "the cursor on DATA");
+    await tab.press("Up");
+    await tab.until((r) => rightStatus(r).includes("CODE"), 5000, "the cursor on CODE");
+  });
   await step("F1, with no help file: nothing, and the keys still the program's", async () => {
     const before = (await tab.settle()).join("\n");
     await tab.press("F1");
@@ -416,6 +452,13 @@ async function phone(browser, mode, served) {
     await tab.until((r) => rightStatus(r).includes("CODE"), 5000, "the cursor on CODE");
     await tab.hit("#keys button:last-child");
     await tab.until((r) => r[0].slice(40).includes("D:\\CODE"), 5000, "D:\\CODE");
+  });
+  await step("a tap on the key bar, then Enter of the row on ..: out", async () => {
+    await tab.hitCell(1, 24);
+    await tab.settle();
+    await tab.hit("#keys button:last-child");
+    await tab.until((r) => !r[0].slice(40).includes("CODE")
+                    && rightStatus(r).includes("CODE"), 5000, "D:\\ with the cursor on CODE");
   });
   await step("the row of keys whole, each key tappable", () => whole(390, 844));
   await shot(tab, `${mode}-portrait`);
