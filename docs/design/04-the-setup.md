@@ -914,7 +914,5 @@ fit in what is left of the segment.*
   `VC.INI`, `Init00` for its reading, `New21` for the private call;
   `VCSUB3.INC`: `SaveSet`, `MakeIni` and `MkIni1` for its writing.
 - [Chapter 1](01-the-program.md) for the main data and the dialogs
-  that the setup program borrows; [chapter 3](03-the-system.md) for the
-  resident part, `New21` and the way back from a command; and
-  [chapter 5](05-into-c.md) for how the setup program became a part of
-  one program in C.
+  that the setup program borrows, and [chapter 3](03-the-system.md) for
+  the resident part, `New21` and the way back from a command.

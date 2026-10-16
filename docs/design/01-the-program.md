@@ -1499,5 +1499,4 @@ the program that loads itself, are listed with the rest of the system in
   editor, copy and find file do on this skeleton;
   [chapter 3](03-the-system.md) for the calls of DOS and the BIOS and
   for the resident part; [chapter 4](04-the-setup.md) for `VC.INI` and
-  the setup program; [chapter 5](05-into-c.md) for the C translation,
-  which keeps the layouts and the names.
+  the setup program.

@@ -134,8 +134,7 @@ byte: 4800h is Up, 1C0Dh is Enter.
 ## How to read this book
 
 The book is about the original program, Volkov's assembly in
-`src/asm/`, and only its last chapter is about the C into which it was
-carried. Each chapter can be read alone, but they build on one another:
+`src/asm/`. Each chapter can be read alone, but they build on one another:
 
 ```mermaid
 graph TD
@@ -144,14 +143,11 @@ graph TD
     C2["2. The features: panels, the tree, walking files, copy, viewer, editor, find file"]
     C3["3. The system: DOS and the BIOS, the critical error, the resident part"]
     C4["4. The setup: VCSETUP.COM, VC.INI and the private call"]
-    C5["5. Into C: the C translation and the portable C"]
     P --> C1
     C1 --> C2
     C1 --> C3
     C2 --> C3
     C3 --> C4
-    C3 --> C5
-    C4 --> C5
 ```
 
 [Chapter 1](01-the-program.md) is the skeleton: how the source is put
@@ -162,8 +158,7 @@ is what the program does with files on that skeleton.
 [Chapter 3](03-the-system.md) is the conversation with DOS and the PC,
 and the part of the program that stays in memory while a command runs.
 [Chapter 4](04-the-setup.md) is the second program, and the file and
-the private call that join the two. [Chapter 5](05-into-c.md) tells
-how the assembly became C.
+the private call that join the two.
 
 Each topic is explained in one place, and the other chapters link to
 it; each chapter ends with what to read next, in the source and in the

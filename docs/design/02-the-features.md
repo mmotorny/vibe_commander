@@ -1440,5 +1440,4 @@ room, which is whatever DOS has left.
   screen and the dialogs; [chapter 3](03-the-system.md) for `Intr21`,
   the critical error, the calls of DOS and the resident part that runs
   a command; [chapter 4](04-the-setup.md) for `VC.INI`, which keeps each
-  panel's mode, sort order, filter and path; and
-  [chapter 5](05-into-c.md) for how these routines were carried into C.
+  panel's mode, sort order, filter and path.

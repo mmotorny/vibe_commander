@@ -5,8 +5,7 @@ DOS, with a viewer, an editor, a file search, a tree of the disk, a
 mouse, a help and a manager for resident programs, into a `.COM` file
 of 65,090 bytes that keeps 12,690 bytes of itself in memory while the
 user's command runs. It reads the original assembly, `src/asm/`, a
-routine at a time; only the last chapter is about the C into which the
-program was carried.
+routine at a time.
 
 The reader it is written for knows a modern toolchain and may remember
 a little DOS: the [preface](00-preface.md#a-dos-refresher) has what the
@@ -164,30 +163,6 @@ The conversation with DOS and the PC: the error wrapper, the critical error, Ctr
   - [Read once, at start](04-the-setup.md#read-once-at-start)
 - [What it adds up to](04-the-setup.md#what-it-adds-up-to)
 - [Where to read next](04-the-setup.md#where-to-read-next)
-
-### [5. From assembly to C](05-into-c.md)
-
-From assembly to C: the C translation that keeps the original's routines, names and layouts, and the portable C of 32 bits with the system behind one header.
-
-- [The C translation: `src/c/`](05-into-c.md#the-c-translation-srcc)
-  - [A routine keeps its name and its registers](05-into-c.md#a-routine-keeps-its-name-and-its-registers)
-  - [What Open Watcom's 16-bit compiler would not do](05-into-c.md#what-open-watcoms-16-bit-compiler-would-not-do)
-  - [Jumps become returns: the commands](05-into-c.md#jumps-become-returns-the-commands)
-  - [The loop is a `switch` that falls through](05-into-c.md#the-loop-is-a-switch-that-falls-through)
-  - [A table of keys becomes a `switch`](05-into-c.md#a-table-of-keys-becomes-a-switch)
-  - [A label is an entry: the critical error](05-into-c.md#a-label-is-an-entry-the-critical-error)
-  - [The data, a file at a time](05-into-c.md#the-data-a-file-at-a-time)
-  - [The part that stays: `resident.c`](05-into-c.md#the-part-that-stays-residentc)
-- [The portable C: `src/portable_c/`](05-into-c.md#the-portable-c-srcportable_c)
-  - [32 bits under DOS/32A](05-into-c.md#32-bits-under-dos32a)
-  - [Pointers where there were segments and offsets](05-into-c.md#pointers-where-there-were-segments-and-offsets)
-  - [Widened numbers and booleans](05-into-c.md#widened-numbers-and-booleans)
-  - [The program kept whole](05-into-c.md#the-program-kept-whole)
-  - [`sys.h`: DOS as the abstraction layer](05-into-c.md#sysh-dos-as-the-abstraction-layer)
-  - [`sys_dos.c`: DOS from protected mode](05-into-c.md#sys_dosc-dos-from-protected-mode)
-  - [Linux and the web](05-into-c.md#linux-and-the-web)
-- [The mapping, in one table](05-into-c.md#the-mapping-in-one-table)
-- [Where to read next](05-into-c.md#where-to-read-next)
 
 ## The screens and the source
 

@@ -1519,4 +1519,3 @@ already does, DOS is made to do.
   for the panels' memory and the features that make most of the calls
   of DOS, and [chapter 4](04-the-setup.md) for the setup program and
   the API of `New21`.
-- [Chapter 5](05-into-c.md) for how all of this is carried into C.
