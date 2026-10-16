@@ -16,6 +16,7 @@ const { makeServer, prepare, treeOf } = await import(path.join(web, "server.mjs"
 const drives = await import(path.join(web, "drives.js"));
 const kept = await import(path.join(web, "kept.js"));
 const { FakeIndexedDB } = await import(new URL("./fakeidb.mjs", import.meta.url));
+const { FILES, layFiles } = await import(new URL("./webfiles.mjs", import.meta.url));
 const bundle = await import(path.join(web, "bundle.mjs"));
 const { Drives, HOST_CONTENTS, HOST_DELETE, HOST_RENAME, HOST_DIR_MAKE,
         HOST_DIR_REMOVE, HOST_MODE, CHANGE_ERRORS } = drives;
@@ -37,13 +38,14 @@ mkdirSync(outside);
 writeFileSync(path.join(outside, "secret.txt"), "not yours");
 const page = path.join(top, "vc.html");
 writeFileSync(page, "<!doctype html><title>page</title>");
-const options = { c: path.join(top, "c"), d: path.join(top, "d"),
-                  demo: path.join(web, "demo"), page };
+const options = { c: path.join(top, "c"), page };
 const roots = await prepare(options);
+// The test's own files on C:, beside vc.
+layFiles(roots.c);
 // A link of the host's inside a drive that leads out of it, and one to a
 // directory outside.
-symlinkSync(path.join(outside, "secret.txt"), path.join(roots.d, "link.txt"));
-symlinkSync(outside, path.join(roots.d, "out"));
+symlinkSync(path.join(outside, "secret.txt"), path.join(roots.c, "link.txt"));
+symlinkSync(outside, path.join(roots.c, "out"));
 const server = makeServer(roots, page);
 await new Promise((done) => server.listen(0, "127.0.0.1", done));
 const base = `http://127.0.0.1:${server.address().port}`;
@@ -70,10 +72,12 @@ const refused = (answer) => {
 };
 
 // 1. The server.
-await check("the drives made", () => {
+await check("the drive made", async () => {
+  assert.deepEqual(Object.keys(roots), ["c"]);
   assert.ok(statSync(path.join(roots.c, "vc")).isDirectory());
-  for (const name of readdirSync(options.demo))
-    assert.ok(existsSync(path.join(roots.d, name)), name);
+  // Made again, it keeps what it has.
+  assert.deepEqual(await prepare(options), roots);
+  assert.ok(existsSync(path.join(roots.c, "readme.txt")));
 });
 await check("the server says that it is one", async () => {
   const answer = await fetch(`${base}/api/server`);
@@ -86,7 +90,7 @@ await check("the page", async () => {
   assert.match(await answer.text(), /<title>page/);
 });
 await check("the tree", async () => {
-  const { status, body } = await tree("d");
+  const { status, body } = await tree("c");
   assert.equal(status, 200);
   const paths = body.entries.map((entry) => entry.path);
   assert.ok(paths.includes("readme.txt"));
@@ -96,7 +100,7 @@ await check("the tree", async () => {
             "a link listed");
   const readme = body.entries.find((entry) => entry.path === "readme.txt");
   assert.equal(Buffer.from(readme.data, "base64").toString(),
-               readFileSync(path.join(roots.d, "readme.txt"), "utf8"));
+               readFileSync(path.join(roots.c, "readme.txt"), "utf8"));
 });
 await check("a file written, its time and read-only", async () => {
   const when = Date.UTC(1994, 4, 3, 12, 0, 0);
@@ -119,61 +123,64 @@ await check("a file into a directory that is not there", async () => {
   assert.equal(answer.body.error, "ENOENT");
 });
 await check("a directory made, renamed, removed", async () => {
-  assert.equal((await change({ op: "mkdir", drive: "d", path: "new" })).status, 200);
-  assert.equal((await change({ op: "mkdir", drive: "d", path: "new" })).body.error,
+  assert.equal((await change({ op: "mkdir", drive: "c", path: "new" })).status, 200);
+  assert.equal((await change({ op: "mkdir", drive: "c", path: "new" })).body.error,
                "EEXIST");
-  assert.equal((await put("d", "new/a.txt", Buffer.from("a"))).status, 200);
-  assert.equal((await change({ op: "rmdir", drive: "d", path: "new" })).body.error,
+  assert.equal((await put("c", "new/a.txt", Buffer.from("a"))).status, 200);
+  assert.equal((await change({ op: "rmdir", drive: "c", path: "new" })).body.error,
                "ENOTEMPTY");
-  assert.equal((await change({ op: "rename", drive: "d", path: "new",
+  assert.equal((await change({ op: "rename", drive: "c", path: "new",
                                to: "old" })).status, 200);
-  assert.ok(existsSync(path.join(roots.d, "old", "a.txt")));
-  assert.equal((await change({ op: "rename", drive: "d", path: "old",
+  assert.ok(existsSync(path.join(roots.c, "old", "a.txt")));
+  assert.equal((await change({ op: "rename", drive: "c", path: "old",
                                to: "old/inner" })).body.error, "EACCES");
-  assert.equal((await change({ op: "rename", drive: "d", path: "readme.txt",
+  assert.equal((await change({ op: "rename", drive: "c", path: "readme.txt",
                                to: "old/a.txt" })).body.error, "EEXIST");
-  assert.equal((await change({ op: "delete", drive: "d", path: "old" })).body.error,
+  assert.equal((await change({ op: "delete", drive: "c", path: "old" })).body.error,
                "EACCES");
-  assert.equal((await change({ op: "delete", drive: "d", path: "old/a.txt" })).status,
+  assert.equal((await change({ op: "delete", drive: "c", path: "old/a.txt" })).status,
                200);
-  assert.equal((await change({ op: "rmdir", drive: "d", path: "old" })).status, 200);
-  assert.ok(!existsSync(path.join(roots.d, "old")));
-  assert.equal((await change({ op: "delete", drive: "d", path: "old" })).body.error,
+  assert.equal((await change({ op: "rmdir", drive: "c", path: "old" })).status, 200);
+  assert.ok(!existsSync(path.join(roots.c, "old")));
+  assert.equal((await change({ op: "delete", drive: "c", path: "old" })).body.error,
                "ENOENT");
 });
 await check("the mode", async () => {
-  assert.equal((await change({ op: "mode", drive: "d", path: "readme.txt",
+  assert.equal((await change({ op: "mode", drive: "c", path: "readme.txt",
                                readonly: true })).status, 200);
-  assert.equal(statSync(path.join(roots.d, "readme.txt")).mode & 0o222, 0);
-  await change({ op: "mode", drive: "d", path: "readme.txt", readonly: false });
-  assert.notEqual(statSync(path.join(roots.d, "readme.txt")).mode & 0o200, 0);
+  assert.equal(statSync(path.join(roots.c, "readme.txt")).mode & 0o222, 0);
+  await change({ op: "mode", drive: "c", path: "readme.txt", readonly: false });
+  assert.notEqual(statSync(path.join(roots.c, "readme.txt")).mode & 0o200, 0);
 });
 await check("paths outside the drives refused", async () => {
   for (const bad of ["..", "../outside/secret.txt", "notes/../../outside",
                      "/etc/passwd", "notes\\todo.txt", "", ".", "notes//x",
                      "notes/./todo.txt", `${outside}/secret.txt`, "a\0b"]) {
-    refused(await put("d", bad, Buffer.from("x")));
-    refused(await change({ op: "delete", drive: "d", path: bad }));
-    refused(await change({ op: "mkdir", drive: "d", path: bad }));
-    refused(await change({ op: "rename", drive: "d", path: "readme.txt",
+    refused(await put("c", bad, Buffer.from("x")));
+    refused(await change({ op: "delete", drive: "c", path: bad }));
+    refused(await change({ op: "mkdir", drive: "c", path: bad }));
+    refused(await change({ op: "rename", drive: "c", path: "readme.txt",
                           to: bad }));
   }
   refused(await put("e", "x.txt", Buffer.from("x")));
   refused(await change({ op: "mkdir", drive: "../c", path: "x" }));
-  refused(await change({ op: "mkdir", drive: "d" }));
+  refused(await change({ op: "mkdir", drive: "c" }));
   assert.equal((await tree("e")).body.error, "EACCES");
-  assert.equal((await change({ op: "chown", drive: "d", path: "readme.txt" }))
+  // D:, which the page had once, is no drive of the server's.
+  assert.equal((await tree("d")).body.error, "EACCES");
+  refused(await put("d", "x.txt", Buffer.from("x")));
+  assert.equal((await change({ op: "chown", drive: "c", path: "readme.txt" }))
                .body.error, "EACCES");
 });
 await check("links of the host refused", async () => {
-  refused(await put("d", "link.txt", Buffer.from("x")));
-  refused(await put("d", "out/new.txt", Buffer.from("x")));
-  refused(await change({ op: "delete", drive: "d", path: "link.txt" }));
-  refused(await change({ op: "delete", drive: "d", path: "out/secret.txt" }));
-  refused(await change({ op: "mode", drive: "d", path: "out/secret.txt",
+  refused(await put("c", "link.txt", Buffer.from("x")));
+  refused(await put("c", "out/new.txt", Buffer.from("x")));
+  refused(await change({ op: "delete", drive: "c", path: "link.txt" }));
+  refused(await change({ op: "delete", drive: "c", path: "out/secret.txt" }));
+  refused(await change({ op: "mode", drive: "c", path: "out/secret.txt",
                         readonly: true }));
-  refused(await change({ op: "rename", drive: "d", path: "out", to: "in" }));
-  refused(await change({ op: "rename", drive: "d", path: "readme.txt",
+  refused(await change({ op: "rename", drive: "c", path: "out", to: "in" }));
+  refused(await change({ op: "rename", drive: "c", path: "readme.txt",
                         to: "out/readme.txt" }));
   assert.equal(readFileSync(path.join(outside, "secret.txt"), "utf8"),
                "not yours");
@@ -254,19 +261,20 @@ const files = new Files();
 const mirror = new Drives({ fs: files, fetch, base });
 await check("the drives loaded", async () => {
   await mirror.load();
-  assert.equal(new TextDecoder().decode(files.readFile("/drive/d/notes/todo.txt")),
-               readFileSync(path.join(roots.d, "notes", "todo.txt"), "utf8"));
+  assert.equal(new TextDecoder().decode(files.readFile("/drive/c/notes/todo.txt")),
+               readFileSync(path.join(roots.c, "notes", "todo.txt"), "utf8"));
   assert.ok(files.stat("/drive/c/vc"));
-  assert.equal(files.stat("/drive/d/data/cities.csv").mtime.getTime(),
-               Math.floor(statSync(path.join(roots.d, "data", "cities.csv"))
+  assert.equal(files.stat("/drive/c/data/cities.csv").mtime.getTime(),
+               Math.floor(statSync(path.join(roots.c, "data", "cities.csv"))
                           .mtimeMs));
-  assert.throws(() => files.stat("/drive/d/link.txt"));
+  assert.throws(() => files.stat("/drive/c/link.txt"));
 });
 await check("where a path is", () => {
-  assert.deepEqual(mirror.locate("/drive/d/notes/todo.txt"),
-                   { drive: "d", path: "notes/todo.txt" });
-  assert.equal(mirror.locate("/drive/d"), null);
-  assert.equal(mirror.locate("/drive/dd/x"), null);
+  assert.deepEqual(mirror.locate("/drive/c/notes/todo.txt"),
+                   { drive: "c", path: "notes/todo.txt" });
+  assert.equal(mirror.locate("/drive/c"), null);
+  assert.equal(mirror.locate("/drive/cc/x"), null);
+  assert.equal(mirror.locate("/drive/d/x"), null);
   assert.equal(mirror.locate("/tmp/x"), null);
 });
 await check("a file closed reaches the server", async () => {
@@ -286,64 +294,68 @@ await check("a file closed reaches the server", async () => {
                                    files.open("/tmp/x"), 0), 0);
 });
 await check("the changes reach the server", async () => {
-  assert.equal(await mirror.change(HOST_DIR_MAKE, "/drive/d/work", null, -1, 0), 0);
-  assert.ok(statSync(path.join(roots.d, "work")).isDirectory());
-  assert.equal(await mirror.change(HOST_DIR_MAKE, "/drive/d/work", null, -1, 0),
+  assert.equal(await mirror.change(HOST_DIR_MAKE, "/drive/c/work", null, -1, 0), 0);
+  assert.ok(statSync(path.join(roots.c, "work")).isDirectory());
+  assert.equal(await mirror.change(HOST_DIR_MAKE, "/drive/c/work", null, -1, 0),
                number("EEXIST"));
-  assert.equal(await mirror.change(HOST_RENAME, "/drive/d/work",
-                                   "/drive/d/play", -1, 0), 0);
-  assert.equal(await mirror.change(HOST_RENAME, "/drive/d/play",
-                                   "/drive/c/play", -1, 0), number("EACCES"));
-  assert.equal(await mirror.change(HOST_DIR_REMOVE, "/drive/d/play", null, -1, 0), 0);
-  assert.ok(!existsSync(path.join(roots.d, "play")));
-  assert.equal(await mirror.change(HOST_MODE, "/drive/d/readme.txt", null, -1,
+  assert.equal(await mirror.change(HOST_RENAME, "/drive/c/work",
+                                   "/drive/c/play", -1, 0), 0);
+  assert.equal(await mirror.change(HOST_RENAME, "/drive/c/play",
+                                   "/tmp/play", -1, 0), number("EACCES"));
+  assert.equal(await mirror.change(HOST_DIR_REMOVE, "/drive/c/play", null, -1, 0), 0);
+  assert.ok(!existsSync(path.join(roots.c, "play")));
+  assert.equal(await mirror.change(HOST_MODE, "/drive/c/readme.txt", null, -1,
                                    0o444), 0);
-  assert.equal(statSync(path.join(roots.d, "readme.txt")).mode & 0o222, 0);
-  assert.equal(await mirror.change(HOST_MODE, "/drive/d/readme.txt", null, -1,
+  assert.equal(statSync(path.join(roots.c, "readme.txt")).mode & 0o222, 0);
+  assert.equal(await mirror.change(HOST_MODE, "/drive/c/readme.txt", null, -1,
                                    0o644), 0);
-  assert.equal(await mirror.change(HOST_DELETE, "/drive/d/data/dos.txt", null,
+  assert.equal(await mirror.change(HOST_DELETE, "/drive/c/data/dos.txt", null,
                                    -1, 0), 0);
-  assert.ok(!existsSync(path.join(roots.d, "data", "dos.txt")));
-  assert.equal(await mirror.change(HOST_DELETE, "/drive/d/data/dos.txt", null,
+  assert.ok(!existsSync(path.join(roots.c, "data", "dos.txt")));
+  assert.equal(await mirror.change(HOST_DELETE, "/drive/c/data/dos.txt", null,
                                    -1, 0), number("ENOENT"));
-  assert.equal(await mirror.change(HOST_DELETE, "/drive/d/link.txt", null,
+  assert.equal(await mirror.change(HOST_DELETE, "/drive/c/link.txt", null,
                                    -1, 0), number("EACCES"));
 });
 await check("an upload", async () => {
   const bytes = new TextEncoder().encode("brought in");
-  assert.ok(!mirror.exists("/drive/d/notes", "new.txt"));
-  assert.equal(await mirror.upload("/drive/d/notes", "new.txt", bytes), 0);
-  assert.ok(mirror.exists("/drive/d/notes", "new.txt"));
-  assert.equal(readFileSync(path.join(roots.d, "notes", "new.txt"), "utf8"),
+  assert.ok(!mirror.exists("/drive/c/notes", "new.txt"));
+  assert.equal(await mirror.upload("/drive/c/notes", "new.txt", bytes), 0);
+  assert.ok(mirror.exists("/drive/c/notes", "new.txt"));
+  assert.equal(readFileSync(path.join(roots.c, "notes", "new.txt"), "utf8"),
                "brought in");
-  assert.equal(await mirror.upload("/drive/d/notes", "../x.txt", bytes),
+  assert.equal(await mirror.upload("/drive/c/notes", "../x.txt", bytes),
                number("EACCES"));
   assert.equal(await mirror.upload("/elsewhere", "x.txt", bytes),
                number("EACCES"));
 });
 await check("a server that is not there is DOS's failure", async () => {
   const gone = new Drives({ fs: files, fetch, base: "http://127.0.0.1:1" });
-  assert.equal(await gone.change(HOST_DELETE, "/drive/d/readme.txt", null, -1, 0),
+  assert.equal(await gone.change(HOST_DELETE, "/drive/c/readme.txt", null, -1, 0),
                number("EIO"));
-  assert.ok(existsSync(path.join(roots.d, "readme.txt")));
+  assert.ok(existsSync(path.join(roots.c, "readme.txt")));
 });
 
-// 3. The page with no server, kept.js: the drives as they are served
-// beside a static page, the store of the browser's in their place.
-const served = { c: { entries: [{ path: "vc", directory: true,
-                                  mtime: 0, readonly: false }] },
-                 d: await treeOf(options.demo) };
+// 3. The page with no server, kept.js: the drive as it is served beside
+// a static page, the store of the browser's in its place. What is served
+// is C: with its directory vc, as static.mjs makes it, and the test's
+// files besides.
+const servedRoot = path.join(top, "served");
+mkdirSync(path.join(servedRoot, "vc"), { recursive: true });
+layFiles(servedRoot);
+const served = { c: await treeOf(servedRoot) };
 let fetched = 0;
 const staticFetch = async (url) => {
   fetched++;
-  const match = /^drives\/([cd])\.json$/.exec(url);
+  const match = /^drives\/([a-z])\.json$/.exec(url);
+  if (match !== null && served[match[1]] === undefined)
+    throw new Error(`${url} asked for: the page has no such drive`);
   if (match === null)
     return new Response("", { status: 404 });
   return new Response(JSON.stringify(served[match[1]]), { status: 200 });
 };
 const text = (fs, at) => new TextDecoder().decode(fs.readFile(at));
-const demoText = (...names) => readFileSync(path.join(options.demo, ...names),
-                                            "utf8");
+const fileText = (name) => FILES[name];
 for (const [kind, makeStore] of [
   ["memory", async () => new kept.MemoryStore()],
   ["IndexedDB", async () => kept.openStore(new FakeIndexedDB())]]) {
@@ -357,50 +369,50 @@ for (const [kind, makeStore] of [
   await check(`${kind}: the drives loaded as they are served`, async () => {
     fetched = 0;
     await local.load();
-    assert.equal(fetched, 2);
-    assert.equal(text(first, "/drive/d/notes/todo.txt"),
-                 demoText("notes", "todo.txt"));
+    assert.equal(fetched, 1);
+    assert.equal(text(first, "/drive/c/notes/todo.txt"),
+                 fileText("notes/todo.txt"));
     assert.ok(first.isDir(first.stat("/drive/c/vc").mode));
-    assert.ok((await store.get("d:notes/todo.txt")).data.length > 0);
+    assert.ok((await store.get("c:notes/todo.txt")).data.length > 0);
   });
   await check(`${kind}: each change kept, a refusal keeping nothing`,
               async () => {
     const change = (...a) => local.change(...a);
-    assert.equal(await change(HOST_DIR_MAKE, "/drive/d/work", null, -1, 0), 0);
-    first.mkdirTree("/drive/d/work");
-    assert.equal(await change(HOST_DIR_MAKE, "/drive/d/work", null, -1, 0),
+    assert.equal(await change(HOST_DIR_MAKE, "/drive/c/work", null, -1, 0), 0);
+    first.mkdirTree("/drive/c/work");
+    assert.equal(await change(HOST_DIR_MAKE, "/drive/c/work", null, -1, 0),
                  number("EEXIST"));
-    const at = "/drive/d/work/new.txt";
+    const at = "/drive/c/work/new.txt";
     first.writeFile(at, new TextEncoder().encode("kept"));
     first.utime(at, 1000, 1000);
     assert.equal(await change(HOST_CONTENTS, null, null, first.open(at), 0), 0);
-    assert.equal(await change(HOST_DIR_REMOVE, "/drive/d/work", null, -1, 0),
+    assert.equal(await change(HOST_DIR_REMOVE, "/drive/c/work", null, -1, 0),
                  number("ENOTEMPTY"));
-    assert.equal(await change(HOST_RENAME, "/drive/d/work", "/drive/d/notes",
+    assert.equal(await change(HOST_RENAME, "/drive/c/work", "/drive/c/notes",
                               -1, 0), number("EEXIST"));
-    assert.equal(await change(HOST_RENAME, "/drive/d/work",
-                              "/drive/d/work/in", -1, 0), number("EACCES"));
-    assert.equal(await change(HOST_RENAME, "/drive/d/work", "/drive/c/work",
+    assert.equal(await change(HOST_RENAME, "/drive/c/work",
+                              "/drive/c/work/in", -1, 0), number("EACCES"));
+    assert.equal(await change(HOST_RENAME, "/drive/c/work", "/tmp/work",
                               -1, 0), number("EACCES"));
-    assert.equal(await change(HOST_RENAME, "/drive/d/work", "/drive/d/play",
+    assert.equal(await change(HOST_RENAME, "/drive/c/work", "/drive/c/play",
                               -1, 0), 0);
-    first.rename("/drive/d/work", "/drive/d/play");
-    assert.equal(await store.get("d:work/new.txt"), undefined);
-    assert.equal((await store.get("d:play/new.txt")).mtime, 1000);
-    assert.equal(await change(HOST_DELETE, "/drive/d/play", null, -1, 0),
+    first.rename("/drive/c/work", "/drive/c/play");
+    assert.equal(await store.get("c:work/new.txt"), undefined);
+    assert.equal((await store.get("c:play/new.txt")).mtime, 1000);
+    assert.equal(await change(HOST_DELETE, "/drive/c/play", null, -1, 0),
                  number("EACCES"));
-    assert.equal(await change(HOST_DELETE, "/drive/d/data/dos.txt", null,
+    assert.equal(await change(HOST_DELETE, "/drive/c/data/dos.txt", null,
                               -1, 0), 0);
-    first.nodes.delete("/drive/d/data/dos.txt");
-    assert.equal(await change(HOST_DELETE, "/drive/d/data/dos.txt", null,
+    first.nodes.delete("/drive/c/data/dos.txt");
+    assert.equal(await change(HOST_DELETE, "/drive/c/data/dos.txt", null,
                               -1, 0), number("ENOENT"));
-    assert.equal(await change(HOST_MODE, "/drive/d/readme.txt", null, -1,
+    assert.equal(await change(HOST_MODE, "/drive/c/readme.txt", null, -1,
                               0o444), 0);
-    assert.equal((await store.get("d:readme.txt")).readonly, true);
-    assert.equal(await local.upload("/drive/d/notes", "brought.txt",
+    assert.equal((await store.get("c:readme.txt")).readonly, true);
+    assert.equal(await local.upload("/drive/c/notes", "brought.txt",
                                     new TextEncoder().encode("in")), 0);
-    assert.equal(text(first, "/drive/d/notes/brought.txt"), "in");
-    assert.equal(await local.upload("/drive/d/notes", "../x", new Uint8Array(1)),
+    assert.equal(text(first, "/drive/c/notes/brought.txt"), "in");
+    assert.equal(await local.upload("/drive/c/notes", "../x", new Uint8Array(1)),
                  number("EACCES"));
     assert.equal(await change(HOST_CONTENTS, null, null,
                               first.open("/tmp/x"), 0), 0);
@@ -410,25 +422,40 @@ for (const [kind, makeStore] of [
     fetched = 0;
     await new kept.KeptDrives({ fs: again, fetch: staticFetch, store }).load();
     assert.equal(fetched, 0);
-    assert.equal(text(again, "/drive/d/play/new.txt"), "kept");
-    assert.equal(again.stat("/drive/d/play/new.txt").mtime.getTime(), 1000);
-    assert.equal(text(again, "/drive/d/notes/brought.txt"), "in");
-    assert.throws(() => again.stat("/drive/d/data/dos.txt"));
-    assert.throws(() => again.stat("/drive/d/work"));
-    assert.equal(again.stat("/drive/d/readme.txt").mode & 0o222, 0);
+    assert.equal(text(again, "/drive/c/play/new.txt"), "kept");
+    assert.equal(again.stat("/drive/c/play/new.txt").mtime.getTime(), 1000);
+    assert.equal(text(again, "/drive/c/notes/brought.txt"), "in");
+    assert.throws(() => again.stat("/drive/c/data/dos.txt"));
+    assert.throws(() => again.stat("/drive/c/work"));
+    assert.equal(again.stat("/drive/c/readme.txt").mode & 0o222, 0);
   });
   await check(`${kind}: a reset is the drives as they are served`, async () => {
     await local.reset();
     const fresh = new Files();
     fetched = 0;
     await new kept.KeptDrives({ fs: fresh, fetch: staticFetch, store }).load();
-    assert.equal(fetched, 2);
-    assert.equal(text(fresh, "/drive/d/data/dos.txt"),
-                 demoText("data", "dos.txt"));
-    assert.throws(() => fresh.stat("/drive/d/play"));
+    assert.equal(fetched, 1);
+    assert.equal(text(fresh, "/drive/c/data/dos.txt"),
+                 fileText("data/dos.txt"));
+    assert.throws(() => fresh.stat("/drive/c/play"));
     first = fresh;
   });
 }
+await check("what a store kept of a drive that is gone is forgotten",
+            async () => {
+  const store = new kept.MemoryStore();
+  const local = new kept.KeptDrives({ fs: new Files(), fetch: staticFetch,
+                                      store });
+  await local.load();
+  await store.put("d:readme.txt", { drive: "d", path: "readme.txt",
+                                    directory: false, mtime: 0,
+                                    readonly: false, data: new Uint8Array(1) });
+  const again = new Files();
+  await new kept.KeptDrives({ fs: again, fetch: staticFetch, store }).load();
+  assert.equal(await store.get("d:readme.txt"), undefined);
+  assert.throws(() => again.stat("/drive/d/readme.txt"));
+  assert.ok(again.stat("/drive/c/readme.txt"));
+});
 await check("a store that is full is DOS's ENOSPC", async () => {
   const idb = new FakeIndexedDB();
   const store = await kept.openStore(idb);
@@ -436,10 +463,10 @@ await check("a store that is full is DOS's ENOSPC", async () => {
   const local = new kept.KeptDrives({ fs: files, fetch: staticFetch, store });
   await local.load();
   idb.full = true;
-  assert.equal(await local.change(HOST_DIR_MAKE, "/drive/d/full", null, -1, 0),
+  assert.equal(await local.change(HOST_DIR_MAKE, "/drive/c/full", null, -1, 0),
                number("ENOSPC"));
   idb.full = false;
-  assert.equal(await store.get("d:full"), undefined);
+  assert.equal(await store.get("c:full"), undefined);
 });
 await check("no IndexedDB, or one that refuses: the page's memory",
             async () => {

@@ -23,27 +23,33 @@ is declared in `src/portable_c/DEVIATIONS.md`, under "The web page"
 
 ### Drives
 
-| Drive | Label | What it holds |
-|---|---|---|
-| C: | VIBE | Where the program lives: its own files, the setup file `VC.INI`, the menu and the extension file, in C:\VC. The page starts at the root of C: |
-| D: | DEMO | At first, a small tree of sample files written for the project, `src/portable_c/web/demo`, which the user may change |
+The page has one drive, C:, labelled VC. It holds C:\VC, where the
+program lives: its own files, the setup file `VC.INI`, the menu and the
+extension file. Nothing else is shipped on it, no demo and no sample
+files, and the page starts in C:\VC. The user brings files in (see
+"Files in and out").
 
-Both are ordinary drives to the program. The shareware's help and menu
+C: is an ordinary drive to the program. The shareware's help and menu
 files are not shipped: F1 shows nothing, as the original does without
 its help file, until the user brings `VC.HLP` into C:\VC.
+
+The tests are another matter: they give the program the bench's two
+drives through the environment, C: labelled VIBE and D: labelled DEMO
+with the program's files in D:\VC, as DOS's bench has them, so that
+their screens are held to the same goldens and masks.
 
 ### Served by its server
 
 `src/portable_c/web/server.mjs` is a Node script that uses only Node's
-own modules, nothing from npm. It serves the page and the two drives'
-directories on the machine it runs on:
+own modules, nothing from npm. It serves the page and the drive's
+directory on the machine it runs on:
 
-- The page loads the drives' trees from it.
-- Every change on either drive, the setup file's too, is made on the
+- The page loads the drive's tree from it.
+- Every change on the drive, the setup file's too, is made on the
   server as it happens, before the program goes on. What the server
   refuses or cannot do is DOS's error for that call.
-- It never reaches outside the two directories, and follows no host
-  link inside them.
+- It never reaches outside the drive's directory, and follows no host
+  link inside it.
 - It listens on 127.0.0.1 only. A reverse proxy such as Tailscale Serve
   can hand it to other devices over HTTPS. Whoever can reach it may
   write, so the proxy is the access control.
@@ -52,10 +58,11 @@ directories on the machine it runs on:
 
 The same page on GitHub Pages, or any host without the server:
 
-- Its drives start from what is served with it, `drives/c.json` and
-  `drives/d.json`.
+- Its drive starts from what is served with it, `drives/c.json`: C:
+  with its directory `vc` and nothing in it.
 - What the user changes is kept in that browser alone, in IndexedDB.
-  Reset drives in the page's bar forgets the changes.
+  Reset drives in the page's bar forgets the changes. What a browser
+  kept of the D: that the page once had is forgotten.
 - Where the browser gives it no IndexedDB, as some private windows do,
   it keeps the changes in memory until the page is closed.
 
@@ -64,7 +71,7 @@ its server answers and a static host does not. If a server does not
 answer, the page says so and does not start, so that a page of the
 server never keeps its changes in the browser. A host that answers that
 name with an error of its own, or does not let the page ask, is taken
-for a static one where it serves the drives beside the page, which the
+for a static one where it serves the drive beside the page, which the
 server never does.
 
 ### Files in and out
@@ -145,9 +152,9 @@ A second build directory can reuse the first one's download with
 | Target | What it makes |
 |---|---|
 | `portable_c-web` | `build/portable_c/web/vc.html`, the page, at `-O2` with no sanitizer |
-| `portable_c-web-static` | `build/portable_c/web/static/`, the static site: the page as `index.html`, the two drives' initial trees, and `.nojekyll` |
+| `portable_c-web-static` | `build/portable_c/web/static/`, the static site: the page as `index.html`, the initial tree of its drive, C: with `vc` alone, and `.nojekyll` |
 | `portable_c-web-node` | `build/portable_c/web-node/vc.js` with its `vc.wasm`: the program under Node with the host's files, sanitized. The scenarios run this one |
-| `portable_c-web-serve` | Not built by default. It builds the page and runs its server in the foreground on `http://127.0.0.1:8437/`, with C: in `build/portable_c/web/drives/c` and D: in `build/portable_c/web/drives/d`. D: is made as a copy of the demo the first time; delete the directory to get the demo afresh. Ctrl-C stops it |
+| `portable_c-web-serve` | Not built by default. It builds the page and runs its server in the foreground on `http://127.0.0.1:8437/`, with C: in `build/portable_c/web/drives/c`, made with its `vc` the first time. Ctrl-C stops it |
 
 ## Running it
 
@@ -157,7 +164,7 @@ another port:
 ```sh
 node src/portable_c/web/server.mjs --port 8437 \
     --page build/portable_c/web/vc.html \
-    --drive-c DIR --drive-d DIR [--demo DIR]
+    --drive-c DIR
 ```
 
 For a phone, put an HTTPS reverse proxy in front of it, for example
@@ -167,7 +174,7 @@ proxy can write to its drives.
 To try the static site locally, run
 `python3 -m http.server -d build/portable_c/web/static 8438` and open
 `http://127.0.0.1:8438/`. Opened as a `file://` URL, the page cannot
-fetch its drives.
+fetch its drive.
 
 `.github/workflows/pages.yml` publishes the static site to GitHub
 Pages. It does nothing until the repository variable `VC_PAGES` is
@@ -201,11 +208,11 @@ two panels and with its Licences, and the iPhone upright and turned, as
 | Test | What it checks |
 |---|---|
 | `portable_c-web-probe` | Only with `-DVC_WEB=ON`. Every file that the web build compiles (the common code, the DOS emulation it shares with Linux, and its own) compiled by emcc for wasm32 with the Linux program's warnings and `-Werror`, each failure printed. `harness/webprobe.py`, which takes from the configuration the list of Linux files that the web leaves out |
-| `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`. `web-node/vc.js`, built with Asyncify and the address and undefined-behaviour sanitizers, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench: its C: is the bench's home directory, and D: a directory of the run's with the program's own files in D:\VC. Screens and files are held to the original's goldens with what is declared for the portable C, for Linux (but the masks of the drive's letter) and for the web. Each scenario not run or cut on the web is named by an entry for Linux or for the web page in `DEVIATIONS.md` |
-| `portable_c-web-page` | Only with `-DVC_WEB=ON`. `vc.html` itself, its scripts run in Node with a stand-in document. Against its server: the drives loaded; the Licences link showing each carried file's text, closed by Esc and its button with no key reaching the program; a directory made; a file opened in a tab; a file written in the editor reaching the server when closed; a directory removed; a server refusal shown as DOS's error; the setup saved on C:; and the page's end. As a static site, behind a host that answers 404 for what it lacks, on a stand-in IndexedDB: changes made and kept, the page reloaded with them, the reset, and a browser with no IndexedDB. Behind hosts that answer 200 with a page, or 500, for what they lack, still a static site; and a server that is away, answering 502, for which the page does not start. `harness/webpage.py` |
-| `portable_c-web-browser` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`. The page in the machine's own Chromium, headless, driven over the DevTools protocol from Node with nothing from npm, from its server on a free port and as the static site behind a host that answers 404. On a 1280 by 800 desktop: a start with no error, the bar's line about where changes are kept right for the way it is served, the VGA font loaded, the grid 640 by 400, the VGA colours, Ctrl-F1, Alt-F2 and D:'s demo, the cursor keys and Tab, F1, a file written in the editor (on the server, or kept across a reload of the static page), the mouse, a click on a file, a double click into a directory, a click on the menu bar and one on the key bar, each followed by a key that has to take effect, Enter on a text file opening a tab of a blob, and the Licences opened and closed by Esc and its button with no key reaching the program. As an iPhone, 390 by 844 at three pixels to one, with touch and Safari's user agent: the row of keys, its Ctrl and Alt held for F1 and F2, a tap on a file moving the cursor there, a tap on the key bar with the row's Enter behind it, and the grid within the screen's width above the bar; turned to 844 by 390, the grid fitted again. And no console error but the 404 by which a static page knows it has no server. `harness/webbrowser.py`, `harness/webbrowser.mjs` |
+| `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`. `web-node/vc.js`, built with Asyncify and the address and undefined-behaviour sanitizers, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drives given through the environment as the bench has them: C: the bench's home directory, labelled VIBE, and D:, labelled DEMO, a directory of the run's with the program's own files in D:\VC. Screens and files are held to the original's goldens with what is declared for the portable C, for Linux (but the masks of the drive's letter) and for the web. Each scenario not run or cut on the web is named by an entry for Linux or for the web page in `DEVIATIONS.md` |
+| `portable_c-web-page` | Only with `-DVC_WEB=ON`. `vc.html` itself, its scripts run in Node with a stand-in document. Against its server, with files that the test makes on C:: the drive loaded and the start in C:\VC; the drive box with C: alone; the Licences link showing each carried file's text, closed by Esc and its button with no key reaching the program; a directory made; a file opened in a tab; a file written in the editor reaching the server when closed; a directory removed; a server refusal shown as DOS's error; the setup saved on C:; and the page's end. As a static site, behind a host that answers 404 for what it lacks, on a stand-in IndexedDB: changes made and kept, the page reloaded with them, the reset, and a browser with no IndexedDB. Behind hosts that answer 200 with a page, or 500, for what they lack, still a static site; and a server that is away, answering 502, for which the page does not start. `harness/webpage.py` |
+| `portable_c-web-browser` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`. The page in the machine's own Chromium, headless, driven over the DevTools protocol from Node with nothing from npm, from its server on a free port and as the static site behind a host that answers 404. On a 1280 by 800 desktop: a start with no error, the bar's line about where changes are kept right for the way it is served, the VGA font loaded, the grid 640 by 400, the VGA colours, Ctrl-F1, the start in C:\VC and C:\ with files that the test lays there, the cursor keys and Tab, F1, a file written in the editor (on the server, or kept across a reload of the static page), the mouse, a click on a file, a double click into a directory, a click on the menu bar and one on the key bar, each followed by a key that has to take effect, Enter on a text file opening a tab of a blob, and the Licences opened and closed by Esc and its button with no key reaching the program. As an iPhone, 390 by 844 at three pixels to one, with touch and Safari's user agent: the row of keys, its Ctrl and Alt held for F1 and F2, Alt-F2 and C:, a tap on a file moving the cursor there, a tap on the key bar with the row's Enter behind it, and the grid within the screen's width above the bar; turned to 844 by 390, the grid fitted again. And no console error but the 404 by which a static page knows it has no server. `harness/webbrowser.py`, `harness/webbrowser.mjs` |
 | `portable_c-web-render` | The page's modules for drawing, keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node. Grids that the program for Linux writes through its test channel are drawn, and the HTML is read back and checked against the cells and the rows that changed. The keys and mouse reports that the modules make of browser events are typed into the program for Linux in a pseudo-terminal, and what it reads is checked against the BIOS's words. `harness/webrender.py`; skipped without Node or clang |
-| `portable_c-web-server` | The server and the page's file system in Node: the server's API and its refusal of every path outside the two drives, host links among them; the page's file system against it, with a file system of Emscripten's shape; what the static page keeps in the browser, `kept.js`, in memory and on a stand-in IndexedDB, with every change and refusal, the next visit, the reset and a full store; and the page's script bundled, compiled and run up to the program. `harness/webserver.py`; skipped without Node |
+| `portable_c-web-server` | The server and the page's file system in Node: the server's API and its refusal of every path outside its drive, D: and host links among them; the page's file system against it, with a file system of Emscripten's shape; what the static page keeps in the browser, `kept.js`, in memory and on a stand-in IndexedDB, with every change and refusal, the next visit, the reset and a full store; and the page's script bundled, compiled and run up to the program. `harness/webserver.py`; skipped without Node |
 
 What is declared for the web is `ON_WEB` of `harness/deviations.py`. It
 goes on top of the portable C's as Linux's does, with Linux's scenarios

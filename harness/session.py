@@ -20,13 +20,16 @@ A row that several frames have is drawn once and used by each, and the
 frames stand one under the other on a strip that CSS moves up frame by
 frame: no script, so that GitHub shows it as an image.
 
-The files that the program lists are the web page's demo,
-src/portable_c/web/demo, copied with fixed times into a home directory
+The files that the program lists are the session's own,
+harness/session_files, copied with fixed times into a home directory
 of a directory of /tmp of the run's own, as harness/posixrun.py has its
 bench, so that the path of the setup file's directory beside it holds
 in DOS's 63 characters; that directory is empty, so that the program
 starts with its defaults. The files' lines are ended as DOS ends them,
-CR LF, which is how the viewer takes a line's end.
+CR LF, which is how the viewer takes a line's end. They were written
+for the project as the web page's demo drive, which the page has no
+longer, and are kept as they were, byte for byte, readme.txt's words on
+that drive too, so that the SVG is the same bytes.
 
     python3 harness/session.py              # docs/vibe-commander-session.svg
     python3 harness/session.py --text       # the frames as text as well
@@ -49,7 +52,7 @@ ROOT = deps.ROOT
 PROGRAM = ROOT / "build" / "portable_c" / "posix" / "vc"
 FONT = (ROOT / "build" / "_deps" / "vga_font-src" / "woff - Web (webfonts)"
         / "Web437_IBM_VGA_8x16.woff")
-DEMO = ROOT / "src" / "portable_c" / "web" / "demo"
+FILES = ROOT / "harness" / "session_files"
 OUT = ROOT / "docs" / "vibe-commander-session.svg"
 STAMP = 961156800               # the time of the files: 16 June 2000,
                                 # 12:00 UTC, the day of 4.05's release
@@ -94,11 +97,11 @@ QUIT = "\r"                     # Enter: the program ends
 
 
 def lay_out(work):
-    """The home directory with the demo, and the setup file's
+    """The home directory with the session's files, and the setup file's
     directory beside it, each time fixed."""
     home = work / "home"
-    for source in sorted(DEMO.rglob("*")):
-        target = home / source.relative_to(DEMO)
+    for source in sorted(FILES.rglob("*")):
+        target = home / source.relative_to(FILES)
         if source.is_dir():
             target.mkdir(parents=True)
         else:

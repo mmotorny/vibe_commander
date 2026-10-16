@@ -2,7 +2,7 @@
 // page"; TODO.md, "Step 7, the web page"): what ties the program, built by
 // Emscripten with the page's library (library.js), to the browser. It
 // draws the grid (render.js), hands over the keys and the mouse (keys.js,
-// mouse.js), keeps the drives on the server (drives.js) or, served with no
+// mouse.js), keeps its drive on the server (drives.js) or, served with no
 // server, in the browser (kept.js), opens a file in
 // a new tab, brings the user's files in by a button and by dragging them
 // onto the page, has a button for the full screen, and on a phone fits the
@@ -553,17 +553,20 @@ window.Module = {
   vcSync: async () => {},
   vcChange: (what, path, other, fd, mode) =>
     page.drives.change(what, path, other, fd, mode),
-  // Emscripten's FS and ENV, before the program starts: the drives
-  // loaded into the FS, which the program waits for.
+  // Emscripten's FS and ENV, before the program starts: the drive, C:,
+  // loaded into the FS, which the program waits for, and the program
+  // started in C:\VC, where its own files are, by the FS's current
+  // directory (sys_web.c).
   vcBegin: ({ FS, ENV, addRunDependency, removeRunDependency }) => {
     page.fs = FS;
     ENV.VC_DRIVE_C = ROOTS.c;
-    ENV.VC_DRIVE_D = ROOTS.d;
     addRunDependency("vc-drives");
     askMode().then(async (mode) => {
       page.mode = mode;
       page.drives = await MODES[mode](FS);
       await page.drives.load();
+      FS.mkdirTree(`${ROOTS.c}/vc`);
+      FS.chdir(`${ROOTS.c}/vc`);
       kept(mode);
       removeRunDependency("vc-drives");
     }).catch((error) => {

@@ -3,19 +3,21 @@
 // alone. It prints a line for each step that fails, with the screen, and
 // exits with 1, or says how many passed.
 
-import { readFileSync, mkdtempSync, readdirSync, existsSync, chmodSync,
-         rmSync, statSync } from "node:fs";
+import { readFileSync, mkdtempSync, mkdirSync, readdirSync, existsSync,
+         chmodSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 import { createServer } from "node:http";
 import { execFileSync } from "node:child_process";
 
 const [web, html, work] = process.argv.slice(2);
-const { makeServer, prepare } = await import(path.join(web, "server.mjs"));
+const { makeServer, prepare, treeOf } = await import(path.join(web, "server.mjs"));
 const { FakeIndexedDB } = await import(new URL("./fakeidb.mjs", import.meta.url));
+const { layFiles } = await import(new URL("./webfiles.mjs", import.meta.url));
 const top = mkdtempSync(path.join(work, "webpage-"));
-const roots = await prepare({ c: path.join(top, "c"), d: path.join(top, "d"),
-                              demo: path.join(web, "demo") });
+const roots = await prepare({ c: path.join(top, "c") });
+// The test's own files on C:, beside the program's directory vc.
+layFiles(roots.c);
 const server = makeServer(roots, html);
 await new Promise((done) => server.listen(0, "127.0.0.1", done));
 const base = `http://127.0.0.1:${server.address().port}`;
@@ -144,12 +146,11 @@ function load(base, indexedDB) {
 const served = new FakeIndexedDB();
 const page0 = load(base, served);
 const { elements, opened, keys, step, see, text } = page0;
-const onServer = (...names) => path.join(roots.d, ...names);
+const onServer = (...names) => path.join(roots.c, ...names);
 
-// The program starts at the root of the first drive, C:, where its own
-// directory is; then D:, by the drive box of the panel.
-await see(" C:\\ ");
-await see("VC");
+// The program starts in C:\VC, where its own files are, on the page's
+// one drive; then goes up to C:\, where the test's files are.
+await see(" C:\\VC ");
 
 // The licences: one link in the bar, which shows the texts of the
 // repository's files that the page carries, the project's own and
@@ -201,7 +202,17 @@ await see("VC");
 }
 keys(KEY.altF2);
 await see("Drive");
-keys("d");
+await step("the drive box has C: alone", () => {
+  const lines = text().split("\n");
+  const at = lines.findIndex((line) => line.includes("Choose"));
+  // The letters between the box's sides, under its question.
+  const left = at >= 0 ? lines[at].indexOf(". Choose") : -1;
+  const right = at >= 0 ? lines[at].indexOf(".", left + 1) : -1;
+  return at >= 0 && lines[at + 1].slice(left + 1, right).trim() === "C";
+});
+keys(KEY.esc);
+await see("8Delete");
+keys(KEY.enter);              // on .., the one entry of C:\VC
 await see("readme");
 keys(KEY.F7);
 await see("Create the directory");
@@ -243,16 +254,16 @@ await see("Do you wish to delete");
 keys(KEY.enter);
 await step("a directory removed on the server",
            () => !existsSync(onServer("newdir")));
-// The server refuses: nothing may be made in D:'s root.
+// The server refuses: nothing may be made in C:'s root.
 await see("8Delete");
-chmodSync(roots.d, 0o555);
+chmodSync(roots.c, 0o555);
 keys(KEY.F7);
 await see("Create the directory");
 keys("locked", KEY.enter);
 await step("a refusal of the server is DOS's error, nothing made",
            () => !existsSync(onServer("locked"))
                  && text().includes("t create"));
-chmodSync(roots.d, 0o755);
+chmodSync(roots.c, 0o755);
 keys(KEY.esc);
 await see("8Delete");
 keys(KEY.shiftF9);
@@ -279,13 +290,28 @@ await step("the server serves no drives of a static site",
 server.close();
 
 // 2. The page served statically, as static.mjs makes it, by a host that
-// answers 404 for what it has not, as GitHub Pages: the drives start from
+// answers 404 for what it has not, as GitHub Pages: the drive starts from
 // what is served, and the changes are kept in IndexedDB (the stand-in,
-// one for the browser across the page's visits).
+// one for the browser across the page's visits). The site ships C: with
+// its directory vc alone; the test serves its own files on C: besides,
+// in a tree of its own in place of the site's.
 const site = path.join(top, "static");
 execFileSync(process.execPath, [path.join(web, "static.mjs"), "--page", html,
-                                "--demo", path.join(web, "demo"),
                                 "--out", site]);
+const shipped = JSON.parse(readFileSync(path.join(site, "drives", "c.json"),
+                                        "utf8"));
+await step("the static site ships C: with its vc alone",
+           () => readdirSync(path.join(site, "drives")).join() === "c.json"
+                 && shipped.entries.length === 1
+                 && shipped.entries[0].path === "vc"
+                 && shipped.entries[0].directory === true);
+{
+  const own = path.join(top, "served");
+  mkdirSync(path.join(own, "vc"), { recursive: true });
+  layFiles(own);
+  writeFileSync(path.join(site, "drives", "c.json"),
+                JSON.stringify(await treeOf(own)));
+}
 // A host of the static site, which answers a name that it has not by
 // `missing`, and anything but the page by `away` where that is set.
 async function hostOf({ missing, away = null }) {
@@ -338,18 +364,16 @@ const inPage = (page, at) => {
 };
 {
   const page = load(at, browser);
-  await page.see(" C:\\ ");
+  await page.see(" C:\\VC ");
   await page.step("the page with no server keeps its changes in the browser",
                   () => page.elements.kept.textContent.includes("this browser")
                         && page.elements.reset.hidden === false);
-  page.keys(KEY.altF2);
-  await page.see("Drive");
-  page.keys("d");
+  page.keys(KEY.enter);         // on .., up to C:\
   await page.see("readme");
   page.keys(KEY.F7);
   await page.see("Create the directory");
   page.keys("newdir", KEY.enter);
-  await page.step("a directory made is kept", () => kept().has("d:newdir"));
+  await page.step("a directory made is kept", () => kept().has("c:newdir"));
   await page.see("NEWDIR");
   page.keys(KEY.shiftF4);
   await page.see("Edit the file");
@@ -363,7 +387,7 @@ const inPage = (page, at) => {
   }
   page.keys(KEY.F2);
   await page.step("a file written in the editor is kept at its close",
-                  () => (keptText("d:note.txt") || "").startsWith("kept here"));
+                  () => (keptText("c:note.txt") || "").startsWith("kept here"));
   page.keys(KEY.esc);
   await page.see("8Delete");
   // The last of the panel, readme.txt: deleted.
@@ -371,7 +395,7 @@ const inPage = (page, at) => {
   await page.see("Do you wish to delete");
   page.keys(KEY.enter);
   await page.step("a file deleted is gone from what is kept",
-                  () => kept().has("d:notes") && !kept().has("d:readme.txt"));
+                  () => kept().has("c:notes") && !kept().has("c:readme.txt"));
   await page.see("8Delete");
   page.keys(KEY.shiftF9);
   await page.see("Save");
@@ -387,14 +411,14 @@ const inPage = (page, at) => {
                   && page.elements.ended.textContent.includes("Reload"));
 }
 {
-  // The page loaded again: the drives as they were left.
+  // The page loaded again: the drive as it was left.
   const page = load(at, browser);
-  await page.see(" C:\\ ");
+  await page.see("8Delete");
   await page.step("the next visit has the changes",
-                  () => (inPage(page, "/drive/d/note.txt") || "")
+                  () => (inPage(page, "/drive/c/note.txt") || "")
                           .startsWith("kept here")
-                        && inPage(page, "/drive/d/readme.txt") === null
-                        && isDirectory(page, "/drive/d/newdir")
+                        && inPage(page, "/drive/c/readme.txt") === null
+                        && isDirectory(page, "/drive/c/newdir")
                         && inPage(page, "/drive/c/vc/vc.ini") !== null);
   page.elements.reset.listeners.click();
   await page.step("Reset forgets them, and loads the page anew",
@@ -402,17 +426,17 @@ const inPage = (page, at) => {
 }
 {
   const page = load(at, browser);
-  await page.see(" C:\\ ");
-  await page.step("after a reset, the drives as they are served",
-                  () => inPage(page, "/drive/d/readme.txt") !== null
-                        && inPage(page, "/drive/d/note.txt") === null
-                        && kept().has("d:readme.txt"));
+  await page.see(" C:\\VC ");
+  await page.step("after a reset, the drive as it is served",
+                  () => inPage(page, "/drive/c/readme.txt") !== null
+                        && inPage(page, "/drive/c/note.txt") === null
+                        && kept().has("c:readme.txt"));
 }
 {
   // A browser that gives the page no IndexedDB: the page's memory, and
   // the page says so.
   const page = load(at, undefined);
-  await page.see(" C:\\ ");
+  await page.see(" C:\\VC ");
   await page.step("no IndexedDB: the changes last as long as the page",
                   () => page.elements.kept.textContent.includes("no storage")
                         && page.elements.reset.hidden === true);
@@ -420,18 +444,18 @@ const inPage = (page, at) => {
   await page.see("Create the directory");
   page.keys("mem", KEY.enter);
   await page.step("a directory made in the page's memory",
-                  () => isDirectory(page, "/drive/c/mem"));
+                  () => isDirectory(page, "/drive/c/vc/mem"));
 }
 host.close();
 // Hosts that answer api/server otherwise than by 4xx: with a page of
 // their own, 200, as a host of pages in a sandbox may, or by 500; the
-// drives beside the page say that it is a static site. And a host that
+// drive beside the page says that it is a static site. And a host that
 // answers 502 for anything but the page, a proxy in front of a server
 // that has stopped: the page does not start.
 for (const missing of [200, 500]) {
   const other = await hostOf({ missing });
   const page = load(`http://127.0.0.1:${other.address().port}`, undefined);
-  await page.see(" C:\\ ");
+  await page.see(" C:\\VC ");
   await page.step(`a host that answers ${missing} for a name it has not is static`,
                   () => page.elements.kept.textContent.includes("no storage"));
   other.close();

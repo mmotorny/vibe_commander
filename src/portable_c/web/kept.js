@@ -1,14 +1,13 @@
 // The page's drives with no server, the piece W3c of step 7 (CLAUDE.md,
 // "The web page"; TODO.md, "Step 7, the web page"): the page served
 // statically, as from GitHub Pages, keeps the user's changes in the
-// browser. The two drives start from what is served with the page, each
-// a tree of the shape of the server's answer, drives/c.json and
-// drives/d.json beside the page (static.mjs makes them), and every change
-// that the program makes is kept in a store of the browser's own,
-// IndexedDB, before it is made in the page's file system, as the page
-// served by the server has it made on the server first (drives.js). At
-// the next visit the drives are loaded from the store, not from what is
-// served, until the user resets them.
+// browser. Its one drive, C:, starts from what is served with the page, a
+// tree of the shape of the server's answer, drives/c.json beside the page
+// (static.mjs makes it), and every change that the program makes is kept
+// in a store of the browser's own, IndexedDB, before it is made in the
+// page's file system, as the page served by the server has it made on
+// the server first (drives.js). At the next visit the drive is loaded
+// from the store, not from what is served, until the user resets it.
 //
 // KeptDrives is drives.js's Drives with the store where the server was:
 // the same `load`, `change` and `upload`, its `put` and `order` made in
@@ -141,6 +140,12 @@ export class KeptDrives extends Drives {
     if (await this.store.get(BEGUN)) {
       records = (await this.store.all()).filter(
         (record) => record && typeof record.drive === "string");
+      // What the store keeps of a drive that the page no longer has, D:
+      // of the demo that the page had once, is forgotten.
+      for (const record of records) {
+        if (this.roots[record.drive] === undefined)
+          await this.store.delete(keyOf(record.drive, record.path));
+      }
     } else {
       records = [];
       for (const drive of Object.keys(this.roots)) {

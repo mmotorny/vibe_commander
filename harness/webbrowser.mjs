@@ -10,9 +10,12 @@
 //       [--shots build/browser/shots] [--only server|static]
 //
 // The page is opened both ways that it is served: by its server,
-// src/portable_c/web/server.mjs, run on a free port with its two drives in
-// the work directory, and as the static site, behind a host that answers
-// 404 for what it has not, as GitHub Pages does. Each way, on a desktop,
+// src/portable_c/web/server.mjs, run on a free port with its drive in the
+// work directory, and as the static site, behind a host that answers 404
+// for what it has not, as GitHub Pages does. The page has one drive, C:,
+// which it ships with the program's directory vc alone: the test lays its
+// own files on it beside vc (harness/webfiles.mjs), in the server's
+// directory, and in a copy of the static site whose tree of C: has them. Each way, on a desktop,
 // 1280 by 800, and as an iPhone, 390 by 844 at three device pixels to
 // one, with touch and Safari's agent, then turned, 844 by 390. What it
 // holds, step by step, is in `desktop` and `phone` below; a step that
@@ -24,13 +27,16 @@
 
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
-import { existsSync, readFileSync, rmSync, statSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, statSync, mkdirSync, cpSync,
+         writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Browser, VIEWPORTS, sleep } from "./browser.mjs";
+import { layFiles } from "./webfiles.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const web = path.join(here, "..", "src", "portable_c", "web");
+const { treeOf } = await import(path.join(web, "server.mjs"));
 
 function options(argv) {
   const said = { chromium: "chromium", shots: null, only: null };
@@ -66,14 +72,14 @@ async function freePort() {
 }
 
 // The page's server, a process of its own, on a free port, with its
-// drives in `top`, made afresh.
+// drive in `top`, made afresh with the test's files.
 async function startServer(top) {
   rmSync(top, { recursive: true, force: true });
+  layFiles(path.join(top, "c"));
   const port = await freePort();
   const child = spawn(process.execPath, [path.join(web, "server.mjs"),
     "--port", String(port), "--page", said.page,
-    "--drive-c", path.join(top, "c"), "--drive-d", path.join(top, "d"),
-    "--demo", path.join(web, "demo")], { stdio: ["ignore", "pipe", "pipe"] });
+    "--drive-c", path.join(top, "c")], { stdio: ["ignore", "pipe", "pipe"] });
   let output = "";
   child.stdout.on("data", (chunk) => { output += chunk; });
   child.stderr.on("data", (chunk) => { output += chunk; });
@@ -104,9 +110,21 @@ async function stop(child) {
     child.kill("SIGKILL");
 }
 
-// A host of the static site that answers 404 for what it has not.
-async function startSite() {
-  const site = said.site;
+// A host of the static site that answers 404 for what it has not: a copy
+// of the site in `top`, its tree of C: with the test's files besides vc.
+async function startSite(top) {
+  const site = path.join(top, "site");
+  rmSync(top, { recursive: true, force: true });
+  cpSync(said.site, site, { recursive: true });
+  const shipped = JSON.parse(readFileSync(path.join(site, "drives", "c.json"),
+                                          "utf8"));
+  must(shipped.entries.length === 1 && shipped.entries[0].path === "vc",
+       "the site's C: has more than its directory vc");
+  const own = path.join(top, "c");
+  mkdirSync(path.join(own, "vc"), { recursive: true });
+  layFiles(own);
+  writeFileSync(path.join(site, "drives", "c.json"),
+                JSON.stringify(await treeOf(own)));
   const host = createServer((request, response) => {
     const name = decodeURIComponent(new URL(request.url, "http://x").pathname);
     const file = path.join(site, name.endsWith("/") ? `${name}index.html` : name);
@@ -195,13 +213,24 @@ async function started(tab, mode) {
   return rows;
 }
 
-// The right panel on D:, both panels shown, the cursor on CODE.
-async function toD(tab) {
-  await tab.press("F2", { alt: true });
-  await tab.settle();
-  await tab.press("d");
-  return tab.until((r) => r[0].slice(40).includes("D:\\")
-                   && rightStatus(r).includes("CODE"), 10000, "D: in the right panel");
+// The right panel at C:\, where the test's files are, from the program's
+// directory C:\VC, where the page starts, by .. where it is there.
+async function upToRoot(tab) {
+  const rows = await tab.until((r) => r[0].slice(40).includes(" C:\\"), 10000,
+                               "C: in the right panel");
+  if (rows[0].slice(40).includes(" C:\\VC ")) {
+    await tab.press("Home");
+    await tab.press("Enter");
+  }
+  return tab.until((r) => r[0].slice(40).includes(" C:\\ ")
+                   && find(r, "readme", 40) !== null, 10000, "C:\\ in the right panel");
+}
+
+// The right panel at C:\, the cursor on CODE.
+async function toFiles(tab) {
+  await upToRoot(tab);
+  await tab.press("Home");
+  return tab.until((r) => rightStatus(r).includes("CODE"), 5000, "the cursor on CODE");
 }
 
 async function desktop(browser, mode, served) {
@@ -232,9 +261,10 @@ async function desktop(browser, mode, served) {
     must(colours[0] === "rgb(85, 255, 255)" && colours[1] === "rgb(0, 0, 170)",
          `the frame is ${colours.join(" on ")}`);
   });
-  await step("Alt-F2, d: D:'s demo files in the right panel", async () => {
-    const rows = await toD(tab);
-    for (const name of ["CODE", "DATA", "NOTES", "readme   txt"])
+  await step("the page starts in C:\\VC, and C:\\ has the test's files", async () => {
+    await tab.until((r) => r[0].slice(40).includes(" C:\\VC "), 5000, "C:\\VC");
+    const rows = await toFiles(tab);
+    for (const name of ["CODE", "DATA", "NOTES", "VC", "readme   txt"])
       must(find(rows, name, 40) !== null, `${name} is not listed`);
   });
   await shot(tab, `${mode}-desktop-panels`);
@@ -247,9 +277,9 @@ async function desktop(browser, mode, served) {
   });
   await step("Tab, and Tab again", async () => {
     await tab.press("Tab");
-    await tab.until((r) => r[23].startsWith("C:\\>"), 5000, "C:'s prompt");
+    await tab.until((r) => r[23].startsWith("C:\\VC>"), 5000, "C:\\VC's prompt");
     await tab.press("Tab");
-    await tab.until((r) => r[23].startsWith("D:\\>"), 5000, "D:'s prompt");
+    await tab.until((r) => r[23].startsWith("C:\\>"), 5000, "C:\\'s prompt");
   });
   // The mouse, each click followed by a key that has to take effect: the
   // program waits for a button to be let go by asking the mouse alone,
@@ -266,17 +296,17 @@ async function desktop(browser, mode, served) {
     const at = find(await tab.settle(), "CODE", 40);
     must(at !== null, "CODE is not listed");
     await tab.doubleClickCell(at.column + 1, at.row);
-    await tab.until((r) => r[0].slice(40).includes("D:\\CODE"), 5000, "D:\\CODE");
+    await tab.until((r) => r[0].slice(40).includes("C:\\CODE"), 5000, "C:\\CODE");
     await tab.press("Enter");
     await tab.until((r) => !r[0].slice(40).includes("CODE")
-                    && rightStatus(r).includes("CODE"), 5000, "D:\\ with the cursor on CODE");
+                    && rightStatus(r).includes("CODE"), 5000, "C:\\ with the cursor on CODE");
   });
   await step("a click on the menu bar: the menu, then Esc", async () => {
     await tab.hitCell(45, 0);
     await tab.until((r) => r[0].includes("Files") && r[0].includes("Commands"), 5000,
                     "the menu bar");
     await tab.press("Escape");
-    await tab.until((r) => !r[0].includes("Commands") && r[0].slice(40).includes("D:\\"),
+    await tab.until((r) => !r[0].includes("Commands") && r[0].slice(40).includes(" C:\\ "),
                     5000, "the menu gone");
   });
   await step("a click on the key bar, then Down", async () => {
@@ -315,7 +345,7 @@ async function desktop(browser, mode, served) {
   });
   if (mode === "server")
     await step("the file is on the server", async () => {
-      const file = path.join(served.drives, "d", "note.txt");
+      const file = path.join(served.drives, "c", "note.txt");
       must(existsSync(file), `${file} is not there`);
       const text = readFileSync(file, "latin1");
       must(text.startsWith("Hello from Chromium."), `it has ${JSON.stringify(text)}`);
@@ -370,7 +400,10 @@ async function desktop(browser, mode, served) {
     await step("a reload: the file kept in the browser", async () => {
       await tab.reload();
       await started(tab, mode);
-      const rows = await toD(tab);
+      await tab.press("F2", { alt: true });
+      await tab.settle();
+      await tab.press("c");
+      const rows = await toFiles(tab);
       must(find(rows, "note     txt", 40) !== null, "note.txt is gone");
     });
   await step("the console has no errors", () => {
@@ -430,12 +463,12 @@ async function phone(browser, mode, served) {
       await tab.until((r) => panels(r) === now, 5000, `${now} panels`);
     }
   });
-  await step("Alt and F2 of the row, then d: D:", async () => {
+  await step("Alt and F2 of the row, then c: C:, and up to C:\\", async () => {
     await tab.hit('[data-latch="alt"]');
     await tab.hit("#keys button:nth-child(4)");
     await tab.settle();
-    await tab.press("d");
-    await tab.until((r) => r[0].slice(40).includes("D:\\"), 10000, "D:");
+    await tab.press("c");
+    await upToRoot(tab);
   });
   await step("a tap on a file moves the cursor there", async () => {
     const rows = await tab.settle();
@@ -451,14 +484,14 @@ async function phone(browser, mode, served) {
     await tab.hitCell(at.column + 1, at.row);
     await tab.until((r) => rightStatus(r).includes("CODE"), 5000, "the cursor on CODE");
     await tab.hit("#keys button:last-child");
-    await tab.until((r) => r[0].slice(40).includes("D:\\CODE"), 5000, "D:\\CODE");
+    await tab.until((r) => r[0].slice(40).includes("C:\\CODE"), 5000, "C:\\CODE");
   });
   await step("a tap on the key bar, then Enter of the row on ..: out", async () => {
     await tab.hitCell(1, 24);
     await tab.settle();
     await tab.hit("#keys button:last-child");
     await tab.until((r) => !r[0].slice(40).includes("CODE")
-                    && rightStatus(r).includes("CODE"), 5000, "D:\\ with the cursor on CODE");
+                    && rightStatus(r).includes("CODE"), 5000, "C:\\ with the cursor on CODE");
   });
   await step("the row of keys whole, each key tappable", () => whole(390, 844));
   await shot(tab, `${mode}-portrait`);
@@ -491,7 +524,7 @@ async function main() {
         continue;
       const served = mode === "server"
         ? await startServer(path.join(said.work, "drives"))
-        : await startSite();
+        : await startSite(path.join(said.work, "site"));
       try {
         for (const run of [desktop, phone]) {
           try {

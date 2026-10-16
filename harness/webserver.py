@@ -1,15 +1,16 @@
 """Hold the web page's server and the page's file system to what they do.
 
 The piece W3b of step 7 (TODO.md, "Step 7, the web page"): the page keeps
-its two drives on a server of the project's own, src/portable_c/web/
-server.mjs, and mirrors them in Emscripten's file system, which every
+its one drive, C:, on a server of the project's own, src/portable_c/web/
+server.mjs, and mirrors it in Emscripten's file system, which every
 change of the program's is asked of the server for first, by
 src/portable_c/web/drives.js. Both are of Node's own modules, and this test
 runs them in Node, harness/webserver.mjs, with no browser and nothing
 downloaded:
 
-  1. The server, listening on a port of its own, with two drives in a
-     directory of build/tmp, D: made of the demo: the page served; its
+  1. The server, listening on a port of its own, with its drive in a
+     directory of build/tmp, made with C:\VC, and the test's own files
+     laid on it (harness/webfiles.mjs): the page served; its
      answer to `api/server`, by which the page knows a server; a
      drive's tree, parents first, with the contents, and no link of the
      host's in it; a file written whole, with its time and its read-only
@@ -19,11 +20,11 @@ downloaded:
      is not there; the read-only bit set and cleared. And refused, with
      nothing changed outside the drives: `..` and `.` anywhere, an
      absolute path, a backslash, a NUL, an empty name, a drive that there
-     is not, an operation that there is not, a body that is no JSON, and
+     is not, D: among them, an operation that there is not, a body that is no JSON, and
      a link of the host's inside a drive, to a file or to a directory
      outside it, wherever it stands in the path.
   2. The page's file system, drives.js, with a file system of the shape
-     of Emscripten's, against the same server: the drives loaded, with
+     of Emscripten's, against the same server: the drive loaded, with
      their times; where a path of the file system is; a file's contents,
      time and read-only bit sent at its close; each change of
      files_posix.c's (enum HostChange) made on the server, with the
@@ -31,8 +32,8 @@ downloaded:
      errors; a file brought in by the user; and a server that is not
      there answering the general failure.
   3. The page with no server, the piece W3c (TODO.md, "W3c"):
-     src/portable_c/web/kept.js, its drives loaded from the trees that a
-     static page is served with, of the server's shape (treeOf of
+     src/portable_c/web/kept.js, its drive loaded from the tree that a
+     static page is served with, C: with vc and the test's files, of the server's shape (treeOf of
      server.mjs), and each change kept in the browser's store before it
      is made, once in the page's memory (MemoryStore) and once in
      IndexedDB (IdbStore on harness/fakeidb.mjs, a stand-in of IndexedDB
@@ -40,8 +41,9 @@ downloaded:
      directory renamed with what is in it, a file deleted, the read-only
      bit, an upload, and refused, with nothing kept, where the file
      system would refuse it (there already, not empty, not there, a
-     directory into itself or onto another drive); the next visit loading
-     what was kept and nothing served, and a reset the drives as they are
+     directory into itself or out of the drive); the next visit loading
+     what was kept and nothing served, what is kept of a drive that the
+     page has no longer, D:, forgotten, and a reset the drive as it is
      served again; a store that is full answering DOS's ENOSPC; no
      IndexedDB, or one that refuses to open, the page's memory.
   4. The page's script as bundle.mjs makes it for the shell: one classic

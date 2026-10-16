@@ -2980,38 +2980,45 @@ it, `portable_c-web-page` with the page's program and its server, and
 browser's side of it, the drawing, the keys, the mouse and the phone,
 is checked by hand.
 
-### W1. Two drives, C: where the program lives and D: of the demo
+### W1. One drive, C:, where the program lives
 
 **What the original does.** It has the drives that DOS has: on the
 bench of the tests the diskettes A: and B:, C: and D:; its own files
 are beside its program, in D:\VC on the bench.
 
-**What the web page does.** It has two drives, each a directory of the
-host that the environment names, `VC_DRIVE_C` and `VC_DRIVE_D`, with
-the labels that `VC_LABEL_C` and `VC_LABEL_D` give (`sys_web.c`). On the
-page, C:, labelled VIBE, is where the program lives, its own files, the
-setup file, the menu and the extension file, in C:\VC; and D:, labelled
-DEMO, starts as the demo's sample files. Both are directories of the
-page's server, which every change is made on as it happens; a page
-served with no server keeps them in the browser (W9). Both are
-ordinary drives: the drive box, the Info panel and every question of a
-drive by its number have both. The program's own files are in the
-directory `vc` of the drive that `VC_PROGRAM_DRIVE` names, C: where it
-names none, made where it is not there. Making a label is refused as on
-Linux (L2). The program starts in the host's current directory where a
-drive has it, and at the root of the first drive otherwise.
+**What the web page does.** The program has the drives that the
+environment names, C: and D:, each a directory of the host,
+`VC_DRIVE_C` and `VC_DRIVE_D`, with the labels that `VC_LABEL_C` and
+`VC_LABEL_D` give (`sys_web.c`). The page names one: C:, labelled VC,
+which holds C:\VC, the program's own files, the setup file, the menu
+and the extension file, and nothing else as the page is shipped; the
+page starts the program there. It is a directory of the page's server,
+which every change is made on as it happens; a page served with no
+server ships C: with its directory `vc` alone and keeps the drive in
+the browser (W9). It is an ordinary drive: the drive box, the Info
+panel and every question of a drive by its number have it. The
+program's own files are in the directory `vc` of the drive that
+`VC_PROGRAM_DRIVE` names, C: where it names none, made where it is not
+there. Making a label is refused as on Linux (L2). The program starts
+in the host's current directory where a drive has it, and at the root
+of the first drive otherwise.
 
 **Why.** The user's decision of 15 October 2026 (CLAUDE.md, "The web
-page"): the program has a place of its own for its files, C:\VC, which a
-listing of the demo's drive does not show, and the demo is a drive
-that the user may change. The tests map the letters as the bench has
-them: C: is the bench's working disk and D: holds the program's own
-files in D:\VC, so the letters are the original's and need no mask.
+page"), which took the place of a second drive, D:, labelled DEMO, of
+sample files: the program has a place of its own for its files, C:\VC,
+and the user brings in what is to be worked on. The tests keep the
+bench's layout through the environment (`harness/posixrun.py`): C: is
+the bench's working disk, labelled VIBE, and D:, labelled DEMO, holds
+the program's own files in D:\VC, so the letters are the original's
+and need no mask, and no golden or mask moved with the decision.
 
 **Which scenarios show it.** The drive's letter is as the original's,
-and is not masked; the drive box's letters and the labels, VIBE and
-DEMO, four letters as Linux's HOME, are masked as on Linux. Not run and
-cut as on Linux for the diskette and D: (L1).
+and is not masked; the drive box's letters and the labels of the
+tests, VIBE and DEMO, four letters as Linux's HOME, are masked as on
+Linux. The page's own label, VC, two letters, makes the box of Ctrl-F4
+narrower than with four, which no scenario shows: the scenarios run
+with the tests' labels. Not run and cut as on Linux for the diskette
+and D: (L1).
 
 ### W2. A command cannot be run
 
@@ -3106,7 +3113,7 @@ the program's cells by `portable_c-web-render`.
 changed on the disk, and what DOS cannot do there is its error.
 
 **What the web page does.** The drives are directories of the page's
-server (W1), and the page has a copy of each. Every change is asked of
+server (W1), and the page has a copy of it. Every change is asked of
 the server first, and made in the copy only where the server has made
 it: what the server refuses or cannot do, or a server that does not
 answer, is DOS's error for that call, access denied for a refusal,
@@ -3115,8 +3122,8 @@ no better number. A file's contents go to the server whole when the
 program closes the file, with its time and whether it is read-only,
 before the close answers: where the server refuses them, the close
 fails with that error, and the copy keeps what the program wrote. The
-server never reaches outside its two directories, and follows no link
-of the host's in them. The page waits for the server at each change,
+server never reaches outside the drive's directory, and follows no
+link of the host's in it. The page waits for the server at each change,
 so a copy of many files is slower than on a disk.
 
 **Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
@@ -3162,18 +3169,20 @@ changes there stays there.
 
 **What the web page does.** The same page has a second way to be
 served: as a static site, from GitHub Pages or any host with no server
-(`web/static.mjs` makes it: the page, and the trees that its two drives
-start from, C: with its directory `vc` and nothing in it, D: the demo).
+(`web/static.mjs` makes it: the page, and the tree that its one drive
+starts from, C: with its directory `vc` and nothing in it).
 The page asks where it is served whether it has a server (`api/server`,
 which the page's server answers with its name); a host that answers
 404, or another refusal of 4xx, has none, and the page keeps the
-drives in the browser (`web/kept.js`). An answer of 5xx, or none, is a
+drive in the browser (`web/kept.js`). An answer of 5xx, or none, is a
 server that is away: the page says so and does not start, so that a
 page of the server never keeps its changes in the browser. With no
 server:
 
-- The drives start from what is served with the page, at the first
+- The drive starts from what is served with the page, at the first
   visit and after a reset; from then on, from what the browser keeps.
+  What a browser kept of D:, the drive of a demo that the page once
+  had, is forgotten at the next visit.
 - Every change is kept in the browser's IndexedDB before it is made in
   the page's copy, as W6 has it made on the server: a file's contents
   at its close, with its time and whether it is read-only, a file
@@ -3184,7 +3193,7 @@ server:
   is DOS's full disk, and one that fails otherwise its general failure.
 - The bar says that the changes are kept in this browser, and has a
   button, Reset drives, that forgets them, after asking, and loads the
-  page anew from the drives as they are served.
+  page anew from the drive as it is served.
 - Where the browser gives the page no IndexedDB, or it does not open,
   as in a sandbox or some private windows, the changes are kept in the
   page's memory, and the bar says that they last until the page is
@@ -3202,8 +3211,9 @@ to test.
 **Which scenarios show it.** None of the original's: under Node the
 program has the host's files. `portable_c-web-page` takes the static
 site, served by a host that answers 404 as GitHub Pages does, with a
-stand-in of IndexedDB: a directory made, a file written, a file of the
-demo deleted and the setup saved, each kept; the page loaded again
+stand-in of IndexedDB, its C: served with files that the test makes
+beside `vc`: a directory made, a file written, a file deleted and the
+setup saved, each kept; the page loaded again
 with them; the reset; and a browser with no IndexedDB. And it holds
 that the page of the server opens no IndexedDB. `portable_c-web-server`
 holds the store's every change and refusal, in memory and in IndexedDB.

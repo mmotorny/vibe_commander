@@ -1,9 +1,9 @@
 // The page's file system against its server, the piece W3b of step 7
-// (CLAUDE.md, "The web page"; TODO.md, "Step 7, the web page"). The two
-// drives are directories of the server's (server.mjs); the page has a
-// copy of each in Emscripten's file system, MEMFS, which the program
-// reads and writes as the program for Linux does the host's files
-// (files_posix.c). At the start their trees are loaded from the server;
+// (CLAUDE.md, "The web page"; TODO.md, "Step 7, the web page"). The
+// page's one drive, C:, is a directory of the server's (server.mjs); the
+// page has a copy of it in Emscripten's file system, MEMFS, which the
+// program reads and writes as the program for Linux does the host's files
+// (files_posix.c). At the start its tree is loaded from the server;
 // then every change that the program makes is asked of the server first,
 // as files_posix.c tells it (enum HostChange of emulate_posix.h, by the
 // page's library, web_change), and made in the copy only where the server
@@ -26,8 +26,10 @@ export const CHANGE_ERRORS = ["", "EACCES", "ENOENT", "EEXIST", "ENOTEMPTY",
                               "ENOSPC", "EIO"];
 const FAILED = CHANGE_ERRORS.indexOf("EIO");
 
-// Where the drives are in the page's file system.
-export const ROOTS = { c: "/drive/c", d: "/drive/d" };
+// Where the drives are in the page's file system, by letter: C:, the one
+// drive of the page, the program's own files in its directory vc. A test
+// may hand Drives others.
+export const ROOTS = { c: "/drive/c" };
 
 export function bytesOfBase64(text) {
   if (typeof Uint8Array.fromBase64 === "function")
@@ -82,7 +84,7 @@ export class Drives {
   }
 
   // The drive and the path in it of a path of the file system, or null
-  // where it is in neither drive or is a drive's root.
+  // where it is in no drive or is a drive's root.
   locate(host) {
     if (typeof host !== "string")
       return null;
@@ -132,7 +134,7 @@ export class Drives {
 
   // A change that the program is about to make, made on the server: the
   // answer for files_posix.c, 0 or the number of an error. A path that is
-  // in neither drive is no concern of the server's.
+  // in no drive is no concern of the server's.
   async change(what, host, other, fd, mode) {
     if (what === HOST_CONTENTS) {
       const stream = this.fs.getStream(fd);

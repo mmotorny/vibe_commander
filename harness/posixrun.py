@@ -79,9 +79,12 @@ PROGRAM = ROOT / "build" / "portable_c" / "posix-asan" / "vc"
 # scenarios here: the program for Linux, and the program for the web
 # under Node, build/portable_c/web-node/vc.js (the piece W2 of step 7),
 # which has the same machine and test channel behind sys.h, its drives
-# C: the bench's home directory (VC_DRIVE_C) and D: the run's `d`
-# (VC_DRIVE_D), with its own files on D:\VC, `d/vc`, as on the bench
-# (sys_web.c).
+# given here as the bench has them, not as the page has its one: C: the
+# bench's home directory (VC_DRIVE_C), labelled VIBE, and D: the run's
+# `d` (VC_DRIVE_D), labelled DEMO, with its own files on D:\VC, `d/vc`,
+# as on the bench (sys_web.c). The labels are those that the program
+# gave the two drives before the page had one, so that the goldens'
+# screens and masks are as they were.
 HOSTED = ("posix", "web")
 # Node, which runs the program for the web.
 NODE = shutil.which("node") or "node"
@@ -471,6 +474,7 @@ def run(scenario, program, setup=..., limit=60, environment=None):
         if web:
             environment.update(VC_DRIVE_C=str(bench / "home"),
                                VC_DRIVE_D=str(bench / "d"),
+                               VC_LABEL_C="VIBE", VC_LABEL_D="DEMO",
                                VC_PROGRAM_DRIVE="D")
             command = [NODE, *command]
         environment.update(given)

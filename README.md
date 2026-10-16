@@ -161,21 +161,22 @@ With `-DVC_WEB=ON`:
 cmake --build build --target portable_c-web-serve
 ```
 
-This builds the page and serves it on `http://127.0.0.1:8437/` with two
-drives: C:, where the program keeps its files, and D:, a small demo
-tree. Changes are written to the server's directories. The server can
+This builds the page and serves it on `http://127.0.0.1:8437/` with one
+drive, C:, labelled VC, which holds C:\VC, the program's own files; the
+page starts there. Bring files in with Upload, or by dragging them onto
+the page. Changes are written to the server's directory. The server can
 also be run by hand:
 
 ```sh
 node src/portable_c/web/server.mjs --port 8437 \
     --page build/portable_c/web/vc.html \
-    --drive-c DIR --drive-d DIR [--demo DIR]
+    --drive-c DIR
 ```
 
 The server listens on 127.0.0.1 only. To reach it from a phone, put an
 HTTPS reverse proxy in front of it, for example
 `tailscale serve --bg 8437`. Anyone who can reach the page can write to
-its drives, so the proxy is the access control.
+its drive, so the proxy is the access control.
 
 The static site, `build/portable_c/web/static/`, needs no server: any
 static host serves it, and the page keeps the user's changes in the
@@ -348,4 +349,4 @@ the C trees are linked without Open Watcom's libraries.
 The shareware distribution of Volkov Commander is proprietary and is not
 part of this repository. The DOS screenshot shows the portable C in its
 directory, with the shareware's files beside it. The animation has none
-of them, only the web page's demo files.
+of them, only a few files written for it, `harness/session_files`.

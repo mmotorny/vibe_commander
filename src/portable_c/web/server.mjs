@@ -1,28 +1,27 @@
 // The web page's server, the piece W3b of step 7 (CLAUDE.md, "The web
 // page"; TODO.md, "Step 7, the web page"): a script for Node, of Node's
-// own modules and nothing else, that serves the page and the two drives'
-// directories, C: where the program lives and D: of the demo, and makes
-// on them every change that the page asks for, as it happens. The page
-// mirrors the drives in its own file system (drives.js) and asks this
+// own modules and nothing else, that serves the page and the directory of
+// its one drive, C:, the program's own files in its directory vc, and
+// makes on it every change that the page asks for, as it happens. The
+// page mirrors the drive in its own file system (drives.js) and asks this
 // server before it changes anything there: what the server refuses or
 // cannot do is DOS's error for that call.
 //
 // It listens on 127.0.0.1 alone, on the port that it is told; an HTTPS
 // reverse proxy in front of it, for example Tailscale Serve, hands it
 // on, and anyone who can reach it through the proxy may write, the proxy
-// being the access. It never reaches
-// outside the two directories: a path is names of a drive's directory,
-// with no `.`, `..`, absolute path or backslash, and none of the names on
-// the way may be a link of the host's.
+// being the access. It never reaches outside the drive's directory: a
+// path is names of that directory, with no `.`, `..`, absolute path or
+// backslash, and none of the names on the way may be a link of the
+// host's.
 //
 //   node src/portable_c/web/server.mjs [--port N] [--page FILE]
-//        [--drive-c DIR] [--drive-d DIR] [--demo DIR]
+//        [--drive-c DIR]
 //
-// The page is build/portable_c/web/vc.html, and the drives are
-// build/portable_c/web/drives/c and d, where nothing else is said: C: is
-// made with its directory vc where it is not there, and D: is made as a
-// copy of the demo, src/portable_c/web/demo, where it is not there. The
-// target `portable_c-web-serve` of the build runs it so.
+// The page is build/portable_c/web/vc.html, and the drive is
+// build/portable_c/web/drives/c, where nothing else is said, made with
+// its directory vc where that is not there. The target
+// `portable_c-web-serve` of the build runs it so.
 //
 // What it answers:
 //   GET  /               the page;
@@ -50,7 +49,7 @@ import { fileURLToPath } from "node:url";
 
 export const ERRORS = ["EACCES", "ENOENT", "EEXIST", "ENOTEMPTY", "ENOSPC",
                        "EIO"];
-export const DRIVES = ["c", "d"];
+export const DRIVES = ["c"];
 const BODY_MOST = 256 * 1024 * 1024;     // bytes of a file, at the most
 const PATH_MOST = 4096;
 
@@ -60,8 +59,6 @@ export const DEFAULTS = {
   port: 8437,
   page: path.join(top, "build", "portable_c", "web", "vc.html"),
   c: path.join(top, "build", "portable_c", "web", "drives", "c"),
-  d: path.join(top, "build", "portable_c", "web", "drives", "d"),
-  demo: path.join(here, "demo"),
 };
 
 // A refusal with its error and HTTP's status.
@@ -108,36 +105,12 @@ export function namesOf(text) {
   return names;
 }
 
-// Copy a directory into one that is not there yet, for the demo.
-async function copyTree(from, to) {
-  await fs.mkdir(to, { recursive: true });
-  for (const entry of await fs.readdir(from, { withFileTypes: true })) {
-    const source = path.join(from, entry.name);
-    const target = path.join(to, entry.name);
-    if (entry.isDirectory())
-      await copyTree(source, target);
-    else if (entry.isFile())
-      await fs.copyFile(source, target);
-  }
-}
-
-// The two drives' directories, made where they are not there, with their
-// paths from the root and their links followed.
+// The drive's directory, made with its directory vc where they are not
+// there, by its letter, with its path from the root and its links
+// followed.
 export async function prepare(options) {
-  const roots = {};
-  const c = options.c, d = options.d;
-  await fs.mkdir(path.join(c, "vc"), { recursive: true });
-  try {
-    await fs.access(d);
-  } catch {
-    if (options.demo)
-      await copyTree(options.demo, d);
-    else
-      await fs.mkdir(d, { recursive: true });
-  }
-  roots.c = await fs.realpath(c);
-  roots.d = await fs.realpath(d);
-  return roots;
+  await fs.mkdir(path.join(options.c, "vc"), { recursive: true });
+  return { c: await fs.realpath(options.c) };
 }
 
 // A directory's files and directories, parents first, as GET /api/tree
@@ -171,8 +144,8 @@ export async function treeOf(root) {
   return { entries };
 }
 
-// The server, not yet listening: `roots` the drives' directories as
-// prepare answers them, `page` the file of the page.
+// The server, not yet listening: `roots` the drive's directory as
+// prepare answers it, `page` the file of the page.
 export function makeServer(roots, page) {
   // The path of the host of a drive's path, every name on the way that the
   // host has looked at: a link refused wherever it leads, the last name
@@ -358,8 +331,7 @@ export function makeServer(roots, page) {
 // The command line: what it is told, the rest by DEFAULTS.
 function told(argv) {
   const options = { ...DEFAULTS };
-  const names = { "--port": "port", "--page": "page", "--drive-c": "c",
-                  "--drive-d": "d", "--demo": "demo" };
+  const names = { "--port": "port", "--page": "page", "--drive-c": "c" };
   for (let i = 0; i < argv.length; i += 2) {
     const name = names[argv[i]];
     if (name === undefined || i + 1 >= argv.length) {
@@ -380,6 +352,6 @@ if (process.argv[1] && path.resolve(process.argv[1])
   const server = makeServer(roots, options.page);
   server.listen(options.port, "127.0.0.1", () => {
     console.log(`Vibe Commander's page on http://127.0.0.1:` +
-                `${server.address().port}/, C: ${roots.c}, D: ${roots.d}`);
+                `${server.address().port}/, C: ${roots.c}`);
   });
 }

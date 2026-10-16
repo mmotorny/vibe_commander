@@ -212,15 +212,15 @@ void DosNameMake(const char *host, DosNameTaken *taken, const void *context,
 #define DOS_HOME_DRIVE 'H'              /* the home directory */
 
 /*
- * The web page has two drives, on the user's word of 15 October 2026
- * (CLAUDE.md, "The web page"), each a directory of the host that its
- * implementation names with the drive's letter and label: on the page,
- * C:, labelled VIBE, where the program lives, its own files in C:\VC,
- * and D:, labelled DEMO, the demo's files; in the tests, C: the bench's
+ * The web page has drives that are each a directory of the host, which
+ * its implementation names with the drive's letter and label (CLAUDE.md,
+ * "The web page"): on the page one, C:, labelled VC, where the program
+ * lives, its own files in C:\VC; in the tests two, C: the bench's
  * working disk and D: the drive of the program's own files, D:\VC, as
  * the bench of DOS has them (the piece W2, TODO.md, "Step 7, the web
- * page"). Both are drives like any other: the drive box, the Info panel
- * and every question of a drive by its number have both.
+ * page"). Each is a
+ * drive like any other: the drive box, the Info panel and every
+ * question of a drive by its number have it.
  */
 struct DriveGiven {
     u8 letter;                          /* in capitals */

@@ -7,17 +7,19 @@
  * behind it, over the file system that Emscripten gives, and this file
  * has what the page has of its own, as sys_posix.c has Linux's:
  *
- *   - There are two drives, C: and D:, each the directory of the host
- *     that a variable of the environment names, VC_DRIVE_C and
- *     VC_DRIVE_D, and labelled as VC_LABEL_C and VC_LABEL_D say, VIBE
- *     and DEMO where they say nothing (DosBeginGiven of files_posix.c):
- *     on the page directories of its store, under Node those that a
- *     test gives. A drive whose variable is not set is not there. The
- *     program's own files are in the directory vc of the drive that
- *     VC_PROGRAM_DRIVE names, C: where it names none: C:\VC on the
- *     page, and D:\VC in the tests, as on the bench of DOS. The program
- *     starts in the host's current directory where a drive has it, else
- *     at the root of the first drive.
+ *   - There are at most two drives, C: and D:, each the directory of
+ *     the host that a variable of the environment names, VC_DRIVE_C and
+ *     VC_DRIVE_D, and labelled as VC_LABEL_C and VC_LABEL_D say, VC and
+ *     DEMO where they say nothing (DosBeginGiven of files_posix.c). A
+ *     drive whose variable is not set is not there. The page names C:
+ *     alone, a directory of its store, with the program's own files in
+ *     C:\VC, and starts the program there (web/page.js); under Node a
+ *     test gives both, with their labels, as the bench of DOS has them
+ *     (harness/posixrun.py). The program's own files are in the
+ *     directory vc of the drive that VC_PROGRAM_DRIVE names, C: where it
+ *     names none: C:\VC on the page, and D:\VC in the tests. The
+ *     program starts in the host's current directory where a drive has
+ *     it, else at the root of the first drive.
  *   - The screen's grid is handed to the page, web_draw of the page's
  *     library (web/library.js), whenever the program yields; the keys
  *     come from the page as the bytes that a terminal with the kitty
@@ -83,7 +85,7 @@ extern void web_where(const char *host);
 static const struct {
     u8 letter;
     const char *label;                  /* where its variable says none */
-} Drives[DOS_DRIVES] = {{'C', "VIBE"}, {'D', "DEMO"}};
+} Drives[DOS_DRIVES] = {{'C', "VC"}, {'D', "DEMO"}};
 
 #define IDLE_WAIT 50                    /* milliseconds, under a tick */
 #define BUSY_YIELD 50.0                 /* milliseconds that KeyWaiting

@@ -768,12 +768,11 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   - The cell is worked out from the measured cell box and clamped to 80×25.
   - Buttons 1, 2 and 4. The context menu is suppressed, and the wheel does nothing (L11).
 - **The clock.** Emscripten's clock_gettime uses the browser's Date and time zone. The test clock is shared from `machine_posix.c`.
-- **The drives (the user's decision).** Two, C: labelled VIBE, where the program lives, its own files in C:\VC, and D: labelled DEMO, the demo's (CLAUDE.md, "The web page").
-  - D: starts as a small tree of sample files written for the project, nothing proprietary, served with the page.
-  - Both are directories of the page's server, a script for Node with Node's own modules: the page loads their tree from it, and every change, the setup file's too, is made there as it happens; what the server refuses or cannot do is DOS's error for that call. Nothing is kept in the browser then.
-  - Served statically, from GitHub Pages with no server, the same page has its drives start from what is served with it, and keeps what the user changes in the browser (CLAUDE.md, "The web page").
-  - The program takes the drives from the environment, `VC_DRIVE_C`, `VC_DRIVE_D` and the rest: W2's section below has them and what W3b sets.
-  - The tests map the letters as the bench has them, C: the working disk and D:\VC the program's files, so the masks of the drive's letter are not needed on the web.
+- **The drive (the user's decision).** One, C: labelled VC, which holds C:\VC, the program's own files, and nothing else as it is shipped; the page starts there (CLAUDE.md, "The web page"; "One drive" below). Until the user's word of 15 October 2026 there were two, C: labelled VIBE and D: labelled DEMO, a small tree of sample files.
+  - It is a directory of the page's server, a script for Node with Node's own modules: the page loads its tree from it, and every change, the setup file's too, is made there as it happens; what the server refuses or cannot do is DOS's error for that call. Nothing is kept in the browser then.
+  - Served statically, from GitHub Pages with no server, the same page has its drive start from what is served with it, C: with `vc` alone, and keeps what the user changes in the browser (CLAUDE.md, "The web page").
+  - The program takes the drives from the environment, `VC_DRIVE_C`, `VC_DRIVE_D` and the rest: W2's section below has them, and the page sets `VC_DRIVE_C` alone.
+  - The tests give the drives as the bench has them, through the environment, C: the working disk labelled VIBE and D:\VC the program's files on D: labelled DEMO, so the masks of the drive's letter are not needed on the web, and no golden or mask moved with the one drive.
 - **Files in and out.**
   - An upload button and drag-and-drop write into the host directory of DOS's current directory, which C publishes to JS at each yield. Overwriting asks confirm(). Then Ctrl-R (1312h) is queued, so that the panel reads the directory anew.
   - `ProgramOpenFile` opens the file in a NEW TAB, as a blob URL with a MIME type from the extension (the user's decision, not a download): the user views or saves it from there.
@@ -816,7 +815,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 
 ### Deployment
 - `SINGLE_FILE` with a shell HTML gives one `build/portable_c/web/vc.html`, with the wasm, the JS, the CSS and the font inline: an estimated 1–3 MB, with no CDN.
-- The demo tree is preloaded into it (`--preload-file` bundled) or embedded.
+- The demo tree is preloaded into it (`--preload-file` bundled) or embedded. (There is no demo since the one drive.)
 - The targets are `portable_c-web` and `portable_c-web-node`.
 - Publishing, by GitHub Pages or otherwise, is asked of the user in W4. Nothing is published before that.
 
@@ -930,7 +929,8 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **The drives.** Two, C: and D:, each the directory of the host that
   a variable of the environment names, `VC_DRIVE_C` and `VC_DRIVE_D`,
   labelled as `VC_LABEL_C` and `VC_LABEL_D` say (11 characters at the
-  most, DOS's form), VIBE and DEMO where they say nothing; a drive whose
+  most, DOS's form), VC and DEMO where they say nothing (VIBE and DEMO
+  until the one drive); a drive whose
   variable is not set is not there, and main() ends with a message
   where neither is (`main` of `sys_web.c`, `DosBeginGiven` of
   `files_posix.c`, `DrivesBeginGiven` of `paths_posix.c`, which take a
@@ -1121,15 +1121,13 @@ with `-DVC_WEB=ON`,
     cmake --build build --target portable_c-web-serve
 
 builds the page and runs its server in the foreground, on
-`http://127.0.0.1:8437/`, with C: in `build/portable_c/web/drives/c` and
-D: in `build/portable_c/web/drives/d` (D: made as a copy of the demo,
-`src/portable_c/web/demo`, the first time; delete the directory to start
-the demo afresh). Ctrl-C stops it. By hand, with other directories or
-another port:
+`http://127.0.0.1:8437/`, with C: in `build/portable_c/web/drives/c`,
+made with its `vc` the first time. Ctrl-C stops it. By hand, with
+another directory or another port:
 
     node src/portable_c/web/server.mjs --port 8437 \
         --page build/portable_c/web/vc.html \
-        --drive-c DIR --drive-d DIR [--demo DIR]
+        --drive-c DIR
 
 For a phone, an HTTPS reverse proxy in front of it, for example
 `tailscale serve --bg 8437`. What to look at by hand: the panels drawn in the VGA font and
@@ -1210,7 +1208,9 @@ held for the next key, and the phone's keyboard by its button.
   licence shown with the others' by the bar's "Licences".
 - **The demo**, `src/portable_c/web/demo`: a readme, notes, three small
   programs' sources that cannot be run, made-up data, and a text with
-  DOS's line ends, written for the project.
+  DOS's line ends, written for the project. Gone from the page with the
+  one drive; the files are the README's animation's since,
+  `harness/session_files`.
 - **The tests.** `portable_c-web-server` (`harness/webserver.py` and
   `.mjs`, Node alone, no VC_WEB): the server's API and its refusals,
   links of the host's among them, the page's file system against it with
@@ -1230,7 +1230,8 @@ held for the next key, and the phone's keyboard by its button.
   away, by Alt-F1 or Alt-F2. Starting on D: is one line of `vcBegin`
   (`FS.chdir(ROOTS.d)` behind the load); it was tried and taken out, as
   a choice that is the user's, and the user decided on 15 October 2026
-  that the page starts on C:, as it does.
+  that the page starts on C:, as it does. With the one drive it starts
+  in C:\VC.
 - **Left for W4**: the README, the licences, the list of keys checked in
   the browsers, and publishing.
 
@@ -1260,7 +1261,7 @@ held for the next key, and the phone's keyboard by its button.
   `build/portable_c/web/static/`, `index.html` (the page), `drives/c.json`
   (C:, its `vc` and nothing in it), `drives/d.json` (the demo, by
   `treeOf` of `server.mjs`, lifted out of `makeServer` for it, the
-  server's tree as it was) and `.nojekyll`. The trees are of the shape of
+  server's tree as it was; gone with the one drive) and `.nojekyll`. The trees are of the shape of
   `/api/tree`. To try it by hand: `python3 -m http.server -d
   build/portable_c/web/static 8438` and `http://127.0.0.1:8438/`, which
   answers 404 for `api/server` as GitHub Pages does (a browser that
@@ -1316,8 +1317,9 @@ held for the next key, and the phone's keyboard by its button.
   for: some browsers ask the visitor, and the user decided on 15 October
   2026 that the static page does not ask it (CLAUDE.md, "The web
   page").
-  The drives that a visitor has kept are not changed by a new deploy of
-  the demo until Reset drives.
+  The drives that a visitor has kept are not changed by a new deploy
+  until Reset drives. What a visitor kept of D: before the one drive is
+  forgotten at the next visit (`load` of `kept.js`).
 
 ### W4, the documents: done, and the user's pass by hand
 
@@ -1527,6 +1529,44 @@ held for the next key, and the phone's keyboard by its button.
   - On the phone held upright the grid is less than half the screen's
     height, centred, with the row of keys at the bottom: as fitting by
     the width makes it.
+
+### One drive, C:\VC alone: done, and what is left of it
+
+On the user's word of 15 October 2026 the page has one drive, C:,
+labelled VC, which holds C:\VC, the program's own files, and nothing
+else as it is shipped; there is no D: of a demo and no sample files, and
+the page starts in C:\VC (CLAUDE.md, "The web page"; W1 of
+DEVIATIONS.md). What it changed and met:
+
+- **The program** keeps its two drives by the environment (`main` of
+  `sys_web.c`): the page names `VC_DRIVE_C` alone, and C:'s label where
+  none is given is VC, a label of two letters, which makes the box of
+  Ctrl-F4 narrower than four do. The page starts the program in C:\VC
+  by the current directory of Emscripten's FS, `FS.chdir` behind the
+  load in `vcBegin` of `page.js`, which the program starts in where a
+  drive has it.
+- **The tests of the scenarios** give the bench's layout through the
+  environment as before, and its labels besides, `VC_LABEL_C=VIBE` and
+  `VC_LABEL_D=DEMO` (`harness/posixrun.py`), which were the program's
+  defaults: so no golden, patch or mask moved.
+- **The server** serves one directory, `--drive-c`, made with its `vc`;
+  `--drive-d` and `--demo` are gone, and it refuses drive `d` as any
+  drive that it has not. **The static site** ships `drives/c.json`
+  alone, C: with `vc`. **The browser's store** keeps the one drive, and
+  forgets at the next visit what it kept of D: before (`load` of
+  `kept.js`). Reset drives is as it was.
+- **The page's tests** make the files that they work on in their drive,
+  by `harness/webfiles.mjs`, nothing of them shipped: the server's test
+  lays them on C: beside `vc`, the page's test on the server's C: and in
+  a tree of C: served in place of the static site's, and the browser's
+  test both ways, its static site a copy in its work directory. The
+  page's test holds that the drive box has C: alone and that the static
+  site ships C: with `vc` alone; the server's that D: is refused and
+  that a store forgets D:.
+- **The demo's files** are the README's animation's now,
+  `harness/session_files`, byte for byte, readme.txt's words on D:
+  among them, so that `python3 harness/session.py` makes the same
+  bytes of `docs/vibe-commander-session.svg`, which it does.
 
 ### Open, for the user
 

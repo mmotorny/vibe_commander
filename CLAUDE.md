@@ -307,16 +307,20 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   font to whoever opens it, has one small "Licences" link that shows all
   of those texts, no work credited apart from the others. The static page
   does not ask the browser to keep its store (`navigator.storage.persist`).
-- Two drives. C:, labelled VIBE, is where the program lives, its own
-  files in C:\VC as the bench has them in D:\VC. D:, labelled DEMO,
-  starts as a small tree of sample files written for the project and
-  served with the page, nothing proprietary, and the user may change it.
-  The drives are directories of the server's, two in the build or as the
-  server is told when it starts: the page loads their tree from the
-  server, and every change on either drive, the setup file too, is made
-  on the server as it happens, not kept in the browser; what the server
-  cannot do or refuses is DOS's error for that call. The tests map the
-  letters as the bench has them. The
+- One drive, on the user's word of 15 October 2026, in place of the two
+  that the page had: C:, labelled VC, which holds C:\VC, the program's
+  own files, and nothing else as it is shipped. There is no drive of a
+  demo and no sample files. The page starts in C:\VC. The drive is a
+  directory of the server's, in the build or as the server is told when
+  it starts: the page loads its tree from the server, and every change
+  on it, the setup file too, is made on the server as it happens, not
+  kept in the browser; what the server cannot do or refuses is DOS's
+  error for that call. The static site ships C: with its `vc` alone,
+  and the browser keeps that one drive. The tests keep the bench's
+  layout through the environment, C: the bench's working disk labelled
+  VIBE and D: with the program's own files in D:\VC labelled DEMO, so
+  that no golden or mask moves; the page's own tests make the files
+  that they work on in their drive, and nothing of them is shipped. The
   user's own files come in by a button and by dragging them onto the
   page, into the current directory.
 - A command says on DOS's screen that commands cannot be run in a web

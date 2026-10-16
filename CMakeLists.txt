@@ -839,7 +839,7 @@ endif()
 # Ultimate Oldschool PC Font Pack, version 2.2, its archive for the web
 # from int10h.org, pinned by its SHA-256, which CLAUDE.md allows by name;
 # its licence is CC BY-SA 4.0, LICENSE.FONT. The page's server,
-# web/server.mjs, serves it with the two drives: the target
+# web/server.mjs, serves it with its one drive, C:, and the target
 # portable_c-web-serve runs it on 127.0.0.1:8437 (TODO.md, "W3b"). Its
 # memory grows to the cap of sys_web.c, 256 MB, and 64 MB besides for the
 # runtime, and no further, since wasm never gives back what it has grown
@@ -879,20 +879,16 @@ if(VC_WEB)
         LINK_DEPENDS ${web_dir}/library.js ${web_dir}/pre.js
                      ${web_page_dir}/shell.html)
     # The page as a static site, the piece W3c of step 7 (TODO.md, "W3c"):
-    # build/portable_c/web/static/, index.html and the two drives' trees
-    # as they start, for a host with no server, as GitHub Pages
+    # build/portable_c/web/static/, index.html and the tree of its one
+    # drive as it starts, for a host with no server, as GitHub Pages
     # (.github/workflows/pages.yml), where the page keeps the user's
     # changes in the browser. Made with every build, for the test.
-    file(GLOB_RECURSE web_demo CONFIGURE_DEPENDS ${web_dir}/demo/*)
     add_custom_command(
         OUTPUT ${web_page_dir}/static/index.html
                ${web_page_dir}/static/drives/c.json
-               ${web_page_dir}/static/drives/d.json
         COMMAND ${node} ${web_dir}/static.mjs
-                --page ${web_page_dir}/vc.html --demo ${web_dir}/demo
-                --out ${web_page_dir}/static
+                --page ${web_page_dir}/vc.html --out ${web_page_dir}/static
         DEPENDS ${web_page_dir}/vc.html ${web_dir}/static.mjs
-                ${web_dir}/server.mjs ${web_demo}
         COMMENT "Making the web page a static site"
         VERBATIM)
     add_custom_target(portable_c-web-static ALL
@@ -902,7 +898,6 @@ if(VC_WEB)
         COMMAND ${node} ${web_dir}/server.mjs --port 8437
                 --page ${web_page_dir}/vc.html
                 --drive-c ${web_page_dir}/drives/c
-                --drive-d ${web_page_dir}/drives/d
         DEPENDS portable_c-web
         USES_TERMINAL
         VERBATIM)
