@@ -1,4 +1,4 @@
-# The viewer and the editor
+# 4. The viewer and the editor
 
 F3 shows a file and F4 changes it. The viewer looks at a file of any
 size, a gigabyte as easily as a kilobyte, through a window of at most
@@ -1265,4 +1265,4 @@ effect at the next Enter without starting the program again.
   [chapter 2](02-the-screen.md) for `ScrBuf`, `Window` and the buffers
   that boxes save into; [chapter 3](03-the-features.md) for the room
   and for find file, the third user of the search;
-  [chapter 4](04-the-system.md) for `Intr21` and the critical error.
+  [chapter 6](06-the-system.md) for `Intr21` and the critical error.

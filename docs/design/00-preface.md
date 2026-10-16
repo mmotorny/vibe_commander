@@ -142,19 +142,22 @@ graph TD
     C1["1. The program: the file, the start, the main data, the loop, the input"]
     C2["2. The screen: frames, boxes, dialogs, focus, menus, shadows"]
     C3["3. The features: panels, the tree, walking files, copy, find file"]
-    CV["The viewer and the editor: a 64K window, the search, the whole text"]
-    C4["4. The system: DOS and the BIOS, the critical error, the resident part"]
-    C5["5. The setup: VCSETUP.COM, VC.INI and the private call"]
+    C4["4. The viewer and the editor: a 64K window, the search, the whole text"]
+    C5["5. Numbers and names: arithmetic without DIV, names, case, code pages"]
+    C6["6. The system: DOS and the BIOS, the critical error, the resident part"]
+    C7["7. The setup: VCSETUP.COM, VC.INI and the private call"]
     P --> C1
     C1 --> C2
     C1 --> C3
     C2 --> C3
-    C3 --> CV
-    C2 --> CV
-    C1 --> C4
     C3 --> C4
+    C2 --> C4
+    C3 --> C5
     C4 --> C5
-    C2 --> C5
+    C1 --> C6
+    C3 --> C6
+    C6 --> C7
+    C2 --> C7
 ```
 
 [Chapter 1](01-the-program.md) is the skeleton: how the source is put
@@ -163,13 +166,16 @@ data and the panels, the main loop and the input.
 [Chapter 2](02-the-screen.md) is the text-mode toolkit on top of it: the
 frames, the boxes and dialogs described as tables, focus, menus, the
 key bar, shadows and what a box saves of what it covers.
-[Chapter 3](03-the-features.md)
-is what the program does with files on that skeleton, and
-[the viewer and the editor](viewer-and-editor.md) are F3 and F4, which
-have a chapter of their own.
-[Chapter 4](04-the-system.md) is the conversation with DOS and the PC,
+[Chapter 3](03-the-features.md) is what the program does with files on
+that skeleton, and [chapter 4](04-the-viewer-and-editor.md) is F3 and
+F4, the viewer and the editor.
+[Chapter 5](05-numbers-and-names.md) gathers the small routines that
+all of them lean on: numbers turned into text without `DIV`, dates,
+sizes and percentages, file names in their eleven-character form, upper
+and lower case, and the two code pages.
+[Chapter 6](06-the-system.md) is the conversation with DOS and the PC,
 and the part of the program that stays in memory while a command runs.
-[Chapter 5](05-the-setup.md) is the second program, and the file and
+[Chapter 7](07-the-setup.md) is the second program, and the file and
 the private call that join the two.
 
 Each topic is explained in one place, and the other chapters link to

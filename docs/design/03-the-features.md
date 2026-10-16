@@ -595,7 +595,7 @@ entry that leaves the top of a column is the one that arrives at the
 bottom of the column before it, in the row that is copied. Anything
 else, PgDn or Home, is `PutFls` and the whole panel. On a CGA, where
 every word copied to the display waits for the retrace or makes snow
-([chapter 4](04-the-system.md#cga-snow-and-volkovs-own-question-marks)),
+([chapter 6](06-the-system.md#cga-snow-and-volkovs-own-question-marks)),
 a scroll by the BIOS and one row of 38 cells is a small fraction of
 the 800 or so words of a whole panel.
 
@@ -1387,7 +1387,7 @@ or from a network path is always a copy.
 A target with wildcards is made in the eleven-byte form of the
 directory, where the `?` of the mask are the only places that take the
 source's characters; [the chapter on numbers and
-names](numbers-and-names.md#copying-txt-to-bak) has it worked through,
+names](05-numbers-and-names.md#copying-txt-to-bak) has it worked through,
 `notes.txt` and `*.bak` making `NOTES.BAK`. Doing it by fixed places
 has one curiosity: with the mask `??x*.*`, the file `a.txt` becomes
 `A_X_____TXT` (`_` a space), since the mask's `x` lands at place 2 of
@@ -1557,7 +1557,7 @@ just seen one.
 
 ## The viewer and the editor
 
-F3 and F4 have [a chapter of their own](viewer-and-editor.md): the
+F3 and F4 have [a chapter of their own](04-the-viewer-and-editor.md): the
 viewer's window of 64K over a file of any size and its line table, the
 search `V81_00` and `V82_00` that find file shares, and the editor's
 whole text with one line apart.
@@ -1623,7 +1623,7 @@ time in the dialog of Ctrl-A.
 Line N is at `ViewSeg` plus 65 x N bytes, which can pass 64K, so
 `FndAdr` (30 bytes) makes a segment and offset of the 32-bit product of
 one `MUL`, the same arithmetic as the editor's
-[`T61_00`](viewer-and-editor.md#a-place-is-20-bits-t61_00-and-t60_00).
+[`T61_00`](04-the-viewer-and-editor.md#a-place-is-20-bits-t61_00-and-t60_00).
 
 `FindFil` (585 bytes) is called with AL, the attributes of what
 `DirFunc` found, and returns at once for anything that is not a
@@ -1640,7 +1640,7 @@ BX) and is a network drive (4409h, bit 12 of DX) or a fixed one (4408h).
 With a text in "Containing", each file that matches is opened and read
 into the room *behind* the list, in parts of up to 32,848 bytes,
 `8000h + 80`. Each part is searched with
-[`V82_00`](viewer-and-editor.md#comparing-v82_00), and the next part
+[`V82_00`](04-the-viewer-and-editor.md#comparing-v82_00), and the next part
 begins 80 bytes before the end of the last, `4201h` with `CX:DX =
 -1:-80`, so that a match across the seam is not lost:
 
@@ -1720,7 +1720,7 @@ screen's rows less six.
 The two codes for F11 and F12 are dead code. `ADD BH,85h-'1'` works out
 85h and 86h correctly, the scan codes that the enhanced keyboard's F11
 and F12 have, but the program reads keys only with functions 0, 1 and 2
-of INT 16h ([chapter 4](04-the-system.md#waiting-is-not-idle)), and the
+of INT 16h ([chapter 6](06-the-system.md#waiting-is-not-idle)), and the
 BIOS keeps F11 and F12 from those, which were made for the 83-key
 keyboard: no key the user can press ever matches an entry so marked.
 Such an entry is still in the menu, and Enter or the mouse chooses it.
@@ -1975,7 +1975,7 @@ history, the extension file and `DosBuf` into it, keeps each panel in
 which runs each command of `DosBuf` and then brings the commander back
 at `Init11`, the panels read again and the cursor and the selection
 found in what was kept.
-[Chapter 4](04-the-system.md#the-resident-part-12690-bytes-that-stay)
+[Chapter 6](06-the-system.md#the-resident-part-12690-bytes-that-stay)
 has all of it.
 
 ## Drives, labels and the Info panel
@@ -2024,7 +2024,7 @@ A: and B: on it, and DOS answers to both letters. Unless the setting
 `DriveB` says otherwise, for A: and for B: the program asks IOCTL
 440Eh which letter that drive answers to now, and drops the letter if
 the answer is the other one: the panel offers the drive once, under
-the letter it was last used by. [Chapter 4](04-the-system.md#the-drives-dos-would-ask-about-itself)
+the letter it was last used by. [Chapter 6](06-the-system.md#the-drives-dos-would-ask-about-itself)
 has `Fantom`, which keeps DOS from asking for the other diskette when
 the program uses the other letter.
 
@@ -2098,7 +2098,7 @@ take. That is not the sum of their sizes, but of their sizes rounded up
 to whole clusters, a 32-bit size divided by a 16-bit cluster in two
 `DIV`s, the high word first and its remainder carried into the low:
 [the chapter on numbers and
-names](numbers-and-names.md#rdinfo-and-the-info-panel-bytes-per-cluster)
+names](05-numbers-and-names.md#rdinfo-and-the-info-panel-bytes-per-cluster)
 has the instructions, and why neither quotient can overflow.
 
 Below a rule comes the text of `DIRINFO`, as much as fits, 36 cells a
@@ -2107,7 +2107,7 @@ this directory". A click on it opens the editor on the file.
 
 ## Errors as the user sees them
 
-[Chapter 4](04-the-system.md#intr21-62-bytes-for-every-error) has how
+[Chapter 6](06-the-system.md#intr21-62-bytes-for-every-error) has how
 an error comes back from DOS: `Intr21` asks function 59h for the exact
 number, and turns a critical error that the user cancelled into 53h.
 What the user then sees is one shape of box, a table of 42 bytes in
@@ -2206,7 +2206,7 @@ bits of sharing, gets what DOS will give. A critical error, a drive
 not ready or a disk that cannot be written, is another thing: DOS
 stops in the middle of the call and the program's own `FatErr` asks
 Retry or Cancel, before any of the boxes above
-([chapter 4](04-the-system.md#the-critical-error-faterr)).
+([chapter 6](06-the-system.md#the-critical-error-faterr)).
 
 ## How the features share the main data
 
@@ -2255,7 +2255,7 @@ is all of it, for `VC.COM`:
 
 | File | When | Read | Written | Into or from |
 |---|---|---|---|---|
-| `VC.INI` | at start; on save | one 3Fh asking 512 where the file has 511, the length test | 3Ch, one 40h of 511 | in place over the panels' save areas; `MenuBuf` ([chapter 5](05-the-setup.md#vcini-a-dump-of-the-main-data)) |
+| `VC.INI` | at start; on save | one 3Fh asking 512 where the file has 511, the length test | 3Ch, one 40h of 511 | in place over the panels' save areas; `MenuBuf` ([chapter 7](07-the-setup.md#vcini-a-dump-of-the-main-data)) |
 | `VC.EXT`, the program's | at start | one 3Fh of 511, and a 1Ah behind | by the editor, which copies its text into `ExtMain` too | `ExtMain`, 512 bytes |
 | `VC.EXT`, a directory's | at every `ReDir` of a panel | one 3Fh of 511 | | `ExtBuf` of the panel |
 | `VC.MNU` | F2 | one 3Fh of 3,999 | by the editor | `MenuBuf` |
@@ -2270,7 +2270,7 @@ is all of it, for `VC.COM`:
 | a file viewed | F3 | up to 65,504 into the window, then halves; the search 4,000 at a time | | the room; `MenuBuf` |
 | a file edited | F4 | all of it, in pieces of 0FF00h | 3Ch, 40h in pieces of 0FF00h | the room |
 | a file searched | Alt-F7, Containing | parts of 8000h + 80, overlapping by 80 | | the room behind the list |
-| `VC.COM` | after a command, in the small mode | by DOS's loader | | ([chapter 4](04-the-system.md#coming-back-vccom-loads-itself)) |
+| `VC.COM` | after a command, in the small mode | by DOS's loader | | ([chapter 6](06-the-system.md#coming-back-vccom-loads-itself)) |
 
 Two handles at most are open at once, and only in the copy, the source
 and the target. The viewer keeps one open for as long as it shows the
@@ -2308,7 +2308,7 @@ through a buffer of its own and then copied onward.
   `Run_00`, `FileLst`.
 - [Chapter 1](01-the-program.md) for the main data and the loop;
   [chapter 2](02-the-screen.md) for the screen, the panels as drawn,
-  `EdLin` and the dialogs; [chapter 4](04-the-system.md) for `Intr21`,
+  `EdLin` and the dialogs; [chapter 6](06-the-system.md) for `Intr21`,
   the critical error, `Fantom`, the calls of DOS and the resident part
-  that runs a command; [chapter 5](05-the-setup.md) for `VC.INI`, which
+  that runs a command; [chapter 7](07-the-setup.md) for `VC.INI`, which
   keeps each panel's mode, sort order, filter and path.

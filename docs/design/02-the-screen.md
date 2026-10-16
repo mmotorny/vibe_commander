@@ -25,7 +25,7 @@ section lists the economies, with their sizes.
 main data where every buffer here lives, the main loop, and `Input`,
 which every routine of this chapter calls to wait for a key. Where the
 display is, how CGA snow is avoided and how the mouse driver is called
-are [chapter 4](04-the-system.md#the-screen). The assembly is quoted
+are [chapter 6](06-the-system.md#the-screen). The assembly is quoted
 with its labels and Volkov's comments; a comment that starts with `;;`
 is the book's. Sizes are those of the routines in the listing of the
 shipped `VC.COM`.
@@ -330,7 +330,7 @@ Palets	DB	07h,07h,1Bh,07h,07h,07h	;  0 - Main windows
 Three palettes, each for a colour and a monochrome card, are one
 table, and switching between them in the Configuration dialog is one
 byte, `ColTyp`. The setup program edits the table as a grid
-([chapter 5](05-the-setup.md)). Two rows are no colours: 38 says how a
+([chapter 7](07-the-setup.md)). Two rows are no colours: 38 says how a
 shadow is made, below; and 39, "Blink / High background", no code of
 either program names.
 
@@ -1079,7 +1079,7 @@ a choice, flip a tick or press a button; the left button outside the
 box is Esc. The right button is Enter wherever it is let go, and the
 middle one Esc; while either is held, the pointer is the character
 that says so, `√` or `x`
-([chapter 4](04-the-system.md#the-mouse-eight-calls-of-int-33h)).
+([chapter 6](06-the-system.md#the-mouse-eight-calls-of-int-33h)).
 
 ## Input lines
 
@@ -1223,7 +1223,7 @@ The third level is one buffer for three boxes, and two guards keep
 them from meeting. The help sets `BlocEr` while it is up, so a disk
 error while it reads `VC.HLP` fails quietly instead of drawing the
 critical error over the help's saved cells
-([chapter 4](04-the-system.md#two-flags-that-stop-the-boxes-piling-up)).
+([chapter 6](06-the-system.md#two-flags-that-stop-the-boxes-piling-up)).
 And the critical error and the diskette prompt have FFh for their
 `bHelp`, which `Dialog` puts into `HlpPage`, and `Help` returns at once
 for that page: F1 does nothing in a box that is already on the third
@@ -1572,6 +1572,6 @@ half blocks, `▌WORK▐`, and a `◄` marks the current directory.
 - [Chapter 1](01-the-program.md) for the main data in which every
   buffer here lives and for `Input`; [chapter 3](03-the-features.md)
   for what the panels list and how they are read;
-  [chapter 4](04-the-system.md#the-screen) for the display's address,
-  CGA snow and the mouse driver; [chapter 5](05-the-setup.md) for the
+  [chapter 6](06-the-system.md#the-screen) for the display's address,
+  CGA snow and the mouse driver; [chapter 7](07-the-setup.md) for the
   setup program, which draws with copies of these routines.

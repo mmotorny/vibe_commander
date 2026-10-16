@@ -1,4 +1,4 @@
-# 4. Talking to DOS and the PC: the system
+# 6. Talking to DOS and the PC: the system
 
 A file manager is mostly a conversation with the operating system:
 open, read, find the next file, ask where the cursor is, wait for a
@@ -693,7 +693,7 @@ another multitasker that understands it; if nothing answers, AL stays
 80h and the program never asks again. DESQview is found at start by
 its own install check, a call of DOS's "set date" with impossible
 values that only DESQview answers, `INT 21h` AX 2B01h with `'DE'` in CX
-and `'SQ'` in DX. [Chapter 5](05-the-setup.md#the-private-call-int-21h-ah-2bh-vc-om) shows the
+and `'SQ'` in DX. [Chapter 7](07-the-setup.md#the-private-call-int-21h-ah-2bh-vc-om) shows the
 commander using the same trick for an API of its own.
 
 ## The mouse: eight calls of `INT 33h`
@@ -1105,7 +1105,7 @@ SS, which still holds the PSP.
 
 `Init00` runs once, on the first start. It reads `VC.INI` straight
 into the resident copy of the main data
-([chapter 5](05-the-setup.md#vcini-a-dump-of-the-main-data) has the
+([chapter 7](07-the-setup.md#vcini-a-dump-of-the-main-data) has the
 format),
 prints the banner through DOS, reads the main extension file, and
 takes three addresses:
@@ -1517,7 +1517,7 @@ VCapi:  CMP     CX,'VC'
         JNE     Old21
         CMP     DX,'OM'
         JNE     Old21
-        ...                             ;; chapter 5
+        ...                             ;; chapter 7
 New21   ENDP
 ```
 
@@ -2172,5 +2172,5 @@ already does, DOS is made to do.
 - [Chapter 1](01-the-program.md) for the main data and the main loop,
   [chapter 2](02-the-screen.md) for the boxes that use these routines, [chapter 3](03-the-features.md)
   for the panels' memory and the features that make most of the calls
-  of DOS, and [chapter 5](05-the-setup.md) for the setup program and
+  of DOS, and [chapter 7](07-the-setup.md) for the setup program and
   the API of `New21`.

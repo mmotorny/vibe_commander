@@ -1,4 +1,4 @@
-# Numbers without DIV, names without strings: the program's arithmetic and text
+# 5. Numbers without DIV, names without strings: the program's arithmetic and text
 
 Every screen of Volkov Commander is full of numbers and names. A panel
 in full mode shows, for each file, a size of up to ten digits, a date
@@ -1150,7 +1150,7 @@ places: the search of the viewer, the letters of the markup that
 command line's completion from the history, and each character of
 `Convert`. That is what makes the viewer's search find Russian text in
 either case on a Russian DOS ([the viewer and the
-editor](viewer-and-editor.md#comparing-v82_00)), with no Russian in
+editor](04-the-viewer-and-editor.md#comparing-v82_00)), with no Russian in
 the program.
 
 ### `LowCase` and `LowTab`: inverted once
@@ -1478,7 +1478,7 @@ EdSub2	ENDP
 with its own end of line. The setup program has its own copy of
 `CmpSym` and its table, as it has of `UpCase`, `LowCase`, the path
 routines and `HexDec`
-([chapter 5](05-the-setup.md#what-it-shares-with-vccom-by-copy)).
+([chapter 7](07-the-setup.md#what-it-shares-with-vccom-by-copy)).
 
 ## One binary for CP437 and CP866
 
@@ -1578,6 +1578,6 @@ because in that form the hard part has already been done.
 - [Chapter 1](01-the-program.md) for the main data, `ScrBuf` and
   `DialBox`; [chapter 3](03-the-features.md) for the panels, the
   filter, the copy and the viewer that use these routines;
-  [chapter 4](04-the-system.md) for `Intr21` and the rest of what is
-  asked of DOS; and [chapter 5](05-the-setup.md) for the setup
+  [chapter 6](06-the-system.md) for `Intr21` and the rest of what is
+  asked of DOS; and [chapter 7](07-the-setup.md) for the setup
   program's copies of them.

@@ -18,7 +18,7 @@ This chapter is the skeleton that the toolkit of the screen in
 the program cuts up its memory when it starts, the structures of its
 data and its panels, the main loop and its commands, the input, the
 screen in outline, the help, and the clock and the blanker. The calls of DOS and the BIOS underneath are
-[chapter 4](04-the-system.md), and so is the resident part that runs a
+[chapter 6](06-the-system.md), and so is the resident part that runs a
 command; this chapter has it in outline. The last section lists the
 economies in one place, with their sizes. A reader who wants a reminder
 of segments, the PSP and memory control blocks will find one in the
@@ -215,7 +215,7 @@ flowchart TD
 ```
 
 `Alloc0`, 256 bytes that run once, does four things before anything
-else, and [chapter 4](04-the-system.md#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb)
+else, and [chapter 6](06-the-system.md#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb)
 has each of them instruction by instruction. It adds up the 65,090
 bytes of its own file into a 16-bit sum, `ChkFile`, by which it will
 know the file again when it loads itself after a command. It refuses a
@@ -237,7 +237,7 @@ reads it with one call of DOS straight into the resident part, at a
 place chosen so that the 330 bytes land on `ComnIni`, the copy of the
 main data that `Init11` will copy down, and asks for one byte more than
 the file has: only a file of the right length reads one byte less than
-was asked. [Chapter 5](05-the-setup.md#reading-it-the-commander) has the
+was asked. [Chapter 7](07-the-setup.md#reading-it-the-commander) has the
 code. Only each panel's 88 bytes then go on, to `WCB1sav` and `WCB2sav`.
 
 The read lands across three of the resident part's buffers, and the
@@ -400,7 +400,7 @@ up the commander, and the resident part does the rest. In outline:
    `VC.COM` as its own loader; either way it comes back to `Init11`,
    which takes the data anew.
 
-[Chapter 4](04-the-system.md#the-resident-part-12690-bytes-that-stay)
+[Chapter 6](06-the-system.md#the-resident-part-12690-bytes-that-stay)
 has the four steps byte by byte: what stays, how a command line is made
 in place, and how the second copy of `VC.COM` hands the first its code
 and its check sum through one word.
@@ -973,7 +973,7 @@ What the loop does each time round:
    for Alt, Ctrl, Shift or none; `PutKey0` draws only when the bar it
    picks differs from `BarPrev`, so holding a key costs nothing.
 2. `LeaveTm` gives the time away to DOS's background programs, to
-   Windows and to DESQview ([chapter 4](04-the-system.md#giving-time-away)).
+   Windows and to DESQview ([chapter 6](06-the-system.md#giving-time-away)).
 3. With a blank delay set, it compares the time with `BlTime`, now
    plus `BlDelay` minutes, set again whenever something happens.
 4. With the clock on, it draws the clock.
@@ -1065,7 +1065,7 @@ numbers counted rather than stored, is in
 ### The mouse driver
 
 The mouse is INT 33h, eight calls in a few lines of `VCSUB1.INC`, and
-[chapter 4](04-the-system.md#the-mouse-eight-calls-of-int-33h) has them
+[chapter 6](06-the-system.md#the-mouse-eight-calls-of-int-33h) has them
 all: the position in cells, the buttons exchanged for a left-handed
 mouse, and a pointer that is a character, `√`, `■` or `x`, to tell the
 user what letting go will do.
@@ -1208,7 +1208,7 @@ The 62 pages hold 65,377 bytes of text; the largest is page 55,
 `RdEntry` refuses a page of 2,968 bytes or more, `LenHelp` less the 32
 bytes of the state, by `CMP CX,LenHelp-20h` and a `CMC` that turns
 "below" into "no error". How the setup program reads its seven pages
-from the same file is in [chapter 5](05-the-setup.md#read-once-at-start).
+from the same file is in [chapter 7](07-the-setup.md#read-once-at-start).
 
 ### One F1: twelve calls of DOS
 
@@ -1497,7 +1497,7 @@ The economies of the screen, its boxes, dialogs and menus are listed
 in [chapter 2](02-the-screen.md#the-economies-in-one-table). The
 economies of the resident part, of the hand-made MCB, `RunPar` and
 the program that loads itself, are listed with the rest of the system in
-[chapter 4](04-the-system.md#what-it-adds-up-to).
+[chapter 6](06-the-system.md#what-it-adds-up-to).
 
 ## Where to read next
 
@@ -1510,6 +1510,6 @@ the program that loads itself, are listed with the rest of the system in
   dialogs and the menus; [chapter 3](03-the-features.md) for what the
   panels, the viewer, the editor, copy and find file do on this
   skeleton;
-  [chapter 4](04-the-system.md) for the calls of DOS and the BIOS and
-  for the resident part; [chapter 5](05-the-setup.md) for `VC.INI` and
+  [chapter 6](06-the-system.md) for the calls of DOS and the BIOS and
+  for the resident part; [chapter 7](07-the-setup.md) for `VC.INI` and
   the setup program.
