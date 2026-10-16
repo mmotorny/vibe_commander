@@ -231,9 +231,10 @@ Linux](#the-program-for-linux), `vc`, which runs in a terminal and
 emulates DOS's services there. It behaves otherwise than the original
 where a thing only made sense on DOS, and the first such thing was that
 it stays in the memory whole while a command runs, with no option for
-that (see [The portable C](#the-portable-c)). What comes after Linux,
-on the user's word of 15 October 2026, is a static web page, the
-program built for WebAssembly and drawn as text, and then iOS.
+that (see [The portable C](#the-portable-c)). After Linux comes [the web
+page](#the-web-page), the program built for WebAssembly and drawn as
+text, served by a server of the project's own or statically, and then
+iOS.
 
 ## Layout
 
@@ -241,10 +242,10 @@ program built for WebAssembly and drawn as text, and then iOS.
 |---|---|
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
-| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original. What it asks of the system is `sys.h`; the files whose names end in `_dos.c` answer it for DOS, and those that end in `_posix.c`, with `emulate_posix.h`, for Linux. Every other file is common to all of them |
+| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original. What it asks of the system is `sys.h`; the files whose names end in `_dos.c` answer it for DOS, and those that end in `_posix.c`, with `emulate_posix.h`, for Linux; the web page has `sys_web.c` with most of Linux's, and its script, its server and its demo in `src/portable_c/web/`. Every other file is common to all of them |
 | `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README; `stub.c` switches the banner of [the extender](#the-extender) off in the program of the portable C; `calls.py` counts the calls that hand registers to an interrupt, outside the file of the system's functions |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
-| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/`, and those of `harness/goldens/posix/` on top of them for the program for Linux |
+| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/`, and those of `harness/goldens/posix/` on top of them for the program for Linux, and of `harness/goldens/web/` for the web page |
 | `docs/` | Pictures for this README |
 
 ## Building
@@ -296,7 +297,9 @@ C](#the-portable-c) says what the two are.
 
 Where it finds clang, the build also compiles the portable C for Linux,
 `build/portable_c/posix/vc` with its sanitized builds beside it: see
-[The program for Linux](#the-program-for-linux).
+[The program for Linux](#the-program-for-linux). With `-DVC_WEB=ON` it
+fetches Emscripten and builds the web page too: see [The web
+page](#the-web-page).
 
 ### Changes to the source
 
@@ -980,8 +983,9 @@ is the program for Linux, with the files that emulate DOS there beside
 it, each ending in `_posix.c`, and their own header, `emulate_posix.h`:
 `machine_posix.c` the part of the functions that has nothing of a
 platform in it, and `keyboard_posix.c` the keys made the BIOS's words,
-which the web page of step 7 is to share; see [The program for
-Linux](#the-program-for-linux).
+which the web page of step 7 shares with it, beside `sys_web.c`; see
+[The program for Linux](#the-program-for-linux) and [The web
+page](#the-web-page).
 
 | What | Functions |
 |---|---|
@@ -1341,8 +1345,6 @@ is no clang:
 | `portable_c-posix-unit` | What the program emulates of DOS without input or output of its own, the files `*_posix.c` but `sys_posix.c` and `machine_posix.c`: names and aliases, the code page and UTF-8, drives and paths, dates, DOS's errors, and the services on files and directories of the host's, by `harness/posixcheck.c`, built with the sanitizers |
 | `portable_c-terminal` | What `posix-asan/vc` draws in a pseudo-terminal, replayed through pyte, a terminal emulator in Python that the harness fetches pinned, held cell by cell to the grid that the program writes for the same keys through its test channel, in 24 bits and in 16 colours; a terminal too small, SIGTSTP and SIGCONT, the kitty protocol and the keys that the program reads held to the BIOS's words, the mouse, and commands with Ctrl-O. `harness/terminal.py` |
 | `portable_c-posix-scenarios` | `posix-asan/vc` through the scenarios, by `harness/posixrun.py`: on a bench of the host's in `/tmp`, its home directory laid out as the machine's C:, driven through the test channel, `VC_TEST`, which takes the scenarios' keys as the BIOS's words and writes the grid whenever the program waits for a key, on the clock of the machine of the tests, `VC_TEST_CLOCK`. Its screens and its files are held to the original's goldens with what is declared for the portable C and, on top of that, for Linux, each scenario that is not run on Linux or is cut there named by an entry of Linux of `DEVIATIONS.md`. It starts a machine of DOS once, for the bench's setup file, and keeps that in `build/posix-bench` |
-| `portable_c-web-probe` | Only with `-DVC_WEB=ON`: every file that the build for the web is to compile, the common code, the files of the emulation of DOS that the web shares with Linux and the web's own, compiled by Emscripten's emcc for wasm32 with the warnings of the program for Linux and `-Werror`, each failure printed. `harness/webprobe.py`, which takes the list of what the web leaves of Linux's files from the configuration |
-| `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`: the program for the web under Node, `web-node/vc.js`, built by Emscripten with Asyncify and the sanitizers of addresses and of undefined behaviour, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drive C: the bench's home directory and D: a directory of the run's with the program's own files in D:\VC. Its screens and its files are held to the original's goldens with what is declared for the portable C, for Linux but the masks of the drive's letter, and for the web, each scenario that is not run on the web or is cut there named by an entry of Linux or of the web page of `DEVIATIONS.md` |
 | `portable_c-tidy` | The common code, the files of Linux and their test held to clang's warnings, with the commands that the build compiles them with, and to clang-tidy by `.clang-tidy`. `harness/tidycheck.py` |
 
 What is declared for Linux is `ON_LINUX` of `harness/deviations.py`,
@@ -1371,6 +1373,156 @@ Linux is expected to show, by what the user decided. `LINUX_NOT_RUN`,
 every cut with its step, and each is named by an entry of "The program
 for Linux" in `src/portable_c/DEVIATIONS.md`.
 
+### The web page
+
+The same source is also a web page, step 7 of the road: the program
+built to WebAssembly by Emscripten, one file, `vc.html`, with the
+program, its script, its style and its font in it, and nothing fetched
+from another site. `CLAUDE.md`, "The web page", has every decision of the
+user's that it rests on, and `TODO.md`, "Step 7, the web page", the plan
+and its pieces, W0 to W4. It shares the emulation of DOS of [the
+program for Linux](#the-program-for-linux), the files `*_posix.c` but
+`sys_posix.c` and `term_posix.c`, with a file of its own behind
+`sys.h`, `src/portable_c/sys_web.c`, and the page's own script in
+`src/portable_c/web/`. Its key loop waits by Emscripten's Asyncify, which
+lets it wait on the network too. The screen is the 80 by 25 cells as
+lines of text in a `<pre>`, in VileR's Web437 IBM VGA 8x16 and the VGA's
+colours exactly, with the blink and the cursor of the VGA, scaled by
+whole multiples of the font.
+
+- **Two drives.** C:, labelled VIBE, is where the program lives: its
+  own files, the setup file `VC.INI`, the menu and the extension file,
+  are in C:\VC. D:, labelled DEMO, starts as a small tree of sample
+  files written for the project, `src/portable_c/web/demo`, which the
+  user may change. Both are ordinary drives to the program. The page
+  starts at the root of C:. The shareware's help and menu files are not
+  shipped: F1 says that there is no help, until the user brings
+  `VC.HLP` into C:\VC.
+- **Served by its server.** `src/portable_c/web/server.mjs`, a script
+  for Node of Node's own modules, nothing from npm, serves the page and
+  the two drives' directories on the workstation: the page loads their
+  trees from it, and every change on either drive, the setup file's
+  too, is made on the server as it happens, before the program goes
+  on; what the server refuses or cannot do is DOS's error for that
+  call. It never reaches outside the two directories and follows no
+  link of the host's in them. It listens on 127.0.0.1 alone, and
+  Tailscale Serve hands it to the user's tailnet over HTTPS: anyone on
+  the tailnet may write, the tailnet being the access.
+- **Served statically.** The same page, from GitHub Pages or any host
+  with no server, has its drives start from what is served with it,
+  `drives/c.json` and `drives/d.json`, and keeps what the user changes
+  in the browser, in IndexedDB, in that browser alone; Reset drives in
+  its bar forgets the changes. Where the browser gives it no IndexedDB,
+  as some private windows do, it keeps them in the page's memory until
+  the page is closed. The page knows which way it is served by asking
+  where it is served, `api/server`, which its server answers and a
+  static host does not; a server that does not answer is said, and the
+  page does not start, so that a page of the server never keeps its
+  changes in the browser.
+- **Files in and out.** Upload in the bar, and files dragged onto the
+  page, write into DOS's current directory, asking before a file is
+  written over. Enter on a file that the extension file has no command
+  for opens it in a new tab of the browser, where the user may view it
+  or save it.
+- **The phone.** It opens on an iPhone, in Safari: the grid is fitted
+  to the screen and fitted again when the phone turns, and the fingers
+  may zoom it; a tap is a click on the cell under the finger. Where
+  there is no mouse, a row of the keys that a phone lacks stands below
+  the grid, F1 to F10, Esc, Tab, the arrows, PgUp and PgDn, with Ctrl
+  and Alt that stay held for the next key, and the bar's Keys button
+  shows it or hides it anywhere; the bar's keyboard button brings up
+  the phone's keyboard, whose text is typed as keys.
+- **The keys that a browser keeps.** A browser never hands an ordinary
+  tab Ctrl-W, Ctrl-T and Ctrl-N with their Shift forms, Ctrl-Tab and
+  Ctrl-Shift-Tab, Ctrl-PgUp and Ctrl-PgDn, Ctrl-F4 and Alt-F4, or the
+  keys of the system around it, Cmd on a Mac and the Windows key; F11
+  and F12 are the browser's own in most. Every other key that the
+  program takes is kept from the browser, Alt alone too. The bar's Full
+  screen locks the keyboard where the browser allows it, as Chromium's
+  do, and then most of those keys reach the program; holding Esc
+  leaves the full screen. A dead key or an input method's character is
+  not typed.
+- **What cannot work.** A command: a page has no shell, so a command of
+  the command line, the user menu or the extension file, and the
+  external viewer and editor, write "Commands cannot be run in a web
+  page." on DOS's screen, behind the prompt and the command, which
+  Ctrl-O shows as on DOS. No file is a program. F10 ends the program,
+  and the page says that a reload starts it again. The mouse's wheel
+  does nothing, as on Linux.
+
+What it does otherwise than the original for all that is declared in
+`src/portable_c/DEVIATIONS.md`, under "The web page", W1 to W9, on top of
+what is declared of Linux.
+
+**Building it.** Only with an option of its own, since it fetches
+Emscripten, a download of 300 MB that unpacks to 1.5 GB:
+
+```sh
+cmake -B build -DVC_WEB=ON
+cmake --build build
+```
+
+A second build directory takes the download of the first with
+`-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=<first>/_deps/emscripten-src`;
+`-DVC_DOS=OFF` beside it leaves Open Watcom and everything of DOS out.
+
+| Target | What it makes |
+|---|---|
+| `portable_c-web` | `build/portable_c/web/vc.html`, the page, at `-O2` with no sanitizer |
+| `portable_c-web-static` | `build/portable_c/web/static/`, the static site: the page as `index.html`, the two drives' trees as they start, and `.nojekyll` |
+| `portable_c-web-node` | `build/portable_c/web-node/vc.js` with its `vc.wasm`, the program under Node with the host's files, sanitized: the one that the scenarios run |
+| `portable_c-web-serve` | Not built by default: it builds the page and runs its server in the foreground on `http://127.0.0.1:8437/`, C: in `build/portable_c/web/drives/c` and D: in `build/portable_c/web/drives/d`, D: made as a copy of the demo the first time (delete the directory to have the demo afresh); Ctrl-C stops it |
+
+**Running it by hand.** The target above, or the server with other
+directories or another port:
+
+```sh
+node src/portable_c/web/server.mjs --port 8437 \
+    --page build/portable_c/web/vc.html \
+    --drive-c DIR --drive-d DIR [--demo DIR]
+```
+
+and for the phone, beside it, `tailscale serve --bg 8437`, which hands
+`https://<machine>.<tailnet>.ts.net/` to the port; `tailscale serve
+status` shows it, `tailscale serve --https=443 off` takes it away. The
+static site, on this computer: `python3 -m http.server -d
+build/portable_c/web/static 8438` and `http://127.0.0.1:8438/`; opened as
+`file://` the page cannot fetch its drives. `.github/workflows/pages.yml`
+publishes the static site to GitHub Pages, and does nothing until the
+repository's variable `VC_PAGES` is `publish` and Pages is switched on:
+it has not been, and whether it is to be is the user's (`TODO.md`).
+
+**How it is judged.** The program under Node goes through the scenarios
+as the program for Linux does; the page's script and its server are
+held in Node, with nothing downloaded for them; the browser itself, the
+drawing, the keys, the mouse and the phone, is a pass by hand, whose
+list is in `TODO.md`, "W4".
+
+| Test | What it checks |
+|---|---|
+| `portable_c-web-probe` | Only with `-DVC_WEB=ON`: every file that the build for the web is to compile, the common code, the files of the emulation of DOS that the web shares with Linux and the web's own, compiled by Emscripten's emcc for wasm32 with the warnings of the program for Linux and `-Werror`, each failure printed. `harness/webprobe.py`, which takes the list of what the web leaves of Linux's files from the configuration |
+| `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`: the program for the web under Node, `web-node/vc.js`, built by Emscripten with Asyncify and the sanitizers of addresses and of undefined behaviour, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drive C: the bench's home directory and D: a directory of the run's with the program's own files in D:\VC. Its screens and its files are held to the original's goldens with what is declared for the portable C, for Linux but the masks of the drive's letter, and for the web, each scenario that is not run on the web or is cut there named by an entry of Linux or of the web page of `DEVIATIONS.md` |
+| `portable_c-web-page` | Only with `-DVC_WEB=ON`: `vc.html` itself, its scripts run in Node with a document of what the page asks of one. Against its server: the drives loaded, a directory made, a file opened in a tab, a file written in the editor reaching the server at its close, a directory removed, a refusal of the server shown as DOS's error, the setup saved on C:, and the page's end. As a static site, served by a host that answers 404 for what it has not, on a stand-in of IndexedDB: changes made and kept, the page loaded again with them, the reset, and a browser with no IndexedDB. `harness/webpage.py` |
+| `portable_c-web-render` | The page's modules that draw and take the keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node: the grids that the program for Linux writes through its test channel drawn, the HTML read back and held to the cells and to the rows that changed; the keys and the mouse's reports that the modules make of the browser's events typed into the program for Linux in a pseudo-terminal, and what it reads held to the BIOS's words. `harness/webrender.py`; skipped where there is no Node or no clang |
+| `portable_c-web-server` | The server and the page's file system in Node: the server's API and its refusals of every path outside the two drives, links of the host's among them; the page's file system against it, with a file system of Emscripten's shape; what the static page keeps in the browser, `kept.js`, in memory and on a stand-in of IndexedDB, every change and refusal, the next visit, the reset, a full store; and the page's script bundled, compiled and run up to the program. `harness/webserver.py`; skipped where there is no Node |
+
+What is declared for the web is `ON_WEB` of `harness/deviations.py`, on
+top of the portable C's as Linux's is, with Linux's scenarios not run
+and cut, and Linux's masks but those of the drive's letter, since the
+tests map the letters as the bench has them; a patch of the web's own
+would be in `harness/goldens/web/`, which has none.
+
+**What it is made with.** Emscripten 6.0.12, under the MIT and the
+University of Illinois/NCSA licences, which builds its C library from
+musl, under MIT: the page has Emscripten's runtime in its script and
+musl's code in its wasm, and their notices are `LICENSE.EMSCRIPTEN` and
+`LICENSE.MUSL` (see [Licence](#licence)). The font, from the Ultimate
+Oldschool PC Font Pack 2.2 by VileR, is under CC BY-SA 4.0, put into the
+page as it comes and credited in the page's bar, with a link to the
+pack's site and to the licence, as the pack asks; its licence is
+`LICENSE.FONT`. Both are fetched by the build, pinned by SHA-256, only
+with `-DVC_WEB=ON`: [What the build downloads](#what-the-build-downloads).
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
@@ -1379,23 +1531,29 @@ numbers and of the program for Linux ask `clang`: each is skipped where
 there is none. `portable_c-tidy` also asks `clang-tidy`, of version 23,
 which the checks of `.clang-tidy` were judged with (`VERSION` of
 `harness/tidycheck.py`): it is skipped without one, and fails with
-another version, which has other checks.
+another version, which has other checks. Those of the web page ask
+`node`, and are skipped without it; with `-DVC_WEB=ON` the configure
+stops without one.
 
 ```sh
 ctest --test-dir build --output-on-failure
 ```
 
-There are eighteen tests: one of the assembly, `asm-bytes`; three of the
-C translation, `c-data`, `c-arith` and `c-scenarios`; thirteen of the
-portable C, of which `portable_c-data` and `portable_c-scenarios` are the
+There are twenty tests, and three more with `-DVC_WEB=ON`: one of the
+assembly, `asm-bytes`; three of the C translation, `c-data`, `c-arith`
+and `c-scenarios`; fifteen of the portable C, eighteen with the web, of which `portable_c-data` and `portable_c-scenarios` are the
 C translation's checks made of it, `portable_c-host`, `portable_c-int16`,
 `portable_c-words`, `portable_c-width` and `portable_c-cut` are of its
 source, `portable_c-layout` and `portable_c-debug-layout` of its two
 programs for DOS as the linker wrote them, and `portable_c-tidy`,
 `portable_c-posix-unit`, `portable_c-terminal` and
 `portable_c-posix-scenarios` of [the program for
-Linux](#the-program-for-linux), which that section has; and one of the
-harness itself, `harness-le`. The two trees are held against the same
+Linux](#the-program-for-linux), which that section has, and
+`portable_c-web-render` and `portable_c-web-server`, with
+`portable_c-web-probe`, `portable_c-web-scenarios` and
+`portable_c-web-page` where the web is built, of [the web
+page](#the-web-page), which that section has; and one of the harness
+itself, `harness-le`. The two trees are held against the same
 goldens. The tests that run no machine take seconds, the terminal's
 some forty; `c-scenarios` and `portable_c-scenarios` each run every
 scenario on the machine, so all of them take four to eight minutes on a
@@ -1403,9 +1561,11 @@ machine that does nothing else. Every test has a label for what it
 judges: `portable_c` for those of the portable C, `frozen` for those of
 the assembly and the C translation, and `harness` for `harness-le`. The
 three that start a machine, `c-scenarios`, `portable_c-scenarios` and
-`portable_c-posix-scenarios`, have the label `machine` too: `ctest
---test-dir build -LE machine` runs the other fifteen, and `-L
-portable_c -LE machine` those of the portable C among them.
+`portable_c-posix-scenarios`, and `portable_c-web-scenarios` where the
+web is built, which runs every scenario under Node, have the label
+`machine` too: `ctest --test-dir build -LE machine` runs the other
+seventeen, nineteen with the web, and `-L portable_c -LE machine` those
+of the portable C among them.
 
 | Test | What it checks |
 |---|---|
@@ -1961,6 +2121,7 @@ CMake fetches these into the build directory, as pinned in
 | JWasm 2.20, as source at a pinned commit | <https://github.com/Baron-von-Riedesel/JWasm> |
 | Open Watcom 2.0, the snapshot of 1 October 2026 with tools ready to run, pinned by SHA-256 | <https://github.com/open-watcom/open-watcom-v2/releases/tag/2026-10-01-Build> |
 | Emscripten 6.0.12, with its LLVM and Binaryen, for Linux on x86-64, as emsdk fetches it, pinned by SHA-256, only with `-DVC_WEB=ON` | <https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/6e9f6885cb17a3d6c8fd488a5cff730f50aba61d/wasm-binaries.tar.xz> |
+| The Ultimate Oldschool PC Font Pack 2.2 by VileR, its archive for the web, under CC BY-SA 4.0, of which the web page takes `Web437_IBM_VGA_8x16.woff`; pinned by SHA-256, only with `-DVC_WEB=ON` | int10h.org, <https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip> |
 
 Two options of CMake say which of the large ones are fetched. `VC_DOS`,
 on by default, is Open Watcom: off, nothing for DOS is built and the tests
@@ -1974,7 +2135,10 @@ config`, and keeps its cache in `build/emscripten/cache`; none of emsdk's
 scripts is run. Emscripten is under the MIT and the University of
 Illinois/NCSA licences, its LLVM under Apache-2.0 with the LLVM
 exception, Binaryen under Apache-2.0, and the C library that it builds
-from musl under MIT.
+from musl under MIT. The workflow of GitHub Pages,
+`.github/workflows/pages.yml`, which runs only by hand and only once the
+user has set it to, takes the same download, and GitHub's own actions
+pinned by commit.
 
 JWasm and Open Watcom are open source under the Sybase Open Watcom Public License, which is
 about the tools' own code. None of that code ends up in the programs built
@@ -2006,6 +2170,25 @@ is not part of this repository; the licence's text is kept here because a
 program that is built here and passed on has to have it with it, and its
 third condition is why this README says what [The extender](#the-extender)
 says.
+
+The web page, `build/portable_c/web/vc.html` and the static site made
+of it, has in it what Emscripten puts into a program, its runtime in the
+script and the C library that it builds from musl in the wasm, and a
+font. Their notices are kept beside `LICENSE` as that of DOS/32A is, for
+the same reason: `LICENSE.EMSCRIPTEN` is the `LICENSE` of Emscripten
+6.0.12, under the MIT licence and the University of Illinois/NCSA Open
+Source Licence, and `LICENSE.MUSL` the `COPYRIGHT` of the musl in it,
+`system/lib/libc/musl/COPYRIGHT`, under the MIT licence, both as
+Emscripten's repository has them at the tag `6.0.12`. What the page may
+have of LLVM's runtime is under Apache-2.0 with the LLVM exception,
+which asks nothing of a program compiled with it. The font is VileR's
+Web437 IBM VGA 8x16 of the Ultimate Oldschool PC Font Pack, (c)
+2016-2020 VileR, under the Creative Commons Attribution-ShareAlike 4.0
+International licence, whose text is `LICENSE.FONT`: the `LICENSE.TXT`
+of the pack's archive that the build fetches, copied as it is. The page
+puts the font in as it comes, unchanged, and credits it in its bar as
+the pack asks, by the handle VileR with a link to the pack's site, and
+by a link to the licence.
 
 The shareware distribution of Volkov Commander is proprietary and is not
 part of this repository. The picture at the top shows the portable C
