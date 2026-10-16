@@ -28,7 +28,7 @@ left out, which is where they are: dos.c of the C translation, sys_dos.c
 of the portable C. The portable C no longer declares the names of the
 first five kinds, so the compiler refuses a call of one there; of the
 sixth nothing does, and this is what would show it. tools/figures.py writes the sum,
-and in how many files, into the README's table.
+and in how many files, into the table of docs/portable-c.md, "The figures".
 """
 import re
 import sys

@@ -2,1506 +2,170 @@
 
 <!-- The session is docs/vibe-commander-session.svg, made by
      python3 harness/session.py
-     with the project built: see "The session at the top". -->
+     with the project built: see "The pictures". -->
 <p align="center">
   <img src="docs/vibe-commander-session.svg" width="720"
        alt="An animated recording of Vibe Commander 0.1 in a terminal of 80x25 on Linux: it starts with one panel beside its banner, Ctrl-F1 brings up the second, the panels go into the directories CODE and NOTES, F3 views hello.c, F9 opens the menu bar and walks the menus Commands, Files and Options, the Configuration dialog opens from Options, and F10 asks whether to quit">
 </p>
 <p align="center">
-  <em>Vibe Commander 0.1, the portable C, built for Linux and running in a terminal:
-  a session recorded from the program's own screens by a script of this repository.</em>
+  <em>Vibe Commander 0.1 running in a terminal on Linux, recorded from the program's own screens.</em>
 </p>
 
-<!-- The picture is screen.png of
-     python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE --home C "F9 o l" Ctrl+l Wait*9
-     with the project built: see "Running the original". -->
-<p align="center">
-  <img src="docs/vibe-commander-0.1.png" width="720"
-       alt="Vibe Commander 0.1 on a blue 80x25 text screen: a file panel listing C:\VC on the left, the program and the files it reads, with the mouse pointer where it starts, in the middle of the screen on the frame of the right panel; the Info panel on the right headed &quot;Vibe Commander 0.1, based on Volkov Commander 4.05&quot;; a DOS prompt and the function key bar along the bottom">
-</p>
-<p align="center">
-  <em>Vibe Commander 0.1, the portable C, in its own directory, with the mouse pointer where it starts, in the middle of the screen,<br>
-  on a PC whose clock reads the day of Volkov Commander 4.05's release, 16 June 2000.
-  Built from this repository, running under FreeDOS, captured by the harness in this repository.</em>
-</p>
+Vibe Commander is a faithful recreation of
+[Volkov Commander](https://en.wikipedia.org/wiki/Volkov_Commander) 4.05,
+the DOS file manager written by Vsevolod V. Volkov. It starts from the
+author's published assembly source, carries it to C, and from DOS to
+modern systems. It runs on DOS, on Linux in a terminal, and as a web
+page. An app for iOS is under way.
 
-A faithful recreation of
-[Volkov Commander](https://en.wikipedia.org/wiki/Volkov_Commander) 4.05, the
-DOS file manager written by Vsevolod V. Volkov, carried from its original
-assembly source to C, and from DOS to modern operating systems.
+The project is also an experiment in how far an AI coding agent can take
+such a recreation on its own. The engineering work is done by Claude. A
+human sets the direction and reviews the results.
 
-The program is here in three trees. `src/asm/` is the assembly: Volkov
-Commander 4.05 as its author published it. `src/c/` is the C translation:
-that program translated to C for DOS, behaving as the original does, bugs
-included; it is finished, and is kept as it is. `src/portable_c/` is the
-portable C: the line that leaves DOS behind. It began as a copy of `src/c/`,
-is built and tested beside it, against the same recordings of the original,
-and is where work goes on; where it is to behave otherwise than the
-original, `src/portable_c/DEVIATIONS.md` says so. It no longer is what
-the original is, and calls itself Vibe Commander 0.1, based on Volkov
-Commander 4.05; the assembly and the C translation are Volkov Commander
-4.05, by that name.
+## What it is
 
-The project is also an experiment in how far an AI coding agent can take such
-a recreation on its own. The engineering work is done by Claude; a human sets
-the direction and reviews the results.
+The source is three trees, and they tell a story in that order.
 
-## Approach
+- **`src/asm/`, the assembly.** Volkov Commander 4.05 as its author
+  published it, changed only as far as building it with free tools
+  takes. Built here, it matches the binaries he shipped byte for byte.
+- **`src/c/`, the C translation.** The same program translated to C for
+  DOS. It behaves as the original does, bugs included, and every test
+  scenario holds it to the original. It is finished and frozen.
+- **`src/portable_c/`, the portable C.** It began as a copy of `src/c/`
+  and is where the work goes on. It calls itself Vibe Commander 0.1,
+  "based on Volkov Commander 4.05". It still asks the system what it
+  asked DOS and the BIOS, through one header, `sys.h`, and each platform
+  answers as DOS would.
 
-Fidelity is judged against the original program, at two levels:
+Fidelity is judged against the original program. Volkov Commander draws
+everything on an 80x25 text screen, so what it shows can be compared
+exactly: every character and colour, the cursor, and the files it leaves
+on disk. The original was run under DOS in an emulator and fed
+keystrokes, and what it did was recorded. A build fed the same
+keystrokes has to do the same. Where the portable C is meant to behave
+otherwise, the difference is declared in
+[`src/portable_c/DEVIATIONS.md`](src/portable_c/DEVIATIONS.md).
 
-- **Bytes.** The binaries Volkov shipped in 2000 are the reference: what is
-  built here must match them byte for byte. His own toolchain, Borland's
-  TASM and TLINK, is commercial software that this project does not fetch
-  or run; matching his output with a free assembler shows that nothing was
-  lost by replacing it.
-- **Behaviour.** Volkov Commander draws everything on an 80x25 text screen,
-  so what it shows can be compared exactly: every character and colour
-  attribute, the cursor, and the files it leaves on disk. The original is
-  run under DOS in an emulator and fed keystrokes, and what it does is
-  recorded; a candidate fed the same keystrokes has to do the same. This is
-  the test that will carry over to the C translation and the portable C.
+## Platforms
 
-The byte comparison has one complication. The binaries Volkov shipped were
-shareware, and contain registration code, tables and strings that the source
-he later published leaves out. That material is his and is not reproduced
-here. Instead, the source can be assembled with room reserved for it: the
-same number of bytes in the same places, filled with NOPs and zeros. Every
-other byte then sits at the address it has in the original, and must be
-identical to it. The reserved room is 109 of 65,090 bytes in `VC.COM` and
-691 of 24,278 in `VCSETUP.COM`, in five places each.
+| Platform | What it is |
+|---|---|
+| DOS | `VC.EXE`, a 32-bit program started by the DOS/32A extender, with all of the machine's memory for its panels and editor |
+| Linux | `vc`, a 64-bit program built with clang that runs in any terminal, with no library. Drives R: (the root) and H: (the home directory); long names get DOS aliases such as `LONGNA~1`; commands run through `$SHELL` |
+| Web | One HTML page, built to WebAssembly by Emscripten. The screen is text in a `<pre>`. It is served by its own small Node server, or by any static host, and works on a phone |
+| iOS | Under way: the same code behind a native shell |
 
-The planned stages:
-
-1. Build the original source with free tools, byte for byte.
-2. Translate the program from assembly to C, still for DOS, a few routines
-   at a time. The translated routines are linked into the assembly program
-   in place of the ones they replace, so that at every step there is one
-   working program to hold against the original. Bytes no longer match from
-   here on; behaviour has to, bugs included, with every intended deviation
-   listed explicitly.
-3. Put modern operating systems under the C program next to DOS: it goes
-   on asking what it asks DOS, through one header of functions named for
-   DOS's services, and every other system emulates DOS behind them.
-
-Where it stands: the first stage is done. Outside the reserved room, both
-programs come out identical to the originals. The second stage is
-done: the program builds as `VC.EXE`, and every routine of it runs as
-C. In the order in which they were translated: those that write
-numbers, sizes, dates and times, those
-that write lines of text with their markup, those that copy, trim and
-shorten texts, paths and file names, those that look up colours and put
-characters and colours into the copy of the screen that the program draws
-in, those that read and write hex digits and numbers and hold a file name
-against a mask, those that filter and sort the list of files of a panel and
-find a file in it, those that say where the panels are and where in them
-the cursor is, those that draw a panel of files: its frame, its path, its
-files, its status line and the cursor, those that draw what a panel
-shows instead of files: the tree of directories, with the cursor on the
-current directory, and the Info, and those that read from the disk what a
-panel shows: the files of a directory with its extension file and the
-sizes of its directories, and for the Info the sizes of the disk, its
-label and the text of dirinfo. The viewer is C: opening a file, for the
-editor too, finding the lines, keeping a part of a large file in the
-memory, writing the screen, its keys and the mouse, looking for a text,
-and the way back to the panels; its texts, boxes and dialogs are
-constants of C, in `src/c/view_t.c`. The editor is C as a whole: the text in
-the memory with the buffer of the line that the cursor is in, the screen
-brought up to where the cursor is, as text or in hex, with its status
-line, what every key does, the search, and saving the file, with its
-texts, boxes and dialogs constants of C in `src/c/edit_t.c`. The commands
-that start the two are C as well, by themselves or by a program that an
-extension file names, which is run with the viewer's memory given up
-for it. The keys of the
-panels are C: those that move the cursor by lines, columns and pages,
-select files one by one and by a mask, switch the panels off and on,
-swap them, make them of another kind and read them again, Tab,
-Enter, which runs a file or a command, the keys that change the
-directory, those that go to the command before and after, and F10. The
-loop that takes a key
-and goes to its command is C, with what the mouse does at the panels,
-and so are what it does on the way: drawing the two panels and reading
-what they show when that has changed, the box that asks for another
-drive when a disk cannot be read, the box of DOS's critical error, which
-names the drive or the device and asks whether to try again, and saving
-the setup when it has
-changed; and leaving the program. The texts and boxes of those two, the
-program's title and the button Ok are constants of C, in
-`src/c/main_t.c`. What the program does once it has
-been started, and again whenever a command has run, is C: reading the
-setup file and the main extension file, or taking the defaults, the
-banner, asking DOS for the memory of its data and making the data of
-what was kept, and finding out what the display, DOS and the
-environment are like. Where DOS enters the program is C too: the check
-sum of the file, the second copy that brings the program back after a
-command, the block of memory made of the part that goes while a command
-runs, and the relocations of that part. What runs a
-command with most of the program out of the memory and loads it again,
-to which Enter hands over, is C, and is the outermost loop of the
-program now: it calls the rest of the program, which comes back to it
-with commands to run or to leave. So is the
-program's watch on DOS: the interrupts of DOS that it takes to note every program that is
-run and every one that stays in the memory, the records it keeps of
-those, by which the map of the memory lists them and releases them, and
-its answer to a program that asks for its data, as its setup program
-does. The help is C as a
-whole: reading its file, showing the index
-and the pages in their window, and taking the keys and the mouse there;
-its file of the assembly is the first that is gone, with its texts, its
-box and its buttons constants of C.
-So is the tree of directories away from its panel: reading it from the
-disk, keeping it in its file there, and the box in which a directory is
-chosen from it; its title, the name of its file and the boxes shown
-while it is read and saved are constants of C, in `src/c/treebox_t.c`.
-The file search is C as a whole: the command with its
-dialog, the drives it searches and Go to, and the search itself, by name
-and by contents through a directory and those below it, with its list
-and the keys taken while it runs; its dialog, its buttons and their
-colours are constants of C, in `src/c/find_t.c`. Deleting a file or a
-directory with what is in it, copying, renaming and moving one, and setting
-attributes, a date and a time, are C, and so is what goes through the files
-of a directory for these, the sizes of directories and the file search, and
-through the files that a mask names. The commands of these are C from
-the key on: Copy and Rename with what they offer as the target, their
-dialogs, the tree to choose the target from, and the renaming of a
-directory of a tree panel, and those that make a directory, delete, set
-attributes and change the volume label; the texts, boxes and dialogs of
-copying and renaming are constants of C, in `src/c/copy_t.c`, and those of
-making a directory, deleting, the attributes and the volume label in
-`src/c/dirfunc_t.c`. The map of the memory is C as
-well: the blocks of DOS, whose they are and which vectors point into
-them, its window, and programs that have stayed in the memory released;
-the buttons of the window are constants of C, in `src/c/memory_t.c`.
-Going through the selected files
-of a panel is C too. At the panels the user menu is C, with what makes
-the commands of a line of a menu or of an extension file and writes the
-list of the selected files for them, and so are the command line, with
-Esc and the names of the selected files and the paths of the panels put
-into it, the history of commands in its box, the speed search, and the
-box that asks for the drive of a panel; what these have of texts, boxes
-and dialogs, the mask to select by, the question before leaving and the
-user menu's, are constants of C, in `src/c/keys_t.c`. The dialogs are C: a
-box with its lines of text, the fields of a dialog, a line to type
-into, a group to choose from, a box to tick and a line of buttons, with
-the keys and the mouse that each takes, and what the fields hold handed
-back at the end. Waiting for a key is C, with the clock that it keeps on
-the screen, the tap on Alt and the keys that the mouse clicks on the key
-bar, and so are what a key does to a line that is typed into, the speed
-search, the key bar, the menu bar, the command line with its prompt, and
-finding what an extension file says for a file. The screen blanker is
-C, with the word to DOS that the program is idle; what the blanker draws
-is on no screen of a scenario (see `TODO.md`). What all of these rest on
-is C too: putting a window of
-the program's copy of the screen on the display, keeping what a box
-covers and putting it back, the frame of a box with its shadow and the
-box growing, the cursor, the mouse with its pointer and the second click,
-the keys that wait, the bell, capitals, every call of DOS with the error
-that it may end in, opening a file, asking DOS for the current directory,
-and asking the user for the disk of a drive that shares the floppy drive
-with another. Saving the setup is C, and so is the jump from a key to its
-command, which was a table in the assembly. The names of the menus in
-the menu bar are constants of C, in `src/c/bars_t.c`, and the names of
-the files that the program reads and the dialog that asks for a disk in
-`src/c/system_t.c`.
-The pull-down menus of the menu bar are C as well: the five menus with
-their ticks and the items that cannot be chosen as things are, and the
-keys and the mouse that the bar takes until an item is chosen. So are
-the commands that the items stand for, in the same file of the source:
-the kind of a panel, its order and its filter, a panel switched off and
-on, the tree in a box to go to a directory, the sizes of directories,
-the screen with as many lines as an EGA or a VGA has, two directories
-compared, the configuration and the advanced options, the menu file and
-the extension files opened in the editor, the switches of the Options
-menu, and the setup saved; their texts, boxes and dialogs are constants
-of C, in `src/c/commands_t.c`.
-The main loop calls the commands. In the original a command is no
-routine: the loop jumps to it by a table of the keys and the menu bar by
-tables of the menus, and it jumps back into the loop at one of several
-places, or on into another command. Each is a function now, which
-returns where the program goes on, and the loop calls it from a `switch`
-(`Command` of `src/c/main.c`); the tables of the menus hold the commands
-by their numbers. What a command finds in the registers, as the command
-before left them, is kept where one reads it. With that no instruction
-of the program is assembly but those that are written into the C, and
-no text or table. And nothing of it is assembled: the translation has no
-assembly file, and its build runs no assembler for it. What the last
-such file said, in what order the program's segments lie and which of
-them count from the PSP, is said by options of the compiler and by the
-linker's command (see [The C translation](#the-c-translation)).
-
-The third stage is under way, in a tree of its own, `src/portable_c/`,
-which started as a copy of that program. Its functions no longer take
-their arguments in the registers of the assembly, the original's setup
-program is a part of it, and it is a program of 32 bits, which a DOS
-extender starts. It uses what 32 bits give: pointers where there were
-segments and offsets, numbers as wide as what they count, and the
-memory of its panels and its texts from the extender, as much as the
-machine has. What it asks of the system it asks through one header,
-`sys.h`, in DOS's terms, and each system has its own files behind it:
-those for DOS, and those of [the program for
-Linux](#the-program-for-linux), `vc`, which runs in a terminal and
-emulates DOS's services there. It behaves otherwise than the original
-where a thing only made sense on DOS, and the first such thing was that
-it stays in the memory whole while a command runs, with no option for
-that (see [The portable C](#the-portable-c)). After Linux comes [the web
-page](#the-web-page), the program built for WebAssembly and drawn as
-text, served by a server of the project's own or statically, and then
-iOS.
-
-## Layout
+## Repository layout
 
 | Path | Contents |
 |---|---|
-| `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
-| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original. What it asks of the system is `sys.h`; the files whose names end in `_dos.c` answer it for DOS, and those that end in `_posix.c`, with `emulate_posix.h`, for Linux; the web page has `sys_web.c` with most of Linux's, and its script, its server and its demo in `src/portable_c/web/`. Every other file is common to all of them |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README; `stub.c` switches the banner of [the extender](#the-extender) off in the program of the portable C; `calls.py` counts the calls that hand registers to an interrupt, outside the file of the system's functions |
-| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
-| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/`, and those of `harness/goldens/posix/` on top of them for the program for Linux, and of `harness/goldens/web/` for the web page |
-| `docs/` | Pictures for this README |
+| `src/asm/` | The original assembly source, adapted to assemble with JWasm |
+| `src/c/` | The C translation: one C file per part of the program, with its tables in the matching `_t.c` file |
+| `src/portable_c/` | The portable C. `sys.h` is what it asks of the system. Files ending in `_dos.c` answer it for DOS, `_posix.c` for Linux, `sys_web.c` and `web/` for the web page, `_ios.c` for iOS. Every other file is common. Files starting with `st` are the original's setup program |
+| `harness/` | The test harness: scenarios, recorded goldens, the test bench in QEMU, and the checks |
+| `tools/` | Build helpers: `mkexe.c` lays out the C translation's `VC.EXE`, `stub.c` silences the extender's banner, `figures.py` and `calls.py` measure the portable C |
+| `docs/` | Reference documentation and the pictures |
 
 ## Building
 
-Needs CMake 3.24 or later, a C compiler and `git`. Clang is optional:
-where the build finds it, it also builds [the program for
-Linux](#the-program-for-linux), and without it the program for DOS
-is built all the same.
+You need CMake 3.24 or later, a C compiler and `git`. Clang is optional:
+with it, the build also makes the program for Linux.
 
 ```sh
 cmake -B build
 cmake --build build
 ```
 
-The original is built by one set of tools and the two C trees by
-another, and neither set touches the other's programs.
+The build fetches its own tools, pinned (see [Downloads](#downloads)).
+It makes:
 
-The original is assembled. The build fetches
-[JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
-MASM-compatible assembler, at a pinned commit, builds it, and assembles
-`src/asm/`, the source as its author published it, into `build/VC.COM` and
-`build/VCSETUP.COM`. It also assembles a second copy of both into
-`build/shareware-layout/`, with the room reserved that the byte
-comparison needs, and both there once more as object files, for their
-relocations; only the tests use those. That is what the test
-`asm-bytes` holds against the binaries that were shipped, and
-what says where the original has its routines and its data. The
-assembler also builds the driver of the tests, `harness/DRIVER.ASM`,
-which is no part of either program.
-
-The translation is compiled: `build/c/VC.EXE`, which is what the tests run
-and hold against the original. It is C and nothing else, `src/c/*.c`,
-and no assembler has a hand in it. What the compiler made of each C
-file is written out as a listing, `build/c/*.lst`. For this the build
-fetches a pinned
-snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
-download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
-and ARM and for Windows on x86-64; the build has been run on Linux x86-64
-only.
-
-The portable C is built by the compiler for 32 bits of the same
-download, `wcc386`, from `src/portable_c/` into `build/portable_c/`:
-`VC.EXE`, the linker's map and the listings. It is a program of 32 bits
-for DOS, which the linker writes with [the extender](#the-extender) in
-front of it; `tools/mkexe.c`, which lays out the C translation's, has no
-hand in it. Its files are compiled a second time, into the same program
-for finding a fault, `build/portable_c/debug/VC.EXE`. [The portable
-C](#the-portable-c) says what the two are.
-
-Where it finds clang, the build also compiles the portable C for Linux,
-`build/portable_c/posix/vc` with its sanitized builds beside it: see
-[The program for Linux](#the-program-for-linux). With `-DVC_WEB=ON` it
-fetches Emscripten and builds the web page too: see [The web
-page](#the-web-page).
-
-### Changes to the source
-
-Everything changed since the source was imported can be listed with
-`git diff $(git rev-list --max-parents=0 HEAD):src HEAD:src/asm`: the first
-commit has the files in `src/` itself. There are three kinds of change.
-
-**Syntax.** The original source is written for TASM; these changes make
-JWasm accept it:
-
-- The `JUMPS` directive is gone: JWasm lengthens out-of-range conditional
-  jumps by itself. One `LOOP` that is out of range is spelled out as a jump
-  over a jump.
-- Structure fields are global names and labels inside procedures are global,
-  as in TASM (`OPTION OLDSTRUCTS`, `OPTION NOSCOPED`).
-- `LABEL` inside a `STRUC` became a zero-length field or, where the structure
-  has initialised instances, an alias defined after it.
-- Structure instances are written `<>` instead of `?`.
-- Procedure headers use MASM's spelling for the language, `USES` and `LOCAL`.
-- Code and code labels that sit in a data segment are preceded by
-  `ASSUME CS:DGROUP`, an indirect `JMP` states its operand size, and
-  `VcVers` is a text equate.
-- `VCSETUP.ASM` declares its segments up front so that uninitialised data
-  comes last and takes no space in the file.
-
-**Encodings.** Where JWasm and TASM encode the same instruction
-differently, the source now says which encoding to use, so that the output
-matches the shipped binaries:
-
-- Arithmetic on `AX` with a small constant carries `WORD PTR`, which selects
-  the accumulator form of the opcode.
-- A handful of jumps that TASM left in their long form are written that way
-  explicitly, as `JMP NEAR PTR` or as a conditional jump over a jump.
-- Two `LEA reg,address` are written as the `MOV` TASM turned them into, and
-  one displacement is written so that it fits a byte.
-- The byte-sized locals of `Input0` are declared two bytes long, because
-  TASM gives each a whole word of stack.
-
-**Layout.** `VCLAYOUT.INC` defines two macros, `ShwCode` and `ShwData`,
-which are placed wherever the shipped binaries have something this source
-does not. Each names a number of bytes. Normally they generate nothing.
-When `SHAREWARE_LAYOUT` is defined they generate that many NOPs or zeros, so
-that what follows lands where it does in the shipped binaries. The filler is
-harmless: the program laid out this way still runs.
-
-## The C translation
-
-`src/c/` started as a copy of the assembly in `src/asm/` and ends as a C
-program. In between it was both. A routine that had been translated was
-deleted from `src/c/asm/` and left a few instructions behind that passed
-its callers on to the C function, and where C code needed a routine that
-was still assembly, the assembly got an entry for it that C could call.
-All of the code is C now, and those are gone, and `src/c/asm/` with them:
-the last file there held no instruction and no data any more, only the
-order of the program's segments. The C code keeps the names
-the routines and their data have in the assembly, so that either can be
-found from the other, and a function still takes its arguments in the
-registers that the assembly called it with. The two routines that the
-compiler calls to multiply and to divide numbers of 32 bits, which a C
-library would bring, are C too, `src/c/arith.c`: the program has no C
-library.
-
-DOS, the BIOS and the mouse driver are called by software interrupts,
-which C cannot express. The C code calls them in one file, `src/c/dos.c`,
-and nowhere else: twelve small functions, each a line of C around the
-instruction, which is inline assembly there, with the registers as its
-arguments; one has three such instructions that may not be parted. Four more are there for a port of the machine and its
-interrupt flag, for which the compiler has functions of its own, and for
-DOS's routine that makes capitals. Everything else is plain C that calls
-these, and reads the BIOS's data and the memory of the display through
-pointers. That file is where the program will meet another operating
-system; until the translation is done it hides nothing of DOS.
-
-The part of the program that stays in the memory while a command runs is
-C in `src/c/resident.c`, with its data. The
-rest of the program is not in the memory then, `src/c/dos.c` with it, so the
-build compiles that file a second time, into that part: one source, two
-copies of its code. `src/c/resident.c` has the only other inline assembly of
-the translation, four instructions where an interrupt arrives that the
-program has taken, INT 21h and INT 27h: they make room on the stack for a
-second return address, and an interrupt function of the compiler's takes
-over, which saves the registers and finds the program's data. Such a
-function has to go on in the handler that had the interrupt before, with the
-stack as the interrupt left it, and C cannot change how deep the stack is
-that it returns on: so it writes that handler's address into the room,
-and returns there. The same four stand where DOS goes on when it has
-ended the program by itself. In front of the four of INT 21h stand
-thirteen more: every call of DOS that any program makes comes there
-while the program is in the memory, and those that it does not deal
-with, nearly all, are told from the others and passed on before
-anything is pushed, by six comparisons, their jumps, and a far jump to
-the handler before. So the program takes nothing of the stack of whoever
-calls DOS, which may be short, and DOS is entered with the flags of
-those comparisons, as in the original; compiled code saves registers
-before it compares and promises nothing of the flags. And nine
-instructions are the interrupt by which the COMMAND.COM in the memory
-runs a command, INT 2Eh: it comes back with no stack and no data
-segment, so both are set there, from the code segment, before any
-compiled instruction runs, and the program goes on in a function of its
-own on an empty stack. `src/c/main.c` has one instruction, which loads
-DS with the segment of the main data, known only when the program runs:
-where DOS calls the program for a critical error, and where the part
-that stays in the memory calls the rest of the program, which is one
-function to it, and gets DS back as it was.
-
-The program is linked as `VC.EXE`, which is not built the way a C
-program usually is. It still loads and starts like the `.COM` file it
-was, keeps its data where the original has it, and gives up and reloads
-most of itself at run time, compiled code included. `src/c/vc.h` describes
-what that asks of the C code, and `tools/mkexe.c` how the file is made.
-The code that begins the program and reloads it after a command had to
-change for this: it measures in paragraphs and relocates what it has
-loaded.
-
-The file is the program as it lies in the memory. First comes the part
-that stays there while a command runs: room for the PSP, which
-`tools/mkexe.c` takes off, its compiled code, and its data
-with the stack at the end, which are nothing but room in the file. That
-data is of `src/c/resident.c`, the one C file
-with data of its own: its texts, the numbers that `tools/mkexe.c`
-writes, which it finds by their names in the linker's map, one
-structure for what the part keeps, in the order of the original, and
-the stack. Code and data of that part are one group to the linker,
-which begins at the PSP, as the program's one segment did when it was a
-`.COM` file: CS, DS and SS are on the PSP there, and every offset
-counts from it. Then, a
-paragraph further on, the part that goes while a command runs: its
-constants first, which are a group of their own, then its code, in two
-segments. The
-original has that part where the data of the first will be and moves it
-up as it starts, over itself; the translation is loaded with it in place, on
-its own stack from the first instruction, and has only to make a block of
-memory of it. That costs 6,384 bytes of the file, and it is what let
-compiled code stand in the first part at all: nothing can lay
-data over code that the compiler has yet to make. It also leaves the
-code that begins the program in the memory, where the original lays its
-data over that code.
-
-None of that layout is in the C language. The order of the segments is
-the linker's to be told, in its command; that the code and the data of
-the first part are one group, and where each kind of data goes, are
-options of the compiler; and `tools/mkexe.c` holds what comes out
-against what the program needs, and stops the build where it differs.
-[What rests on Open Watcom](#what-rests-on-open-watcom) has each such
-place.
-
-Every step was checked by the `c-scenarios` test below, and nothing else
-decides whether a translation is right. The routines are listed there, batch
-by batch, in `harness/ported.py`.
-
-The program's texts and tables are checked by themselves, by the `c-data`
-test: a table that no screen shows can be wrong in every scenario and
-pass. The boxes and dialogs name their texts, their buttons and one
-another by address, words that are offsets in the one segment the
-assembly has them in. In C they are constants written with the names of
-what they name, in files that hold nothing else (`src/c/help_t.c`, with
-`src/c/tables.h` for how they are written): the compiler puts them into
-a group of their own, where a word that names one is its offset, as it
-is in the original's one segment. They are apart from the code because the code has its data
-segment on memory that the program asks DOS for, and would read a
-constant that it names there. The test holds each against the original
-by its name: the bytes, and for a word that holds an address the thing
-that it names, which the original's source, assembled once more as an
-object file, tells by its relocations.
-
-The tests run the program that is shipped, as they run the original: a
-driver in the machine takes either through the scenarios (see [When a step
-is finished](#when-a-step-is-finished)). The driver also writes the
-program's stack out whenever a step ends, and the `c-scenarios` test reports
-for every scenario how much of it the program never used.
-
-The stack is where the translation departs from the original in what it
-takes of the memory. The original has 256 bytes of it. Compiled code uses
-more stack than the assembly it replaces, and a stack used beyond its bottom
-would overwrite data without a trace on the screen, so the translation has
-4,096 bytes, of which the scenarios use some 200. The stack is the end of
-the part of the program that stays in memory while a command runs: that part
-is 19,728 bytes where it was 12,704, and a command has 7,024 bytes less
-than the original leaves it: 3,840 for the stack, and the rest because
-compiled code is longer than the assembly it replaces, and because the
-code that starts the program stays.
-
-### What rests on Open Watcom
-
-The translation is C, but it is not all C that any compiler would take or
-would make the same program of. These are the places, so that whoever
-carries the program to another compiler has them in one list. Each has
-a comment where it is done.
-
-First what the code is written in, which shows wherever it is used and
-which a 16-bit program for DOS with the original's layouts cannot do
-without:
-
-| What | Where | How many |
-|---|---|---|
-| `__far` and `__near` pointers, and pointers based on a segment, `CODE` and `STACK` of `src/c/vc.h` | every file | some 1,200 `__far`, 475 `STACK`, 97 `CODE` |
-| `#pragma aux`: the registers that a function takes and returns, kept from the assembly, and the name that the linker has for it | every file | 866 |
-| `#pragma pack(1)` for the structures that are the original's | `src/c/vc.h`, `src/c/tables.h` and five files with structures of their own | 8 pairs |
-| `__interrupt` functions, which save the registers and load DS | `FatErr` of `src/c/main.c`; `CtrlC`, `Int21`, `Int27`, `Exit05` of `src/c/resident.c` | 5 |
-| `__loadds` functions, which load DS when they are called from the other part | `SetBrk`, `Release` of `src/c/resident.c` | 2 |
-| `__declspec(naked)` functions, which are their inline assembly and nothing else | `New21`, `New27`, `Exit01`, `Int2E` of `src/c/resident.c` | 4 |
-| Intrinsic functions: `inp`, `_disable`, `_enable` | `src/c/dos.c` | 3 |
-| The two routines that the compiler calls for arithmetic on 32 bits, under its names and with its registers | `__U4M`, `__U4D` of `src/c/arith.c` | 2 |
-
-Then what cannot be seen in the code: where the program is right only
-because of what this compiler and its linker do with it. The language
-promises none of these. `tools/mkexe.c` stops the build where one of
-the first eleven does not hold; the others would show in the tests.
-
-| | What is relied on | Where it is done | What holds it |
-|---|---|---|---|
-| 1 | The option `-nd=R` gives the data of a file a group of its own, `R_GROUP`, which its code reads through DS without loading a segment, in four segments of the class `FAR_DATA`: `RCONST`, `RCONST2`, `R_DATA`, `R_BSS` | `CMakeLists.txt`, for `src/c/resident.c` | `tools/mkexe.c` knows the four names, and refuses any other data |
-| 2 | The option `-g=R_GROUP` puts the code segment into a group of that name, and the linker makes one group of two of the same name: the part that stays is one segment to the program, the PSP's | `CMakeLists.txt`, for `src/c/resident.c` and the second copy of `src/c/dos.c` | the group has to begin at 0 |
-| 3 | The linker's `order` directive, which its help does not list for DOS: the order of the classes and of the segments within one | `CMakeLists.txt`, the linker's command | the checks of 2, 6, 8 and 11 |
-| 4 | A segment holds what the object files have of it in their order: `resident.c` is linked first, `transit_t.c` first of the part that goes | `CMakeLists.txt` | the checks of 6 and 10 |
-| 5 | The compiler writes the objects of the code segment that have a value in the order of the file, and those without in front of them: so `Vect21` is given a value, `= 0` | `src/c/resident.c` | the check of 6 |
-| 6 | So the room of the PSP, `Psp`, is the first thing of the code segment and of the program | `src/c/resident.c`, its first lines | `Psp` has to be at 0 |
-| 7 | What has a value is in `R_DATA` in the order of the file, so `Stays`, written last and with a value, zeros, is the last of it: the part is nothing but zeros from there on, which the check sum of the file leaves out | `src/c/resident.c` | from `Stays` to the part that goes the file has to be zeros, and the seven words that are written in have to stand in front |
-| 8 | What has no value is in a segment of its own behind the others, `R_BSS`: the stack, `DataSav`, is the one object without, and so the end of the part that stays | `src/c/resident.c` | `R_BSS` may hold no other symbol, and `DataSav` has to be at its start |
-| 9 | A far pointer to something has the linker's number of its segment in the high word, and a word of the part that stays that names the part that goes is left as that number: `TRN_SEG` | `src/c/resident.c` | a number that is not 0 has to be a segment behind the part that stays |
-| 10 | The constants of the files without code are in `CONST2` of the compiler's group, `DGROUP`, and begin with `TrnBeg`, 32 bytes in which there is a whole paragraph | `src/c/transit_t.c`, `src/c/*_t.c` | `TrnBeg` has to stand where the stack ends; a file with code and such constants is refused |
-| 11 | No code of the part that goes is within 4K of the stack, the constants being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 3; `c_second` in `CMakeLists.txt` | read in the linker's map |
-| 12 | `md`, the main data, is declared as an object and named to the linker as `Psp`: the linker takes the offset of an object in the group that the object is of, 0 here | `src/c/vc.h` | every scenario |
-| 13 | The segment of a far pointer made of a near one is DS, `MAIN_SEG`, and of one to a local variable it is SS, with the option `-zu`: `ResSeg` | `src/c/vc.h`, `src/c/misc.c` | every scenario |
-| 14 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with its group, by a number that is relocated; `SecDat`, the one variable of `DGROUP`, is where `FatErr` finds the main data by that | `src/c/vc.h`, `src/c/main_t.c`, `src/c/main.c`, `src/c/resident.c` | the scenarios of the critical error and of the programs that stay |
-| 15 | A variable with a value in a file without code is in `_DATA` of `DGROUP`, in the file | `src/c/main_t.c`, `SecDat` | `tools/mkexe.c` refuses one without a value |
-| 16 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/c/resident.c`, `Alloc0` | every scenario |
-| 17 | A far call to a function of the same segment is made `push cs` and a near call by the linker, and needs no relocation: so the part that stays can call its own far functions before its relocations are applied | `src/c/resident.c`, `Alloc0` | every scenario |
-
-What else the notes on the translation have, in `DIARY.md`, is how to
-write for this compiler, not what the program rests on: a register that
-it ignores in a `#pragma aux`, a pointer that it truncates.
-
-### Inline assembly
-
-Every piece of it, 81 instructions in 14 pieces. The first nine are a
-`#pragma aux` each in `src/c/dos.c`, put in place where the function of
-that file calls them; no other file calls DOS, the BIOS or the mouse
-driver.
-
-| File | Piece | Instructions | Why it is not C |
-|---|---|---|---|
-| `src/c/dos.c` | `Dos` | 20: `NEG AX` for the carry flag, `PUSH` of BP and DS, nine that load the registers from a structure on the stack, `INT 21h`, five that store what DOS returns, `SBB AX,AX` for the carry flag, two `POP` | A software interrupt is no call that C has, DOS takes and returns more registers than a function can, DS among them, and its answer is the carry flag |
-| `src/c/dos.c` | `Video` | 7: `PUSH BP`, `INT 10h`, `POP BP`, four that store AX to DX on the stack | The BIOS for the screen; some lose BP |
-| `src/c/dos.c` | `VideoBuffer` | 3: `PUSH BP`, `INT 10h`, `POP BP` | The same, with an address in ES:DI |
-| `src/c/dos.c` | `Keyboard` | 3: `INT 16h`, `PUSHF`, `POP DX` | The BIOS for the keyboard answers in the zero flag |
-| `src/c/dos.c` | `Multiplex` | 1: `INT 2Fh` | The interrupt that the mouse driver and Windows are asked by |
-| `src/c/dos.c` | `DosIdle` | 1: `INT 28h` | The program says that it is idle |
-| `src/c/dos.c` | `DesqviewPause` | 6: `MOV AX` and `INT 15h`, three times | DESQview takes the program off its stack between the first and the third: no compiled instruction may stand between them |
-| `src/c/dos.c` | `MouseDriver` | 1: `INT 33h` | The mouse driver |
-| `src/c/dos.c` | `MouseState` | 4: `INT 33h`, three that store BX, CX and DX on the stack | The same, which answers in three registers |
-| `src/c/main.c` | `DataSeg` | 1: `MOV DS,AX` | C has no word for a segment register. DS is put on the main data, whose segment is known only when the program runs: where DOS calls the program for a critical error, and around the main loop |
-| `src/c/resident.c` | `New21` | 17: six `CMP` with their jumps, a far `JMP` through `Vect21`, and `PUSHF`, `PUSH AX`, `PUSH AX`, `JMP` to the interrupt function | Every call of DOS by any program comes here. One that the program does not deal with is passed on with no register changed, nothing taken of the caller's stack and the flags of the original's comparisons; compiled code saves registers first and promises nothing of flags |
-| `src/c/resident.c` | `New27` | 4: `PUSHF`, `PUSH AX`, `PUSH AX`, `JMP` | Room on the stack for a second return address, so that the interrupt function can go on in the handler before by returning: C cannot change how deep the stack is that it returns on |
-| `src/c/resident.c` | `Exit01` | 4: the same | Where DOS goes on when it has ended the program by itself, on the stack of the program that started this one, to which it goes on in the same way |
-| `src/c/resident.c` | `Int2E` | 9: `INT 2Eh`, `CLI`, `MOV AX,CS`, `MOV SS,AX`, `MOV SP`, `STI`, `MOV DS,AX`, `CLD`, `JMP` | COMMAND.COM's interrupt for a command comes back with no stack and no data segment: both are set from CS before any compiled instruction can run, and the function that called cannot be returned into |
-
-Three more instructions are the compiler's own, by its intrinsic
-functions in `src/c/dos.c`: `IN` for a port of the machine, `CLI`, and
-`STI` with `CLD`.
-
-## The portable C
-
-`src/portable_c/` began as a copy of the C translation. What changes
-there first is how the program is written, toward C that any compiler
-takes, and what follows says where it has left the C translation so far.
-Where it behaves otherwise than the original, that is declared in
-`src/portable_c/DEVIATIONS.md`. Its first entry is that [it stays in
-the memory whole](#staying-in-the-memory-whole) while a command runs,
-and so is one program, which the linker writes, where the C translation
-is two parts laid out by a tool. Then come [what the program did for
-the PC and for the programs around it](#what-else-has-gone), and what a
-register happened to hold where DOS or the BIOS is called, which [the
-functions of the system](#the-system-in-one-place) do not hand over; no
-scenario shows either. Then [what a user of DOS saw of the
-program](#what-a-user-sees-no-more), a command or an option that only
-made sense there. And the original's second program, its setup program,
-[is a part of this one](#the-setup-program-in-it). In every
-scenario that a deviation does not change the portable C is held
-against the original's golden, as the C translation is.
-
-With that much gone from it and the setup in it, the program no longer
-is what the original is, and does not carry its name: it calls itself
-Vibe Commander 0.1, and says what it is based on wherever the original
-named its version. Its banner is "Vibe Commander 0.1, based on Volkov
-Commander 4.05" over "Copyright (C) 1991-2000 Vsevolod V. Volkov, (C)
-2026 Maksym Motorny", two lines as the original's is; the first of them
-is the title over its help; the title of its Info panel, which has no
-room for all of that, is "Vibe Commander 0.1", with "based on Volkov
-Commander 4.05" on a line of its own below it; and the box that asks
-before the program is left calls it the Vibe Commander. That is entry
-10 of `DEVIATIONS.md`. Its files keep their names, `VC.EXE` and
-`VC.INI` and the rest, and the help file is the distribution's.
-
-It is a program of 32 bits, still for DOS, where the original and the C
-translation are programs of 16: that is the first step of the road
-that takes it off DOS, which `CLAUDE.md` has under "The portable C".
-Open Watcom's compiler for 32 bits, `wcc386`, compiles it in the flat
-model, in which the memory is one address after another and a pointer
-is an offset of 32 bits, and [the extender](#the-extender) DOS/32A
-starts it. `cmake --build build` makes two programs of it:
-
-| Program | What it is |
+| Output | What it is |
 |---|---|
-| `build/portable_c/VC.EXE` | The program: compiled for the 386, for small code (`-os`), with nothing for a debugger. It is the one that is to be shipped, and the one that the tests judge |
-| `build/portable_c/debug/VC.EXE` | The same source for finding a fault, to be run by hand: compiled as it is written, with nothing moved or left out (`-od`), with the lines of the source between the instructions of its listings (`-d2`), and with `CHECKED` defined, by which the words that make a pointer of a segment and an offset are to look at what they are handed. Nothing reads `CHECKED` yet. No test runs this program, since unoptimised code takes more instructions and the machine's clock is counted in those; it is built so that it does not rot, and the test `portable_c-debug-layout` reads it |
-
-Each is a linear executable that Open Watcom's linker writes, with its
-map, `VC.MAP`, and a listing of every file next to it, and with the
-extender in front of it. [Staying in the memory
-whole](#staying-in-the-memory-whole) says how it is laid out. `DIARY.md`
-has the plan by which it became such a program, "Write down the plan for
-the 32 bits, with the scripts of its trials", with what each piece of
-that met in the entries behind it: while it was made, the same source
-was also built as a program of 16 bits, which the scenarios judged until
-the one of 32 bits passed them all, on 13 October 2026, and that build
-is gone.
-
-The registers are gone from its functions. In the C translation a
-function that another file calls takes its arguments and returns its
-value in the registers that the assembly called it with, by a
-`#pragma aux` that also says what it changes and gives it a name of its
-own for the linker; there is no assembly left to call it, and in the
-portable C such a function is called as the compiler calls any other,
-under the name that the compiler gives it: 329 functions, and the type
-of the five among them that are called through a table.
-
-A function that hands back two things, where the assembly has two
-registers or a register and the carry flag, returns them in the C
-translation as the halves of one number of 32 bits, which the caller
-takes apart. In the portable C such a function returns a structure
-with members named for what they are: `GetMous` the buttons and the
-place of the mouse, `OpenFil` what DOS answered and whether that is an
-error, `EdLin` the cursor and whether anything changed, a command of
-the keys the place of the loop where the program goes on, with the
-panel and the item of the menu where that place takes them. A call
-that still took such a number apart would not compile. Of the 114
-functions that returned one, 104 return a structure. Five had one
-thing to say, the same place of the loop from every return, which is
-the end of a command in the assembly, a jump: they return nothing. Two
-are gone. And three returned a number that is one: `Timer` of
-`system.c`, the BIOS's count of timer ticks; the compiler's routine
-that multiplies numbers of 32 bits, which a program of 32 bits has no
-use for; and `Dos35` of `main.c`, an address as DOS has it, which went
-into the file of the system's functions. Three numbers of 16 bits that
-had a second thing or a flag above the first went the same way: how the
-editor was left, and in the main loop where the program goes on after a
-command and what the mouse asks for.
-
-The lines that say something of registers still, and why:
-
-| What | Where |
-|---|---|
-| Inline assembly: the instruction and the registers it takes and leaves | eleven pieces of `src/portable_c/sys_dos.c` |
-| A function that assembly calls, where the extender enters the program for DOS's critical error, with its arguments in the registers that the assembly has them in | `Arrived` of `sys_dos.c` |
-
-That a function does not return, which lines of `#pragma aux` said
-with `aborts`, is said by a word in front of it, `NO_RETURN`, which is
-Open Watcom's `__declspec(aborts)` and nothing to another compiler:
-`src/portable_c/compiler.h` has the words that each compiler says in
-its own way, and `vc.h` includes it; [the figures](#the-figures) have how many lines of `#pragma
-aux` there are in the portable C, where the C translation has 863.
-None of them gives anything a name. In the C translation a constant that another file
-names has a `#pragma aux` wherever it is defined or declared, which
-takes off the underscore that the compiler puts in front: the assembly
-named it so. `harness/datacheck.py` knows an object with the underscore
-or without, so in the portable C those lines are gone, 361 of them, and
-with them the three by which a file of constants had a second, near
-name for a text that code names far: the portable C has one kind of
-pointer. What was left beyond that while the tree was still two parts,
-80 lines in all, the names of what the part that stays in the memory
-defined, of a second copy of the file that calls DOS and of the main
-data, and the registers where one part called the other, went with the
-two parts.
-
-The jumps that the translation kept from the assembly, `goto`, are gone
-where that was easy: in a function that only jumps forward, or whose
-jumps back make a loop with one way in, they became `if`, loops,
-`break`, `continue` and `return`. A label that went leaves the
-assembly's name in a comment where it stood, so that the code can still
-be held against `src/c/` and `src/asm/`. Nine functions keep theirs,
-where loops are entered in the middle or paths cross, until one is
-rewritten for another reason: `C20_00` of `copy.c`, `FncSel` of
-`dirfunc.c`, `Loop` of `main.c`, `F39_00` of `menu.c`, `F32_00`,
-`FileLst` and `Run_00` of `usermenu.c`, and `V00_10` and `V82_00` of
-`view.c`.
-
-### The figures
-
-What can be measured of the portable C, or counted in its source, and
-changes with every step of the work, is written here and nowhere else:
-how long its file is, what it has of the memory, how much room the
-layout that it rests on has left, and how much of it only Open Watcom
-takes. No test holds the length of its
-file to anything: only the C translation's is held, to three times the
-original's. `python3 tools/figures.py --write` puts the
-table here, of the build in `build/` and of `src/portable_c/`, and is
-run when a piece of work lands; `python3 tools/figures.py --check` says
-whether the table is that of the build. The rest of this README,
-`TODO.md` and `src/portable_c/DEVIATIONS.md` say these things without
-the number. No test holds the table.
-
-<!-- The figures: written by `python3 tools/figures.py --write`, not by hand. -->
-
-| What | Figure |
-|---|---|
-| `VC.EXE` | 294,339 bytes, of which the extender's stub is 27,536 |
-| as a multiple of the original's 65,090 bytes | 4.52 |
-| more than the C translation's 133,056 bytes | 161,283 bytes |
-| Its code, and what the file has of its data | 124,812 and 104,499 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 230,060 bytes |
-| The addresses in it that the extender sets when it loads it | 4,647 |
-| What it has for its room on the bench of the tests, a machine of 16 MB, where the extender's memory ends at FE0000h: all that is behind its objects and its two panels, as long as each is when it holds the original's 64K, `PANEL_LEAST`, each block with the extender's 16 bytes in front | 15,236,288 bytes |
-| The least of that memory with which it gets to its panels: its objects, its two panels and the least of the room, `LEAST_ROOM`, 8,000 bytes, each block with the extender's 16 bytes, worked out of the same; with less, the extender or the program says that there is not enough | 369,280 bytes |
-| The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
-| Its stack | 16,384 bytes |
-| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 396,319 bytes, 229,111 of them code |
-| Inline assembly | 100 instructions in 13 pieces: 100 in 13 of `sys_dos.c` |
-| Lines of `#pragma aux` | 12 |
-| Intrinsic functions | 2: `_disable`, `_enable` |
-| Pairs of `#pragma pack` | 8 |
-| Calls outside the file of the system's functions that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
-
-<!-- The end of the figures. -->
-
-The rows of the file are what the harness's reader of a flat program
-of 32 bits finds in it, `harness/le.py`, and how much room the layout
-that it rests on has left, as the test `portable_c-layout` works it
-out. What the test `portable_c-host` counts of what only Open Watcom
-reads, by kinds, is in its own table, in `DIARY.md`, "Hold the source of
-the portable C against gcc: the test portable_c-host".
-
-### Staying in the memory whole
-
-The original is two parts. One stays in the memory while a command
-runs, with the stack and a copy of the setup and of what the panels
-show; the other, the code and the main data, is given back to DOS for
-the command, and made again afterwards: the main data of the copy, and
-the code, if the Options menu has Memory allocation switched on, by
-loading it from the program's file. The C translation is laid out for
-that, by `tools/mkexe.c`, and most of what [rests on Open
-Watcom](#what-rests-on-open-watcom) there is the two parts held
-together.
-
-The portable C stays in the memory whole, and is one program: the first
-of the features that only made sense on DOS to go from this tree, which
-is to lose them one by one. `src/portable_c/DEVIATIONS.md` has what the
-original does, what the portable C does, why, and the scenarios that
-show it.
-
-What went, and what each thing was for. The things are named as the C
-translation has them, in `src/c/`, where each still is:
-
-| What | What it was for |
-|---|---|
-| The line Memory allocation of the Options menu, its command `M73_00`, its page of the menu's help, and Shift with Enter | The switch, and the same turned round for one command |
-| The block of the code given back to DOS before a command; `Exec10`, which asked for a block, ran the program's file as a second copy, held its check sum against the first copy's and said "Bad or missing"; in the entry, the check sum of the file, and the second copy, which knew itself by its command tail and moved its code into the first copy's block; `OvlPth`, where the environment has the program's file | Giving the code up and loading it again |
-| `FreMem1`, and the call of DOS that found it | What the Info panel showed for free memory with the switch on |
-| The main data given back to DOS in `F21_31`, and asked for again in `Init11`; `WCB1sav`, `WCB2sav` and `ComnIni`, 12.5 KB, with `F21_40` writing a panel there and `Expand` making one of it; `Init00` reading the setup to where that copy is, with no main data yet | Giving the data up and making it again of a copy |
-| `struct Stays`, the group `R_GROUP` and the options `-nd=R -g=R_GROUP`; `Psp`, the room of the PSP at the start of the file; DS on the PSP in `resident.c`, and `md` named to the linker as `Psp` | The part that stays as one segment with the PSP, as a `.COM` file is |
-| `dos.c` compiled a second time, with other names | That part could not call what was not in the memory |
-| `TrnMain` called through a pointer, `Stay`, `Go`, `Stay11`, `TrnAdr`, `TRN_SEG`, `RunPar`; `SetBrk` and `Release` called through pointers and `__loadds`; `ResSeg` and `MemRun`; `STAYS` and the far pointers made of that part's segment in `start.c`, `enter.c`, `memory.c` and `main.c` | One part calling the other, wherever that was after a command |
-| `SecDat` and `DataSeg`, the instruction `MOV DS,AX` | Finding the main data where DOS calls the program, and at the seam |
-| `Reloc`, the relocations of the part that stays applied in the entry, `TrnBeg`, the block of the other part made by writing the header that DOS keeps in front of one, and the seven words that `tools/mkexe.c` wrote into the file | A file that the program loads and relocates itself, time after time |
-| `tools/mkexe.c`, for this tree, with what it checked | Laying that file out, and holding it to what the code took for granted |
-
-What stayed, because a user or another program sees it, is in `exec.c`,
-the file that was `resident.c` while it was the part that stays, and is
-a file like any other now: the commands run through COMMAND.COM, with
-their texts, what the program does first, and what it does when it
-leaves. DOS's critical error, Ctrl-Break and Ctrl-C, the interrupts
-taken and given back, and where DOS goes on when it ends the program by
-another's hand, are in the file of [the system's
-functions](#the-system-in-one-place). Where one of these could not stay
-as the original has it, `DEVIATIONS.md` says what differs. Three things
-that stayed at first have gone since: the watch on DOS, which noted the
-programs that stay in the memory and released them, with the map of the
-memory that it was for, and the commands run through COMMAND.COM's INT
-2Eh, with Quick execute commands (see [What a user sees no
-more](#what-a-user-sees-no-more)); and the program's own call, by which
-a setup program read and wrote its setup, with the entry of INT 21h
-that was left for it alone (see [The setup program in
-it](#the-setup-program-in-it)).
-
-How the program is laid out. The linker writes `VC.EXE`, a linear
-executable with [the extender](#the-extender) in front of it. The
-extender loads it above the first megabyte, sets every word of it that
-holds an address, and enters it at `Start` of `sys_dos.c`, on the stack
-that the file's header names. It is two objects, the code and the data,
-and the linker's command says in which order the data lies
-(`add_portable_c` of `CMakeLists.txt`, with the reason for each thing's
-place):
-
-- The stack, `stack_dos.c`, first. The extender packs the data right behind
-  the code, and the machine of the tests is many times slower at a
-  write to a page of the memory that has code which it has run: what
-  shares that page is the low end of the stack, which a program writes
-  to only when it has used three quarters of its stack.
-- The constants of the code and the tables, the files whose names end
-  in `_t`, and behind them what has a value, which is little more than
-  the tables that the program writes to.
-- The main data, `md`, a variable of `main.c`, which the file has as
-  zeros.
-- What has no value, which the file does not hold: the variables of the
-  files, which a file may have here, those of `sys_dos.c` last.
-
-A segment is no number in the program any more: a panel, the text of
-the viewer or of the editor, a block of the memory and a table are
-pointers, and a box, a dialog, a text or a line of buttons is handed on
-by a pointer to it. What stays a number of 16 bits is an offset that
-is the original's by its layout, a file's in a panel's block, and a
-place of the main data where the original leaves it in a register for
-something else to read: the words of `src/portable_c/vc.h` that make
-pointers of those ("The words of the addresses" there) count from where
-their block or structure begins, and take nothing for granted of where
-the linker has put it. Until the piece F10 of the plan for a flat memory
-(`DIARY.md`, "Take the megabyte down: its words out of vc.h, its rules
-out of the test of the layout"), the program kept the memory of a
-program of DOS inside its own, a megabyte counted from 64K below the
-main data, in which a segment and an offset were made a pointer, and
-the test `portable_c-layout` held the linked file to where that put
-the tables and what followed the main data.
-
-One kind of word is a pointer already, since C has it as one: a word of
-a table that names something, a line of a box, the box of a dialog, the
-buttons of a field. In the original that is a word of two bytes, the
-offset of what it names. Here it is four bytes, an address that the
-extender sets when it loads the program, and a box or a dialog is
-longer than the original's by two bytes for each; the code reads such
-a word as the pointer that it is. So the tables are held against the original's field by field,
-by the test `portable_c-data`: [the figures](#the-figures) have how
-many such words there are.
-
-The memory of the panels, the viewer and the editor is not DOS's but
-the extender's, above the megabyte, as much as the machine has. The
-program asks for it as the original asks DOS, all that there is, and
-`sys_dos.c` asks the extender, DPMI 0500h to 0503h: a block for each
-panel, the original's 64K at the least, which is kept for as long as the
-program runs and grows and shrinks as its directory needs while the
-directory is read, and may be moved then, and one for the room that the
-viewer, the editor, a copy and the file search take, all that the
-extender has behind the panels, where the original has one block that
-it cuts up and moves its panels in, and which gives way while a panel
-grows and is taken again behind it. [The figures](#the-figures) have how long the room is on the bench
-of the tests. The extender keeps 16 bytes of its own in front of each
-block and ends the program at its next call for memory where something
-has written into them; the tests look at them when a scenario ends,
-and a write just outside a block fails the scenario. So a command that
-the program runs has DOS's memory below the megabyte, all but the
-extender's part, and finds none above it, which the extender holds; a
-program of the same extender that it runs, a second copy of it among
-them, gets the room that it has given back; and the editor has room for
-a larger file than the original's has. Entries 1 and 13 of
-`DEVIATIONS.md` say what follows from each.
-
-`VC.EXE` of the portable C is longer than the C translation's: it is
-compiled for 32 bits, the main data is in the file, every word that
-names something has an entry in the table that the extender goes by,
-and the extender is in front of it; the part that stayed in the memory,
-with its copies and its second copy of the file that calls DOS, is
-gone. [The figures](#the-figures) have how long it is.
-
-How far the source is from what another compiler takes is counted, by
-the test `portable_c-host` (see [Testing](#testing)): gcc reads every
-file for a machine of 64 bits, where a pointer does not fit a number of
-32 bits, and each place that it refuses is counted, with each that only
-Open Watcom reads, by kind and by file. `harness/hostcheck.txt` has the
-counts as they stand, and `DIARY.md`, "Hold the source of the portable C
-against gcc: the test portable_c-host", what each kind waited for. The
-words by which the C translation says what segment a thing is in,
-`__far`, `STACK` and `CODE`, are in no file of the portable C.
-
-What rests on Open Watcom, for the portable C. Of what the code is
-written in, the first table of [What rests on Open
-Watcom](#what-rests-on-open-watcom) above: `#pragma aux` and `#pragma
-pack(1)`, each as often as [the figures](#the-figures) say; two
-`__declspec(naked)` functions, `DeviceEntry` and `NothingEntry` of
-`sys_dos.c`, which the extender enters where DOS's critical error,
-Ctrl-Break and Ctrl-C arrive; two intrinsic functions, `_disable` and
-`_enable`; and, which the C translation has not, `#pragma data_seg`,
-for the main data and for the stack, which `SEGMENT_BEGIN` and
-`SEGMENT_END` of `compiler.h` write, and which are nothing to another
-compiler. It has no `__interrupt` and no
-`__loadds` function, and no routine for arithmetic on 32 bits, which
-the compiler for 32 bits does by itself. The test `portable_c-host`
-counts these by their kinds, and `DIARY.md`, "Hold the source of the
-portable C against gcc: the test portable_c-host", has its table. Of
-what cannot be seen in the code, none of the seventeen places of the
-second table there is left: they are of a program of 16 bits in two
-parts. What this program rests on is where the linker puts things:
-
-| | What is relied on | Where it is done | What holds it |
-|---|---|---|---|
-| 1 | The linker's `order` directive: the classes of the segments in the order that its command names, each class linked whole | `CMakeLists.txt`, the linker's command | `portable_c-layout`, in each of the rows below |
-| 2 | `#pragma data_seg` makes a segment of the name and of the class that it names: the main data is of a class of its own, `MAIN`, and the stack of the class `STACK`, which the linker takes for the stack, naming its end in the file's header | `SEGMENT_BEGIN` of `src/portable_c/compiler.h`, in `main.c` and `stack_dos.c` | `portable_c-layout`: the stack is the segment that ends where the header has the stack's top, and is in the file as zeros, by which the scenarios' test tells how much of it a scenario has left |
-| 3 | What has no value is of the class `BSS`, the last, and is not in the file; everything in front of it is | `CMakeLists.txt` | `portable_c-layout` |
-| 4 | The compiler puts nothing between the fields of a box or a dialog, nor between two objects of a file | `src/portable_c/tables.h`, by `#pragma pack(1)` | `portable_c-data`: an object is as long as its declaration makes it |
-| 5 | Compiled code takes ES to be on the data and the direction flag to be clear, and the extender enters the program with ES on the PSP: the first thing that the program does settles both | `Entered`, in `Start` of `src/portable_c/sys_dos.c` | every scenario |
-| 6 | A `__declspec(naked)` function is its `_asm` and nothing else, and `_asm` reads a variable through CS: where the extender enters the program from real mode, with DS and ES anywhere | `DeviceEntry` of `src/portable_c/sys_dos.c` | the scenarios of the critical error |
-| 7 | The compiler keeps a cut that a cast says. It loses one: of a byte with a sign made a number of 16 bits without one, `(u16)(signed char)byte`, which it extends with its sign to all 32 bits wherever the number goes on into 32 bits. The tree writes neither that nor the form with a `short` between, which it keeps: where the original has `CBW`, the byte is taken as it is, or with its sign into an int | `src/portable_c/vc.h`, "A byte with a sign made a word" | `portable_c-cut`: the tree has the form nowhere, and the compiler makes of `harness/cutcheck.c` the instructions that are written there, the wrong ones of the form that it loses and the right ones of every cast that narrows |
-
-The rule of the C translation that a file of code may have no variable
-and no string is gone with the two parts: nothing checks the object
-files of the portable C, and nothing has to.
-
-Inline assembly, for the portable C, is all in `sys_dos.c`, thirteen
-pieces: eleven that are a `#pragma aux` with their instructions, put in
-place where they are called, and the two functions that are their
-`_asm` and nothing else. [The figures](#the-figures) have how many
-instructions that is.
-
-| Piece | Instructions | Why it is not C |
-|---|---|---|
-| `Dos` | 17: the registers of 32 bits loaded from a structure, `INT 21h`, four of them stored back, and the carry flag | A software interrupt is no function call. The extender reads all 32 bits of a register where it translates a call |
-| `Dpmi` | 17: the same around `INT 31h` | The extender's own services, by which a call is made in real mode, an interrupt is taken and a block below the megabyte is asked for |
-| `Video` | 7 | The BIOS for the screen, `INT 10h`; some lose EBP |
-| `Keyboard` | 5 | The BIOS for the keyboard, `INT 16h`, answers in the zero flag |
-| `Multiplex` | 3 | `INT 2Fh`, by which the driver of a CD-ROM is asked, answers in two registers |
-| `DosIdle` | 1: `INT 28h` | The program says that it is idle |
-| `MouseDriver` | 1: `INT 33h` | The mouse driver |
-| `MouseState` | 4 | The same, which answers in three registers |
-| `StackNow` | 1 | The stack pointer, for where the critical error may use the program's stack |
-| `Selectors` | 3 | CS and DS, which the routine entered from real mode loads its segments by |
-| `Entered` | 5 | ES put on the data and the direction flag cleared, before any compiled instruction counts on either |
-| `DeviceEntry` | 33 | Where the extender enters the program for DOS's critical error, with the registers of real mode, DS and ES anywhere and a stack of the extender's: no compiled instruction can run before the segments and the stack are the program's |
-| `NothingEntry` | 1: `IRETD` | Where it enters the program for Ctrl-Break and Ctrl-C: an interrupt's return is no function's |
-
-Of the pieces that the C translation has, those of `src/c/dos.c` have
-their like here, with registers of 32 bits, but for `VideoBuffer` and
-`DesqviewPause`, which are [gone](#what-else-has-gone). Those of
-`src/c/resident.c` are gone with what they were for, the entries of INT
-21h and INT 27h and the way through INT 2Eh, or are the extender's to
-do: where DOS goes on when it has ended the program is no code of the
-program's here (see [The system in one place](#the-system-in-one-place)).
-Of the three instructions that are the compiler's own in the C
-translation, by its intrinsic functions, `IN` is gone too: the program
-reads no port.
-
-### What else has gone
-
-After the two parts, what the program did only because it ran on a PC
-under DOS, next to other programs of that time, and that no screen of a
-scenario shows. Each is an entry of `src/portable_c/DEVIATIONS.md`, by
-its number here, and is gone outright: the code, the calls, and what the
-main data kept of it, whose bytes stay where they are and are neither
-set nor read, since the layout of the main data is the original's. The
-things are named as the C translation has them, in `src/c/`, where each
-still is.
-
-| | What | What it was for |
-|---|---|---|
-| 2 | `TopView` and `TopScr` of `dos.c`, the inline assembly `VideoBuffer`, their calls in `IniData` of `start.c` and in `Window` | Drawing into the buffer that TopView or DESQview shows in place of the display's memory, and telling them what has changed there |
-| 3 | `DvPause` of `dos.c`, the inline assembly `DesqviewPause`, its call in `LeaveTm` of `blank.c`, the call of DOS in `IniData` that asked for DESQview, and the two places that went by the answer, in `Input0` and in the editor's loop of keys | Giving the rest of the program's turn to the other programs of DESQview, and leaving Alt and the keyboard's buffer to it |
-| 4 | The call of INT 2Fh with AX 1680h in `LeaveTm` | Giving the rest of the program's turn to Windows, or to whatever else ran programs of DOS as guests. The call of INT 28h, DOS's own word that the program is idle, stays |
-| 5 | The test of the display in `IniData`, the waiting in `Window` and `MovScr` of `window.c`, `InPort` of `dos.c` and the intrinsic function `inp` | Writing to the memory of a CGA only while it does not draw, which otherwise shows as snow. Snow mode stays a byte of the setup, kept as it is found |
-
-### The system in one place
-
-What the program asks of the system that it runs on, it is to ask in one
-place, and the rest of it is not to know which system that is. The C
-translation has one place for the instruction only: every file that
-wants something of DOS fills a structure of registers, with the number
-of the service among them, and hands it to `Intr21` or `Int21d`, and so
-for the BIOS: 348 calls in 25 files when this began, each of which knows
-DOS.
-
-In the portable C that place is `src/portable_c/sys.h`: 99 functions
-named for what is asked, with no register, no number of a service and no
-interrupt in them, and no word of Open Watcom: the test
-`portable_c-host` has the file clean. `sys_dos.c` is those functions for
-DOS on a PC, for a program of 32 bits under [the
-extender](#the-extender), and the one file that knows how DOS is asked:
-no other file of the portable C has a structure of registers, the number
-of a service, or an interrupt that it calls. The same functions for
-another system are other files beside it, and the build picks the files
-of an implementation by the end of their names, beside the common code,
-every file that ends in no implementation's name, by the lists of
-`portable_c_sources` in `CMakeLists.txt`. Those of DOS end in
-`_dos.c`: `sys_dos.c` and the stack, `stack_dos.c`. And `sys_posix.c`
-is the program for Linux, with the files that emulate DOS there beside
-it, each ending in `_posix.c`, and their own header, `emulate_posix.h`:
-`machine_posix.c` the part of the functions that has nothing of a
-platform in it, and `keyboard_posix.c` the keys made the BIOS's words,
-which the web page of step 7 shares with it, beside `sys_web.c`; see
-[The program for Linux](#the-program-for-linux) and [The web
-page](#the-web-page).
-
-| What | Functions |
-|---|---|
-| Files: made, opened, closed, read, written, a place in one and a step from where one is, deleted, renamed, their attributes and their date and time, what a handle is, a full path | 18 |
-| Files by a file control block: a mask deleted at one call, a label | 2 |
-| Directories: what is in one, made, removed, the current one | 8 |
-| Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
-| Memory: a block taken, given back, made another size, where the system looks for one, and the program's own block made as long as the program | 6 |
-| The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
-| Other programs: one run, with what it is told behind its name; whether a file is one, and a file handed to what opens its kind; this one ended, on an old DOS too; what this one was told when it was started, and its environment | 8 |
-| What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; what the system is to put back when it has ended the program, said, taken and given back | 11 |
-| The console: a character and a text where the cursor is | 2 |
-| The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
-| The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, whether the display is an EGA and how many rows its font gives it, where the cells are and the cells themselves | 15 |
-| The mouse: whether there is one, its pointer shown, placed and shaped, where it is | 8 |
-| The timer | 1 |
-
-What they take and answer with is still as DOS and the BIOS have it: a
-drive by its letter, a path with backslashes, DOS's attributes, dates,
-times and numbers of errors, a key with its scan code, a cell with its
-colour, memory by the segment. The program has those shapes everywhere
-and the screens show them; another system has to answer in them.
-
-One function is one thing asked. Where the program asks several things
-in a row, the row is still in the program, in the original's order,
-since what DOS is asked and in which order is behaviour that the
-scenarios see. Three things of the original's are in the functions by
-name, where they were in what a register happened to hold:
-
-- How a call is asked. The original calls DOS through its routine
-  `Intr21` where a drive may not be ready, which lets the program's box
-  for that come up, makes the error 53h of a call that the user gave up
-  there, and asks DOS for its extended error behind a call that failed;
-  and it calls DOS itself where it does none of that. The functions of
-  files, directories and drives are of the first kind, and the five
-  that the original also calls the second way are functions of their
-  own, with Bare in their names.
-- The carry flag before a call. DOS leaves it as it finds it at two of
-  its calls, and `Intr21` takes a flag that is set for an error: the two
-  functions take the flag as an argument, `flagged`.
-- What a call leaves. Every answer has what DOS left in AX, also where
-  nothing failed, since some callers go on with that; what else a call
-  answers in is a member with a name.
-
-What the functions do not take is what a register happened to hold
-where the call does not read it, the low byte of AX at most calls of
-DOS: the original hands DOS and the BIOS whatever the code before left
-there, and the portable C hands them 0. No screen shows that, and
-`src/portable_c/DEVIATIONS.md` declares it, with every place.
-
-What DOS and the BIOS enter of the program while it runs is in the
-header too, and where they arrive is in `sys_dos.c`: DOS's critical error,
-Ctrl-Break and Ctrl-C, each of which the program takes by a function and
-the first two of which it gives back by one, in the original's order.
-They are interrupts of real mode, which the program takes through the
-extender: that comes over from real mode and enters a routine of
-`sys_dos.c`, on a stack of its own. What the program does when DOS asks it
-about a device, its box with Retry and Abort, is the program's own
-function, `FtErr1` of `main.c`, which it hands over when it takes the
-critical error; the entry, `DeviceEntry`, goes over to the program's
-stack, and what it calls there reads DOS's registers and the header of
-the device, calls the program's function as any function is called, with
-what DOS says is wrong and with the device's name where it is no drive,
-and hands DOS what the program answers. Ctrl-Break and Ctrl-C arrive at
-a routine that does nothing.
-
-The fourth thing that DOS enters is where it goes on when it has ended
-the program, by another program's hand. Nothing of a program of 32 bits
-can run there: the extender sees the call in real mode and takes itself
-out first, with the memory above the megabyte that the program is in. So
-the program is not asked, and the header has it as a value and not as a
-function of the program's to be called. The program says beforehand what
-it has changed of DOS that DOS does not put back by itself, which is one
-thing, whether DOS looks for Ctrl-C at every call
-(`ProgramEndedBreakCheck`, which `SetBrk` of `exec.c` says whenever it
-has noted that). And where the PSP has DOS go on, while the program has
-taken its end, is eight instructions of real mode that `sys_dos.c` keeps
-in a block below the megabyte, written there as their bytes, `Ended_T`:
-they have DOS look for Ctrl-C as the program has said, leave the
-registers that the original leaves for the program that started this
-one, and go on where the PSP said before. The scenario `ended` shows
-those registers. One thing is left otherwise, by the extender:
-Ctrl-Break goes where it went before the program was started, where the
-original leaves it going into memory that is free.
-
-Not in the header, and in `sys_dos.c` all the same, is where the extender
-enters the program, `Start`: it settles what compiled code takes for
-granted, asks the extender where the PSP and the environment are and for
-a block of 512 bytes below the megabyte, makes ready the memory that the
-program is handed, and calls `Main` of `main.c`, which is the program.
-What the program does first it asks through the header like everything
-else: the version of DOS, and that it keep no more of the memory than it
-is. The PSP is read and written in `sys_dos.c` alone: the command tail and
-the environment, for the functions that answer with them, and the
-address at which DOS goes on when the program has ended; and `sys_dos.c`
-makes the block that DOS is told of a program to run.
-
-How a call gets to DOS is that file's matter too. DOS, the BIOS and the
-mouse driver are of real mode: the program calls them by the same
-software interrupts, and the extender takes each call there and back. A
-call of DOS that takes the address of a name or of a buffer, and that
-the extender knows, the extender translates. Thirteen functions it does
-not carry through as `sys.h` has them, and those `sys_dos.c` makes in real
-mode, by the extender's service for that, with what DOS reads and writes
-in the block below the megabyte. The top of the file says which they are
-and how each was found.
-
-Nothing of DOS is left outside `sys_dos.c`: no other file has a line of
-assembly or a register in a `#pragma aux`, which the test
-`portable_c-host` holds. The commands' loop of `exec.c` has one way of
-running a command, by a COMMAND.COM of its own. Quick execute commands,
-which handed a command to the COMMAND.COM that the program was started
-from, the map of the memory and the watch on DOS [are
-gone](#what-a-user-sees-no-more).
-
-Every file asks the system through the header: the 348 calls went over a
-file at a time, and the functions by which a structure of registers was
-handed to an interrupt are gone with the last of them. `CLAUDE.md`,
-"Moving a file to the system's functions", has what that met and how a
-function is added. `python3 tools/calls.py` counts such calls, none in
-the portable C and all of them in the C translation, and [the
-figures](#the-figures) say so.
-
-### What a user sees no more
-
-Then the features that a user of the program sees and that only made
-sense on DOS. Each is an entry of `src/portable_c/DEVIATIONS.md`, by
-its number here, and is gone outright, not kept as a setting that does
-nothing: its command with its key, its line of a menu and its name in
-the key bar, its code and its data. What the main data kept of it keeps
-its bytes, and a byte of the setup that switched it is kept as it is
-found, so the setup file is the original's. The scenarios that showed
-such a thing are not run for the portable C, or are run without the
-steps that went there, against the original's golden without them:
-`DEVIATIONS.md` has each.
-
-| | What | What it was for |
-|---|---|---|
-| 7 | The map of the memory, Alt+F5, Memory info of the Commands menu: `memory.c` and `memory_t.c`. And the watch on DOS that it rested on, in `exec.c`: the entry of INT 27h, `New27` with `Int27`; in the entry of INT 21h the three calls by which a program is run, stays in the memory or gives a block back; the list of the programs that have stayed and their records, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk`, `Release`; `GetStat`; and the programs released when the program is left | Listing what DOS has given to whom, and getting a program out of the memory again that was run from here and has stayed, which DOS had no way to do |
-| 11 | The two lines on the memory in the Info panel, "Bytes Memory" and "Bytes Free": the part of `PutInf` of `info.c` that wrote them, with their three texts; and for the first, `MemEnd` of `sys.h`, which read in the PSP where the memory ends, with its call in `IniData` of `start.c` | Saying how much memory DOS has for programs and how much of it the next command gets. The panel is no row shorter for it: what the program is based on stands below its title, the line under the title a row further down, and the row below that is empty |
-| 12 | EGA lines, Alt+F9, of the Commands menu: `F69_00` of `commands.c`; its name in the key bar with Alt held, and the key bar that the panels had on a display without such lines; and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`, with their bodies in `sys_dos.c` | Giving the screen 43 rows on an EGA or 50 on a VGA, and 25 again, by having the BIOS load a font of 8 lines, and telling the Print Screen key of the rows. The program still asks how many rows the screen has, when it starts and behind every command, and draws on as many as it finds, up to 50: the rows are to come from the system that it runs on. No scenario has it on more than 25 for now |
-| 14 | Quick execute commands, of the Advanced options and of the setup's Configuration, where it was the last of the Execute options: the way through the shell in `Exec02` of `exec.c`; the command that went to the current drive first, which `F21_31` of `enter.c` left for it, with DOS asked for the drive there and in `IniData` of `start.c`; and `ShellRun` of `sys.h`, which `sys_dos.c` made in real mode, by 26 bytes of instructions that it put below the megabyte | Handing a command to the COMMAND.COM that the program was started from, by that shell's INT 2Eh, in place of running a COMMAND.COM for each: sooner, and with what the command set there kept. Every command is run the second way. The Advanced options are a row shorter, with Clear keyboard buffer the one line of Other options, and the right half of the setup's Configuration begins with the Keyboard options |
-| 24 | The editor's count of free bytes in its status line, with the word "Free" behind it: the block of `T00_20` of `edit.c` that wrote the figure, and `FrBuf_S` of `edit_t.c` | Saying how much of the memory that the editor took is left for the text. The editor still says when its room is full, as before |
-| 29 | Unsorted, the fifth order of the Left and the Right menu: its line in both menus, the branch of `CmpPar` of `files.c` for the order in which the files were read, and the tick of `F40_00` of `menu.c` for it. A panel is sorted by name unless the user picks another order, and a setup file that says Unsorted, as the distribution's does, is read as by name | Listing the files in the order in which DOS lists the directory, which on DOS was the order in which they were made. On the systems that the program is carried to that order is of the file system and says nothing to a user. The menus are a row shorter |
-
-Quick execute commands is not of DOS alone by what it gave, only by
-how it was done, and was taken out on the user's word of 13 October
-2026, as EGA lines was, and not by the rule, as the two above them
-were: `DEVIATIONS.md` has it under 14 as it has those. The editor's count
-of free bytes went on the user's word of 14 October 2026, that every
-figure of free memory goes, on DOS too: entry 24. Unsorted went on the
-user's word of 15 October 2026, with the bench's panels sorted by name:
-entry 29.
-
-Besides what has gone, `DEVIATIONS.md` declares what the user has had
-done otherwise than the original, one thing at a time, as the work on
-the numbers and the memory came to it, entries 15 to 28. Most are bugs
-of the original that are fixed: Go to of the file search asks for the
-disk of the drive that its line is on, the search reads no part of a
-file behind the end of its room, a copy from a device counts its room
-down by every read, a tree's file or a help file that is broken is
-refused, and the menu bar no longer goes on with the menu that is none.
-The others are limits of the original that went when a number was
-widened: the viewer finds a text beyond column 65,535, the editor
-reaches every line of a text of more than 65,535, the Info panel counts
-clusters of 64K, and a panel keeps all of its files while a command
-runs. Above all a panel holds as many entries of a directory as there
-is memory for, where the original stops at 2,703, and stops for good
-at 65,536, the most that a directory of DOS holds, since an entry keeps
-the original's number of 16 bits: entry 27.
-
-What was left of the watch then was what was not for the map: the
-program still took INT 21h, for its own call, by which a setup program
-reads and writes its setup in the memory, and handed every other call
-on untouched. That has gone since, with the call: see [The setup
-program in it](#the-setup-program-in-it).
-
-### The setup program in it
-
-The original is two programs, and the second, `VCSETUP.COM`, is where
-most of the setup is set: every colour, and the options that the main
-program's menus have not. It exists only as assembly,
-`src/asm/VCSETUP.ASM` with two files of routines that are for the most
-part copies of the main program's. In the portable C it is a
-part of the one program, entry 8 of `src/portable_c/DEVIATIONS.md`: an
-item of the Options menu, " More setup...", its last, behind which the
-setup program is on the screen as the original's is when it is run from
-the program's command line, over what DOS had shown. It is translated as it
-is: it reads the setup file and edits that, and the program takes what
-was saved when the setup is left, as the original's running copy is
-handed it by a call of DOS.
-
-That call, the program's own (INT 21h with AH 2Bh, 'VC' in CX and 'OM'
-in DX), is gone from the portable C, since nothing asks a running
-program for its data any more, and with it the last reason for the
-program to take DOS's own interrupt. What went: `New21`, the entry of
-INT 21h, eight instructions of assembly that every call of DOS by any
-program passed while the program was in the memory; `Int21`, the
-interrupt function that answered the one call; `Vect21`, where the
-interrupt went before, a variable in the code segment for that entry to
-read; `PutVector`, which wrote an address into the machine's
-table of interrupts; and the interrupt taken when the program starts
-and given back when it leaves or when DOS ends it. A call of DOS goes
-to DOS. The scenarios `asked` and `handed-on`, which show the call
-answered and the others handed on, are not run for the portable C, and
-stay for the C translation.
-
-Its files have names that begin with `st`, and its routines and tables
-have `St` in front of the names that they have in the assembly, where
-many are the main program's names too. `stmain.c` has the setup
-entered and left, its file, its menu and the setup that the program
-has without a file; `stmain_t.c` its tables. `sthelp.c` has its help,
-with `sthelp_t.c`: the seven pages that the help file has for the
-setup, read when the setup is entered, and the page of where the user
-is in a window, for F1. What both programs have is there once: the
-boxes, the dialogs, the bars and the mouse are the main program's, and
-the three routines that the setup program has otherwise
-go by a variable that says the setup is open, `StOpen`: `PutKey0`,
-which has the setup's key bars then, `Dialog`, and `Input`, where F1 is
-the setup's own help. What the setup program has in a segment of its
-own is the main data here, in buffers that the main program makes anew
-after a command anyway.
-
-`stcolor.c` has the three palettes, Set Black & White palette, Set
-Color palette and Set Laptop palette: the list of the 39 colours of
-one, with the grid of the 256 colours beside it, and the picture in
-which a colour of the list is chosen, one of four screens of the
-program painted in the palette. `stcolor_t.c` has its tables, the
-four screens among them. What a colour becomes in a shadow, which a
-picture asks for a shadow that is not the one set, is `ShadCol` of
-`screen.c`, for both programs.
-
-`stopts.c` has the four dialogs of the options: the Configuration,
-Screen and Mouse, the Panel options, with the delay of the tree that
-is typed there and the box for one that is none, and the Country info,
-whose lines are written as the country has them before the box is
-shown. `stopts_t.c` has their tables. The first two are without four
-settings that the original's setup program has there, Memory
-allocation, Quick execute commands, TSR manager and Screen output,
-which are of what the portable C has no more: what stood below them in
-a box stands further up, and their bytes of the setup file are kept as
-they are found (`src/portable_c/DEVIATIONS.md`, 1, 5, 7 and 14).
-
-All nine items of the menu do what the original's do, and F1 is the
-help. The mouse at the menu is the main program's routine for a list in
-a box, `F32_70` of `usermenu.c`, which the setup program has word for
-word under a name of its own. `DIARY.md` has the plan, "Write down the
-plan for the setup program, with the scripts of its trial", with what
-each piece brought and what is declared for it.
-
-### The extender
-
-A program of 32 bits does not run on DOS by itself: an extender puts the
-processor into protected mode, loads the program above the first
-megabyte, and hands what the program asks of DOS and the BIOS down to
-them. The portable C is started by DOS/32A:
-
-**This product uses DOS/32 Advanced DOS Extender technology.**
-
-The extender is the first 27,536 bytes of the program's file, its
-stub, which the linker copies there from `binw/dos32a.exe` of the Open
-Watcom that the build fetches. It is in no file of this repository;
-its licence is, [`LICENSE.DOS32A`](#licence). One bit of it is changed:
-as it comes, DOS/32A writes two lines of its name and its copyright
-when it starts, onto what is the program's first screen, and
-`tools/stub.c` clears the bit of its settings that makes it, in the
-file that the linker wrote. That tool says where the bit is and how it
-was found. Open Watcom has other extenders too. CauseWay, which is
-free as well, does not run on the machine of the tests, for a fault of
-QEMU's (`DIARY.md`, "Write down what a trial of a 32-bit program on the
-bench showed"); DOS/4GW and PMODE/W are not free, and are neither linked
-nor run here.
-
-### The program for Linux
-
-The same source is also a program for Linux of 64 bits, `vc`, built
-with clang: `CLAUDE.md`, "The program for Linux", which has every
-decision of the user's that it rests on; `DIARY.md`, what each piece of
-it, L1 to L7, built and met; and `TODO.md`, "Step 6, the program for
-Linux: what is left", what it left. Nothing of the common code knows
-that it is on Linux. It asks the system what it asked DOS and the BIOS,
-through `src/portable_c/sys.h`, and for Linux the files
-`src/portable_c/*_posix.c` answer as DOS would, at the level of DOS's
-services, where DOSBox emulates the processor:
-
-- Two drives, R:, the root of the file system, labelled ROOT, and H:,
-  the home directory, labelled HOME. The program starts on H: where it
-  is started under the home directory, on R: otherwise. Paths keep
-  DOS's 67 characters; a name of the host that is not of DOS's form, 8.3
-  in capitals, is shown under an alias of DOS's form, `LONGNA~1`, which
-  leads back to it for the run.
-- The code page 437, always, and the country with it: names cross
-  between it and UTF-8, and a character that the code page lacks shows
-  as `_`.
-- The screen, 80 columns by 25 rows whatever the terminal's size, drawn
-  in the terminal by the program's own escape sequences and termios,
-  with no library: the VGA's sixteen colours exactly where `COLORTERM`
-  says that the terminal has 24 bits, the theme's sixteen elsewhere.
-- The keys, made the words that the BIOS of the machine of the tests
-  gives, with the kitty protocol of the keyboard where the terminal has
-  it, so that Alt by itself and the key bar's Shift, Ctrl and Alt work
-  as on DOS; and the mouse from the terminal's reports, with its
-  pointer drawn as DOS's mouse driver draws it.
-- A command, run by `$SHELL -c` (`/bin/sh` where that is not set) on
-  the terminal's own screen, with the paths of DOS's in it, and the
-  names of DOS's of the current directory, made the host's; Ctrl-O shows
-  that screen until a key. Enter on a file that the user may execute
-  runs it, whatever its name, and on any other file that the extension
-  file has no command for hands it to `xdg-open`.
-
-What it does otherwise than the original for all that is declared in
-`src/portable_c/DEVIATIONS.md`, under "The program for Linux".
-
-**Building it.** The one build, `cmake -B build` and `cmake --build
-build`, makes it where it finds clang, beside the program for DOS, with
-a list of clang's warnings written out, each an error:
-
-| Program | What it is |
-|---|---|
-| `build/portable_c/posix/vc` | The program, with the usual hardening of a program for Linux |
-| `build/portable_c/posix-asan/vc` | The same with the sanitizers of addresses, of undefined behaviour, of integers and of implicit conversions, each fatal: the one that the tests run |
-| `build/portable_c/posix-msan/vc` | The same with the sanitizer of memory, which goes with no other: built only by its name, `cmake --build build --target portable_c-posix-msan`, run by no test, and kept for audits (`DIARY.md`, "Take the program for Linux through the scenarios, with its clock, masks and not-run list", says how) |
-
-**Running it by hand.** In a terminal of 80 columns by 25 rows or more:
+| `build/VC.COM`, `build/VCSETUP.COM` | The original, assembled by JWasm |
+| `build/c/VC.EXE` | The C translation, compiled by Open Watcom for 16-bit DOS |
+| `build/portable_c/VC.EXE` | The portable C for DOS, compiled by Open Watcom's 32-bit compiler with DOS/32A in front |
+| `build/portable_c/debug/VC.EXE` | The same, unoptimised, with source lines in its listings, for finding faults |
+| `build/portable_c/posix/vc` | The program for Linux, with the usual hardening (needs clang) |
+| `build/portable_c/posix-asan/vc` | The same with the address, undefined-behaviour, integer and implicit-conversion sanitizers; the tests run this one |
+
+Two CMake options choose the large downloads:
+
+- `-DVC_WEB=ON` fetches Emscripten (300 MB, 1.5 GB unpacked) and builds
+  the web page, `build/portable_c/web/vc.html`, and the static site,
+  `build/portable_c/web/static/`. Node is then required.
+- `-DVC_DOS=OFF` leaves out Open Watcom and everything for DOS. What is
+  left is the original assembled, the programs for Linux and the web,
+  and their tests.
+
+A second build directory can reuse the first one's Emscripten with
+`-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=<first>/_deps/emscripten-src`.
+
+The memory sanitizer cannot be combined with the others, so its build
+is made only on request:
+`cmake --build build --target portable_c-posix-msan`.
+
+## Running
+
+### On DOS
+
+The DOS programs run on the test bench: FreeDOS in QEMU, with the
+bench's files on `C:` and the program on `D:`. This needs `python3`,
+`qemu-system-i386` and `mtools`, and a terminal of at least 80x25.
 
 ```sh
-cd ~ && /path/to/the/checkout/build/portable_c/posix/vc
+python3 harness/play.py                 # the portable C
+python3 harness/play.py --tree c        # the C translation
+python3 harness/play.py --original      # Volkov Commander 4.05 itself
 ```
 
-It takes the terminal's alternate screen and shows its banner, "Vibe
-Commander 0.1, based on Volkov Commander 4.05", in the first two rows,
-its panels on H:\, the prompt and the key bar, at the top left of a
-larger terminal; a smaller one shows only the lines that ask for 80 by
-25, until it is made larger. F10 leaves it, and gives the terminal back
-as it was. Its own directory, where the original has the files that it
-reads beside its own, is `~/.config/vc` (`$XDG_CONFIG_HOME/vc` where
-that is set), made when it is not there: the setup is saved there as
-`vc.ini`, and the help file and the files of the menus and the
-extensions are read there. The program does not bring them, being the
-original's: F1 shows no help and F2 no user menu until they are copied
-there from the shareware distribution, which the harness keeps in
-`downloads/vc405sw.zip` once it has fetched it (`python3
-harness/deps.py` does). Of its files the program reads `VC.HLP`,
-`VC.MNU`, `VC.EXT`, `VCVIEW.EXT`, `VCEDIT.EXT`, `ARCHIVES.MNU` and
-`FORMAT.MNU`, their names in capitals or not. Its standard input and
-output have to be a terminal. Ctrl-Z is the program's key for the tree
-and does not stop it; `kill -TSTP` does, and `fg` draws it again. The
-sanitized build writes a report on the alternate screen, which goes
-with it: run that one with `2>file`.
+`--country ru` uses the Russian bench, and `--display gtk` opens a
+window. F10 leaves the program and the machine switches itself off. The
+disks are made anew every time, so nothing is kept.
 
-**How it is judged.** By the same scenarios and goldens as the program
-for DOS, and by tests of its own, each of which is skipped where there
-is no clang:
+<p align="center">
+  <img src="docs/vibe-commander-0.1.png" width="560"
+       alt="Vibe Commander 0.1 on a blue 80x25 text screen: a file panel listing C:\VC on the left, the Info panel on the right headed &quot;Vibe Commander 0.1, based on Volkov Commander 4.05&quot;, a DOS prompt and the function key bar along the bottom">
+</p>
+<p align="center">
+  <em>The portable C under FreeDOS, on a PC whose clock reads 16 June 2000, the day Volkov Commander 4.05 was released.</em>
+</p>
 
-| Test | What it checks |
-|---|---|
-| `portable_c-posix-unit` | What the program emulates of DOS without input or output of its own, the files `*_posix.c` but `sys_posix.c` and `machine_posix.c`: names and aliases, the code page and UTF-8, drives and paths, dates, DOS's errors, and the services on files and directories of the host's, by `harness/posixcheck.c`, built with the sanitizers |
-| `portable_c-terminal` | What `posix-asan/vc` draws in a pseudo-terminal, replayed through pyte, a terminal emulator in Python that the harness fetches pinned, held cell by cell to the grid that the program writes for the same keys through its test channel, in 24 bits and in 16 colours; a terminal too small, SIGTSTP and SIGCONT, the kitty protocol and the keys that the program reads held to the BIOS's words, the mouse, and commands with Ctrl-O. `harness/terminal.py` |
-| `portable_c-posix-scenarios` | `posix-asan/vc` through the scenarios, by `harness/posixrun.py`: on a bench of the host's in `/tmp`, its home directory laid out as the machine's C:, driven through the test channel, `VC_TEST`, which takes the scenarios' keys as the BIOS's words and writes the grid whenever the program waits for a key, on the clock of the machine of the tests, `VC_TEST_CLOCK`. Its screens and its files are held to the original's goldens with what is declared for the portable C and, on top of that, for Linux, each scenario that is not run on Linux or is cut there named by an entry of Linux of `DEVIATIONS.md`. It starts a machine of DOS once, for the bench's setup file, and keeps that in `build/posix-bench` |
-| `portable_c-cap` | The cap of the memory that the program's blocks hold together, which the machine of `*_posix.c` takes from the implementation, none on Linux, 256 MB on the web page and at most that on iOS, and from `VC_MEMORY` in its place for a test: `posix-asan/vc`, the app for iOS on a host, `ios-host/vc`, and with `-DVC_WEB=ON` `web-node/vc.js`, on the bench of `harness/posixrun.py`, the editor asked for a file of 1 MB. With `VC_MEMORY` at 512K the box that refuses it is the original's, cell for cell, as the golden of `editor-big` has it where the original refuses the same file; without it the editor opens the file; and with a `VC_MEMORY` that is no number of bytes the program does not start. `harness/capcheck.py` |
-| `portable_c-tidy` | The common code, the files of Linux and their test held to clang's warnings, with the commands that the build compiles them with, and to clang-tidy by `.clang-tidy`. `harness/tidycheck.py` |
+`python3 harness/screenshot.py` boots the original from its shareware
+distribution and saves its screen to `out/`, as a PNG, as text and as
+the raw 4,000 bytes of video memory. With `--program FILE` it runs a
+build instead, through the keys that follow. Two runs give identical
+files.
 
-What is declared for Linux is `ON_LINUX` of `harness/deviations.py`,
-each part with its reason there. Masks: what the comparison leaves out
-where the golden has the original's, because it is the host's and no
-golden can expect it, found on the screen by a rule and not written as
-cells: the drive's letter and its label, the drive menu's letters, the
-room of the drive in the Info panel, the time of a directory that the
-run wrote into, the place of the program's own files, and what DOS
-showed behind the panels after a command. Every other cell is
-compared. The scenarios that rest on what only DOS has, Russia, the
-diskette, a program or a command of DOS's, are not run, each with its
-reason; others are cut, taken only as far as a step, where what follows
-is DOS's alone, a diskette or the original's directory, or is otherwise
-on Linux for a reason that is written there. Two decisions of the
-user's of 15 October 2026 took most of the cuts away. The bench makes
-its directories and its files in the order of their names, so that the
-tree and the file search, which list a directory as it stands on the
-disk, list it alphabetically on DOS as on Linux. And DOS's names of
-devices, NUL, CON and the like, are ordinary names of files on Linux:
-the steps of a scenario that use them as devices are left out there,
-or the scenario is cut where the original beeps for one. Where a mask cannot do, a patch
-of its own, in `harness/goldens/posix/`, says what the program for
-Linux is expected to show, by what the user decided. `LINUX_NOT_RUN`,
-`LINUX_CUT` and `LINUX_LEFT_OUT_OF` of `harness/deviations.py` have
-every cut with its step, and each is named by an entry of "The program
-for Linux" in `src/portable_c/DEVIATIONS.md`.
+### On Linux
 
-### The web page
-
-The same source is also a web page, step 7 of the road: the program
-built to WebAssembly by Emscripten, one file, `vc.html`, with the
-program, its script, its style and its font in it, and nothing fetched
-from another site. `CLAUDE.md`, "The web page", has every decision of the
-user's that it rests on, and `TODO.md`, "Step 7, the web page", the plan
-and its pieces, W0 to W4. It shares the emulation of DOS of [the
-program for Linux](#the-program-for-linux), the files `*_posix.c` but
-`sys_posix.c` and `term_posix.c`, with a file of its own behind
-`sys.h`, `src/portable_c/sys_web.c`, and the page's own script in
-`src/portable_c/web/`. Its key loop waits by Emscripten's Asyncify, which
-lets it wait on the network too. The screen is the 80 by 25 cells as
-lines of text in a `<pre>`, in VileR's Web437 IBM VGA 8x16 and the VGA's
-colours exactly, with the blink and the cursor of the VGA, scaled by
-whole multiples of the font.
-
-- **Two drives.** C:, labelled VIBE, is where the program lives: its
-  own files, the setup file `VC.INI`, the menu and the extension file,
-  are in C:\VC. D:, labelled DEMO, starts as a small tree of sample
-  files written for the project, `src/portable_c/web/demo`, which the
-  user may change. Both are ordinary drives to the program. The page
-  starts at the root of C:. The shareware's help and menu files are not
-  shipped: F1 shows nothing, as the original does without its help
-  file, until the user brings
-  `VC.HLP` into C:\VC.
-- **Served by its server.** `src/portable_c/web/server.mjs`, a script
-  for Node of Node's own modules, nothing from npm, serves the page and
-  the two drives' directories on the workstation: the page loads their
-  trees from it, and every change on either drive, the setup file's
-  too, is made on the server as it happens, before the program goes
-  on; what the server refuses or cannot do is DOS's error for that
-  call. It never reaches outside the two directories and follows no
-  link of the host's in them. It listens on 127.0.0.1 alone, and
-  Tailscale Serve hands it to the user's tailnet over HTTPS: anyone on
-  the tailnet may write, the tailnet being the access.
-- **Served statically.** The same page, from GitHub Pages or any host
-  with no server, has its drives start from what is served with it,
-  `drives/c.json` and `drives/d.json`, and keeps what the user changes
-  in the browser, in IndexedDB, in that browser alone; Reset drives in
-  its bar forgets the changes. Where the browser gives it no IndexedDB,
-  as some private windows do, it keeps them in the page's memory until
-  the page is closed. The page knows which way it is served by asking
-  where it is served, `api/server`, which its server answers and a
-  static host does not; a server that does not answer is said, and the
-  page does not start, so that a page of the server never keeps its
-  changes in the browser. A host that answers that name by an error of
-  its own, or does not let the page ask for it, is taken for a static
-  one where it serves the drives beside the page, which the server
-  never does.
-- **Files in and out.** Upload in the bar, and files dragged onto the
-  page, write into DOS's current directory, asking before a file is
-  written over. Enter on a file that the extension file has no command
-  for opens it in a new tab of the browser, where the user may view it
-  or save it.
-- **The phone.** It opens on an iPhone, in Safari: the grid is fitted
-  to the screen and fitted again when the phone turns, and the fingers
-  may zoom it; a tap is a click on the cell under the finger. Where
-  there is no mouse, a row of the keys that a phone lacks stands below
-  the grid, F1 to F10, Esc, Tab, the arrows, PgUp and PgDn, with Ctrl
-  and Alt that stay held for the next key, and Enter, wider, at its
-  end, so that the phone's keyboard is not needed for it; the bar's
-  Keys button shows it or hides it anywhere; the bar's keyboard button
-  brings up the phone's keyboard, whose text is typed as keys.
-- **The keys that a browser keeps.** A browser never hands an ordinary
-  tab Ctrl-W, Ctrl-T and Ctrl-N with their Shift forms, Ctrl-Tab and
-  Ctrl-Shift-Tab, Ctrl-PgUp and Ctrl-PgDn, Ctrl-F4 and Alt-F4, or the
-  keys of the system around it, Cmd on a Mac and the Windows key; F11
-  and F12 are the browser's own in most. Every other key that the
-  program takes is kept from the browser, Alt alone too. The bar's Full
-  screen locks the keyboard where the browser allows it, as Chromium's
-  do, and then most of those keys reach the program; holding Esc
-  leaves the full screen. A dead key or an input method's character is
-  not typed.
-- **Licences.** The bar names the program, "Vibe Commander 0.1, based
-  on Volkov Commander 4.05.", and has one small "Licences", on a phone
-  too, which shows in a dialog of the page the licence of every work
-  that the page carries, each in the same form, with its copyright and
-  its home: Vibe Commander's own, Volkov Commander's, Emscripten's,
-  musl's and the font's, the texts of `LICENSE`, `src/asm/LICENSE.TXT`,
-  `LICENSE.EMSCRIPTEN`, `LICENSE.MUSL` and `LICENSE.FONT`, which the
-  build puts into the page as it makes it. Esc and its button close it,
-  and no key reaches the program while it is up.
-- **What cannot work.** A command: a page has no shell, so a command of
-  the command line, the user menu or the extension file, and the
-  external viewer and editor, write "Commands cannot be run in a web
-  page." on DOS's screen, behind the prompt and the command, which
-  Ctrl-O shows as on DOS. No file is a program. F10 ends the program,
-  and the page says that a reload starts it again. The mouse's wheel
-  does nothing, as on Linux.
-
-What it does otherwise than the original for all that is declared in
-`src/portable_c/DEVIATIONS.md`, under "The web page", W1 to W9, on top of
-what is declared of Linux.
-
-**Building it.** Only with an option of its own, since it fetches
-Emscripten, a download of 300 MB that unpacks to 1.5 GB:
+In a terminal of at least 80 columns by 25 rows:
 
 ```sh
-cmake -B build -DVC_WEB=ON
-cmake --build build
+cd ~ && /path/to/checkout/build/portable_c/posix/vc
 ```
 
-A second build directory takes the download of the first with
-`-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=<first>/_deps/emscripten-src`;
-`-DVC_DOS=OFF` beside it leaves Open Watcom and everything of DOS out.
+The program uses the terminal's alternate screen and gives it back when
+F10 leaves. It keeps its setup in `~/.config/vc/vc.ini`
+(`$XDG_CONFIG_HOME/vc` where that is set). The help and the menu files
+are the original's and are not shipped: to have F1 and F2, copy
+`VC.HLP`, `VC.MNU`, `VC.EXT` and the other files of the shareware
+distribution into `~/.config/vc`. `python3 harness/deps.py` downloads
+the distribution to `downloads/vc405sw.zip`. Ctrl-O shows the output of
+the last command. [docs/linux.md](docs/linux.md) has the details.
 
-| Target | What it makes |
-|---|---|
-| `portable_c-web` | `build/portable_c/web/vc.html`, the page, at `-O2` with no sanitizer |
-| `portable_c-web-static` | `build/portable_c/web/static/`, the static site: the page as `index.html`, the two drives' trees as they start, and `.nojekyll` |
-| `portable_c-web-node` | `build/portable_c/web-node/vc.js` with its `vc.wasm`, the program under Node with the host's files, sanitized: the one that the scenarios run |
-| `portable_c-web-serve` | Not built by default: it builds the page and runs its server in the foreground on `http://127.0.0.1:8437/`, C: in `build/portable_c/web/drives/c` and D: in `build/portable_c/web/drives/d`, D: made as a copy of the demo the first time (delete the directory to have the demo afresh); Ctrl-C stops it |
+### As a web page
 
-**Running it by hand.** The target above, or the server with other
-directories or another port:
+With `-DVC_WEB=ON`:
+
+```sh
+cmake --build build --target portable_c-web-serve
+```
+
+This builds the page and serves it on `http://127.0.0.1:8437/` with two
+drives: C:, where the program keeps its files, and D:, a small demo
+tree. Changes are written to the server's directories. The server can
+also be run by hand:
 
 ```sh
 node src/portable_c/web/server.mjs --port 8437 \
@@ -1509,764 +173,175 @@ node src/portable_c/web/server.mjs --port 8437 \
     --drive-c DIR --drive-d DIR [--demo DIR]
 ```
 
-and for the phone, beside it, `tailscale serve --bg 8437`, which hands
-`https://<machine>.<tailnet>.ts.net/` to the port; `tailscale serve
-status` shows it, `tailscale serve --https=443 off` takes it away. The
-static site, on this computer: `python3 -m http.server -d
-build/portable_c/web/static 8438` and `http://127.0.0.1:8438/`; opened as
-`file://` the page cannot fetch its drives. `.github/workflows/pages.yml`
-publishes the static site to GitHub Pages, and does nothing until the
-repository's variable `VC_PAGES` is `publish` and Pages is switched on:
-it has not been, and whether it is to be is the user's (`TODO.md`).
+The server listens on 127.0.0.1 only. To reach it from a phone, put an
+HTTPS reverse proxy in front of it, for example
+`tailscale serve --bg 8437`. Anyone who can reach the page can write to
+its drives, so the proxy is the access control.
 
-**How it is judged.** The program under Node goes through the scenarios
-as the program for Linux does; the page's script and its server are
-held in Node, with nothing downloaded for them; and the page itself is
-opened in the machine's own Chromium, headless, as its server serves it
-and as the static site, on a desktop and as an iPhone held both ways.
-What a test cannot judge, how it looks and feels in Firefox and in
-Safari on the iPhone, is a pass by hand, whose list is in `TODO.md`,
-"W4". For screenshots of the page to look at:
+The static site, `build/portable_c/web/static/`, needs no server: any
+static host serves it, and the page keeps the user's changes in the
+browser. To try it locally:
+`python3 -m http.server -d build/portable_c/web/static 8438`. The
+workflow `.github/workflows/pages.yml` publishes it to GitHub Pages. It
+runs only by hand, and only once the repository variable `VC_PAGES` is
+`publish` and Pages is switched on.
 
-```sh
-node harness/webbrowser.mjs --page build/portable_c/web/vc.html \
-    --site build/portable_c/web/static --work build/browser \
-    --shots build/browser/shots
-```
-
-which saves, for each way of serving, the desktop at its start, with
-its two panels and with its Licences, and the iPhone held upright and
-turned, as `build/browser/shots/{server,static}-*.png`.
-
-| Test | What it checks |
-|---|---|
-| `portable_c-web-probe` | Only with `-DVC_WEB=ON`: every file that the build for the web is to compile, the common code, the files of the emulation of DOS that the web shares with Linux and the web's own, compiled by Emscripten's emcc for wasm32 with the warnings of the program for Linux and `-Werror`, each failure printed. `harness/webprobe.py`, which takes the list of what the web leaves of Linux's files from the configuration |
-| `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`: the program for the web under Node, `web-node/vc.js`, built by Emscripten with Asyncify and the sanitizers of addresses and of undefined behaviour, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drive C: the bench's home directory and D: a directory of the run's with the program's own files in D:\VC. Its screens and its files are held to the original's goldens with what is declared for the portable C, for Linux but the masks of the drive's letter, and for the web, each scenario that is not run on the web or is cut there named by an entry of Linux or of the web page of `DEVIATIONS.md` |
-| `portable_c-web-page` | Only with `-DVC_WEB=ON`: `vc.html` itself, its scripts run in Node with a document of what the page asks of one. Against its server: the drives loaded, the bar's one link to the licences showing the text of each file that the page carries and closed by Esc and its button with no key reaching the program, a directory made, a file opened in a tab, a file written in the editor reaching the server at its close, a directory removed, a refusal of the server shown as DOS's error, the setup saved on C:, and the page's end. As a static site, served by a host that answers 404 for what it has not, on a stand-in of IndexedDB: changes made and kept, the page loaded again with them, the reset, and a browser with no IndexedDB; by hosts that answer 200 with a page or 500 for what they have not, a static site all the same; and a server that is away, by 502, for which the page does not start. `harness/webpage.py` |
-| `portable_c-web-browser` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`: the page in the machine's own Chromium, headless, driven over its DevTools protocol from Node with nothing from npm, as its server serves it, on a free port, and as the static site behind a host that answers 404 for what it has not. On a desktop of 1280 by 800: the start with nothing that says it stopped and the bar's line of where changes are kept right for the way it is served, the VGA's font loaded, the grid 640 by 400, the VGA's colours, Ctrl-F1, Alt-F2 and D:'s demo, the cursor's keys and Tab, F1, the editor's file written (on the server, or kept across a reload of the static page), Enter on a text file opening a tab of a blob, the Licences opened and closed by Esc and by its button with no key reaching the program. As an iPhone, 390 by 844 at three pixels to one, with touch and Safari's agent: the row of keys, Ctrl and Alt of it held for F1 and F2, a tap on a file moving the cursor there, the grid within the screen's width above the bar; turned, 844 by 390, the grid fitted again. And no error in the console, but the 404 by which a static page knows that it has no server. `harness/webbrowser.py`, `harness/webbrowser.mjs` |
-| `portable_c-web-render` | The page's modules that draw and take the keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node: the grids that the program for Linux writes through its test channel drawn, the HTML read back and held to the cells and to the rows that changed; the keys and the mouse's reports that the modules make of the browser's events typed into the program for Linux in a pseudo-terminal, and what it reads held to the BIOS's words. `harness/webrender.py`; skipped where there is no Node or no clang |
-| `portable_c-web-server` | The server and the page's file system in Node: the server's API and its refusals of every path outside the two drives, links of the host's among them; the page's file system against it, with a file system of Emscripten's shape; what the static page keeps in the browser, `kept.js`, in memory and on a stand-in of IndexedDB, every change and refusal, the next visit, the reset, a full store; and the page's script bundled, compiled and run up to the program. `harness/webserver.py`; skipped where there is no Node |
-
-What is declared for the web is `ON_WEB` of `harness/deviations.py`, on
-top of the portable C's as Linux's is, with Linux's scenarios not run
-and cut, and Linux's masks but those of the drive's letter, since the
-tests map the letters as the bench has them; a patch of the web's own
-would be in `harness/goldens/web/`, which has none.
-
-**What it is made with.** Emscripten 6.0.12, under the MIT and the
-University of Illinois/NCSA licences, which builds its C library from
-musl, under MIT: the page has Emscripten's runtime in its script and
-musl's code in its wasm, and their notices are `LICENSE.EMSCRIPTEN` and
-`LICENSE.MUSL` (see [Licence](#licence)). The font, from the Ultimate
-Oldschool PC Font Pack 2.2 by VileR, is under CC BY-SA 4.0, put into the
-page as it comes; its licence is `LICENSE.FONT`. The page's "Licences"
-shows these three with the project's own and Volkov Commander's, all
-alike. Both are fetched by the build, pinned by SHA-256, only
-with `-DVC_WEB=ON`: [What the build downloads](#what-the-build-downloads).
+The page cannot run commands, since a browser has no shell.
+[docs/web.md](docs/web.md) has the details, including the phone's key
+row and the keys a browser keeps for itself.
 
 ## Testing
 
-Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
-One test, `portable_c-host`, asks `gcc`, and those of the source's
-numbers and of the program for Linux ask `clang`: each is skipped where
-there is none. `portable_c-tidy` also asks `clang-tidy`, of version 23,
-which the checks of `.clang-tidy` were judged with (`VERSION` of
-`harness/tidycheck.py`): it is skipped without one, and fails with
-another version, which has other checks. Those of the web page ask
-`node`, and are skipped without it; with `-DVC_WEB=ON` the configure
-stops without one. `portable_c-web-browser` also asks `chromium` on the
-path, any version, and is skipped without it.
+The tests need `python3`, `qemu-system-i386` and `mtools`. Some need
+more and are skipped without it: `gcc` for `portable_c-host`, `clang`
+for the source checks and the programs for Linux, `clang-tidy` version
+23 for `portable_c-tidy`, `node` for the web, and `chromium` on the path
+for `portable_c-web-browser`.
 
 ```sh
-ctest --test-dir build --output-on-failure
+ctest --test-dir build --output-on-failure      # everything
+ctest --test-dir build -LE machine -j4          # the fast tests, a minute or two
+ctest --test-dir build -R portable_c -j4        # what a change to the portable C needs
 ```
 
-There are twenty tests, and four more with `-DVC_WEB=ON`: one of the
-assembly, `asm-bytes`; three of the C translation, `c-data`, `c-arith`
-and `c-scenarios`; fifteen of the portable C, nineteen with the web, of which `portable_c-data` and `portable_c-scenarios` are the
-C translation's checks made of it, `portable_c-host`, `portable_c-int16`,
-`portable_c-words`, `portable_c-width` and `portable_c-cut` are of its
-source, `portable_c-layout` and `portable_c-debug-layout` of its two
-programs for DOS as the linker wrote them, and `portable_c-tidy`,
-`portable_c-posix-unit`, `portable_c-terminal`,
-`portable_c-posix-scenarios` and `portable_c-cap` of [the program for
-Linux](#the-program-for-linux), which that section has, the last of the
-web page's program too, and
-`portable_c-web-render` and `portable_c-web-server`, with
-`portable_c-web-probe`, `portable_c-web-scenarios`,
-`portable_c-web-page` and `portable_c-web-browser` where the web is built, of [the web
-page](#the-web-page), which that section has; and one of the harness
-itself, `harness-le`. The two trees are held against the same
-goldens. The tests that run no machine take seconds, the terminal's
-some forty; `c-scenarios` and `portable_c-scenarios` each run every
-scenario on the machine, so all of them take four to eight minutes on a
-machine that does nothing else. Every test has a label for what it
-judges: `portable_c` for those of the portable C, `frozen` for those of
-the assembly and the C translation, and `harness` for `harness-le`. The
-three that start a machine, `c-scenarios`, `portable_c-scenarios` and
-`portable_c-posix-scenarios`, with `portable_c-cap`, which starts one
-for the bench of Linux as that does, and `portable_c-web-scenarios` where
-the web is built, which runs every scenario under Node, have the label
-`machine` too: `ctest --test-dir build -LE machine` runs the other
-seventeen, twenty with the web, and `-L portable_c -LE machine` those
-of the portable C among them.
+The labels are `portable_c`, `frozen` (the assembly and the C
+translation), `harness`, and `machine` for the tests that start a
+machine or take a program through every scenario. Those take several
+minutes each.
+
+The heart of the testing is the scenarios. A scenario, in
+`harness/scenarios.py`, is a list of key presses and mouse moves. The
+original was taken through each one under FreeDOS in QEMU, and what it
+showed after every step, and the files it left, are kept in
+`harness/goldens/`. A build passes a scenario when it does the same,
+cell for cell. The goldens are derived by
+`python3 harness/goldens.py derive` and never edited by hand. Where the
+portable C is declared to differ, a patch in
+`harness/goldens/portable_c/` or a rule in `harness/deviations.py` says
+how. [docs/testing.md](docs/testing.md) explains the bench, the driver
+in the machine, and how coverage is measured.
 
 | Test | What it checks |
 |---|---|
-| `asm-bytes` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `c-data` | Every text, box, dialog and table of the translation that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
-| `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, called near or far as each returns, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
-| `portable_c-data` | The check of `c-data` for the portable C, `build/portable_c/VC.EXE`: every text, box, dialog and table that has the name of one of the original, against the original's bytes, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A table that is declared to differ is held against the original's with that difference made to it. A text, box, dialog or table of the setup program, which has `St` in front of its name in this tree, is held against the bytes of the original's `VCSETUP.COM` in the same way. A text or a table of bytes is the original's bytes. A box, a dialog and a table of pointers are not: a word that names something is a pointer in C, four bytes in a program of 32 bits with whatever stands behind it that much further on, so the object is longer than the original's and is held against it field by field. Which of its fields are pointers, the test reads in the declaration, `BOX`, `BOX1`, `BOX2` or `DIALOG` of `src/portable_c/tables.h` with its count, or an array of pointers; it fails for an object that is not as long as its declaration makes it with pointers of four bytes, which is how it would show a gap that the compiler had put in, and there is none. A pointer that the original has a name for has to be an address that the extender sets when it loads the program, a relocation of the file, of the thing that the tree has by that name, with the same distance from it; one that the original has a number for, the length of a line that is typed into, or nothing, a line across a box, has to be no such address, with the number in its low half and 0 in its high one; and an address anywhere else in an object fails. A place of the main data is the number of 16 bits that the original has. None of these is shorter than what the code reads of it, as in the C translation. The bytes and the addresses are read in the file, with the harness's reader, where each object is in the linker's map, and how long it is in its object file, since the compiler rounds what a file has of a segment up to four bytes. No machine is run for it |
-| `portable_c-host` | The source of the portable C as another compiler reads it: `harness/hostcheck.py` has gcc read every file of `src/portable_c/` for a machine of 64 bits, as strict C of 1999, and counts by kind what gcc refuses, a pointer cast to a number of 16 or 32 bits, a number made a pointer, a structure that is not as long as on DOS, and what only Open Watcom reads, an interrupt function, inline assembly, a `#pragma` of its own. `harness/hostcheck.txt` has what was counted last, of every file, and the test fails where a file has another count of any kind: more, and a clean file that is clean no more, and fewer too, so that the record is always what is so, and what a change did to it shows in the commit. `python3 harness/hostcheck.py --record` writes the record anew, `--show` lists the places of a file or of a kind, and `--macros` says which macros make the casts. Nothing is compiled or run for it. It is skipped where there is no gcc |
-| `portable_c-int16` | The arithmetic of the portable C that counts on an int of 16 bits. C makes an int of two numbers of 16 bits before it adds them or takes one from the other: without a sign and wrapped round where an int has 16 bits, with a sign and not wrapped where it has 32. `harness/int16.py` has clang read every file, for a machine whose int has 32 bits, and works out by the rules of C where a number that an int of 16 bits and one of 32 may have otherwise is looked at before it is put back into 16 bits: held against another, divided, shifted right, made a number of 32 bits, asked whether it is 0, added to a pointer; and where a number that is written below 0 is kept in 16 bits without a sign, `(u16)-160`, which added to a pointer is the way back only where a pointer wraps round at 16 bits. `harness/int16.txt` has every such place, with the reason why it is the same with either int all the same, written by whoever read it: the code was written and judged with an int of 16 bits and is compiled with one of 32, so a place is where the program can do otherwise than what it was translated from, and where step 2 of the road widens a variable; a place that can differ has no reason and gets the cast that says what an int of 16 bits does, `(u16)(a - b) < c`. The test fails for a place that the record has not, for one of the record that is gone, and for one without a reason. The finder is held against lines that were written for it, `harness/int16check.c`, each time it runs. `--show` lists the places of a file or of a kind, and `--record` writes the record anew and keeps the reasons. Nothing is compiled or run for it. It is skipped where there is no clang |
-| `portable_c-words` | The words by which the portable C says where a thing is in the memory, `MD_PLACE`, `ENTRY` and their like, which stood for what a segment and an offset were on DOS and went as a segment became a pointer, `AT` and `SEG_OF` the last of them; those that are left are an offset or a place of 16 bits that stays. `harness/words.py` counts how often each file of `src/portable_c/` writes each, `harness/words.txt` has what was counted last, and the test fails where a file has another count, fewer as well as more, so that what a change did shows in the commit. `--record` writes the record anew and `--show` lists the places of a word or of a file. Nothing is compiled or run for it |
-| `portable_c-width` | The numbers without a sign of the portable C, of 8, 16 and 32 bits, which step 2 of the road makes as wide as what they count and gives a sign unless there is a reason for none. `harness/width.py` has clang read every file, as the test of the int does, and finds every such number that a file declares, what a function returns, a parameter, a variable, a field of a structure; where a number with a sign that may be below 0 by its type is shifted to the right or divided; and, to print for whoever is to widen a number and held by nothing, every cut, where a number that may not fit, by the types alone, is put into 8 or 16 bits with no cast, by being kept, stepped, handed to a function or returned. `harness/width.txt` has the numbers and the places of a sign. Of a function or a structure that has been sorted by the rule of that step, every number that is still without a sign and every such place is an entry with its reason, written by whoever read it: for a number that has its width, or no sign, by what it is, a character, a cell of the screen, a row and a column, bits, the size of a file, one word of a list that the record has at its top with what each says, since the code gives no type a name for what a number means, and for anything else a sentence; what was given a sign or made a boolean is counted in the table at its top, by file and by the clusters of the plan; a structure whose layout is not the program's to change is there once, with whose it is; and of what nobody has read yet it has the counts. The test fails where the tree is not as the record has it, a count that moved, fewer as well as more, a number that is new in something sorted, an entry without a reason, so that a number added later is sorted and a commit shows what it widened. And a file that is sorted is held to the casts: where a number meets one of another sign or is put into fewer bits, the code says so with a cast, and no list beside the code has such a place. The test fails for what clang says of such a file under `-Wconversion`, all of it, which has `-Wimplicit-int-conversion` and `-Wsign-conversion`, under `-Wsign-compare`, and under two warnings of a boolean that is none, none of them switched off for a line, which it also looks for. What clang names is what is held: arithmetic on numbers of 8 or 16 bits that is kept in as many, `word = word + 1`, and a step, `++` and `+=`, it leaves out on purpose, and such a place stays as it is written. The finder is held against lines that were written for it, `harness/widthcheck.c`, each time it runs. `--show` lists the numbers and the cuts of a file, of a function, or what is cut in being handed to a function, in every file; `--sort` makes entries of what is not sorted; `--record` writes the record anew and keeps the reasons. Nothing is compiled or run for it. It is skipped where there is no clang |
-| `portable_c-cut` | A cut that Open Watcom's compiler loses, and those that it keeps. It extends a number with a sign that is converted to a wider type without one, and from there to a still wider type, with its sign both times: a byte with a sign made a number of 16 bits without one, `(u16)(signed char)byte`, has its sign in all 32 bits wherever it goes on into 32 bits, FFFFFFFEh for the byte FEh where C says 0000FFFEh. With a `short` between it is right; the portable C writes neither, but takes the byte that the original's `CBW` makes a word as it is, or with its sign into an int. `harness/cut.py` has clang read every file of the tree and fails for the form that is lost, anywhere, also where a mask or arithmetic with a number that is written makes it come out right today, and for a number of 64 bits or a floating type, where the same fault is with another third type; it fails for a build whose options expand a function in place, `-oe` or `-ox`, with which the fault is across a call as well; and it compiles `harness/cutcheck.c` with the compiler and the options that the build compiles the tree with and holds each of its functions to the instructions that are written in front of it: those that have the fault to the wrong ones, so that a compiler which is mended is noticed, and the form with a `short` between, with every other cast that narrows, each handed on, added, compared and made an index, to the right ones. It runs no machine; without clang the tree is not read, and the test counts as skipped if the compiler's half has passed. |
-| `portable_c-layout`, `portable_c-debug-layout` | [The two programs of the portable C](#the-portable-c), each as the linker wrote it, against the layout that the tests rest on: one that is linked otherwise has its stack where the driver of the tests does not look, or is many times slower on the machine of the tests, with no word said. `harness/layoutcheck.py` reads the file and the linker's map of it, with the harness's reader, and holds: that the stack is the segment which ends where the file's header has the stack's top, as the driver of the tests looks for it, and is in the file as zeros; that the file holds of the data everything but what has no value; and that nothing which a scenario writes shares a page of the memory with code. And of the file itself: two objects, each as long as the map has it, the entry at `Start`, every relocation an address with the offset of what it names in the file, and a stub that is DOS/32A's with the banner switched off and nothing else changed. Until the piece F10 of step 2 it held the tables, `IniSave` and the end of the program to where the megabyte that the program kept inside its own let a segment and an offset name them: those rules went with that megabyte. No machine is run for them, and neither program is run; the debug program is read by no other test |
-| `harness-le` | It judges the harness and no tree, and is named for that. The harness's own reader of a 32-bit program for DOS, `harness/le.py`, which the tests of the portable C go by. `harness/lecheck.py` builds a toy, `harness/lecheck.c`, as a flat program with DOS/32A for its stub, with the compiler and the linker that the build fetches, and holds what the reader finds in the file and in the linker's map against what the toy's source says must be there: where the stub ends, the objects and how much of each the file has, the entry and the stack, where a symbol is, a static one too, and every address that the extender puts in when it loads the program, with those that lie across the end of a page and those that name something outside their object. The toy is not run; what it shows of itself on the bench, and how that is held against the reader by hand, is at the top of `harness/lecheck.py`. No machine is run for it |
-| `portable_c-scenarios` | The check of `c-scenarios` for the portable C, by the same `harness/ported.py` and against the same goldens: what is said of the translation in the row below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A scenario that is declared to change is held against the original's golden with that difference made to it, the steps that are left out, the rules and the rows of its patch, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original's golden as it is, and names the others. A patch that does not fit its golden, or that names no entry of `DEVIATIONS.md` which names its scenario, fails the test. Before anything is run it asks `harness/layoutcheck.py` for the layout, as the test `portable_c-layout` does; and from QEMU's log of the code that ran, it holds that the program was in the memory where the driver of the tests reads its variables and its stack, and so was a copy of it that a scenario starts from its command line. Half of the stack is to be left in every scenario. Every C function of a batch has to have run, under the name that this tree has it by: the entry of the critical error is `DeviceEntry` of `sys_dos.c`, and the entry of the program `Start`. Its file is held to no multiple of the original's size: the test says how long it is |
-| `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
+| `asm-bytes` | The assembled original is identical to the shipped binaries, apart from the room reserved for the shareware's own code |
+| `c-data` | Every text, box, dialog and table of the C translation holds the original's bytes |
+| `c-arith` | The C translation's routines for 32-bit multiplication and division, against Python |
+| `c-scenarios` | The C translation through every scenario, and every translated instruction run by some scenario |
+| `portable_c-data` | `c-data` for the portable C, with declared differences |
+| `portable_c-scenarios` | The portable C for DOS through every scenario, against the goldens with declared differences |
+| `portable_c-layout`, `portable_c-debug-layout` | The two DOS programs as the linker laid them out |
+| `portable_c-host` | The source as gcc reads it for a 64-bit machine, counted against a record |
+| `portable_c-int16` | Arithmetic that counts on a 16-bit `int`, each place with its reason |
+| `portable_c-words` | How often each word for a place in memory is used, against a record |
+| `portable_c-width` | The width and sign of every 8- and 16-bit number, with clang's conversion warnings |
+| `portable_c-cut` | A narrowing cast that Open Watcom loses, nowhere in the source |
+| `portable_c-tidy` | The common code and the Linux files, with clang's warnings and clang-tidy |
+| `portable_c-posix-unit` | What the Linux build emulates of DOS: names, aliases, code page, drives |
+| `portable_c-terminal` | What the Linux program draws in a pseudo-terminal, replayed through pyte |
+| `portable_c-posix-scenarios` | The Linux program through the scenarios, with masks for what is the host's |
+| `portable_c-cap` | The cap on the memory of the program's blocks on each platform |
+| `portable_c-ios-keys` | The table of iOS hardware-keyboard keys, held to the BIOS's key words |
+| `portable_c-ios-host-scenarios` | The iOS program, built on Linux against a stand-in shell, through the scenarios |
+| `portable_c-web-probe` | Every file of the web build compiles for WebAssembly |
+| `portable_c-web-scenarios` | The web program under Node through the scenarios |
+| `portable_c-web-page` | The page's scripts in Node, against its server and as a static site |
+| `portable_c-web-browser` | The page in headless Chromium, on a desktop and as an iPhone |
+| `portable_c-web-render` | The page's drawing, keys and mouse modules in Node |
+| `portable_c-web-server` | The web server's API and its refusal of every path outside its drives |
+| `harness-le` | The harness's reader of 32-bit DOS programs |
 
-### Scenarios and goldens
+The web tests other than `portable_c-web-render` and
+`portable_c-web-server` need `-DVC_WEB=ON`.
 
-A scenario is a list of key presses, written down in `harness/scenarios.py`.
-The original was taken through each one once, and what it showed after the
-start and after every step, and what it left on its disks, is kept in
-`harness/goldens/` as text. A build is right if it does the same. The
-goldens are derived, never edited:
+## The pictures
 
-```sh
-python3 harness/goldens.py derive [SCENARIO...]
-```
+The animation at the top is made by `python3 harness/session.py`, with
+the project built with `-DVC_WEB=ON` for the font. It runs the Linux
+program in a pseudo-terminal through a fixed list of keys and draws each
+screen as a frame of an SVG that animates by CSS alone. Two runs give
+the same file.
 
-Where a build is meant to differ from the original, `harness/deviations.py`
-says how, and the golden is derived with that difference in it, so that it
-holds exactly what a build should show. There are three such places. The
-banner names the edition, and the published source is of another edition
-than the binaries shipped in 2000: that holds for as much of the name as
-shows, its beginning next to a panel on the right or its end next to one
-on the left. The program names its own file when
-it cannot load it again after a command: the original is `VC.COM`, the
-translation `VC.EXE`. And the command that starts the original's setup
-program, of which the next paragraph says more, is no line of what a
-build shows.
-
-The original is two programs, `VC.COM` and its setup program,
-`VCSETUP.COM`, and the portable C is to be one, with the setup an item of
-its Options menu. A scenario may be of the setup program: it says so in
-`harness/scenarios.py`, and the original then has `VCSETUP.COM` of its
-distribution next to it on the bench, which a step starts from the
-original's own command line, with the banner that it prints sent
-nowhere. Its golden is what the setup program showed, driven and
-recorded as the main program is, and the list of what ran that is kept
-with it is of `VCSETUP.COM`, apart from those of `VC.COM`. A tree that
-has the setup in itself is taken through the same steps, but for the
-keys of its menu's item in place of the command, and has to show the
-same, screen for screen: behind the setup program is what DOS has shown,
-and the one line there that a build has not is the command's own. The C
-translation has no setup program and is taken through none of these
-scenarios. The top of `harness/scenarios.py` says how such a scenario is
-written, derived and declared; `setup` is the first.
-
-Some numbers on the screen are not compared at all: the bytes that the
-editor says it has free, the memory that the Info panel says is free, and
-what `mem`, run as a command, says is in use and free. All follow the
-size of the program, the last two the size of the part that stays in
-memory while a command runs, or the Info's that of all of it when Memory
-allocation is switched off. The translation is larger than the original and
-has less, by more with every routine translated, and the numbers are not
-worth an expectation that follows the size of the build. Both screens
-have `#` in their place when a build is held against a golden, so a
-golden that was derived with a number still in it need not be derived
-again. The editor's and the Info's numbers are left out for the C
-translation alone: the portable C shows no figure of free memory
-(`src/portable_c/DEVIATIONS.md`, 11 and 24), and where the original has
-one it is expected to show what the declaration says, every cell of
-it. What `mem` says is left out for every tree.
-
-What the portable C is declared to do otherwise than the original is
-another matter, since the original cannot be made to show it. The
-portable C is held against the original's goldens there too, with the
-declared difference made to a golden each time it is read for that
-tree, and written nowhere: the steps that the tree is not taken through
-are left out with their screens; what is otherwise on many screens is a
-rule of the comparison, for that tree alone; and the rows that one
-scenario shows otherwise are its patch, `NAME.patch` in
-`harness/goldens/portable_c/`. The rules are of the program's name,
-which the original has on a thousand screens, in its banner behind the
-panels, in the Info panel and over the help, often with a menu, a box
-or a panel over a part of it. Such a rule is a part of the screen,
-`Part` of `harness/deviations.py`: the text as the original shows it
-and as the portable C does, cell for cell. Wherever enough of the
-original's text shows on a screen of the golden to know it by, each
-cell that the golden has as that text has it is expected as the
-portable C's text has it, and every other cell, which is what covers
-the text, as the golden has it. So a rule leaves no cell out of the
-comparison, and a screen on which it is wrong of a cell fails and gets
-a patch. The rule for the top of the Info panel is four rows of the
-panel with their colours, since the portable C has other rows there,
-without the original's two lines on the memory: it knows its cells in
-the shadow of a menu too, and the panel with its first rows gone off
-the top of the screen. A patch says of each such row what the
-original's golden has and what the portable C is expected to show, one
-above the other, by the screen's line in the golden and the number of
-the row:
-
-```
-Deviation: 7 of src/portable_c/DEVIATIONS.md
-Why: the key bar with Alt held has no name for F5, where the original
-has Memory
-
-== 13: Alt+F10
-row 23
--|1Left   2Right  3View.. 4Edit.. 5Memory 6DirSiz ...| 07x1 30x6 ...
-+|1Left   2Right  3View.. 4Edit.. 5       6DirSiz ...| 07x1 30x6 ...
-```
-
-It is exact: it is made to the golden only where every row with `-` is
-what the golden has, and otherwise the test fails before anything is
-run, with the patch, the screen, the row and both lines. That happens
-when the original's golden has been derived again and come out
-otherwise, or when the scenario has other steps, and is a failure to
-look at: a patch is not made again to make it go away. The top of
-`harness/goldens.py` has the whole form, with the cursor, the cells
-that blink and the disks, and says why it is not a unified diff.
-
-```sh
-python3 harness/goldens.py patch --tree portable_c SCENARIO...
-python3 harness/goldens.py changes --tree portable_c [SCENARIO...]
-```
-
-The first is how the rows of a patch are got: it takes the build
-through the scenario and writes every row that differs from the
-original's golden, under a header to be filled in. What it writes is
-what the build did. It becomes a patch when its author has read every
-row against the entry of `src/portable_c/DEVIATIONS.md` that declares
-it, has named that entry and the reason in the header, and has
-committed it: a statement of what the program is to show, which the
-tests then hold the program to, not another run. A row that the
-declaration does not explain is a change that was not meant. The
-second prints what each patch says, the rows with the cells that differ
-marked, and the steps that are left out. Which steps are left out of
-every scenario for the tree, which of one scenario, where they pass
-through something that the tree has no more, which rules it has and
-which scenarios are not run for it at all is in
-`harness/deviations.py`, under `TREES`, as
-`src/portable_c/DEVIATIONS.md` declares it; a patch names the entries
-of that file which it is of, and the test fails for an entry that does
-not name the scenario, and for a scenario that is not run and that no
-entry names.
-
-Two more deviations show on no screen, and are listed in the same file.
-When the original tries again to load itself after a command, it stores a
-word through a segment register that is left on the DOS environment, and
-the word lands in other data of its own. The translation stores it where it
-belongs. And of two codes in the markup of its texts, one for a colour and
-one for a character, the original's routine that writes a line has each
-for the other, unlike the routine that measures it and unlike Norton
-Guides, where the markup comes from. The translation has them agree. No text
-uses either code.
-
-`python3 harness/compare.py FILE [SCENARIO...]` takes any
-`VC.COM` or `VC.EXE` through scenarios and reports where it departs from
-the goldens. For a `VC.COM` it needs the listing that the build writes
-next to the file, and for the translation's `VC.EXE` the linker's map there.
-No test runs the programs assembled from `src/asm/`, which the
-byte comparison answers for; this is how to run them. The copy with the
-reserved room has no edition name in its banner, and differs from the
-goldens wherever the banner shows.
-
-`python3 harness/show.py STEP...` prints the screens that the original
-shows after each of some steps, or with `--program` those of a build. It
-is how to find out what keys do before writing them into a scenario. With
-`--changes` it prints of each screen only the rows that differ from the
-one before, which is most of what there is to see; rows that are again as
-they were after an earlier step, as when a dialog closes, it names in a
-line. A step that the program does not get through ends the run after
-five minutes, as in a test, or after `--limit SECONDS`, with the screen
-it stopped on. With `--setup` the bench has the original's setup program
-for a step to start.
-
-`python3 harness/reach.py ROUTINE...` says of each routine of the original
-how many of its instructions some scenario has run and which are left, by
-their addresses, in a line; with `--list` it prints those that are left as
-the listing has them. With `--steps` it says which of them some steps
-would reach, and takes `--limit` like `show.py`. With `--setup` the
-routines are those of the original's setup program, and what has run is
-what the scenarios of the setup program have run of it.
-
-`python3 harness/notice.py FILE OLD NEW` makes one change to a copy of a
-C tree, the one that `FILE` is of, builds it, and says which scenario
-notices, or that none does.
-That an instruction ran in the original does not mean that a screen shows
-what it is for; this is how to find out, for a branch whose effect cannot be
-pointed to in a golden.
-
-`python3 harness/arithcheck.py build/c` is the test `c-arith` by
-itself; with `--pairs N` it takes that many random pairs of numbers
-where the test takes 4,000. The two routines were held to 200,000 when
-they were written, which takes two and a half minutes.
-
-### The machines
-
-DOS is booted once for each country that scenarios need, the United States
-and Russia, and the machine is saved as it is about to start the program.
-Every scenario then gets a machine of its own in that state, which takes a
-tenth of a second: the program under test on drive `D:` with the original's
-help and configuration files, started in `C:\WORK`, on disks that no other
-scenario has touched, and on a third disk, one without a file system, the
-script of the scenario. Keeping the program off the drive it displays stops
-its file size from appearing on screen as free space. A scenario that wants
-the program set up differently does that itself, through the menus. When a
-build is tested, up to four scenarios run side by side.
-
-What the machines need while they run, the images of their disks above
-all, 60 to 130 MB for a scenario, is kept in `build/tmp` of the checkout
-and removed when a run ends; what a run has left there by being killed,
-the next run removes. A directory that the environment names for
-temporary files, by `TMPDIR`, is used in its place. So is the system's,
-with a line that says so, where the checkout lies so deep that the
-socket by which QEMU is spoken to would have too long a path there.
-`workdir` of `harness/dos.py` is the one place that makes such a
-directory.
-
-The hard disks are SD cards, each in a controller of its own, which the
-BIOS serves like any hard disk; DOS and the program know a disk only
-through the BIOS. QEMU reads a sector of an SD card, as of a diskette,
-while the machine executes the instruction that asks for it. A disk on
-its IDE controller it reads in the background, and the BIOS asks in a
-loop whether the sector is there yet: how often, depends on how busy the
-computer is, and that made a machine's time of day differ from one run
-to the next (see below). QEMU does not keep all of such a controller in
-a saved state, so the harness notes where the BIOS has put each one and
-tells the machine that goes on from the state, through the ports that
-the BIOS used.
-
-Where DOS loads the program is chosen: the driver of the tests keeps some
-memory more than it needs, so that the original's stack ends where a page
-of the machine's memory ends. QEMU has to look at every write to a page
-with code in it that it has run, and the program has its code right
-behind its stack: a push is many times slower there than elsewhere, which
-is a third of the time of a scenario with dialogs or more. The translation
-has its texts behind its stack, more than a page of them, and does not
-depend on where it is loaded. The portable C has its stack
-among its data above the megabyte, where the linker put it, and the
-test of its layout holds that nothing which a scenario writes shares a
-page with code.
-`python3 harness/place.py` says where the stacks of the original and of
-the translation end on each bench.
-
-Both machines have a mouse: the PS/2 mouse of QEMU's PC, and FreeDOS's
-driver for it, CuteMouse, which the boot floppy lacks and the harness adds.
-The program finds the driver and shows the pointer, a cell of the screen
-with its colours exchanged, in the middle of every screen until a
-scenario moves it. A step moves the mouse and presses its buttons by the
-cell it goes to: "Click@3,5", "RightClick@3,6", "MiddleClick@3,7",
-"Move@40,12"; a button held while the pointer moves is "Click@3,5>3,2".
-CuteMouse takes a PS/2 mouse for one of two buttons until it is told of
-the third, so the bench loads it with its option for that, /3.
-
-The Russian machine also has a Russian keyboard: the keyboard driver of
-FreeDOS with its Russian layout, which the boot floppy lacks and the
-harness adds. It types Latin letters until Alt and the right Shift select
-its Cyrillic ones, and a scenario can then type Russian text. The driver
-takes 40 KB, so this machine shows less memory free than the other. The
-other machine has the keyboard a PC has by itself, and no way to type a
-letter beyond ASCII: Alt with the numeric keypad types nothing there.
-
-The program is set up as its distribution sets it up, with three
-exceptions.
-The clock in the corner of the screen is off. It would put the time of day
-on every screen, and the machine's time is counted in the instructions it
-executes (see below), of which the translation takes more than the original
-to get through a scenario. And the panel on the right lists files, as the
-one on the left does, where the distribution has the Info panel there: that
-shows the size of the memory, the label of the disk and what is free on it,
-things of the machine and of the system, and it would be on nearly every
-screen of nearly every scenario. No setup file
-is prepared for either. Whenever the harness sets up its machines, the
-original is started once, made to switch the clock off in its Options menu,
-to make the right panel one of files in its Right menu, and to save its
-setup, and the `VC.INI` it writes is what every scenario
-starts from. One scenario, `clock`, switches the clock on again, and a
-scenario that is about the Info panel switches that on.
-
-The third is that the panels of the bench list their files sorted by
-name, where the distribution has them unsorted, on the user's word of
-15 October 2026:
-the same setup file is saved with Name chosen in the Left and the Right
-menu. The order of a directory is that of its entries on the disk,
-which the portable C no longer shows ([entry
-29](#what-a-user-sees-no-more)), so the scenarios move the cursor to
-the files that they mean in a sorted list. The tree of directories and
-the file search have no order of their own and list a directory as it
-stands on the disk; on the user's word of the same day the bench makes
-its directories and its files in the order of their names, so that
-those lists are alphabetical on DOS too, as they are on Linux. A
-directory still stands in front of the files of its directory, as the
-bench makes them.
-
-A scenario that wants files to work on that are not the bench's own has
-them in `C:\FILES`, on its bench alone, since the bench's disks are on
-every golden: the files of FreeDOS's boot diskette's `FREEDOS\BIN` in
-`BIN`, and three files in front of it, two of the diskette's and one of
-the distribution's, with their times (`files_layout` of
-`harness/setups.py`). Such a scenario went to `A:`, the diskette, or to
-`D:\VC`, the original's directory, for them before; the program for
-Linux has the same files in `H:\FILES`, so that the scenario runs alike
-on every platform, and its golden was derived again from the original.
-
-### When a step is finished
-
-The screen has to be read when the program has done all that a key makes
-it do, and not before; and a key has to come when the program is ready for
-it. Neither is decided from outside the machine. DOS loads a small
-resident program before Volkov Commander, the driver of the tests
-(`harness/DRIVER.ASM`, with `harness/driver.py` for the host's side), and
-that takes the program through the steps of the scenario's script.
-
-The driver stands in for nothing. A key is the scan codes that the
-keyboard would send, handed to the keyboard controller with the command
-it has for that, so the BIOS, and on the Russian machine the keyboard
-driver of DOS, make of them what they make of a keyboard's: the key in the
-BIOS's buffer, and Shift, Ctrl and Alt in its flags. Every request the
-program makes for a key is answered by the BIOS as always. The mouse is
-fed the same way: its packets, the buttons and how far it has moved, go
-to the controller's auxiliary port, the BIOS hands them to the mouse
-driver, and the mouse driver moves the pointer and answers the program.
-A mouse does not say where it is, so a step takes the pointer to the top
-left corner first and from there to its cell, in movements too small for
-the driver to speed them up.
-
-The driver only watches three interrupts on their way to their owners:
-the one by which a program says that it is idle, which Volkov Commander
-calls every time it has gone round waiting for a key; the BIOS's
-keyboard interrupt, for a program that waits inside the BIOS; and the
-mouse driver's, where the program asks which buttons are down. A button
-of the mouse comes up when the program has asked that so many times: a
-program that waits for it to come up is not idle, and asks nothing else.
-
-When the program is idle and the BIOS's buffer is empty, it has taken
-every key so far, and the driver hands over the next: so no key is ever
-found waiting by a program that looks for keys while it works. Shift, Ctrl
-and Alt go down and come up one at a time, with a round of the program
-between. Where a scenario wants the program to find a key while it works,
-as `find` does of a search, the key is written as one name with the key
-that starts the work, "Enter+Home": the two go into the buffer together.
-A step may also let time pass with nothing pressed, "Wait*18" for 18
-ticks of the machine's timer, a second: the driver hands the program
-nothing more until the BIOS's count of ticks has gone up by so many, and
-the program does meanwhile what it does by itself, as after a minute
-without a key, when it blanks the screen.
-A step is finished when the program has gone round twice with no key left
-and nothing that it will do by itself after a while, which the driver
-reads in the program's own data: a time of day, which it believes for two
-seconds, since the program's data holds no time that means anything
-until the main loop has run. The driver then writes the screen, with
-the cursor, to a port that QEMU keeps in a file, and goes on with the
-next step; after the last it resets the machine, which ends QEMU. The
-host starts the machine and reads the file and the disks afterwards.
-
-The original and the translation are driven alike, and neither is changed
-for it. What the driver has to know of a program, its name and where two of
-its variables are, it is told in the script, which takes that from the
-listing of the original's assembly: the translation keeps those variables
-where the original does. It knows the program's call of the
-idle interrupt from DOS's by where the call comes from: the memory of the
-program that DOS has as the current one, and that has that name. None of this is measured
-in time, and a busy computer makes a run slower, not different.
-
-The portable C is driven by the same driver, and is not changed for it
-either. It is a program of 32 bits under [the extender](#the-extender),
-and that is another thing to the driver in two ways. Its idle call comes
-through
-the extender, from the extender's part of real mode, which lies in the
-block of the program that DOS has as the current one: the driver knows
-the call as it knows any. But the program's data is above the megabyte,
-where a program of real mode cannot read. So the script tells the
-driver three addresses of the machine's memory, of the two variables
-and of the stack, which `harness/driver.py` works out from the
-program's file, the linker's map and the place where the extender puts
-the program on the bench (`BENCH` of `harness/le.py`); and the driver
-reads there with the BIOS's service for moving a block of the memory,
-INT 15h with 87h, every time the program comes round. That is a part of
-the driver that only such a script switches on, by an event in front of
-its first key, so the original goes through the instructions that it
-went through before the driver had it: every golden was derived again
-to see that, and none changed. A scenario may start the program a
-second time from the command line of the first. The extender loads
-that copy right behind the first, the script has the addresses of
-three copies, each started by the one before, and the driver finds out
-which of them idles by counting the programs of that name along DOS's
-blocks of memory. From QEMU's log of the code that ran, the scenarios'
-test holds that the program, and every copy of it, was where the
-driver was told. A machine's second takes more of the computer's time
-while this program idles than while the original or the C translation
-does, for the way through the extender and the block moves at every
-round; nothing that a scenario shows differs for it.
-
-Where time is what the program goes by, it is the machine's, and the
-machine's clock is counted in the instructions that the machine executes,
-256 nanoseconds for each (QEMU's `-icount`): the timer's ticks, the time
-of day and the waits of the program come when the machine has done so
-much, not when the computer has had so long. Nothing of the computer's
-time gets into it. Where the machine is halted, as the BIOS halts it
-while a program waits there for a key, its clock goes straight on to the
-next tick of the timer (`sleep=off`). Nothing in the machine waits for
-the computer: its disks answer within the instruction that asks. And the
-state that every scenario starts from is saved where the machine stops
-itself, which the driver has it do, by the port QEMU has for that, when
-it is loaded and finds no script. So every scenario begins at the same
-instruction and the same time of day, and gets to each of its steps at
-the same hundredth of a second, in every run and on a computer however
-busy. The program's first screen comes some ten seconds past noon. A
-scenario that shows the time of day still has to do so early, within the
-machine's first minute: the translation and the original do not execute the
-same number of instructions, and their clocks drift apart by that.
-
-With the clock on, when a golden is derived, the driver looks at the
-screen every time the program comes round, for more than a second of the
-BIOS's timer ticks, and writes out both states of what blinks.
-
-Nothing waits without a limit. A program that hangs fails its scenario
-when the driver has written nothing for five minutes, with the screen it
-got stuck on, and one that resets its machine fails at once. The five
-minutes are of the computer's clock and of the machine's own, both: when
-the computer's are over, the harness asks QEMU how many instructions the
-machine has executed since the driver last wrote, and gives the program
-up only if those are five minutes of the machine's clock too, or if it
-executes nothing at all. So a machine that the computer has given little
-time is waited for, and a step takes as long as it takes there; a step
-that has the driver wait has the seconds of its wait besides. Nothing
-keeps runs of the harness apart: several checkouts may run their machines
-on one computer at once, and each only gets slower.
-
-### What ran
-
-Which code ran is taken from QEMU's log of the code it translates, which
-`harness/coverage.py` matches against the program file. For the original
-it is recorded with the goldens, and mapped to source lines through the
-listing of the build in `build/shareware-layout/`, which has every
-instruction at the address it has in the original. The translation's code is
-not in the memory quite as it is in its file: the program adds the segment
-it is loaded at to the words that its relocation table names, and the file
-is held against the log with those words as the program has them where
-it is. The portable C is a linear executable behind its stub, and the
-extender puts an address into every place of it that names something
-when it loads it: `harness/le.py` makes of the file what the memory then
-holds, with the first object where it is on the bench, and the log is
-held against that, as far as it is code.
-
-The reserved room is listed in `harness/bytecheck.py`, with the offset and
-length of each piece and a note of what the original has there.
-
-## Running the original
-
-Needs `python3`, `qemu-system-i386` and `mtools`.
-
-```sh
-python3 harness/screenshot.py
-```
-
-This downloads the Volkov Commander 4.05 shareware distribution and FreeDOS,
-builds a boot floppy and a hard disk with the distribution unpacked in
-`C:\VC`, boots the machine in QEMU, starts `VC` and waits for the screen to
-stand still. It then writes to `out/`:
-
-| File | Contents |
-|---|---|
-| `screen.png` | The display as the video card renders it |
-| `screen.bin` | The text screen from video memory: 4000 bytes, a character and a colour attribute for each of the 80x25 cells |
-| `screen.txt` | The characters of `screen.bin` as UTF-8 text |
-| `screen.json` | Video mode, cursor position and shape, and which cells blink |
-
-The run is repeatable: the PC's clock starts at noon on 16 June 2000 on every
-boot and every file on its disks has a fixed date, so two runs give identical
-files. `--scale 3x4` enlarges the 720x400 display to roughly the 4:3
-shape it had on a monitor.
-
-With `--program`, a build is run on the test bench instead, in `D:\VC`
-with the files that it reads there and nothing else, and taken through
-the steps that follow, written as a scenario's are: the screen is taken
-when the program waits for a key behind the last of them. With `--home
-C` as well, the program and those files are in `C:\VC` instead, next to
-the bench's other files on `C:`, and the program is started there. The
-picture at the top under the session is `screen.png` from
+The DOS screenshot is made by
 
 ```sh
 python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE \
     --home C "F9 o l" Ctrl+l Wait*9
 ```
 
-with the project built. Of the bench's setup, which has the clock off and
-files in the right panel, `F9 o l` switches the clock on and `Ctrl+l`
-makes the right panel the Info panel, of drive `C:`; and `Wait*9` lets
-half a second pass, so that the colon of the clock shows when the screen
-is taken. The bench has a mouse, and the program shows its pointer
-where the mouse driver puts it when the program starts, in the middle of
-the screen: a step such as `Move@4,7` would put it elsewhere. Two runs give the same files.
-`python3 harness/screenshot.py --scale 3x4` makes the picture of the
-original that the top of this README showed before, byte for byte.
+## Further reading
 
-## The session at the top
+| Document | What it holds |
+|---|---|
+| [docs/translation.md](docs/translation.md) | How the assembly is built byte for byte, and how the C translation is made and laid out |
+| [docs/portable-c.md](docs/portable-c.md) | The portable C for DOS: its layout, the system interface `sys.h`, the extender, and its figures |
+| [docs/linux.md](docs/linux.md) | The program for Linux: what it emulates and how it is tested |
+| [docs/web.md](docs/web.md) | The web page: its drives, its server, the phone, and its tests |
+| [docs/testing.md](docs/testing.md) | The scenarios, the goldens, the bench and the driver |
+| [src/portable_c/DEVIATIONS.md](src/portable_c/DEVIATIONS.md) | Every place where the portable C behaves otherwise than the original, and why |
+| [CLAUDE.md](CLAUDE.md) | The rules the work follows, and the decisions behind them |
+| [TODO.md](TODO.md) | What is left to do |
+| [DIARY.md](DIARY.md) | How the work got here, day by day |
 
-The animation at the top of this README, `docs/vibe-commander-session.svg`,
-is the program for Linux in motion, made by
+## Downloads
 
-```sh
-python3 harness/session.py
-```
-
-with the project built with `-DVC_WEB=ON`, which fetches the font. It
-runs `build/portable_c/posix/vc` in a pseudo-terminal of 80 by 25, in a
-home directory of its own that holds the web page's demo,
-`src/portable_c/web/demo`, with fixed times; types a fixed list of keys
-as xterm sends them, each when the program has stopped writing; replays
-what the program writes through pyte, as the test `portable_c-terminal`
-does; and takes the screen behind each key for a frame, shown for a
-time that the script gives it. The SVG draws the 80 by 25 cells in the
-VGA's colours and in VileR's Web437 IBM VGA 8x16, which it carries, and
-moves from frame to frame by CSS alone, with no script, so that GitHub
-shows it as an image. Two runs give the same file. `--text` prints the
-frames as text besides.
-
-## Using the C trees by hand
-
-Needs the project built, and a terminal of 80 columns by 25 lines at least.
-
-```sh
-python3 harness/play.py
-```
-
-This starts the portable C, `build/portable_c/VC.EXE`, on the machine of
-the tests, with its screen in the terminal and the terminal's keyboard:
-FreeDOS from its floppy, the bench's files on `C:` and the program on
-`D:`. `--tree c` runs the C translation, `build/c/VC.EXE`, `--original`
-runs the original there, `--country ru` uses the Russian bench, and
-`--display gtk` opens a window where there is a desktop. F10 leaves the
-program, and the machine then switches itself off. The disks are made anew
-every time, so nothing done there is kept.
-
-## Origins
-
-### The source
-
-`src/asm/` holds the contents of the 4.05 source archive published by the
-author:
-
-- URL: <https://vc.vvv.kyiv.ua/download/src/vc405.zip>
-- SHA-256: `c4ede94b833ea81da24483231de157bd64b67cf1ec66a77be383490046889c3e`
-
-The first commit of this repository contains the 19 files of that archive
-exactly as extracted. They are CP866 text with CRLF line endings, and git is
-configured not to convert them.
-
-The source builds two programs, `VC.COM` and `VCSETUP.COM`. It is a freeware
-variant of 4.05: unlike the shareware binaries distributed in 2000, it has no
-registration code.
-
-### What the harness downloads
-
-These are fetched into `downloads/` when first needed, checked against the
-SHA-256 sums pinned in `harness/deps.py`, and never stored in the repository:
+Nothing third-party is stored in the repository. The harness fetches
+these into `downloads/` when first needed, checked against SHA-256 sums
+in `harness/deps.py`:
 
 | What | From |
 |---|---|
 | Volkov Commander 4.05 shareware distribution | The author's site, <https://vc.vvv.kyiv.ua/download/vc405sw.zip> |
-| FreeDOS 1.4 Floppy Edition, for its boot floppy | The FreeDOS project's download host, <https://download.freedos.org/1.4/FD14-FloppyEdition.zip> |
-| FreeDOS 1.4 Lite USB image, for the keyboard driver and its layouts, which are among its packages | <https://download.freedos.org/1.4/FD14-LiteUSB.zip> |
-| pyte 0.8.2, a terminal emulator in Python, under the LGPL 3, through which the test `portable_c-terminal` replays what the program for Linux draws; the wheel as its authors publish it on the Python Package Index | The Python Package Index, <https://pypi.org/project/pyte/0.8.2/>, from its host of files |
+| FreeDOS 1.4 Floppy Edition, for the boot floppy | <https://download.freedos.org/1.4/FD14-FloppyEdition.zip> |
+| FreeDOS 1.4 Lite USB image, for the keyboard driver and its layouts | <https://download.freedos.org/1.4/FD14-LiteUSB.zip> |
+| pyte 0.8.2, a terminal emulator in Python (LGPL 3), for `portable_c-terminal` | The Python Package Index, <https://pypi.org/project/pyte/0.8.2/> |
 
-### What the build downloads
-
-CMake fetches these into the build directory, as pinned in
+CMake fetches these into the build directory, pinned in
 `CMakeLists.txt`:
 
 | What | From |
 |---|---|
 | JWasm 2.20, as source at a pinned commit | <https://github.com/Baron-von-Riedesel/JWasm> |
-| Open Watcom 2.0, the snapshot of 1 October 2026 with tools ready to run, pinned by SHA-256 | <https://github.com/open-watcom/open-watcom-v2/releases/tag/2026-10-01-Build> |
-| Emscripten 6.0.12, with its LLVM and Binaryen, for Linux on x86-64, as emsdk fetches it, pinned by SHA-256, only with `-DVC_WEB=ON` | <https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/6e9f6885cb17a3d6c8fd488a5cff730f50aba61d/wasm-binaries.tar.xz> |
-| The Ultimate Oldschool PC Font Pack 2.2 by VileR, its archive for the web, under CC BY-SA 4.0, of which the web page takes `Web437_IBM_VGA_8x16.woff`; pinned by SHA-256, only with `-DVC_WEB=ON` | int10h.org, <https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip> |
+| Open Watcom 2.0, the snapshot of 1 October 2026, pinned by SHA-256 (150 MB) | <https://github.com/open-watcom/open-watcom-v2/releases/tag/2026-10-01-Build> |
+| Emscripten 6.0.12 with its LLVM and Binaryen, pinned by SHA-256, only with `-DVC_WEB=ON` | <https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/6e9f6885cb17a3d6c8fd488a5cff730f50aba61d/wasm-binaries.tar.xz> |
+| The Ultimate Oldschool PC Font Pack 2.2 by VileR, pinned by SHA-256, only with `-DVC_WEB=ON` | <https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip> |
 
-Two options of CMake say which of the large ones are fetched. `VC_DOS`,
-on by default, is Open Watcom: off, nothing for DOS is built and the tests
-of DOS and of the frozen trees are not made, and what is left is the
-original assembled, the program for Linux and its tests, and the tests
-that read the source. `VC_WEB`, off by default, is Emscripten, a download
-of 300 MB that unpacks to 1.5 GB, for the web page, step 7 of the
-portable C's road: on, it is fetched, and the web's tests are made. emcc
-is run with a configuration that the build writes, `build/emscripten/
-config`, and keeps its cache in `build/emscripten/cache`; none of emsdk's
-scripts is run. Emscripten is under the MIT and the University of
-Illinois/NCSA licences, its LLVM under Apache-2.0 with the LLVM
-exception, Binaryen under Apache-2.0, and the C library that it builds
-from musl under MIT. The workflow of GitHub Pages,
-`.github/workflows/pages.yml`, which runs only by hand and only once the
-user has set it to, takes the same download, and GitHub's own actions
-pinned by commit.
+The original source in `src/asm/` is the author's 4.05 source archive,
+<https://vc.vvv.kyiv.ua/download/src/vc405.zip> (SHA-256
+`c4ede94b833ea81da24483231de157bd64b67cf1ec66a77be383490046889c3e`).
+The first commit holds its 19 files exactly as extracted: CP866 text
+with CRLF line endings, which git is configured not to convert. It is a
+freeware variant of 4.05 and lacks the shareware's registration code.
 
-JWasm and Open Watcom are open source under the Sybase Open Watcom Public License, which is
-about the tools' own code. None of that code ends up in the programs built
-here: the C trees are linked without Open Watcom's libraries.
+## Licences and credits
 
-One file of the Open Watcom download does end up in a program, and is
-not Open Watcom's code: `binw/dos32a.exe`, the DOS extender DOS/32A,
-which the linker puts in front of the program of the portable C
-(see [The extender](#the-extender)). It has a licence of its own, which
-that download has as `binw/license.d32`.
+This project is released under the 3-clause BSD licence in
+[`LICENSE`](LICENSE). That covers everything written for it, including
+the changes to the files in `src/asm/`.
 
-## Licence
+| Work | Copyright | Licence | Text |
+|---|---|---|---|
+| Volkov Commander 4.05 | 1991-2000 Vsevolod V. Volkov | 2-clause BSD | [`src/asm/LICENSE.TXT`](src/asm/LICENSE.TXT) |
+| DOS/32A, the DOS extender linked into the DOS programs of the portable C | 1996-2006 Narech K. | its own licence | [`LICENSE.DOS32A`](LICENSE.DOS32A) |
+| Emscripten 6.0.12, whose runtime is in the web page | 2010-2014 the Emscripten authors | MIT and University of Illinois/NCSA | [`LICENSE.EMSCRIPTEN`](LICENSE.EMSCRIPTEN) |
+| musl, the C library in the web page's WebAssembly | 2005-2020 Rich Felker, et al. | MIT | [`LICENSE.MUSL`](LICENSE.MUSL) |
+| Web437 IBM VGA 8x16 from the Ultimate Oldschool PC Font Pack, used unchanged in the web page and the animation | 2016-2020 VileR | CC BY-SA 4.0 | [`LICENSE.FONT`](LICENSE.FONT) |
 
-This project is released under the 3-clause BSD licence in `LICENSE`. That
-covers everything written for it, including changes made to the files in
-`src/asm/`.
+**This product uses DOS/32 Advanced DOS Extender technology.**
 
-Volkov Commander is Copyright 1991-2000 Vsevolod V. Volkov and was released
-by its author under the 2-clause BSD licence in `src/asm/LICENSE.TXT`, which
-continues to apply to his code.
+The extender's stub comes with the Open Watcom download and is linked
+into `build/portable_c/VC.EXE` and `debug/VC.EXE` at build time. It is
+not stored in the repository. Its licence text is kept here because a
+program built with it has to carry it. The web page's "Licences" dialog
+shows every licence above except DOS/32A's, since the page does not
+carry the extender. What the page may have of LLVM's runtime is under
+Apache-2.0 with the LLVM exception, which asks nothing of a compiled
+program.
 
-DOS/32A, the DOS/32 Advanced DOS Extender, is Copyright 1996-2006 Narech K.
-and is distributed under the licence in `LICENSE.DOS32A`: the text of
-`binw/license.d32` of the Open Watcom snapshot that the build fetches,
-copied as it is. It covers the extender's stub, which the build links into
-the two programs of the portable C, `build/portable_c/VC.EXE` and
-`build/portable_c/debug/VC.EXE`. The stub comes with that download and
-is not part of this repository; the licence's text is kept here because a
-program that is built here and passed on has to have it with it, and its
-third condition is why this README says what [The extender](#the-extender)
-says.
-
-The web page, `build/portable_c/web/vc.html` and the static site made
-of it, has in it what Emscripten puts into a program, its runtime in the
-script and the C library that it builds from musl in the wasm, and a
-font. Their notices are kept beside `LICENSE` as that of DOS/32A is, for
-the same reason: `LICENSE.EMSCRIPTEN` is the `LICENSE` of Emscripten
-6.0.12, under the MIT licence and the University of Illinois/NCSA Open
-Source Licence, and `LICENSE.MUSL` the `COPYRIGHT` of the musl in it,
-`system/lib/libc/musl/COPYRIGHT`, under the MIT licence, both as
-Emscripten's repository has them at the tag `6.0.12`. What the page may
-have of LLVM's runtime is under Apache-2.0 with the LLVM exception,
-which asks nothing of a program compiled with it. The font is VileR's
-Web437 IBM VGA 8x16 of the Ultimate Oldschool PC Font Pack, (c)
-2016-2020 VileR, under the Creative Commons Attribution-ShareAlike 4.0
-International licence, whose text is `LICENSE.FONT`: the `LICENSE.TXT`
-of the pack's archive that the build fetches, copied as it is. The page
-puts the font in as it comes, unchanged.
-The animation at the top of this README, `docs/vibe-commander-session.svg`,
-carries the same font, unchanged, and says in its own text whose it is,
-under which licence, and where the licence's text is.
-
-The page credits every work that it carries alike: its bar has one
-link, "Licences", which shows the texts of `LICENSE`,
-`src/asm/LICENSE.TXT`, `LICENSE.EMSCRIPTEN`, `LICENSE.MUSL` and
-`LICENSE.FONT`, put into the page from these files when it is built,
-each under the name of its work, its copyright and its home: the
-font's as the pack asks, "(c) 2016-2020 VileR" with a link to the
-pack's site. `LICENSE.DOS32A` is not among them, since no page carries
-the extender.
+JWasm and Open Watcom are open source under the Sybase Open Watcom
+Public License. None of their code ends up in the programs built here:
+the C trees are linked without Open Watcom's libraries.
 
 The shareware distribution of Volkov Commander is proprietary and is not
-part of this repository. The picture at the top under the session
-shows the portable C running in its directory, with its files beside
-it; the session has none of them, only the web page's demo.
+part of this repository. The DOS screenshot shows the portable C in its
+directory, with the shareware's files beside it. The animation has none
+of them, only the web page's demo files.

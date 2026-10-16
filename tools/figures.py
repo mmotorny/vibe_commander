@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """The figures of the portable C that follow its size and its source, in
-the one place that has them: a table of the README.
+the one place that has them: a table of docs/portable-c.md, "The figures".
 
     figures.py              print the table
-    figures.py --write      put it into the README, where its two marks are
-    figures.py --check      say whether the README's table is this one
+    figures.py --write      put it into docs/portable-c.md, where its two marks are
+    figures.py --check      say whether the table there is this one
 
 Every step of the work changes the size of the program, and agents that
 work side by side each change it: a figure written into a sentence by hand
-is stale a commit later, and a conflict at every rebase. So the README has
+is stale a commit later, and a conflict at every rebase. So docs/portable-c.md has
 them once, between two marks, and this writes what stands between. Run it
 with --write when a piece of work lands, after the build; everything else
 says the thing without the number, or points to the table. A figure that
@@ -54,7 +54,7 @@ import hostcheck  # noqa: E402
 import layoutcheck  # noqa: E402
 import le  # noqa: E402
 
-README = ROOT / "README.md"
+PAGE = ROOT / "docs" / "portable-c.md"
 SOURCE = ROOT / "src" / "portable_c"
 BUILD = ROOT / "build"
 
@@ -221,9 +221,9 @@ def main():
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--write", action="store_true",
-                       help="put the table into the README")
+                       help="put the table into docs/portable-c.md")
     group.add_argument("--check", action="store_true",
-                       help="say whether the README has this table, with "
+                       help="say whether docs/portable-c.md has this table, with "
                             "status 1 if not")
     args = parser.parse_args()
 
@@ -231,16 +231,16 @@ def main():
     if not (args.write or args.check):
         print("\n".join(lines))
         return
-    text = README.read_text()
+    text = PAGE.read_text()
     pattern = re.compile(re.escape(BEGIN) + r"\n(.*?)" + re.escape(END),
                          flags=re.S)
     match = pattern.search(text)
     if not match:
-        sys.exit(f"{README.name} has no place for the table: the lines\n"
+        sys.exit(f"{PAGE.name} has no place for the table: the lines\n"
                  f"{BEGIN}\n{END}")
     was = match[1].strip("\n").split("\n")
     if was == lines and args.check:
-        print(f"{README.name} has the figures of this build")
+        print(f"{PAGE.name} has the figures of this build")
         return
     if args.check:
         for old, new in zip(was, lines):
@@ -249,10 +249,10 @@ def main():
         if len(was) != len(lines):
             print(f"{len(was)} lines there, {len(lines)} here")
         sys.exit(1)
-    README.write_text(pattern.sub(
+    PAGE.write_text(pattern.sub(
         lambda _: BEGIN + "\n\n" + "\n".join(lines) + "\n\n" + END, text,
         count=1))
-    print(f"{README.name}: the figures written"
+    print(f"{PAGE.name}: the figures written"
           + (", as they were" if was == lines else ""))
 
 
