@@ -1,10 +1,6 @@
-' The viewers of Vibe Commander: the viewer of your own that F3
-' runs for a file by its extension, in place of the built-in one.
-' A line such as
+' F3 views a file with the viewer of its extension, the built-in
+' one where no line names it; Alt-F3 always uses the built-in one.
+' A line is the extension, a colon and the command, ! and !.! as in
+' VC.EXT. Take the apostrophe off a line to use it.
 '
-'   doc: wordview !.!
-'
-' names one. Alt-F3 always uses the built-in viewer.
-'
-' A web page cannot run commands, so this file names no viewer, and
-' F3 uses the built-in one for every file.
+'doc: wordview !.!

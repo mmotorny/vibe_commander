@@ -39,11 +39,13 @@ C:\VC holds, as the page ships it, nothing of the shareware's:
 - `VC.INI`, the setup file that the program saves (`tools/webini.py`),
   with the clock on;
 - `VC.MNU`, `VC.EXT`, `VCVIEW.EXT` and `VCEDIT.EXT`, the project's own,
-  whose comments say their forms; the extension files have no entry,
-  since a web page runs no command.
+  whose comments say their forms, as a user's own would; the
+  extension files have no entry that is not commented out, since a web
+  page runs no command.
 
 C:\ has a mock `AUTOEXEC.BAT` and `CONFIG.SYS`, for the look of a DOS
-disk and for something to view. The files are in
+disk and for something to view, written as a DOS machine of the time
+had them, with no comment about the page. The files are in
 `src/portable_c/web/drive/`, and the build puts the rest in beside them.
 
 The drives are ephemeral. The page is a static site, and at every load

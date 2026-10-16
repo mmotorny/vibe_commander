@@ -334,7 +334,9 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   own with the clock off; a VC.MNU, VC.EXT, VCVIEW.EXT and VCEDIT.EXT
   of the project's own; and the project's help as `vc.hlp`, which takes
   the place of a README, none being shipped; in C:\ a mock AUTOEXEC.BAT
-  and CONFIG.SYS (`src/portable_c/web/drive/`). Nothing of the
+  and CONFIG.SYS (`src/portable_c/web/drive/`). What the project writes
+  of those files reads as a DOS user's own would, with no word about
+  the page or the project. Nothing of the
   shareware's goes in. Beside it A:, empty and with no label, which the
   page makes, so that changing disks can be tried. The drives are
   ephemeral, on the user's word of 16 October 2026: every load of the

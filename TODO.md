@@ -1867,7 +1867,8 @@ Item 2 of the queue above, on the user's word of 16 October 2026
   `vcview.ext` and `vcedit.ext` of the project's own; in C:\ a mock
   `autoexec.bat` and `config.sys`. The written ones are in
   `src/portable_c/web/drive/`, CRLF text kept as it is
-  (`.gitattributes`). The extension files have comments only, since an
+  (`.gitattributes`), and read as a DOS user's own would, with no word
+  about the page or the project. The extension files have comments only, since an
   entry would have Enter, F3 or F4 run a command that the page cannot
   run in place of what it does without one. No README, on the user's
   word: the help takes its place. Every file has the page's time.

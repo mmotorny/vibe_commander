@@ -1,17 +1,12 @@
-' The user menu of Vibe Commander, which F2 shows: a line at the left
-' margin is an item, a key and a colon and what the menu shows; the
-' lines below it that begin with a space or a tab are its commands.
-' A line that begins with an apostrophe is a comment. In a command,
-' ! is the name of the file under the cursor, !.! the name with its
-' extension, !: the current drive and !\ the current directory.
-'
-' A web page cannot run commands: an item here says so on DOS's
-' screen, which Ctrl-O shows. Edit this file with Menu file edit, in
-' the Commands menu, and try your own.
-D: Show the date and the time
+' User menu: F2 shows it. An item starts at the left margin, with
+' its hot key, a colon and its title; its commands follow, each
+' indented. In a command ! is the file under the cursor without its
+' extension, !.! with it, !: the current drive and !\ the current
+' directory.
+D: Date and time
 	date
 	time
-L: List the current directory
+L: Directory listing
 	dir !:!\
 T: Type the file under the cursor
 	type !.!

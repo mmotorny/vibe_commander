@@ -3300,9 +3300,9 @@ heading line, made by the build of the repository's files so that it
 cannot drift from them, the page's Licences dialog showing the same
 texts; the project's own help, VC.HLP, which takes the place of a
 README; VC.MNU, VC.EXT, VCVIEW.EXT and VCEDIT.EXT of the project's own,
-whose comments say their forms and that a web page runs no command,
-VC.EXT and VCVIEW.EXT and VCEDIT.EXT having no entry so that Enter, F3
-and F4 do what they do without one; and VC.INI, the setup file that the program saves from its
+whose comments say their forms as a user's own would, VC.EXT and
+VCVIEW.EXT and VCEDIT.EXT having no entry that is not commented out so
+that Enter, F3 and F4 do what they do without one; and VC.INI, the setup file that the program saves from its
 own defaults with its own keys, the clock switched on, the left panel
 on C:\VC and the right one on C:\ (`tools/webini.py`). So a user of the
 page has the clock on, as the original's distribution has it; the
