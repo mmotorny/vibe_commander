@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://mmotorny.github.io/vibe_commander/">
     <img src="docs/vibe-commander-session.svg" width="720"
-         alt="An animated recording of Vibe Commander 0.1 in its web page: it starts with C:\VC on the left and C:\ on the right and the clock on, selects three files with Insert and copies them to A: with F5, its box of progress showing, goes to A: with Alt-F1 to see them and back to C:, views AUTOEXEC.BAT with F3, shows DOS's screen with Ctrl-O, brings up the Info panel with Ctrl-L, the tree with Alt-F10 and the red box of F8, walks the menus of F9, and ends in the stars of the screen saver">
+         alt="An animated recording of Vibe Commander 0.1 in its web page: it starts with C:\VC on the left and C:\ on the right and the clock on, selects three files with Insert and copies them to A: with F5, its box of progress showing, goes to A: with Alt-F1 to see them and back to C:, views AUTOEXEC.BAT with F3, shows DOS's screen with Ctrl-O, brings up the Info panel with Ctrl-L, the tree with Alt-F10 and the question of F8, cancelled, walks the menus of F9, and ends in the stars of the screen saver">
   </a>
 </p>
 <p align="center">
