@@ -841,6 +841,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **W3c, the static page: done**, below. The same page with no server, its drives starting from what is served with it and the user's changes kept in the browser (CLAUDE.md, "The web page"), the static site, and the workflow of GitHub Pages, which runs only by hand and with a variable set.
 - **W4, the documents: done**, below. DEVIATIONS "The web page" (W1 to W9, written by the pieces before it), the README's section "The web page", the licences of Emscripten, musl and the font, and the question of publishing, which is the user's, under "Open, for the user" below.
 - **W5, the licences on the page: done**, below. The bar's credit of the font gone, and one "Licences" that shows the texts of every work that the page carries, put in from the repository's files as the page is made (the user's decision of 15 October 2026, CLAUDE.md, "The web page").
+- **W6, the page in a real browser: done**, below. The machine's own Chromium, headless, driven over CDP from Node; both ways of serving, on a desktop and as an iPhone held both ways; the screenshots looked at; two faults of the drawing on a phone mended; the test `portable_c-web-browser`.
 
 ### W0, the toolchain: done, and what a later piece should know
 
@@ -1446,6 +1447,87 @@ held for the next key, and the phone's keyboard by its button.
   and Safari on the iPhone, scrolled, and closed by Esc and by its
   button.
 
+### W6, the page in a real browser: done
+
+- **The browser** is the machine's own Chromium, found on the path,
+  `chromium` or `chromium-browser`, not fetched or pinned (CLAUDE.md,
+  "The web page"); on the workstation that is the snap of Chromium 155.
+  A snap reads no hidden directory and not the real /tmp: the profile
+  and everything that it opens are in `build/`. The snapshots of
+  Chromium's own storage were tried first: they need NSS and NSPR
+  (`libnss3`, `libnssutil3`, `libsmime3`, `libnspr4`), which the
+  workstation lacked.
+- **The driver**, `harness/browser.mjs`: Chromium started headless with
+  `--remote-debugging-port=0` and its profile in a directory of the
+  build, the port read from the profile's `DevToolsActivePort`, CDP over
+  Node's own `WebSocket`, a tab a session of one connection (`flatten`).
+  Keys by `Input.dispatchKeyEvent` with `code`, `key` and the virtual key
+  of Windows, the modifiers going down before and up after as a keyboard
+  has them; taps by `Input.dispatchTouchEvent`, clicks by
+  `dispatchMouseEvent`; the phone by `Emulation.setDeviceMetricsOverride`
+  with `mobile`, `setTouchEmulationEnabled` and Safari's agent, which
+  gives `(pointer: coarse)` and so the row of keys; the console by
+  `Runtime` and `Log`; a tab that the page opens by
+  `Target.targetCreated` with an opener, its URL asked after, since it
+  is empty when the tab is made.
+- **The checks**, `harness/webbrowser.mjs`, and the test
+  `portable_c-web-browser` (`harness/webbrowser.py`), which runs them
+  without screenshots in some forty seconds: the README's table has
+  them. With `--shots DIR` the same run saves its screenshots. The
+  server is `server.mjs` as a process of its own on a free port; the
+  static site is behind a host of Node's that answers 404, whose
+  sockets are closed with it, or Chromium's kept-alive ones hold its
+  `close` for ever.
+- **What looking at it found, and what was mended:**
+  - On the phone the grid had a black seam between every two rows,
+    across every frame of a panel. An inline run of text has its
+    background only as tall as the font's own ascent and descent, and
+    at a scale that is no whole multiple of 8 by 16 that falls short of
+    the row. Each run is an `inline-block` as tall as the cell now
+    (`--cell`, `shell.html`).
+  - Then the upright lines of the frames had a notch at every third
+    row: Chromium puts a line of text on a whole pixel of the page's,
+    not of the device's, so rows of 9.33 pixels each shifted their
+    glyphs. The cell is a whole number of the page's pixels now,
+    `Math.floor(16 * scale)`, which makes the grid on an iPhone held
+    upright 360 pixels wide where it was 382. The desktop, at whole
+    multiples, is as it was. Two other ways were tried and dropped: a
+    cell of a whole number of the device's pixels left the notches
+    sharper at every third row; and a `translate` that put the grid's
+    corner on a pixel of the device's drew a faint line between every
+    two rows, the compositor resampling the moved layer. In the
+    device's own pixels a faint notch may still show in an upright line
+    on the phone held upright, where a glyph of 16 lines is drawn in 27;
+    at the size of the screen it is not seen, and turned, in 33, there
+    is none.
+  - The page asked for `/favicon.ico`, which neither the server nor a
+    static host has: an error in the console at every load. It has an
+    empty icon of its own now, and the `mobile-web-app-capable` that
+    Chromium asks for beside Apple's.
+  - The README said that F1 says there is no help. It shows nothing, as
+    the original does without its help file.
+- **What a test has to know of the program**, which it met as faults of
+  its own: the editor clears what is typed ahead of it (Clear keyboard
+  buffer, on by default), so a test types there a key at a time and
+  waits for the screen; Shift-F4 on a name that is not there asks
+  New-file first; the key bar of Shift stays up while a dialog is, as
+  the original's does; without a setup file the program shows one
+  panel, the right one, as the original does; and it saves its setup by
+  itself, so a second tab of the same drives starts as the first left
+  them.
+- **What is left, for whoever goes on:**
+  - The static page's question, `api/server`, is a 404 that Chromium
+    writes into the console as an error. It is how the page knows that
+    it has no server, so the test leaves it out. A file `api/server` in
+    the static site, saying that it is no server, would end it, at the
+    cost of `portable_c-web-page` no longer meeting the hosts that
+    answer 200 or 5xx for what they have not.
+  - A button of the row of keys keeps the focus after a tap, and
+    Chromium draws its ring of focus around it; Safari may not.
+  - On the phone held upright the grid is less than half the screen's
+    height, centred, with the row of keys at the bottom: as fitting by
+    the width makes it.
+
 ### Open, for the user
 
 - Whether to publish to GitHub Pages: set `VC_PAGES` to `publish` (a
@@ -1465,7 +1547,7 @@ keep its data, `navigator.storage.persist()` (W3c).
 
 ### Left open when the session on the workstation ended, 15 October 2026
 
-- **The page in a real browser: not seen yet.** The test uses the system's Chromium (CLAUDE.md, "The web page"), which the user installs. The piece still to do: a Node driver over CDP with nothing from npm; both ways of serving, on a desktop and as an iPhone held both ways; screenshots looked at; the test `portable_c-web-browser`, skipped where no Chromium is installed. On a Mac, Claude in Chrome against the user's own Chrome is another way to look.
+- **The page in a real browser**: done as W6, above, in Chromium. Firefox and Safari on the iPhone are still the pass by hand of W4.
 - **The private artifact** of the static page (https://claude.ai/artifact/LGs8hcnLh9vm24bL3Hw3yY) has not been opened either. In the Claude app:
   - `confirm()` answers no at once, so Reset drives and an upload over a file do nothing;
   - Enter on a file may give only the fallback link;

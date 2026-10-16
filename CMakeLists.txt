@@ -1239,6 +1239,20 @@ if(VC_WEB)
         LABELS portable_c SKIP_RETURN_CODE 77)
     set_tests_properties(portable_c-web-scenarios PROPERTIES
         LABELS "portable_c;machine")
+    # The page in a real browser, the piece W6 of step 7: vc.html as its
+    # server serves it and the static site behind a host of pages, in the
+    # machine's own headless Chromium, found on the path and not fetched,
+    # driven from Node over its DevTools protocol, on a desktop and as an
+    # iPhone held both ways. Skipped where there is no Chromium. See
+    # harness/webbrowser.py; harness/webbrowser.mjs with --shots saves
+    # screenshots for a person to look at.
+    add_test(NAME portable_c-web-browser
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webbrowser.py
+                ${CMAKE_BINARY_DIR}/portable_c/web/vc.html
+                ${CMAKE_BINARY_DIR}/portable_c/web/static
+                ${CMAKE_BINARY_DIR}/portable_c/web/browser)
+    set_tests_properties(portable_c-web-browser PROPERTIES
+        LABELS portable_c SKIP_RETURN_CODE 77)
 endif()
 # The cap of the memory, the piece I1 of step 8 (TODO.md, "Step 8, the
 # app for iOS"): the program for Linux, the app's on a host (ios-host)

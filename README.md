@@ -1397,7 +1397,8 @@ whole multiples of the font.
   files written for the project, `src/portable_c/web/demo`, which the
   user may change. Both are ordinary drives to the program. The page
   starts at the root of C:. The shareware's help and menu files are not
-  shipped: F1 says that there is no help, until the user brings
+  shipped: F1 shows nothing, as the original does without its help
+  file, until the user brings
   `VC.HLP` into C:\VC.
 - **Served by its server.** `src/portable_c/web/server.mjs`, a script
   for Node of Node's own modules, nothing from npm, serves the page and
@@ -1507,15 +1508,29 @@ it has not been, and whether it is to be is the user's (`TODO.md`).
 
 **How it is judged.** The program under Node goes through the scenarios
 as the program for Linux does; the page's script and its server are
-held in Node, with nothing downloaded for them; the browser itself, the
-drawing, the keys, the mouse and the phone, is a pass by hand, whose
-list is in `TODO.md`, "W4".
+held in Node, with nothing downloaded for them; and the page itself is
+opened in the machine's own Chromium, headless, as its server serves it
+and as the static site, on a desktop and as an iPhone held both ways.
+What a test cannot judge, how it looks and feels in Firefox and in
+Safari on the iPhone, is a pass by hand, whose list is in `TODO.md`,
+"W4". For screenshots of the page to look at:
+
+```sh
+node harness/webbrowser.mjs --page build/portable_c/web/vc.html \
+    --site build/portable_c/web/static --work build/browser \
+    --shots build/browser/shots
+```
+
+which saves, for each way of serving, the desktop at its start, with
+its two panels and with its Licences, and the iPhone held upright and
+turned, as `build/browser/shots/{server,static}-*.png`.
 
 | Test | What it checks |
 |---|---|
 | `portable_c-web-probe` | Only with `-DVC_WEB=ON`: every file that the build for the web is to compile, the common code, the files of the emulation of DOS that the web shares with Linux and the web's own, compiled by Emscripten's emcc for wasm32 with the warnings of the program for Linux and `-Werror`, each failure printed. `harness/webprobe.py`, which takes the list of what the web leaves of Linux's files from the configuration |
 | `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`: the program for the web under Node, `web-node/vc.js`, built by Emscripten with Asyncify and the sanitizers of addresses and of undefined behaviour, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drive C: the bench's home directory and D: a directory of the run's with the program's own files in D:\VC. Its screens and its files are held to the original's goldens with what is declared for the portable C, for Linux but the masks of the drive's letter, and for the web, each scenario that is not run on the web or is cut there named by an entry of Linux or of the web page of `DEVIATIONS.md` |
 | `portable_c-web-page` | Only with `-DVC_WEB=ON`: `vc.html` itself, its scripts run in Node with a document of what the page asks of one. Against its server: the drives loaded, the bar's one link to the licences showing the text of each file that the page carries and closed by Esc and its button with no key reaching the program, a directory made, a file opened in a tab, a file written in the editor reaching the server at its close, a directory removed, a refusal of the server shown as DOS's error, the setup saved on C:, and the page's end. As a static site, served by a host that answers 404 for what it has not, on a stand-in of IndexedDB: changes made and kept, the page loaded again with them, the reset, and a browser with no IndexedDB; by hosts that answer 200 with a page or 500 for what they have not, a static site all the same; and a server that is away, by 502, for which the page does not start. `harness/webpage.py` |
+| `portable_c-web-browser` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`: the page in the machine's own Chromium, headless, driven over its DevTools protocol from Node with nothing from npm, as its server serves it, on a free port, and as the static site behind a host that answers 404 for what it has not. On a desktop of 1280 by 800: the start with nothing that says it stopped and the bar's line of where changes are kept right for the way it is served, the VGA's font loaded, the grid 640 by 400, the VGA's colours, Ctrl-F1, Alt-F2 and D:'s demo, the cursor's keys and Tab, F1, the editor's file written (on the server, or kept across a reload of the static page), Enter on a text file opening a tab of a blob, the Licences opened and closed by Esc and by its button with no key reaching the program. As an iPhone, 390 by 844 at three pixels to one, with touch and Safari's agent: the row of keys, Ctrl and Alt of it held for F1 and F2, a tap on a file moving the cursor there, the grid within the screen's width above the bar; turned, 844 by 390, the grid fitted again. And no error in the console, but the 404 by which a static page knows that it has no server. `harness/webbrowser.py`, `harness/webbrowser.mjs` |
 | `portable_c-web-render` | The page's modules that draw and take the keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node: the grids that the program for Linux writes through its test channel drawn, the HTML read back and held to the cells and to the rows that changed; the keys and the mouse's reports that the modules make of the browser's events typed into the program for Linux in a pseudo-terminal, and what it reads held to the BIOS's words. `harness/webrender.py`; skipped where there is no Node or no clang |
 | `portable_c-web-server` | The server and the page's file system in Node: the server's API and its refusals of every path outside the two drives, links of the host's among them; the page's file system against it, with a file system of Emscripten's shape; what the static page keeps in the browser, `kept.js`, in memory and on a stand-in of IndexedDB, every change and refusal, the next visit, the reset, a full store; and the page's script bundled, compiled and run up to the program. `harness/webserver.py`; skipped where there is no Node |
 
@@ -1546,15 +1561,16 @@ which the checks of `.clang-tidy` were judged with (`VERSION` of
 `harness/tidycheck.py`): it is skipped without one, and fails with
 another version, which has other checks. Those of the web page ask
 `node`, and are skipped without it; with `-DVC_WEB=ON` the configure
-stops without one.
+stops without one. `portable_c-web-browser` also asks `chromium` on the
+path, any version, and is skipped without it.
 
 ```sh
 ctest --test-dir build --output-on-failure
 ```
 
-There are twenty tests, and three more with `-DVC_WEB=ON`: one of the
+There are twenty tests, and four more with `-DVC_WEB=ON`: one of the
 assembly, `asm-bytes`; three of the C translation, `c-data`, `c-arith`
-and `c-scenarios`; fifteen of the portable C, eighteen with the web, of which `portable_c-data` and `portable_c-scenarios` are the
+and `c-scenarios`; fifteen of the portable C, nineteen with the web, of which `portable_c-data` and `portable_c-scenarios` are the
 C translation's checks made of it, `portable_c-host`, `portable_c-int16`,
 `portable_c-words`, `portable_c-width` and `portable_c-cut` are of its
 source, `portable_c-layout` and `portable_c-debug-layout` of its two
@@ -1564,8 +1580,8 @@ programs for DOS as the linker wrote them, and `portable_c-tidy`,
 Linux](#the-program-for-linux), which that section has, the last of the
 web page's program too, and
 `portable_c-web-render` and `portable_c-web-server`, with
-`portable_c-web-probe`, `portable_c-web-scenarios` and
-`portable_c-web-page` where the web is built, of [the web
+`portable_c-web-probe`, `portable_c-web-scenarios`,
+`portable_c-web-page` and `portable_c-web-browser` where the web is built, of [the web
 page](#the-web-page), which that section has; and one of the harness
 itself, `harness-le`. The two trees are held against the same
 goldens. The tests that run no machine take seconds, the terminal's
@@ -1579,7 +1595,7 @@ three that start a machine, `c-scenarios`, `portable_c-scenarios` and
 for the bench of Linux as that does, and `portable_c-web-scenarios` where
 the web is built, which runs every scenario under Node, have the label
 `machine` too: `ctest --test-dir build -LE machine` runs the other
-seventeen, nineteen with the web, and `-L portable_c -LE machine` those
+seventeen, twenty with the web, and `-L portable_c -LE machine` those
 of the portable C among them.
 
 | Test | What it checks |
