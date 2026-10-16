@@ -4,7 +4,7 @@ What the work on Vibe Commander decided and learned, day by day, kept
 for posterity. `CLAUDE.md` has the rules as they stand and `TODO.md` what
 is still to do; this is how they came to be, and what was met on the way.
 
-Each entry is the text that `CLAUDE.md` or `TODO.md` had for it, moved
+Each entry is the text that `CLAUDE.md`, `TODO.md` or the README had for it, moved
 here as it last stood: it is placed on the day that its first line was
 written, and headed by the commit that wrote that line, whose subject
 names the piece of work. Later additions to an entry stay with it, so an
@@ -12,6 +12,189 @@ entry may speak of a later day. Within a day the entries are in the order
 of those commits. Names in the entries are those of their day: `dos.c`
 and `dos32.c` are `sys_dos.c` now, `resident.c` is `exec.c`, `stack.c` is
 `stack_dos.c`, and the program of 16 bits that the portable C was is gone.
+
+## 10 October 2026
+
+### Import the Volkov Commander 4.05 source
+
+*d8b7e90, from README.md, "Approach".*
+
+The planned stages:
+
+1. Build the original source with free tools, byte for byte.
+2. Translate the program from assembly to C, still for DOS, a few routines
+   at a time. The translated routines are linked into the assembly program
+   in place of the ones they replace, so that at every step there is one
+   working program to hold against the original. Bytes no longer match from
+   here on; behaviour has to, bugs included, with every intended deviation
+   listed explicitly.
+3. Put modern operating systems under the C program next to DOS: it goes
+   on asking what it asks DOS, through one header of functions named for
+   DOS's services, and every other system emulates DOS behind them.
+
+Where it stands: the first stage is done. Outside the reserved room, both
+programs come out identical to the originals. The second stage is
+done: the program builds as `VC.EXE`, and every routine of it runs as
+C. In the order in which they were translated: those that write
+numbers, sizes, dates and times, those
+that write lines of text with their markup, those that copy, trim and
+shorten texts, paths and file names, those that look up colours and put
+characters and colours into the copy of the screen that the program draws
+in, those that read and write hex digits and numbers and hold a file name
+against a mask, those that filter and sort the list of files of a panel and
+find a file in it, those that say where the panels are and where in them
+the cursor is, those that draw a panel of files: its frame, its path, its
+files, its status line and the cursor, those that draw what a panel
+shows instead of files: the tree of directories, with the cursor on the
+current directory, and the Info, and those that read from the disk what a
+panel shows: the files of a directory with its extension file and the
+sizes of its directories, and for the Info the sizes of the disk, its
+label and the text of dirinfo. The viewer is C: opening a file, for the
+editor too, finding the lines, keeping a part of a large file in the
+memory, writing the screen, its keys and the mouse, looking for a text,
+and the way back to the panels; its texts, boxes and dialogs are
+constants of C, in `src/c/view_t.c`. The editor is C as a whole: the text in
+the memory with the buffer of the line that the cursor is in, the screen
+brought up to where the cursor is, as text or in hex, with its status
+line, what every key does, the search, and saving the file, with its
+texts, boxes and dialogs constants of C in `src/c/edit_t.c`. The commands
+that start the two are C as well, by themselves or by a program that an
+extension file names, which is run with the viewer's memory given up
+for it. The keys of the
+panels are C: those that move the cursor by lines, columns and pages,
+select files one by one and by a mask, switch the panels off and on,
+swap them, make them of another kind and read them again, Tab,
+Enter, which runs a file or a command, the keys that change the
+directory, those that go to the command before and after, and F10. The
+loop that takes a key
+and goes to its command is C, with what the mouse does at the panels,
+and so are what it does on the way: drawing the two panels and reading
+what they show when that has changed, the box that asks for another
+drive when a disk cannot be read, the box of DOS's critical error, which
+names the drive or the device and asks whether to try again, and saving
+the setup when it has
+changed; and leaving the program. The texts and boxes of those two, the
+program's title and the button Ok are constants of C, in
+`src/c/main_t.c`. What the program does once it has
+been started, and again whenever a command has run, is C: reading the
+setup file and the main extension file, or taking the defaults, the
+banner, asking DOS for the memory of its data and making the data of
+what was kept, and finding out what the display, DOS and the
+environment are like. Where DOS enters the program is C too: the check
+sum of the file, the second copy that brings the program back after a
+command, the block of memory made of the part that goes while a command
+runs, and the relocations of that part. What runs a
+command with most of the program out of the memory and loads it again,
+to which Enter hands over, is C, and is the outermost loop of the
+program now: it calls the rest of the program, which comes back to it
+with commands to run or to leave. So is the
+program's watch on DOS: the interrupts of DOS that it takes to note every program that is
+run and every one that stays in the memory, the records it keeps of
+those, by which the map of the memory lists them and releases them, and
+its answer to a program that asks for its data, as its setup program
+does. The help is C as a
+whole: reading its file, showing the index
+and the pages in their window, and taking the keys and the mouse there;
+its file of the assembly is the first that is gone, with its texts, its
+box and its buttons constants of C.
+So is the tree of directories away from its panel: reading it from the
+disk, keeping it in its file there, and the box in which a directory is
+chosen from it; its title, the name of its file and the boxes shown
+while it is read and saved are constants of C, in `src/c/treebox_t.c`.
+The file search is C as a whole: the command with its
+dialog, the drives it searches and Go to, and the search itself, by name
+and by contents through a directory and those below it, with its list
+and the keys taken while it runs; its dialog, its buttons and their
+colours are constants of C, in `src/c/find_t.c`. Deleting a file or a
+directory with what is in it, copying, renaming and moving one, and setting
+attributes, a date and a time, are C, and so is what goes through the files
+of a directory for these, the sizes of directories and the file search, and
+through the files that a mask names. The commands of these are C from
+the key on: Copy and Rename with what they offer as the target, their
+dialogs, the tree to choose the target from, and the renaming of a
+directory of a tree panel, and those that make a directory, delete, set
+attributes and change the volume label; the texts, boxes and dialogs of
+copying and renaming are constants of C, in `src/c/copy_t.c`, and those of
+making a directory, deleting, the attributes and the volume label in
+`src/c/dirfunc_t.c`. The map of the memory is C as
+well: the blocks of DOS, whose they are and which vectors point into
+them, its window, and programs that have stayed in the memory released;
+the buttons of the window are constants of C, in `src/c/memory_t.c`.
+Going through the selected files
+of a panel is C too. At the panels the user menu is C, with what makes
+the commands of a line of a menu or of an extension file and writes the
+list of the selected files for them, and so are the command line, with
+Esc and the names of the selected files and the paths of the panels put
+into it, the history of commands in its box, the speed search, and the
+box that asks for the drive of a panel; what these have of texts, boxes
+and dialogs, the mask to select by, the question before leaving and the
+user menu's, are constants of C, in `src/c/keys_t.c`. The dialogs are C: a
+box with its lines of text, the fields of a dialog, a line to type
+into, a group to choose from, a box to tick and a line of buttons, with
+the keys and the mouse that each takes, and what the fields hold handed
+back at the end. Waiting for a key is C, with the clock that it keeps on
+the screen, the tap on Alt and the keys that the mouse clicks on the key
+bar, and so are what a key does to a line that is typed into, the speed
+search, the key bar, the menu bar, the command line with its prompt, and
+finding what an extension file says for a file. The screen blanker is
+C, with the word to DOS that the program is idle; what the blanker draws
+is on no screen of a scenario (see `TODO.md`). What all of these rest on
+is C too: putting a window of
+the program's copy of the screen on the display, keeping what a box
+covers and putting it back, the frame of a box with its shadow and the
+box growing, the cursor, the mouse with its pointer and the second click,
+the keys that wait, the bell, capitals, every call of DOS with the error
+that it may end in, opening a file, asking DOS for the current directory,
+and asking the user for the disk of a drive that shares the floppy drive
+with another. Saving the setup is C, and so is the jump from a key to its
+command, which was a table in the assembly. The names of the menus in
+the menu bar are constants of C, in `src/c/bars_t.c`, and the names of
+the files that the program reads and the dialog that asks for a disk in
+`src/c/system_t.c`.
+The pull-down menus of the menu bar are C as well: the five menus with
+their ticks and the items that cannot be chosen as things are, and the
+keys and the mouse that the bar takes until an item is chosen. So are
+the commands that the items stand for, in the same file of the source:
+the kind of a panel, its order and its filter, a panel switched off and
+on, the tree in a box to go to a directory, the sizes of directories,
+the screen with as many lines as an EGA or a VGA has, two directories
+compared, the configuration and the advanced options, the menu file and
+the extension files opened in the editor, the switches of the Options
+menu, and the setup saved; their texts, boxes and dialogs are constants
+of C, in `src/c/commands_t.c`.
+The main loop calls the commands. In the original a command is no
+routine: the loop jumps to it by a table of the keys and the menu bar by
+tables of the menus, and it jumps back into the loop at one of several
+places, or on into another command. Each is a function now, which
+returns where the program goes on, and the loop calls it from a `switch`
+(`Command` of `src/c/main.c`); the tables of the menus hold the commands
+by their numbers. What a command finds in the registers, as the command
+before left them, is kept where one reads it. With that no instruction
+of the program is assembly but those that are written into the C, and
+no text or table. And nothing of it is assembled: the translation has no
+assembly file, and its build runs no assembler for it. What the last
+such file said, in what order the program's segments lie and which of
+them count from the PSP, is said by options of the compiler and by the
+linker's command (see The C translation).
+
+The third stage is under way, in a tree of its own, `src/portable_c/`,
+which started as a copy of that program. Its functions no longer take
+their arguments in the registers of the assembly, the original's setup
+program is a part of it, and it is a program of 32 bits, which a DOS
+extender starts. It uses what 32 bits give: pointers where there were
+segments and offsets, numbers as wide as what they count, and the
+memory of its panels and its texts from the extender, as much as the
+machine has. What it asks of the system it asks through one header,
+`sys.h`, in DOS's terms, and each system has its own files behind it:
+those for DOS, and those of the program for
+Linux, `vc`, which runs in a terminal and
+emulates DOS's services there. It behaves otherwise than the original
+where a thing only made sense on DOS, and the first such thing was that
+it stays in the memory whole while a command runs, with no option for
+that (see The portable C). After Linux comes the web
+page, the program built for WebAssembly and drawn as
+text, served by a server of the project's own or statically, and then
+iOS.
 
 ## 11 October 2026
 
@@ -3919,6 +4102,32 @@ in "The portable C".
   knows the tree by that name, and holds a build of any other name to
   the original's goldens with nothing declared for it.
 
+### Say what is left of the functions that return two things as one number
+
+*e06a7ee, from README.md, "The portable C".*
+
+A function that hands back two things, where the assembly has two
+registers or a register and the carry flag, returns them in the C
+translation as the halves of one number of 32 bits, which the caller
+takes apart. In the portable C such a function returns a structure
+with members named for what they are: `GetMous` the buttons and the
+place of the mouse, `OpenFil` what DOS answered and whether that is an
+error, `EdLin` the cursor and whether anything changed, a command of
+the keys the place of the loop where the program goes on, with the
+panel and the item of the menu where that place takes them. A call
+that still took such a number apart would not compile. Of the 114
+functions that returned one, 104 return a structure. Five had one
+thing to say, the same place of the loop from every return, which is
+the end of a command in the assembly, a jump: they return nothing. Two
+are gone. And three returned a number that is one: `Timer` of
+`system.c`, the BIOS's count of timer ticks; the compiler's routine
+that multiplies numbers of 32 bits, which a program of 32 bits has no
+use for; and `Dos35` of `main.c`, an address as DOS has it, which went
+into the file of the system's functions. Three numbers of 16 bits that
+had a second thing or a flag above the first went the same way: how the
+editor was left, and in the main loop where the program goes on after a
+command and what the mouse asks for.
+
 ### Keep the portable C in the memory whole while a command runs
 
 *38d56cf, from CLAUDE.md, "Notes on the portable C".*
@@ -3965,6 +4174,26 @@ whoever calls DOS, holds for the portable C as it is written there;
 "Where the size of the translation becomes other behaviour", which is
 the second item above now; and "How the part that stays in the memory
 is laid out by C".
+
+### Keep the portable C in the memory whole while a command runs
+
+*38d56cf, from README.md, "The portable C", "Staying in the memory whole".*
+
+What went, and what each thing was for. The things are named as the C
+translation has them, in `src/c/`, where each still is:
+
+| What | What it was for |
+|---|---|
+| The line Memory allocation of the Options menu, its command `M73_00`, its page of the menu's help, and Shift with Enter | The switch, and the same turned round for one command |
+| The block of the code given back to DOS before a command; `Exec10`, which asked for a block, ran the program's file as a second copy, held its check sum against the first copy's and said "Bad or missing"; in the entry, the check sum of the file, and the second copy, which knew itself by its command tail and moved its code into the first copy's block; `OvlPth`, where the environment has the program's file | Giving the code up and loading it again |
+| `FreMem1`, and the call of DOS that found it | What the Info panel showed for free memory with the switch on |
+| The main data given back to DOS in `F21_31`, and asked for again in `Init11`; `WCB1sav`, `WCB2sav` and `ComnIni`, 12.5 KB, with `F21_40` writing a panel there and `Expand` making one of it; `Init00` reading the setup to where that copy is, with no main data yet | Giving the data up and making it again of a copy |
+| `struct Stays`, the group `R_GROUP` and the options `-nd=R -g=R_GROUP`; `Psp`, the room of the PSP at the start of the file; DS on the PSP in `resident.c`, and `md` named to the linker as `Psp` | The part that stays as one segment with the PSP, as a `.COM` file is |
+| `dos.c` compiled a second time, with other names | That part could not call what was not in the memory |
+| `TrnMain` called through a pointer, `Stay`, `Go`, `Stay11`, `TrnAdr`, `TRN_SEG`, `RunPar`; `SetBrk` and `Release` called through pointers and `__loadds`; `ResSeg` and `MemRun`; `STAYS` and the far pointers made of that part's segment in `start.c`, `enter.c`, `memory.c` and `main.c` | One part calling the other, wherever that was after a command |
+| `SecDat` and `DataSeg`, the instruction `MOV DS,AX` | Finding the main data where DOS calls the program, and at the seam |
+| `Reloc`, the relocations of the part that stays applied in the entry, `TrnBeg`, the block of the other part made by writing the header that DOS keeps in front of one, and the seven words that `tools/mkexe.c` wrote into the file | A file that the program loads and relocates itself, time after time |
+| `tools/mkexe.c`, for this tree, with what it checked | Laying that file out, and holding it to what the code took for granted |
 
 ### Return what the functions inside the editor return as structures
 
@@ -4239,6 +4468,43 @@ is laid out by C".
 
 - Names that say what no longer is: `resident.c`, of which nothing is
   resident; `FreMem2`, which is how many paragraphs it is from the main
+
+### Make the portable C one program, which keeps its data as well as its code
+
+*61c11ba, from README.md, "The portable C".*
+
+None of them gives anything a name. In the C translation a constant that another file
+names has a `#pragma aux` wherever it is defined or declared, which
+takes off the underscore that the compiler puts in front: the assembly
+named it so. `harness/datacheck.py` knows an object with the underscore
+or without, so in the portable C those lines are gone, 361 of them, and
+with them the three by which a file of constants had a second, near
+name for a text that code names far: the portable C has one kind of
+pointer. What was left beyond that while the tree was still two parts,
+80 lines in all, the names of what the part that stays in the memory
+defined, of a second copy of the file that calls DOS and of the main
+data, and the registers where one part called the other, went with the
+two parts.
+
+### Take the buffer of TopView and DESQview out of the portable C
+
+*dce4004, from README.md, "The portable C", "What else has gone".*
+
+After the two parts, what the program did only because it ran on a PC
+under DOS, next to other programs of that time, and that no screen of a
+scenario shows. Each is an entry of `src/portable_c/DEVIATIONS.md`, by
+its number here, and is gone outright: the code, the calls, and what the
+main data kept of it, whose bytes stay where they are and are neither
+set nor read, since the layout of the main data is the original's. The
+things are named as the C translation has them, in `src/c/`, where each
+still is.
+
+| | What | What it was for |
+|---|---|---|
+| 2 | `TopView` and `TopScr` of `dos.c`, the inline assembly `VideoBuffer`, their calls in `IniData` of `start.c` and in `Window` | Drawing into the buffer that TopView or DESQview shows in place of the display's memory, and telling them what has changed there |
+| 3 | `DvPause` of `dos.c`, the inline assembly `DesqviewPause`, its call in `LeaveTm` of `blank.c`, the call of DOS in `IniData` that asked for DESQview, and the two places that went by the answer, in `Input0` and in the editor's loop of keys | Giving the rest of the program's turn to the other programs of DESQview, and leaving Alt and the keyboard's buffer to it |
+| 4 | The call of INT 2Fh with AX 1680h in `LeaveTm` | Giving the rest of the program's turn to Windows, or to whatever else ran programs of DOS as guests. The call of INT 28h, DOS's own word that the program is idle, stays |
+| 5 | The test of the display in `IniData`, the waiting in `Window` and `MovScr` of `window.c`, `InPort` of `dos.c` and the intrinsic function `inp` | Writing to the memory of a CGA only while it does not draw, which otherwise shows as snow. Snow mode stays a byte of the setup, kept as it is found |
 
 ### Give u8, u16 and u32 their widths on every compiler, and say so
 
@@ -5043,6 +5309,62 @@ What moving `blank.c`, `main.c`, `enter.c`, `commands.c`, `keys.c`,
   that menu is clicked for the portable C again. A dark item of the
   Files menu is tried by its key, in `menu`.
 
+### Take the map of the memory out of the portable C, with the watch on DOS
+
+*4fa34f8, from README.md, "The portable C", "What a user sees no more".*
+
+Then the features that a user of the program sees and that only made
+sense on DOS. Each is an entry of `src/portable_c/DEVIATIONS.md`, by
+its number here, and is gone outright, not kept as a setting that does
+nothing: its command with its key, its line of a menu and its name in
+the key bar, its code and its data. What the main data kept of it keeps
+its bytes, and a byte of the setup that switched it is kept as it is
+found, so the setup file is the original's. The scenarios that showed
+such a thing are not run for the portable C, or are run without the
+steps that went there, against the original's golden without them:
+`DEVIATIONS.md` has each.
+
+| | What | What it was for |
+|---|---|---|
+| 7 | The map of the memory, Alt+F5, Memory info of the Commands menu: `memory.c` and `memory_t.c`. And the watch on DOS that it rested on, in `exec.c`: the entry of INT 27h, `New27` with `Int27`; in the entry of INT 21h the three calls by which a program is run, stays in the memory or gives a block back; the list of the programs that have stayed and their records, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk`, `Release`; `GetStat`; and the programs released when the program is left | Listing what DOS has given to whom, and getting a program out of the memory again that was run from here and has stayed, which DOS had no way to do |
+| 11 | The two lines on the memory in the Info panel, "Bytes Memory" and "Bytes Free": the part of `PutInf` of `info.c` that wrote them, with their three texts; and for the first, `MemEnd` of `sys.h`, which read in the PSP where the memory ends, with its call in `IniData` of `start.c` | Saying how much memory DOS has for programs and how much of it the next command gets. The panel is no row shorter for it: what the program is based on stands below its title, the line under the title a row further down, and the row below that is empty |
+| 12 | EGA lines, Alt+F9, of the Commands menu: `F69_00` of `commands.c`; its name in the key bar with Alt held, and the key bar that the panels had on a display without such lines; and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`, with their bodies in `sys_dos.c` | Giving the screen 43 rows on an EGA or 50 on a VGA, and 25 again, by having the BIOS load a font of 8 lines, and telling the Print Screen key of the rows. The program still asks how many rows the screen has, when it starts and behind every command, and draws on as many as it finds, up to 50: the rows are to come from the system that it runs on. No scenario has it on more than 25 for now |
+| 14 | Quick execute commands, of the Advanced options and of the setup's Configuration, where it was the last of the Execute options: the way through the shell in `Exec02` of `exec.c`; the command that went to the current drive first, which `F21_31` of `enter.c` left for it, with DOS asked for the drive there and in `IniData` of `start.c`; and `ShellRun` of `sys.h`, which `sys_dos.c` made in real mode, by 26 bytes of instructions that it put below the megabyte | Handing a command to the COMMAND.COM that the program was started from, by that shell's INT 2Eh, in place of running a COMMAND.COM for each: sooner, and with what the command set there kept. Every command is run the second way. The Advanced options are a row shorter, with Clear keyboard buffer the one line of Other options, and the right half of the setup's Configuration begins with the Keyboard options |
+| 24 | The editor's count of free bytes in its status line, with the word "Free" behind it: the block of `T00_20` of `edit.c` that wrote the figure, and `FrBuf_S` of `edit_t.c` | Saying how much of the memory that the editor took is left for the text. The editor still says when its room is full, as before |
+| 29 | Unsorted, the fifth order of the Left and the Right menu: its line in both menus, the branch of `CmpPar` of `files.c` for the order in which the files were read, and the tick of `F40_00` of `menu.c` for it. A panel is sorted by name unless the user picks another order, and a setup file that says Unsorted, as the distribution's does, is read as by name | Listing the files in the order in which DOS lists the directory, which on DOS was the order in which they were made. On the systems that the program is carried to that order is of the file system and says nothing to a user. The menus are a row shorter |
+
+Quick execute commands is not of DOS alone by what it gave, only by
+how it was done, and was taken out on the user's word of 13 October
+2026, as EGA lines was, and not by the rule, as the two above them
+were: `DEVIATIONS.md` has it under 14 as it has those. The editor's count
+of free bytes went on the user's word of 14 October 2026, that every
+figure of free memory goes, on DOS too: entry 24. Unsorted went on the
+user's word of 15 October 2026, with the bench's panels sorted by name:
+entry 29.
+
+Besides what has gone, `DEVIATIONS.md` declares what the user has had
+done otherwise than the original, one thing at a time, as the work on
+the numbers and the memory came to it, entries 15 to 28. Most are bugs
+of the original that are fixed: Go to of the file search asks for the
+disk of the drive that its line is on, the search reads no part of a
+file behind the end of its room, a copy from a device counts its room
+down by every read, a tree's file or a help file that is broken is
+refused, and the menu bar no longer goes on with the menu that is none.
+The others are limits of the original that went when a number was
+widened: the viewer finds a text beyond column 65,535, the editor
+reaches every line of a text of more than 65,535, the Info panel counts
+clusters of 64K, and a panel keeps all of its files while a command
+runs. Above all a panel holds as many entries of a directory as there
+is memory for, where the original stops at 2,703, and stops for good
+at 65,536, the most that a directory of DOS holds, since an entry keeps
+the original's number of 16 bits: entry 27.
+
+What was left of the watch then was what was not for the map: the
+program still took INT 21h, for its own call, by which a setup program
+reads and writes its setup in the memory, and handed every other call
+on untouched. That has gone since, with the call: see The setup
+program in it.
+
 ### Note that Quick execute and the phantom drive B: wait for the user's word
 
 *fc4f2f4, from TODO.md, "The portable C: one program".*
@@ -5415,6 +5737,16 @@ the callers gave back what they had of registers as they went over. The
 last 35 calls, with the functions of the old way that went behind
 them, gave back 738 bytes. The README's figures say where the file
 stands.
+
+### Say entry 6 as the assembly has it, and what is true of sys.h at the end
+
+*a2e2830, from README.md, "The portable C", "The system in one place".*
+
+Every file asks the system through the header: the 348 calls went over a
+file at a time, and the functions by which a structure of registers was
+handed to an interrupt are gone with the last of them. `CLAUDE.md`,
+"Moving a file to the system's functions", has what that met and how a
+function is added.
 
 ### Write down what a trial of a 32-bit program on the bench showed
 
@@ -8110,6 +8442,25 @@ For whoever goes on:
   comparison, for a line that only the portable C prints: the segment
   of the program that prints follows the size of the program under
   test. Nothing reads those registers but that scenario.
+
+### Take the program's own call out of the portable C, with the entry of INT 21h
+
+*e5788f2, from README.md, "The portable C", "The setup program in it".*
+
+That call, the program's own (INT 21h with AH 2Bh, 'VC' in CX and 'OM'
+in DX), is gone from the portable C, since nothing asks a running
+program for its data any more, and with it the last reason for the
+program to take DOS's own interrupt. What went: `New21`, the entry of
+INT 21h, eight instructions of assembly that every call of DOS by any
+program passed while the program was in the memory; `Int21`, the
+interrupt function that answered the one call; `Vect21`, where the
+interrupt went before, a variable in the code segment for that entry to
+read; `PutVector`, which wrote an address into the machine's
+table of interrupts; and the interrupt taken when the program starts
+and given back when it leaves or when DOS ends it. A call of DOS goes
+to DOS. The scenarios `asked` and `handed-on`, which show the call
+answered and the others handed on, are not run for the portable C, and
+stay for the C translation.
 
 ### Take the three settings of what is gone out of the setup's two dialogs
 
@@ -17419,6 +17770,28 @@ scenarios that failed, T and L for what was found on the way, W, Z1, Z2
 and R1 for the switch. Nothing of the plan is open: what was the user's
 is decided, in "Open, for the user", and the next step of the road has
 a plan of its own, "The portable C in a flat memory: the plan".
+
+### Have the README say what the portable C is now, one program of 32 bits
+
+*db9c09f, from README.md, "The portable C".*
+
+`DIARY.md`
+has the plan by which it became such a program, "Write down the plan for
+the 32 bits, with the scripts of its trials", with what each piece of
+that met in the entries behind it: while it was made, the same source
+was also built as a program of 16 bits, which the scenarios judged until
+the one of 32 bits passed them all, on 13 October 2026, and that build
+is gone.
+
+Three things
+that stayed at first have gone since: the watch on DOS, which noted the
+programs that stay in the memory and released them, with the map of the
+memory that it was for, and the commands run through COMMAND.COM's INT
+2Eh, with Quick execute commands (see What a user sees no
+more); and the program's own call, by which
+a setup program read and wrote its setup, with the entry of INT 21h
+that was left for it alone (see The setup program in
+it).
 
 ### Write down the net and the record of step 2, and what a later piece should know
 
@@ -30151,3 +30524,15 @@ of Linux of `DEVIATIONS.md`, and held to clang's warnings, clang-tidy
 and the sanitizers. What the user left open there stays as `DEVIATIONS.md`
 says it (the tree's order, NUL, the panels off without what the
 commands wrote, the wheel). Step 7, the web page, is next.
+
+### Point the references of finished work to DIARY.md, and of CLAUDE.md to its sections as they are
+
+*42c1819, from README.md, "The portable C", "Staying in the memory whole".*
+
+Until the piece F10 of the plan for a flat memory
+(`DIARY.md`, "Take the megabyte down: its words out of vc.h, its rules
+out of the test of the layout"), the program kept the memory of a
+program of DOS inside its own, a megabyte counted from 64K below the
+main data, in which a segment and an offset were made a pointer, and
+the test `portable_c-layout` held the linked file to where that put
+the tables and what followed the main data.
