@@ -34,7 +34,11 @@ keyboard and the mouse. Then comes the largest piece, the part of the
 program that stays in memory while a command runs: how 1,511 bytes of
 code and messages, 10,923 bytes of saved state and the PSP's 256 give
 the user's program all but 12,690 bytes of the machine in the
-program's small mode, and how the commander gets back.
+program's small mode, and how the commander gets back. This chapter is
+the one place where the resident part is told; the others link here.
+Last come the memory map, which walks DOS's own chain of memory blocks
+and takes resident programs out of it, and the 256-byte stack that all
+of this runs on, with its deepest call counted byte by byte.
 
 The assembly is quoted from `src/asm/` with its labels and its own
 comments; a comment that starts with `;;` is the book's. Sizes and
@@ -358,8 +362,10 @@ diskette for drive B: and press any key" with its own console calls.
 drive answers to now; if it is not the one wanted, the routine shows
 its own box, "Insert diskette for drive B:", and then makes the wanted
 letter current with 440Fh, so that DOS has nothing to ask. Those two
-IOCTL calls first appeared in DOS 3.20, which is the likeliest reason
-for the version that `Alloc0` demands; the source does not say.
+IOCTL calls first appeared in DOS 3.20, and they bear on the version
+that `Alloc0` demands
+([below](#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb), under "Why
+3.20").
 
 When the disk of a panel's drive cannot be read, at start or when the
 user picks a drive for a panel, the program sets `BlocEr` around the
@@ -422,7 +428,38 @@ another segment, through `CallPSP`, a six-byte routine that turns an
 offset in AX into a far call into SS. The resident part calls it near,
 and the six bytes of `SetBrk0` in front, which the code falls through,
 rewrite the near return address on the stack into a far one. One body,
-two kinds of call, for six bytes.
+two kinds of call, for six bytes:
+
+```
+called near, from the resident part        called from the transient part
+(Exec03: CALL SetBrk0)                     (MOV AX,OFFSET SetBrk / CALL CallPSP)
+
+after CALL SetBrk0:                        after CALL CallPSP:
+  SP -> | ret                 |              SP -> | ret                  |
+        | ...the caller's     |                    | ...the caller's      |
+
+POP BP       BP = ret                      CallPSP: POP BP, PUSH CS, PUSH BP,
+PUSH CS      CS is the PSP here                     PUSH SS, PUSH AX
+PUSH BP                                      SP -> | OFFSET SetBrk        |  RETF
+  SP -> | ret                 |                    | SS, the PSP          |  uses these
+        | CS = PSP            |  a far             | ret                  |  a far
+        | ...the caller's     |  return            | CS = RunPar          |  return
+                                                   | ...the caller's      |
+falls into SetBrk, which pushes and pops     RETF lands in SetBrk, which pushes
+its three words and ends in RETF:            and pops its three words and ends
+back to PSP:ret, the caller's own            in RETF: back to RunPar:ret
+segment
+```
+
+`CallPSP` itself is the same idea turned round: six bytes that make a
+far call out of a near one, so that the transient part reaches every
+routine of the resident part through one place without knowing the
+PSP's segment in advance; SS always holds it. `SetBrk0` costs BP,
+and its other two instructions are a service: both of its callers come
+straight back from an EXEC or from INT 2Eh, after which no register
+but CS:IP can be trusted, and it hands them ES on the PSP and the
+direction flag cleared. `SetBrk` keeps the flags with `PUSHF` and
+`POPF`, so the `JNC` behind the EXEC still tests DOS's carry.
 
 It runs at start and after every command, since a command may change
 both BREAK and INT 23h. Every command starts with BREAK put back as
@@ -706,18 +743,38 @@ TypMo1: XOR     BX,BX                   ;; a software text cursor
         INT     33h
 ```
 
+The driver keeps the cell under the pointer and writes `(cell AND
+screen mask) XOR cursor mask` there. The cell is the display's word,
+the character in the low byte and its colour in the high one, and the
+two masks work on it bit by bit:
 
-the driver keeps the cell under the pointer and writes `(cell AND
-screen mask) XOR cursor mask` there. With the masks FFFFh and 7700h
-the cell keeps its character and has its colours inverted. Because the
-driver keeps a copy of the cell, a write under the pointer would be
-undone when the pointer moves, which is why `Window` and `Int10m` hide
-the pointer around every write. With AL not 0, `TypMous` makes the
-pointer a character instead, the screen mask keeping only the colour
-and the cursor mask bringing the character: `'√'` over something that
-a click would act on, `■` while the button is held in the corner that
-switches the panels off, `x` while the middle button is held in the
-help, find file and the memory map.
+```
+bit           15   14 13 12   11   10  9  8   7 ............ 0
+cell          blink background bright foreground  character
+              ---- ---------- ------ ---------- ----------------
+arrow pointer, AL = 0:
+  screen mask   1    1  1  1    1    1  1  1    1 1 1 1 1 1 1 1   FFFFh: keep it all
+  cursor mask   0    1  1  1    0    1  1  1    0 0 0 0 0 0 0 0   7700h: flip the colours
+  result      kept   inverted   kept  inverted    kept
+character pointer, AL = 'x':
+  screen mask   1    1  1  1    1    1  1  1    0 0 0 0 0 0 0 0   FF00h: keep the colour
+  cursor mask   0    1  1  1    0    1  1  1    0 1 1 1 1 0 0 0   7778h: flip it, and 'x'
+  result      kept   inverted   kept  inverted    'x'
+```
+
+So the pointer over a file name of the panels, bright cyan on blue,
+1Bh, is the same character in 1Bh XOR 77h = 6Ch, bright red on brown,
+and over the cursor bar of the memory map, 0Fh, the `x` is drawn in
+78h; the recorded screens have both. Blink and brightness are left
+alone, so a bright character stays bright under the pointer.
+
+Because the driver keeps a copy of the cell, a write under the pointer
+would be undone when the pointer moves, which is why `Window` and
+`Int10m` hide the pointer around every write. With AL not 0, `TypMous`
+makes the pointer a character, still in the inverted colours: `'√'`
+over something that a click would act on, `■` while the button is held
+in the corner that switches the panels off, `x` while the middle button
+is held in the help, find file and the memory map.
 
 `GetMous` divides the driver's pixel coordinates by 8 for a cell and,
 for a left-handed mouse, swaps bits 0 and 1 of the buttons:
@@ -743,6 +800,29 @@ for a left-handed mouse, swaps bits 0 and 1 of the buttons:
         OR      AL,BH
 GetMo1: AND     AX,WORD PTR 7
 ```
+
+The driver answers with the buttons in BL, bit 0 the left, bit 1 the
+right, bit 2 the middle. Five instructions move each bit where the
+other hand wants it, with no table and no jump:
+
+```
+                       bit 7 .. 3   2    1    0
+BL from the driver      0 ... 0     m    r    l
+BH = BL                 0 ... 0     m    r    l
+SHR BL,1                0 ... 0     0    m    r
+SHL BH,1                0 ... m     r    l    0
+AND BX,201h   BL:       0 ... 0     0    0    r      only bit 0 kept
+              BH:       0 ... 0     0    l    0      only bit 1 kept
+AND AL,4                0 ... 0     m    0    0
+OR AL,BL / OR AL,BH     0 ... 0     m    l    r      left and right swapped
+```
+
+| Pressed | BL from the driver | AL with `LftMous` |
+|---|---:|---:|
+| left | 1 | 2, "right" |
+| right | 2 | 1, "left" |
+| middle | 4 | 4 |
+| left and right | 3 | 3 |
 
 A double click is not the driver's either. `DoublMo` asks DOS for the
 time at the first click and takes a second click on the same place
@@ -815,11 +895,44 @@ first trick of the program is.
 
 ### `ORG LastRes`: the start-up runs where the vectors will go
 
-The start-up code, `Alloc0`, is assembled by `ORG LastRes` at the
-address of `IntTab`, the kilobyte for the TSR manager's copy of the
-interrupt vectors, and the transient part behind it over the rest of
-the resident buffers ([chapter 1](01-the-program.md#the-parts-of-vccom)
-has the source). `Alloc0` is 256 bytes, runs once, and is then written
+Behind the resident code, at `LastRes`, the source declares the
+10,923 bytes of buffers that the table above ends with, and then, at
+the start of the main module, goes back:
+
+```asm
+LastRes:
+
+;--------------------- Release data --------------------
+IntTab  DD      256     DUP(?)          ;; the interrupt table, for the TSR list
+SavePtr DD      ?
+Vect21  DD      ?
+Vect22  DD      ?
+Vect27  DD      ?
+Counter DW      ?
+PrgList DW      MaxProg DUP(?)
+NameBuf DB      12      DUP(?)
+
+;------------------ Data save segment ------------------
+WCB1sav DB      WCBsave + 13 * MinFls   DUP(?)  ; WCB1
+WCB2sav DB      WCBsave + 13 * MinFls   DUP(?)  ; WCB2
+ComnIni DB      CmnSave                 DUP(?)  ; Common data
+DataSav DB      LenStk                  DUP(?)  ; Local stack
+VcStack:
+LastDat:
+        ...                             ;; the tables and texts
+;--------------------- Main module ---------------------
+        .CODE
+        ORG     LastRes                 ;; back to 06E7h
+
+Alloc0: CLD
+```
+
+So the start-up code, `Alloc0`, is assembled at the address of
+`IntTab`, the kilobyte for the TSR manager's copy of the interrupt
+vectors, and the transient part behind it over the rest of the
+resident buffers. In the file those bytes are code; once the program
+runs, the code has been copied elsewhere and the same addresses are
+the buffers. `Alloc0` is 256 bytes, runs once, and is then written
 over by the first copy of the vectors. Behind it, at 7E7h, is `Init00`, where the
 transient part begins, and the transient part overlaps the rest of the
 resident data in the file as well. So the start-up's first job is to
@@ -884,6 +997,36 @@ Alloc4: RETN                            ;; DOS 1 or 2: PSP:0, INT 20h
 returns to the zero that DOS pushed for a `.COM` file and so to the
 `INT 20h` at the start of the PSP. On DOS 3.0 to 3.1 it says "This
 program requires DOS 3.20 or later." and ends with code 2.
+
+**Why 3.20.** The source gives no reason: the
+comment is "Check DOS version", and the number is the `314h` of the
+comparison. What the code shows is which calls need what. DOS 3.0 is a
+hard floor: the reload after a command finds `VC.COM` by the full path
+that DOS 3 leaves behind the environment, `Intr21` asks function 59h
+for every error, and `FatErr` answers Fail, all of which DOS 2 lacks.
+Of everything the program calls, only two things are younger than
+3.1: IOCTL 440Eh and 440Fh, the map of the logical drives, which came
+with 3.20 and which `Fantom` and the drive menu use for the one floppy
+drive that is both A: and B:. Even those two are guarded. Both places
+test the carry flag after the call and go on as if there were no
+second letter when DOS does not know the function:
+
+```asm
+        MOV     AX,440Eh                ;; Fantom: which letter now?
+        INT     21h
+        JC      Fantm1                  ;; DOS 3.1 says "invalid function":
+        ...                             ;; ...
+Fantm1: CLC                             ;; as if no phantom drive
+```
+
+So on DOS 3.1 the program would run, and would lose only its own box
+for drive B:, DOS printing "Insert diskette for drive B:" behind the
+panels instead. Everything younger still, the upper memory of DOS 5
+(5802h), the true version (3306h), the names in the MCBs of DOS 4, is
+asked for and done without when it fails. The check reads best as the
+oldest DOS on which the program does everything that it was designed
+to do, and the only feature that draws that line is the phantom
+drive; the source does not say more.
 
 **The move.** `Alloc5` makes the block as long as the resident part, a
 paragraph for an MCB and the transient part (AH 4Ah), and copies the
@@ -1420,7 +1563,9 @@ returns with the carry set; `New21` changes the program's AH 31h into
 4Ch, and it ends like any program, its memory going back to DOS.
 
 **`Release`, and the map.** The memory map, Alt-F5, lists the noted
-programs and offers to release one. `Release` checks the note's sum
+programs and offers to release them
+([below](#the-memory-map-alt-f5), where `Release` has its flowchart).
+`Release` checks the note's sum
 (`ChkBlk`), puts back the vectors and the save pointer that it holds,
 and then walks DOS's chain of MCBs from its start, which function 52h
 gives, freeing every block that the TSR's PSP owns: its environment,
@@ -1483,6 +1628,506 @@ last first. `Release` frees blocks by AH 49h, which still goes through
 and the loop finds the next one at the end of it. INT 23h and 24h are
 not restored here: DOS takes them from the PSP when the program ends.
 
+## The memory map: Alt-F5
+
+Alt-F5 opens a box that lists every block of DOS's memory, who owns
+it, how big it is and which interrupts point into it, and lets the user
+take a resident program out again. All of it is `VCMEM.INC`: 2,036
+bytes of code, `F65_00` to `MemItem`, 120 bytes of texts and 62 of
+tables, 2,218 in all, and not one byte of buffer of its own. It reads
+DOS's chain of memory control blocks into `WinBuf`, makes the lines of
+the box in `MenuBuf`, keeps its few variables in `TmpBuf`, and marks
+interrupts in `ErrBuf`: four buffers of the main data that are idle
+while the box is up.
+
+```
+╔══════════════════════════ Memory Info ═══════════════════════════╗
+║ Address Blocks   Size    Program        Hooked vectors           ║
+╟──────────────────────────────────────────────────────────────────╢
+║   0070     2    26,016   DOS 7.10       00 01 02 03 06 08 09 ... ║
+║   06CC     1    42,192   system                                  ║
+║   ....    ..    ......   free memory                             ║
+║   1121     2    73,008   COMMAND        2E                       ║
+║   22BF     1     3,088   CTMOUSE        10                       ║
+║   2381     2     9,776   DRIVER.COM     16 28 33                 ║
+║   25E6     2    ......   VC.EXE         1B 21 22 23 27           ║
+║   ....    ..    ......   free memory                             ║
+║ • ....     2       448   T.COM          60                       ║
+║   ....    ..    ......   free memory                             ║
+║ • ....     2       448   U.COM          61                       ║
+║   ....    ..    ......   free memory                             ║
+║                                                                  ║
+╟──────────────────────────────────────────────────────────────────╢
+║                     [ Release ]   [ Cancel ]                     ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+*The box as the shipped program draws it on DOS 7.10, after two tiny
+resident programs, `T.COM` and `U.COM`, were started from its command
+line; the recording leaves out the figures that follow the length of
+the program under test, shown here as dots. `DRIVER.COM` is the
+recording bench's own resident program, and the bench starts the
+commander under the name `VC.EXE`. The `•` marks the two programs that
+the TSR manager noted and can release.*
+
+### Walking the chain: `F65_00` to `F65_05`
+
+Function 52h of DOS, undocumented but known to every memory lister of
+the day, hands back in ES:BX DOS's "list of lists", and the word in
+front of it, at ES:BX-2, is the segment of the first MCB. From there
+each block's header says how long the block is, and the next header is
+right behind it, until one says `'Z'`. The walk, 128 bytes, writes
+two words per block into `BlkList`, which is `WinBuf`:
+
+```asm
+F65_01: MOV     SI,OFFSET BlkList       ;; = WinBuf
+        MOV     DI,SI
+        MOV     AX,SegDOS               ;; 70h: where DOS itself is loaded
+        STOSW                           ;; a block at 70h...
+        STOSW                           ;; ...owned by 70h
+        PUSH    AX
+        MOV     AH,52h
+        INT     21h
+        MOV     AX,ES:[BX-2]            ;; the first MCB
+        PUSH    DS
+        POP     ES
+        POP     BX                      ;; its block, too, is DOS's: owner 70h
+        MOV     DS,AX
+        INC     AX
+        JMP     F65_04
+F65_02: INC     AX                      ;; the block, behind its MCB
+        MOV     BX,DS:[1]               ;; its owner
+        ...                             ;; our data block, and in the small mode
+        ...                             ;; our code, count as free: owner 0
+F65_04: STOSW                           ;; segment
+        MOV     AX,BX
+        STOSW                           ;; owner
+        MOV     AX,DS
+        ADD     AX,DS:[3]
+        INC     AX                      ;; the next MCB
+        CMP     BYTE PTR DS:[0],'M'
+        MOV     DS,AX
+        JE      F65_02
+```
+
+```
+BlkList, in WinBuf: 4 bytes a block
++0  word  the block's segment, its MCB's + 1
++2  word  the owner: a PSP, 8 for DOS's own, 0 for free
+first:      0070h, 0070h     DOS, from its code at 70h to the first MCB
+            seg,   0070h     the first MCB's block, given to DOS too
+            ...
+end:        seg,   0         the segment behind the last block, as a bound
+            0                no more
+```
+
+Two of the commander's own blocks are written down as free: the block
+of its main data and panels, which it gives back before every command,
+and, in the small mode of Memory allocation, the block of its
+transient part, found by `RunPar`. The map shows what a command would
+have, not what the commander happens to hold. Around the walk the
+program links DOS 5's upper memory into the chain with 5803h, and puts
+the link back as it was afterwards, so that blocks above 640 KB are
+listed too.
+
+`WinBuf` holds 7,392 bytes, 1,848 blocks; the walk does not count, and
+no machine has that many.
+
+### What a block is: `F65_05` to `F65_15`
+
+The second pass makes of the blocks the lines of the box, one line of
+28 bytes for each program, run of free blocks or block of DOS's:
+
+```
+MemList, in MenuBuf: 28 bytes a line, 142 lines in 4,000 bytes
++0   byte      bit 0: releasable, the TSR manager has a note
+               bit 1: selected for release
++1   word      the segment: a PSP, or the block's own
++3   word      how many blocks
++5   word      the size in paragraphs, the MCBs not counted
++7   12 bytes  the name, padded with spaces
++13h byte      n, the vectors found, which may pass 8
++14h 8 bytes   the first eight vector numbers
+end: a line whose segment is 0
+```
+
+```mermaid
+flowchart TD
+    A["the next block of BlkList: segment, owner"] --> B{"owner?"}
+    B -- "0" --> F["free: join the free blocks behind it,<br/>one line, 'free memory'"]
+    B -- "the block itself" --> P["a program's PSP block: count every block<br/>whose owner is this PSP, add their sizes"]
+    B -- "the segment of another block" --> S["skip it: it is counted<br/>with that program"]
+    B -- "anything else" --> O["one line for this block alone"]
+    F --> N["a name"]
+    P --> N
+    O --> N
+    S --> A
+    N --> A
+```
+
+`F65_10` joins free blocks that follow one another into one line, with
+the number of blocks and the size from the first to the end of the
+last, the MCBs between them included, which is how large the block
+would be once DOS merged them. A program's line counts its PSP's block
+and every block whose owner is that PSP: its environment, and whatever
+it has allocated. The size is a difference of segments less one, so it
+comes free with the walk.
+
+### The name: nine rules, `F65_15` to `F65_30`
+
+The name is the longest part of the map, 321 bytes, because DOS keeps
+no name for a program until version 4, and not always then:
+
+| The block | The name | From |
+|---|---|---|
+| owner 0 | `free memory` | `FrMem_S` |
+| segment 70h | `DOS 7.10` | the true version, `VerDOS`, by `HexDec`, a leading zero dropped |
+| its PSP is in a note of the TSR manager | the note's 12 bytes, and the line marked releasable | `PrgList` |
+| owner 8 or lower | `system` | DOS's own data and drivers |
+| owner not the block itself | `unknown` | |
+| the environment is the program's own block and its strings are followed by a count of 1 | the file name of the program's path, cut by `CutPath` | DOS 3 and later |
+| DOS 3, and the program is its own parent (PSP:16h) | `COMMAND.COM` | the resident part's `Command`, the text for running the shell |
+| DOS 4 or later, or DR DOS 5.0 or later (INT 21h AX 4452h answers with 65h or more in AL) | the 8 bytes at offset 8 of the MCB | DOS's name in the header |
+| anything else | `unknown` | |
+
+A program's path is the best name, `DRIVER.COM` with its extension,
+since a program may free its environment, and then the MCB's name,
+`CTMOUSE`, is the next best. The primary shell has no path behind its
+environment, and on DOS 3, which has no names in its MCBs, the program
+falls back on the fact that only the first `COMMAND.COM` is its own
+parent, and reuses the one copy of the text that it has, which the
+resident part needs for `COMSPEC`. A name of an MCB is not ended by a
+zero when it has eight characters: `F65_39` copies it into `MemTmp` and
+adds one. A "system" or "unknown" block gets its owner word in
+`BlkList` changed to its own segment on the way (`XCHG AX,ES:[SI-2]`),
+so that the next pass gives such a block its interrupts.
+
+### Hooked vectors: 92 bytes for 256 interrupts
+
+Which interrupts a program has taken cannot be asked of DOS. The map
+decides by where each vector points: the paragraph of `segment +
+offset / 16` lies in one block, and the block's owner has the
+interrupt.
+
+```asm
+F65_31: POP     BP                      ;; MemList
+        XOR     SI,SI
+        MOV     DS,SI                   ;; the vectors, at 0000:0000
+        MOV     CX,4                    ;; CL 4, CH the vector's number, 0
+F65_32: LODSW                           ;; offset
+        SHR     AX,CL
+        MOV     DI,AX
+        LODSW                           ;; segment
+        ADD     AX,DI                   ;; AX = vector address
+        MOV     BX,DX                   ;; BlkList
+        CMP     AX,ES:[BX]
+        JB      F65_35                  ;; below DOS: no one's
+F65_33: CMP     WORD PTR ES:[BX+4],0
+        JE      F65_35
+        ADD     BX,4
+        CMP     AX,ES:[BX]
+        JAE     F65_33                  ;; the block that holds it
+        MOV     DI,ES:[BX-2]            ; DI = owner
+        ...                             ;; its line in MemList, by segment
+        TEST    BYTE PTR ES:[BX-7-12],1
+        JNZ     F65_35                  ;; releasable: the note knows better
+        INC     BYTE PTR ES:[BX]        ;; one more
+        MOV     AL,ES:[BX]
+        CMP     AL,MaxVect+1
+        JAE     F65_35                  ;; eight are kept, the rest counted
+        MOV     AH,0
+        ADD     BX,AX
+        MOV     ES:[BX],CH              ;; the vector's number
+F65_35: INC     CH
+        JNE     F65_32                  ;; all 256, CH wrapping to 0
+```
+
+A vector that points into the BIOS's ROM, above every block, falls off
+the end of the list and is no one's. So the line for DOS gets every
+interrupt that still points into the kernel, 00, 01, 02 and the rest,
+and a resident program gets the ones that it has taken. For a program
+that the TSR manager noted, the map does not guess: the line takes the
+numbers from the note, the vectors that the program changed when it
+stayed. `MemItem` prints the first eight; when there are more it prints
+seven and `...`.
+
+### The box and its keys
+
+The box is drawn as any other: the window saved by `SavWin` into
+`WinBuf`, over `BlkList`, which is no longer needed; the frame, the
+title, the header line, the buttons by `MinMnu`. It is as tall as the
+screen less three rows, and lists as many lines as the screen has rows
+less 12, 13 on a screen of 25 rows. Each line is made by `MemItem` from its record, the
+address and the vectors by `HexByt`, the blocks and the size by
+`Number` with a separator of thousands, the size being the paragraphs
+shifted left by four into 32 bits. Its first cell is a space, `•` for
+a releasable program, `√` for one that is selected; the colour comes
+from `Memo_P`, one of four by the cursor and the selection.
+
+```asm
+Memo_T  DW      4800h, F65_50           ;; Up
+        DW      5000h, F65_52           ;; Down
+        DW      4700h, F65_54           ;; Home
+        DW      4F00h, F65_55           ;; End
+        DW      4900h, F65_56           ;; PgUp
+        DW      5100h, F65_57           ;; PgDn
+        DW      5200h, F65_60           ;; Ins: select one
+        DW      4E2Bh, F65_62           ;; Grey +: select all
+        DW      4A2Dh, F65_63           ;; Grey -: select none
+        DW      000Dh, F65_70           ;; Enter
+        DW      001Bh, F65_83           ;; Esc
+        DW      4400h, F65_83           ;; F10
+        DW      0
+```
+
+Ins flips bit 1 of a releasable line and moves down, if the setting
+"Ins moves down" says so; it does nothing on any other line. Grey+ and
+Grey- go over every line with one loop that is told what to do by two
+bytes in AX, an AND and an OR:
+
+```asm
+F65_62: MOV     AX,2FFh                 ; Grey +  ;; AND FFh, OR 2: set
+        JMP     F65_64
+F65_63: MOV     AX,0FDh                 ; Grey -  ;; AND FDh, OR 0: clear
+F65_64: MOV     SI,OFFSET MemList
+F65_65: TEST    BYTE PTR DS:[SI],1
+        JZ      F65_66                  ;; only the releasable ones
+        AND     DS:[SI],AL
+        OR      DS:[SI],AH
+F65_66: ADD     SI,7+12+1+MaxVect
+        CMP     WORD PTR DS:[SI+1],0
+        JNE     F65_65
+        ADD     WORD PTR DS:MemFrst,2   ;; a false "first line shown"...
+        MOV     AX,DS:MemFrst
+        MOV     DS:MemCur,AX            ;; ...and cursor: all is redrawn
+```
+
+The loop at `F65_40` redraws only what has changed between the cursor
+and the first line in BP and DI and the ones in `MemCur` and `MemFrst`
+that are on the screen. To have every line redrawn, the two keys spoil
+the copies on the screen, rather than call a routine that draws them.
+
+The mouse does what it does in the panels: a click moves the cursor, a
+double click releases the program under it, the right button held
+down selects or unselects the lines it passes over, by the state of
+the first one, and the middle button, with the pointer an `x`, leaves.
+
+### Release: newest first, by a set of 256 bytes
+
+Enter on Release takes out every selected program, or, if none is
+selected, the one under the cursor if it is releasable. Order matters.
+A resident program that hooks an interrupt keeps the old vector and
+jumps there; if an older program that the newer one chains to were
+taken out, the newer one would jump into freed memory. So `F65_74`
+goes through `PrgList` from the last program noted to the first, with
+256 bytes of `ErrBuf` as a set of the interrupts that a program
+staying in memory has taken:
+
+```asm
+F65_77: CALL    MemAddr                 ;; the line of this program
+        ...
+        TEST    BYTE PTR ES:[SI],2
+        JZ      F65_80                  ;; not selected: it stays
+        MOV     CL,DS:[14]              ;; n, from its note
+        MOV     CH,0
+        JCXZ    F65_79
+        MOV     SI,15
+F65_78: MOV     AL,DS:[SI]              ;; a vector it changed
+        MOV     AH,0
+        MOV     BP,AX
+        CMP     BYTE PTR ES:ErrBuf[BP],0
+        JNE     F65_80                  ;; a newer one that stays has it too
+        ADD     SI,5
+        LOOP    F65_78
+F65_79: MOV     AX,OFFSET Release
+        CALL    CallPSP                 ;; take it out
+        JMP     F65_82
+F65_80: MOV     CL,DS:[14]              ;; it stays: its vectors
+        ...                             ;; go into the set
+        MOV     BYTE PTR ES:ErrBuf[BP],1
+```
+
+A selected program whose interrupt a newer, unselected one has also
+taken stays, without a word: releasing it would break the newer one.
+Around the loop the program gives the critical error and Ctrl-Break
+back first (`RestVct`), so that the vectors that `Release` writes back
+from the notes, which were taken before the commander hooked those
+two, are not mistaken for its own, and afterwards it takes them again
+(`HookVct`), sets INT 23h to `CtrlC` again, and starts the mouse
+driver anew (`IniMous`), in case the program that went was the
+driver or one that sat on INT 33h.
+
+`Release` itself is in the resident part, since the commander also
+calls it at its end, with the transient part perhaps gone. It is 104
+bytes:
+
+```mermaid
+flowchart TD
+    A["Release, DS on the note"] --> B["GetStat: upper memory linked in"]
+    B --> C{"ChkBlk: does the note's sum hold?"}
+    C -- "no" --> Z["SetStat, RETF: nothing done"]
+    C -- "yes" --> D["CLI: for each of the n vectors,<br/>old offset and segment back to 0:4*v"]
+    D --> E["the EGA save pointer back to 0:04A8h, STI"]
+    E --> F["SI = the program's PSP, from the note"]
+    F --> G["AH 52h: the first MCB, at ES:BX-2"]
+    G --> H{"this MCB's owner is SI?"}
+    H -- "yes" --> I["AH 49h on its block,<br/>which New21 passes to FreeBlk"]
+    H -- "no" --> J["the next MCB: this one + its length + 1"]
+    I --> J
+    J --> K{"this one was 'M'?"}
+    K -- "yes" --> H
+    K -- "no, 'Z'" --> Z
+```
+
+The note is in the program's own block, so it goes with the program;
+DS still points at it while the walk goes on, which is safe, since DOS
+does not write into a block that it is given back. Each AH 49h goes
+through `New21`, and `FreeBlk` drops the program from `PrgList` when
+the freed block is its PSP's: the list keeps itself in order with no
+code in the map for it.
+
+## 256 bytes of stack
+
+The stack is `DataSav`, the last 256 bytes of the resident part, from
+3092h up to `VcStack` at 3192h. Every routine of the transient part
+lives in it, and so do DOS, the BIOS and the mouse driver whenever the
+program calls them, and every hardware interrupt that arrives meanwhile.
+How deep does it go?
+
+It starts empty. The main loop runs with nothing on the stack: a
+command is reached through `Case`, which drops its own return address
+(`ADD SP,4`) before it jumps, and a command goes back to the loop by a
+jump too. And INT 2Eh, which loses SP, is answered by setting SP to
+`VcStack` again, which would be wrong if the loop kept anything there.
+
+### The deepest chain
+
+The worst case is a copy that DOS cannot finish: a drive not ready in
+the middle of `C20_00`'s loop, the critical error box, and in it the
+key bar redrawn because the user pressed Shift. Frame by frame, from
+the code:
+
+| Frame | What is pushed | Bytes | Depth |
+|---|---|---:|---:|
+| `FncSel`: `CALL ES:FncAddr` | the return | 2 | 2 |
+| `C00_00`, the copy of one file | BP SI DI DX CX BX | 12 | 14 |
+| `C20_01`: the copy's box is up | SI DX BX, for `ResWin` | 6 | 20 |
+| `CALL Intr21` for the read | the return | 2 | 22 |
+| `INT 21h`, and DOS calling `INT 24h` on the caller's stack | IP CS FLAGS of INT 21h, AX BX CX DX SI DI BP DS ES, IP CS FLAGS of INT 24h | 30 | 52 |
+| `FatErr` | DS ES BP SI DI DX CX BX | 16 | 68 |
+| `Dialog`, at its fields | the return, SI DI DX CX BX, CX, SI DX, BP SI BX | 24 | 92 |
+| `MinMnu`, the buttons | the return, SI DI | 6 | 98 |
+| `Input` | the return, AX | 4 | 102 |
+| `Input0` | the return, BP, 30 bytes of locals, DS SI DI DX CX BX | 46 | 148 |
+| `PutKey` | the return, BX AX | 6 | 154 |
+| `PutKey0` | the return, SI DI DX CX BX AX | 14 | 168 |
+| `Window` | the return, DS SI DI DX CX BX AX ES | 18 | 186 |
+| `CurMous`, the pointer hidden | the return, AX | 4 | 190 |
+| `INT 33h` | IP CS FLAGS | 6 | 196 |
+
+196 of 256 bytes, with 60 left for what the program cannot count: the
+mouse driver's own pushes inside INT 33h, and the timer's interrupt,
+which can arrive at any instruction and adds its 6 bytes, the BIOS's
+handler's registers and its call of INT 1Ch, and whatever resident
+programs have hooked either.
+
+`Input0`'s 30 bytes of locals are its state between two keys, kept on
+the stack because `Input0` is re-entered from everywhere and keeps
+nothing in the main data that a nested call could spoil:
+
+```asm
+Input0  PROC    NEAR C USES DS SI DI DX CX BX
+        LOCAL   IKeyBar[2]:BYTE ,\      ; Each byte takes a word of stack
+                BlMouse[2]:BYTE ,\
+                KbdFlgs[2]:BYTE ,\
+                AltLock[2]:BYTE ,\
+                ClkFlag[2]:BYTE ,\
+                ClkBuf[6]:WORD  ,\      ;; the clock's six cells
+                BlTime  :DWORD  ,\      ;; when the blanker starts
+                AltTime :DWORD          ;; when Alt went down
+```
+
+Volkov's own comment counts the cost: five flags of one byte take ten
+bytes, since the assembler gives each `LOCAL` a whole word.
+
+### Two bytes that cap it
+
+Two nestings would go deeper, and the program forbids both with a byte
+each.
+
+**The help over the critical error.** F1 in `FatErr`'s box goes from
+`Input` to `Help`, and the help, with its own window, its `MinMnu` and
+another `Input0`, would put some 80 bytes more on the 102 that `Input`
+stands on. But the box's header has 0FFh for its help page, `Dialog`
+copies that into `HlpPage`, and `Help` tests it before it does
+anything: it pushes its 22 bytes, sees 0FFh and returns.
+
+**The critical error under the help.** The help reads `VC.HLP` from
+the disk, a page at a time, while the user reads; a disk that is not
+ready then would put `FatErr`'s box, 30 bytes of DOS and the box's own
+`Dialog` and `Input0` on top of the help's. `Help` sets `BlocEr` for
+as long as it is on the screen:
+
+```asm
+        MOV     AH,1
+        XCHG    AH,DS:BlocEr            ;; no critical error box in the help
+        MOV     AL,DS:HlpPage
+        PUSH    AX                      ;; the old BlocEr, for the way out
+```
+
+and `FatErr` fails a call at once when `BlocEr` is set, so the help
+shows its own error box instead, one `Dialog` deep.
+
+What is left is the help over an ordinary dialog of the copy, the
+"overwrite?" box of `C20_26`: 22 bytes of the copy, `Dialog` 24,
+`MinMnu` 6, `Input` 4, `Help` 28 at its buttons, `MinMnu` 6, `Input` 4
+and the same 94 of `Input0` down to INT 33h, 188 bytes. The critical
+error is the deeper by eight.
+
+### A directory deeper, and what lies under the stack
+
+Each of those figures is for a file that is selected in the panel.
+A file inside a selected directory is copied one level further down:
+`C00_00` for the directory goes to `C30_00`, which calls `DirFunc`,
+which calls `C00_00` again for each file through `FncAddr`. `DirFunc`
+keeps no state on the stack (it finds its place again by name, as
+[chapter 3](03-the-features.md#one-dta-and-the-search-found-again)
+shows), so each level costs exactly 16 bytes: the return from
+`CALL DirFunc`, the return from `CALL DS:FncAddr`, and `C00_00`'s six
+registers.
+
+```
+depth of the chain above, for a file n directories below the panel:
+   n = 0      196 bytes
+   n = 1      212
+   n = 3      244, about all that 256 bytes hold with a timer tick
+   n = 30     676: the deepest that DirFunc's 68-byte path allows,
+              C:\D\A\B\... with one letter a name
+```
+
+So a copy of a deep tree goes through the bottom of `DataSav`, and
+nothing happens, because of what lies under it:
+
+```
+PSP:2CA5  ComnIni.DosChg      5 bytes
+    2CAA  ComnIni.DosBuf  1,000 bytes   the command line, saved
+    3092  DataSav           256 bytes   the stack
+    3192  VcStack
+```
+
+`ComnIni` is the resident copy of the first 2,733 bytes of the main
+data, and the program reads or writes it only around a command:
+`F21_31` fills all of it from the main data before the command,
+`Exec` runs the commands from its `DosBuf`, and `Init11` copies it
+back. While the panels are on the screen nothing in it is in use but
+`BreakFl`, near its start, which `SetBrk` keeps. Its last 1,000 bytes,
+the saved command line, are an unmarked extension of the stack, and
+the 676 bytes of the deepest copy fit in 256 + 1,000 with room to
+spare. The source says nothing about it, no comment and no constant,
+so whether `DosBuf` sits under the stack by design or by the order in
+which the fields were added cannot be told; but the order is what
+makes 256 bytes enough.
+
 ## What it adds up to
 
 | Economy | Where | What it saves |
@@ -1501,6 +2146,14 @@ not restored here: DOS takes them from the PSP when the program ends.
 | One word for the reload handshake | `LoadSiz` | a channel between two copies |
 | The TSR's note in the TSR's memory | `AddProg` | some 1.3 KB per program in the resident part |
 | One word as "who is ending us" | `Vect22.Segm` | a flag |
+| The memory map in four idle buffers | `VCMEM.INC`, 2,218 bytes | a buffer of its own: blocks in `WinBuf`, lines in `MenuBuf`, a set of interrupts in `ErrBuf` |
+| A program's name from its path, its MCB, or its being its own parent | `F65_15` to `F65_30` | a list of names; `COMMAND.COM` is the resident part's text |
+| Hooked vectors by where they point | `F65_31`, 92 bytes | asking each program |
+| Release newest first, with a byte per interrupt | `F65_74` | a TSR left jumping into freed memory |
+| One loop for Grey+ and Grey-, told by an AND and an OR | `F65_64` | a second loop |
+| A full redraw by spoiling the copy of what is shown | `MemFrst` + 2 | a routine to draw all lines |
+| Help and the critical error kept from nesting | `bHelp` 0FFh, `BlocEr` | some 80 bytes of stack |
+| The saved command line under the stack | `ComnIni.DosBuf` | room for a copy 30 directories down, whether meant or not |
 
 The pattern is the same throughout: a buffer that is idle at the
 moment is borrowed rather than a new one added, and whatever DOS
@@ -1508,6 +2161,8 @@ already does, DOS is made to do.
 
 ## Where to read next
 
+- `src/asm/VCMEM.INC`, all of it, for the memory map; `Release`,
+  `ChkBlk` and `FreeBlk` of `VC.ASM` for what it calls.
 - `src/asm/VC.ASM`: `Exec` to `Release` for the resident part,
   `Alloc0` to `Init11` for the start, and `HookVct`, `FatErr`,
   `ErrRdy` and `Exit` near the end.

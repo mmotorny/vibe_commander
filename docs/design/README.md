@@ -138,7 +138,7 @@ What the program does with files: reading and sorting a directory, the tree, the
 
 ### [4. Talking to DOS and the PC: the system](04-the-system.md)
 
-The conversation with DOS and the PC: the error wrapper, the critical error, Ctrl-Break, the display, the keyboard, the mouse, and the resident part that runs a command and loads the commander again.
+The conversation with DOS and the PC: the error wrapper, the critical error, Ctrl-Break, the display, the keyboard, the mouse, the resident part that runs a command and loads the commander again, the memory map, and the 256-byte stack.
 
 - [`SecDat`: the main data from anywhere](04-the-system.md#secdat-the-main-data-from-anywhere)
 - [`Intr21`: 62 bytes for every error](04-the-system.md#intr21-62-bytes-for-every-error)
@@ -169,6 +169,17 @@ The conversation with DOS and the PC: the error wrapper, the critical error, Ctr
   - [Where DOS puts the blocks: `GetStat` and `SetStat`](04-the-system.md#where-dos-puts-the-blocks-getstat-and-setstat)
   - [The TSR manager: `New21`](04-the-system.md#the-tsr-manager-new21)
   - [The ways out](04-the-system.md#the-ways-out)
+- [The memory map: Alt-F5](04-the-system.md#the-memory-map-alt-f5)
+  - [Walking the chain: `F65_00` to `F65_05`](04-the-system.md#walking-the-chain-f65_00-to-f65_05)
+  - [What a block is: `F65_05` to `F65_15`](04-the-system.md#what-a-block-is-f65_05-to-f65_15)
+  - [The name: nine rules, `F65_15` to `F65_30`](04-the-system.md#the-name-nine-rules-f65_15-to-f65_30)
+  - [Hooked vectors: 92 bytes for 256 interrupts](04-the-system.md#hooked-vectors-92-bytes-for-256-interrupts)
+  - [The box and its keys](04-the-system.md#the-box-and-its-keys)
+  - [Release: newest first, by a set of 256 bytes](04-the-system.md#release-newest-first-by-a-set-of-256-bytes)
+- [256 bytes of stack](04-the-system.md#256-bytes-of-stack)
+  - [The deepest chain](04-the-system.md#the-deepest-chain)
+  - [Two bytes that cap it](04-the-system.md#two-bytes-that-cap-it)
+  - [A directory deeper, and what lies under the stack](04-the-system.md#a-directory-deeper-and-what-lies-under-the-stack)
 - [What it adds up to](04-the-system.md#what-it-adds-up-to)
 - [Where to read next](04-the-system.md#where-to-read-next)
 
