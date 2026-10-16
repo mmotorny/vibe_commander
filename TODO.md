@@ -41,8 +41,8 @@ The portable C stays in the memory whole while a command runs
 (`src/portable_c/DEVIATIONS.md`, the first entry), and is one program:
 the linker writes its file, DOS loads and relocates it, its main data is
 a variable, and it has no part that stays, no copy of anything and no
-tool that lays it out (`docs/portable-c.md`, "Staying in the memory
-whole", has what is left of what rests on Open Watcom, and `DIARY.md`
+tool that lays it out (`docs/portable-c.md`, "What rests on Open
+Watcom", has what is left of that, and `DIARY.md`
 what went). What that has
 left open:
 
