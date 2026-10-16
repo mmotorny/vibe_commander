@@ -207,6 +207,117 @@ seconds with the country's decimal separator, and checked by a routine
 that the dialog's header names, `F04_10`, before Ok is taken; a text
 it cannot read is "Illegal format of auto change dir time delay.".
 
+### The palette editor: a list, a grid and four pictures
+
+F5, F6 and F7 are one routine entered at three labels, which differ in
+the name of the palette and in BP, the palette's number, 0 for black
+and white, 1 for colour, 2 for the laptop. BP is all that says which
+palette is edited: the colour of item n is the byte at `ColTab` + 6n +
+2BP, one further on a monochrome card, as `ColAddr` finds it for the
+commander ([chapter 2](02-the-screen.md#colours-by-number) has the
+table). The screen is drawn once, in two parts:
+
+```
+ col  0     6                                          50       61              76 79
+ row  1                                                      Mode: Color
+      2                                                   Palette: Color
+      3     ╔═══════════════ Color Setup ═══════════════╗
+      4     ║  Panels                    <- cursor bar  ║          xxxxxxxxxxxxxxxx   bg 0
+      5     ║  Current pointer                          ║          xxxxxxxxxxxxxxxx   bg 1
+            ║  ...  17 of the 39 items: Colrs_S         ║          ...                attribute =
+     19     ║  ...                                      ║          xxxxxxxxxxxxxxxx   bg 15, 16 x row + column
+     20     ║  Dialog box text                          ║
+     21     ╚═══════════════════════════════════════════╝            Bright Cyan
+     22                                                                 on Blue
+     24  1Help   2       3       4       5       6       7       8Reset  9       10Quit
+                                                                 ^ the hardware cursor sits
+                                                                   on the cell of the item's colour
+```
+
+The grid is 256 cells of the letter `x`, written by two loops with
+`STOSW` and `INC AH`, so that the attribute is the cell's number: the
+row is the background, the column the foreground, and rows 8 to 15
+have the blink bit, which a card in its default mode shows as blinking.
+No table of the 256 is needed, and the colour under the cursor is found
+by arithmetic the other way: `F07_75` splits the item's attribute into
+its nibbles, puts the cursor at row 4 plus the background, column 61
+plus the foreground, and names the two from `ColNm_S`, sixteen names
+of colours and two more for Shadow, whose value is no colour: cell 0
+of the grid is "No shadow", cell 1 "Inv brightness", and any other a
+grey shadow.
+
+The list is the help's index again: `F07_10` to `F07_52` are `Help10`
+to `Help58` of the commander
+([chapter 1](01-the-program.md#the-index-and-the-pages)) with the
+list's own sizes and table of names and without the pages, and F8 is
+"Reset", which asks and then copies the palette's column of the
+defaults, `Palets`, over the column of `ColTab`, 40 bytes six apart,
+the unlisted 40th among them.
+Enter on an item, or a double click, turns to the grid:
+
+```mermaid
+flowchart TD
+    L["the list: Up, Down, PgUp, PgDn, Home, End move the cursor bar"] -- "Enter or double click: Col00" --> P["save the left 58 columns in WinBuf, Clock and KeyBar off, ColTyp = BP"]
+    P --> D["draw the item's picture: ColPage, PagTab, 25 rows of runs"]
+    D --> G["the grid: CL is the attribute"]
+    G -- "Left, Right: round the row. Up, Down: 16 on, round 256" --> C["Col30: name it, recolour the item's runs, Window of those rows"]
+    G -- "Home, End, PgUp, PgDn: ends of the row or the column" --> C
+    G -- "F8: the default, Palets" --> C
+    G -- "a click in the 16 x 16" --> C
+    C --> G
+    G -- "Enter, or the right button: Col50" --> W["ColAddr, the byte of ColTab = CL"]
+    G -- "Esc, F10: Col55" --> R["ResWin, ColTyp, Clock, KeyBar back"]
+    W --> R
+    R --> L
+```
+
+The left 58 columns become a picture of the commander in the palette
+that is being edited, with the colour under the cursor of the grid
+applied as it moves, so the user sees each colour where the program
+uses it. There are four pictures, each 25 lines of 58 characters
+written out in the source, `Page1_S` to `Page4_S`: the panels with a
+tree, a drive menu and a user menu; the Left menu over the blanker's
+sky; the editor of an extension file with a tree to choose a directory, an
+error, a delete and a dialog over it; and the help with its index.
+`ColPage`, 39 bytes, says which picture each item is shown on, and
+each picture has a table of
+runs beside it, `Colr1_T` to `Colr4_T`, a count and a colour's number
+for each run of a row, ended by 0:
+
+```asm
+Colr1_T	DB	16,Back_C, 8,Cursr_C, 10,Back_C, 2,Clock_C, 1,Clock_C+80h, 3,Clock_C, 18,0FFh, 0
+	DB	 1,Back_C, 12,Title_C, 1,Back_C, 9,Title_C, 1,Back_C, 8,Title_C, ...
+	...
+;; a run is: count, colour number  +40h: in a box's shadow  +80h: the blink bit,
+;;                                 which makes the clock's colon blink
+;;                                 0FFh: attribute 07h, what DOS shows
+```
+
+`Col00` draws the picture by looking every run's colour up with the
+commander's own `Color`, `ColTyp` having been set to the palette being
+edited for the while, and a run marked +40h goes through `ShadCol`,
+the commander's shadow, so the picture shows the shadows that the
+program would. When a key changes the colour, `Col30` walks the same
+table again and rewrites the attributes of the runs whose number is
+the item's, and no others, with `MvsColr`, which writes attributes and
+leaves the characters; it notes the first and last rows that it
+changed and copies only those to the display. Nothing is written into
+`ColTab` until Enter.
+
+The editor is the largest part of the setup program. Its code,
+`F05_00` to `Col55`, is 1,818 bytes; the four pictures are 5,800
+bytes of `CONST`, more than half of the program's texts; their tables
+of runs 990 bytes of `_DATA`, and the 39 names of the items 829: some
+9.4 KB of a file of 24,278 bytes, to show a colour where it is used
+rather than only as a cell in a grid.
+
+![F6, Enter: the grid](img/setup-grid.png)
+
+*F6, Enter on "Panels", Right: the item is bright red on blue for the
+moment, in the picture of the panels, which the grid's cursor at row
+1, column 12 of the grid names below it. The menu and the blanker's
+sky are in other pictures.*
+
 ## `VC.INI`: a dump of the main data
 
 ### Why a dump
@@ -266,30 +377,9 @@ offset
 
 The colour table is 40 rows, one for each thing that the program
 colours, of six bytes, one for each pair of a palette and a kind of
-display. `ColAddr` of `VCSUB1.INC` finds a colour's byte:
-
-```asm
-ColAddr PROC    NEAR
-        PUSH    AX
-        MOV     AL,6
-        MUL     AH                      ;; the colour's row
-        MOV     DI,AX
-        MOV     AL,ES:ColTyp            ;; 0 B&W, 1 Color, 2 Laptop
-        CMP     AL,3
-        JB      ColAd1
-        MOV     AL,1
-ColAd1: CBW
-        ADD     AX,AX
-        CMP     ES:ScrMod,7
-        JNE     ColAd2
-        INC     AX                      ;; the monochrome column
-ColAd2: ADD     DI,AX
-        ADD     DI,ColTab
-        POP     AX
-        RET
-ColAddr ENDP
-```
-
+display; `ColAddr` of `VCSUB1.INC` finds a colour's byte by the row, the
+palette and whether the card is monochrome, and
+[chapter 2](02-the-screen.md#colours-by-number) has it with the table.
 So the user picks one of three palettes and gets a second variant of
 it free on a monochrome card, and the 240 bytes need no header of
 their own. The `VC.INI` that the distribution ships is such a file:
@@ -497,8 +587,9 @@ MkIni1  ENDP
 
 ### Writing it
 
-The commander saves its setup by Shift-F9, and at its end when Auto
-save setup is ticked: `MakeIni` builds the 511 bytes in `MenuBuf` of
+The commander saves its setup by Shift-F9, and with Auto save setup
+ticked whenever the main loop finds that it has changed
+([chapter 1](01-the-program.md#saving-the-setup-without-a-dirty-flag)): `MakeIni` builds the 511 bytes in `MenuBuf` of
 the main data, `VVV`, the two panels by `MkIni1`, the 330 bytes from
 offset 0 of the main data and the sum, and `SaveSet` writes them. The
 setup program writes its own image, which is already in that shape:
@@ -794,27 +885,13 @@ its page in the same numbering.
 
 ### The file
 
-The file is lightly encoded: every byte of the index and of the pages
-is XORed with 1Ah, the end-of-file character of DOS, so that `TYPE
-VC.HLP` shows nothing readable. Its header is in clear, `VC 4.05 Help`
-at offset 8, and at offset 194h it has, encoded, the place of the
-index: a header of 26 bytes, `HlpData`, with the number of pages in
-`HlpLins`, and six bytes for each page, of which the last four are the
-page's place in the file. The decoder is shared, word for word:
-
-```asm
-DeCode  PROC    NEAR
-        PUSH    SI
-        PUSH    CX
-        MOV     SI,DX
-DeCod1: XOR     BYTE PTR DS:[SI],1Ah
-        INC     SI
-        LOOP    DeCod1
-        POP     CX
-        POP     SI
-        RET
-DeCode  ENDP
-```
+The file is a database in the layout of Norton Guides, XORed with 1Ah
+behind a header in clear, with the place of its index at offset 194h;
+the index is a list of 62 lines, each with the place of its page.
+[Chapter 1](01-the-program.md#the-file-a-norton-guides-database) draws
+it with its offsets, and has `DeCode`, 13 bytes, which the setup
+program has word for word. What the setup program does differently is
+when it reads.
 
 ### Read once, at start
 
@@ -897,6 +974,8 @@ fit in what is left of the segment.*
 | The file is read into its place | `Init00`, `ReadOne` | a buffer, and a copy of the settings |
 | A test of length by reading one byte more | both programs | a call for the file's size |
 | A palette's monochrome variant as a column | `ColAddr` | a second table, or a conversion |
+| The grid of colours is the 256 attributes in order, written by `INC AH` | `F07_05`, `F07_75` | a table of colours; the colour under the cursor is its row and column |
+| The editor's pictures as text and runs of colour numbers, recoloured run by run | `Page1_S`..`Page4_S`, `Colr1_T`..`Colr4_T`, `Col30` | the program's own screens shown in the palette being edited, without the program |
 | An install check through "set date" | `New21`, `Exit6` | a vector, a signature in memory, a search for it |
 | The same layout declared twice, by name | `SUB BX,OFFSET ColTab` | any translation of addresses between two programs |
 | A label on the check sum | `LoadRes LABEL BYTE` | a field of the commander's state in the setup program |

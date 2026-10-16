@@ -240,6 +240,44 @@ the file has: only a file of the right length reads one byte less than
 was asked. [Chapter 5](05-the-setup.md#reading-it-the-commander) has the
 code. Only each panel's 88 bytes then go on, to `WCB1sav` and `WCB2sav`.
 
+The read lands across three of the resident part's buffers, and the
+addresses are those of the listing, offsets from the PSP:
+
+```
+ resident part, before the read           the 512 bytes asked for, at BP = 2532h
+ 0B29h +------------------------------+
+       | WCB1sav, 3,422 bytes         |
+ 0B87h |  +94: the path of VC.INI,    |   MainPth builds "C:\VC\VC.INI" here,
+       |       made by MainPth        |   behind the panel's header, in its
+       |                              |   list, which is still unused
+       |                              |
+ 1887h +------------------------------+
+       | WCB2sav, 3,422 bytes         |
+       |                              |
+ 2532h |  +3,243 ...................  |   0000  'VVV'                 3
+ 2535h |                              |   0003  WCB 1, 88 bytes      88  --+
+ 258Dh |                              |   005B  WCB 2, 88 bytes      88  --|--+
+ 25E5h +-- ComnIni, 2,733 bytes ------+   00B3  ColTab .. ResIni    330   |  |
+       |  the 330 bytes land on       |         already where Init11  |  |
+       |  their final place           |         will copy them from   |  |
+ 272Fh |                              |   01FD  the sum               2   |  |
+ 2731h |                              |   01FF  a 512th byte, never   1   |  |
+       |                              |         read if the file is good |  |
+ 3092h +-- DataSav, the stack --------+                                  |  |
+                                                                         |  |
+ then:  REP MOVSB 88 bytes from 2535h to WCB1sav, 0B29h  <---------------+  |
+        REP MOVSB 88 bytes from 258Dh to WCB2sav, 1887h  <------------------+
+```
+
+The 179 bytes in front of `ComnIni` fall on the end of `WCB2sav`, which
+holds a panel's list only while a command runs, and the path that
+named the file is in `WCB1sav` behind the 94 bytes of the panel's
+header, where the 88 bytes copied to the head of the buffer do not
+reach it: `Init09` takes the same path again, with `VC.EXT` put in
+place of the name, to read the extension file. Nothing is copied twice
+but the two panels: one buffer for the file, one for its name, and
+none of the main data's, which does not exist yet.
+
 Without a good file the defaults come from `_DATA`, which begins with
 them laid out exactly as the main data begins: `Palets`, 240 bytes of
 colours, and behind them `DefInit`, one byte for each option, so that
@@ -497,9 +535,54 @@ Func06:	PUSH	SS
 	REP	MOVSB			;; the new image is the saved one
 ```
 
-The cost is a comparison of 509 bytes per key, about a millisecond on a
-4.77 MHz PC, and it catches every way an option can change: a menu, a
-dialog, Ctrl-B, the setup program.
+The two images side by side, with what `Func15` and the two `MOV`s copy
+from the new into the old before the compare:
+
+```
+ image of VC.INI, 511 bytes          new: MenuBuf (DS)    old: IniSave = WCB1sav (SS)
+ offset
+ 000  'VVV'                          compared
+ 003  WCB 1: WinTyp .. DskMas        compared
+ 017  WCB 1: WinPath, 68 bytes       ########  copied new -> old by Func15
+ 05B  WCB 2: WinTyp .. DskMas        compared
+ 06F  WCB 2: WinPath, 68 bytes       ########  copied new -> old by Func15
+ 0B3  ColTab, 240 bytes              compared
+ 1A3  FulScr .. ClrBuf, 27 bytes     compared
+ 1BE  Active                         ########  copied by MOV AL / MOV ES:[DI+BX]
+ 1BF  Ctrl_O                         ########  copied by MOV AL / MOV ES:[DI+BX]
+ 1C0  ChkTSR .. ResIni, 61 bytes     compared
+ 1FD  the sum, 2 bytes               not compared: DEC CX twice
+ 1FF  end
+      509 bytes go through REPE CMPSB; 138 of them were made equal first,
+      so 371 bytes decide. Then REP MOVSB copies all 511 new over old.
+```
+
+What that costs, in the 8088's own clocks from Intel's tables (a
+string instruction's byte form costs the same on the 8088 as on the
+8086), when nothing has changed and the compare runs to the end:
+
+| Step | Work | Clocks |
+|---|---|---:|
+| `MakeIni`: `MkIni1` twice | `FilZero` over 13 + 68 bytes (`SCASB` 15 or `STOSB` 10 a byte), `REP MOVSB` of 88 (9 + 17 x 88) | about 5,200 |
+| `MakeIni`: the settings | `REP MOVSB` of 330: 9 + 17 x 330 | 5,619 |
+| `ChkSum` | 509 rounds of `LODSB` 12 + `ADD` 3 + `LOOP` 17 = 32 | 16,288 |
+| `Func15` twice | `REP MOVSB` of 68: 2 x (9 + 17 x 68) | 2,330 |
+| the compare | `REPE CMPSB` of 509: 9 + 22 x 509 | 11,207 |
+| the copy | `REP MOVSB` of 511: 9 + 17 x 511 | 8,696 |
+| **in all** | | **about 49,300** |
+
+At 4.77 MHz a clock is 210 ns, so the round costs about 10 ms: not a
+millisecond, and a tenth of the 92 ms between two keys that the BIOS
+repeats at its default rate. Volkov kept it off the one path where
+that would be felt. The cursor keys end at `F00_80`, `JMP Func07`, and
+go round the loop behind `Func05`: holding Down through a list costs no
+comparison at all. Every other command, a key typed into the command
+line among them (`F73_01: JMP Func05`), pays its 10 ms. On a 286 at
+8 MHz, where `MOVSB` costs 4 clocks a byte, `CMPSB` 9 and a round of
+`ChkSum` about 16, the same work is some 18,000 clocks, about 2 ms.
+
+It catches every way an option can change: a menu, a dialog, Ctrl-B,
+the setup program.
 
 ## The panels
 
@@ -911,6 +994,74 @@ pointer a `√` while it is on a key; letting go on a key returns that
 key, 3Bh plus the column divided by 8 for F1 to F10, 54h on for Shift,
 68h on for Alt.
 
+### The key bar: one byte from the caller, three tables
+
+The number that every caller of `Input` hands over in AL is the key
+bar's, and the shift keys held pick one of four variants of it. Ten
+names are found for it in three steps, each a table indexed by what the
+step before found. `PutKey` makes of the BIOS's shift flags, INT 16h AH
+2, a number in AH, 3 for Alt (bit 3), 2 for Ctrl (bit 2), 1 for either
+Shift (bits 0 and 1), 0 for none, in that order of precedence; then
+`PutKey0` does the rest:
+
+```asm
+	SHL	AL,1
+	SHL	AL,1
+	OR	AL,AH			;; bar x 4 + shift
+	MOV	AH,0
+	MOV	BX,AX
+	MOV	AL,0			;; a bar past the table: row 0, no names
+	CMP	BL,LenKeyB
+	JAE	PutKy3
+	MOV	AL,CS:KeyB_T[BX]	;; 1: the row
+	...
+	MOV	AH,10
+	MUL	AH
+	MOV	SI,AX			;; the row's ten numbers in KeyC_T
+	...
+	MOV	CX,6
+	MOV	AL,CS:KeyC_T[SI]	;; 2: the name's number
+	MUL	CL
+	ADD	AX,OFFSET Key_S		;; 3: its six letters
+	MOV	SI,AX
+```
+
+Worked through for one key, F5 at the panels with Alt held:
+
+```
+ Input, AL = 0 (the panels)    PutKey: shift flags 08h -> AH = 3 (Alt)
+
+ KeyB_T, 15 bars x 4 shifts = 60 bytes
+          none Shift Ctrl Alt
+ bar  0     1    2     3    4  <-- index 0 x 4 + 3 = 3: row 4
+ bar  1     7    0     0    0
+ ...
+                                  |
+                                  v
+ KeyC_T, 19 rows x 10 keys = 190 bytes
+          F1  F2  F3  F4  F5  F6  F7  F8  F9  F10
+ row  1    1   2   3   4   5   6   7   8   9  10
+ ...
+ row  4   13  14  15  16  30  17  18  19  20  21  <-- index 4 x 10 + 4 = 44: name 30
+ ...                       |
+                           v
+ Key_S, 34 names x 6 = 204 bytes
+  0 '      '   1 'Help  '   2 'Menu  '  ...  29 'Q&Save'
+ 30 'Memory'  <-- offset 30 x 6 = 180          31 'Main  ' ...
+
+ the bottom row:  1Left   2Right  3View.. 4Edit.. 5Memory 6DirSiz 7Find   8Histry 9EGA Ln 10Tree
+```
+
+The three tables are 454 bytes for 60 variants of the bottom row, of
+which 37 are in use. Written out as texts, the 19 rows of ten names
+would be 1,140 bytes; written out per variant, 3,600. A name that many
+rows show, "Help  " and "Quit  " in 10 each, is six bytes once. A bar
+that has nothing for a shift key held, such as a dialog's with Ctrl,
+has 0 there and gets row 0, ten blank names: holding Ctrl in a dialog
+leaves the numbers 1 to 10 alone on the bottom row. How the row is drawn, eight cells a key and the
+numbers counted rather than stored, is in
+[chapter 2](02-the-screen.md#the-key-bar).
+
 ### The mouse driver
 
 The mouse is INT 33h, eight calls in a few lines of `VCSUB1.INC`, and
@@ -950,28 +1101,96 @@ state over the first 32 bytes of the buffer and the text behind it:
 HlpData	STRUC
 	DB	HelpBuf DUP(?)		;; start at HelpBuf, in the main data
 HlpHndl	DW	?			;; the open file
-HlpPrms	DB	0 DUP(?)		;; 26 bytes of an entry's header:
-HlpMode	DW	?			;;   0 the index, or a page
+HlpPrms	DB	0 DUP(?)		;; 26 bytes of an entry's header, read as they are:
+HlpMode	DW	?			;;   0 the index, 1 a page
 HlpSize	DW	?			;;   length of its text
 HlpLins	DW	?			;;   its lines
 	DW	?
-HlpBkLn	DW	?			;;   the line of the index it is under
-HlpOffs	DD	?			;;   the offset of the index
-HlpFrst	DW	?
-HlpCur	DW	?
+HlpBkLn	DW	?			;;   a page's own line in the index
+HlpOffs	DD	?			;;   the entry to read next; a page has the index
+HlpFrst	DW	?			;; the first line shown
+HlpCur	DW	?			;; the index's line under the cursor
 	DB	10 DUP(?)
-HlpBkFr	DW	?
+HlpBkFr	DW	?			;; the index's first line, kept for the way back
 HlpInfo	DB	0 DUP(?)		;; the text, at HelpBuf+32
 HlpData	ENDS
 ```
 
-The file has `VC 4.05 Help` and a zero at offset 8, which `Help`
-compares, and at offset 194h the offset of the index. An entry is its
-26 bytes and its text, at most 2,968 bytes, and the whole file is XORed
-with 1Ah, which `DeCode`, 13 bytes, undoes as each piece is read:
+### The file: a Norton Guides database
+
+`VC.HLP` is 68,836 bytes, and its layout is that of a database of
+Norton Guides, the pop-up reference reader of the late 1980s: the
+signature `NG`, a title at offset 8, five lines of credits of 66 bytes
+from 30h, a menu, and then entries of two kinds, a *short* entry, which
+is a list of lines that each lead to another entry, and a *long* one,
+which is a page of text, each behind a header of 26 bytes, and all of
+it XORed with 1Ah. The program reads it with nothing of a reader of
+Norton Guides but the two kinds of entry. Of the menu it reads one
+dword, the offset of its first item, at the fixed place 194h, and that
+item is the index:
+
+```
+ VC.HLP, 68,836 bytes                                  in clear / XOR 1Ah
+ 0000  'NG', 00 01 00 00, 01 00          signature, one menu       clear
+ 0008  'VC 4.05 Help', 0                 the title; Help compares  clear
+                                         these 13 bytes
+ 0030  'Copyright (C) 1991-2000 by       five lines of 66 bytes    clear
+        Vsevolod V. Volkov', 0 ...
+ 017A  menu: 02 00 2E 00 02 00 ...       one item, "VC Main"       XOR
+ 0194  dword 000001C2h                   its entry: the index      XOR
+ 01C2  the index, a short entry          type 0                    XOR
+       +00  HlpMode  0
+       +02  HlpSize  1,371               the text behind the header
+       +04  HlpLins  62                  lines, one for each page
+       +08  HlpBkLn  FFFFh               no parent:
+       +0A  HlpOffs  FFFFFFFFh             no Next, no Index button
+       +1A  62 x 6 bytes:  word   where the line's text is (not read)
+                           dword  where the page's entry is
+       +1A+372  62 texts, each ended by a zero:
+                " About the Commander", " Keyboard reference", ...
+ 0737  page 1, a long entry              type 1                    XOR
+       +00  HlpMode  1
+       +02  HlpSize  1,470
+       +04  HlpLins  41                  its title is line 0
+       +08  HlpBkLn  0                   its own line in the index
+       +0A  HlpOffs  000001C2h           the index, for the Index button
+       +0E  zeros, and FFh x 8           the reader's Previous and Next
+                                         entries: not read
+       +1A  the text, lines ended by a zero
+ 0D0F  page 2 ... page 62, one behind the other
+109DA  page 62, "VC Environment variable", 752 bytes
+10CE4  end: 1C2h + 26 + 1,371 + 62 x 26 + 65,377 = 68,836
+```
+
+So the index is the table of contents and the directory at once:
+`Help70`, 23 bytes, turns a line of it into the place of a page, six
+bytes a line, by additions:
 
 ```asm
-DeCode	PROC	NEAR
+Help70	PROC	NEAR			;; AX the line of the index
+	ADD	AX,AX
+	MOV	SI,AX
+	ADD	SI,AX
+	ADD	SI,AX			;; x 6
+	MOV	AX,DS:[SI].HlpInfo[2].Lo	;; skip the word, take the dword
+	MOV	DS:HlpOffs.Lo,AX
+	MOV	AX,DS:[SI].HlpInfo[2].Hi
+	MOV	DS:HlpOffs.Hi,AX
+	RET
+Help70	ENDP
+```
+
+The texts are in the markup of Norton Guides, `^b` and `^u` for bold
+and underlined and FFh with a count for a run of spaces, which is the
+markup of every box of the program: `NgLine`
+([chapter 2](02-the-screen.md#ngline-one-markup-for-every-text)) draws
+the help's lines as it draws a dialog's. The XOR with 1Ah is the
+Norton Guides' own, and is no secret: it keeps `TYPE VC.HLP` from
+showing the text, and 1Ah being DOS's end of file, from showing much
+at all. `DeCode`, 13 bytes, undoes it in place after every read:
+
+```asm
+DeCode	PROC	NEAR			;; DS:DX the bytes, CX how many
 	PUSH	SI
 	PUSH	CX
 	MOV	SI,DX
@@ -984,16 +1203,120 @@ DeCod1:	XOR	BYTE PTR DS:[SI],1Ah
 DeCode	ENDP
 ```
 
-Each line of the index carries six bytes behind its text, four of them
-the offset of its page in the file, so the index is the table of
-contents and the directory at once. What page F1 opens is `HlpPage`, a
-byte of the main data: `Func07` clears it to 0, the index, and every
+The 62 pages hold 65,377 bytes of text; the largest is page 55,
+"Configuration", which is the setup program's, at 2,939 bytes.
+`RdEntry` refuses a page of 2,968 bytes or more, `LenHelp` less the 32
+bytes of the state, by `CMP CX,LenHelp-20h` and a `CMC` that turns
+"below" into "no error". How the setup program reads its seven pages
+from the same file is in [chapter 5](05-the-setup.md#read-once-at-start).
+
+### One F1: twelve calls of DOS
+
+`HlpPage`, a byte of the main data, says which page F1 opens: `Func07`
+clears it to 0, the index, before every key at the panels, and every
 dialog and menu sets its own, the `bHelp` of its header, 26 for the
-quit dialog. While the help is up, `HlpPage` is FFh, and the F1 that
-`Input` passes to `Help` from within the help itself returns at once.
-The window is drawn at row 2, column 4, 74 columns wide, over what it
-saves in `ErrBuf1`, and its lines are drawn by `NgLine`, the same markup
-as every box, in the colours of `Help_P`.
+quit dialog. A page is found through the index, so F1 in a dialog reads
+two entries, the index and then its page:
+
+```mermaid
+sequenceDiagram
+    participant H as Help
+    participant R as RdEntry
+    participant D as DOS
+    H->>D: 3Dh open VC.HLP, read-only
+    H->>D: 42h to 8, 3Fh 13 bytes
+    Note over H: REPE CMPSB with 'VC 4.05 Help', 0
+    H->>D: 42h to 194h, 3Fh 4 bytes
+    Note over H: DeCode: HlpOffs = 1C2h, the index
+    H->>R: the index
+    R->>D: 42h to 1C2h, 3Fh 26 bytes, 3Fh 1,371 bytes
+    Note over H: Help70 with HlpPage less 1: HlpOffs = the page
+    H->>R: the page
+    R->>D: 42h to the page, 3Fh 26 bytes, 3Fh its text
+    Note over H: the window, the keys, until Esc
+    H->>D: 3Eh close
+```
+
+Twelve calls and at most 4.4 KB read, nine calls for the index alone
+at the panels, for a page that the program cannot keep:
+the alternative was 65,377 bytes of text in a program of 65,090. A
+file that is missing, or not this help, or a read that comes short,
+gets one box, "There was error reading data from the help file.", and
+the help is left.
+
+### The index and the pages
+
+The window is at row 2, column 4, 74 columns wide and `Lines` less 3
+rows high, drawn by `MinBox` over what it saves in `ErrBuf1`; its text
+is 62 columns of `Lines` less 12 rows, 13 on a screen of 25. On the
+index the first row is the program's title line, `Title_S`, "The Volkov
+Commander, Version 4.05", and the lines below it are
+the index's texts with a cursor bar; on a page the first row is the
+page's line 0, its title, the rest scroll under it, and there is no
+cursor. The buttons tell the two apart by the index's own header:
+where `HlpOffs` is FFFFFFFFh, the entry has no index to go back to,
+and the buttons are `[ Help ]` and `[ Cancel ]`; on a page they are
+`[ Next ]`, `[ Previous ]`, `[ Index ]` and `[ Cancel ]`, and CL holds
+the one that is current.
+
+Five words of the state say where the user is. `HlpCur` and `HlpFrst`
+are the cursor and the first line shown; `HlpBkLn` comes from a page's
+header, the line of the index that the page hangs under; `HlpBkFr` is
+`HlpFrst` of the index, kept by `RdEntry` when it leaves the index for
+a page. `RdEntry` sets the two for the entry it reads by where it comes
+from:
+
+```asm
+RdEntry	PROC	NEAR
+	...
+	MOV	SI,DS:HlpBkLn		;; from a page: the index's cursor on
+	MOV	DI,DS:HlpBkFr		;;  that page's line, the list as it was
+	CMP	DS:HlpMode,0
+	JNE	RdEnt1
+	MOV	AX,DS:HlpFrst		;; from the index: keep where it stood,
+	MOV	DS:HlpBkFr,AX
+	XOR	SI,SI			;;  and open the page at its top
+	XOR	DI,DI
+RdEnt1:	...				;; seek, 26 bytes, DeCode, the text, DeCode
+	MOV	AX,DS:HlpMode
+	SUB	DS:HlpLins,AX		;; a page's title is not a line to scroll
+	MOV	DS:HlpFrst,DI
+	MOV	DS:HlpCur,SI
+```
+
+Enter, `Help60`, or a double click on a line of the index, then does
+one of five things:
+
+```mermaid
+flowchart TD
+    E["Enter: Help60"] --> Q{"HlpOffs FFFFFFFFh: the index?"}
+    Q -- "yes, Help" --> P1["Help70 of HlpCur: HlpOffs = the page"] --> RP["RdEntry: the page, at its top"]
+    Q -- "yes, Cancel" --> X["Help66: leave the help"]
+    Q -- "no: a page" --> M["HlpMode = 1"]
+    M -- "Index" --> RI["RdEntry of HlpOffs: the index, cursor HlpBkLn, first line HlpBkFr"]
+    M -- "Next or Previous" --> RI2["RdEntry: the index, HlpCur = this page's line"]
+    RI2 --> N["HlpCur + 1 or - 1, round the 62 lines"] --> P2["Help70: HlpOffs = that page"] --> RP
+    M -- "Cancel" --> X
+```
+
+The index is read on the way back with the page's `HlpBkLn` as its
+cursor, so Index goes back to the index with the cursor on the line of
+the page that was read and the list scrolled as it was when the page
+was chosen, and Next and Previous are that same index read again and
+its next or previous line followed: the pages need no
+links of their own, and their order is the index's, wrapping from the
+last page to the first. Esc and F10 leave the help from anywhere, by
+the same `Help66` as Cancel; the way back to the index is the Index
+button.
+
+`Help10`, which every key goes back to, keeps the cursor within the
+window: it moves `HlpFrst` so that `HlpCur` is visible, and redraws
+only what moved. A line is found by `Help72`, which counts zeros with
+`REPNE SCASB` from the start of the text, the six-byte records of the
+index skipped; Up and Down at the edge scroll the window by a line
+with the BIOS's INT 10h AH 6 and 7 and draw only the new line. While
+the help is up, `HlpPage` is FFh, and the F1 that `Input` passes to
+`Help` from within the help itself returns at once.
 
 ![F1 at the panels](img/help.png)
 
@@ -1089,6 +1412,36 @@ Blnk07:	MOV	AL,ES:StarTab[3]
 	XOR	AX,AX			;; out: a space, and the slot free
 ```
 
+With the default `StarTab`, FAh F9h 07h 04h 0Fh, a star's life is this,
+in ticks of the timer, 18.2 a second:
+
+| Countdown after the tick | High byte 0: it explodes | High byte 1: it goes out | Colour |
+|---|---|---|---|
+| born, 100 to 255 | `StarTab[0]`, `·` | `·` | `Sky1_C`, 36, "Stars" |
+| 12 | `StarTab[1]`, `∙` | `∙` | `Sky2_C`, 37, "Explosing stars" |
+| 9 | `StarTab[2]`, `•` | a space, the slot free | `Sky2_C` |
+| 6 | `StarTab[3]`, `♦` | | `Sky2_C` |
+| 3 | `StarTab[4]`, `☼` | | `Sky2_C` |
+| 0 | a space, the slot free | | |
+
+```
+ ticks:   0 ............................ n-12   n-9   n-6   n-3    n
+ explodes:  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·   ∙     •     ♦     ☼    (gone)
+ goes out:  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·   ∙   (gone)
+            |<-- 88 to 243 ticks, 4.8 to 13.4 s ---->|<- 12 ticks, 0.66 s ->|
+```
+
+A star sits as a dim dot for most of its life and then, in the last
+two-thirds of a second, brightens and either winks out or swells
+through three shapes. Each tick makes one attempt at a birth, at a
+random row and column, which goes on past two random tests, a count of
+100 or more out of 0 to 255 and then 50 or more, 61 and 80 percent,
+and past a scan of the 32 slots for a free one and for a star on the
+same cell: about 9 births a second against lives of 9.7 s on average.
+The 32 slots are full four seconds after the screen goes dark, and
+from then on a star is born only where one has gone out. Whether it
+explodes is one bit of a random number at birth, so half the stars do.
+
 `StarTab` is five bytes of the setup, so the user's own shapes of a star
 are saved in `VC.INI` with the colours. The random numbers are `Rnd`,
 37 bytes, a recurrence of two words, the new one three times the sum of
@@ -1133,7 +1486,8 @@ calls `LeaveTm`, so even the blanker gives its time to DOS and Windows.
 | Key tables of 4 bytes an entry, walked by one routine that jumps by dropping its own return | `Case`, `FncTab` and 17 more | 37 bytes for every `switch` on a key; 72 keys of the panels in 290 bytes |
 | An injected key: auto menus are F2 in AX, auto change dir the pseudo-key FE00h | `Func07`, `Input0` | no code path of their own in the loop |
 | F1 caught in `Input` for every routine that waits | `Input` | help everywhere in 18 bytes |
-| The help kept in its file, one entry read at a time, XORed with 1Ah | `Help`, `HelpBuf`, `DeCode` | the help's text costs no byte of the program; 3,000 bytes of data |
+| The key bar as a bar, a row and a name, each a number into the next table | `PutKey0`, `KeyB_T`, `KeyC_T`, `Key_S` | 60 variants of the bottom row in 454 bytes |
+| The help kept in its file, a Norton Guides database, one entry read at a time; the index is the directory of the pages, and Next and Previous follow it | `Help`, `RdEntry`, `Help70`, `DeCode` | 65,377 bytes of text cost no byte of the program; 3,000 bytes of data; no links in the pages |
 | The clock's covered cells kept in the wait's own stack frame, the clock drawn only when its separator changes | `Input0`, `ClkBuf` | no buffer in the main data; two copies a second |
 | The blanker drawing through the BIOS, so the shadow screen keeps the real one | `Blank` | nothing to save to blank, one `Window` to come back |
 | A pointer that is a character, by the driver's own masks | `TypMous` | the `√`, `■` and `x` feedback in one call |
