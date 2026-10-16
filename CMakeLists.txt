@@ -1188,7 +1188,7 @@ if(VC_WEB)
                 ${CMAKE_BINARY_DIR}/portable_c/web/static
                 ${CMAKE_BINARY_DIR}/portable_c/web/browser)
     set_tests_properties(portable_c-web-browser PROPERTIES
-        LABELS portable_c SKIP_RETURN_CODE 77 RESOURCE_LOCK chromium)
+        LABELS browser SKIP_RETURN_CODE 77 RESOURCE_LOCK chromium)
     # The scenarios through the page itself, the piece W7 of step 7:
     # vc.html served as a static site whose C: is the bench's, in the
     # machine's own headless Chromium, every key and step of the mouse the
@@ -1201,7 +1201,7 @@ if(VC_WEB)
                 --page ${CMAKE_BINARY_DIR}/portable_c/web/vc.html
                 --out ${CMAKE_BINARY_DIR}/webpagerun)
     set_tests_properties(portable_c-web-page-scenarios PROPERTIES
-        LABELS "portable_c;machine" SKIP_RETURN_CODE 77
+        LABELS "browser;machine" SKIP_RETURN_CODE 77
         RESOURCE_LOCK chromium)
 endif()
 # The cap of the memory (TODO.md, "The cap of the memory: done"): the
@@ -1224,7 +1224,10 @@ endif()
 # What each test judges, as a label, so that a run can pick by it: `ctest
 # -L portable_c` for a change to the portable C alone, which cannot
 # change what the frozen trees are judged by ("Work by several agents"
-# in CLAUDE.md); `-LE machine` for the tests that start no machine.
+# in CLAUDE.md); `-LE machine` for the tests that start no machine;
+# `-L browser` for the two tests of the web page in Chromium, which no
+# piece runs, the user judging the page by hand (CLAUDE.md, "The web
+# page").
 set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-tidy

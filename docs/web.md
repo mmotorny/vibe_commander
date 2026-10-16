@@ -244,6 +244,11 @@ the failures grouped by cause to `build/webpagerun/summary.txt`.
 | `portable_c-web-render` | The page's modules for drawing, keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node. Grids that the program for Linux writes through its test channel are drawn, and the HTML is read back and checked against the cells and the rows that changed. The keys and mouse reports that the modules make of browser events are typed into the program for Linux in a pseudo-terminal, and what it reads is checked against the BIOS's words. `harness/webrender.py`; skipped without Node or clang |
 | `portable_c-web-site` | The static site, its server and the page's drive in Node: the site made with C: as shipped and with C: of a directory, its tree with contents, times and the read-only bit and no host link; `serve.mjs` serving the page and the site's files and nothing outside them, 404 for `..`, a backslash, a NUL, a host link and any method but GET and HEAD; the drive loaded by `drives.js` into a file system of Emscripten's shape, a file brought in, and a site with no drive refused; and the page's script bundled, compiled and run up to the program. `harness/website.py`; skipped without Node |
 
+The two tests in Chromium, `portable_c-web-browser` and
+`portable_c-web-page-scenarios`, have the label `browser` and not
+`portable_c`: `ctest -L portable_c` leaves them out, and `ctest -L
+browser` runs them. The user judges the page by hand.
+
 What is declared for the web is `ON_WEB` of `harness/deviations.py`. It
 goes on top of the portable C's as Linux's does, with Linux's scenarios
 not run and cut, and Linux's masks except those of the drive's letter,

@@ -307,6 +307,10 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   protocol from Node with nothing from npm, one test of it at a time.
   It opens the page as the static site, on a desktop and as an iPhone
   held both ways, and its screenshots are looked at.
+- The tests in Chromium, `portable_c-web-browser` and
+  `portable_c-web-page-scenarios`, are kept, under the label `browser`,
+  but not run by the pieces, on the user's word of 16 October 2026; the
+  user judges the page by hand.
 - Every third-party work is credited alike: its licence in a `LICENSE.*`
   file of the repository, and the page, which carries their code and the
   font to whoever opens it, has one small "Licences" link that shows all
