@@ -12,6 +12,10 @@ asks of one, against the server on a port of its own with two drives in
 a directory of build/tmp, and types into it as the page's keys do:
 
   - the drives loaded and the panel drawn;
+  - the bar's one link to the licences, which shows the text of every
+    file of the repository that the page carries (LICENCES of
+    src/portable_c/web/bundle.mjs), and is closed by Esc and by its
+    button with no key of it reaching the program;
   - F7, a directory made on the server;
   - Enter on a file, opened in a tab with its bytes;
   - Shift-F4 and the editor, a file written, which reaches the server

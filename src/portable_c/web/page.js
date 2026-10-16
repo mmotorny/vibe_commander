@@ -6,7 +6,9 @@
 // server, in the browser (kept.js), opens a file in
 // a new tab, brings the user's files in by a button and by dragging them
 // onto the page, has a button for the full screen, and on a phone fits the
-// grid to the screen and has a row of the keys that a phone lacks.
+// grid to the screen and has a row of the keys that a phone lacks. Its
+// "Licences" shows the licences of all that it carries, which the build
+// put into it from the repository's files (bundle.mjs, LICENCES).
 //
 // The build makes one classic script of this and the modules that it
 // names (bundle.mjs), put into the page's shell (shell.html) in front of
@@ -90,6 +92,7 @@ const page = {
   cell: { width: 8, height: 16 },
   latched: { ctrl: false, alt: false },
   ended: false,
+  unseen: new Set(),              // keys gone down while the licences were up
 };
 
 // What goes to the program, queued while it runs (library.js, web_input).
@@ -138,6 +141,17 @@ function withLatched(event) {
 }
 
 function onKey(event) {
+  // While the licences are up, no key is the program's, and neither is
+  // the letting go of one that went down then: Esc, which closes them.
+  if ($("licences").open) {
+    if (event.type === "keydown")
+      page.unseen.add(event.code);
+    else
+      page.unseen.delete(event.code);
+    return;
+  }
+  if (event.type === "keyup" && page.unseen.delete(event.code))
+    return;
   if (event.target && event.target.closest && event.target.closest("dialog"))
     return;
   const latched = page.latched.ctrl || page.latched.alt;
@@ -270,6 +284,77 @@ async function fullScreen() {
   }
 }
 
+// The licences of what the page carries, as the build put them into it:
+// each work, its copyright, where it is from and its text. In a dialog of
+// the page's, which Esc and its button close, or, in a browser that has
+// no such dialog, as text in a new tab.
+function licenceTexts() {
+  try {
+    return JSON.parse($("licences-data").textContent);
+  } catch {
+    return [];
+  }
+}
+
+function showLicences() {
+  const dialog = $("licences");
+  const all = licenceTexts();
+  if (typeof dialog.showModal !== "function") {
+    const text = all.map((one) => `${one.work}\n${one.owner}\n` +
+      `${one.home ? `${one.home}\n` : ""}\n${one.text}`).join("\n\n");
+    const url = URL.createObjectURL(new Blob([text],
+                                             { type: "text/plain;charset=utf-8" }));
+    setTimeout(() => URL.revokeObjectURL(url), 10 * 60 * 1000);
+    if (!window.open(url, "_blank"))
+      notice("The browser kept the tab of the licences from opening.");
+    return;
+  }
+  const texts = $("licences-texts");
+  if (!texts.dataset.made) {
+    for (const one of all) {
+      const heading = document.createElement("h2");
+      heading.textContent = one.work;
+      const owner = document.createElement("p");
+      owner.textContent = one.owner;
+      if (one.home) {
+        const link = document.createElement("a");
+        link.href = one.home;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = one.home;
+        owner.append(", ", link);
+      }
+      const text = document.createElement("pre");
+      text.textContent = one.text;
+      texts.append(heading, owner, text);
+    }
+    texts.dataset.made = "1";
+  }
+  dialog.showModal();
+}
+
+function wireLicences() {
+  const dialog = $("licences");
+  $("licences-open").addEventListener("click", showLicences);
+  $("licences-close").addEventListener("click", () => dialog.close());
+  // A click on the backdrop, outside the dialog's box, closes it too.
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      const box = dialog.getBoundingClientRect();
+      if (event.clientX < box.left || event.clientX > box.right
+          || event.clientY < box.top || event.clientY > box.bottom)
+        dialog.close();
+    }
+  });
+  // The focus goes back to the button, where Enter or Space would open
+  // the licences again, not reach the program: it is taken off it.
+  dialog.addEventListener("close", () => {
+    const button = $("licences-open");
+    if (button.blur)
+      button.blur();
+  });
+}
+
 // The row of keys that a phone lacks.
 const BAR = [
   ["Esc", "Escape", "Escape"], ["Tab", "Tab", "Tab"],
@@ -376,6 +461,7 @@ function wire() {
     $("full").hidden = true;
 
   $("reset").addEventListener("click", reset);
+  wireLicences();
 
   makeBar();
   fit();

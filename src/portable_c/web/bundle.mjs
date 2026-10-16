@@ -1,10 +1,14 @@
 // The shell of the web page made whole for Emscripten, the piece W3b of
 // step 7 (TODO.md, "Step 7, the web page"): shell.html with the font put
-// in as base64 and the page's modules put in as one classic script, which
+// in as base64, the licences of what the page carries put in as data,
+// and the page's modules put in as one classic script, which
 // emcc then takes with --shell-file and fills with the program, one file
 // by SINGLE_FILE. Node's own modules alone.
 //
 //   node bundle.mjs FONT.woff OUT.html
+//
+// The licences are the repository's own files, read as the page is made,
+// so that what the page shows cannot drift from them: LICENCES below.
 //
 // The modules are plain ES modules that the tests import as they are;
 // here each becomes a function of its own that answers what it exports,
@@ -20,6 +24,40 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const MODULES = ["render.js", "keys.js", "mouse.js", "drives.js",
                         "kept.js", "page.js"];
+
+// What the page carries of every work, and the file of the repository
+// that has its licence: the page's "Licences" shows these and nothing
+// else, each in the same form, the work, its copyright as the work has
+// it, where it is from, and the text (CLAUDE.md, "The web page"). The
+// project's own first, then Volkov Commander's, whose code it is made
+// of, and the three that the build puts in: Emscripten's runtime in the
+// script, musl's code in the wasm, the font. DOS/32A is in no page.
+export const LICENCES = [
+  { work: "Vibe Commander 0.1", owner: "(c) 2026 Maksym Motorny",
+    home: null, file: "LICENSE" },
+  { work: "Volkov Commander 4.05, which Vibe Commander is based on",
+    owner: "(c) 1991-2000 Vsevolod V. Volkov", home: null,
+    file: "src/asm/LICENSE.TXT" },
+  { work: "Emscripten 6.0.12, its runtime in the page's script",
+    owner: "(c) 2010-2014 Emscripten authors",
+    home: "https://emscripten.org/", file: "LICENSE.EMSCRIPTEN" },
+  { work: "musl, the C library in the page's program",
+    owner: "(c) 2005-2020 Rich Felker, et al.",
+    home: "https://musl.libc.org/", file: "LICENSE.MUSL" },
+  { work: "Web437 IBM VGA 8x16, of the Ultimate Oldschool PC Font Pack 2.2",
+    owner: "(c) 2016-2020 VileR",
+    home: "https://int10h.org/oldschool-pc-fonts/", file: "LICENSE.FONT" },
+];
+
+// The licences as the page has them: each with its text, read from the
+// top of the repository, its line ends made LF.
+export function licences(top = path.resolve(here, "../../..")) {
+  return LICENCES.map((one) => ({
+    work: one.work, owner: one.owner, home: one.home,
+    text: readFileSync(path.join(top, one.file), "utf8")
+      .replace(/\r\n/g, "\n"),
+  }));
+}
 
 const NAME = "[A-Za-z_$][\\w$]*";
 
@@ -88,7 +126,13 @@ export function shell(font, directory = here) {
   const page = script(directory);
   if (page.includes("{{{") || page.includes("</script"))
     throw new Error("the page's script has what the shell cannot hold");
+  // JSON in a script element of its own, whose `<` is escaped, so that
+  // no text can end the element.
+  const data = JSON.stringify(licences()).replace(/</g, "\\u003c");
+  if (data.includes("{{{"))
+    throw new Error("a licence has what the shell cannot hold");
   return template.replace("@@FONT@@", () => font.toString("base64"))
+    .replace("@@LICENCES@@", () => data)
     .replace("@@PAGE@@", () => page);
 }
 

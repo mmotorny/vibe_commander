@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- The shell of the web page, the piece W3b of step 7 (TODO.md, "Step 7,
-     the web page"). bundle.mjs puts the font and the page's script in
-     where the two marks of @@ stand, and Emscripten its program where
+     the web page"). bundle.mjs puts the font, the licences and the page's
+     script in where the three marks of @@ stand, and Emscripten its program where
      SCRIPT stands, all into one file, vc.html. -->
 <html lang="en">
 <head>
@@ -61,7 +61,33 @@ body {
 #kept { font-size: 11px; color: #bbb; }
 #kept[hidden], #reset[hidden] { display: none; }
 #credit { font-size: 11px; color: #777; margin-left: 8px; }
-#credit a { color: #999; }
+#bar button.link {
+  font-size: 11px; color: #999; background: none; border: 0; padding: 6px 2px;
+  min-width: 0; text-decoration: underline; cursor: pointer;
+}
+#licences {
+  width: min(46em, 92vw); max-height: 86vh; overflow: auto; padding: 0;
+  box-sizing: border-box;
+  background: #111; color: #ccc; border: 1px solid #555; border-radius: 6px;
+}
+#licences::backdrop { background: rgba(0, 0, 0, 0.7); }
+#licences header {
+  position: sticky; top: 0; display: flex; align-items: center;
+  justify-content: space-between; gap: 8px; padding: 8px 12px;
+  background: #222; border-bottom: 1px solid #444;
+}
+#licences h1 { font-size: 16px; margin: 0; }
+#licences h2 { font-size: 14px; margin: 16px 12px 2px; color: #eee; }
+#licences p { margin: 0 12px 6px; font-size: 12px; }
+#licences a { color: #9cf; }
+#licences pre {
+  margin: 0 12px 12px; padding: 8px; background: #000; color: #bbb;
+  font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+#licences button {
+  font: inherit; color: #ddd; background: #333; border: 1px solid #555;
+  border-radius: 4px; padding: 6px 10px;
+}
 #notice, #ended {
   position: fixed; left: 50%; top: 12px; transform: translateX(-50%);
   background: #fff; color: #000; padding: 8px 12px; border-radius: 4px;
@@ -84,12 +110,16 @@ body {
   <button id="full" title="The full screen">Full screen</button>
   <span id="kept" hidden></span>
   <button id="reset" title="Forget the changes kept in this browser" hidden>Reset drives</button>
-  <span id="credit">Vibe Commander 0.1, based on Volkov Commander 4.05.
-  Font: <a href="https://int10h.org/oldschool-pc-fonts/" target="_blank"
-  rel="noopener">Web437 IBM VGA 8x16</a> by VileR,
-  <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank"
-  rel="noopener">CC BY-SA 4.0</a>.</span>
+  <span id="credit">Vibe Commander 0.1, based on Volkov Commander 4.05.</span>
+  <button id="licences-open" class="link" type="button"
+          aria-haspopup="dialog" title="The licences of what the page carries">Licences</button>
 </div>
+<dialog id="licences" aria-labelledby="licences-title">
+  <header><h1 id="licences-title">Licences</h1>
+  <button id="licences-close" type="button">Close</button></header>
+  <div id="licences-texts"></div>
+</dialog>
+<script type="application/json" id="licences-data">@@LICENCES@@</script>
 <input id="files" type="file" multiple hidden>
 <input id="input" type="text" autocapitalize="off" autocomplete="off"
        autocorrect="off" spellcheck="false" aria-label="Keyboard">

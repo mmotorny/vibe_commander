@@ -41,23 +41,36 @@ function load(base, indexedDB) {
       this.innerHTML = "";
       this.listeners = {};
       this.classList = { toggle() {}, add() {}, remove() {} };
+      this.children = [];
+      this.open = false;
     }
-    append() {}
+    append(...items) { this.children.push(...items); }
     addEventListener(type, listener) { this.listeners[type] = listener; }
+    // A dialog, as the licences are shown in.
+    showModal() { this.open = true; }
+    close() {
+      this.open = false;
+      if (this.listeners.close)
+        this.listeners.close({ target: this });
+    }
+    blur() {}
     getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 400 }; }
     focus() {}
     click() {}
   }
   const elements = {};
   const opened = [];
-  const page = { elements, opened, reloads: 0, fs: null, screen: null };
+  const listeners = {};
+  const page = { elements, opened, listeners, reloads: 0, fs: null,
+                 screen: null };
   const window = {
     document: {
       readyState: "complete", head: new Element("head"),
       documentElement: new Element("html"),
       getElementById: (id) => (elements[id] ||= new Element(id)),
       createElement: (tag) => new Element(tag),
-      querySelectorAll: () => [], addEventListener() {},
+      querySelectorAll: () => [],
+      addEventListener: (type, listener) => { listeners[type] = listener; },
     },
     matchMedia: () => ({ matches: false }), addEventListener() {},
     location: { href: `${base}/`, reload: () => { page.reloads++; } },
@@ -78,9 +91,16 @@ function load(base, indexedDB) {
     }
   };
   const context = vm.createContext(window);
-  for (const [, script] of readFileSync(html, "utf8")
-         .matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))
-    vm.runInContext(script, context);
+  // The scripts run, and the data of the licences is the text of its
+  // element, as a browser has them.
+  for (const [, type, script] of readFileSync(html, "utf8")
+         .matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)) {
+    // Emscripten minifies the shell: an attribute may have no quotes.
+    if (/\bid="?licences-data\b/.test(type))
+      window.document.getElementById("licences-data").textContent = script;
+    else
+      vm.runInContext(script, context);
+  }
   const Module = window.Module;
   page.Module = Module;
   Module.vcDraw = (cells) => { page.screen = Array.from(cells); };
@@ -122,13 +142,63 @@ function load(base, indexedDB) {
 
 // 1. The page against its server, which every change is made on.
 const served = new FakeIndexedDB();
-const { elements, opened, keys, step, see, text } = load(base, served);
+const page0 = load(base, served);
+const { elements, opened, keys, step, see, text } = page0;
 const onServer = (...names) => path.join(roots.d, ...names);
 
 // The program starts at the root of the first drive, C:, where its own
 // directory is; then D:, by the drive box of the panel.
 await see(" C:\\ ");
 await see("VC");
+
+// The licences: one link in the bar, which shows the texts of the
+// repository's files that the page carries, the project's own and
+// Volkov Commander's among them, and not DOS/32A's, which is in no page;
+// Esc closes them, and neither Esc nor any key while they are up reaches
+// the program.
+{
+  const repository = path.resolve(web, "../../..");
+  const texts = ["LICENSE", "src/asm/LICENSE.TXT", "LICENSE.EMSCRIPTEN",
+                 "LICENSE.MUSL", "LICENSE.FONT"]
+    .map((name) => readFileSync(path.join(repository, name), "utf8")
+      .replace(/\r\n/g, "\n"));
+  const dos32a = readFileSync(path.join(repository, "LICENSE.DOS32A"), "utf8");
+  const shell = readFileSync(html, "utf8");
+  await step("the bar has one link to the licences, and no credit apart",
+             () => /<button [^>]*\bid="?licences-open\b[^>]*>Licences<\/button>/.test(shell)
+                   && !shell.includes("CC BY-SA 4.0</a>"));
+  const sent = [];
+  const push = page0.Module.vcInput.push;
+  page0.Module.vcInput.push = (...bytes) => sent.push(...bytes);
+  const key = (type, code, key) => ({
+    type, code, key, repeat: false, shiftKey: false, altKey: false,
+    ctrlKey: false, metaKey: false, getModifierState: () => false,
+    preventDefault() {}, target: { closest: () => null },
+  });
+  elements["licences-open"].listeners.click();
+  const shown = elements["licences-texts"].children
+    .filter((child) => child.id === "pre").map((child) => child.textContent);
+  await step("the licences show every text that the page carries",
+             () => elements.licences.open && shown.length === texts.length
+                   && texts.every((text, at) => shown[at] === text)
+                   && !shown.includes(dos32a));
+  page0.listeners.keydown(key("keydown", "KeyA", "a"));
+  page0.listeners.keyup(key("keyup", "KeyA", "a"));
+  page0.listeners.keydown(key("keydown", "Escape", "Escape"));
+  elements.licences.close();      // what the browser does with Esc
+  page0.listeners.keyup(key("keyup", "Escape", "Escape"));
+  await step("Esc closes the licences, and the program sees no key of it",
+             () => !elements.licences.open && sent.length === 0);
+  elements["licences-open"].listeners.click();
+  elements["licences-close"].listeners.click();
+  page0.listeners.keydown(key("keydown", "KeyA", "a"));
+  page0.listeners.keyup(key("keyup", "KeyA", "a"));
+  await step("the button closes them, and the keys are the program's again",
+             () => !elements.licences.open && sent.length > 0
+                   && elements["licences-texts"].children.length
+                      === 3 * texts.length);
+  page0.Module.vcInput.push = push;
+}
 keys(KEY.altF2);
 await see("Drive");
 keys("d");

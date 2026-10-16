@@ -834,10 +834,11 @@ endif()
 # page"): build/portable_c/web/vc.html, one file by SINGLE_FILE, with the
 # program, its JS, the page's script (web/page.js and the modules that it
 # names, made one script by web/bundle.mjs into the shell, web/shell.html)
-# and the font in it. The font is VileR's Web437 IBM VGA 8x16 of the
+# and the font in it, and the licences of what it carries, which its
+# "Licences" shows. The font is VileR's Web437 IBM VGA 8x16 of the
 # Ultimate Oldschool PC Font Pack, version 2.2, its archive for the web
 # from int10h.org, pinned by its SHA-256, which CLAUDE.md allows by name;
-# its licence is CC BY-SA 4.0, and the page credits it. The page's server,
+# its licence is CC BY-SA 4.0, LICENSE.FONT. The page's server,
 # web/server.mjs, serves it with the two drives: the target
 # portable_c-web-serve runs it on 127.0.0.1:8437 (TODO.md, "W3b").
 if(VC_WEB)
@@ -850,12 +851,17 @@ if(VC_WEB)
     set(web_page_script render.js keys.js mouse.js drives.js kept.js
         page.js shell.html bundle.mjs)
     list(TRANSFORM web_page_script PREPEND ${web_dir}/)
+    # The licences that the page shows, put into it from these files as it
+    # is made (LICENCES of web/bundle.mjs).
+    set(web_licences LICENSE src/asm/LICENSE.TXT LICENSE.EMSCRIPTEN
+        LICENSE.MUSL LICENSE.FONT)
+    list(TRANSFORM web_licences PREPEND ${CMAKE_SOURCE_DIR}/)
     file(MAKE_DIRECTORY ${web_page_dir})
     add_custom_command(
         OUTPUT ${web_page_dir}/shell.html
         COMMAND ${node} ${web_dir}/bundle.mjs ${web_font}
                 ${web_page_dir}/shell.html
-        DEPENDS ${web_page_script} ${web_font}
+        DEPENDS ${web_page_script} ${web_font} ${web_licences}
         COMMENT "Making the shell of the web page"
         VERBATIM)
     add_portable_c_host(portable_c-web ${web_page_dir} web
