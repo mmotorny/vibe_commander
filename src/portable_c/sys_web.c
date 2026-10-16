@@ -29,7 +29,9 @@
  *     places that the plan names: KeyRead waits by emscripten_sleep and
  *     Idle yields; KeyWaiting yields once 50 ms have passed since the
  *     last yield, so that a copy or a search that looks for Esc lets
- *     the page go on; Ticks yields at its second read with no yield
+ *     the page go on, and MouseWhere so too, and takes what the page has
+ *     queued, so that a loop that waits for a button to be let go gets
+ *     the release; Ticks yields at its second read with no yield
  *     between, so that the zooming boxes and the blanker are drawn; and
  *     ProgramEnd waits for the store to be written. The page calls
  *     nothing of the program while it waits: what comes meanwhile is
@@ -228,12 +230,21 @@ u16 KeysHeld(void)
     return held;
 }
 
+/* The program waits on the mouse by asking for it in a loop that asks
+   nothing else, until a button is let go (Inpt12 of input.c, Select of
+   dialog.c, a click on the key bar): so MouseWhere takes what the
+   page has queued, as KeyWaiting does, and yields as it does, or the
+   page would never go on and the release would never come. */
 struct MouseAt MouseWhere(void)
 {
-    if (Testing)
+    if (emscripten_get_now() - YieldedAt >= BUSY_YIELD)
+        Yield(0);
+    if (Testing) {
         TestMouseAsked();
-    else
+    } else {
+        PageInput(0);
         MouseFromPage(true);
+    }
     return MouseAnswer();
 }
 

@@ -165,12 +165,21 @@ u16 KeysHeld(void)
     return held;
 }
 
+/* The program waits on the mouse by asking for it in a loop that asks
+   nothing else, until a button is let go (Inpt12 of input.c, Select of
+   dialog.c, a click on the key bar): the terminal's reports are read
+   here too, as KeyWaiting reads them, the screen shown first as there,
+   or the release never comes. */
 struct MouseAt MouseWhere(void)
 {
-    if (OnTerminal)
+    if (OnTerminal) {
+        Show();
+        TermInput(0);
         MouseFromTerminal(true);
-    else
+        OwnScreen();
+    } else {
         TestMouseAsked();
+    }
     return MouseAnswer();
 }
 

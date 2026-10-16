@@ -47,12 +47,17 @@
  * program has looked at the one before (KeysHeld, MouseWhere), or for
  * CHANGE_WAIT at the most: a press and a release that come together, a
  * tap or a click over a slow line, are seen by the program as two, as a
- * hand's are on DOS.
+ * hand's are on DOS. And a change of the buttons stays for BUTTON_HOLD
+ * at the least, looked at or not: the program looks at the mouse once to
+ * know that a button is down and again to know where, and since
+ * MouseWhere reads what has come, a press would be let go between the
+ * two, where a hand holds it longer.
  */
 
 #define ESC 0x1B
 #define ESC_WAIT 25                     /* milliseconds */
 #define CHANGE_WAIT 100                 /* milliseconds */
+#define BUTTON_HOLD 50                  /* milliseconds, under CHANGE_WAIT */
 #define KEYS_ROOM 16                    /* as the BIOS's buffer */
 #define TYPED_ROOM 256
 
@@ -81,7 +86,7 @@ static struct ReportedMouse Pointer = { 0, 0, 0, 0 };
    held when it was pressed. Each waits CHANGE_WAIT at the most, for a
    program that does not look. */
 static bool HeldSeen = true, ButtonSeen = true;
-static int64_t ChangedAt = 0, PushedAt = 0;
+static int64_t ChangedAt = 0, PushedAt = 0, ButtonAt = -BUTTON_HOLD;
 
 static int64_t Now(void)
 {
@@ -94,7 +99,10 @@ static int64_t Now(void)
 /* Whether what comes behind the last change may be taken. */
 static bool Settled(void)
 {
-    return (HeldSeen && ButtonSeen) || Now() - ChangedAt >= CHANGE_WAIT;
+    int64_t now = Now();
+
+    return (HeldSeen && ButtonSeen && now - ButtonAt >= BUTTON_HOLD)
+           || now - ChangedAt >= CHANGE_WAIT;
 }
 
 /* Whether a change may be made now. */
@@ -489,6 +497,7 @@ static bool Mouse(i32 b, i32 x, i32 y, bool up)
             return false;
         ButtonSeen = false;
         ChangedAt = Now();
+        ButtonAt = ChangedAt;
     }
     Pointer.column = x < 1 ? 0 : x > 256 ? 255 : x - 1;
     Pointer.row = y < 1 ? 0 : y > 256 ? 255 : y - 1;
@@ -718,7 +727,8 @@ static i32 Soonest(void)
 {
     int64_t now = Now(), left = TypedSince + ESC_WAIT - now, more;
 
-    more = !Settled() ? ChangedAt + CHANGE_WAIT - now
+    more = !Settled() ? (HeldSeen && ButtonSeen ? ButtonAt + BUTTON_HOLD
+                                                : ChangedAt + CHANGE_WAIT) - now
            : KeysCount > 0 ? PushedAt + CHANGE_WAIT - now : 0;
     if (more > 0 && (left <= 0 || more < left))
         left = more;

@@ -740,6 +740,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **Where the program yields (Asyncify).**
   - `KeyRead` waits by `emscripten_sleep`, and `Idle` yields.
   - `KeyWaiting` yields once 50 ms have passed since the last yield, so that TstBrk sees Esc in a copy or a search.
+  - `MouseWhere` yields as `KeyWaiting` does and takes what the page has queued, since the program waits for a button to be let go by asking the mouse alone: without it a click on the key bar froze the page. A change of the buttons stays for 50 ms at the least, `BUTTON_HOLD` of `keyboard_posix.c`, so that a press and its release that were queued together are not seen as a release alone; the program for Linux has the same, and reads the terminal in `MouseWhere` for the same reason.
   - `Ticks` yields at its second read with no yield between, so that the zooming boxes and the blanker are drawn.
   - `ProgramEnd` awaits the sync of the store.
   - JS never calls into the wasm while it is suspended: keys, the mouse and uploads are queued in JS, and C drains the queues at each yield.
@@ -906,8 +907,9 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   MouseWhere, ProgramRun, ProgramOfFile, ProgramOpenFile, ProgramEnd and
   main(). The yields are the plan's, `Yield` there: KeyRead waits by
   `emscripten_sleep` (50 ms at a time while nothing is queued), Idle
-  yields, KeyWaiting yields once 50 ms of the host's clock have passed
-  since the last yield, Ticks at its second read with no yield between,
+  yields, KeyWaiting and MouseWhere yield once 50 ms of the host's
+  clock have passed since the last yield, and MouseWhere takes what the
+  page has queued, Ticks at its second read with no yield between,
   and ProgramEnd draws and waits for `web_sync` before the machine's end.
   Under the test channel it yields at the same places, with 0 ms, so
   that the scenarios go through Asyncify's unwinding as the page does.
