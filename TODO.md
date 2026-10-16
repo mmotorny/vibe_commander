@@ -1465,11 +1465,7 @@ keep its data, `navigator.storage.persist()` (W3c).
 
 ### Left open when the session on the workstation ended, 15 October 2026
 
-- **The page in a real browser: not seen yet.** The headless Chromium of CLAUDE.md ("The web page") has no test so far.
-  - The snapshot is chosen: revision 1720314, `https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/1720314/chrome-linux.zip`, 251,789,489 bytes, SHA-256 `abdf43304eb2ff97b78ad7b44acda0dc4bf3c5486f8f9f49c004692f08cbb381`.
-  - On the workstation it does not start: `chrome` wants `libnspr4.so`, `libnss3.so`, `libnssutil3.so` and `libsmime3.so` (Ubuntu's `libnss3` and `libnspr4`), which are not installed. The user is asked to install them.
-  - The piece still to do: pin it in CMake, write a Node driver over CDP with nothing from npm, and run both ways of serving on a desktop and as an iPhone held both ways. Look at the screenshots, and make it the test `portable_c-web-browser`.
-  - On a Mac, Claude in Chrome against the user's own Chrome is another way to look.
+- **The page in a real browser: not seen yet.** The test uses the system's Chromium (CLAUDE.md, "The web page"), which the user installs. The piece still to do: a Node driver over CDP with nothing from npm; both ways of serving, on a desktop and as an iPhone held both ways; screenshots looked at; the test `portable_c-web-browser`, skipped where no Chromium is installed. On a Mac, Claude in Chrome against the user's own Chrome is another way to look.
 - **The private artifact** of the static page (https://claude.ai/artifact/LGs8hcnLh9vm24bL3Hw3yY) has not been opened either. In the Claude app:
   - `confirm()` answers no at once, so Reset drives and an upload over a file do nothing;
   - Enter on a file may give only the fallback link;

@@ -294,10 +294,10 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
 - The screen is drawn as text: the 80 by 25 cells as lines of a `<pre>`
   with the colours of DOS in spans, not on a canvas. The font is VileR's
   Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned and put into the page.
-- The page is judged in a real browser as well: a headless Chromium,
-  an official open-source build from Chromium's own snapshots, pinned by
-  revision and SHA-256 and fetched only for a build that asks for the
-  web page, the download that this allows, driven over its DevTools
+- The page is judged in a real browser as well: the Chromium that the
+  machine has installed, found on the path and not fetched or pinned,
+  simplicity counting for more there than a pin (the user), its test
+  skipped where there is none, driven headless over its DevTools
   protocol from Node with nothing from npm. It opens the page as the
   server serves it and as the static site, on a desktop and as an
   iPhone held both ways, and its screenshots are looked at.
