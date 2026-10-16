@@ -361,6 +361,10 @@ Step 8, as the user decided it (`TODO.md` has the plan and its pieces).
   program shows it by QuickLook; a command says that commands cannot be
   run on iOS; F10 shows the last screen, and a tap starts the program
   again.
+- A hardware keyboard on iOS: the left Option is Alt, the right Option
+  types what the layout has there, as AltGr does; Command and what goes
+  with it are the system's, never the program's; the keypad always types
+  figures, as with Num Lock on, Shift making its cursor keys.
 - The room of the editor and the viewer has a cap where the system ends
   a program that takes too much: on iOS, and for the web page, where the
   memory once taken is never given back; Linux has none. `VC_MEMORY`
