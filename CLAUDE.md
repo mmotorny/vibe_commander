@@ -45,6 +45,11 @@ here; what was done and how is in git's history.
   commit (see `CMakeLists.txt`), and fetched only for a build that needs
   it: Open Watcom for a build for DOS, Emscripten for the web page,
   where that makes sense. Anything new to download is asked first.
+- No GitHub Actions workflow runs by itself, on the user's word of 16
+  October 2026: every workflow's only trigger is `workflow_dispatch`, run
+  by hand, never `push`, `pull_request`, `schedule` or any other event,
+  so that no push spends the account's Actions minutes. Adding any other
+  trigger is asked of the user first. `pages.yml` is so, and stays so.
 - DOS/32A, the extender of the program for DOS: its stub is linked from
   the pinned Open Watcom download when the program is built and never
   committed, its licence text is kept in the repository, and the README
@@ -345,13 +350,24 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   from what is served with it and what the user changes kept in the
   browser of the user's own. It is an addition: the page served by the
   server writes to the server, and only a page with no server keeps its
-  changes in the browser. Switching GitHub Pages on, or publishing the
-  page anywhere, is asked first.
+  changes in the browser. Publishing the page anywhere else is asked
+  first.
+- The static page is published on GitHub Pages, at
+  https://mmotorny.github.io/vibe_commander/, on the user's word of 16
+  October 2026: by `.github/workflows/pages.yml`, run by hand (`gh
+  workflow run pages.yml`) while the repository variable `VC_PAGES` is
+  `publish` and Pages has GitHub Actions as its source, both set then.
+  A run publishes the page of the commit it runs on; nothing publishes
+  it by itself. The README's animation links to it.
 - The room of the editor and the viewer has a cap on the web page, since
   the memory of WebAssembly once taken is never given back while the page
   is open; Linux has none. `VC_MEMORY` sets it for a test.
 - The README shows a recorded session as an animated SVG made by the
-  project's own script from the program's screens (`harness/session.py`).
+  project's own script from the program's screens (`harness/session.py`):
+  the web page as its server serves it, C: labelled VC and the page
+  starting in C:\VC, played in the machine's Chromium and taken from the
+  page's own cells, with a button drawn below the screen, "Try it live in
+  your browser", which the README links to the published page.
 
 ### Deviations
 
