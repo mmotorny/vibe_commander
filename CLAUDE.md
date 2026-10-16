@@ -345,6 +345,8 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   system of the program's own, an event loop. On iOS the room of the
   editor and the viewer gets a cap, since the system ends a program that
   takes too much.
+- The README shows a recorded session as an animated SVG made by the
+  project's own script from the program's screens (`harness/session.py`).
 
 ### The app for iOS
 

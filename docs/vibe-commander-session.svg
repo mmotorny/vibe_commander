@@ -1,0 +1,992 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 400" width="640" height="400">
+<title>Vibe Commander 0.1 in a terminal</title>
+<desc>A session of Vibe Commander 0.1, made by harness/session.py. The font is VileR's Web437 IBM VGA 8x16 of the Ultimate Oldschool PC Font Pack, (c) 2016-2020 VileR, https://int10h.org/oldschool-pc-fonts/, under the Creative Commons Attribution-ShareAlike 4.0 International licence, https://creativecommons.org/licenses/by-sa/4.0/, as it comes, unchanged.</desc>
+<style>
+@font-face{font-family:"Web437 IBM VGA 8x16";src:url(data:font/woff;base64,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) format("woff")}
+text{font-family:"Web437 IBM VGA 8x16",monospace;font-size:16px;white-space:pre;font-kerning:none;font-variant-ligatures:none}
+#film{animation:film 36.30s steps(1,end) infinite}@keyframes film{0.000%{transform:translateY(-0px)}6.887%{transform:translateY(-400px)}11.295%{transform:translateY(-800px)}14.601%{transform:translateY(-1200px)}16.253%{transform:translateY(-1600px)}19.008%{transform:translateY(-2000px)}28.650%{transform:translateY(-2400px)}31.405%{transform:translateY(-2800px)}33.058%{transform:translateY(-3200px)}36.364%{transform:translateY(-3600px)}39.118%{transform:translateY(-4000px)}40.771%{transform:translateY(-4400px)}42.975%{transform:translateY(-4800px)}46.281%{transform:translateY(-5200px)}49.036%{transform:translateY(-5600px)}52.342%{transform:translateY(-6000px)}54.545%{transform:translateY(-6400px)}56.749%{transform:translateY(-6800px)}58.953%{transform:translateY(-7200px)}62.259%{transform:translateY(-7600px)}65.565%{transform:translateY(-8000px)}68.871%{transform:translateY(-8400px)}71.074%{transform:translateY(-8800px)}73.829%{transform:translateY(-9200px)}75.207%{transform:translateY(-9600px)}76.584%{transform:translateY(-10000px)}77.961%{transform:translateY(-10400px)}80.165%{transform:translateY(-10800px)}89.807%{transform:translateY(-11200px)}93.113%{transform:translateY(-11600px)}100%{transform:translateY(-11600px)}}
+.b,.c{animation:blink .53s steps(1,end) infinite}@keyframes blink{0%{opacity:1}50%{opacity:0}}
+</style>
+<rect width="640" height="400" fill="#000"/>
+<defs>
+<g id="r0"><rect x="320" width="136" height="16" fill="#0000aa"/><rect x="456" width="40" height="16" fill="#00aaaa"/><rect x="496" width="144" height="16" fill="#0000aa"/><text x="0" y="12" fill="#aaaaaa">Vibe Commander 0.1, based on Volkov Comm</text><text x="320" y="12" fill="#55ffff">╔════════════╤═══</text><text x="464" y="12" fill="#000000">H:\</text><text x="496" y="12" fill="#55ffff">════╤════════════╗</text></g>
+<g id="r1"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#aaaaaa">Copyright (C) 1991-2000 Vsevolod V. Volk</text><text x="320" y="12" fill="#55ffff">║</text><text x="360" y="12" fill="#ffff55">Name</text><text x="424" y="12" fill="#55ffff">│</text><text x="464" y="12" fill="#ffff55">Name</text><text x="528" y="12" fill="#55ffff">│</text><text x="568" y="12" fill="#ffff55">Name</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r2"><rect x="320" width="8" height="16" fill="#0000aa"/><rect x="328" width="96" height="16" fill="#00aaaa"/><rect x="424" width="216" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">║</text><text x="328" y="12" fill="#000000">CODE</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r3"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">║DATA        │            │            ║</text></g>
+<g id="r4"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">║NOTES       │            │            ║</text></g>
+<g id="r5"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">║readme   txt│            │            ║</text></g>
+<g id="r6"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r7"><rect x="320" width="8" height="16" fill="#aa5500"/><rect x="328" width="312" height="16" fill="#0000aa"/><text x="320" y="12" fill="#ff5555">║</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r8"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">╟────────────┴────────────┴────────────╢</text></g>
+<g id="r9"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">║CODE         ►SUB-DIR◄  6-16-00 12:00p║</text></g>
+<g id="ra"><rect x="320" width="320" height="16" fill="#0000aa"/><text x="320" y="12" fill="#55ffff">╚══════════════════════════════════════╝</text></g>
+<g id="rb"><text x="0" y="12" fill="#aaaaaa">H:\&gt;</text></g>
+<g id="rc"><rect x="8" width="48" height="16" fill="#00aaaa"/><rect x="72" width="48" height="16" fill="#00aaaa"/><rect x="136" width="48" height="16" fill="#00aaaa"/><rect x="200" width="48" height="16" fill="#00aaaa"/><rect x="264" width="48" height="16" fill="#00aaaa"/><rect x="328" width="48" height="16" fill="#00aaaa"/><rect x="392" width="48" height="16" fill="#00aaaa"/><rect x="456" width="48" height="16" fill="#00aaaa"/><rect x="520" width="48" height="16" fill="#00aaaa"/><rect x="592" width="48" height="16" fill="#00aaaa"/><text x="0" y="12" fill="#aaaaaa">1</text><text x="8" y="12" fill="#000000">Help</text><text x="64" y="12" fill="#aaaaaa">2</text><text x="72" y="12" fill="#000000">Menu</text><text x="128" y="12" fill="#aaaaaa">3</text><text x="136" y="12" fill="#000000">View</text><text x="192" y="12" fill="#aaaaaa">4</text><text x="200" y="12" fill="#000000">Edit</text><text x="256" y="12" fill="#aaaaaa">5</text><text x="264" y="12" fill="#000000">Copy</text><text x="320" y="12" fill="#aaaaaa">6</text><text x="328" y="12" fill="#000000">RenMov</text><text x="384" y="12" fill="#aaaaaa">7</text><text x="392" y="12" fill="#000000">Mkdir</text><text x="448" y="12" fill="#aaaaaa">8</text><text x="456" y="12" fill="#000000">Delete</text><text x="512" y="12" fill="#aaaaaa">9</text><text x="520" y="12" fill="#000000">PullDn</text><text x="576" y="12" fill="#aaaaaa">10</text><text x="592" y="12" fill="#000000">Quit</text></g>
+<g id="rd"><rect x="0" width="456" height="16" fill="#0000aa"/><rect x="456" width="40" height="16" fill="#00aaaa"/><rect x="496" width="144" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╔════════════╤═══ H:\ ════╤════════════╗╔════════════╤═══</text><text x="464" y="12" fill="#000000">H:\</text><text x="496" y="12" fill="#55ffff">════╤════════════╗</text></g>
+<g id="re"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="40" y="12" fill="#ffff55">Name</text><text x="104" y="12" fill="#55ffff">│</text><text x="144" y="12" fill="#ffff55">Name</text><text x="208" y="12" fill="#55ffff">│</text><text x="248" y="12" fill="#ffff55">Name</text><text x="312" y="12" fill="#55ffff">║║</text><text x="360" y="12" fill="#ffff55">Name</text><text x="424" y="12" fill="#55ffff">│</text><text x="464" y="12" fill="#ffff55">Name</text><text x="528" y="12" fill="#55ffff">│</text><text x="568" y="12" fill="#ffff55">Name</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="rf"><rect x="0" width="328" height="16" fill="#0000aa"/><rect x="328" width="96" height="16" fill="#00aaaa"/><rect x="424" width="216" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE        │            │            ║║</text><text x="328" y="12" fill="#000000">CODE</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r10"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║DATA        │            │            ║║DATA        │            │            ║</text></g>
+<g id="r11"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║NOTES       │            │            ║║NOTES       │            │            ║</text></g>
+<g id="r12"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║readme   txt│            │            ║║readme   txt│            │            ║</text></g>
+<g id="r13"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │            ║║            │            │            ║</text></g>
+<g id="r14"><rect x="0" width="320" height="16" fill="#0000aa"/><rect x="320" width="8" height="16" fill="#aa5500"/><rect x="328" width="312" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │            ║</text><text x="320" y="12" fill="#ff5555">║</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r15"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢</text></g>
+<g id="r16"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE         ►SUB-DIR◄  6-16-00 12:00p║║CODE         ►SUB-DIR◄  6-16-00 12:00p║</text></g>
+<g id="r17"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╚══════════════════════════════════════╝╚══════════════════════════════════════╝</text></g>
+<g id="r18"><rect x="0" width="440" height="16" fill="#0000aa"/><rect x="440" width="72" height="16" fill="#00aaaa"/><rect x="512" width="128" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╔════════════╤═══ H:\ ════╤════════════╗╔════════════╤═</text><text x="448" y="12" fill="#000000">H:\CODE</text><text x="512" y="12" fill="#55ffff">══╤════════════╗</text></g>
+<g id="r19"><rect x="0" width="328" height="16" fill="#0000aa"/><rect x="328" width="96" height="16" fill="#00aaaa"/><rect x="424" width="216" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE        │            │            ║║</text><text x="328" y="12" fill="#000000">..</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r1a"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║DATA        │            │            ║║build    bat│            │            ║</text></g>
+<g id="r1b"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║NOTES       │            │            ║║hello    c  │            │            ║</text></g>
+<g id="r1c"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║readme   txt│            │            ║║sort     py │            │            ║</text></g>
+<g id="r1d"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE         ►SUB-DIR◄  6-16-00 12:00p║║..           ►UP--DIR◄  6-16-00 12:00p║</text></g>
+<g id="r1e"><text x="0" y="12" fill="#aaaaaa">H:\CODE&gt;</text></g>
+<g id="r1f"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE        │            │            ║║..          │            │            ║</text></g>
+<g id="r20"><rect x="0" width="328" height="16" fill="#0000aa"/><rect x="328" width="96" height="16" fill="#00aaaa"/><rect x="424" width="216" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║DATA        │            │            ║║</text><text x="328" y="12" fill="#000000">build    bat</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r21"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE         ►SUB-DIR◄  6-16-00 12:00p║║build.bat          129  6-16-00 12:00p║</text></g>
+<g id="r22"><rect x="0" width="328" height="16" fill="#0000aa"/><rect x="328" width="96" height="16" fill="#00aaaa"/><rect x="424" width="216" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║NOTES       │            │            ║║</text><text x="328" y="12" fill="#000000">hello    c</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r23"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE         ►SUB-DIR◄  6-16-00 12:00p║║hello.c            256  6-16-00 12:00p║</text></g>
+<g id="r24"><rect x="0" width="640" height="16" fill="#00aaaa"/><text x="0" y="12" fill="#000000">View: hello.c                           Col 0                256 Bytes     100%</text></g>
+<g id="r25"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">/* The smallest program worth reading. */</text></g>
+<g id="r26"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">#include &lt;stdio.h&gt;</text></g>
+<g id="r27"><rect x="0" width="640" height="16" fill="#0000aa"/></g>
+<g id="r28"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">int main(void)</text></g>
+<g id="r29"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">{</text></g>
+<g id="r2a"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="32" y="12" fill="#55ffff">const char *names[] = { "left panel", "right panel" };</text></g>
+<g id="r2b"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="32" y="12" fill="#55ffff">int i;</text></g>
+<g id="r2c"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="32" y="12" fill="#55ffff">for (i = 0; i &lt; 2; i++)</text></g>
+<g id="r2d"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="64" y="12" fill="#55ffff">printf("Hello from the %s!\n", names[i]);</text></g>
+<g id="r2e"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="32" y="12" fill="#55ffff">return 0;</text></g>
+<g id="r2f"><rect x="0" width="320" height="16" fill="#0000aa"/><rect x="320" width="8" height="16" fill="#aa5500"/><rect x="328" width="312" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">}</text></g>
+<g id="r30"><rect x="8" width="48" height="16" fill="#00aaaa"/><rect x="72" width="48" height="16" fill="#00aaaa"/><rect x="136" width="48" height="16" fill="#00aaaa"/><rect x="200" width="48" height="16" fill="#00aaaa"/><rect x="264" width="48" height="16" fill="#00aaaa"/><rect x="328" width="48" height="16" fill="#00aaaa"/><rect x="392" width="48" height="16" fill="#00aaaa"/><rect x="456" width="48" height="16" fill="#00aaaa"/><rect x="520" width="48" height="16" fill="#00aaaa"/><rect x="592" width="48" height="16" fill="#00aaaa"/><text x="0" y="12" fill="#aaaaaa">1</text><text x="8" y="12" fill="#000000">Help</text><text x="64" y="12" fill="#aaaaaa">2</text><text x="72" y="12" fill="#000000">Unwrap</text><text x="128" y="12" fill="#aaaaaa">3</text><text x="136" y="12" fill="#000000">Quit</text><text x="192" y="12" fill="#aaaaaa">4</text><text x="200" y="12" fill="#000000">Hex</text><text x="256" y="12" fill="#aaaaaa">5</text><text x="320" y="12" fill="#aaaaaa">6</text><text x="384" y="12" fill="#aaaaaa">7</text><text x="392" y="12" fill="#000000">Search</text><text x="448" y="12" fill="#aaaaaa">8</text><text x="512" y="12" fill="#aaaaaa">9</text><text x="576" y="12" fill="#aaaaaa">10</text><text x="592" y="12" fill="#000000">Quit</text></g>
+<g id="r31"><rect x="0" width="136" height="16" fill="#0000aa"/><rect x="136" width="40" height="16" fill="#00aaaa"/><rect x="176" width="464" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╔════════════╤═══</text><text x="144" y="12" fill="#000000">H:\</text><text x="176" y="12" fill="#55ffff">════╤════════════╗╔════════════╤═══ H:\ ════╤════════════╗</text></g>
+<g id="r32"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="536" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">CODE</text><text x="104" y="12" fill="#55ffff">│            │            ║║CODE        │            │            ║</text></g>
+<g id="r33"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║CODE        │            │            ║║CODE        │            │            ║</text></g>
+<g id="r34"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="536" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">DATA</text><text x="104" y="12" fill="#55ffff">│            │            ║║DATA        │            │            ║</text></g>
+<g id="r35"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║DATA         ►SUB-DIR◄  6-16-00 12:00p║║CODE         ►SUB-DIR◄  6-16-00 12:00p║</text></g>
+<g id="r36"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="536" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">NOTES</text><text x="104" y="12" fill="#55ffff">│            │            ║║NOTES       │            │            ║</text></g>
+<g id="r37"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║NOTES        ►SUB-DIR◄  6-16-00 12:00p║║CODE         ►SUB-DIR◄  6-16-00 12:00p║</text></g>
+<g id="r38"><rect x="0" width="120" height="16" fill="#0000aa"/><rect x="120" width="80" height="16" fill="#00aaaa"/><rect x="200" width="440" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╔════════════╤═</text><text x="128" y="12" fill="#000000">H:\NOTES</text><text x="200" y="12" fill="#55ffff">═╤════════════╗╔════════════╤═══ H:\ ════╤════════════╗</text></g>
+<g id="r39"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="536" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">..</text><text x="104" y="12" fill="#55ffff">│            │            ║║CODE        │            │            ║</text></g>
+<g id="r3a"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║ideas    md │            │            ║║DATA        │            │            ║</text></g>
+<g id="r3b"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║todo     txt│            │            ║║NOTES       │            │            ║</text></g>
+<g id="r3c"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │            ║║readme   txt│            │            ║</text></g>
+<g id="r3d"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║..           ►UP--DIR◄  6-16-00 12:00p║║CODE         ►SUB-DIR◄  6-16-00 12:00p║</text></g>
+<g id="r3e"><text x="0" y="12" fill="#aaaaaa">H:\NOTES&gt;</text></g>
+<g id="r3f"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║..          │            │            ║║CODE        │            │            ║</text></g>
+<g id="r40"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="536" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">ideas    md</text><text x="104" y="12" fill="#55ffff">│            │            ║║DATA        │            │            ║</text></g>
+<g id="r41"><rect x="0" width="640" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║ideas.md           330  6-16-00 12:00p║║CODE         ►SUB-DIR◄  6-16-00 12:00p║</text></g>
+<g id="r42"><rect x="0" width="16" height="16" fill="#00aaaa"/><rect x="80" width="560" height="16" fill="#00aaaa"/><text x="32" y="12" fill="#ffffff">Left</text><text x="96" y="12" fill="#000000">Files    Commands    Options    Right</text></g>
+<g id="r43"><rect x="8" width="48" height="16" fill="#00aaaa"/><rect x="72" width="48" height="16" fill="#00aaaa"/><rect x="136" width="48" height="16" fill="#00aaaa"/><rect x="200" width="48" height="16" fill="#00aaaa"/><rect x="264" width="48" height="16" fill="#00aaaa"/><rect x="328" width="48" height="16" fill="#00aaaa"/><rect x="392" width="48" height="16" fill="#00aaaa"/><rect x="456" width="48" height="16" fill="#00aaaa"/><rect x="520" width="48" height="16" fill="#00aaaa"/><rect x="592" width="48" height="16" fill="#00aaaa"/><text x="0" y="12" fill="#aaaaaa">1</text><text x="8" y="12" fill="#000000">Help</text><text x="64" y="12" fill="#aaaaaa">2</text><text x="128" y="12" fill="#aaaaaa">3</text><text x="192" y="12" fill="#aaaaaa">4</text><text x="256" y="12" fill="#aaaaaa">5</text><text x="320" y="12" fill="#aaaaaa">6</text><text x="384" y="12" fill="#aaaaaa">7</text><text x="448" y="12" fill="#aaaaaa">8</text><text x="512" y="12" fill="#aaaaaa">9</text><text x="576" y="12" fill="#aaaaaa">10</text><text x="592" y="12" fill="#000000">Quit</text></g>
+<g id="r44"><rect x="0" width="80" height="16" fill="#00aaaa"/><rect x="152" width="488" height="16" fill="#00aaaa"/><text x="32" y="12" fill="#000000">Left</text><text x="96" y="12" fill="#ffffff">Files</text><text x="168" y="12" fill="#000000">Commands    Options    Right</text></g>
+<g id="r45"><rect x="0" width="152" height="16" fill="#00aaaa"/><rect x="248" width="392" height="16" fill="#00aaaa"/><text x="32" y="12" fill="#000000">Left    Files</text><text x="168" y="12" fill="#ffffff">Commands</text><text x="264" y="12" fill="#000000">Options    Right</text></g>
+<g id="r46"><rect x="0" width="248" height="16" fill="#00aaaa"/><rect x="336" width="304" height="16" fill="#00aaaa"/><text x="32" y="12" fill="#000000">Left    Files    Commands</text><text x="264" y="12" fill="#ffffff">Options</text><text x="352" y="12" fill="#000000">Right</text></g>
+<g id="r47"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="504" width="136" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="40" y="12" fill="#ffff55">Name</text><text x="104" y="12" fill="#55ffff">│</text><text x="144" y="12" fill="#ffff55">Name</text><text x="208" y="12" fill="#55ffff">│</text><text x="248" y="12" fill="#000000">┌──────────────────────────────┐</text><text x="528" y="12" fill="#55ffff">│</text><text x="568" y="12" fill="#ffff55">Name</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r48"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="8" height="16" fill="#00aaaa"/><rect x="496" width="8" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║..          │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffff55">C</text><text x="280" y="12" fill="#ffffff">onfiguration...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r49"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="144" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">ideas    md</text><text x="104" y="12" fill="#55ffff">│            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffffff">advanced</text><text x="344" y="12" fill="#ffff55">O</text><text x="352" y="12" fill="#ffffff">ptions...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r4a"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║todo     txt│            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffffff">e</text><text x="280" y="12" fill="#ffff55">X</text><text x="288" y="12" fill="#ffffff">tension file edit...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r4b"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffff55">V</text><text x="280" y="12" fill="#ffffff">iewers...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r4c"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffff55">E</text><text x="280" y="12" fill="#ffffff">ditors...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r4d"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│ ──────────────────────────── │</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r4e"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffff55">A</text><text x="280" y="12" fill="#ffffff">uto menus</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r4f"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="256" y="12" fill="#ffffff">√</text><text x="272" y="12" fill="#ffff55">P</text><text x="280" y="12" fill="#ffffff">ath prompt</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r50"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="256" y="12" fill="#ffffff">√</text><text x="272" y="12" fill="#ffff55">K</text><text x="280" y="12" fill="#ffffff">ey bar            Ctrl-B</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r51"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="256" y="12" fill="#ffffff">√</text><text x="272" y="12" fill="#ffff55">F</text><text x="280" y="12" fill="#ffffff">ull screen</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r52"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="72" height="16" fill="#00aaaa"/><rect x="320" width="8" height="16" fill="#aa0000"/><rect x="328" width="176" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffffff">auto</text><text x="312" y="12" fill="#ffff55">D</text><text x="320" y="12" fill="#555555">i</text><text x="328" y="12" fill="#ffffff">rectory sizes</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r53"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="256" y="12" fill="#ffffff">√ mi</text><text x="288" y="12" fill="#ffff55">N</text><text x="296" y="12" fill="#ffffff">i status</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r54"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffffff">c</text><text x="280" y="12" fill="#ffff55">L</text><text x="288" y="12" fill="#ffffff">ock</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r55"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffff55">S</text><text x="280" y="12" fill="#ffffff">ave setup         Shift-F9</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r56"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffff55">M</text><text x="280" y="12" fill="#ffffff">ore setup...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r57"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │            │</text><text x="248" y="12" fill="#000000">└──────────────────────────────┘</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r58"><rect x="0" width="264" height="16" fill="#0000aa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╟────────────┴────────────┴──────</text><text x="264" y="12" fill="#00aaaa">──────╢╟────────────┴───────────</text><text x="520" y="12" fill="#55ffff">─┴────────────╢</text></g>
+<g id="r59"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="416" width="224" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="40" y="12" fill="#ffff55">Name</text><text x="104" y="12" fill="#55ffff">│</text><text x="144" y="12" fill="#ffff55">N</text><text x="152" y="12" fill="#000000">┌───────────────────────────────┐</text><text x="424" y="12" fill="#55ffff">│</text><text x="464" y="12" fill="#ffff55">Name</text><text x="528" y="12" fill="#55ffff">│</text><text x="568" y="12" fill="#ffff55">Name</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r5a"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="8" height="16" fill="#00aaaa"/><rect x="408" width="8" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║..          │</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">T</text><text x="176" y="12" fill="#ffffff">ree                  Alt-F10</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r5b"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="48" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">ideas    md</text><text x="104" y="12" fill="#55ffff">│</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">V</text><text x="176" y="12" fill="#ffffff">olume label          Ctrl-F4</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r5c"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║todo     txt│</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">D</text><text x="176" y="12" fill="#ffffff">irectory sizes       Alt-F6</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r5d"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">F</text><text x="176" y="12" fill="#ffffff">ind file             Alt-F7</text><text x="408" y="12" fill="#000000">│</text><text x="416" y="12" fill="#00aaaa">t│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r5e"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">H</text><text x="176" y="12" fill="#ffffff">istory               Alt-F8</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r5f"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">│ ───────────────────────────── │</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r60"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">S</text><text x="176" y="12" fill="#ffffff">wap panels           Ctrl-U</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r61"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">P</text><text x="176" y="12" fill="#ffffff">anels on/off         Ctrl-O</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r62"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">C</text><text x="176" y="12" fill="#ffffff">ompare directories   Ctrl-C</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r63"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="168" height="16" fill="#00aaaa"/><rect x="320" width="8" height="16" fill="#aa0000"/><rect x="328" width="88" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">│</text><text x="168" y="12" fill="#ffff55">M</text><text x="176" y="12" fill="#ffffff">enu file edit</text><text x="408" y="12" fill="#000000">│</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r64"><rect x="0" width="152" height="16" fill="#0000aa"/><rect x="152" width="264" height="16" fill="#00aaaa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="152" y="12" fill="#000000">└───────────────────────────────┘</text><text x="424" y="12" fill="#00aaaa">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r65"><rect x="0" width="168" height="16" fill="#0000aa"/><rect x="432" width="208" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="208" y="12" fill="#00aaaa">│            ║║            │</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r66"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="304" width="336" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="40" y="12" fill="#ffff55">Name</text><text x="80" y="12" fill="#000000">┌──────────────────────────┐</text><text x="312" y="12" fill="#55ffff">║║</text><text x="360" y="12" fill="#ffff55">Name</text><text x="424" y="12" fill="#55ffff">│</text><text x="464" y="12" fill="#ffff55">Name</text><text x="528" y="12" fill="#55ffff">│</text><text x="568" y="12" fill="#ffff55">Name</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r67"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="8" height="16" fill="#00aaaa"/><rect x="296" width="8" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║..</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">H</text><text x="104" y="12" fill="#ffffff">elp              F1</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║CODE        │            │            ║</text></g>
+<g id="r68"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="296" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">ideas    │</text><text x="96" y="12" fill="#ffff55">U</text><text x="104" y="12" fill="#ffffff">ser menu         F2</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║DATA        │            │            ║</text></g>
+<g id="r69"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║todo</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">V</text><text x="104" y="12" fill="#ffffff">iew              F3</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║NOTES       │            │            ║</text></g>
+<g id="r6a"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">E</text><text x="104" y="12" fill="#ffffff">dit              F4</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║readme   txt│            │            ║</text></g>
+<g id="r6b"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">C</text><text x="104" y="12" fill="#ffffff">opy              F5</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r6c"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">R</text><text x="104" y="12" fill="#ffffff">ename or move    F6</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r6d"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">M</text><text x="104" y="12" fill="#ffffff">ake directory    F7</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r6e"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">D</text><text x="104" y="12" fill="#ffffff">elete            F8</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r6f"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│ ──────────────────────── │</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r70"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffffff">file</text><text x="136" y="12" fill="#ffff55">A</text><text x="144" y="12" fill="#ffffff">ttributes   Ctrl-A</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r71"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="8" height="16" fill="#aa5500"/><rect x="328" width="312" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│ ──────────────────────── │</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#ff5555">║</text><text x="424" y="12" fill="#55ffff">│            │            ║</text></g>
+<g id="r72"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffffff">select</text><text x="152" y="12" fill="#ffff55">G</text><text x="160" y="12" fill="#ffffff">roup      Gray +</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r73"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffffff">u</text><text x="104" y="12" fill="#ffff55">N</text><text x="112" y="12" fill="#ffffff">select group    Gray -</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r74"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">I</text><text x="104" y="12" fill="#ffffff">nvert group      Gray *</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r75"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffffff">re</text><text x="112" y="12" fill="#ffff55">S</text><text x="120" y="12" fill="#ffffff">tore selection Ctrl-M</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r76"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">│</text><text x="96" y="12" fill="#ffff55">Q</text><text x="104" y="12" fill="#ffffff">uit              F10</text><text x="296" y="12" fill="#000000">│</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r77"><rect x="0" width="80" height="16" fill="#0000aa"/><rect x="80" width="224" height="16" fill="#00aaaa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="80" y="12" fill="#000000">└──────────────────────────┘</text><text x="312" y="12" fill="#00aaaa">║</text><text x="320" y="12" fill="#55ffff">║            │            │            ║</text></g>
+<g id="r78"><rect x="0" width="96" height="16" fill="#0000aa"/><rect x="320" width="320" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╟───────────</text><text x="96" y="12" fill="#00aaaa">─┴────────────┴────────────╢</text><text x="320" y="12" fill="#55ffff">╟────────────┴────────────┴────────────╢</text></g>
+<g id="r79"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="256" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║..          │            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffff55">C</text><text x="280" y="12" fill="#ffffff">onfiguration...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r7a"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="96" height="16" fill="#00aaaa"/><rect x="104" width="144" height="16" fill="#0000aa"/><rect x="248" width="8" height="16" fill="#00aaaa"/><rect x="496" width="8" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">ideas    md</text><text x="104" y="12" fill="#55ffff">│            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffffff">advanced</text><text x="344" y="12" fill="#ffff55">O</text><text x="352" y="12" fill="#ffffff">ptions...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r7b"><rect x="0" width="248" height="16" fill="#0000aa"/><rect x="248" width="8" height="16" fill="#00aaaa"/><rect x="496" width="8" height="16" fill="#00aaaa"/><rect x="520" width="120" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║todo     txt│            │</text><text x="248" y="12" fill="#000000">│</text><text x="272" y="12" fill="#ffffff">e</text><text x="280" y="12" fill="#ffff55">X</text><text x="288" y="12" fill="#ffffff">tension file edit...</text><text x="496" y="12" fill="#000000">│</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r7c"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="600" width="40" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║..</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r7d"><rect x="0" width="8" height="16" fill="#0000aa"/><rect x="8" width="592" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="8" y="12" fill="#000000">idea</text><text x="64" y="12" fill="#ffffff">╔═══════════════════════ Configuration ════════════════════════╗</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r7e"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║todo</text><text x="64" y="12" fill="#ffffff">║  ┌</text><text x="104" y="12" fill="#ffff55">Screen colors</text><text x="216" y="12" fill="#ffffff">──────┐  ┌</text><text x="304" y="12" fill="#ffff55">Panel options</text><text x="416" y="12" fill="#ffffff">────────────────┐  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r7f"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  ( ) Black &amp; White  │  │  [x] Ins moves down           │  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r80"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  (•) Color          │  │  [x] Auto change directory    │  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r81"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  ( ) Laptop         │  └───────────────────────────────┘  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r82"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  └─────────────────────┘  ┌</text><text x="304" y="12" fill="#ffff55">Other options</text><text x="416" y="12" fill="#ffffff">────────────────┐  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r83"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  ┌</text><text x="104" y="12" fill="#ffff55">Screen blank delay</text><text x="256" y="12" fill="#ffffff">─┐  │  [ ] Menu bar always visible  │  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r84"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  ( ) 40 minutes     │  │  [x] Auto save setup          │  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r85"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r86"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="280" height="16" fill="#00aaaa"/><rect x="320" width="8" height="16" fill="#aa0000"/><rect x="328" width="272" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  (•)  5 minutes     │  │  [</text><text x="320" y="12" fill="#555555">x</text><text x="328" y="12" fill="#ffffff">] Zooming boxes            │  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r87"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r88"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  ( )  1 minute      │  ┌</text><text x="304" y="12" fill="#ffff55">Mouse options</text><text x="416" y="12" fill="#ffffff">────────────────┐  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r89"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r8a"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║  └─────────────────────┘  └───────────────────────────────┘  ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r8b"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="144" height="16" fill="#00aaaa"/><rect x="240" width="176" height="16" fill="#00aaaa"/><rect x="440" width="40" height="16" fill="#00aaaa"/><rect x="504" width="96" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║        Press  Space  to change an option,  ↑  and  ↓         ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r8c"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">║                   to move between options                    ║</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r8d"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║</text><text x="64" y="12" fill="#ffffff">╟──────────────────────────────────────────────────────────────╢</text><text x="632" y="12" fill="#55ffff">║</text></g>
+<g id="r8e"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╟────</text><text x="64" y="12" fill="#ffffff">║</text><text x="240" y="12" fill="#ffff55">[ Ok ]</text><text x="312" y="12" fill="#ffffff">[ Cancel ]                      ║</text><text x="600" y="12" fill="#00aaaa">──</text><text x="616" y="12" fill="#55ffff">──╢</text></g>
+<g id="r8f"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║idea</text><text x="64" y="12" fill="#ffffff">╚══════════════════════════════════════════════════════════════╝</text><text x="600" y="12" fill="#00aaaa">:0</text><text x="616" y="12" fill="#55ffff">0p║</text></g>
+<g id="r90"><rect x="0" width="40" height="16" fill="#0000aa"/><rect x="40" width="560" height="16" fill="#00aaaa"/><rect x="616" width="24" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">╚════</text><text x="600" y="12" fill="#00aaaa">══</text><text x="616" y="12" fill="#55ffff">══╝</text></g>
+<g id="r91"><text x="0" y="12" fill="#aaaaaa">H:\NOTE</text><text x="56" y="12" fill="#ffffff">S&gt;</text></g>
+<g id="r92"><rect x="0" width="120" height="16" fill="#0000aa"/><rect x="120" width="392" height="16" fill="#aaaaaa"/><rect x="512" width="128" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r93"><rect x="0" width="120" height="16" fill="#0000aa"/><rect x="120" width="392" height="16" fill="#aaaaaa"/><rect x="528" width="112" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="144" y="12" fill="#000000">╔═══════════ The Vibe Commander ══════════╗</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r94"><rect x="0" width="120" height="16" fill="#0000aa"/><rect x="120" width="392" height="16" fill="#aaaaaa"/><rect x="528" width="112" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="144" y="12" fill="#000000">║ Do you want to quit the Vibe Commander? ║</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r95"><rect x="0" width="120" height="16" fill="#0000aa"/><rect x="120" width="160" height="16" fill="#aaaaaa"/><rect x="280" width="40" height="16" fill="#00aaaa"/><rect x="320" width="192" height="16" fill="#aaaaaa"/><rect x="528" width="112" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="144" y="12" fill="#000000">║                 Yes   No                ║</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r96"><rect x="0" width="120" height="16" fill="#0000aa"/><rect x="120" width="392" height="16" fill="#aaaaaa"/><rect x="528" width="112" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="144" y="12" fill="#000000">╚═════════════════════════════════════════╝</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r97"><rect x="0" width="120" height="16" fill="#0000aa"/><rect x="120" width="392" height="16" fill="#aaaaaa"/><rect x="528" width="112" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+<g id="r98"><rect x="0" width="136" height="16" fill="#0000aa"/><rect x="528" width="112" height="16" fill="#0000aa"/><text x="0" y="12" fill="#55ffff">║            │</text><text x="208" y="12" fill="#00aaaa">│            ║║            │</text><text x="528" y="12" fill="#55ffff">│            ║</text></g>
+</defs>
+<g id="film">
+<g transform="translate(0 0)">
+<use xlink:href="#r0" y="0"/>
+<use xlink:href="#r1" y="16"/>
+<use xlink:href="#r2" y="32"/>
+<use xlink:href="#r3" y="48"/>
+<use xlink:href="#r4" y="64"/>
+<use xlink:href="#r5" y="80"/>
+<use xlink:href="#r6" y="96"/>
+<use xlink:href="#r6" y="112"/>
+<use xlink:href="#r6" y="128"/>
+<use xlink:href="#r6" y="144"/>
+<use xlink:href="#r6" y="160"/>
+<use xlink:href="#r6" y="176"/>
+<use xlink:href="#r7" y="192"/>
+<use xlink:href="#r6" y="208"/>
+<use xlink:href="#r6" y="224"/>
+<use xlink:href="#r6" y="240"/>
+<use xlink:href="#r6" y="256"/>
+<use xlink:href="#r6" y="272"/>
+<use xlink:href="#r6" y="288"/>
+<use xlink:href="#r6" y="304"/>
+<use xlink:href="#r8" y="320"/>
+<use xlink:href="#r9" y="336"/>
+<use xlink:href="#ra" y="352"/>
+<use xlink:href="#rb" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="32" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 400)">
+<use xlink:href="#rd" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#rf" y="32"/>
+<use xlink:href="#r10" y="48"/>
+<use xlink:href="#r11" y="64"/>
+<use xlink:href="#r12" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r16" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#rb" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="32" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 800)">
+<use xlink:href="#r18" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r19" y="32"/>
+<use xlink:href="#r1a" y="48"/>
+<use xlink:href="#r1b" y="64"/>
+<use xlink:href="#r1c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r1d" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r1e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="64" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 1200)">
+<use xlink:href="#r18" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r1f" y="32"/>
+<use xlink:href="#r20" y="48"/>
+<use xlink:href="#r1b" y="64"/>
+<use xlink:href="#r1c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r21" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r1e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="64" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 1600)">
+<use xlink:href="#r18" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r1f" y="32"/>
+<use xlink:href="#r1a" y="48"/>
+<use xlink:href="#r22" y="64"/>
+<use xlink:href="#r1c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r23" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r1e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="64" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 2000)">
+<use xlink:href="#r24" y="0"/>
+<use xlink:href="#r25" y="16"/>
+<use xlink:href="#r26" y="32"/>
+<use xlink:href="#r27" y="48"/>
+<use xlink:href="#r28" y="64"/>
+<use xlink:href="#r29" y="80"/>
+<use xlink:href="#r2a" y="96"/>
+<use xlink:href="#r2b" y="112"/>
+<use xlink:href="#r27" y="128"/>
+<use xlink:href="#r2c" y="144"/>
+<use xlink:href="#r2d" y="160"/>
+<use xlink:href="#r2e" y="176"/>
+<use xlink:href="#r2f" y="192"/>
+<use xlink:href="#r27" y="208"/>
+<use xlink:href="#r27" y="224"/>
+<use xlink:href="#r27" y="240"/>
+<use xlink:href="#r27" y="256"/>
+<use xlink:href="#r27" y="272"/>
+<use xlink:href="#r27" y="288"/>
+<use xlink:href="#r27" y="304"/>
+<use xlink:href="#r27" y="320"/>
+<use xlink:href="#r27" y="336"/>
+<use xlink:href="#r27" y="352"/>
+<use xlink:href="#r27" y="368"/>
+<use xlink:href="#r30" y="384"/>
+</g>
+<g transform="translate(0 2400)">
+<use xlink:href="#r18" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r1f" y="32"/>
+<use xlink:href="#r1a" y="48"/>
+<use xlink:href="#r22" y="64"/>
+<use xlink:href="#r1c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r23" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r1e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="64" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 2800)">
+<use xlink:href="#r18" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r19" y="32"/>
+<use xlink:href="#r1a" y="48"/>
+<use xlink:href="#r1b" y="64"/>
+<use xlink:href="#r1c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r1d" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r1e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="64" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 3200)">
+<use xlink:href="#rd" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#rf" y="32"/>
+<use xlink:href="#r10" y="48"/>
+<use xlink:href="#r11" y="64"/>
+<use xlink:href="#r12" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r16" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#rb" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="32" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 3600)">
+<use xlink:href="#r31" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r32" y="32"/>
+<use xlink:href="#r10" y="48"/>
+<use xlink:href="#r11" y="64"/>
+<use xlink:href="#r12" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r16" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#rb" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="32" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 4000)">
+<use xlink:href="#r31" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r33" y="32"/>
+<use xlink:href="#r34" y="48"/>
+<use xlink:href="#r11" y="64"/>
+<use xlink:href="#r12" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r35" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#rb" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="32" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 4400)">
+<use xlink:href="#r31" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r33" y="32"/>
+<use xlink:href="#r10" y="48"/>
+<use xlink:href="#r36" y="64"/>
+<use xlink:href="#r12" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r37" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#rb" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="32" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 4800)">
+<use xlink:href="#r38" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r39" y="32"/>
+<use xlink:href="#r3a" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r3c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r3d" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="72" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 5200)">
+<use xlink:href="#r38" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r3f" y="32"/>
+<use xlink:href="#r40" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r3c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="72" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 5600)">
+<use xlink:href="#r42" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r3f" y="32"/>
+<use xlink:href="#r40" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r3c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 6000)">
+<use xlink:href="#r44" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r3f" y="32"/>
+<use xlink:href="#r40" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r3c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 6400)">
+<use xlink:href="#r45" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r3f" y="32"/>
+<use xlink:href="#r40" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r3c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 6800)">
+<use xlink:href="#r46" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r3f" y="32"/>
+<use xlink:href="#r40" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r3c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 7200)">
+<use xlink:href="#r46" y="0"/>
+<use xlink:href="#r47" y="16"/>
+<use xlink:href="#r48" y="32"/>
+<use xlink:href="#r49" y="48"/>
+<use xlink:href="#r4a" y="64"/>
+<use xlink:href="#r4b" y="80"/>
+<use xlink:href="#r4c" y="96"/>
+<use xlink:href="#r4d" y="112"/>
+<use xlink:href="#r4e" y="128"/>
+<use xlink:href="#r4f" y="144"/>
+<use xlink:href="#r50" y="160"/>
+<use xlink:href="#r51" y="176"/>
+<use xlink:href="#r52" y="192"/>
+<use xlink:href="#r53" y="208"/>
+<use xlink:href="#r54" y="224"/>
+<use xlink:href="#r4d" y="240"/>
+<use xlink:href="#r55" y="256"/>
+<use xlink:href="#r4d" y="272"/>
+<use xlink:href="#r56" y="288"/>
+<use xlink:href="#r57" y="304"/>
+<use xlink:href="#r58" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 7600)">
+<use xlink:href="#r45" y="0"/>
+<use xlink:href="#r59" y="16"/>
+<use xlink:href="#r5a" y="32"/>
+<use xlink:href="#r5b" y="48"/>
+<use xlink:href="#r5c" y="64"/>
+<use xlink:href="#r5d" y="80"/>
+<use xlink:href="#r5e" y="96"/>
+<use xlink:href="#r5f" y="112"/>
+<use xlink:href="#r60" y="128"/>
+<use xlink:href="#r61" y="144"/>
+<use xlink:href="#r62" y="160"/>
+<use xlink:href="#r5f" y="176"/>
+<use xlink:href="#r63" y="192"/>
+<use xlink:href="#r64" y="208"/>
+<use xlink:href="#r65" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 8000)">
+<use xlink:href="#r44" y="0"/>
+<use xlink:href="#r66" y="16"/>
+<use xlink:href="#r67" y="32"/>
+<use xlink:href="#r68" y="48"/>
+<use xlink:href="#r69" y="64"/>
+<use xlink:href="#r6a" y="80"/>
+<use xlink:href="#r6b" y="96"/>
+<use xlink:href="#r6c" y="112"/>
+<use xlink:href="#r6d" y="128"/>
+<use xlink:href="#r6e" y="144"/>
+<use xlink:href="#r6f" y="160"/>
+<use xlink:href="#r70" y="176"/>
+<use xlink:href="#r71" y="192"/>
+<use xlink:href="#r72" y="208"/>
+<use xlink:href="#r73" y="224"/>
+<use xlink:href="#r74" y="240"/>
+<use xlink:href="#r75" y="256"/>
+<use xlink:href="#r6f" y="272"/>
+<use xlink:href="#r76" y="288"/>
+<use xlink:href="#r77" y="304"/>
+<use xlink:href="#r78" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 8400)">
+<use xlink:href="#r45" y="0"/>
+<use xlink:href="#r59" y="16"/>
+<use xlink:href="#r5a" y="32"/>
+<use xlink:href="#r5b" y="48"/>
+<use xlink:href="#r5c" y="64"/>
+<use xlink:href="#r5d" y="80"/>
+<use xlink:href="#r5e" y="96"/>
+<use xlink:href="#r5f" y="112"/>
+<use xlink:href="#r60" y="128"/>
+<use xlink:href="#r61" y="144"/>
+<use xlink:href="#r62" y="160"/>
+<use xlink:href="#r5f" y="176"/>
+<use xlink:href="#r63" y="192"/>
+<use xlink:href="#r64" y="208"/>
+<use xlink:href="#r65" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 8800)">
+<use xlink:href="#r46" y="0"/>
+<use xlink:href="#r47" y="16"/>
+<use xlink:href="#r48" y="32"/>
+<use xlink:href="#r49" y="48"/>
+<use xlink:href="#r4a" y="64"/>
+<use xlink:href="#r4b" y="80"/>
+<use xlink:href="#r4c" y="96"/>
+<use xlink:href="#r4d" y="112"/>
+<use xlink:href="#r4e" y="128"/>
+<use xlink:href="#r4f" y="144"/>
+<use xlink:href="#r50" y="160"/>
+<use xlink:href="#r51" y="176"/>
+<use xlink:href="#r52" y="192"/>
+<use xlink:href="#r53" y="208"/>
+<use xlink:href="#r54" y="224"/>
+<use xlink:href="#r4d" y="240"/>
+<use xlink:href="#r55" y="256"/>
+<use xlink:href="#r4d" y="272"/>
+<use xlink:href="#r56" y="288"/>
+<use xlink:href="#r57" y="304"/>
+<use xlink:href="#r58" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 9200)">
+<use xlink:href="#r46" y="0"/>
+<use xlink:href="#r47" y="16"/>
+<use xlink:href="#r79" y="32"/>
+<use xlink:href="#r7a" y="48"/>
+<use xlink:href="#r4a" y="64"/>
+<use xlink:href="#r4b" y="80"/>
+<use xlink:href="#r4c" y="96"/>
+<use xlink:href="#r4d" y="112"/>
+<use xlink:href="#r4e" y="128"/>
+<use xlink:href="#r4f" y="144"/>
+<use xlink:href="#r50" y="160"/>
+<use xlink:href="#r51" y="176"/>
+<use xlink:href="#r52" y="192"/>
+<use xlink:href="#r53" y="208"/>
+<use xlink:href="#r54" y="224"/>
+<use xlink:href="#r4d" y="240"/>
+<use xlink:href="#r55" y="256"/>
+<use xlink:href="#r4d" y="272"/>
+<use xlink:href="#r56" y="288"/>
+<use xlink:href="#r57" y="304"/>
+<use xlink:href="#r58" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 9600)">
+<use xlink:href="#r46" y="0"/>
+<use xlink:href="#r47" y="16"/>
+<use xlink:href="#r79" y="32"/>
+<use xlink:href="#r49" y="48"/>
+<use xlink:href="#r7b" y="64"/>
+<use xlink:href="#r4b" y="80"/>
+<use xlink:href="#r4c" y="96"/>
+<use xlink:href="#r4d" y="112"/>
+<use xlink:href="#r4e" y="128"/>
+<use xlink:href="#r4f" y="144"/>
+<use xlink:href="#r50" y="160"/>
+<use xlink:href="#r51" y="176"/>
+<use xlink:href="#r52" y="192"/>
+<use xlink:href="#r53" y="208"/>
+<use xlink:href="#r54" y="224"/>
+<use xlink:href="#r4d" y="240"/>
+<use xlink:href="#r55" y="256"/>
+<use xlink:href="#r4d" y="272"/>
+<use xlink:href="#r56" y="288"/>
+<use xlink:href="#r57" y="304"/>
+<use xlink:href="#r58" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 10000)">
+<use xlink:href="#r46" y="0"/>
+<use xlink:href="#r47" y="16"/>
+<use xlink:href="#r79" y="32"/>
+<use xlink:href="#r7a" y="48"/>
+<use xlink:href="#r4a" y="64"/>
+<use xlink:href="#r4b" y="80"/>
+<use xlink:href="#r4c" y="96"/>
+<use xlink:href="#r4d" y="112"/>
+<use xlink:href="#r4e" y="128"/>
+<use xlink:href="#r4f" y="144"/>
+<use xlink:href="#r50" y="160"/>
+<use xlink:href="#r51" y="176"/>
+<use xlink:href="#r52" y="192"/>
+<use xlink:href="#r53" y="208"/>
+<use xlink:href="#r54" y="224"/>
+<use xlink:href="#r4d" y="240"/>
+<use xlink:href="#r55" y="256"/>
+<use xlink:href="#r4d" y="272"/>
+<use xlink:href="#r56" y="288"/>
+<use xlink:href="#r57" y="304"/>
+<use xlink:href="#r58" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 10400)">
+<use xlink:href="#r46" y="0"/>
+<use xlink:href="#r47" y="16"/>
+<use xlink:href="#r48" y="32"/>
+<use xlink:href="#r49" y="48"/>
+<use xlink:href="#r4a" y="64"/>
+<use xlink:href="#r4b" y="80"/>
+<use xlink:href="#r4c" y="96"/>
+<use xlink:href="#r4d" y="112"/>
+<use xlink:href="#r4e" y="128"/>
+<use xlink:href="#r4f" y="144"/>
+<use xlink:href="#r50" y="160"/>
+<use xlink:href="#r51" y="176"/>
+<use xlink:href="#r52" y="192"/>
+<use xlink:href="#r53" y="208"/>
+<use xlink:href="#r54" y="224"/>
+<use xlink:href="#r4d" y="240"/>
+<use xlink:href="#r55" y="256"/>
+<use xlink:href="#r4d" y="272"/>
+<use xlink:href="#r56" y="288"/>
+<use xlink:href="#r57" y="304"/>
+<use xlink:href="#r58" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+<g transform="translate(0 10800)">
+<use xlink:href="#r38" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r7c" y="32"/>
+<use xlink:href="#r7d" y="48"/>
+<use xlink:href="#r7e" y="64"/>
+<use xlink:href="#r7f" y="80"/>
+<use xlink:href="#r80" y="96"/>
+<use xlink:href="#r81" y="112"/>
+<use xlink:href="#r82" y="128"/>
+<use xlink:href="#r83" y="144"/>
+<use xlink:href="#r84" y="160"/>
+<use xlink:href="#r85" y="176"/>
+<use xlink:href="#r86" y="192"/>
+<use xlink:href="#r87" y="208"/>
+<use xlink:href="#r88" y="224"/>
+<use xlink:href="#r89" y="240"/>
+<use xlink:href="#r8a" y="256"/>
+<use xlink:href="#r8b" y="272"/>
+<use xlink:href="#r8c" y="288"/>
+<use xlink:href="#r8d" y="304"/>
+<use xlink:href="#r8e" y="320"/>
+<use xlink:href="#r8f" y="336"/>
+<use xlink:href="#r90" y="352"/>
+<use xlink:href="#r91" y="368"/>
+<use xlink:href="#r43" y="384"/>
+<rect class="c" x="120" y="110" width="8" height="2" fill="#ffffff"/>
+</g>
+<g transform="translate(0 11200)">
+<use xlink:href="#r38" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r3f" y="32"/>
+<use xlink:href="#r40" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r3c" y="80"/>
+<use xlink:href="#r13" y="96"/>
+<use xlink:href="#r13" y="112"/>
+<use xlink:href="#r13" y="128"/>
+<use xlink:href="#r13" y="144"/>
+<use xlink:href="#r13" y="160"/>
+<use xlink:href="#r13" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#rc" y="384"/>
+<rect class="c" x="72" y="382" width="8" height="2" fill="#aaaaaa"/>
+</g>
+<g transform="translate(0 11600)">
+<use xlink:href="#r38" y="0"/>
+<use xlink:href="#re" y="16"/>
+<use xlink:href="#r3f" y="32"/>
+<use xlink:href="#r40" y="48"/>
+<use xlink:href="#r3b" y="64"/>
+<use xlink:href="#r92" y="80"/>
+<use xlink:href="#r93" y="96"/>
+<use xlink:href="#r94" y="112"/>
+<use xlink:href="#r95" y="128"/>
+<use xlink:href="#r96" y="144"/>
+<use xlink:href="#r97" y="160"/>
+<use xlink:href="#r98" y="176"/>
+<use xlink:href="#r14" y="192"/>
+<use xlink:href="#r13" y="208"/>
+<use xlink:href="#r13" y="224"/>
+<use xlink:href="#r13" y="240"/>
+<use xlink:href="#r13" y="256"/>
+<use xlink:href="#r13" y="272"/>
+<use xlink:href="#r13" y="288"/>
+<use xlink:href="#r13" y="304"/>
+<use xlink:href="#r15" y="320"/>
+<use xlink:href="#r41" y="336"/>
+<use xlink:href="#r17" y="352"/>
+<use xlink:href="#r3e" y="368"/>
+<use xlink:href="#r43" y="384"/>
+</g>
+</g></svg>

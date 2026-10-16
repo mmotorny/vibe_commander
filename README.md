@@ -1,5 +1,17 @@
 # Vibe Commander
 
+<!-- The session is docs/vibe-commander-session.svg, made by
+     python3 harness/session.py
+     with the project built: see "The session at the top". -->
+<p align="center">
+  <img src="docs/vibe-commander-session.svg" width="720"
+       alt="An animated recording of Vibe Commander 0.1 in a terminal of 80x25 on Linux: it starts with one panel beside its banner, Ctrl-F1 brings up the second, the panels go into the directories CODE and NOTES, F3 views hello.c, F9 opens the menu bar and walks the menus Commands, Files and Options, the Configuration dialog opens from Options, and F10 asks whether to quit">
+</p>
+<p align="center">
+  <em>Vibe Commander 0.1, the portable C, built for Linux and running in a terminal:
+  a session recorded from the program's own screens by a script of this repository.</em>
+</p>
+
 <!-- The picture is screen.png of
      python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE --home C "F9 o l" Ctrl+l Wait*9
      with the project built: see "Running the original". -->
@@ -2079,7 +2091,7 @@ the steps that follow, written as a scenario's are: the screen is taken
 when the program waits for a key behind the last of them. With `--home
 C` as well, the program and those files are in `C:\VC` instead, next to
 the bench's other files on `C:`, and the program is started there. The
-picture at the top is `screen.png` from
+picture at the top under the session is `screen.png` from
 
 ```sh
 python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE \
@@ -2095,6 +2107,28 @@ where the mouse driver puts it when the program starts, in the middle of
 the screen: a step such as `Move@4,7` would put it elsewhere. Two runs give the same files.
 `python3 harness/screenshot.py --scale 3x4` makes the picture of the
 original that the top of this README showed before, byte for byte.
+
+## The session at the top
+
+The animation at the top of this README, `docs/vibe-commander-session.svg`,
+is the program for Linux in motion, made by
+
+```sh
+python3 harness/session.py
+```
+
+with the project built with `-DVC_WEB=ON`, which fetches the font. It
+runs `build/portable_c/posix/vc` in a pseudo-terminal of 80 by 25, in a
+home directory of its own that holds the web page's demo,
+`src/portable_c/web/demo`, with fixed times; types a fixed list of keys
+as xterm sends them, each when the program has stopped writing; replays
+what the program writes through pyte, as the test `portable_c-terminal`
+does; and takes the screen behind each key for a frame, shown for a
+time that the script gives it. The SVG draws the 80 by 25 cells in the
+VGA's colours and in VileR's Web437 IBM VGA 8x16, which it carries, and
+moves from frame to frame by CSS alone, with no script, so that GitHub
+shows it as an image. Two runs give the same file. `--text` prints the
+frames as text besides.
 
 ## Using the C trees by hand
 
@@ -2219,6 +2253,9 @@ Web437 IBM VGA 8x16 of the Ultimate Oldschool PC Font Pack, (c)
 International licence, whose text is `LICENSE.FONT`: the `LICENSE.TXT`
 of the pack's archive that the build fetches, copied as it is. The page
 puts the font in as it comes, unchanged.
+The animation at the top of this README, `docs/vibe-commander-session.svg`,
+carries the same font, unchanged, and says in its own text whose it is,
+under which licence, and where the licence's text is.
 
 The page credits every work that it carries alike: its bar has one
 link, "Licences", which shows the texts of `LICENSE`,
@@ -2230,5 +2267,6 @@ pack's site. `LICENSE.DOS32A` is not among them, since no page carries
 the extender.
 
 The shareware distribution of Volkov Commander is proprietary and is not
-part of this repository. The picture at the top shows the portable C
-running in its directory, with its files beside it.
+part of this repository. The picture at the top under the session
+shows the portable C running in its directory, with its files beside
+it; the session has none of them, only the web page's demo.
