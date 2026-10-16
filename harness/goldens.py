@@ -1457,6 +1457,11 @@ def from_run(name, program, benches):
         # As the test holds them (departures).
         disks = on_the_host(disks)
         left = on_the_host(left, disks)
+    declared = deviations.TREES.get(tree)
+    if run.cut or (declared is not None and name in declared.cut):
+        # A run that is cut leaves its disks as they are then, and the
+        # test holds no disks of it (departures): nothing to state.
+        disks = {}
     for drive in sorted(disks):
         for entry in sorted(disks[drive].keys() | left[drive].keys()):
             a, b = disks[drive].get(entry), left[drive].get(entry)
@@ -1487,19 +1492,109 @@ def from_run(name, program, benches):
 
 def unmasked(want, got, tree, written, commanded=False):
     """The screen `got` of a build with every cell that a mask of the
-    tree `tree` leaves out of the comparison where the golden has `want`
-    (deviations.masked) as the golden has it: a patch says nothing of
-    such a cell, and the mask is to find it on the patched golden too."""
+    tree `tree` leaves out of the comparison (deviations.masked) as the
+    golden has it, and the cursor where a mask takes it so: a patch says
+    nothing of such a cell. The test finds the masks on the golden with
+    the patch made to it, so they are found here on that too, the golden
+    `want` with the rows that the build shows otherwise in their place,
+    until those rows stay as they are: a mask that the original's row
+    has and the patched row has not, the prompt that a scroll of the
+    original left a row higher, takes nothing of the original's into the
+    patch. On a row that the patch states, a masked cell is the build's,
+    with what is the host's said as the bench's (as_the_bench, benched),
+    so that the masks find it there as they find it on the original's
+    rows, and a build of another tree that falls back to the patch, the
+    web page's, is held to it alike."""
     rules = deviations.declared(tree).rules
-    blanked, _ = deviations.masked(deviations.compared(want), got, rules,
-                                   written, commanded)
-    if blanked.cells == deviations.compared(want).cells:
-        return got
-    cells = bytearray(got.cells)
-    for at in range(0, len(cells), 2):
-        if blanked.cells[at:at + 2] == deviations.MASKED:
-            cells[at:at + 2] = want.cells[at:at + 2]
-    return replace(got, cells=bytes(cells))
+    base = deviations.compared(want)
+    if tree in posixrun.HOSTED:
+        got = as_the_bench(got)
+    patched = want
+    out = got
+    for _ in range(8):
+        blanked, seen = deviations.masked(deviations.compared(patched),
+                                          got, rules, written, commanded)
+        cells = bytearray(got.cells)
+        for row in range(ROWS):
+            start, end = row * COLUMNS * 2, (row + 1) * COLUMNS * 2
+            if patched.cells[start:end] != want.cells[start:end]:
+                continue          # a row that the patch states
+            for at in range(start, end, 2):
+                if blanked.cells[at:at + 2] == deviations.MASKED:
+                    cells[at:at + 2] = want.cells[at:at + 2]
+        # The cursor too, where a mask takes it as the golden has it.
+        out = benched(replace(got, cells=bytes(cells), cursor=seen.cursor),
+                      base, blanked)
+        rows = bytearray(want.cells)
+        for row in range(ROWS):
+            start, end = row * COLUMNS * 2, (row + 1) * COLUMNS * 2
+            if base.cells[start:end] != out.cells[start:end]:
+                rows[start:end] = out.cells[start:end]
+        if bytes(rows) == patched.cells:
+            break
+        patched = replace(want, cells=bytes(rows))
+    return out
+
+
+# What the program for Linux shows of the host's where the bench has
+# its own, as the masks of the drive's letter and of its label find the
+# bench's (deviations.LINUX_MASKS): each pattern with the host's in the
+# place of the bench's, and what the bench has there.
+_HOST_LETTER = [(re.compile(pattern.pattern.replace("[Cc]", "[Hh]")
+                            .replace("(C)", "(H)")), None, below)
+                for pattern, _, below in deviations.LINUX_LETTER_MASKS
+                if pattern.groups == 1
+                and ("[Cc]" in pattern.pattern or "(C)" in pattern.pattern)]
+_HOST_LABEL = [(re.compile(rule[0].pattern.replace("WORK", "HOME")), "WORK",
+                rule[2])
+               for rule in deviations.LINUX_MASKS
+               if isinstance(rule, tuple) and "(WORK)" in rule[0].pattern]
+
+
+def as_the_bench(screen):
+    """The screen `screen` of the program for Linux with the drive's
+    letter H: and its label HOME as the bench's C: and WORK where the
+    masks would find the bench's: a row that a patch states is the
+    build's, and the masks are found on the patched golden."""
+    cells = bytearray(screen.cells)
+    lines = screen.lines()
+    for row, line in enumerate(lines):
+        for pattern, text, below in _HOST_LETTER + _HOST_LABEL:
+            if below and not (row + 1 < ROWS
+                              and below.search(lines[row + 1])):
+                continue
+            for match in pattern.finditer(line):
+                start, end = match.span(1)
+                said = text or ("C" if match.group(1) == "H" else "c")
+                for column, char in zip(range(start, end), said):
+                    cells[(row * COLUMNS + column) * 2] = ord(char)
+    return replace(screen, cells=bytes(cells))
+
+
+def benched(screen, base, blanked):
+    """`screen`, of unmasked(), with the date and the time of a directory
+    that the run wrote into said as the bench's clock has them, where a
+    row that the patch states has them masked (deviations.WrittenTimes):
+    the host's time of the run, which the mask leaves out, would make the
+    patch otherwise at every run that writes it."""
+    cells = bytearray(screen.cells)
+    lines = screen.lines()
+    for row in range(ROWS):
+        start, end = row * COLUMNS * 2, (row + 1) * COLUMNS * 2
+        if base.cells[start:end] == screen.cells[start:end]:
+            continue
+        for when in deviations.WrittenTimes.WHEN.finditer(lines[row]):
+            first, last = when.span()
+            if any(blanked.cells[(row * COLUMNS + column) * 2:
+                                 (row * COLUMNS + column) * 2 + 2]
+                   != deviations.MASKED for column in range(first, last)
+                   if lines[row][column] != " "):
+                continue          # the space in front goes by its length
+            text = "6-16-00" if "-" in when.group() else "12:00p"
+            text = text.rjust(last - first)[-(last - first):]
+            for column, char in zip(range(first, last), text):
+                cells[(row * COLUMNS + column) * 2] = ord(char)
+    return replace(screen, cells=bytes(cells))
 
 
 def restated(old, new, codepage):

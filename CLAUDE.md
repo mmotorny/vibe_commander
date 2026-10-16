@@ -677,6 +677,14 @@ each such cell is expected as the tree's. Fewer is a patch.
   has the real one.
 - An expectation of its own, `harness/goldens/posix/`, has the header
   "Decided: CLAUDE.md, step 6", and is made only where a mask cannot do.
+- A patch of `harness/goldens/posix/` is made as the test reads it, with
+  the masks found on the golden with the patch made to it: on a row that
+  the patch states, the host's drive letter, label and time of a written
+  directory are written as the bench's, C:, WORK and its clock, so that
+  the masks find them there and the web page, which falls back to these
+  patches, is held alike (`unmasked` of `harness/goldens.py`). A
+  scenario that is cut gets no disks in its patch, as the test holds
+  none.
 
 ### The records
 
