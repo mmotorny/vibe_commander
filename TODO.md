@@ -1874,7 +1874,7 @@ deviation is (DEVIATIONS.md), documented in the README and
 
    The words "Try it live" stay in the README's caption alone, not in
    the SVG, as the user had it on 16 October 2026.
-5. **Then the README's figures**, beside its paragraph "The project is
+5. **The README's figures: done**, beside its paragraph "The project is
    also an experiment in how far an AI coding agent can take such a
    recreation on its own. …", which is rephrased as what has been
    done, not as a hope. The figures, totals only, nothing from the
@@ -1886,6 +1886,12 @@ deviation is (DEVIATIONS.md), documented in the README and
    - the number of the human's own messages;
    - the model or models used, and the harness, Claude Code, with its
      versions as the records give them.
+   They were counted by a script that is not kept: the agentic time
+   as the sum of the gaps of under five minutes between consecutive
+   entries of every record, the main sessions' and their agents'; the
+   messages as the entries that the records mark as the human's
+   (`origin` of kind `human`); the models and versions from the
+   `model` and `version` fields.
 
 **Decided and left as it is:** the clock is on only through the page's
 shipped `vc.ini`; the program's built-in defaults keep the original's,

@@ -23,9 +23,26 @@ author's published assembly source, carries it to C, and from DOS to
 modern systems. It runs on DOS, on Linux in a terminal, and as a web
 page.
 
-The project is also an experiment in how far an AI coding agent can take
-such a recreation on its own. The engineering work is done by Claude. A
-human sets the direction and reviews the results.
+Vibe Commander was built by an AI coding agent. Claude did the
+engineering, the translation, the ports, the tests and the documents,
+while a human set the direction and reviewed the results.
+
+| | |
+|---|---|
+| Dates | 10 to 16 October 2026, first commit to last |
+| Wall time | about 127 hours |
+| Agentic time | about 195 hours: 46 in the main sessions, 149 in their agents |
+| Agents | 295, in 7 main sessions |
+| The human's messages | 304 |
+| Commits | about 790 |
+| Model | Claude Opus 5.5 (`claude-opus-5-5`) |
+| Harness | Claude Code, 2.1.296 to 2.1.301 |
+
+The agentic time is the sum, over every session record and every
+agent's, of the gaps between consecutive entries that are shorter than
+five minutes, so that waits for the human are left out. The messages
+are those that the records mark as typed or sent by the human, not tool
+results, notifications of agents or summaries of a compacted context.
 
 ## What it is
 
