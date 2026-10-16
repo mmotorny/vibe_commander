@@ -1,0 +1,86 @@
+The program for Linux in the scenario mouse-keys: what it is expected to show
+otherwise than the original. A patch of harness/goldens/mouse-keys.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Decided: CLAUDE.md, step 6
+Why: the bell is a beep alone on Linux and on the web page, and moves nothing
+(DEVIATIONS.md, L14; the user's word of 16 October 2026), where the bench's
+BIOS moves the screen up a row for it with the cursor hidden below the last
+row: from the beep at step 11 on, the screen keeps the panels' titles and the
+key bar on its last row, a box that stands over the beep is drawn once, and
+what the program draws later is on the rows it draws it at, where the
+original's screen has it a row further up for every beep.
+
+== 11: "nofile" Enter
+rows 0-16
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │                          │            │            ║| 1Bx27 70x26 1Bx27
+-|║empty    dat│            │   ╔══════ View ══════╗   │            │            ║| 1Bx27 70x26 03x2 1Bx25
+-|║hello    txt│            │   ║ Reading the file ║   │            │            ║| 1Bx27 70x26 03x2 1Bx25
+-|║notes    doc│            │   ║      nofile      ║   │            │            ║| 1Bx27 70x26 03x2 1Bx25
+-|║readme   txt│                                                    │            ║| 1Bx25 4Fx29 03x1 1Bx25
+-|║run      bat│              ╔════════ View ═══════╗               │            ║| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
+-|║            │              ║ Can't find the file ║               │            ║| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
+-|║            │              ║        nofile       ║               │            ║| 1Bx25 4Fx29 03x2 1Bx24
+-|║            │              ║          Ok         ║               │            ║| 1Bx25 4Fx13 70x4 4Fx12 03x2 1Bx24
+-|║            │              ╚═════════ Ok ════════╝               │            ║| 1Bx25 4Fx13 70x4 4Fx12 03x2 1Bx24
+-|║            │                                                    │            ║| 1Bx25 4Fx29 03x2 1Bx24
+-|║            │            │            ║║            │            │            ║| 1Bx27 03x29 1Bx24
+-|║            │            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │                          │            │            ║| 1Bx27 70x26 1Bx27
++|║empty    dat│            │   ╔══════ View ══════╗   │            │            ║| 1Bx27 70x26 03x2 1Bx25
++|║hello    txt│            │   ║ Reading the file ║   │            │            ║| 1Bx27 70x26 03x2 1Bx25
++|║notes    doc│            │   ║      nofile      ║   │            │            ║| 1Bx27 70x26 03x2 1Bx25
++|║readme   txt│                                                    │            ║| 1Bx25 4Fx29 03x1 1Bx25
++|║run      bat│              ╔════════ View ═══════╗               │            ║| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
++|║            │              ║ Can't find the file ║               │            ║| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
++|║            │              ║        nofile       ║               │            ║| 1Bx25 4Fx29 03x2 1Bx24
++|║            │              ║          Ok         ║               │            ║| 1Bx25 4Fx13 70x4 4Fx12 03x2 1Bx24
++|║            │              ╚═════════════════════╝               │            ║| 1Bx25 4Fx29 03x2 1Bx24
++|║            │                                                    │            ║| 1Bx25 4Fx29 03x2 1Bx24
++|║            │            │            ║║            │            │            ║| 1Bx27 03x29 1Bx24
+rows 19-24
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x5 47x1
+-|                                                                                | 07x79 70x1
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
++|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x5 47x1
+
+== 12: Esc
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │                          │            │            ║| 1Bx27 70x26 1Bx27
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx1 30x12 1Bx67
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x5 47x1
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║..           ►UP--DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80

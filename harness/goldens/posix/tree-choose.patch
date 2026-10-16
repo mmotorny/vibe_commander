@@ -1,0 +1,38 @@
+The program for Linux in the scenario tree-choose: what it is expected to show
+otherwise than the original. A patch of harness/goldens/tree-choose.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Decided: CLAUDE.md, step 6
+Why: the bell is a beep alone on Linux and on the web page, and moves nothing
+(DEVIATIONS.md, L14; the user's word of 16 October 2026), where the bench's
+BIOS moves the screen up a row for it with the cursor hidden below the last
+row: from the beep at step 13 on, the screen keeps the panels' titles and the
+key bar on its last row, a box that stands over the beep is drawn once, and
+what the program draws later is on the rows it draws it at, where the
+original's screen has it a row further up for every beep. The portable C's
+patch of the scenario, of the key bar with Alt held, is not wanted here: that
+bar is under the box of the tree, where the original's has gone up a row.
+
+== 13: Alt+F10
+rows 0-3
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │                                                    │            ║| 1Bx1 30x12 1Bx3 3Fx48 1Bx16
+-|║            │     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+-|║            │     ║                                        ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
++|╔═══════════ C:\STAMPS\SUB ════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx12 30x15 1Bx53
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │                                                    │            ║| 1Bx1 30x12 1Bx3 3Fx48 1Bx16
++|║            │     ╔═══════════ Choose Directory ═══════════╗     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+rows 18-23
+-|║            │     ║ Reading directory tree...              ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
+-|╟────────────┴──   ║ C:\STAMPS\SUB                          ║   ──┴────────────╢| 1Bx16 3Fx48 03x2 1Bx14
+-|║..           ►U   ╚═══════════════            ═════════════╝    6-16-00 12:00p║| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
+-|╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
+-|C:\STAMPS\SUB>                                                                  | 07x18 0Fx48 07x14
+-|1Left   2Right  3View.. 4Edit.. 5Memory 6DirSiz 7Find   8Histry 9EGA Ln 10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │     ╟────────────────────────────────────────╢     │            ║| 1Bx16 3Fx48 03x2 1Bx14
++|║            │     ║ C:\STAMPS\SUB                          ║     │            ║| 1Bx16 3Fx48 03x2 1Bx14
++|╟────────────┴──   ║ Speed search:                          ║   ──┴────────────╢| 1Bx16 3Fx19 0Fx12 3Fx17 03x2 1Bx14
++|║..           ►U   ╚════════════════════════════════════════╝    6-16-00 12:00p║| 1Bx16 3Fx48 03x2 1Bx14
++|╚═══════════════                                                ═══════════════╝| 1Bx16 3Fx48 03x2 1Bx14
++|C:\STAMPS\SUB>                                                                  | 07x18 0Fx48 07x14

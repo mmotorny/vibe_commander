@@ -1,0 +1,262 @@
+The program for Linux in the scenario delete-mask: what it is expected to show
+otherwise than the original. A patch of harness/goldens/delete-mask.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Decided: CLAUDE.md, step 6
+Why: the bell is a beep alone on Linux and on the web page, and moves nothing
+(DEVIATIONS.md, L14; the user's word of 16 October 2026), where the bench's
+BIOS moves the screen up a row for it with the cursor hidden below the last
+row: from the beep at step 6 on, the screen keeps the panels' titles and the
+key bar on its last row, a box that stands over the beep is drawn once, and
+what the program draws later is on the rows it draws it at, where the
+original's screen has it a row further up for every beep.
+
+== 6: Enter
+rows 0-16
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║readme   txt│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+-|║run      bat│            │                          │            │            ║| 1Bx27 4Fx25 1Bx28
+-|║            │            │   ╔═════ Delete ════╗    │            │            ║| 1Bx27 4Fx25 03x2 1Bx26
+-|║            │            │   ║ Can't find file ║    │            │            ║| 1Bx27 4Fx25 03x2 1Bx26
+-|║            │            │   ║    nosuch.txt   ║    │            │            ║| 1Bx27 4Fx13 38x1 4Fx11 03x2 1Bx26
+-|║            │            │   ║        Ok       ║    │            │            ║| 1Bx27 4Fx11 70x2 07x1 70x1 4Fx10 03x2 1Bx26
+-|║            │            │   ╚═══════ Ok ══════╝    │            │            ║| 1Bx27 4Fx11 70x4 4Fx10 03x2 1Bx26
+-|║            │            │                          │            │            ║| 1Bx27 4Fx25 03x2 1Bx26
+-|║            │            │            ║║            │            │            ║| 1Bx29 03x25 1Bx26
+-|║            │            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
++|║readme   txt│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
++|║run      bat│            │                          │            │            ║| 1Bx27 4Fx25 1Bx28
++|║            │            │   ╔═════ Delete ════╗    │            │            ║| 1Bx27 4Fx25 03x2 1Bx26
++|║            │            │   ║ Can't find file ║    │            │            ║| 1Bx27 4Fx25 03x2 1Bx26
++|║            │            │   ║    nosuch.txt   ║    │            │            ║| 1Bx27 4Fx13 38x1 4Fx11 03x2 1Bx26
++|║            │            │   ║        Ok       ║    │            │            ║| 1Bx27 4Fx11 70x4 4Fx10 03x2 1Bx26
++|║            │            │   ╚═════════════════╝    │            │            ║| 1Bx27 4Fx25 03x2 1Bx26
++|║            │            │                          │            │            ║| 1Bx27 4Fx25 03x2 1Bx26
++|║            │            │            ║║            │            │            ║| 1Bx29 03x25 1Bx26
+rows 19-24
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+-|                                                                                | 07x80
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
++|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: Esc
+rows 0-8
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
+-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+-|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+-|║readme   txt│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+-|║run      bat│            │                          │            │            ║| 1Bx27 4Fx25 1Bx28
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
++|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|║empty    dat│            │            ║║            │            │            ║| 1Bx80
++|║notes    doc│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
++|║readme   txt│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 8: Shift+F8
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 9: "src\."
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 10: Enter
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 11: Esc
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 12: Shift+F8
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 13: "*.*"
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 14: Enter
+rows 0-4
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
+-|║SRC         │            │            ║║            │            │            ║| 1Bx80
+-|║data     bin│            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx80
++|║SRC         │            │            ║║            │            │            ║| 1Bx80
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║     40 bytes in 1 selected file      ║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx6 1Ex27 1Bx47
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80

@@ -856,13 +856,16 @@ static void LineFeed(void)
 /* What the BIOS does with a character that it types: a carriage return,
    a line feed, a step back and the bell are no characters; any other is
    written in the colour that the cell has, and the cursor goes on, to
-   the next line behind the last column. And whatever it types, with the
-   cursor below the last row, as the program has it where it hides it
-   (Cursor of window.c), the BIOS takes it a row up and moves the lines
-   up a row, as for a line feed there: the bench's BIOS does, and an
-   error's beep moves the screen so (CLAUDE.md, the rules of a part).
-   The new row has the colour of the first cell of the last, which no
-   scenario tells from another: the ones there are have 07h in both. */
+   the next line behind the last column. The bell is a beep alone: it is
+   not typed, the cursor stays and nothing moves, as an IBM BIOS and
+   DOSBox have it, where the bench's BIOS moves the screen up a row for
+   it when the cursor is hidden below the last row (DEVIATIONS.md, L14).
+   Whatever else it types, with the cursor below the last row, as the
+   program has it where it hides it (Cursor of window.c), the BIOS takes
+   it a row up and moves the lines up a row, as for a line feed there,
+   as the bench's BIOS does. The new row has the colour of the first
+   cell of the last, which no scenario tells from another: the ones
+   there are have 07h in both. */
 void ScreenType(u16 character, u16 page, u16 color)
 {
     u16 *cell;
@@ -870,6 +873,8 @@ void ScreenType(u16 character, u16 page, u16 color)
 
     (void)page;
     (void)color;
+    if (c == 7)
+        return;
     Type(c);
     switch (c) {
     case '\r':
@@ -881,8 +886,6 @@ void ScreenType(u16 character, u16 page, u16 color)
     case '\b':
         if (Column() > 0)
             Place(Row(), Column() - 1);
-        break;
-    case 7:
         break;
     default:
         if (Row() >= ROWS)

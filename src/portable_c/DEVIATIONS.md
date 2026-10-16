@@ -2955,6 +2955,47 @@ refusal, and the emulation does not make one up.
 **Which scenarios show it.** None. `copy-tree` renames WORK while the
 current directory is a directory inside it, which DOS allows.
 
+### L14. The bell moves nothing on the screen
+
+**What the original does.** An error beeps: `Beep` has the BIOS type the
+bell, 07h, by its teletype call, INT 10h 0Eh. Where the program has
+hidden its cursor below the last row, at row 7Fh (`HidCur`), the bench's
+BIOS, SeaBIOS, takes the bell for a character typed there and moves the
+whole screen up a row, as it does for any character typed below the last
+row. The panels lose their titles, the box of the error is drawn again
+where it was, so that its Ok shows twice, on its bottom row and on the
+row above it, the key bar is left a row up with the row below it
+empty or another bar, and what the program draws afterwards at its own
+rows lands on rows that hold something else; another beep moves the
+screen up once more. The program for DOS does the same on the bench,
+which uses the BIOS (entry 11).
+
+**What the program for Linux and the web page do.** The BIOS that they
+emulate, `ScreenType` of `machine_posix.c`, takes the bell for a beep
+alone: nothing is typed, the cursor stays where it is and nothing moves.
+The screen stays where the program drew it, with the panels' titles and
+the key bar on the last row, and the box of the error is drawn once.
+
+**Why.** The user's decision of 16 October 2026: the scroll is a quirk
+of the bench's BIOS, not a part of the program's design, and an IBM BIOS
+and DOSBox are believed to make no character of the bell. The emulation
+copies the bench's BIOS elsewhere on purpose, and here does not. The
+program for DOS is unchanged, since it has the machine's BIOS.
+
+**Which scenarios show it.** Each of these beeps with the cursor hidden,
+and is held by a patch of `harness/goldens/posix/`, which the web page's
+test takes too: the original's screens from the first beep on, moved
+down by a row for each beep, with what the program drew at its own rows
+in its place: `copy`, `copy-ask`, `copy-dirs`, `copy-tree`, `delete`,
+`delete-mask`, `help-broken`, `make-directory`, `mouse-keys`,
+`setup-help-file`, `setup-help-pages`, `setup-help-screens`,
+`tree-choose`, `user-menu` and `view-keys`. The patches of `user-menu`,
+`setup-help-file` and `setup-help-screens` have what the portable C's
+patches of those scenarios have besides; that of `tree-choose` has the
+key bar of Alt no more, since it stands under the box of the tree in
+the program for Linux. `move`, where an error beeps over the Info panel
+(entry 11), is cut on Linux at step 4, before it beeps.
+
 ## The web page
 
 The portable C is also a web page (`CLAUDE.md`, the road, step 7, and
@@ -2963,7 +3004,7 @@ the machine of the program for Linux behind `sys.h` and a file of its
 own, `sys_web.c`. It shares the emulation of DOS of the program for
 Linux, so what the part above says of names, the code page, attributes,
 devices, large files and the order of a directory holds for it as well,
-L3 to L7, L12 and L13; what it has otherwise is here. The entries are W1 and
+L3 to L7 and L12 to L14; what it has otherwise is here. The entries are W1 and
 on, and a patch of the web's, in `harness/goldens/web/`, names the
 decision that it is by, "Decided: CLAUDE.md, step 7".
 

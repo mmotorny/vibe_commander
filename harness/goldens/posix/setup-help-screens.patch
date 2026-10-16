@@ -1,0 +1,331 @@
+The program for Linux in the scenario setup-help-screens: what it is expected
+to show otherwise than the original. A patch of
+harness/goldens/setup-help-screens.txt, see harness/goldens.py: a line with -
+is the golden's, a line with + is what is expected in its place.
+Decided: CLAUDE.md, step 6
+Why: the bell is a beep alone on Linux and on the web page, and moves nothing
+(DEVIATIONS.md, L14; the user's word of 16 October 2026), where the bench's
+BIOS moves the screen up a row for it with the cursor hidden below the last
+row: from the beep at step 23 on, the screen keeps the panels' titles and the
+key bar on its last row, a box that stands over the beep is drawn once, and
+what the program draws later is on the rows it draws it at, where the
+original's screen has it a row further up for every beep. Besides, what the
+portable C's patch of the scenario has, entries 1, 5, 7 and 14 of
+src/portable_c/DEVIATIONS.md: the Configuration of the setup has no Execute
+options, and Screen and Mouse no Screen output.
+
+== 2: F2
+rows 4-15
+-|    ║  ┌ General options ──────────┐  ┌ Execute options ───────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex15 3Fx23 0Fx2
+-|    ║  │  [ ] Auto menus           │  │  [x] Memory allocation         │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Path prompt          │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Key bar              │  │  [x] TSR manager               │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Menu bar visible     │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Full screen          │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
+-|    ║  │  [ ] Clock                │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Confirmation on quit │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Error sound          │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
+-|    ║  │  [ ] Auto save setup      │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Show logical drive B:│  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  └───────────────────────────┘  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  ┌ General options ──────────┐  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex16 3Fx22 0Fx2
++|    ║  │  [ ] Auto menus           │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Path prompt          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Key bar              │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Menu bar visible     │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Full screen          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Clock                │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Confirmation on quit │                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Error sound          │                                      ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
++|    ║  │  [ ] Auto save setup      │                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Show logical drive B:│                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  └───────────────────────────┘                                      ║     | 07x1 3Fx77 0Fx2
+
+== 4: Esc
+rows 4-15
+-|    ║  ┌ General options ──────────┐  ┌ Execute options ───────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex15 3Fx23 0Fx2
+-|    ║  │  [ ] Auto menus           │  │  [x] Memory allocation         │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Path prompt          │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Key bar              │  │  [x] TSR manager               │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Menu bar visible     │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Full screen          │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
+-|    ║  │  [ ] Clock                │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Confirmation on quit │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Error sound          │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
+-|    ║  │  [ ] Auto save setup      │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Show logical drive B:│  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  └───────────────────────────┘  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  ┌ General options ──────────┐  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex16 3Fx22 0Fx2
++|    ║  │  [ ] Auto menus           │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Path prompt          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Key bar              │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Menu bar visible     │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Full screen          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Clock                │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Confirmation on quit │                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Error sound          │                                      ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
++|    ║  │  [ ] Auto save setup      │                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Show logical drive B:│                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  └───────────────────────────┘                                      ║     | 07x1 3Fx77 0Fx2
+
+== 6: F3
+rows 4-15
+-|         ║  ┌ Screen colors ──────┐  ┌ Screen output ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) Black & White  │  │  ( ) Synchronized access    │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  (•) Color          │  │  ( ) Asynchronized access   │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Laptop         │  │  (•) Auto detect            │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  └─────────────────────┘  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  ┌ Screen blank delay ─┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex18 3Fx7 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) 40 minutes     │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) 20 minutes     │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
+-|         ║  │  (•)  5 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
+-|         ║  │  ( )  3 minutes     │  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( )  1 minute      │  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Off            │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  ┌ Screen colors ──────┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
++|         ║  │  ( ) Black & White  │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•) Color          │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
++|         ║  │  ( ) Laptop         │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  └─────────────────────┘  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
++|         ║  ┌ Screen blank delay ─┐  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx8 3Ex18 3Fx42 0Fx2 07x4
++|         ║  │  ( ) 40 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) 20 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•)  5 minutes     │                                   ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
++|         ║  │  ( )  3 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( )  1 minute      │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) Off            │                                   ║         | 07x6 3Fx68 0Fx2 07x4
+
+== 7: Tab Tab Tab Tab
+rows 4-15
+-|         ║  ┌ Screen colors ──────┐  ┌ Screen output ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) Black & White  │  │  ( ) Synchronized access    │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  (•) Color          │  │  ( ) Asynchronized access   │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Laptop         │  │  (•) Auto detect            │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  └─────────────────────┘  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  ┌ Screen blank delay ─┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex18 3Fx7 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) 40 minutes     │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) 20 minutes     │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
+-|         ║  │  (•)  5 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
+-|         ║  │  ( )  3 minutes     │  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( )  1 minute      │  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Off            │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  ┌ Screen colors ──────┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
++|         ║  │  ( ) Black & White  │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•) Color          │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
++|         ║  │  ( ) Laptop         │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  └─────────────────────┘  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
++|         ║  ┌ Screen blank delay ─┐  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx8 3Ex18 3Fx42 0Fx2 07x4
++|         ║  │  ( ) 40 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) 20 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•)  5 minutes     │                                   ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
++|         ║  │  ( )  3 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( )  1 minute      │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) Off            │                                   ║         | 07x6 3Fx68 0Fx2 07x4
+-cursor 60 11 lines 6 7 mode 3
++cursor 60 6 lines 6 7 mode 3
+
+== 9: Esc
+rows 4-15
+-|         ║  ┌ Screen colors ──────┐  ┌ Screen output ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) Black & White  │  │  ( ) Synchronized access    │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  (•) Color          │  │  ( ) Asynchronized access   │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Laptop         │  │  (•) Auto detect            │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  └─────────────────────┘  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  ┌ Screen blank delay ─┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex18 3Fx7 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) 40 minutes     │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) 20 minutes     │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
+-|         ║  │  (•)  5 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
+-|         ║  │  ( )  3 minutes     │  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( )  1 minute      │  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Off            │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  ┌ Screen colors ──────┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
++|         ║  │  ( ) Black & White  │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•) Color          │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
++|         ║  │  ( ) Laptop         │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  └─────────────────────┘  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
++|         ║  ┌ Screen blank delay ─┐  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx8 3Ex18 3Fx42 0Fx2 07x4
++|         ║  │  ( ) 40 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) 20 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•)  5 minutes     │                                   ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
++|         ║  │  ( )  3 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( )  1 minute      │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) Off            │                                   ║         | 07x6 3Fx68 0Fx2 07x4
+-cursor 60 11 lines 6 7 mode 3
++cursor 60 6 lines 6 7 mode 3
+
+== 23: F1
+rows 0-24
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+-|                                                                                | 07x7 3Fx66 07x7
+-|          ╔══════════════════════ Country info ══════════════════════╗          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  ┌ Time format ─┐ ┌ Date format ──┐ ┌ Numbers format ─┐  ║          | 07x7 3Fx8 3Ex11 3Fx6 3Ex11 3Fx7 3Ex14 3Fx9 0Fx2 07x5
+-|          ║  │    9:00p     │ │   MM-DD-YY    │ │  1,000,000,000  │  ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  └──────────────┘ └───────────────┘ └─────────────────┘  ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  ┌ Characters table ──────────────────────────────────┐  ║          | 07x7 3Fx8 3Ex16 3Fx42 0Fx2 07x5
+-|          ║  │      ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº      │  ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  │   ┌─►                                              │  ║          | 07x7 3Fx13 4Fx40 3Fx13 0Fx2 07x5
+-|          ║  │   │     ╔═════════════ Help ═════════════╗   ◄─┐   │  ║          | 07x7 3Fx13 4Fx40 07x2 3Fx11 0Fx2 07x5
+-|          ║  │   │     ║ Help contents is not available ║     │   │  ║          | 07x7 3Fx13 4Fx40 07x2 3Fx11 0Fx2 07x5
+-|          ║  │   │     ║               Ok               ║     │   │  ║          | 07x7 3Fx13 4Fx18 70x2 07x1 70x1 4Fx18 07x2 3Fx11 0Fx2 07x5
+-|          ║  │   ├─►   ╚══════════════ Ok ══════════════╝     │   │  ║          | 07x7 3Fx13 4Fx18 70x2 07x1 70x1 4Fx18 07x2 3Fx11 0Fx2 07x5
+-|          ║  │   │                                          ◄─┤   │  ║          | 07x7 3Fx13 4Fx40 07x2 3Fx11 0Fx2 07x5
+-|          ║  │   └──── Upper case              Lower case ────┘   │  ║          | 07x7 3Fx15 07x1 06x34 07x5 3Fx11 0Fx2 07x5
+-|          ║  └────────────────────────────────────────────────────┘  ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║         The country information is determined by         ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║      the country= statement in the config.sys file.      ║          | 07x7 3Fx14 3Ex8 3Fx18 3Ex10 3Fx16 0Fx2 07x5
+-|          ╟──────────────────────────────────────────────────────────╢          | 07x7 3Fx66 0Fx2 07x5
+-|          ║                          [ Ok ]                          ║          | 07x7 3Fx30 0Fx6 3Fx30 0Fx2 07x5
+-|          ╚══════════════════════════════════════════════════════════╝          | 07x7 3Fx66 0Fx2 07x5
+-|                                                                                | 07x7 3Fx66 0Fx2 07x5
+-|                                                                                | 07x9 0Fx66 07x5
+-|1Help   2       3       4       5       6       7       8Reset  9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+-|                                                                                | 07x80
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
++|                                                                                | 07x7 3Fx66 07x7
++|          ╔══════════════════════ Country info ══════════════════════╗          | 07x7 3Fx66 0Fx2 07x5
++|          ║  ┌ Time format ─┐ ┌ Date format ──┐ ┌ Numbers format ─┐  ║          | 07x7 3Fx8 3Ex11 3Fx6 3Ex11 3Fx7 3Ex14 3Fx9 0Fx2 07x5
++|          ║  │    9:00p     │ │   MM-DD-YY    │ │  1,000,000,000  │  ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║  └──────────────┘ └───────────────┘ └─────────────────┘  ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║  ┌ Characters table ──────────────────────────────────┐  ║          | 07x7 3Fx8 3Ex16 3Fx42 0Fx2 07x5
++|          ║  │      ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº      │  ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║  │   ┌─►                                              │  ║          | 07x7 3Fx13 4Fx40 3Fx13 0Fx2 07x5
++|          ║  │   │     ╔═════════════ Help ═════════════╗   ◄─┐   │  ║          | 07x7 3Fx13 4Fx40 07x2 3Fx11 0Fx2 07x5
++|          ║  │   │     ║ Help contents is not available ║     │   │  ║          | 07x7 3Fx13 4Fx40 07x2 3Fx11 0Fx2 07x5
++|          ║  │   │     ║               Ok               ║     │   │  ║          | 07x7 3Fx13 4Fx18 70x2 07x1 70x1 4Fx18 07x2 3Fx11 0Fx2 07x5
++|          ║  │   ├─►   ╚════════════════════════════════╝     │   │  ║          | 07x7 3Fx13 4Fx40 07x2 3Fx11 0Fx2 07x5
++|          ║  │   │                                          ◄─┤   │  ║          | 07x7 3Fx13 4Fx40 07x2 3Fx11 0Fx2 07x5
++|          ║  │   └──── Upper case              Lower case ────┘   │  ║          | 07x7 3Fx15 07x1 06x34 07x5 3Fx11 0Fx2 07x5
++|          ║  └────────────────────────────────────────────────────┘  ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║         The country information is determined by         ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║      the country= statement in the config.sys file.      ║          | 07x7 3Fx14 3Ex8 3Fx18 3Ex10 3Fx16 0Fx2 07x5
++|          ╟──────────────────────────────────────────────────────────╢          | 07x7 3Fx66 0Fx2 07x5
++|          ║                          [ Ok ]                          ║          | 07x7 3Fx30 0Fx6 3Fx30 0Fx2 07x5
++|          ╚══════════════════════════════════════════════════════════╝          | 07x7 3Fx66 0Fx2 07x5
++|                                                                                | 07x7 3Fx66 0Fx2 07x5
++|                                                                                | 07x9 0Fx66 07x5
++|1Help   2       3       4       5       6       7       8Reset  9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 24: Enter
+rows 0-8
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+-|                                                                                | 07x7 3Fx66 07x7
+-|          ╔══════════════════════ Country info ══════════════════════╗          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  ┌ Time format ─┐ ┌ Date format ──┐ ┌ Numbers format ─┐  ║          | 07x7 3Fx8 3Ex11 3Fx6 3Ex11 3Fx7 3Ex14 3Fx9 0Fx2 07x5
+-|          ║  │    9:00p     │ │   MM-DD-YY    │ │  1,000,000,000  │  ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  └──────────────┘ └───────────────┘ └─────────────────┘  ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  ┌ Characters table ──────────────────────────────────┐  ║          | 07x7 3Fx8 3Ex16 3Fx42 0Fx2 07x5
+-|          ║  │      ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº      │  ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║  │   ┌─►                                              │  ║          | 07x7 3Fx13 4Fx40 3Fx13 0Fx2 07x5
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
++|                                                                                | 07x7 3Fx66 07x7
++|          ╔══════════════════════ Country info ══════════════════════╗          | 07x7 3Fx66 0Fx2 07x5
++|          ║  ┌ Time format ─┐ ┌ Date format ──┐ ┌ Numbers format ─┐  ║          | 07x7 3Fx8 3Ex11 3Fx6 3Ex11 3Fx7 3Ex14 3Fx9 0Fx2 07x5
++|          ║  │    9:00p     │ │   MM-DD-YY    │ │  1,000,000,000  │  ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║  └──────────────┘ └───────────────┘ └─────────────────┘  ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║  ┌ Characters table ──────────────────────────────────┐  ║          | 07x7 3Fx8 3Ex16 3Fx42 0Fx2 07x5
++|          ║  │      ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº      │  ║          | 07x7 3Fx66 0Fx2 07x5
+rows 16-23
+-|          ║         The country information is determined by         ║          | 07x7 3Fx66 0Fx2 07x5
+-|          ║      the country= statement in the config.sys file.      ║          | 07x7 3Fx14 3Ex8 3Fx18 3Ex10 3Fx16 0Fx2 07x5
+-|          ╟──────────────────────────────────────────────────────────╢          | 07x7 3Fx66 0Fx2 07x5
+-|          ║                          [ Ok ]                          ║          | 07x7 3Fx30 0Fx6 3Fx30 0Fx2 07x5
+-|          ╚══════════════════════════════════════════════════════════╝          | 07x7 3Fx66 0Fx2 07x5
+-|                                                                                | 07x7 3Fx66 0Fx2 07x5
+-|                                                                                | 07x9 0Fx66 07x5
+-|1Help   2       3       4       5       6       7       8Reset  9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|          ║  └────────────────────────────────────────────────────┘  ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║         The country information is determined by         ║          | 07x7 3Fx66 0Fx2 07x5
++|          ║      the country= statement in the config.sys file.      ║          | 07x7 3Fx14 3Ex8 3Fx18 3Ex10 3Fx16 0Fx2 07x5
++|          ╟──────────────────────────────────────────────────────────╢          | 07x7 3Fx66 0Fx2 07x5
++|          ║                          [ Ok ]                          ║          | 07x7 3Fx30 0Fx6 3Fx30 0Fx2 07x5
++|          ╚══════════════════════════════════════════════════════════╝          | 07x7 3Fx66 0Fx2 07x5
++|                                                                                | 07x7 3Fx66 0Fx2 07x5
++|                                                                                | 07x9 0Fx66 07x5
+
+== 25: Esc
+rows 0-1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+-|                                                                                | 07x7 3Fx66 07x7
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+
+== 26: F8
+rows 0-1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+-|                                                                                | 07x7 3Fx66 07x7
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+
+== 27: Enter
+rows 0-1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+-|                                                                                | 07x7 3Fx66 07x7
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+
+== 28: F10
+rows 0-1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+-|                                                                                | 07x7 3Fx66 07x7
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+
+== 29: F1
+rows 0-1
+-|                                                                                | 07x7 3Fx66 07x7
+-|                                                                                | 07x80
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+rows 4-15
+-|                                                                                | 07x25 70x29 07x26
+-|                            ╔═══════ Setup ═══════╗                             | 07x25 70x29 0Fx2 07x24
+-|                            ║ Do you wish to save ║                             | 07x25 70x29 0Fx2 07x24
+-|                            ║  the current setup? ║                             | 07x25 70x29 0Fx2 07x24
+-|                                                                                | 07x20 4Fx40 07x20
+-|                       ╔═════════════ Help ═════════════╗                       | 07x20 4Fx40 0Fx2 07x18
+-|                       ║ Help contents is not available ║                       | 07x20 4Fx40 0Fx2 07x18
+-|                       ║               Ok               ║                       | 07x20 4Fx18 70x2 07x1 70x1 4Fx18 0Fx2 07x18
+-|                       ╚══════════════ Ok ══════════════╝                       | 07x20 4Fx18 70x2 07x1 70x1 4Fx18 0Fx2 07x18
+-|                                                                                | 07x20 4Fx40 0Fx2 07x18
+-|                                                                                | 07x22 0Fx40 07x18
+-|                                                                                | 07x80
++|                                                                                | 07x80
++|                                                                                | 07x25 70x29 07x26
++|                            ╔═══════ Setup ═══════╗                             | 07x25 70x29 0Fx2 07x24
++|                            ║ Do you wish to save ║                             | 07x25 70x29 0Fx2 07x24
++|                            ║  the current setup? ║                             | 07x25 70x29 0Fx2 07x24
++|                                                                                | 07x20 4Fx40 07x20
++|                       ╔═════════════ Help ═════════════╗                       | 07x20 4Fx40 0Fx2 07x18
++|                       ║ Help contents is not available ║                       | 07x20 4Fx40 0Fx2 07x18
++|                       ║               Ok               ║                       | 07x20 4Fx18 70x2 07x1 70x1 4Fx18 0Fx2 07x18
++|                       ╚════════════════════════════════╝                       | 07x20 4Fx40 0Fx2 07x18
++|                                                                                | 07x20 4Fx40 0Fx2 07x18
++|                                                                                | 07x22 0Fx40 07x18
+rows 23-24
+-|1Help   2       3       4       5       6       7       8Reset  9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+-|                                                                                | 07x80
++|                                                                                | 07x80
++|1Help   2       3       4       5       6       7       8Reset  9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 30: Enter
+rows 0-1
+-|                                                                                | 07x7 3Fx66 07x7
+-|                                                                                | 07x80
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
+rows 4-8
+-|                                                                                | 07x25 70x29 07x26
+-|                            ╔═══════ Setup ═══════╗                             | 07x25 70x29 0Fx2 07x24
+-|                            ║ Do you wish to save ║                             | 07x25 70x29 0Fx2 07x24
+-|                            ║  the current setup? ║                             | 07x25 70x29 0Fx2 07x24
+-|                                                                                | 07x20 4Fx40 07x20
++|                                                                                | 07x80
++|                                                                                | 07x25 70x29 07x26
++|                            ╔═══════ Setup ═══════╗                             | 07x25 70x29 0Fx2 07x24
++|                            ║ Do you wish to save ║                             | 07x25 70x29 0Fx2 07x24
++|                            ║  the current setup? ║                             | 07x25 70x29 0Fx2 07x24
+row 23
+-|1Help   2       3       4       5       6       7       8Reset  9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|                                                                                | 07x80

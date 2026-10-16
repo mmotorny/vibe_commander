@@ -1,0 +1,185 @@
+The program for Linux in the scenario copy-dirs: what it is expected to show
+otherwise than the original. A patch of harness/goldens/copy-dirs.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Decided: CLAUDE.md, step 6
+Why: the bell is a beep alone on Linux and on the web page, and moves nothing
+(DEVIATIONS.md, L14; the user's word of 16 October 2026), where the bench's
+BIOS moves the screen up a row for it with the cursor hidden below the last
+row: from the beep at step 9 on, the screen keeps the panels' titles and the
+key bar on its last row, a box that stands over the beep is drawn once, and
+what the program draws later is on the rows it draws it at, where the
+original's screen has it a row further up for every beep.
+
+== 9: "hello.txt" Enter
+rows 0-17
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+-|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
+-|║data     bin│             ╔═════════ Copy ════════╗              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║empty    dat│             ║ Copying the directory ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║hello    txt│             ║          DOCS         ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║notes    doc│             ║           to          ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║readme   txt│             ║       HELLO.TXT       ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║run      bat│                                                    │            ║| 1Bx22 4Fx36 1Bx22
+-|║            │           ╔═══════════ Copy ═══════════╗           │            ║| 1Bx22 4Fx36 03x2 1Bx20
+-|║            │           ║ Can't create the directory ║           │            ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
+-|║            │           ║         HELLO.TXT          ║           │            ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
+-|║            │           ║             Ok             ║           │            ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
+-|║            │           ╚════════════ Ok ════════════╝           │            ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
+-|║            │                                                    │            ║| 1Bx22 4Fx36 03x2 1Bx20
+-|║            │            │            ║║            │            │            ║| 1Bx24 03x36 1Bx20
+-|║            │            │            ║║            │            │            ║| 1Bx80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
++|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
++|║data     bin│             ╔═════════ Copy ════════╗              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║empty    dat│             ║ Copying the directory ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║hello    txt│             ║          DOCS         ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║notes    doc│             ║           to          ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║readme   txt│             ║       HELLO.TXT       ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║run      bat│                                                    │            ║| 1Bx22 4Fx36 1Bx22
++|║            │           ╔═══════════ Copy ═══════════╗           │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │           ║ Can't create the directory ║           │            ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
++|║            │           ║         HELLO.TXT          ║           │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │           ║             Ok             ║           │            ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
++|║            │           ╚════════════════════════════╝           │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │                                                    │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │            │            ║║            │            │            ║| 1Bx24 03x36 1Bx20
+rows 19-24
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+-|                                                                                | 07x80
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
++|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 10: Enter
+rows 0-3
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+-|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 11: F5
+rows 0-3
+-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+-|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+rows 19-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
+
+== 12: "nodir\x" Enter
+rows 0-24
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+-|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
+-|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
+-|║data     bin│             ╔═════════ Copy ════════╗              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║empty    dat│             ║ Copying the directory ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║hello    txt│             ║          DOCS         ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║notes    doc│             ║           to          ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║readme   txt│             ║        NODIR\X        ║              │            ║| 1Bx24 70x31 03x2 1Bx23
+-|║run      bat│                                                    │            ║| 1Bx22 4Fx36 1Bx22
+-|║            │           ╔═══════════ Copy ═══════════╗           │            ║| 1Bx22 4Fx36 03x2 1Bx20
+-|║            │           ║ Can't create the directory ║           │            ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
+-|║            │           ║          NODIR\X           ║           │            ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
+-|║            │           ║             Ok             ║           │            ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
+-|║            │           ╚════════════ Ok ════════════╝           │            ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
+-|║            │                                                    │            ║| 1Bx22 4Fx36 03x2 1Bx20
+-|║            │            │            ║║            │            │            ║| 1Bx24 03x36 1Bx20
+-|║            │            │            ║║            │            │            ║| 1Bx80
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+-|                                                                                | 07x80
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
++|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
++|║data     bin│             ╔═════════ Copy ════════╗              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║empty    dat│             ║ Copying the directory ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║hello    txt│             ║          DOCS         ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║notes    doc│             ║           to          ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║readme   txt│             ║        NODIR\X        ║              │            ║| 1Bx24 70x31 03x2 1Bx23
++|║run      bat│                                                    │            ║| 1Bx22 4Fx36 1Bx22
++|║            │           ╔═══════════ Copy ═══════════╗           │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │           ║ Can't create the directory ║           │            ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
++|║            │           ║          NODIR\X           ║           │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │           ║             Ok             ║           │            ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
++|║            │           ╚════════════════════════════╝           │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │                                                    │            ║| 1Bx22 4Fx36 03x2 1Bx20
++|║            │            │            ║║            │            │            ║| 1Bx24 03x36 1Bx20
++|║            │            │            ║║            │            │            ║| 1Bx80
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
++|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: Enter
+rows 0-3
+-|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
+-|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+-|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
+-|║SRC         │                                                    │            ║| 1Bx24 70x31 1Bx25
++|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
++|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
++|║..          │            │            ║║STAMPS      │            │            ║| 1Bx80
++|║DOCS        │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+rows 18-23
+-|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+-|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+-|C:\WORK>                                                                        | 07x80
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|║            │            │            ║║            │            │            ║| 1Bx80
++|║            │            │            ║║            │            │            ║| 1Bx80
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
++|║DOCS         ►SUB-DIR◄  6-16-00 12:00p║║STAMPS       ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
++|C:\WORK>                                                                        | 07x80
