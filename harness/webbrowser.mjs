@@ -362,12 +362,25 @@ async function phone(browser, mode, served) {
          `the grid is ${grid.width} by ${grid.height}: it does not fill the screen`);
     return grid;
   };
+  // The row of keys: every key within the viewport, and tall enough to tap.
+  const whole = async (width, height) => {
+    const all = await tab.eval("Array.from(document.querySelectorAll('#keys button'))" +
+      ".map((b) => { const r = b.getBoundingClientRect();" +
+      " return [b.textContent, r.left, r.right, r.top, r.bottom, r.height]; })");
+    for (const [label, left, right, top, bottom, high] of all) {
+      must(left >= 0 && right <= width + 0.5 && top >= 0 && bottom <= height + 0.5,
+           `${label} is from ${left},${top} to ${right},${bottom}`);
+      must(high >= 28, `${label} is ${high} high`);
+    }
+  };
   await tab.go(served.url);
   await step("the page starts", () => started(tab, mode));
   await step("the row of keys shows", async () => {
     must(!(await tab.eval("document.getElementById('keys').hidden")), "it is hidden");
     const keys = await tab.eval("document.querySelectorAll('#keys button').length");
-    must(keys === 20, `it has ${keys} keys`);
+    must(keys === 21, `it has ${keys} keys`);
+    const last = await tab.eval("document.querySelector('#keys button:last-child').textContent");
+    must(last === "Enter", `its last key is ${last}`);
   });
   await step("the grid fits the width, nothing cut off", () => fits(390, 844));
   // The page starts from the setup that the desktop's run saved, two
@@ -395,6 +408,16 @@ async function phone(browser, mode, served) {
     await tab.hitCell(at.column + 1, at.row);
     await tab.until((r) => rightStatus(r).includes("readme"), 5000, "the cursor on readme.txt");
   });
+  await step("a tap on CODE and Enter of the row: into it", async () => {
+    const rows = await tab.settle();
+    const at = find(rows, "CODE", 40);
+    must(at !== null, "CODE is not listed");
+    await tab.hitCell(at.column + 1, at.row);
+    await tab.until((r) => rightStatus(r).includes("CODE"), 5000, "the cursor on CODE");
+    await tab.hit("#keys button:last-child");
+    await tab.until((r) => r[0].slice(40).includes("D:\\CODE"), 5000, "D:\\CODE");
+  });
+  await step("the row of keys whole, each key tappable", () => whole(390, 844));
   await shot(tab, `${mode}-portrait`);
   view = "landscape";
   await step("turned: the grid refits", async () => {
@@ -403,6 +426,7 @@ async function phone(browser, mode, served) {
     await fits(844, 390);
     await tab.settle();
   });
+  await step("turned: the row of keys whole, each key tappable", () => whole(844, 390));
   await shot(tab, `${mode}-landscape`);
   await step("the console has no errors", () => {
     const wrong = errors(tab, mode);

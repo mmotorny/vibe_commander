@@ -412,6 +412,14 @@ function makeBar() {
     });
     keys.append(button);
   }
+  // Enter last, a little wider, where a thumb finds it at the row's end:
+  // the key that is pressed most, which is not to need the phone's
+  // keyboard. It goes as the others do, with Ctrl and Alt as held.
+  const enter = document.createElement("button");
+  enter.textContent = "Enter";
+  enter.className = "enter";
+  enter.addEventListener("click", () => press("Enter", "Enter"));
+  keys.append(enter);
   // The phone's keyboard comes up for an input that has the focus, and
   // only when it is given it in the tap itself.
   $("type").addEventListener("click", () => {

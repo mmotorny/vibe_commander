@@ -3090,7 +3090,7 @@ turns or changes size, and the fingers may zoom it. Below it is a bar
 of the page's own: buttons to bring files in (W8), for the full screen
 (W4), for a row of the keys that a phone lacks, F1 to F10, Esc, Tab,
 the arrows, PgUp and PgDn, with Ctrl and Alt that stay held for the
-next key, and for the phone's keyboard, whose text is typed as keys;
+next key and Enter at its end, and for the phone's keyboard, whose text is typed as keys;
 and the credit of the font. A tap is a click on the cell under the
 finger. The mouse's wheel does nothing, as on Linux.
 

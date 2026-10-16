@@ -209,8 +209,14 @@ keys("newdir", KEY.enter);
 await step("a directory made on the server",
            () => existsSync(onServer("newdir")));
 await see("NEWDIR");
-keys(KEY.end, KEY.enter);
-await step("Enter on a file opens it in a tab", () => opened.length === 1
+// Enter of the row of keys that a phone lacks, its last key, which goes
+// as the keyboard's Enter does.
+const rowEnter = elements.keys.children.at(-1);
+await step("the row of keys ends in Enter",
+           () => rowEnter && rowEnter.textContent === "Enter");
+keys(KEY.end);
+rowEnter.listeners.click();
+await step("Enter of the row on a file opens it in a tab", () => opened.length === 1
            && opened.blob && opened.blob.size
               === readFileSync(onServer("readme.txt")).length);
 keys(KEY.shiftF4);

@@ -1434,9 +1434,10 @@ whole multiples of the font.
   may zoom it; a tap is a click on the cell under the finger. Where
   there is no mouse, a row of the keys that a phone lacks stands below
   the grid, F1 to F10, Esc, Tab, the arrows, PgUp and PgDn, with Ctrl
-  and Alt that stay held for the next key, and the bar's Keys button
-  shows it or hides it anywhere; the bar's keyboard button brings up
-  the phone's keyboard, whose text is typed as keys.
+  and Alt that stay held for the next key, and Enter, wider, at its
+  end, so that the phone's keyboard is not needed for it; the bar's
+  Keys button shows it or hides it anywhere; the bar's keyboard button
+  brings up the phone's keyboard, whose text is typed as keys.
 - **The keys that a browser keeps.** A browser never hands an ordinary
   tab Ctrl-W, Ctrl-T and Ctrl-N with their Shift forms, Ctrl-Tab and
   Ctrl-Shift-Tab, Ctrl-PgUp and Ctrl-PgDn, Ctrl-F4 and Alt-F4, or the
