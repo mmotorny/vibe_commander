@@ -1483,7 +1483,7 @@ The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
 ### Pieces
 - **I1, the cap**, in `machine_posix.c`, plus `VC_MEMORY` and the web page's 256 MB. Done here, on Linux. The plan is copied into TODO.md. Start now.
 - **I2, `sys_ios.c`** and a tree "ios-host": `sys_ios.c` built on Linux against a stand-in for the shell, as the rule on test builds allows, and run through every scenario by VC_TEST, sanitized, as the web's Node build is. Here. Start now.
-- **I3, the table from HID codes and modifiers to kitty bytes**, in C, held to `keyboard_posix.c`'s decoder as `portable_c-web-render` holds keys.js. Here. Start now.
+- **I3, the table from HID codes and modifiers to kitty bytes**, in C, held to `keyboard_posix.c`'s decoder as `portable_c-web-render` holds keys.js. Here. Done: see "I3, the keys of a hardware keyboard" below.
 - **I4, the build on the Mac.**
   - `VC_IOS` in CMake (`-G Xcode -DCMAKE_SYSTEM_NAME=iOS`), and the SwiftUI app with its grid view and font.
   - It needs the Mac on the tailnet with SSH (Remote Login) on, its hostname, and Xcode installed. The user gives these.
@@ -1497,6 +1497,62 @@ The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
 - **I8, installing** on the iPhone from Xcode with the paid team. The user does it by hand, with instructions.
 - **I9, the documents:** DEVIATIONS "iOS" (I entries), the README, and CLAUDE.md's notes.
 - **Order:** I1, I2 and I3 now. Then I4 once the Mac is reachable, I5 and I6 after I4, I7 after I2 and I4, I8 after I7, and I9 last.
+
+### I3, the keys of a hardware keyboard: done, and what I5 should know
+
+- `src/portable_c/keys_ios.c` and `keys_ios.h`: the shell fills a
+  `struct IosKey` of a `UIKey` (`keyCode`, `modifierFlags.rawValue`,
+  `characters` and `charactersIgnoringModifiers` in UTF-8, and
+  `IOS_PRESS`, `IOS_REPEAT` or `IOS_RELEASE`), keeps one `struct
+  IosKeys` (zeros at the start), and hands both to `IosKeyBytes`, which
+  writes the bytes of kitty's that `keyboard_posix.c` decodes, at most
+  `IOS_KEY_ROOM`, or answers 0: then the press is not the program's and
+  the shell calls `super`. `IosKeysLost` is the terminal's focus lost,
+  `CSI O`, for when the view stops being the first responder or the app
+  leaves the foreground: what the program takes to be held is let go.
+  The file is the table and nothing else; it needs `codepage_posix.c`
+  (`Utf8Decode`, `UnicodeSmall`) and includes `emulate_posix.h`.
+- The test `portable_c-ios-keys`, `harness/ioskeys.py`: the table built
+  on Linux by itself, `build/portable_c/ios-keys/ioskeys` (driven by
+  `harness/ioskeys.c`, a line per event), 85 cases of US, German and
+  Russian layouts of the Mac and of the keypad typed into
+  `posix-asan/vc` in a pseudo-terminal with the kitty protocol and held
+  to the bench's BIOS's words by `VC_TRACE`, as `webrender.py` holds
+  `keys.js`; five events held to give no bytes. About 45 seconds.
+- For the build: `ios` is in `portable_c_implementations` of
+  `CMakeLists.txt`, with no `portable_c_takes_ios` yet (I2's), so that
+  no `*_ios.c` is taken for common code; `tidycheck.py` leaves `*_ios.c`
+  out of the common code and reads `keys_ios.c` with the emulation's
+  command; `int16.py` has `_ios.c` among `OTHER_SYSTEMS`. The records of
+  `hostcheck` and `words` have the two files, clean.
+- Decided in the piece, for the user to look at (no deviation of the
+  original: the original has no Mac keyboard):
+  - The left Option is Alt: its key bar while held, a tap of it the menu
+    bar, Alt with a letter by the US key in its place. The right Option
+    is AltGraph (kitty's `ISO_LEVEL3_SHIFT`): no Alt held, and a key
+    under it types what `characters` has, as a German layout of the Mac
+    types @ [ ] { } | \ ~ (right Option with L is `2640`, with Shift and
+    7 `085C`). Both held is Alt. One Option for both could not be: Alt
+    alone, whose tap opens the menu bar, could not be told from the
+    shift of a character to come. Terminals of the Mac let either
+    Option be Meta the same way.
+  - A key with Command, and Command itself, is left to UIKit, where
+    `keys.js` hands Meta on as kitty's Super, which the decoder types as
+    if nothing were held.
+  - The keypad types its figures, which is Num Lock on; Shift turns it
+    round as the bench's BIOS does (Shift with the keypad's 7 is Home).
+    Clear, where a PC has Num Lock, holds nothing.
+- What only the device can say, for I5: whether
+  `charactersIgnoringModifiers` keeps Shift (the table takes either:
+  the test has Shift-1 both ways); what `characters` is under Control
+  and Option (the table takes the key by `charactersIgnoringModifiers`
+  then, `characters` being what Option or Control makes of it); whether
+  the press of an Option has `.alternate` in its own flags (the table
+  goes by the key's usage for those, and clears what it keeps when a
+  key comes without `.alternate`); what a dead key gives (with nothing
+  typed the key of the US layout goes, as `keys.js` sends it); and that
+  UIKit repeats no key, so the shell repeats a held key by a timer as
+  `IOS_REPEAT`, at the rate it chooses.
 
 ## A patch with a line for a cell that blinks: untried
 

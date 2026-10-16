@@ -343,8 +343,9 @@ endfunction()
 # program for Linux, *_posix.c, but the two files that have a terminal
 # and a shell, sys_posix.c and term_posix.c, and has its own, *_web.c. A
 # file of a new implementation is named here when it is added, or it is
-# taken for common code.
-set(portable_c_implementations dos posix web)
+# taken for common code. The app for iOS (step 8, TODO.md, "Step 8, the
+# app for iOS") has its files, *_ios.c, beside them.
+set(portable_c_implementations dos posix web ios)
 set(portable_c_takes_dos dos)
 set(portable_c_takes_posix posix)
 set(portable_c_takes_web posix web)
@@ -746,6 +747,32 @@ if(clang)
         DEPENDS ${unit_dir}/check)
 endif()
 
+# The table of the keys of iOS, src/portable_c/keys_ios.c, the piece I3
+# of step 8 (TODO.md, "Step 8, the app for iOS"), built on Linux with the
+# command of the test of the emulation above, warnings and sanitizers,
+# beside codepage_posix.c, whose UTF-8 it reads, and harness/ioskeys.c,
+# which runs it: build/portable_c/ios-keys/ioskeys, for the test
+# portable_c-ios-keys.
+if(clang)
+    set(ios_keys_dir ${CMAKE_BINARY_DIR}/portable_c/ios-keys)
+    file(MAKE_DIRECTORY ${ios_keys_dir})
+    add_custom_command(
+        OUTPUT ${ios_keys_dir}/ioskeys
+        COMMAND ${unit_compile} -o ${ios_keys_dir}/ioskeys
+                ${unit_source}/keys_ios.c ${unit_source}/codepage_posix.c
+                ${CMAKE_SOURCE_DIR}/harness/ioskeys.c
+        DEPENDS ${unit_source}/keys_ios.c ${unit_source}/keys_ios.h
+                ${unit_source}/codepage_posix.c
+                ${CMAKE_SOURCE_DIR}/harness/ioskeys.c
+                ${unit_source}/emulate_posix.h ${unit_source}/vc.h
+                ${unit_source}/sys.h ${unit_source}/compiler.h
+                ${unit_dir}/compiled.txt
+        COMMENT "Building the table of the keys of iOS for Linux"
+        VERBATIM)
+    add_custom_target(portable_c-ios-keys-table ALL
+        DEPENDS ${ios_keys_dir}/ioskeys)
+endif()
+
 # --- Emscripten ---------------------------------------------------------------
 # The compiler of the web page, step 7 of the road, with VC_WEB alone: the
 # portable C built to WebAssembly by Emscripten, which CLAUDE.md allows as
@@ -1081,6 +1108,17 @@ add_test(NAME portable_c-web-render
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webrender.py
             ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
 set_tests_properties(portable_c-web-render PROPERTIES SKIP_RETURN_CODE 77)
+# The table of the keys of a hardware keyboard on iOS, the piece I3 of
+# step 8: keys_ios.c, run on Linux with UIKit's key events of US, German
+# and Russian layouts and of the keypad, its bytes typed into the program
+# for Linux in a pseudo-terminal and held to the BIOS's words that it
+# reads. See harness/ioskeys.py. It runs no machine, and is skipped where
+# there is no clang.
+add_test(NAME portable_c-ios-keys
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ioskeys.py
+            ${CMAKE_BINARY_DIR}/portable_c/ios-keys/ioskeys
+            ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
+set_tests_properties(portable_c-ios-keys PROPERTIES SKIP_RETURN_CODE 77)
 # The web page's server and its file system, the piece W3b of step 7:
 # src/portable_c/web/server.mjs and drives.js run in Node, the server's
 # API held, its refusals of every path outside the two drives, and the
@@ -1175,7 +1213,7 @@ set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-tidy
     portable_c-posix-unit portable_c-terminal portable_c-web-render
-    portable_c-web-server
+    portable_c-web-server portable_c-ios-keys
     PROPERTIES LABELS portable_c)
 if(VC_DOS)
     set_tests_properties(c-data c-arith PROPERTIES LABELS frozen)

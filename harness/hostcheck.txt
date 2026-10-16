@@ -39,6 +39,8 @@ info.c            clean
 input.c           clean
 keyboard_posix.c  clean
 keys.c            clean
+keys_ios.c        clean
+keys_ios.h        clean
 keys_t.c          clean
 line.c            clean
 machine_posix.c   clean
