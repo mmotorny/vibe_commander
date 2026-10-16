@@ -141,13 +141,16 @@ graph TD
     P["Preface: the program, its limits, a DOS refresher"]
     C1["1. The program: the file, the start, the main data, the loop, the input"]
     C2["2. The screen: frames, boxes, dialogs, focus, menus, shadows"]
-    C3["3. The features: panels, the tree, walking files, copy, viewer, editor, find file"]
+    C3["3. The features: panels, the tree, walking files, copy, find file"]
+    CV["The viewer and the editor: a 64K window, the search, the whole text"]
     C4["4. The system: DOS and the BIOS, the critical error, the resident part"]
     C5["5. The setup: VCSETUP.COM, VC.INI and the private call"]
     P --> C1
     C1 --> C2
     C1 --> C3
     C2 --> C3
+    C3 --> CV
+    C2 --> CV
     C1 --> C4
     C3 --> C4
     C4 --> C5
@@ -161,7 +164,9 @@ data and the panels, the main loop and the input.
 frames, the boxes and dialogs described as tables, focus, menus, the
 key bar, shadows and what a box saves of what it covers.
 [Chapter 3](03-the-features.md)
-is what the program does with files on that skeleton.
+is what the program does with files on that skeleton, and
+[the viewer and the editor](viewer-and-editor.md) are F3 and F4, which
+have a chapter of their own.
 [Chapter 4](04-the-system.md) is the conversation with DOS and the PC,
 and the part of the program that stays in memory while a command runs.
 [Chapter 5](05-the-setup.md) is the second program, and the file and
@@ -172,8 +177,8 @@ it; each chapter ends with what to read next, in the source and in the
 book. The [contents](README.md) list every section.
 
 **The excerpts.** Code is quoted from `src/asm/` with Volkov's labels,
-instructions and comments. In chapters 1, 2, 4 and 5 a comment that
-starts with `;;` is the book's and one with a single `;` is Volkov's;
+instructions and comments. In chapters 1, 2, 4 and 5, and in the one
+on the viewer and the editor, a comment that starts with `;;` is the book's and one with a single `;` is Volkov's;
 in chapter 3 the comments of the excerpts are the book's. Volkov's
 names are a numbering, not words, and chapter 1 explains them. Where
 his comments disagree with his code, the book says so, and the code is

@@ -102,7 +102,7 @@ The user interface: frames drawn from the code page, the shadow screen and the c
 
 ### [3. Working with files: the commander's features](03-the-features.md)
 
-What the program does with files: reading and sorting a directory, the tree, the walkers that every group command shares, delete, copy, the viewer, the editor, find file, the user menu and Enter.
+What the program does with files: reading and sorting a directory, the tree, the walkers that every group command shares, delete, copy, find file, the user menu and Enter.
 
 - [The room](03-the-features.md#the-room)
 - [A panel: `WCBdef`](03-the-features.md#a-panel-wcbdef)
@@ -123,10 +123,7 @@ What the program does with files: reading and sorting a directory, the tree, the
   - [The copy loop: all of the room](03-the-features.md#the-copy-loop-all-of-the-room)
   - [The bar: 48-bit arithmetic without `MUL`](03-the-features.md#the-bar-48-bit-arithmetic-without-mul)
   - [A disk that fills up](03-the-features.md#a-disk-that-fills-up)
-- [The viewer: a 64K window over any file](03-the-features.md#the-viewer-a-64k-window-over-any-file)
-  - [Search: `V81_00` and `V82_00`](03-the-features.md#search-v81_00-and-v82_00)
-- [The editor: the whole text, and one line apart](03-the-features.md#the-editor-the-whole-text-and-one-line-apart)
-  - [Save](03-the-features.md#save)
+- [The viewer and the editor](03-the-features.md#the-viewer-and-the-editor)
 - [Find file](03-the-features.md#find-file)
   - [Searching inside files](03-the-features.md#searching-inside-files)
 - [The user menu and the extension files](03-the-features.md#the-user-menu-and-the-extension-files)
@@ -135,6 +132,44 @@ What the program does with files: reading and sorting a directory, the tree, the
   - [Running it](03-the-features.md#running-it)
 - [How the features share the main data](03-the-features.md#how-the-features-share-the-main-data)
 - [Where to read next](03-the-features.md#where-to-read-next)
+
+### [The viewer and the editor](viewer-and-editor.md)
+
+F3 and F4: the viewer's window of 64K that slides by halves over a file of any size, its line table and its two views, the search shared with find file, and the editor's whole text with one line apart, its lines, columns, words, undo and screen.
+
+- [The state: two structures over `TmpBuf`](viewer-and-editor.md#the-state-two-structures-over-tmpbuf)
+  - [`ViewDat`: a structure whose names are addresses](viewer-and-editor.md#viewdat-a-structure-whose-names-are-addresses)
+  - [`EdData`: holes where the viewer's fields must survive](viewer-and-editor.md#eddata-holes-where-the-viewers-fields-must-survive)
+- [Opening a file](viewer-and-editor.md#opening-a-file)
+- [The viewer](viewer-and-editor.md#the-viewer)
+  - [A window of 64K](viewer-and-editor.md#a-window-of-64k)
+  - [The line table: `V60_00`](viewer-and-editor.md#the-line-table-v60_00)
+  - [Sliding the window: `V50_00` and `V51_00`](viewer-and-editor.md#sliding-the-window-v50_00-and-v51_00)
+  - [Moving through the lines: `V20_00`, `NextLin`, `PrevLin`](viewer-and-editor.md#moving-through-the-lines-v20_00-nextlin-prevlin)
+  - [Wrap and unwrap: one table, two readings](viewer-and-editor.md#wrap-and-unwrap-one-table-two-readings)
+  - [Drawing a line: `V32_00`](viewer-and-editor.md#drawing-a-line-v32_00)
+  - [The hex view](viewer-and-editor.md#the-hex-view)
+  - [The status line: `V25_00` and `V40_00`](viewer-and-editor.md#the-status-line-v25_00-and-v40_00)
+  - [The mouse](viewer-and-editor.md#the-mouse)
+- [The search, shared](viewer-and-editor.md#the-search-shared)
+  - [The pattern in `HelpBuf`: `V81_00`](viewer-and-editor.md#the-pattern-in-helpbuf-v81_00)
+  - [Comparing: `V82_00`](viewer-and-editor.md#comparing-v82_00)
+  - [The viewer's search: `V15_00`](viewer-and-editor.md#the-viewers-search-v15_00)
+- [The editor](viewer-and-editor.md#the-editor)
+  - [All of the file, or nothing](viewer-and-editor.md#all-of-the-file-or-nothing)
+  - [A place is 20 bits: `T61_00` and `T60_00`](viewer-and-editor.md#a-place-is-20-bits-t61_00-and-t60_00)
+  - [The line apart: `T50_00` and `T51_00`](viewer-and-editor.md#the-line-apart-t50_00-and-t51_00)
+  - [Lines: `T53_00` forward, `T54_00` backward](viewer-and-editor.md#lines-t53_00-forward-t54_00-backward)
+  - [Columns and tabs: `T57_00` and `T56_00`](viewer-and-editor.md#columns-and-tabs-t57_00-and-t56_00)
+  - [Words: `T55_00`](viewer-and-editor.md#words-t55_00)
+  - [The screen: `T71_00`, `T72_00` and `T73_10`](viewer-and-editor.md#the-screen-t71_00-t72_00-and-t73_10)
+  - [Deleting, and Ctrl-U](viewer-and-editor.md#deleting-and-ctrl-u)
+  - [A line longer than 3,900 bytes](viewer-and-editor.md#a-line-longer-than-3900-bytes)
+  - [The search in the editor](viewer-and-editor.md#the-search-in-the-editor)
+  - [The help for the program's own files](viewer-and-editor.md#the-help-for-the-programs-own-files)
+  - [Save](viewer-and-editor.md#save)
+- [What it adds up to](viewer-and-editor.md#what-it-adds-up-to)
+- [Where to read next](viewer-and-editor.md#where-to-read-next)
 
 ### [4. Talking to DOS and the PC: the system](04-the-system.md)
 
