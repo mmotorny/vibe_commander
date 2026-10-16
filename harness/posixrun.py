@@ -566,8 +566,8 @@ def run(scenario, program, setup=..., limit=60, environment=None):
         disks["D"]["VC\\" + program.filename] = fat.Entry(
             "VC\\" + program.filename, 0x20, 0, 0, 0, "")
         if page:
-            # The files that the page held as stand-ins are on the server's
-            # drive empty, as webpagerun.drive() laid them; where nothing
+            # The files that the page held as stand-ins come back from its
+            # drive empty, as webpagerun.drive() served them; where nothing
             # has changed them, they are as the bench has them.
             for path, (when, size, _) in laid.items():
                 name = "\\".join(part.upper() for part in

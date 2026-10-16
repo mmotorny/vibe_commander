@@ -356,8 +356,8 @@
  vc.hlp.
 
  ^BThe web^B: one HTML page, built to WebAssembly. Its screen
- is text, it keeps your files in the browser, and it works
- on a phone.
+ is text, your changes last until the page is reloaded or
+ closed, and it works on a phone.
 
  The program asks the system what it asked DOS, and each
  platform answers as DOS would.

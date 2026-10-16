@@ -1,26 +1,55 @@
-// The test of the web page's program against its server, run by
-// harness/webpage.py: see there for what it holds. Node's own modules
+// The test of the web page's program as its static site serves it, run
+// by harness/webpage.py: see there for what it holds. Node's own modules
 // alone. It prints a line for each step that fails, with the screen, and
 // exits with 1, or says how many passed.
 
-import { readFileSync, mkdtempSync, mkdirSync, readdirSync, existsSync,
-         chmodSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, mkdirSync, readdirSync, rmSync,
+         statSync } from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 import { createServer } from "node:http";
-import { execFileSync } from "node:child_process";
 
 const [web, html, work] = process.argv.slice(2);
-const { makeServer, prepare, treeOf } = await import(path.join(web, "server.mjs"));
-const { FakeIndexedDB } = await import(new URL("./fakeidb.mjs", import.meta.url));
+const { makeSite } = await import(path.join(web, "static.mjs"));
+const { serve } = await import(path.join(web, "serve.mjs"));
 const { layFiles } = await import(new URL("./webfiles.mjs", import.meta.url));
 const top = mkdtempSync(path.join(work, "webpage-"));
-const roots = await prepare({ c: path.join(top, "c") });
-// The test's own files on C:, beside the program's directory vc.
-layFiles(roots.c);
-const server = makeServer(roots, html);
-await new Promise((done) => server.listen(0, "127.0.0.1", done));
-const base = `http://127.0.0.1:${server.address().port}`;
+
+// The site as it is shipped, and one whose C: has the test's own files
+// beside the program's directory vc, each served as a host of files
+// serves it.
+const shipped = path.join(top, "shipped");
+await makeSite({ page: html, out: shipped });
+const own = path.join(top, "c");
+mkdirSync(path.join(own, "vc"), { recursive: true });
+layFiles(own);
+const site = path.join(top, "site");
+await makeSite({ page: html, out: site, drive: own });
+// Every file of a directory, with its bytes and its time: what the run
+// is to leave as it was.
+function listing(root) {
+  const out = [];
+  const walk = (at) => {
+    for (const name of readdirSync(at).sort()) {
+      const file = path.join(at, name);
+      const status = statSync(file);
+      out.push(`${path.relative(root, file)} ${status.mtimeMs} ${status.mode}`
+               + (status.isFile() ? ` ${readFileSync(file).toString("base64")}` : ""));
+      if (status.isDirectory())
+        walk(file);
+    }
+  };
+  walk(root);
+  return out.join("\n");
+}
+const before = listing(top);
+async function hostOf(root) {
+  const host = serve(root);
+  await new Promise((done) => host.listen(0, "127.0.0.1", done));
+  return host;
+}
+const host = await hostOf(site);
+const base = `http://127.0.0.1:${host.address().port}`;
 
 let passed = 0, failed = 0;
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -29,16 +58,16 @@ const KEY = { F2: "\x1b[Q", F7: "\x1b[18~", F8: "\x1b[19~", F10: "\x1b[21~",
               end: "\x1b[F", altF2: "\x1b[1;3Q", down: "\x1b[B", esc: "\x1b[27u", enter: "\r" };
 
 // The page loaded from `base`, its scripts run as the browser would, with a
-// document of nothing but what the page asks of one, and `indexedDB` as
-// the window has it (harness/fakeidb.mjs, or none).
-function load(base, indexedDB) {
+// document of nothing but what the page asks of one, and a window whose
+// stores of the browser's say whether the page has asked for one.
+function load(base) {
   class Element {
     constructor(id) {
       this.id = id;
       this.style = { setProperty(name, value) { this[name] = value; } };
       this.dataset = {};
       // Hidden as the shell has them at the start.
-      this.hidden = ["keys", "kept", "reset", "notice", "ended"].includes(id);
+      this.hidden = ["keys", "notice", "ended"].includes(id);
       this.textContent = "";
       this.innerHTML = "";
       this.listeners = {};
@@ -64,7 +93,11 @@ function load(base, indexedDB) {
   const opened = [];
   const listeners = {};
   const page = { elements, opened, listeners, reloads: 0, fs: null,
-                 screen: null };
+                 screen: null, stored: [] };
+  // The browser's stores, each use of which is noted.
+  const store = (name) => new Proxy({}, {
+    get: (_, key) => { page.stored.push(`${name}.${String(key)}`); return () => null; },
+  });
   const window = {
     document: {
       readyState: "complete", head: new Element("head"),
@@ -80,7 +113,9 @@ function load(base, indexedDB) {
     fetch: (url, init) => fetch(new URL(url, `${base}/`), init),
     console, setTimeout, clearTimeout, setInterval, clearInterval, URL, Blob,
     URLSearchParams, atob, btoa, TextDecoder, TextEncoder, WebAssembly, performance, crypto,
-    navigator: { userAgent: "node" }, confirm: () => true, indexedDB,
+    navigator: { userAgent: "node", storage: store("navigator.storage") },
+    confirm: () => true, indexedDB: store("indexedDB"),
+    localStorage: store("localStorage"), sessionStorage: store("sessionStorage"),
   };
   window.window = window.self = window;
   // The tab that is opened has the file as a blob: the name of DOS's that
@@ -142,11 +177,25 @@ function load(base, indexedDB) {
   return page;
 }
 
-// 1. The page against its server, which every change is made on.
-const served = new FakeIndexedDB();
-const page0 = load(base, served);
+const isDirectory = (page, at) => {
+  try {
+    return page.fs.isDir(page.fs.stat(at).mode);
+  } catch {
+    return false;
+  }
+};
+const inPage = (page, at) => {
+  try {
+    return Buffer.from(page.fs.readFile(at)).toString("latin1");
+  } catch {
+    return null;
+  }
+};
+
+// 1. The page as its site serves it, its C: with the test's files.
+const page0 = load(base);
 const { elements, opened, keys, step, see, text } = page0;
-const onServer = (...names) => path.join(roots.c, ...names);
+const inPage0 = (...names) => inPage(page0, ["/drive/c", ...names].join("/"));
 
 // The program starts in C:\VC, where its own files are, on the page's
 // one drive; then goes up to C:\, where the test's files are.
@@ -168,6 +217,9 @@ await see(" C:\\VC ");
   await step("the bar has one link to the licences, and no credit apart",
              () => /<button [^>]*\bid="?licences-open\b[^>]*>Licences<\/button>/.test(shell)
                    && !shell.includes("CC BY-SA 4.0</a>"));
+  await step("the bar says that changes last until the page is reloaded or closed",
+             () => /<span [^>]*\bid="?kept\b[^>]*>Changes last until the page is reloaded or closed\.<\/span>/
+                     .test(shell));
   const sent = [];
   const push = page0.Module.vcInput.push;
   page0.Module.vcInput.push = (...bytes) => sent.push(...bytes);
@@ -217,8 +269,8 @@ await see("readme");
 keys(KEY.F7);
 await see("Create the directory");
 keys("newdir", KEY.enter);
-await step("a directory made on the server",
-           () => existsSync(onServer("newdir")));
+await step("a directory made in the page's memory",
+           () => isDirectory(page0, "/drive/c/newdir"));
 await see("NEWDIR");
 // Enter of the row of keys that a phone lacks, its last key, which goes
 // as the keyboard's Enter does.
@@ -229,7 +281,7 @@ keys(KEY.end);
 rowEnter.listeners.click();
 await step("Enter of the row on a file opens it in a tab", () => opened.length === 1
            && opened.blob && opened.blob.size
-              === readFileSync(onServer("readme.txt")).length);
+              === readFileSync(path.join(own, "readme.txt")).length);
 keys(KEY.shiftF4);
 await see("Edit the file");
 keys("note.txt", KEY.enter);
@@ -243,34 +295,28 @@ for (const [at, character] of [..."hello from the page"].entries()) {
   await see(`Col ${at + 2} `);
 }
 keys(KEY.F2);
-await step("a file written in the editor reaches the server at its close",
-           () => existsSync(onServer("note.txt"))
-                 && readFileSync(onServer("note.txt"), "latin1")
-                      .startsWith("hello from the page"));
+await step("a file written in the editor is in the page's memory",
+           () => (inPage0("note.txt") || "").startsWith("hello from the page"));
 keys(KEY.esc);
 await see("8Delete");
 keys(KEY.home, KEY.down, KEY.down, KEY.F8);
 await see("Do you wish to delete");
 keys(KEY.enter);
-await step("a directory removed on the server",
-           () => !existsSync(onServer("newdir")));
-// The server refuses: nothing may be made in C:'s root.
+await step("a directory removed from the page's memory",
+           () => !isDirectory(page0, "/drive/c/newdir"));
 await see("8Delete");
-chmodSync(roots.c, 0o555);
-keys(KEY.F7);
-await see("Create the directory");
-keys("locked", KEY.enter);
-await step("a refusal of the server is DOS's error, nothing made",
-           () => !existsSync(onServer("locked"))
-                 && text().includes("t create"));
-chmodSync(roots.c, 0o755);
-keys(KEY.esc);
+// The last of the panel, readme.txt: deleted.
+keys(KEY.end, KEY.F8);
+await see("Do you wish to delete");
+keys(KEY.enter);
+await step("a file deleted from the page's memory",
+           () => inPage0("readme.txt") === null && inPage0("notes", "todo.txt") !== null);
 await see("8Delete");
 keys(KEY.shiftF9);
 await see("Save");
 keys(KEY.enter);
-await step("the setup saved on C: of the server",
-           () => existsSync(path.join(roots.c, "vc", "vc.ini")));
+await step("the setup saved on C:, in the page's memory",
+           () => inPage0("vc", "vc.ini") !== null);
 await see("8Delete");
 keys(KEY.F10);
 await see("Do you want to quit");
@@ -278,196 +324,54 @@ keys(KEY.enter);
 await step("the program ends, and the page says so",
            () => elements.ended && !elements.ended.hidden
                  && elements.ended.textContent.includes("Reload"));
+await step("nothing is kept: no store of the browser's asked for, and " +
+           "nothing served changed",
+           () => page0.stored.length === 0 && listing(top) === before);
 
-await step("the page of the server keeps nothing in the browser",
-           () => served.opened === 0
-                 && (!elements.kept || elements.kept.textContent === ""));
-// What the page takes for a static site where api/server is not answered
-// as it should be: the server never serves it.
-const drivesOfSite = (await fetch(`${base}/drives/c.json`)).status;
-await step("the server serves no drives of a static site",
-           () => drivesOfSite === 404);
-server.close();
-
-// 2. The page served statically, as static.mjs makes it, by a host that
-// answers 404 for what it has not, as GitHub Pages: the drive starts from
-// what is served, and the changes are kept in IndexedDB (the stand-in,
-// one for the browser across the page's visits). The site ships C: with
-// its directory vc alone; the test serves its own files on C: besides,
-// in a tree of its own in place of the site's.
-const site = path.join(top, "static");
-execFileSync(process.execPath, [path.join(web, "static.mjs"), "--page", html,
-                                "--out", site]);
-const shipped = JSON.parse(readFileSync(path.join(site, "drives", "c.json"),
-                                        "utf8"));
-await step("the static site ships C: with its vc alone",
-           () => readdirSync(path.join(site, "drives")).join() === "c.json"
-                 && shipped.entries.length === 1
-                 && shipped.entries[0].path === "vc"
-                 && shipped.entries[0].directory === true);
+// 2. The page loaded again: its drive as it is served, whatever the
+// visit before did.
 {
-  const own = path.join(top, "served");
-  mkdirSync(path.join(own, "vc"), { recursive: true });
-  layFiles(own);
-  writeFileSync(path.join(site, "drives", "c.json"),
-                JSON.stringify(await treeOf(own)));
-}
-// A host of the static site, which answers a name that it has not by
-// `missing`, and anything but the page by `away` where that is set.
-async function hostOf({ missing, away = null }) {
-  const host = createServer((request, response) => {
-    const name = new URL(request.url, "http://localhost").pathname;
-    const file = path.join(site, name.endsWith("/") ? `${name}index.html` : name);
-    if (away !== null && !name.endsWith("/")) {
-      response.writeHead(away, { "Content-Type": "text/html" });
-      response.end("<h1>away</h1>");
-      return;
-    }
-    if (!file.startsWith(site) || !existsSync(file)
-        || !statSync(file).isFile()) {
-      if (missing === 200) {
-        response.writeHead(200, { "Content-Type": "text/html" });
-        response.end(readFileSync(path.join(site, "index.html")));
-        return;
-      }
-      response.writeHead(missing, { "Content-Type": "text/html" });
-      response.end(`<h1>${missing}</h1>`);
-      return;
-    }
-    response.writeHead(200);
-    response.end(readFileSync(file));
-  });
-  await new Promise((done) => host.listen(0, "127.0.0.1", done));
-  return host;
-}
-const host = await hostOf({ missing: 404 });
-const at = `http://127.0.0.1:${host.address().port}`;
-const browser = new FakeIndexedDB();
-const kept = () => browser.records("vibe-commander", "records");
-const keptText = (key) => {
-  const record = kept().get(key);
-  return record ? Buffer.from(record.data).toString("latin1") : null;
-};
-const isDirectory = (page, at) => {
-  try {
-    return page.fs.isDir(page.fs.stat(at).mode);
-  } catch {
-    return false;
-  }
-};
-const inPage = (page, at) => {
-  try {
-    return Buffer.from(page.fs.readFile(at)).toString("latin1");
-  } catch {
-    return null;
-  }
-};
-{
-  const page = load(at, browser);
+  const page = load(base);
   await page.see(" C:\\VC ");
-  await page.step("the page with no server keeps its changes in the browser",
-                  () => page.elements.kept.textContent.includes("this browser")
-                        && page.elements.reset.hidden === false);
-  page.keys(KEY.enter);         // on .., up to C:\
-  await page.see("readme");
-  page.keys(KEY.F7);
-  await page.see("Create the directory");
-  page.keys("newdir", KEY.enter);
-  await page.step("a directory made is kept", () => kept().has("c:newdir"));
-  await page.see("NEWDIR");
-  page.keys(KEY.shiftF4);
-  await page.see("Edit the file");
-  page.keys("note.txt", KEY.enter);
-  await page.see("New-file");
-  page.keys(KEY.enter);
-  await page.see("2Save");
-  for (const [place, character] of [..."kept here"].entries()) {
-    page.keys(character);
-    await page.see(`Col ${place + 2} `);
-  }
-  page.keys(KEY.F2);
-  await page.step("a file written in the editor is kept at its close",
-                  () => (keptText("c:note.txt") || "").startsWith("kept here"));
-  page.keys(KEY.esc);
-  await page.see("8Delete");
-  // The last of the panel, readme.txt: deleted.
-  page.keys(KEY.end, KEY.F8);
-  await page.see("Do you wish to delete");
-  page.keys(KEY.enter);
-  await page.step("a file deleted is gone from what is kept",
-                  () => kept().has("c:notes") && !kept().has("c:readme.txt"));
-  await page.see("8Delete");
-  page.keys(KEY.shiftF9);
-  await page.see("Save");
-  page.keys(KEY.enter);
-  await page.step("the setup saved on C: is kept",
-                  () => kept().has("c:vc/vc.ini"));
-  await page.see("8Delete");
-  page.keys(KEY.F10);
-  await page.see("Do you want to quit");
-  page.keys(KEY.enter);
-  await page.step("the program ends", () => page.elements.ended
-                  && !page.elements.ended.hidden
-                  && page.elements.ended.textContent.includes("Reload"));
-}
-{
-  // The page loaded again: the drive as it was left.
-  const page = load(at, browser);
-  await page.see("8Delete");
-  await page.step("the next visit has the changes",
-                  () => (inPage(page, "/drive/c/note.txt") || "")
-                          .startsWith("kept here")
-                        && inPage(page, "/drive/c/readme.txt") === null
-                        && isDirectory(page, "/drive/c/newdir")
-                        && inPage(page, "/drive/c/vc/vc.ini") !== null);
-  page.elements.reset.listeners.click();
-  await page.step("Reset forgets them, and loads the page anew",
-                  () => page.reloads === 1 && kept().size === 0);
-}
-{
-  const page = load(at, browser);
-  await page.see(" C:\\VC ");
-  await page.step("after a reset, the drive as it is served",
+  await page.step("a page loaded again starts from what is served",
                   () => inPage(page, "/drive/c/readme.txt") !== null
                         && inPage(page, "/drive/c/note.txt") === null
-                        && kept().has("c:readme.txt"));
-}
-{
-  // A browser that gives the page no IndexedDB: the page's memory, and
-  // the page says so.
-  const page = load(at, undefined);
-  await page.see(" C:\\VC ");
-  await page.step("no IndexedDB: the changes last as long as the page",
-                  () => page.elements.kept.textContent.includes("no storage")
-                        && page.elements.reset.hidden === true);
-  page.keys(KEY.F7);
-  await page.see("Create the directory");
-  page.keys("mem", KEY.enter);
-  await page.step("a directory made in the page's memory",
-                  () => isDirectory(page, "/drive/c/vc/mem"));
+                        && inPage(page, "/drive/c/vc/vc.ini") === null
+                        && !isDirectory(page, "/drive/c/newdir")
+                        && page.stored.length === 0);
 }
 host.close();
-// Hosts that answer api/server otherwise than by 4xx: with a page of
-// their own, 200, as a host of pages in a sandbox may, or by 500; the
-// drive beside the page says that it is a static site. And a host that
-// answers 502 for anything but the page, a proxy in front of a server
-// that has stopped: the page does not start.
-for (const missing of [200, 500]) {
-  const other = await hostOf({ missing });
-  const page = load(`http://127.0.0.1:${other.address().port}`, undefined);
+
+// 3. The site as it is shipped: C: with its directory vc alone.
+{
+  const other = await hostOf(shipped);
+  const page = load(`http://127.0.0.1:${other.address().port}`);
   await page.see(" C:\\VC ");
-  await page.step(`a host that answers ${missing} for a name it has not is static`,
-                  () => page.elements.kept.textContent.includes("no storage"));
+  await page.step("the shipped site's C: has its directory vc alone",
+                  () => page.fs.readdir("/drive/c").filter((n) => n !== "."
+                          && n !== "..").join() === "vc");
   other.close();
 }
+
+// 4. A host that serves the page and no drive: the page says so and does
+// not start.
 {
-  const other = await hostOf({ missing: 404, away: 502 });
-  const page = load(`http://127.0.0.1:${other.address().port}`, undefined);
-  await page.step("a server that is away: the page says so and does not start",
+  const answer = createServer((request, response) => {
+    if (new URL(request.url, "http://x").pathname === "/") {
+      response.writeHead(200, { "Content-Type": "text/html" });
+      response.end(readFileSync(html));
+      return;
+    }
+    response.writeHead(404);
+    response.end();
+  });
+  await new Promise((done) => answer.listen(0, "127.0.0.1", done));
+  const page = load(`http://127.0.0.1:${answer.address().port}`);
+  await page.step("a site with no drive: the page says so and does not start",
                   () => page.elements.ended && !page.elements.ended.hidden
-                        && page.elements.ended.textContent.includes("502")
+                        && page.elements.ended.textContent.includes("could not be loaded")
                         && page.screen === null);
-  other.close();
+  answer.close();
 }
 rmSync(top, { recursive: true, force: true });
 if (failed > 0) {

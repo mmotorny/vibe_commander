@@ -3010,16 +3010,17 @@ decision that it is by, "Decided: CLAUDE.md, step 7".
 
 The test `portable_c-web-scenarios` takes the program under Node, the
 link `web-node`, through the scenarios as the program for Linux is
-taken, with the host's files (`NODERAWFS`) where the page has the
-directories of its server: so what the page does to have a change made
-on the server is not what the scenarios show. What the harness goes by is `ON_WEB` of
+taken, with the host's files (`NODERAWFS`) where the page has its drive
+in its own memory. `portable_c-web-page-scenarios` takes the page itself
+through them in Chromium, its C: the bench's, served as its static site
+serves it. What the harness goes by is `ON_WEB` of
 `harness/deviations.py`, which has what is declared of Linux but its
 masks of the drive's letter, and what is the web's alone. What the
-page itself adds, W4 to W9, the page's own test holds where Node can run
-it, `portable_c-web-page` with the page's program and its server, and
-`portable_c-web-server` with the server and the page's file system; the
-browser's side of it, the drawing, the keys, the mouse and the phone,
-is checked by hand.
+page itself adds, W4 to W8, the page's own tests hold:
+`portable_c-web-page` with the page's program in Node,
+`portable_c-web-site` with the static site and the page's drive, and
+`portable_c-web-browser` with the drawing, the keys, the mouse and the
+phone in Chromium.
 
 ### W1. One drive, C:, where the program lives
 
@@ -3033,10 +3034,10 @@ environment names, C: and D:, each a directory of the host,
 `VC_LABEL_D` give (`sys_web.c`). The page names one: C:, labelled VC,
 which holds C:\VC, the program's own files, the setup file, the menu
 and the extension file, and nothing else as the page is shipped; the
-page starts the program there. It is a directory of the page's server,
-which every change is made on as it happens; a page served with no
-server ships C: with its directory `vc` alone and keeps the drive in
-the browser (W9). It is an ordinary drive: the drive box, the Info
+page starts the program there. It is a directory of Emscripten's file
+system in the page's memory, loaded at every load of the page from what
+is served with it, its directory `vc` alone as the page is shipped, and
+it lasts as long as the page (W6). It is an ordinary drive: the drive box, the Info
 panel and every question of a drive by its number have it. The
 program's own files are in the directory `vc` of the drive that
 `VC_PROGRAM_DRIVE` names, C: where it names none, made where it is not
@@ -3152,32 +3153,38 @@ page").
 **Which scenarios show it.** None; the grid that is drawn is held to
 the program's cells by `portable_c-web-render`.
 
-### W6. A change that the server cannot make is DOS's error
+### W6. The drive lasts as long as the page
 
 **What the original does.** A file, a directory or an attribute is
-changed on the disk, and what DOS cannot do there is its error.
+changed on the disk, and stays so.
 
-**What the web page does.** The drives are directories of the page's
-server (W1), and the page has a copy of it. Every change is asked of
-the server first, and made in the copy only where the server has made
-it: what the server refuses or cannot do, or a server that does not
-answer, is DOS's error for that call, access denied for a refusal,
-file or path not found, a full disk, or a general failure for what has
-no better number. A file's contents go to the server whole when the
-program closes the file, with its time and whether it is read-only,
-before the close answers: where the server refuses them, the close
-fails with that error, and the copy keeps what the program wrote. The
-server never reaches outside the drive's directory, and follows no
-link of the host's in it. The page waits for the server at each change,
-so a copy of many files is slower than on a disk.
+**What the web page does.** The page is a static site, the page and the
+tree that its one drive starts from (`web/static.mjs`), served by any
+host of files, GitHub Pages among them. At every load the page loads
+that tree into its own memory, Emscripten's file system, and the
+program changes the drive there and nowhere else (`web/drives.js`):
+nothing is written to where the page is served from, and nothing is
+kept in the browser, neither in IndexedDB nor in any other store. What
+the program and the user change, the setup file too, lasts until the
+page is closed or loaded again, and the next load starts from what is
+served. The bar says so: "Changes last until the page is reloaded or
+closed." A host that serves the page and no drive has the page say that
+the drive could not be loaded, and the program does not start.
 
-**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
-page"): the drives are the server's, written through as they change.
+**Why.** The user's decision of 16 October 2026 (`CLAUDE.md`, "The web
+page"), which took the place of a server of the project's own that
+wrote every change to a directory of its host, and of a static page
+that kept its changes in the browser: the page is static alone, and
+ephemeral.
 
 **Which scenarios show it.** None of the original's: under Node the
 program has the host's files. `portable_c-web-page` has the page's
-program make a directory, write a file, remove a directory and save its
-setup on the server, and be refused.
+program make and remove a directory, write a file, delete one and save
+its setup, each in the page's memory, with nothing of the site changed
+and no store of the browser's asked for, and the page loaded again
+without them; `portable_c-web-browser` reloads the page in Chromium and
+finds the file that it wrote gone, and nothing of the page's in the
+browser's stores.
 
 ### W7. F10 ends the page
 
@@ -3197,71 +3204,25 @@ Node end as on Linux.
 **What the original does.** Nothing of the kind: files come by DOS.
 
 **What the web page does.** The page's Upload button, and files dragged
-onto the page, write the files into DOS's current directory, on the
-server first (W6), asking before one is written over; then the page
-types Ctrl-R, which has the panel read the directory anew.
+onto the page, write the files into DOS's current directory, in the
+page's memory as everything of its drive is (W6), asking before one is
+written over; then the page types Ctrl-R, which has the panel read the
+directory anew.
 
 **Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
 page").
 
-**Which scenarios show it.** None; `portable_c-web-server` holds the
+**Which scenarios show it.** None; `portable_c-web-site` holds the
 writing of such a file.
 
-### W9. Served with no server, the page keeps its changes in the browser
+### W9. Gone: the page kept its changes in the browser
 
-**What the original does.** Its drives are DOS's disks, and what it
-changes there stays there.
-
-**What the web page does.** The same page has a second way to be
-served: as a static site, from GitHub Pages or any host with no server
-(`web/static.mjs` makes it: the page, and the tree that its one drive
-starts from, C: with its directory `vc` and nothing in it).
-The page asks where it is served whether it has a server (`api/server`,
-which the page's server answers with its name); a host that answers
-404, or another refusal of 4xx, has none, and the page keeps the
-drive in the browser (`web/kept.js`). An answer of 5xx, or none, is a
-server that is away: the page says so and does not start, so that a
-page of the server never keeps its changes in the browser. With no
-server:
-
-- The drive starts from what is served with the page, at the first
-  visit and after a reset; from then on, from what the browser keeps.
-  What a browser kept of D:, the drive of a demo that the page once
-  had, is forgotten at the next visit.
-- Every change is kept in the browser's IndexedDB before it is made in
-  the page's copy, as W6 has it made on the server: a file's contents
-  at its close, with its time and whether it is read-only, a file
-  deleted, a file or directory renamed, a directory made or removed,
-  the read-only bit, a file brought in (W8), the setup file too. What
-  the copy is to refuse is refused first, with DOS's error, so that
-  the browser keeps nothing that the copy has not; a store that is full
-  is DOS's full disk, and one that fails otherwise its general failure.
-- The bar says that the changes are kept in this browser, and has a
-  button, Reset drives, that forgets them, after asking, and loads the
-  page anew from the drive as it is served.
-- Where the browser gives the page no IndexedDB, or it does not open,
-  as in a sandbox or some private windows, the changes are kept in the
-  page's memory, and the bar says that they last until the page is
-  closed.
-- What the browser keeps is the visitor's own, in that browser alone,
-  and the browser may clear it as it clears a site's data.
-
-**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
-page"): a static page, from GitHub Pages, with its changes kept in the
-browser of the user's own, beside the page of the server and not in
-place of it. One page is built and served both ways, and knows which by
-the answer of where it is served, so that there is one page to build and
-to test.
-
-**Which scenarios show it.** None of the original's: under Node the
-program has the host's files. `portable_c-web-page` takes the static
-site, served by a host that answers 404 as GitHub Pages does, with a
-stand-in of IndexedDB, its C: served with files that the test makes
-beside `vc`: a directory made, a file written, a file deleted and the
-setup saved, each kept; the page loaded again
-with them; the reset; and a browser with no IndexedDB. And it holds
-that the page of the server opens no IndexedDB. `portable_c-web-server`
-holds the store's every change and refusal, in memory and in IndexedDB.
+A page served with no server kept its drive in the browser, in
+IndexedDB, with a button that forgot it, beside a page served by a
+server of the project's own that wrote every change to its host. Both
+went on the user's word of 16 October 2026: the page is static alone,
+and keeps nothing (W6). The number stays, so that those behind it keep
+theirs.
 
 ### W10. The memory has a cap of 256 MB
 

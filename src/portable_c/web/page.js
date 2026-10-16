@@ -2,11 +2,12 @@
 // page"; TODO.md, "Step 7, the web page"): what ties the program, built by
 // Emscripten with the page's library (library.js), to the browser. It
 // draws the grid (render.js), hands over the keys and the mouse (keys.js,
-// mouse.js), keeps its drive on the server (drives.js) or, served with no
-// server, in the browser (kept.js), opens a file in
-// a new tab, brings the user's files in by a button and by dragging them
-// onto the page, has a button for the full screen, and on a phone fits the
-// grid to the screen and has a row of the keys that a phone lacks. Its
+// mouse.js), loads its drive from what is served beside it into the
+// page's memory, where every change stays until the page is closed or
+// loaded again (drives.js), opens a file in a new tab, brings the user's
+// files in by a button and by dragging them onto the page, has a button
+// for the full screen, and on a phone fits the grid to the screen and has
+// a row of the keys that a phone lacks. Its
 // "Licences" shows the licences of all that it carries, which the build
 // put into it from the repository's files (bundle.mjs, LICENCES).
 //
@@ -19,76 +20,7 @@
 import { COLUMNS, ROWS, BLINK_CLASS, BLINK_HALF, CURSOR_HALF, Screen, css, apply } from "./render.js";
 import { keyEvent, FOCUS_OUT } from "./keys.js";
 import { Mouse } from "./mouse.js";
-import { Drives, ROOTS, CHANGE_ERRORS } from "./drives.js";
-import { KeptDrives, openStore } from "./kept.js";
-
-// How the page keeps its drives, chosen here and nowhere else. "server":
-// the page's server (server.mjs), which every change is made on. "browser":
-// a page served statically, with no server, as from GitHub Pages, whose
-// drives start from what is served with it (static.mjs) and whose changes
-// are kept in the browser, in IndexedDB, or in the page's memory where the
-// browser gives it no IndexedDB (kept.js).
-//
-// Which it is, the page asks where it is served, askMode below: the project's server
-// answers `api/server` with its name, and a static host has no such file,
-// 404 or another refusal of 4xx. One page is built and served both ways;
-// a build of its own for each would be a second page to build and test.
-// An answer of 5xx, or none, is a server that should be there and is not
-// (a proxy in front of a server that has stopped): the page says so and
-// does not start, so that a page of the server never keeps its changes in
-// the browser where the server is merely away. Unless the drives of a
-// static site are served beside the page, `drives/c.json`, which the
-// server never serves: then it is a static host that answers a name it
-// has not otherwise than by 4xx, or that does not let the page ask for
-// it at all, as a host of pages in a sandbox may (staticSite below).
-const MODES = {
-  server: async (fs) => new Drives({ fs, fetch: (...a) => fetch(...a),
-                                     base: "" }),
-  browser: async (fs) => new KeptDrives({
-    fs, fetch: (...a) => fetch(...a), base: "drives/",
-    store: await openStore(window.indexedDB) }),
-};
-
-// Whether the drives of a static site are served beside the page: the
-// tree of C: as static.mjs writes it.
-async function staticSite() {
-  try {
-    const answer = await fetch("drives/c.json", { cache: "no-cache" });
-    if (!answer.ok)
-      return false;
-    const tree = await answer.json();
-    return Array.isArray(tree && tree.entries);
-  } catch {
-    return false;
-  }
-}
-
-async function askMode() {
-  let answer;
-  try {
-    answer = await fetch("api/server", { cache: "no-store" });
-  } catch (caught) {
-    if (await staticSite())
-      return "browser";
-    throw new Error(`the page's server did not answer (${caught.message})`);
-  }
-  if (answer.ok) {
-    let said = null;
-    try {
-      said = await answer.json();
-    } catch {
-      // a file of that name on a static host, which is no server
-    }
-    if (said && said.server === "vibe-commander")
-      return "server";
-    return "browser";
-  }
-  if (answer.status >= 400 && answer.status < 500)
-    return "browser";
-  if (await staticSite())
-    return "browser";
-  throw new Error(`the page's server answered ${answer.status}`);
-}
+import { Drives, ROOTS } from "./drives.js";
 
 // The type of a file that is opened in a new tab, by its extension.
 const TYPES = {
@@ -108,7 +40,7 @@ const $ = (id) => document.getElementById(id);
 // The hook of a test of the page, harness/webpagerun.mjs, which puts it on
 // the window before the page's scripts run; a user's page has none. It
 // is told when the program is about to start, with Emscripten's FS and
-// ENV, and when the drives are loaded; and it is the page's side of the
+// ENV, and when the drive is loaded; and it is the page's side of the
 // test channel (library.js, web_test_event and web_test_screen): it gives
 // the keys and the mouse of an event as a user would, and reads each
 // screen that the channel records from what the page shows.
@@ -116,7 +48,6 @@ const TEST = window.vcTestHook || null;
 
 const page = {
   drives: null,
-  mode: null,                     // a name of MODES, once it is known
   fs: null,
   where: "",                      // DOS's current directory, of the FS
   screen: null,
@@ -282,8 +213,9 @@ function open(host, name) {
   }
 }
 
-// The user's files written into DOS's current directory, on the server
-// first, and then Ctrl-R, which has the panel read the directory anew.
+// The user's files written into DOS's current directory, in the page's
+// memory as everything of its drive is, and then Ctrl-R, which has the
+// panel read the directory anew.
 async function bring(files) {
   if (page.drives === null || page.ended)
     return;
@@ -293,9 +225,9 @@ async function bring(files) {
         && !confirm(`${file.name} is there already. Write over it?`))
       continue;
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const answer = await page.drives.upload(page.where, file.name, bytes);
-    if (answer !== 0) {
-      notice(`${file.name} could not be written: ${CHANGE_ERRORS[answer]}.`);
+    const refused = page.drives.upload(page.where, file.name, bytes);
+    if (refused !== null) {
+      notice(`${file.name} could not be written: ${refused}.`);
       continue;
     }
     brought++;
@@ -504,7 +436,6 @@ function wire() {
   else
     $("full").hidden = true;
 
-  $("reset").addEventListener("click", reset);
   wireLicences();
 
   makeBar();
@@ -513,39 +444,6 @@ function wire() {
   window.addEventListener("orientationchange", () => setTimeout(fit, 200));
   if (window.visualViewport)
     window.visualViewport.addEventListener("resize", fit);
-}
-
-// Where the page keeps the user's changes, said in its bar where they are
-// kept in the browser, with the button that forgets them.
-function kept(mode) {
-  if (mode !== "browser")
-    return;
-  if (page.drives.kept) {
-    $("kept").textContent = "Changes are kept in this browser.";
-    $("reset").hidden = false;
-  } else {
-    $("kept").textContent = "This browser gives the page no storage: " +
-      "changes last until the page is closed.";
-  }
-  $("kept").hidden = false;
-}
-
-// The drives as they are served, again: what the browser keeps forgotten,
-// and the page loaded anew.
-async function reset() {
-  if (page.mode !== "browser" || !page.drives
-      || !confirm("Forget every change kept in this browser, and start " +
-                  "again from the drives as they are served?"))
-    return;
-  page.ended = true;
-  try {
-    await page.drives.reset();
-  } catch {
-    page.ended = false;
-    notice("The browser did not forget the changes.");
-    return;
-  }
-  window.location.reload();
 }
 
 function ended(text) {
@@ -559,31 +457,25 @@ window.Module = {
   vcInput: [],
   vcWhere: (host) => { page.where = host; },
   vcOpen: open,
-  vcSync: async () => {},
-  vcChange: (what, path, other, fd, mode) =>
-    page.drives.change(what, path, other, fd, mode),
   // Emscripten's FS and ENV, before the program starts: the drive, C:,
-  // loaded into the FS, which the program waits for, and the program
-  // started in C:\VC, where its own files are, by the FS's current
-  // directory (sys_web.c).
+  // loaded into the FS from what is served beside the page, which the
+  // program waits for, and the program started in C:\VC, where its own
+  // files are, by the FS's current directory (sys_web.c).
   vcBegin: ({ FS, ENV, addRunDependency, removeRunDependency }) => {
     page.fs = FS;
     ENV.VC_DRIVE_C = ROOTS.c;
     if (TEST)
       TEST.begin({ FS, ENV });
     addRunDependency("vc-drives");
-    askMode().then(async (mode) => {
-      page.mode = mode;
-      page.drives = await MODES[mode](FS);
-      await page.drives.load();
+    page.drives = new Drives({ fs: FS, fetch: (...a) => fetch(...a) });
+    page.drives.load().then(async () => {
       FS.mkdirTree(`${ROOTS.c}/vc`);
       FS.chdir(`${ROOTS.c}/vc`);
       if (TEST)
         await TEST.loaded({ FS });
-      kept(mode);
       removeRunDependency("vc-drives");
     }).catch((error) => {
-      ended(`The drives could not be loaded: ${error.message}`);
+      ended(`The drive could not be loaded: ${error.message}`);
     });
   },
   vcTestEvent: TEST ? (event) => TEST.event(event) : undefined,

@@ -69,7 +69,6 @@ body {
 #keys { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
 #keys[hidden] { display: none; }
 #kept { font-size: 11px; color: #bbb; }
-#kept[hidden], #reset[hidden] { display: none; }
 #credit { font-size: 11px; color: #777; margin-left: 8px; }
 #bar button.link {
   font-size: 11px; color: #999; background: none; border: 0; padding: 6px 2px;
@@ -118,8 +117,7 @@ body {
   <button id="more" title="The keys that a phone lacks">Keys</button>
   <button id="upload" title="Bring files into the current directory">Upload</button>
   <button id="full" title="The full screen">Full screen</button>
-  <span id="kept" hidden></span>
-  <button id="reset" title="Forget the changes kept in this browser" hidden>Reset drives</button>
+  <span id="kept">Changes last until the page is reloaded or closed.</span>
   <span id="credit">Vibe Commander 0.1, based on Volkov Commander 4.05.</span>
   <button id="licences-open" class="link" type="button"
           aria-haspopup="dialog" title="The licences of what the page carries">Licences</button>

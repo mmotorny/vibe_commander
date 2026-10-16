@@ -14,7 +14,7 @@
 // here each becomes a function of its own that answers what it exports,
 // in the order of MODULES, which is the order in which they name one
 // another, and its `import` lines take what it names from the answers of
-// those before it. That is all of ES modules that the six use: one-line
+// those before it. That is all of ES modules that the five use: one-line
 // imports of names, and `export` in front of a declaration.
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const MODULES = ["render.js", "keys.js", "mouse.js", "drives.js",
-                        "kept.js", "page.js"];
+                        "page.js"];
 
 // What the page carries of every work, and the file of the repository
 // that has its licence: the page's "Licences" shows these and nothing

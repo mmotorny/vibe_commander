@@ -11,8 +11,8 @@ time that its step gives it.
 The screens are taken one of two ways:
 
 - From the web page, the default, as it is published: SESSION is played
-  by harness/websession.mjs on build/portable_c/web/vc.html, served by
-  its server with its one drive, C:, labelled VC, which holds C:\\VC
+  by harness/websession.mjs on build/portable_c/web/vc.html, made a
+  static site with its one drive, C:, labelled VC, which holds C:\\VC
   alone, where the page starts, in the Chromium that the machine has
   (`chromium` or `chromium-browser` on the path), headless, with the
   keys as a keyboard sends them to the page. A frame is the page's own

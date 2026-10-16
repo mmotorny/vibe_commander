@@ -1,8 +1,9 @@
 // The session of the README's animation, played on the web page in a real
 // browser (harness/session.py, which runs this and draws what it writes):
-// the page build/portable_c/web/vc.html as its server serves it, with its
-// one drive, C:, labelled VC, which holds the directory vc alone, where
-// the page starts; in the Chromium that the machine has, headless, driven
+// the page build/portable_c/web/vc.html made a static site, as it is
+// published, with its one drive, C:, labelled VC, which holds the
+// directory vc alone, where the page starts, served by
+// src/portable_c/web/serve.mjs; in the Chromium that the machine has, headless, driven
 // as harness/browser.mjs drives it, with the keys as a keyboard sends
 // them to the page.
 //
@@ -24,12 +25,10 @@
 // So that the same steps make the same frames, the page's clock is the
 // time MS of --stamp (milliseconds since 1970, UTC) when the page loads,
 // and goes on from there, in UTC: the file that the session makes, and
-// its directory, are of that time, and so is the drive's vc, which the
-// server's directory has at that time. Every process that it starts it
-// ends: Chromium, the server.
+// its directory, are of that time, and so are the drive's vc and its
+// root, which the site's tree of C: has at that time. Every process that
+// it starts it ends: Chromium, the host.
 
-import { spawn } from "node:child_process";
-import { createServer } from "node:http";
 import { mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -59,51 +58,24 @@ function options(argv) {
   return said;
 }
 
-async function freePort() {
-  const probe = createServer();
-  await new Promise((done) => probe.listen(0, "127.0.0.1", done));
-  const { port } = probe.address();
-  await new Promise((done) => probe.close(done));
-  return port;
-}
-
-// The page's server on a free port, with C: a directory of the work's,
-// made afresh with its vc alone, both of the time of the stamp.
-async function startServer(drive, page, stamp) {
+// The page made a static site in `work`, its C: a directory made afresh
+// with its vc alone, both of the time of the stamp, served on a free port.
+async function startSite(work, page, stamp) {
+  const { makeSite } = await import(path.join(web, "static.mjs"));
+  const { serve } = await import(path.join(web, "serve.mjs"));
+  const drive = path.join(work, "c"), site = path.join(work, "site");
   rmSync(drive, { recursive: true, force: true });
   mkdirSync(path.join(drive, "vc"), { recursive: true });
   for (const made of [path.join(drive, "vc"), drive])
     utimesSync(made, stamp / 1000, stamp / 1000);
-  const port = await freePort();
-  const child = spawn(process.execPath, [path.join(web, "server.mjs"),
-    "--port", String(port), "--page", page, "--drive-c", drive],
-    { stdio: ["ignore", "pipe", "pipe"] });
-  let output = "";
-  child.stdout.on("data", (chunk) => { output += chunk; });
-  child.stderr.on("data", (chunk) => { output += chunk; });
-  const url = `http://127.0.0.1:${port}/`;
-  const stop = async () => {
-    if (child.exitCode !== null)
-      return;
-    child.kill();
-    for (let tries = 0; tries < 50 && child.exitCode === null; tries++)
-      await sleep(100);
-    if (child.exitCode === null)
-      child.kill("SIGKILL");
-  };
-  for (let tries = 0; tries < 100; tries++) {
-    if (child.exitCode !== null)
-      throw new Error(`the server ended: ${output}`);
-    try {
-      if ((await fetch(`${url}api/server`)).ok)
-        return { url, stop };
-    } catch {
-      // not listening yet
-    }
-    await sleep(100);
-  }
-  await stop();
-  throw new Error(`the server did not answer: ${output}`);
+  await makeSite({ page, out: site, drive });
+  const host = serve(site);
+  await new Promise((done) => host.listen(0, "127.0.0.1", done));
+  return { url: `http://127.0.0.1:${host.address().port}/`,
+           stop: () => new Promise((done) => {
+             host.close(done);
+             host.closeAllConnections();
+           }) };
 }
 
 // The page's clock, put in before any script of the page runs: Date as it
@@ -162,7 +134,7 @@ async function main() {
   const steps = JSON.parse(readFileSync(said.steps, "utf8"));
   mkdirSync(said.work, { recursive: true });
   rmSync(path.join(said.work, "profile"), { recursive: true, force: true });
-  const served = await startServer(path.join(said.work, "c"), said.page, said.stamp);
+  const served = await startSite(said.work, said.page, said.stamp);
   let browser = null;
   try {
     browser = await Browser.start(said.chromium, path.join(said.work, "profile"));

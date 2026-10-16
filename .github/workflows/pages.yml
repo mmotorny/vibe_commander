@@ -1,14 +1,13 @@
 # The web page as a static site on GitHub Pages, the piece W3c of step 7
-# (CLAUDE.md, "The web page"; TODO.md, "W3c"): the page with no server,
-# whose drive starts from what is served with it and whose changes are
-# kept in the visitor's browser. It builds the target portable_c-web-static
+# (CLAUDE.md, "The web page"; TODO.md, "W3c"): the page whose drive
+# starts from what is served with it at every load and whose changes last
+# until the page is closed. It builds the target portable_c-web-static
 # with Emscripten, the pinned download of CMakeLists.txt, and deploys
 # build/portable_c/web/static, the page and the tree of its drive, C:
 # with its directory vc alone.
 #
 # It never runs by itself. Publishing is the user's to decide (CLAUDE.md,
-# "The web page": switching GitHub Pages on, or publishing the page
-# anywhere, is asked first), so the workflow has no trigger but a run
+# "The web page"), so the workflow has no trigger but a run
 # asked for by hand, and that run does nothing unless the repository's
 # variable VC_PAGES is `publish`; GitHub Pages has to be switched on for
 # the repository, with GitHub Actions as its source, besides.

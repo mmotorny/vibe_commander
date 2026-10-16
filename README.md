@@ -58,7 +58,7 @@ otherwise, the difference is declared in
 |---|---|
 | DOS | `VC.EXE`, a 32-bit program started by the DOS/32A extender, with all of the machine's memory for its panels and editor |
 | Linux | `vc`, a 64-bit program built with clang that runs in any terminal, with no library. Drives R: (the root) and H: (the home directory); long names get DOS aliases such as `LONGNA~1`; commands run through `$SHELL` |
-| Web | One HTML page, built to WebAssembly by Emscripten. The screen is text in a `<pre>`. It is served by its own small Node server, or by any static host, and works on a phone |
+| Web | One HTML page, built to WebAssembly by Emscripten. The screen is text in a `<pre>`. It is a static site that any host of files serves, its drive in the page's memory until the page is closed, and works on a phone |
 
 ## Repository layout
 
@@ -163,35 +163,25 @@ the last command. [docs/linux.md](docs/linux.md) has the details.
 
 ### As a web page
 
-With `-DVC_WEB=ON`:
+With `-DVC_WEB=ON`, the build makes the page a static site,
+`build/portable_c/web/static/`. Serve it on this machine with the
+project's own small server, a Node script of Node's own modules:
 
 ```sh
-cmake --build build --target portable_c-web-serve
+node src/portable_c/web/serve.mjs build/portable_c/web/static
 ```
 
-This builds the page and serves it on `http://127.0.0.1:8437/` with one
-drive, C:, labelled VC, which holds C:\VC, the program's own files; the
-page starts there. Bring files in with Upload, or by dragging them onto
-the page. Changes are written to the server's directory. The server can
-also be run by hand:
+and open `http://127.0.0.1:8437/`; any server of static files does as
+well, for example `python3 -m http.server -d
+build/portable_c/web/static 8437`. The page has one drive, C:, labelled
+VC, which holds C:\VC, the program's own files; the page starts there.
+Bring files in with Upload, or by dragging them onto the page. The
+drive lives in the page's memory: every load starts from what is
+served, and changes last until the page is closed or reloaded. Nothing
+is written anywhere else or kept in the browser.
 
-```sh
-node src/portable_c/web/server.mjs --port 8437 \
-    --page build/portable_c/web/vc.html \
-    --drive-c DIR
-```
-
-The server listens on 127.0.0.1 only. To reach it from a phone, put an
-HTTPS reverse proxy in front of it, for example
-`tailscale serve --bg 8437`. Anyone who can reach the page can write to
-its drive, so the proxy is the access control.
-
-The static site, `build/portable_c/web/static/`, needs no server: any
-static host serves it, and the page keeps the user's changes in the
-browser. To try it locally:
-`python3 -m http.server -d build/portable_c/web/static 8438`. It is
-published at <https://mmotorny.github.io/vibe_commander/> by the
-workflow `.github/workflows/pages.yml`, which runs only by hand
+The page is published at <https://mmotorny.github.io/vibe_commander/>
+by the workflow `.github/workflows/pages.yml`, which runs only by hand
 (`gh workflow run pages.yml`), and only while the repository variable
 `VC_PAGES` is `publish` and Pages is switched on with GitHub Actions as
 its source, as both are.
@@ -252,15 +242,15 @@ in the machine, and how coverage is measured.
 | `portable_c-cap` | The cap on the memory of the program's blocks on each platform |
 | `portable_c-web-probe` | Every file of the web build compiles for WebAssembly |
 | `portable_c-web-scenarios` | The web program under Node through the scenarios |
-| `portable_c-web-page` | The page's scripts in Node, against its server and as a static site |
+| `portable_c-web-page` | The page's scripts in Node, served as its static site |
 | `portable_c-web-browser` | The page in headless Chromium, on a desktop and as an iPhone |
 | `portable_c-web-page-scenarios` | Every scenario played through the page itself in headless Chromium, its screens read from the `<pre>` and from its pixels |
 | `portable_c-web-render` | The page's drawing, keys and mouse modules in Node |
-| `portable_c-web-server` | The web server's API and its refusal of every path outside its drives |
+| `portable_c-web-site` | The page's static site, its server on this machine and the page's drive |
 | `harness-le` | The harness's reader of 32-bit DOS programs |
 
 The web tests other than `portable_c-web-render` and
-`portable_c-web-server` need `-DVC_WEB=ON`.
+`portable_c-web-site` need `-DVC_WEB=ON`.
 
 ## The pictures
 
@@ -290,7 +280,7 @@ python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE \
 | [docs/translation.md](docs/translation.md) | How the assembly is built byte for byte, and how the C translation is made and laid out |
 | [docs/portable-c.md](docs/portable-c.md) | The portable C for DOS: its layout, the system interface `sys.h`, the extender, and its figures |
 | [docs/linux.md](docs/linux.md) | The program for Linux: what it emulates and how it is tested |
-| [docs/web.md](docs/web.md) | The web page: its drives, its server, the phone, and its tests |
+| [docs/web.md](docs/web.md) | The web page: its drive, its static site, the phone, and its tests |
 | [docs/testing.md](docs/testing.md) | The scenarios, the goldens, the bench and the driver |
 | [src/portable_c/DEVIATIONS.md](src/portable_c/DEVIATIONS.md) | Every place where the portable C behaves otherwise than the original, and why |
 | [CLAUDE.md](CLAUDE.md) | The rules the work follows, and the decisions behind them |

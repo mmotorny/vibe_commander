@@ -12,8 +12,11 @@
  *     VC_DRIVE_D, and labelled as VC_LABEL_C and VC_LABEL_D say, VC and
  *     DEMO where they say nothing (DosBeginGiven of files_posix.c). A
  *     drive whose variable is not set is not there. The page names C:
- *     alone, a directory of its store, with the program's own files in
- *     C:\VC, and starts the program there (web/page.js); under Node a
+ *     alone, a directory of Emscripten's file system in the page's
+ *     memory, loaded from what is served with the page, with the
+ *     program's own files in C:\VC, and starts the program there
+ *     (web/page.js, web/drives.js); what the program changes there lasts
+ *     until the page is closed or loaded again. Under Node a
  *     test gives both, with their labels, as the bench of DOS has them
  *     (harness/posixrun.py). The program's own files are in the
  *     directory vc of the drive that VC_PROGRAM_DRIVE names, C: where it
@@ -38,16 +41,14 @@
  *     the page go on, and MouseWhere so too, and takes what the page has
  *     queued, so that a loop that waits for a button to be let go gets
  *     the release; Ticks yields at its second read with no yield
- *     between, so that the zooming boxes and the blanker are drawn; and
- *     ProgramEnd waits for the store to be written. The page calls
- *     nothing of the program while it waits: what comes meanwhile is
- *     queued in the page and taken here at each yield.
+ *     between, so that the zooming boxes and the blanker are drawn.
+ *     The page calls nothing of the program while it waits: what comes
+ *     meanwhile is queued in the page and taken here at each yield.
  *   - A command cannot be run: DOS's screen says so, and the command
  *     answers that it ran with the code 1. Enter on a file opens it in a
  *     new tab of the browser, web_open_file; nothing is a program.
  */
 #include <emscripten.h>
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,20 +58,13 @@
 
 /* What the page's library has, web/library.js: the bytes that wait from
    the keyboard and the mouse, as many as fit at `to`, the count
-   answered; the grid drawn; a file of the host opened in a new tab,
-   `name` being DOS's name of it; and the store written, waited for. */
+   answered; the grid drawn; and a file of the host opened in a new tab,
+   `name` being DOS's name of it. And of the page's file system: the
+   directory of the host that is DOS's current one, where the page puts
+   what the user brings in. */
 extern i32 web_input(char *to, i32 room);
 extern void web_draw(const u16 *cells, u16 place, u16 shape);
 extern void web_open_file(const char *host, const u8 *name);
-extern void web_sync(void);
-/* And of the page's file system: a change of the host's files made on
-   the server that the page mirrors, before the program makes it in the
-   mirror, waited for, as files_posix.c tells it (enum HostChange); the
-   answer 0, or a number of Errors below for what the server refused or
-   what failed on the way to it. And the directory of the host that is
-   DOS's current one, where the page puts what the user brings in. */
-extern i32 web_change(i32 what, const char *path, const char *other, i32 fd,
-                      u32 mode);
 extern void web_where(const char *host);
 /* And of a test of the page: the event of the test channel's keys of
    that number had the page give, waited for; and a screen that the
@@ -121,23 +115,6 @@ static void Draw(void)
     if (DosCurrentHost(&MachineDos, where, (i32)sizeof where).failed)
         where[0] = 0;
     web_where(where);
-}
-
-/* A change of the files told to the page, which makes it on its server
-   first (web_change): the host's error for what the page answers. The
-   test channel's page under Node has no server, and answers 0. */
-static const int Errors[] = {
-    0, EACCES, ENOENT, EEXIST, ENOTEMPTY, ENOSPC, EIO
-};
-
-static int Change(enum HostChange what, const char *path, const char *other,
-                  int fd, u32 mode)
-{
-    i32 answer = web_change((i32)what, path, other, (i32)fd, mode);
-
-    if (answer < 0 || answer >= (i32)(sizeof Errors / sizeof Errors[0]))
-        return EIO;
-    return Errors[answer];
 }
 
 /* The page let go on for `wait` milliseconds, the grid drawn first. */
@@ -381,11 +358,10 @@ struct Answer ProgramOpenFile(const u8 *name)
     return answer;
 }
 
-/* The end: the store written first, then the machine's end. */
+/* The end: the grid drawn, then the machine's end. */
 void ProgramEnd(u16 code)
 {
     Draw();
-    web_sync();
     MachineEnd(code);
 }
 
@@ -447,7 +423,6 @@ int main(int count, char **arguments)
     MachineBegin(given, drives,
                  own != 0 && own[0] != 0 ? (u8)(own[0] & ~0x20) : 'C',
                  MEMORY_CAP);
-    MachineDos.change = Change;
     MachineEnvironment((const u8 *)"COMMAND.COM", count, arguments);
     YieldedAt = emscripten_get_now();
     Main();

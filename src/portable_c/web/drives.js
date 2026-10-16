@@ -1,30 +1,17 @@
-// The page's file system against its server, the piece W3b of step 7
-// (CLAUDE.md, "The web page"; TODO.md, "Step 7, the web page"). The
-// page's one drive, C:, is a directory of the server's (server.mjs); the
-// page has a copy of it in Emscripten's file system, MEMFS, which the
-// program reads and writes as the program for Linux does the host's files
-// (files_posix.c). At the start its tree is loaded from the server;
-// then every change that the program makes is asked of the server first,
-// as files_posix.c tells it (enum HostChange of emulate_posix.h, by the
-// page's library, web_change), and made in the copy only where the server
-// has made it: what the server refuses or cannot do is DOS's error for
-// that call, CHANGE_ERRORS by number, the table of sys_web.c.
-//
-// A file's contents go whole when the program closes it, before the close
-// answers, with its time and whether it is read-only.
+// The page's drive, the pieces W3b and W3c of step 7 (CLAUDE.md, "The web
+// page"; TODO.md, "Step 7, the web page"). The page's one drive, C:, is a
+// directory of Emscripten's file system, MEMFS, in the page's memory,
+// which the program reads and writes as the program for Linux does the
+// host's files (files_posix.c). At the start it is loaded from what is
+// served beside the page, drives/c.json, the tree that static.mjs makes;
+// from then on it is the page's alone. Nothing of it is written anywhere
+// else and nothing is kept in the browser: what the program and the user
+// change lasts until the page is closed or loaded again, and every load
+// starts from what is served.
 //
 // A plain module of ECMAScript that is handed the file system, of the
 // shape of Emscripten's FS, and `fetch`, so that the test runs it in Node
-// against the server with a file system of its own.
-
-// What the program changes (enum HostChange of emulate_posix.h).
-export const HOST_CONTENTS = 0, HOST_DELETE = 1, HOST_RENAME = 2,
-             HOST_DIR_MAKE = 3, HOST_DIR_REMOVE = 4, HOST_MODE = 5;
-
-// The answers, by number, as sys_web.c's table has them: 0 for done.
-export const CHANGE_ERRORS = ["", "EACCES", "ENOENT", "EEXIST", "ENOTEMPTY",
-                              "ENOSPC", "EIO"];
-const FAILED = CHANGE_ERRORS.indexOf("EIO");
+// with a file system of its own.
 
 // Where the drives are in the page's file system, by letter: C:, the one
 // drive of the page, the program's own files in its directory vc. A test
@@ -41,33 +28,31 @@ export function bytesOfBase64(text) {
   return bytes;
 }
 
-// The number of an error that the server answered, by its name.
-function numberOf(name) {
-  const number = CHANGE_ERRORS.indexOf(name);
-  return number > 0 ? number : FAILED;
-}
-
 export class Drives {
-  // `fs` of the shape of Emscripten's FS (mkdirTree, writeFile, readFile,
-  // stat, utime, chmod, getStream), `fetch` of the browser's shape, `base`
-  // the server's URL that the API's paths are put behind.
-  constructor({ fs, fetch, base = "", roots = ROOTS }) {
+  // `fs` of the shape of Emscripten's FS (mkdirTree, writeFile, stat,
+  // utime, chmod), `fetch` of the browser's shape, `base` where the trees
+  // are served, relative to the page: a drive's tree is `${base}c.json`.
+  constructor({ fs, fetch, base = "drives/", roots = ROOTS }) {
     this.fs = fs;
     this.fetch = fetch;
     this.base = base;
     this.roots = roots;
   }
 
-  // Each drive's tree, loaded from the server into its directory.
+  // Each drive's tree, as it is served, made in its directory: its files
+  // and directories, parents first, { entries: [{ path, directory, mtime,
+  // readonly, data }], mtime }, `data` the contents in base64 and `mtime`
+  // that of the drive's root where the tree has it.
   async load() {
     for (const [drive, root] of Object.entries(this.roots)) {
-      const answer = await this.fetch(
-        `${this.base}/api/tree?drive=${encodeURIComponent(drive)}`,
-        { cache: "no-store" });
+      const answer = await this.fetch(`${this.base}${drive}.json`,
+                                      { cache: "no-cache" });
       if (!answer.ok)
-        throw new Error(`the server did not give drive ${drive}: ` +
+        throw new Error(`drive ${drive.toUpperCase()}: was not served: ` +
                         `${answer.status}`);
       const { entries, mtime } = await answer.json();
+      if (!Array.isArray(entries))
+        throw new Error(`drive ${drive.toUpperCase()}: is no tree`);
       this.fs.mkdirTree(root);
       for (const entry of entries) {
         const at = `${root}/${entry.path}`;
@@ -90,95 +75,7 @@ export class Drives {
     }
   }
 
-  // The drive and the path in it of a path of the file system, or null
-  // where it is in no drive or is a drive's root.
-  locate(host) {
-    if (typeof host !== "string")
-      return null;
-    for (const [drive, root] of Object.entries(this.roots)) {
-      if (host.startsWith(`${root}/`) && host.length > root.length + 1)
-        return { drive, path: host.slice(root.length + 1) };
-    }
-    return null;
-  }
-
-  // A request to the server: 0, or the number of its error, that of a
-  // failure on the way where it answered nothing.
-  async request(url, init) {
-    let answer;
-    try {
-      answer = await this.fetch(`${this.base}${url}`, init);
-    } catch {
-      return FAILED;
-    }
-    if (answer.ok)
-      return 0;
-    try {
-      return numberOf((await answer.json()).error);
-    } catch {
-      return FAILED;
-    }
-  }
-
-  async order(body) {
-    return this.request("/api/change", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-  }
-
-  async put(place, bytes, mtime, readonly) {
-    const query = new URLSearchParams({
-      drive: place.drive, path: place.path, mtime: String(Math.round(mtime)),
-      readonly: readonly ? "1" : "0" });
-    return this.request(`/api/file?${query}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/octet-stream" },
-      body: bytes,
-    });
-  }
-
-  // A change that the program is about to make, made on the server: the
-  // answer for files_posix.c, 0 or the number of an error. A path that is
-  // in no drive is no concern of the server's.
-  async change(what, host, other, fd, mode) {
-    if (what === HOST_CONTENTS) {
-      const stream = this.fs.getStream(fd);
-      const place = stream ? this.locate(stream.path) : null;
-      if (place === null)
-        return 0;
-      const status = this.fs.stat(stream.path);
-      return this.put(place, this.fs.readFile(stream.path),
-                      Number(status.mtime), (status.mode & 0o200) === 0);
-    }
-    const place = this.locate(host);
-    if (place === null)
-      return 0;
-    switch (what) {
-      case HOST_DELETE:
-        return this.order({ op: "delete", ...place });
-      case HOST_RENAME: {
-        const to = this.locate(other);
-        if (to === null || to.drive !== place.drive)
-          return numberOf("EACCES");
-        return this.order({ op: "rename", ...place, to: to.path });
-      }
-      case HOST_DIR_MAKE:
-        return this.order({ op: "mkdir", ...place });
-      case HOST_DIR_REMOVE:
-        return this.order({ op: "rmdir", ...place });
-      case HOST_MODE:
-        return this.order({ op: "mode", ...place,
-                            readonly: (mode & 0o200) === 0 });
-      default:
-        return numberOf("EACCES");
-    }
-  }
-
-  // A file that the user brings in, `name` in the directory `directory` of
-  // the file system, written on the server and then in the copy: 0, or the
-  // number of an error. Whether it is there already is `exists`.
+  // Whether `name` is in the directory `directory` of the file system.
   exists(directory, name) {
     try {
       this.fs.stat(`${directory}/${name}`);
@@ -188,23 +85,20 @@ export class Drives {
     }
   }
 
-  async upload(directory, name, bytes) {
+  // A file that the user brings in, `name` in the directory `directory`
+  // of the file system, written there with the time of now: null, or why
+  // it was not.
+  upload(directory, name, bytes) {
     if (name === "" || /[/\\\0]/.test(name) || name === "." || name === "..")
-      return numberOf("EACCES");
+      return "no name that a file can have";
     const host = `${directory}/${name}`;
-    const place = this.locate(host);
-    if (place === null)
-      return numberOf("EACCES");
     const now = Date.now();
-    const answer = await this.put(place, bytes, now, false);
-    if (answer !== 0)
-      return answer;
     try {
       this.fs.writeFile(host, bytes);
       this.fs.utime(host, now, now);
     } catch {
-      return FAILED;
+      return "the page could not write it";
     }
-    return 0;
+    return null;
   }
 }

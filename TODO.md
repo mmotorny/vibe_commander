@@ -769,22 +769,21 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
   - Buttons 1, 2 and 4. The context menu is suppressed, and the wheel does nothing (L11).
 - **The clock.** Emscripten's clock_gettime uses the browser's Date and time zone. The test clock is shared from `machine_posix.c`.
 - **The drive (the user's decision).** One, C: labelled VC, which holds C:\VC, the program's own files, and nothing else as it is shipped; the page starts there (CLAUDE.md, "The web page"; "One drive" below). Until the user's word of 15 October 2026 there were two, C: labelled VIBE and D: labelled DEMO, a small tree of sample files.
-  - It is a directory of the page's server, a script for Node with Node's own modules: the page loads its tree from it, and every change, the setup file's too, is made there as it happens; what the server refuses or cannot do is DOS's error for that call. Nothing is kept in the browser then.
-  - Served statically, from GitHub Pages with no server, the same page has its drive start from what is served with it, C: with `vc` alone, and keeps what the user changes in the browser (CLAUDE.md, "The web page").
+  - Since W8, on the user's word of 16 October 2026, the page is a static site alone and its drive is ephemeral: every load starts it from what is served with the page, C: with `vc` alone, in the page's own memory, and every change, the setup file's too, lasts until the page is closed or loaded again; nothing is written back and nothing is kept in the browser. Until then it was a directory of a server of the project's own, written through as it changed (W3b), or, served statically, kept in the browser (W3c).
   - The program takes the drives from the environment, `VC_DRIVE_C`, `VC_DRIVE_D` and the rest: W2's section below has them, and the page sets `VC_DRIVE_C` alone.
   - The tests give the drives as the bench has them, through the environment, C: the working disk labelled VIBE and D:\VC the program's files on D: labelled DEMO, so the masks of the drive's letter are not needed on the web, and no golden or mask moved with the one drive.
 - **Files in and out.**
   - An upload button and drag-and-drop write into the host directory of DOS's current directory, which C publishes to JS at each yield. Overwriting asks confirm(). Then Ctrl-R (1312h) is queued, so that the panel reads the directory anew.
   - `ProgramOpenFile` opens the file in a NEW TAB, as a blob URL with a MIME type from the extension (the user's decision, not a download): the user views or saves it from there.
   - `ProgramOfFile` answers 0: nothing on the page is a program.
-- **The setup file.** C:\VC\VC.INI, `vc/vc.ini` of C:'s directory, on the server like the rest of the drive.
+- **The setup file.** C:\VC\VC.INI, `vc/vc.ini` of C:'s directory, in the page's memory like the rest of the drive (W8).
 
 ### Deviations (W entries of DEVIATIONS.md, a part of their own, "The web page")
 - **A command.** ProgramRun writes the prompt and the command, then "Commands cannot be run in a web page." on DOS's screen, and answers that it ran with code 1. This covers the user menu, VC.EXT, and the external viewer and editor.
 - **Ctrl-O.** It is the program's own key, as on DOS: the panels go off and DOS's screen shows.
 - **Enter on a file.** It opens a new tab.
 - **The keys.** The browser's reserved keys, as above.
-- **F10, leaving.** It shows the last screen and "Reload to start again", after the sync.
+- **F10, leaving.** It shows the last screen and "Reload to start again".
 - **Memory.** Capped at 2 GB (`MAXIMUM_MEMORY`); since the cap ("The cap of the memory: done"), at 256 MB for the program's blocks and 320 MB for the page (W10).
 - **The screen.** It is scaled by whole multiples of the font.
 - **Help and menus.** The shareware's files are not shipped: F1 shows the original's message for help that is missing. A user may upload their own.
@@ -844,6 +843,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **W5, the licences on the page: done**, below. The bar's credit of the font gone, and one "Licences" that shows the texts of every work that the page carries, put in from the repository's files as the page is made (the user's decision of 15 October 2026, CLAUDE.md, "The web page").
 - **W6, the page in a real browser: done**, below. The machine's own Chromium, headless, driven over CDP from Node; both ways of serving, on a desktop and as an iPhone held both ways; the screenshots looked at; two faults of the drawing on a phone mended; the test `portable_c-web-browser`.
 - **W7, the scenarios through the page: done**, below. Every scenario of the web played through `vc.html` in Chromium, its keys and mouse the browser's events, its screens read from the `<pre>` and from the pixels; `harness/webpagerun.py`.
+- **W8, the page static alone, its drive ephemeral: done**, below. The server's writes, the page's mode of a server, the store in the browser and Reset drives gone, and the hook in `files_posix.c` and `sys_web.c` that the server needed; `serve.mjs` for the tests and for trying the page out; the tests adapted (the user's decision of 16 October 2026, CLAUDE.md, "The web page").
 
 ### W0, the toolchain: done, and what a later piece should know
 
@@ -1709,9 +1709,63 @@ program asks for (1 to 61, the setup's 55 to 61 among them), and
 (the target `portable_c-help`); the file is not kept in the repository.
 The test `portable_c-help-file` holds what F1 shows of it in the program
 for Linux. **Not yet on the page:** the piece that places C:\VC's files
-copies `build/portable_c/VC.HLP` into the page's C:\VC as `vc.hlp`, for
-the server's drive and the static site's `drives/c.json` alike, and the
-page's F1 then shows it.
+copies `build/portable_c/VC.HLP` into the page's C:\VC as `vc.hlp`, in
+the static site's `drives/c.json`, and the page's F1 then shows it.
+
+### W8, the page static alone, its drive ephemeral: done
+
+On the user's word of 16 October 2026 (CLAUDE.md, "The web page";
+DEVIATIONS.md, W6 and W9) the page is a static site alone, and its
+drive lasts as long as the page: every load starts C: from what is
+served with it, `drives/c.json`, in Emscripten's file system, and
+nothing is written back or kept in the browser. What went:
+
+- `web/server.mjs`, the server of the project's own with its API of
+  writes, the target `portable_c-web-serve`, and the notes on a reverse
+  proxy and Tailscale; the page's mode of a server (`askMode`, `MODES`,
+  the request for `api/server`, whose 404 the console of a static page
+  reported); `web/kept.js` with IndexedDB and Reset drives; the writes
+  of `web/drives.js`.
+- The hook of the C that the server needed: `enum HostChange`, `change`
+  of `struct Dos` and `made` of `struct DosHandle` in
+  `emulate_posix.h`, `Told` and its calls in `files_posix.c`, which the
+  reverse of the part of W3b's commit that put them there takes out as
+  it was, so that Linux is as it was before them; and `Change`,
+  `web_change` and `web_sync` of `sys_web.c` and `web/library.js`
+  (`Module.vcChange`, `Module.vcSync`). `ProgramEnd` draws and ends,
+  with nothing to wait for.
+- `harness/fakeidb.mjs`, and the test `portable_c-web-server`, whose
+  checks of what stays are the test `portable_c-web-site`
+  (`harness/website.py`, `.mjs`): the site that `static.mjs` makes, with
+  C: as shipped and with C: of a directory (`treeOf`, which moved there
+  from `server.mjs`, and `makeSite`); `web/serve.mjs`, a server of a
+  static directory on 127.0.0.1 that writes nothing, for the tests and
+  for trying the page out, held to serve nothing outside its directory;
+  the drive loaded by `drives.js`; and the page's script.
+
+How the tests have the page now:
+
+- `portable_c-web-page` makes the site with the test's files on C:,
+  serves it by `serve.mjs`, and holds that each change is in the page's
+  memory, that nothing of the site changes and no store of the
+  browser's is asked for, and that the page loaded again has none of the
+  changes.
+- `portable_c-web-browser` serves a copy of the built site by
+  `serve.mjs`, and holds that a reload has the drive as served and that
+  the browser has nothing of the page's. The test of the browser and
+  `portable_c-web-page-scenarios` take a `RESOURCE_LOCK` of `chromium`,
+  so that `ctest -j` runs one of them at a time.
+- `harness/webpagerun.py` makes a site of its own for each scenario,
+  `build/webpagerun/sites/NAME`, its `drives/c.json` the tree of the
+  bench's C:; the hook lays D: out as before; and at the end both drives
+  are read back from the page's file system (`vcTestHook.drive`) and
+  laid on the bench's directories, D: as before and C: now too, where the
+  server's directory had been C: itself. A stand-in of STAMPS comes back
+  empty, and posixrun takes it as the bench has it where nothing has
+  changed it, as it did.
+- `harness/websession.mjs` makes the site with C: of a directory of the
+  stamp's time and serves it: the README's animation is the same bytes
+  as before.
 
 ### Open, for the user
 
@@ -1744,7 +1798,7 @@ deviation is (DEVIATIONS.md), documented in the README and
 "Open, for the user" above has it.
 
 1. **Running now**, two pieces side by side:
-   - **(a) The page made truly ephemeral.** The page keeps nothing: the
+   - **(a) The page made truly ephemeral: done**, as W8 above. The page keeps nothing: the
      server's mode goes, so there is one way of serving, the static
      one, and with it the probe of `api/server`; the browser's store goes, IndexedDB and
      its stand-ins (W3b and W3c above have both), and the button Reset drives with it. The

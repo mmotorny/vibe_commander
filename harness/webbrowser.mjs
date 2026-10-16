@@ -5,30 +5,24 @@
 // screenshots to look at:
 //
 //   node harness/webbrowser.mjs --chromium chromium \
-//       --page build/portable_c/web/vc.html \
 //       --site build/portable_c/web/static --work build/browser \
-//       [--shots build/browser/shots] [--only server|static]
+//       [--shots build/browser/shots]
 //
-// The page is opened both ways that it is served: by its server,
-// src/portable_c/web/server.mjs, run on a free port with its drive in the
-// work directory, and as the static site, behind a host that answers 404
-// for what it has not, as GitHub Pages does. The page has one drive, C:,
-// which it ships with the program's directory vc alone: the test lays its
-// own files on it beside vc (harness/webfiles.mjs), in the server's
-// directory, and in a copy of the static site whose tree of C: has them. Each way, on a desktop,
-// 1280 by 800, and as an iPhone, 390 by 844 at three device pixels to
-// one, with touch and Safari's agent, then turned, 844 by 390. What it
-// holds, step by step, is in `desktop` and `phone` below; a step that
-// fails says what the screen was, saves a screenshot of the moment into
-// the work directory, and the run goes on to the next way of serving.
-// The work directory has to be one that Chromium may read and write: one
-// of a snap reads no hidden directory and not the real /tmp, so it is in
-// build/. Every process that it starts it ends: Chromium, the server.
+// The page is opened as the static site, served by src/portable_c/web/
+// serve.mjs, which answers 404 for what it has not, as GitHub Pages does.
+// The site ships C: with the program's directory vc alone: the test lays
+// its own files on it beside vc (harness/webfiles.mjs), in a copy of the
+// site whose tree of C: has them. On a desktop, 1280 by 800, and as an
+// iPhone, 390 by 844 at three device pixels to one, with touch and
+// Safari's agent, then turned, 844 by 390. What it holds, step by step,
+// is in `desktop` and `phone` below; a step that fails says what the
+// screen was, saves a screenshot of the moment into the work directory,
+// and the run goes on to the next view. The work directory has to be
+// one that Chromium may read and write: one of a snap reads no hidden
+// directory and not the real /tmp, so it is in build/. Every process
+// that it starts it ends: Chromium, the host.
 
-import { spawn } from "node:child_process";
-import { createServer } from "node:http";
-import { existsSync, readFileSync, rmSync, statSync, mkdirSync, cpSync,
-         writeFileSync } from "node:fs";
+import { readFileSync, rmSync, mkdirSync, cpSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Browser, VIEWPORTS, sleep } from "./browser.mjs";
@@ -36,21 +30,22 @@ import { layFiles } from "./webfiles.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const web = path.join(here, "..", "src", "portable_c", "web");
-const { treeOf } = await import(path.join(web, "server.mjs"));
+const { treeOf } = await import(path.join(web, "static.mjs"));
+const { serve } = await import(path.join(web, "serve.mjs"));
 
 function options(argv) {
-  const said = { chromium: "chromium", shots: null, only: null };
+  const said = { chromium: "chromium", shots: null };
   for (let i = 0; i < argv.length; i += 2) {
     const name = argv[i].replace(/^--/, "");
-    if (!["chromium", "page", "site", "work", "shots", "only"].includes(name)
+    if (!["chromium", "site", "work", "shots"].includes(name)
         || i + 1 >= argv.length) {
       console.error(`webbrowser.mjs: what is ${argv[i]}? See the top of the file.`);
       process.exit(2);
     }
     said[name] = path.isAbsolute(argv[i + 1]) || name === "chromium"
-      || name === "only" ? argv[i + 1] : path.resolve(argv[i + 1]);
+      ? argv[i + 1] : path.resolve(argv[i + 1]);
   }
-  for (const wanted of ["page", "site", "work"])
+  for (const wanted of ["site", "work"])
     if (!said[wanted]) {
       console.error(`webbrowser.mjs: --${wanted} is wanted.`);
       process.exit(2);
@@ -61,54 +56,6 @@ function options(argv) {
 const said = options(process.argv.slice(2));
 let passed = 0;
 const failures = [];
-
-// A free port of the loopback's.
-async function freePort() {
-  const probe = createServer();
-  await new Promise((done) => probe.listen(0, "127.0.0.1", done));
-  const { port } = probe.address();
-  await new Promise((done) => probe.close(done));
-  return port;
-}
-
-// The page's server, a process of its own, on a free port, with its
-// drive in `top`, made afresh with the test's files.
-async function startServer(top) {
-  rmSync(top, { recursive: true, force: true });
-  layFiles(path.join(top, "c"));
-  const port = await freePort();
-  const child = spawn(process.execPath, [path.join(web, "server.mjs"),
-    "--port", String(port), "--page", said.page,
-    "--drive-c", path.join(top, "c")], { stdio: ["ignore", "pipe", "pipe"] });
-  let output = "";
-  child.stdout.on("data", (chunk) => { output += chunk; });
-  child.stderr.on("data", (chunk) => { output += chunk; });
-  const url = `http://127.0.0.1:${port}/`;
-  for (let tries = 0; tries < 100; tries++) {
-    if (child.exitCode !== null)
-      throw new Error(`the server ended: ${output}`);
-    try {
-      const answer = await fetch(`${url}api/server`);
-      if (answer.ok)
-        return { url, stop: () => stop(child), drives: top };
-    } catch {
-      // not listening yet
-    }
-    await sleep(100);
-  }
-  stop(child);
-  throw new Error(`the server did not answer: ${output}`);
-}
-
-async function stop(child) {
-  if (child.exitCode !== null)
-    return;
-  child.kill();
-  for (let tries = 0; tries < 50 && child.exitCode === null; tries++)
-    await sleep(100);
-  if (child.exitCode === null)
-    child.kill("SIGKILL");
-}
 
 // A host of the static site that answers 404 for what it has not: a copy
 // of the site in `top`, its tree of C: with the test's files besides vc.
@@ -125,19 +72,7 @@ async function startSite(top) {
   layFiles(own);
   writeFileSync(path.join(site, "drives", "c.json"),
                 JSON.stringify(await treeOf(own)));
-  const host = createServer((request, response) => {
-    const name = decodeURIComponent(new URL(request.url, "http://x").pathname);
-    const file = path.join(site, name.endsWith("/") ? `${name}index.html` : name);
-    if (!file.startsWith(site) || !existsSync(file) || !statSync(file).isFile()) {
-      response.writeHead(404, { "Content-Type": "text/html" });
-      response.end("<h1>404</h1>");
-      return;
-    }
-    const type = file.endsWith(".html") ? "text/html"
-      : file.endsWith(".json") ? "application/json" : "application/octet-stream";
-    response.writeHead(200, { "Content-Type": type });
-    response.end(readFileSync(file));
-  });
+  const host = serve(site);
   await new Promise((done) => host.listen(0, "127.0.0.1", done));
   return { url: `http://127.0.0.1:${host.address().port}/`,
            stop: () => new Promise((done) => {
@@ -146,27 +81,18 @@ async function startSite(top) {
            }) };
 }
 
-// What the console has said that is an error, but for the one that a
-// static page is meant to cause: it asks for api/server to know whether it
-// has a server (askMode of page.js), and Chromium reports the host's 404
-// for it as an error of the console.
-function errors(tab, mode) {
-  return tab.errors().filter((e) => !(mode === "static"
-    && /status of 404 .*\/api\/server\)$/.test(e.text)));
-}
-
 // One check: `what` is said, and passes when `test` returns without
 // throwing.
-async function check(mode, view, what, test, tab) {
+async function check(view, what, test, tab) {
   try {
     await test();
     passed++;
   } catch (caught) {
-    failures.push(`${mode}, ${view}: ${what}: ${caught.message}`);
-    console.log(`FAIL ${mode}, ${view}: ${what}: ${caught.message}`);
+    failures.push(`${view}: ${what}: ${caught.message}`);
+    console.log(`FAIL ${view}: ${what}: ${caught.message}`);
     if (tab) {
       try {
-        await tab.shot(path.join(said.work, `failed-${mode}-${view}-${failures.length}.png`));
+        await tab.shot(path.join(said.work, `failed-${view}-${failures.length}.png`));
       } catch {
         // the tab is gone
       }
@@ -199,17 +125,14 @@ function find(rows, text, from = 0) {
 const rightStatus = (rows) => rows[21].slice(40);
 
 // The page started: the key bar on the screen, nothing that says that it
-// stopped, and the bar's line on where changes are kept.
-async function started(tab, mode) {
+// stopped, and the bar's line on how long changes last.
+async function started(tab) {
   const rows = await tab.until((r, s) => s.includes("1Help") && s.includes("10Quit"),
                                30000, "the program's screen");
   must((await tab.text("ended")) === null, "the page says that it ended");
   const kept = await tab.text("kept");
-  if (mode === "server")
-    must(kept === null, `the bar says "${kept}" for a page of the server`);
-  else
-    must(kept === "Changes are kept in this browser.",
-         `the bar says ${JSON.stringify(kept)} for a static page`);
+  must(kept === "Changes last until the page is reloaded or closed.",
+       `the bar says ${JSON.stringify(kept)}`);
   return rows;
 }
 
@@ -233,12 +156,12 @@ async function toFiles(tab) {
   return tab.until((r) => rightStatus(r).includes("CODE"), 5000, "the cursor on CODE");
 }
 
-async function desktop(browser, mode, served) {
+async function desktop(browser, served) {
   const tab = await browser.page(VIEWPORTS.desktop);
   const view = "desktop";
-  const step = (what, test) => check(mode, view, what, test, tab);
+  const step = (what, test) => check(view, what, test, tab);
   await tab.go(served.url);
-  await step("the page starts", () => started(tab, mode));
+  await step("the page starts", () => started(tab));
   await step("the font is the VGA's, and loaded", async () => {
     const font = await tab.eval("getComputedStyle(document.getElementById('screen')).fontFamily");
     must(font.includes("Web437 IBM VGA 8x16"), `the screen's font is ${font}`);
@@ -249,7 +172,7 @@ async function desktop(browser, mode, served) {
     const r = await tab.rect("#screen");
     must(r.width === 640 && r.height === 400, `the grid is ${r.width} by ${r.height}`);
   });
-  await shot(tab, `${mode}-desktop-start`);
+  await shot(tab, `desktop-start`);
   await step("Ctrl-F1: the left panel too", async () => {
     await tab.press("F1", { ctrl: true });
     await tab.until((r) => (r[0].match(/╔/g) || []).length === 2, 5000, "two panels");
@@ -267,7 +190,7 @@ async function desktop(browser, mode, served) {
     for (const name of ["CODE", "DATA", "NOTES", "VC", "readme   txt"])
       must(find(rows, name, 40) !== null, `${name} is not listed`);
   });
-  await shot(tab, `${mode}-desktop-panels`);
+  await shot(tab, `desktop-panels`);
   await step("Down, Down, Up", async () => {
     await tab.press("Down");
     await tab.press("Down");
@@ -343,13 +266,6 @@ async function desktop(browser, mode, served) {
     await tab.until((r) => find(r, "note     txt", 40) !== null, 10000,
                     "note.txt in the panel");
   });
-  if (mode === "server")
-    await step("the file is on the server", async () => {
-      const file = path.join(served.drives, "c", "note.txt");
-      must(existsSync(file), `${file} is not there`);
-      const text = readFileSync(file, "latin1");
-      must(text.startsWith("Hello from Chromium."), `it has ${JSON.stringify(text)}`);
-    });
   await step("Enter on a text file: a new tab, or the link to one", async () => {
     await tab.press("End");
     await tab.until((r) => rightStatus(r).includes("readme"), 5000, "readme.txt");
@@ -384,7 +300,7 @@ async function desktop(browser, mode, served) {
     must(await tab.eval("document.getElementById('licences').open"), "the dialog is not open");
     const works = await tab.eval("document.querySelectorAll('#licences h2').length");
     must(works === 5, `the dialog has ${works} works`);
-    await shot(tab, `${mode}-desktop-licences`);
+    await shot(tab, `desktop-licences`);
     await tab.press("Escape");
     await sleep(300);
     must(!(await tab.eval("document.getElementById('licences').open")), "Esc left it open");
@@ -396,27 +312,30 @@ async function desktop(browser, mode, served) {
          "its button left it open");
     must((await tab.settle()).join("\n") === before, "the screen changed");
   });
-  if (mode === "static")
-    await step("a reload: the file kept in the browser", async () => {
-      await tab.reload();
-      await started(tab, mode);
-      await tab.press("F2", { alt: true });
-      await tab.settle();
-      await tab.press("c");
-      const rows = await toFiles(tab);
-      must(find(rows, "note     txt", 40) !== null, "note.txt is gone");
-    });
+  await step("a reload: the drive as it is served, the file gone", async () => {
+    await tab.reload();
+    await started(tab);
+    const rows = await toFiles(tab);
+    must(find(rows, "note     txt", 40) === null, "note.txt is still there");
+    must(find(rows, "readme   txt", 40) !== null, "readme.txt is gone");
+  });
+  await step("the page keeps nothing in the browser", async () => {
+    const kept = await tab.eval("(async () => {" +
+      " const databases = indexedDB.databases ? await indexedDB.databases() : [];" +
+      " return databases.length + localStorage.length + sessionStorage.length; })()");
+    must(kept === 0, `the browser has ${kept} things of the page's`);
+  });
   await step("the console has no errors", () => {
-    const wrong = errors(tab, mode);
+    const wrong = tab.errors();
     must(wrong.length === 0, wrong.map((e) => e.text).join("; "));
   });
   await tab.close();
 }
 
-async function phone(browser, mode, served) {
+async function phone(browser, served) {
   const tab = await browser.page(VIEWPORTS.portrait);
   let view = "portrait";
-  const step = (what, test) => check(mode, view, what, test, tab);
+  const step = (what, test) => check(view, what, test, tab);
   // What fits: the grid within the viewport's width, above the bar, and
   // the bar's bottom within its height.
   const fits = async (width, height) => {
@@ -443,7 +362,7 @@ async function phone(browser, mode, served) {
     }
   };
   await tab.go(served.url);
-  await step("the page starts", () => started(tab, mode));
+  await step("the page starts", () => started(tab));
   await step("the row of keys shows", async () => {
     must(!(await tab.eval("document.getElementById('keys').hidden")), "it is hidden");
     const keys = await tab.eval("document.querySelectorAll('#keys button').length");
@@ -452,8 +371,8 @@ async function phone(browser, mode, served) {
     must(last === "Enter", `its last key is ${last}`);
   });
   await step("the grid fits the width, nothing cut off", () => fits(390, 844));
-  // The page starts from the setup that the desktop's run saved, two
-  // panels: Ctrl-F1 of the row takes the left one away and brings it back.
+  // Ctrl-F1 of the row takes the left panel away and brings it back, or
+  // the other way round.
   const panels = (r) => (r[0].match(/╔/g) || []).length;
   await step("Ctrl and F1 of the row, twice: the left panel off and on", async () => {
     const before = panels(await tab.settle());
@@ -494,7 +413,7 @@ async function phone(browser, mode, served) {
                     && rightStatus(r).includes("CODE"), 5000, "C:\\ with the cursor on CODE");
   });
   await step("the row of keys whole, each key tappable", () => whole(390, 844));
-  await shot(tab, `${mode}-portrait`);
+  await shot(tab, "portrait");
   view = "landscape";
   await step("turned: the grid refits", async () => {
     await tab.view(VIEWPORTS.landscape);
@@ -503,9 +422,9 @@ async function phone(browser, mode, served) {
     await tab.settle();
   });
   await step("turned: the row of keys whole, each key tappable", () => whole(844, 390));
-  await shot(tab, `${mode}-landscape`);
+  await shot(tab, "landscape");
   await step("the console has no errors", () => {
-    const wrong = errors(tab, mode);
+    const wrong = tab.errors();
     must(wrong.length === 0, wrong.map((e) => e.text).join("; "));
   });
   await tab.close();
@@ -519,23 +438,17 @@ async function main() {
   const browser = await Browser.start(said.chromium, path.join(said.work, "profile"));
   console.log(`${browser.version}`);
   try {
-    for (const mode of ["server", "static"]) {
-      if (said.only !== null && said.only !== mode)
-        continue;
-      const served = mode === "server"
-        ? await startServer(path.join(said.work, "drives"))
-        : await startSite(path.join(said.work, "site"));
-      try {
-        for (const run of [desktop, phone]) {
-          try {
-            await run(browser, mode, served);
-          } catch {
-            // said already; on to the next
-          }
+    const served = await startSite(path.join(said.work, "site"));
+    try {
+      for (const run of [desktop, phone]) {
+        try {
+          await run(browser, served);
+        } catch {
+          // said already; on to the next
         }
-      } finally {
-        await served.stop();
       }
+    } finally {
+      await served.stop();
     }
   } finally {
     await browser.close();

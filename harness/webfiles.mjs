@@ -1,7 +1,7 @@
 // The files that the web page's tests work on, made by each test in the
 // page's one drive, C:, beside the program's own directory vc, where the
 // page itself starts with nothing but that directory (CLAUDE.md, "The
-// web page"): harness/webserver.mjs, harness/webpage.mjs and
+// web page"): harness/website.mjs, harness/webpage.mjs and
 // harness/webbrowser.mjs. Nothing of them is shipped with the page.
 // Node's own modules alone.
 

@@ -4,9 +4,12 @@
 The test portable_c-web-scenarios takes the program for the web through
 the scenarios under Node (posixrun.py, the link web-node), past the page.
 This takes the page, build/portable_c/web/vc.html, through them in the
-machine's own Chromium, headless, as a user has it: the page is served
-by its own server (src/portable_c/web/server.mjs) with the bench's two
-drives, the keys of each step are the browser's key events and the mouse
+machine's own Chromium, headless, as a user has it: the page is made a
+static site as it is published (src/portable_c/web/static.mjs), its C:
+the bench's C:, and served (src/portable_c/web/serve.mjs), the bench's
+D: laid out in the page's file system by the page's test hook, and both
+drives read back from it at the end, where every change of the run
+stays; the keys of each step are the browser's key events and the mouse
 its pointer events, which keys.js and mouse.js make the program's input
 as they make a user's, and each screen is read from what the page shows.
 harness/webpagerun.mjs runs a scenario; the top of it says how.
@@ -30,9 +33,9 @@ counted besides, and its pixels decoded into the cell that they show.
 
 What the page's file system cannot hold: the four files of C:\\STAMPS of
 a gigabyte or more (setups.STAMPS_FILES), which are sparse on the host
-and would be read whole into the page's memory, are laid out empty on
-the server's drive and made as long as the bench has them in the page's
-file system once it is loaded, read as zeros (the hook's `standIns`), and
+and would be read whole into the page's memory, are served empty in the
+site's C: and made as long as the bench has them in the page's file
+system once it is loaded, read as zeros (the hook's `standIns`), and
 the disks after a run have them as long as the bench does where nothing
 has changed them.
 
@@ -215,9 +218,11 @@ def kept_keys(steps):
                    if not name.startswith('"') and KEPT.fullmatch(name)})
 
 
-def tree_of(root):
-    """The files and directories under `root`, parents first, as the
-    page's server answers a drive's tree, and the root's time."""
+def tree_of(root, at):
+    """The files and directories under `root`, parents first, as a
+    static site serves a drive's tree (src/portable_c/web/static.mjs),
+    and the root's time; `at` where the drive is in the page's file
+    system."""
     import base64
     entries = []
     for path in sorted(root.rglob("*")):
@@ -229,13 +234,13 @@ def tree_of(root):
         if not entry["directory"]:
             entry["data"] = base64.b64encode(path.read_bytes()).decode()
         entries.append(entry)
-    return {"root": "/drive/d", "entries": entries,
+    return {"root": at, "entries": entries,
             "mtime": int(root.stat().st_mtime * 1000)}
 
 
 def put_tree(root, tree):
-    """`root` made what `tree` has, the page's D: at the end of a run,
-    with the times and the read-only bits, so that the disks are read as
+    """`root` made what `tree` has, a drive of the page at the end of a
+    run, with the times and the read-only bits, so that the disks are read as
     under Node."""
     import base64
     for path in sorted(root.rglob("*"), reverse=True):
@@ -285,14 +290,19 @@ def drive(page, bench, keys_text, steps, environment, cwd, limit):
             os.truncate(path, 0)
             os.utime(path, (when, when))
             stand_ins.append([f"/drive/c/STAMPS/{name}", size])
+    # The page as a static site of its own, whose C: is the bench's; the
+    # bench's D:, with the program's own files, is given to the page's
+    # file system by the hook. Both are taken back from it at the end.
+    site = WORK / "sites" / bench.name
+    shutil.rmtree(site, ignore_errors=True)
+    (site / "drives").mkdir(parents=True)
+    shutil.copyfile(page, site / "index.html")
+    (site / "drives" / "c.json").write_text(
+        json.dumps(tree_of(home, "/drive/c")))
     job = {
-        "page": str(Path(page).resolve()), "chromium": chromium(),
+        "site": str(site.resolve()), "chromium": chromium(),
         "profile": str(WORK / "profiles" / bench.name),
-        "drives": {"c": str(home.resolve())},
-        # The page has one drive, C:, on its server; the bench's D:, with
-        # the program's own files, is given to the page's file system by
-        # the hook, and taken back from it at the end.
-        "d": tree_of(d), "cHasVc": (home / "vc").exists(),
+        "d": tree_of(d, "/drive/d"), "cHasVc": (home / "vc").exists(),
         "cTime": int(home.stat().st_mtime * 1000),
         "environment": environment, "keys": keys_text,
         "actions": actions(steps), "cwd": cwd, "standIns": stand_ins,
@@ -320,7 +330,10 @@ def drive(page, bench, keys_text, steps, environment, cwd, limit):
         for file in (job_file, out_file):
             file.unlink(missing_ok=True)
         shutil.rmtree(WORK / "profiles" / bench.name, ignore_errors=True)
+        shutil.rmtree(site, ignore_errors=True)
     said = "\n".join(out["said"])
+    if out.get("c"):
+        put_tree(home, out["c"])
     if out.get("d"):
         put_tree(d, out["d"])
     if out["error"]:

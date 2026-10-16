@@ -9,34 +9,38 @@
 //
 //   node harness/webpagerun.mjs JOB.json OUT.json
 //
-// JOB has `page` (vc.html), `chromium`, `profile` (a directory of the
-// build for Chromium's profile: a snap reads no hidden directory and not
-// the real /tmp), `drives` { c, d } (the bench's directories, which the
-// page's own server, server.mjs, serves as it serves a user's drives),
-// `environment` (the test channel's variables, which the page's test
-// hook puts into the program's environment), `keys` (the channel's keys),
-// `actions` (for each event of the keys, by its number, what the browser
-// is to be given for it, or null), `cwd` (the directory of the page's
-// file system that the program starts in), `standIns` (files that the
-// page's file system cannot hold, by their paths there and the sizes
-// that they have: see webpagerun.py), `limit` (seconds for the whole run)
-// and `shots` (a directory where the screenshot of a screen whose pixels
-// are not its cells is saved, or null).
+// JOB has `chromium`, `profile` (a directory of the build for Chromium's
+// profile: a snap reads no hidden directory and not the real /tmp),
+// `site` (the page made a static site whose C: is the bench's C:, which
+// src/portable_c/web/serve.mjs serves as any host of files serves the
+// page), `d` (the tree of the bench's D:, which the hook lays out in the
+// page's file system), `environment` (the test channel's variables,
+// which the page's test hook puts into the program's environment),
+// `keys` (the channel's keys), `actions` (for each event of the keys, by
+// its number, what the browser is to be given for it, or null), `cwd`
+// (the directory of the page's file system that the program starts in),
+// `standIns` (files that the page's file system cannot hold, by their
+// paths there and the sizes that they have: see webpagerun.py), `limit`
+// (seconds for the whole run) and `shots` (a directory where the
+// screenshot of a screen whose pixels are not its cells is saved, or
+// null).
 //
 // The page is the page as a user gets it. What the test adds is the
 // page's test hook, window.vcTestHook (page.js), put there before the
 // page's scripts run: it is handed the environment and the file system
-// before the program starts, and is the page's side of the test channel
-// (sys_web.c, VC_TEST_PAGE): the program asks it for each event and
-// tells it each screen, and waits each time until this has answered.
+// before the program starts, lays D: out once the page has loaded C:,
+// and is the page's side of the test channel (sys_web.c, VC_TEST_PAGE):
+// the program asks it for each event and tells it each screen, and waits
+// each time until this has answered. At the end both drives are read
+// back from the page's file system, where every change of the run is.
 //
 // OUT has, for each record of the channel in order, the kind and the
 // number, the cells as the <pre> has them (`dom`), as the pixels show
 // them (`pixels`), the cursor as the page draws it, and what did not
 // fit: rows of the <pre> that are not 80 cells, cells whose pixels are
-// none of what they should be; and the channel's own records (base64),
-// what the program said on its standard error (the console), and how the
-// page ended.
+// none of what they should be; the channel's own records (base64), what
+// the program said on its standard error (the console), how the page
+// ended, and C: and D: as the run left them (`c`, `d`).
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
@@ -45,8 +49,8 @@ import { fileURLToPath } from "node:url";
 import { Browser, VIEWPORTS, sleep } from "./browser.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const { makeServer } = await import(
-  path.join(here, "..", "src", "portable_c", "web", "server.mjs"));
+const { serve } = await import(
+  path.join(here, "..", "src", "portable_c", "web", "serve.mjs"));
 
 const COLUMNS = 80, ROWS = 25, WIDTH = 8, HEIGHT = 16;
 const SHADES = new Set([0xB0, 0xB1, 0xB2]);
@@ -161,12 +165,12 @@ function hookSource(config) {
       FS.writeFile("/test/keys", config.keys);
     },
     async loaded({ FS }) {
-      // The page has one drive, C:, and makes C:\VC for the program's
-      // own files where it is not there; the bench has those in D:\VC,
-      // and no C:\VC, which a page made is taken away again with the
-      // root's time as the bench has it. D: is the bench's, written into
-      // the file system from the job: its changes stay there, where no
-      // server is asked (drives.js, locate), and are read at the end.
+      // The page has one drive, C:, the bench's as the site serves it,
+      // and makes C:\VC for the program's own files where it is not
+      // there; the bench has those in D:\VC, and no C:\VC, which a page
+      // made is taken away again with the root's time as the bench has
+      // it. D: is the bench's, written into the file system from the job.
+      // The changes of both stay there, and are read at the end.
       FS.chdir(config.cwd);
       if (!config.cHasVc) {
         try {
@@ -195,6 +199,7 @@ function hookSource(config) {
         const node = FS.lookupPath(where).node;
         node.usedBytes = size;
         node.contents = new Uint8Array(0);
+        node.vcStandIn = true;
         node.stream_ops = { ...node.stream_ops,
           read(stream, buffer, offset, length, position) {
             const count = Math.max(0, Math.min(size - position, length));
@@ -229,9 +234,10 @@ function hookSource(config) {
       taken = null;
       resolve();
     },
-    // D: as it is at the end: each file and directory, parents first,
-    // with its time, whether it may be written, and a file's bytes.
-    driveD() {
+    // A drive as it is at the end, by its root: each file and directory,
+    // parents first, with its time, whether it may be written, and a
+    // file's bytes, none of a stand-in, which the bench has as it is.
+    drive(root) {
       const out = [];
       const walk = (directory, prefix) => {
         for (const name of fs.readdir(directory).sort()) {
@@ -244,7 +250,9 @@ function hookSource(config) {
           const entry = { path, directory: directory_,
                           mtime: +status.mtime,
                           readonly: (status.mode & 0o200) === 0 };
-          if (!directory_) {
+          if (!directory_ && fs.lookupPath(at).node.vcStandIn) {
+            entry.data = "";
+          } else if (!directory_) {
             const bytes = fs.readFile(at);
             let text = "";
             for (let i = 0; i < bytes.length; i += 8192)
@@ -256,8 +264,8 @@ function hookSource(config) {
             walk(at, path);
         }
       };
-      walk(config.d.root, "");
-      return { entries: out, mtime: +fs.stat(config.d.root).mtime };
+      walk(root, "");
+      return { entries: out, mtime: +fs.stat(root).mtime };
     },
     records() {
       try {
@@ -534,7 +542,7 @@ const job = JSON.parse(readFileSync(jobFile, "utf8"));
 process.env.TZ = "UTC";
 
 const out = { screens: [], said: [], ended: null, records: "", error: null };
-const server = makeServer({ c: job.drives.c }, job.page);
+const server = serve(job.site);
 await new Promise((done) => server.listen(0, "127.0.0.1", done));
 const sockets = new Set();
 server.on("connection", (socket) => {
@@ -664,7 +672,8 @@ try {
     await tab.eval("vcTestHook.done()");
   }
   out.records = await tab.eval("vcTestHook.records()");
-  out.d = await tab.eval("vcTestHook.driveD()");
+  out.c = await tab.eval("vcTestHook.drive('/drive/c')");
+  out.d = await tab.eval(`vcTestHook.drive(${JSON.stringify(job.d.root)})`);
 } catch (caught) {
   out.error = `${caught && caught.message || caught}, at ${last}`;
 } finally {

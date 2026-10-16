@@ -838,10 +838,8 @@ endif()
 # "Licences" shows. The font is VileR's Web437 IBM VGA 8x16 of the
 # Ultimate Oldschool PC Font Pack, version 2.2, its archive for the web
 # from int10h.org, pinned by its SHA-256, which CLAUDE.md allows by name;
-# its licence is CC BY-SA 4.0, LICENSE.FONT. The page's server,
-# web/server.mjs, serves it with its one drive, C:, and the target
-# portable_c-web-serve runs it on 127.0.0.1:8437 (TODO.md, "W3b"). Its
-# memory grows to the cap of sys_web.c, 256 MB, and 64 MB besides for the
+# its licence is CC BY-SA 4.0, LICENSE.FONT. It is served as the static
+# site below, and nothing else. Its memory grows to the cap of sys_web.c, 256 MB, and 64 MB besides for the
 # runtime, and no further, since wasm never gives back what it has grown
 # by (TODO.md, "The cap of the memory: done").
 if(VC_WEB)
@@ -851,7 +849,7 @@ if(VC_WEB)
     FetchContent_MakeAvailable(vga_font)
     set(web_page_dir ${CMAKE_BINARY_DIR}/portable_c/web)
     set(web_font "${vga_font_SOURCE_DIR}/woff - Web (webfonts)/Web437_IBM_VGA_8x16.woff")
-    set(web_page_script render.js keys.js mouse.js drives.js kept.js
+    set(web_page_script render.js keys.js mouse.js drives.js
         page.js shell.html bundle.mjs)
     list(TRANSFORM web_page_script PREPEND ${web_dir}/)
     # The licences that the page shows, put into it from these files as it
@@ -880,9 +878,10 @@ if(VC_WEB)
                      ${web_page_dir}/shell.html)
     # The page as a static site, the piece W3c of step 7 (TODO.md, "W3c"):
     # build/portable_c/web/static/, index.html and the tree of its one
-    # drive as it starts, for a host with no server, as GitHub Pages
-    # (.github/workflows/pages.yml), where the page keeps the user's
-    # changes in the browser. Made with every build, for the test.
+    # drive as every load starts it, for any host of files, as GitHub
+    # Pages (.github/workflows/pages.yml); the page keeps every change in
+    # its memory until it is closed. Made with every build, for the tests;
+    # web/serve.mjs serves it on this machine.
     add_custom_command(
         OUTPUT ${web_page_dir}/static/index.html
                ${web_page_dir}/static/drives/c.json
@@ -894,13 +893,6 @@ if(VC_WEB)
     add_custom_target(portable_c-web-static ALL
         DEPENDS ${web_page_dir}/static/index.html)
     add_dependencies(portable_c-web-static portable_c-web)
-    add_custom_target(portable_c-web-serve
-        COMMAND ${node} ${web_dir}/server.mjs --port 8437
-                --page ${web_page_dir}/vc.html
-                --drive-c ${web_page_dir}/drives/c
-        DEPENDS portable_c-web
-        USES_TERMINAL
-        VERBATIM)
 endif()
 
 # --- Tests --------------------------------------------------------------------
@@ -1099,15 +1091,15 @@ add_test(NAME portable_c-web-render
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webrender.py
             ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
 set_tests_properties(portable_c-web-render PROPERTIES SKIP_RETURN_CODE 77)
-# The web page's server and its file system, the piece W3b of step 7:
-# src/portable_c/web/server.mjs and drives.js run in Node, the server's
-# API held, its refusals of every path outside the two drives, and the
-# page's file system against it; and the page's script as the build makes
-# it. See harness/webserver.py. It needs Node and nothing downloaded, and
-# runs no machine.
-add_test(NAME portable_c-web-server
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webserver.py)
-set_tests_properties(portable_c-web-server PROPERTIES SKIP_RETURN_CODE 77)
+# The web page's static site and its drive, the pieces W3b and W3c of
+# step 7: src/portable_c/web/static.mjs, serve.mjs and drives.js run in
+# Node, the site made, served with nothing outside it, and the page's
+# drive loaded from it; and the page's script as the build makes it. See
+# harness/website.py. It needs Node and nothing downloaded, and runs no
+# machine.
+add_test(NAME portable_c-web-site
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/website.py)
+set_tests_properties(portable_c-web-site PROPERTIES SKIP_RETURN_CODE 77)
 # The program for Linux through the scenarios, the piece L3b of step 6:
 # the sanitized build run on a bench of the host's laid out as the DOS
 # bench's, its screens and its disks held to the goldens of the original
@@ -1173,10 +1165,11 @@ if(VC_WEB)
     add_test(NAME portable_c-web-scenarios
         COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
                 ${CMAKE_BINARY_DIR}/portable_c/web-node/vc.js)
-    # The web page's program against its server, the piece W3b of step
-    # 7: build/portable_c/web/vc.html run in Node with a document of what
-    # it asks of one, its drives on server.mjs, each change of the
-    # program's made on the server first. See harness/webpage.py.
+    # The web page's program in Node, the piece W3b of step 7:
+    # build/portable_c/web/vc.html made a static site and served, run with
+    # a document of what it asks of one, its drive loaded from the site
+    # and every change kept in the page's memory alone. See
+    # harness/webpage.py.
     add_test(NAME portable_c-web-page
         COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webpage.py
                 ${CMAKE_BINARY_DIR}/portable_c/web/vc.html)
@@ -1184,22 +1177,20 @@ if(VC_WEB)
         LABELS portable_c SKIP_RETURN_CODE 77)
     set_tests_properties(portable_c-web-scenarios PROPERTIES
         LABELS "portable_c;machine")
-    # The page in a real browser, the piece W6 of step 7: vc.html as its
-    # server serves it and the static site behind a host of pages, in the
-    # machine's own headless Chromium, found on the path and not fetched,
+    # The page in a real browser, the piece W6 of step 7: the static site
+    # behind a host of pages, in the machine's own headless Chromium, found on the path and not fetched,
     # driven from Node over its DevTools protocol, on a desktop and as an
     # iPhone held both ways. Skipped where there is no Chromium. See
     # harness/webbrowser.py; harness/webbrowser.mjs with --shots saves
     # screenshots for a person to look at.
     add_test(NAME portable_c-web-browser
         COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webbrowser.py
-                ${CMAKE_BINARY_DIR}/portable_c/web/vc.html
                 ${CMAKE_BINARY_DIR}/portable_c/web/static
                 ${CMAKE_BINARY_DIR}/portable_c/web/browser)
     set_tests_properties(portable_c-web-browser PROPERTIES
-        LABELS portable_c SKIP_RETURN_CODE 77)
+        LABELS portable_c SKIP_RETURN_CODE 77 RESOURCE_LOCK chromium)
     # The scenarios through the page itself, the piece W7 of step 7:
-    # vc.html as its server serves it over the bench's drives, in the
+    # vc.html served as a static site whose C: is the bench's, in the
     # machine's own headless Chromium, every key and step of the mouse the
     # browser's events, every screen read from the <pre> and from its
     # pixels and held to the goldens of the tree "web". Some ten minutes,
@@ -1210,7 +1201,8 @@ if(VC_WEB)
                 --page ${CMAKE_BINARY_DIR}/portable_c/web/vc.html
                 --out ${CMAKE_BINARY_DIR}/webpagerun)
     set_tests_properties(portable_c-web-page-scenarios PROPERTIES
-        LABELS "portable_c;machine" SKIP_RETURN_CODE 77)
+        LABELS "portable_c;machine" SKIP_RETURN_CODE 77
+        RESOURCE_LOCK chromium)
 endif()
 # The cap of the memory (TODO.md, "The cap of the memory: done"): the
 # program for Linux and, with VC_WEB, the program for the web under
@@ -1237,7 +1229,7 @@ set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-tidy
     portable_c-posix-unit portable_c-terminal portable_c-web-render
-    portable_c-web-server portable_c-help-file
+    portable_c-web-site portable_c-help-file
     PROPERTIES LABELS portable_c)
 if(VC_DOS)
     set_tests_properties(c-data c-arith PROPERTIES LABELS frozen)

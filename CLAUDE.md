@@ -295,8 +295,8 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
 
 - The program built to WebAssembly by Emscripten, fetched and pinned as
   any other download and only for a build that asks for the web page; its
-  key loop made to wait by Emscripten's Asyncify, which lets it wait on
-  the network too; behind `sys.h` a file of its own.
+  key loop made to wait by Emscripten's Asyncify; behind `sys.h` a file
+  of its own.
 - The screen is drawn as text: the 80 by 25 cells as lines of a `<pre>`
   with the colours of DOS in spans, not on a canvas. The font is VileR's
   Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned and put into the page.
@@ -304,24 +304,23 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   machine has installed, found on the path and not fetched or pinned,
   simplicity counting for more there than a pin (the user), its test
   skipped where there is none, driven headless over its DevTools
-  protocol from Node with nothing from npm. It opens the page as the
-  server serves it and as the static site, on a desktop and as an
-  iPhone held both ways, and its screenshots are looked at.
+  protocol from Node with nothing from npm, one test of it at a time.
+  It opens the page as the static site, on a desktop and as an iPhone
+  held both ways, and its screenshots are looked at.
 - Every third-party work is credited alike: its licence in a `LICENSE.*`
   file of the repository, and the page, which carries their code and the
   font to whoever opens it, has one small "Licences" link that shows all
-  of those texts, no work credited apart from the others. The static page
-  does not ask the browser to keep its store (`navigator.storage.persist`).
+  of those texts, no work credited apart from the others.
 - One drive, on the user's word of 15 October 2026, in place of the two
   that the page had: C:, labelled VC, which holds C:\VC, the program's
   own files, and nothing else as it is shipped. There is no drive of a
-  demo and no sample files. The page starts in C:\VC. The drive is a
-  directory of the server's, in the build or as the server is told when
-  it starts: the page loads its tree from the server, and every change
-  on it, the setup file too, is made on the server as it happens, not
-  kept in the browser; what the server cannot do or refuses is DOS's
-  error for that call. The static site ships C: with its `vc` alone,
-  and the browser keeps that one drive. The tests keep the bench's
+  demo and no sample files. The page starts in C:\VC. The drive is
+  ephemeral, on the user's word of 16 October 2026: every load of the
+  page starts it from what is served with the page, C: with its `vc`
+  alone, in the page's own memory, and every change on it, the setup
+  file too, lasts until the page is closed or loaded again. Nothing is
+  written back to where the page is served from, and there is no store
+  of the browser's, IndexedDB or any other. The tests keep the bench's
   layout through the environment, C: the bench's working disk labelled
   VIBE and D: with the program's own files in D:\VC labelled DEMO, so
   that no golden or mask moves; the page's own tests make the files
@@ -342,19 +341,15 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   row of keys that a phone lacks, F1 to F10, Esc, Tab, Enter, the arrows,
   PgUp and PgDn, and Ctrl and Alt that stay held for the next key, stands
   with a button that brings up the phone's keyboard.
-- It is served by a server of the project's own, a script for Node
-  with Node's own modules and nothing from npm: the page, and the drives' directories with their
-  writes, and nothing outside them. It listens on the local machine
-  alone, and an HTTPS reverse proxy in front of it, for example Tailscale
-  Serve, hands it on: anyone who can reach it through the proxy may
-  write, the proxy being the access.
-- Beside that, the same page has a second way to be served: as a static
-  page, from GitHub Pages, with no server, its two drives then starting
-  from what is served with it and what the user changes kept in the
-  browser of the user's own. It is an addition: the page served by the
-  server writes to the server, and only a page with no server keeps its
-  changes in the browser. Publishing the page anywhere else is asked
-  first.
+- It is a static site alone, on the user's word of 16 October 2026, in
+  place of a server of the project's own that wrote every change to a
+  directory of its host and of a static page that kept its changes in
+  the browser: the page and the tree that its drive starts from, which
+  any host of files serves. A small server of the project's own,
+  `web/serve.mjs`, a script for Node with Node's own modules and nothing
+  from npm, serves such a site on 127.0.0.1 for the tests and for trying
+  the page out, and writes nothing. Publishing the page anywhere but
+  GitHub Pages is asked first.
 - The static page is published on GitHub Pages, at
   https://mmotorny.github.io/vibe_commander/, on the user's word of 16
   October 2026: by `.github/workflows/pages.yml`, run by hand (`gh
@@ -367,7 +362,7 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   is open; Linux has none. `VC_MEMORY` sets it for a test.
 - The README shows a recorded session as an animated SVG made by the
   project's own script from the program's screens (`harness/session.py`):
-  the web page as its server serves it, C: labelled VC and the page
+  the web page as its static site serves it, C: labelled VC and the page
   starting in C:\VC, played in the machine's Chromium and taken from the
   page's own cells, the screen alone: the README links the image and
   the caption under it, "Try it live in your browser", to the published

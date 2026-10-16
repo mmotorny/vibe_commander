@@ -464,26 +464,7 @@ struct DosHandle {
     bool stamped;                       /* a time was set for it: it is
                                            set again when it is closed, as
                                            DOS has it then */
-    bool made;                          /* made anew or cut to nothing
-                                           when it was opened */
     struct DosStamp stamp;
-};
-
-/* What the emulation changes of the host's files, told to whatever keeps
-   them besides the host before it is made: the web page's server, which
-   the page's file system mirrors (sys_web.c). A file's contents, its time
-   and whether it is read-only are told when it is closed, of the handle
-   `fd` that is still open then, where it was made, written or stamped;
-   the others before the host is asked, `path` being what changes,
-   `other` where a file is renamed to and `mode` the bits that a file is
-   to have. */
-enum HostChange {
-    HOST_CONTENTS,                      /* of `fd`, about to be closed */
-    HOST_DELETE,
-    HOST_RENAME,                        /* `path` to `other` */
-    HOST_DIR_MAKE,
-    HOST_DIR_REMOVE,
-    HOST_MODE                           /* `mode`, for read-only */
 };
 
 struct Dos {
@@ -503,12 +484,6 @@ struct Dos {
        has stamped it with its own clock at every write. DosBegin makes it
        none. */
     struct DosStamp (*clock)(void);
-    /* What the host's files are kept by besides, told of every change
-       before it is made: answers 0, or the host's error (errno) for which
-       the change is not made and the call fails with DOS's error of it
-       (DosErrorOf). DosBegin makes it none, which is Linux's. */
-    int (*change)(enum HostChange what, const char *path, const char *other,
-                  int fd, u32 mode);
 };
 
 /* The state that the emulation begins with: the drives, R: the current
