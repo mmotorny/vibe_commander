@@ -213,8 +213,9 @@ Windows and macOS are not targets.
 - The jumps that the translation kept from the assembly, `goto`, go where
   they are easy: in a function that only jumps forward, or whose jumps
   back make a loop with one way in. Those where loops are entered in the
-  middle or paths cross (`V00_10` of `view.c`, `C20_00` of `copy.c`,
-  `F32_00` and `Run_00` of `usermenu.c`, `F39_00` of `menu.c` among them)
+  middle or paths cross, nine functions with some 440 jumps among them
+  on 16 October 2026 (`V00_10` of `view.c`, `C20_00` of `copy.c`,
+  `F32_00` and `Run_00` of `usermenu.c`, `F39_00` of `menu.c` among them),
   keep theirs until one is rewritten for another reason. A label that
   goes leaves the assembly's name in a comment where it stood.
 

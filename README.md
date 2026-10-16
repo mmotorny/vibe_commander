@@ -303,6 +303,7 @@ python3 harness/screenshot.py --scale 3x4 --program build/portable_c/VC.EXE \
 
 | Document | What it holds |
 |---|---|
+| [docs/design/](docs/design/README.md) | A book on the program's design: how Volkov Commander fits its features into 64 KB, read in the portable C |
 | [docs/translation.md](docs/translation.md) | How the assembly is built byte for byte, and how the C translation is made and laid out |
 | [docs/portable-c.md](docs/portable-c.md) | The portable C for DOS: its layout, the system interface `sys.h`, the extender, and its figures |
 | [docs/linux.md](docs/linux.md) | The program for Linux: what it emulates and how it is tested |

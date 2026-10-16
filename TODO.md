@@ -2082,6 +2082,20 @@ Linux"). One thing that it asked for is not built:
 
 ## Known and not dealt with
 
+- Found while the design book, `docs/design/`, was written, on 16 October
+  2026, and left for the user, not mended:
+  - No code was found that stops a host directory at 65,536 entries on
+    Linux, though entry 27 of `src/portable_c/DEVIATIONS.md` says a
+    system that is not DOS shows at most so many: `read.c` has no such
+    check, and the search of `files_posix.c` keeps its place as a 32-bit
+    entry number (`AT_ENTRY`, `AT_ENTRY_HIGH`), so a longer directory
+    looks as if it would be read whole.
+  - The reason that `CMakeLists.txt` gives for `-fno-strict-aliasing`,
+    that the common code reads a word out of bytes through a cast
+    pointer, may be stale since such words are made of their bytes by
+    `GET16`, `PUT16`, `GET32` and `PUT32` of `vc.h`. Whether the option
+    is still needed was not looked into.
+
 - Saving in the editor to a disk that cannot be written, the floppy A:
   of the bench, with the box of DOS's critical error, is in no scenario:
   it went beyond the stack of 256 bytes that the translation had when the
