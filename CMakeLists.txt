@@ -341,15 +341,17 @@ endfunction()
 # but those that portable_c_leaves_<it> names: the web page's (step 7,
 # TODO.md, "Step 7, the web page") takes the emulation of DOS of the
 # program for Linux, *_posix.c, but the two files that have a terminal
-# and a shell, sys_posix.c and term_posix.c, and has its own, *_web.c. A
-# file of a new implementation is named here when it is added, or it is
-# taken for common code. The app for iOS (step 8, TODO.md, "Step 8, the
-# app for iOS") has its files, *_ios.c, beside them.
+# and a shell, sys_posix.c and term_posix.c, and has its own, *_web.c;
+# the app for iOS's (step 8, TODO.md, "Step 8, the app for iOS") the same
+# of Linux's, with its own, *_ios.c. A file of a new implementation is
+# named here when it is added, or it is taken for common code.
 set(portable_c_implementations dos posix web ios)
 set(portable_c_takes_dos dos)
 set(portable_c_takes_posix posix)
 set(portable_c_takes_web posix web)
 set(portable_c_leaves_web sys_posix.c term_posix.c)
+set(portable_c_takes_ios posix ios)
+set(portable_c_leaves_ios sys_posix.c term_posix.c)
 
 # portable_c_sources(<variable> <implementation>) sets <variable> to the
 # files that a build of <implementation> takes, by the lists above, by
@@ -606,6 +608,7 @@ function(add_portable_c_host target directory implementation)
             DEPENDS ${source_dir}/${source} ${source_dir}/vc.h
                     ${source_dir}/tables.h ${source_dir}/sys.h
                     ${source_dir}/compiler.h ${source_dir}/emulate_posix.h
+                    ${source_dir}/ios_shell.h
                     ${directory}/compiled.txt
             COMMENT "Compiling portable_c/${source} (${target})"
             VERBATIM)
@@ -693,6 +696,21 @@ if(clang)
         COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer
                 -fsanitize=memory -fsanitize-memory-track-origins
                 -fno-sanitize-recover=all)
+    # The program of the app for iOS on this computer, the piece I2 of
+    # step 8 (TODO.md, "Step 8, the app for iOS"): sys_ios.c with the
+    # emulation of Linux's, as the app has it, and in place of the app's
+    # shell in SwiftUI a stand-in in C, harness/ios_stand_in.c, as the
+    # rule on test builds allows; with the sanitizers of posix-asan.
+    # build/portable_c/ios-host/vc, which the test
+    # portable_c-ios-host-scenarios takes through the scenarios.
+    set(ios_stand_in ${CMAKE_SOURCE_DIR}/harness/ios_stand_in.c)
+    add_portable_c_host(portable_c-ios-host
+        ${CMAKE_BINARY_DIR}/portable_c/ios-host ios
+        COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer -pthread
+                -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
+                -fno-sanitize-recover=all
+        LINK ${ios_stand_in}
+        LINK_DEPENDS ${ios_stand_in} ${CMAKE_SOURCE_DIR}/src/portable_c/ios_shell.h)
 endif()
 
 # What the program for Linux emulates of DOS without input or output of

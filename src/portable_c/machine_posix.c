@@ -2080,10 +2080,17 @@ void MachineEnvironment(const u8 *shell, int count, char **arguments)
     ScreenSetMode(3);
 }
 
-void MachineEnd(u16 code)
+void MachineStop(u16 code)
 {
     Record("end ", code & 0xFF);
     GiveAll();
     DosEnd(&MachineDos);
+    free(Environment);
+    Environment = 0;
+}
+
+void MachineEnd(u16 code)
+{
+    MachineStop(code);
     exit(code & 0xFF);
 }

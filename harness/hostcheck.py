@@ -122,9 +122,10 @@ AT_ITS_USE = "-ftrack-macro-expansion=0"
 # counted here by the word, and made nothing of for gcc.
 OWN = ["-D__interrupt=", "-D__declspec(x)="]
 
-# What the build of the files of Linux, *_posix.c, gives them, which
-# they are not to be read without: the functions of POSIX and X/Open
-# beside C's (CMakeLists.txt, the build of portable_c-posix-unit).
+# What the build of the files of Linux, *_posix.c, gives them, and those
+# of the app for iOS, *_ios.c, which they are not to be read without:
+# the functions of POSIX and X/Open beside C's (CMakeLists.txt, the
+# build of portable_c-posix-unit).
 POSIX = ["-D_XOPEN_SOURCE=700"]
 
 # The kinds, in the order of the summary: the name that the record has
@@ -287,7 +288,7 @@ def read(command, source, path, at_its_use=True):
     places, text, inline = own(name, text)
     result = subprocess.run(
         [command, *OPTIONS, *([AT_ITS_USE] if at_its_use else []), *OWN,
-         *(POSIX if name.endswith("_posix.c") else []),
+         *(POSIX if name.endswith(("_posix.c", "_ios.c")) else []),
          "-I", str(source), "-"],
         input=f'#line 1 "{name}"\n{text}'.encode("latin-1"),
         capture_output=True, env=dict(os.environ, LC_ALL="C"))

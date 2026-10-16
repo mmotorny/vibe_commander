@@ -667,7 +667,10 @@ void MachineEnvironment(const u8 *shell, int count, char **arguments);
 
 /* The end: the last screen recorded for the test channel, the memory
    given back, the files closed, and the host's process ended with the
-   low byte of `code`. */
+   low byte of `code`. MachineStop is all of that but the process's end,
+   for an implementation whose program ends and the process goes on, the
+   app for iOS's, which may begin the machine again (sys_ios.c). */
+void MachineStop(u16 code);
 void MachineEnd(u16 code);
 
 /* The timer, as Ticks answers it. */

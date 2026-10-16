@@ -99,6 +99,10 @@ PLACE = re.compile(r"^(?P<path>[^:\n]+):(?P<line>\d+):(?P<column>\d+): "
 # The files of Linux that are the program's and not the emulation's: they
 # read what the common code has, and are read with it.
 PROGRAM_POSIX = ("sys_posix.c", "machine_posix.c")
+# And the app for iOS's binding of sys.h, sys_ios.c (the piece I2 of
+# step 8), which reads what the common code has as sys_posix.c does and
+# asks nothing of the host that Linux has not: read with them.
+PROGRAM_IOS = ("sys_ios.c",)
 
 
 def files():
@@ -108,7 +112,7 @@ def files():
     CMakeLists.txt takes them for posix/vc."""
     return sorted(path for path in SOURCE.glob("*.c")
                   if not re.search(r"_(dos|posix|web|ios)\.c$", path.name)
-                  or path.name in PROGRAM_POSIX)
+                  or path.name in PROGRAM_POSIX + PROGRAM_IOS)
 
 
 def posix_files():

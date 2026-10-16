@@ -36,7 +36,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "src" / "portable_c"
 
 # The implementations of sys.h, by the end of a file's name.
-IMPLEMENTATIONS = ("dos", "posix", "web")
+IMPLEMENTATIONS = ("dos", "posix", "web", "ios")
 
 def not_shared(compiled_path):
     """The files of Linux that the web has not: `portable_c_leaves_web` of
