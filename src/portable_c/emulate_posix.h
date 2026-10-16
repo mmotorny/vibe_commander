@@ -214,7 +214,8 @@ void DosNameMake(const char *host, DosNameTaken *taken, const void *context,
 /*
  * The web page has drives that are each a directory of the host, which
  * its implementation names with the drive's letter and label (CLAUDE.md,
- * "The web page"): on the page one, C:, labelled VC, where the program
+ * "The web page"): on the page two, A:, empty and with no label, a
+ * diskette to change disks with, and C:, labelled VC, where the program
  * lives, its own files in C:\VC; in the tests two, C: the bench's
  * working disk and D: the drive of the program's own files, D:\VC, as
  * the bench of DOS has them (the piece W2, TODO.md, "Step 7, the web
@@ -224,10 +225,12 @@ void DosNameMake(const char *host, DosNameTaken *taken, const void *context,
  */
 struct DriveGiven {
     u8 letter;                          /* in capitals */
-    const char *label;                  /* of DOS's form, in capitals */
+    const char *label;                  /* of DOS's form, in capitals:
+                                           empty for a drive that has
+                                           none */
     const char *root;                   /* a directory of the host */
 };
-#define DOS_DRIVES 2
+#define DOS_DRIVES 3                    /* the web page's A:, C: and D: */
 #define DOS_PATH_ROOM 128               /* a full path, with its zero, as
                                            sys.h's FileTrueName has it */
 #define DOS_PATH_LONGEST 67             /* what the program holds, its
@@ -256,7 +259,8 @@ struct DosDrive {
 };
 struct Drives {
     struct DosDrive drive[DOS_DRIVES];  /* H: and R:, or the web page's
-                                           C: and D:, by their letters */
+                                           A:, C: and D:, by their
+                                           letters */
     i32 current;                        /* the current one, its index */
 };
 

@@ -1220,6 +1220,7 @@ static struct Answer Label(struct Dos *dos, const struct DosDrive *drive,
     struct stat status;
 
     if (entry != 0 || strcmp(directory->path, drive->root) != 0
+        || drive->label[0] == '\0'     /* a drive without a label */
         || !Matches(state + AT_TEMPLATE, (const u8 *)drive->label)
         || stat(drive->root, &status) != 0)
         return Failed(dos, NO_MORE_FILES);
@@ -1557,10 +1558,16 @@ struct Device DosDriveRemote(struct Dos *dos, u16 drive)
     return device;
 }
 
-/* 1 for a disk that cannot be taken out (RBIL, INT 21h 4408h). */
+/* 1 for a disk that cannot be taken out, 0 for one that can (RBIL, INT
+   21h 4408h): A: and B:, the PC's diskettes, can, as the web page's A:
+   is; every other drive cannot. */
 struct Answer DosDriveFixed(struct Dos *dos, u16 drive)
 {
-    return IsDrive(dos, drive) ? Done(1) : Failed(dos, INVALID_DRIVE);
+    i32 at = DriveNumbered(dos, drive);
+
+    if (at < 0)
+        return Failed(dos, INVALID_DRIVE);
+    return Done(dos->drives.drive[at].letter <= 'B' ? 0 : 1);
 }
 
 bool DosDriveCd(struct Dos *dos, u16 drive)

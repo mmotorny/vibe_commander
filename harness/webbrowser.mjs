@@ -10,9 +10,9 @@
 //
 // The page is opened as the static site, served by src/portable_c/web/
 // serve.mjs, which answers 404 for what it has not, as GitHub Pages does.
-// The site ships C: with the program's directory vc alone: the test lays
-// its own files on it beside vc (harness/webfiles.mjs), in a copy of the
-// site whose tree of C: has them. On a desktop, 1280 by 800, and as an
+// The site ships C: with C:\VC's files and C:\'s (TODO.md, "C:\VC as it is
+// shipped"): the test lays its own files on C: beside an empty vc
+// (harness/webfiles.mjs), in a copy of the site whose tree of C: has them. On a desktop, 1280 by 800, and as an
 // iPhone, 390 by 844 at three device pixels to one, with touch and
 // Safari's agent, then turned, 844 by 390. What it holds, step by step,
 // is in `desktop` and `phone` below; a step that fails says what the
@@ -65,8 +65,10 @@ async function startSite(top) {
   cpSync(said.site, site, { recursive: true });
   const shipped = JSON.parse(readFileSync(path.join(site, "drives", "c.json"),
                                           "utf8"));
-  must(shipped.entries.length === 1 && shipped.entries[0].path === "vc",
-       "the site's C: has more than its directory vc");
+  const paths = shipped.entries.map((entry) => entry.path);
+  must(["vc", "vc/vc.ini", "vc/vc.hlp", "autoexec.bat"]
+         .every((one) => paths.includes(one)),
+       `the site's C: has ${paths.join(", ")}`);
   const own = path.join(top, "c");
   mkdirSync(path.join(own, "vc"), { recursive: true });
   layFiles(own);
@@ -171,6 +173,24 @@ async function desktop(browser, served) {
   await step("the grid is 640 by 400, a whole multiple of the font", async () => {
     const r = await tab.rect("#screen");
     must(r.width === 640 && r.height === 400, `the grid is ${r.width} by ${r.height}`);
+  });
+  await step("the strip of the keys that the browser keeps, and its hint",
+             async () => {
+    const strip = await tab.eval("Array.from(document.querySelectorAll(" +
+      "'#bar > #kept-keys button')).map((b) => b.textContent).join()");
+    must(strip === "Ctrl-PgUp,Ctrl-PgDn,Ctrl-T,Ctrl-W,Ctrl-F4,Alt-F4",
+         `the bar's strip is ${strip}`);
+    const hint = await tab.text("kept-hint");
+    must(hint && hint.includes("Full screen") && hint.includes("Chrome and Edge"),
+         `the hint is ${JSON.stringify(hint)}`);
+    const r = await tab.rect("#kept-keys");
+    must(r.height <= 40, `the strip is ${r.height} high`);
+  });
+  await step("no pointer of the browser's over the grid, one over the bar",
+             async () => {
+    const grid = await tab.eval("getComputedStyle(document.getElementById('screen')).cursor");
+    const bar = await tab.eval("getComputedStyle(document.querySelector('#kept-keys button')).cursor");
+    must(grid === "none" && bar !== "none", `the grid's is ${grid}, the strip's ${bar}`);
   });
   await shot(tab, `desktop-start`);
   await step("Ctrl-F1: the left panel too", async () => {
@@ -366,7 +386,11 @@ async function phone(browser, served) {
   await step("the row of keys shows", async () => {
     must(!(await tab.eval("document.getElementById('keys').hidden")), "it is hidden");
     const keys = await tab.eval("document.querySelectorAll('#keys button').length");
-    must(keys === 21, `it has ${keys} keys`);
+    must(keys === 27, `it has ${keys} keys`);
+    const strip = await tab.eval("Array.from(document.querySelectorAll(" +
+      "'#keys #kept-keys button')).map((b) => b.textContent).join()");
+    must(strip === "Ctrl-PgUp,Ctrl-PgDn,Ctrl-T,Ctrl-W,Ctrl-F4,Alt-F4",
+         `the row's strip is ${strip}`);
     const last = await tab.eval("document.querySelector('#keys button:last-child').textContent");
     must(last === "Enter", `its last key is ${last}`);
   });

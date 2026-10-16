@@ -173,12 +173,15 @@ node src/portable_c/web/serve.mjs build/portable_c/web/static
 
 and open `http://127.0.0.1:8437/`; any server of static files does as
 well, for example `python3 -m http.server -d
-build/portable_c/web/static 8437`. The page has one drive, C:, labelled
-VC, which holds C:\VC, the program's own files; the page starts there.
-Bring files in with Upload, or by dragging them onto the page. The
-drive lives in the page's memory: every load starts from what is
-served, and changes last until the page is closed or reloaded. Nothing
-is written anywhere else or kept in the browser.
+build/portable_c/web/static 8437`. The page has two drives. C:,
+labelled VC, holds C:\VC, with the project's program for DOS, `VC.EXE`,
+its help, the setup file with the clock on, and menu and extension files
+of the project's own; C:\ has a mock `AUTOEXEC.BAT` and `CONFIG.SYS`. A:
+is empty, for changing disks. The page starts in C:\VC. Bring files in
+with Upload, or by dragging them onto the page. The drives live in the
+page's memory: every load starts from what is served, and changes last
+until the page is closed or reloaded. Nothing is written anywhere else
+or kept in the browser.
 
 The page is published at <https://mmotorny.github.io/vibe_commander/>
 by the workflow `.github/workflows/pages.yml`, which runs only by hand
@@ -186,9 +189,12 @@ by the workflow `.github/workflows/pages.yml`, which runs only by hand
 `VC_PAGES` is `publish` and Pages is switched on with GitHub Actions as
 its source, as both are.
 
-The page cannot run commands, since a browser has no shell.
-[docs/web.md](docs/web.md) has the details, including the phone's key
-row and the keys a browser keeps for itself.
+The page cannot run commands, since a browser has no shell. A browser
+keeps some keys for itself; a strip of buttons below the screen gives the
+program Ctrl-PgUp, Ctrl-PgDn, Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4, and in
+full screen (the Full screen button, by the keyboard lock of Chrome and
+Edge) those keys work from the keyboard too. [docs/web.md](docs/web.md)
+has the details, including the phone's key row.
 
 ## Testing
 

@@ -15,11 +15,10 @@ const { serve } = await import(path.join(web, "serve.mjs"));
 const { layFiles } = await import(new URL("./webfiles.mjs", import.meta.url));
 const top = mkdtempSync(path.join(work, "webpage-"));
 
-// The site as it is shipped, and one whose C: has the test's own files
-// beside the program's directory vc, each served as a host of files
-// serves it.
-const shipped = path.join(top, "shipped");
-await makeSite({ page: html, out: shipped });
+// The site as the build has made it to be shipped, beside the page, and
+// one whose C: has the test's own files beside the program's directory
+// vc, each served as a host of files serves it.
+const shipped = path.join(path.dirname(html), "static");
 const own = path.join(top, "c");
 mkdirSync(path.join(own, "vc"), { recursive: true });
 layFiles(own);
@@ -54,7 +53,7 @@ const base = `http://127.0.0.1:${host.address().port}`;
 let passed = 0, failed = 0;
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
 const KEY = { F2: "\x1b[Q", F7: "\x1b[18~", F8: "\x1b[19~", F10: "\x1b[21~",
-              shiftF4: "\x1b[1;2S", shiftF9: "\x1b[20;2~", home: "\x1b[H",
+              shiftF4: "\x1b[1;2S", altF1: "\x1b[1;3P", shiftF9: "\x1b[20;2~", home: "\x1b[H",
               end: "\x1b[F", altF2: "\x1b[1;3Q", down: "\x1b[B", esc: "\x1b[27u", enter: "\r" };
 
 // The page loaded from `base`, its scripts run as the browser would, with a
@@ -254,13 +253,14 @@ await see(" C:\\VC ");
 }
 keys(KEY.altF2);
 await see("Drive");
-await step("the drive box has C: alone", () => {
+await step("the drive box has A: and C:", () => {
   const lines = text().split("\n");
   const at = lines.findIndex((line) => line.includes("Choose"));
   // The letters between the box's sides, under its question.
   const left = at >= 0 ? lines[at].indexOf(". Choose") : -1;
   const right = at >= 0 ? lines[at].indexOf(".", left + 1) : -1;
-  return at >= 0 && lines[at + 1].slice(left + 1, right).trim() === "C";
+  return at >= 0 && lines[at + 1].slice(left + 1, right).trim()
+    .replace(/\s+/g, " ") === "A C";
 });
 keys(KEY.esc);
 await see("8Delete");
@@ -342,14 +342,59 @@ await step("nothing is kept: no store of the browser's asked for, and " +
 }
 host.close();
 
-// 3. The site as it is shipped: C: with its directory vc alone.
+// 3. The site as the build has made it to be shipped: C:\VC with the
+// program's files, C:\ with AUTOEXEC.BAT and CONFIG.SYS, the clock on by
+// the VC.INI that it ships, the empty A:, and the strip of the keys that
+// the browser keeps, with its hint.
 {
   const other = await hostOf(shipped);
   const page = load(`http://127.0.0.1:${other.address().port}`);
+  const names = (at) => page.fs.readdir(at).filter((n) => n !== "."
+                                                  && n !== "..").sort().join();
   await page.see(" C:\\VC ");
-  await page.step("the shipped site's C: has its directory vc alone",
-                  () => page.fs.readdir("/drive/c").filter((n) => n !== "."
-                          && n !== "..").join() === "vc");
+  await page.step("the shipped site's C: has vc, AUTOEXEC.BAT and CONFIG.SYS",
+                  () => names("/drive/c") === "autoexec.bat,config.sys,vc");
+  await page.step("the shipped site's C:\\VC has the program's files",
+                  () => ["dos32a.txt", "license.txt", "vc.ext", "vc.hlp",
+                         "vc.ini", "vc.mnu", "vcedit.ext", "vcview.ext"]
+                    .every((name) => names("/drive/c/vc").split(",")
+                      .includes(name)));
+  await page.see("vc       ini");
+  await page.see("vc       hlp");
+  // The clock, in the corner of the top row, "12:00p" as the program
+  // writes it, its colon blinking.
+  await page.step("the clock is on, in the top row's corner",
+                  () => /^[ \d]\d[: ]\d\d[ap]$/.test(
+                    page.text().split("\n")[0].slice(74)));
+  const left = () => page.text().split("\n")[0].slice(0, 40);
+  await page.step("C:\\VC on the left, C:\\ on the right",
+                  () => left().includes(" C:\\VC ")
+                        && page.text().split("\n")[0].slice(40)
+                          .includes(" C:\\ "));
+  await page.step("A: is there and empty",
+                  () => isDirectory(page, "/drive/a")
+                        && names("/drive/a") === "");
+  page.keys(KEY.altF1);
+  await page.see("Drive");
+  page.keys("a");
+  await page.see(" A:\\ ");
+  page.keys(KEY.altF1);
+  await page.see("Drive");
+  page.keys("c");
+  await page.see(" C:\\VC ");
+  const strip = page.elements["kept-keys"].children;
+  const labels = strip.filter((child) => child.id !== "kept-hint")
+    .map((child) => child.textContent);
+  const hint = strip.find((child) => child.id === "kept-hint");
+  await page.step("the strip has the keys that the browser keeps, and a hint",
+                  () => labels.join() === "Ctrl-PgUp,Ctrl-PgDn,Ctrl-T," +
+                          "Ctrl-W,Ctrl-F4,Alt-F4"
+                        && hint && /Full screen/.test(hint.textContent)
+                        && /Chrome and Edge/.test(hint.textContent));
+  // Ctrl-PgUp of the strip, as the browser would not hand it on: C:\.
+  strip[0].listeners.click();
+  await page.step("Ctrl-PgUp of the strip takes the left panel to C:\\",
+                  () => left().includes(" C:\\ "));
   other.close();
 }
 

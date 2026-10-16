@@ -2,9 +2,10 @@
 # (CLAUDE.md, "The web page"; TODO.md, "W3c"): the page whose drive
 # starts from what is served with it at every load and whose changes last
 # until the page is closed. It builds the target portable_c-web-static
-# with Emscripten, the pinned download of CMakeLists.txt, and deploys
-# build/portable_c/web/static, the page and the tree of its drive, C:
-# with its directory vc alone.
+# with Emscripten, and with Open Watcom for the program for DOS, VC.EXE,
+# which C:\VC ships (TODO.md, "C:\VC as it is shipped"), both the pinned
+# downloads of CMakeLists.txt, and deploys build/portable_c/web/static,
+# the page and the tree of its drive, C: as it is shipped.
 #
 # It never runs by itself. Publishing is the user's to decide (CLAUDE.md,
 # "The web page"), so the workflow has no trigger but a run
@@ -58,7 +59,7 @@ jobs:
           if [ -d ~/emscripten-src/emscripten ]; then
             from="-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=$HOME/emscripten-src"
           fi
-          cmake -S . -B build -DVC_DOS=OFF -DVC_WEB=ON $from
+          cmake -S . -B build -DVC_WEB=ON $from
       - name: Keep Emscripten for the next run
         if: steps.cache.outputs.cache-hit != 'true'
         run: cp -a build/_deps/emscripten-src ~/emscripten-src

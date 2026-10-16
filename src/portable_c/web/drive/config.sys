@@ -1,0 +1,9 @@
+REM The setup of a DOS machine, as a PC of 1995 might have had it.
+REM It is only for the look on the web page: nothing reads it here.
+DEVICE=C:\DOS\HIMEM.SYS
+DEVICE=C:\DOS\EMM386.EXE NOEMS
+DOS=HIGH,UMB
+FILES=40
+BUFFERS=20
+LASTDRIVE=Z
+SHELL=C:\DOS\COMMAND.COM C:\DOS\ /E:1024 /P

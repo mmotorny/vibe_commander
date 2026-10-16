@@ -40,18 +40,30 @@ const when = Date.UTC(2026, 9, 16, 9, 30, 0);
 
 // 1. The site.
 const shipped = path.join(top, "shipped");
-await check("the site as it is shipped: the page and C: with vc alone",
-            async () => {
-  await makeSite({ page, out: shipped });
+await check("the site as it is shipped: the page, and C: with vc and the " +
+            "files named", async () => {
+  const files = path.join(top, "files");
+  mkdirSync(files);
+  writeFileSync(path.join(files, "one"), "the help");
+  writeFileSync(path.join(files, "two"), "REM a start\r\n");
+  await makeSite({ page, out: shipped,
+                   files: [["vc/vc.hlp", path.join(files, "one")],
+                           ["autoexec.bat", path.join(files, "two")]] });
   assert.deepEqual(readdirSync(shipped).sort(),
                    [".nojekyll", "drives", "index.html"]);
   assert.equal(readFileSync(path.join(shipped, "index.html"), "utf8"),
                readFileSync(page, "utf8"));
   assert.deepEqual(readdirSync(path.join(shipped, "drives")), ["c.json"]);
   const c = JSON.parse(readFileSync(path.join(shipped, "drives", "c.json")));
-  assert.equal(c.entries.length, 1);
-  assert.equal(c.entries[0].path, "vc");
-  assert.equal(c.entries[0].directory, true);
+  assert.deepEqual(c.entries.map((entry) => [entry.path, entry.directory]),
+                   [["vc", true], ["autoexec.bat", false],
+                    ["vc/vc.hlp", false]]);
+  assert.equal(Buffer.from(c.entries[2].data, "base64").toString(),
+               "the help");
+  assert.equal(Buffer.from(c.entries[1].data, "base64").toString(),
+               "REM a start\r\n");
+  for (const entry of c.entries)
+    assert.equal(entry.mtime, c.mtime);
 });
 const drive = path.join(top, "c");
 mkdirSync(path.join(drive, "vc"), { recursive: true });

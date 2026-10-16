@@ -1,0 +1,14 @@
+' The extension file of Vibe Commander: what Enter does with a file
+' by its extension. A line such as
+'
+'   txt: edit !.!
+'
+' has Enter on a .TXT file run that command; ? stands for any
+' character of the extension and * for any rest, ! for the file's
+' name and !.! for its name and extension.
+'
+' A web page cannot run commands, so this file has no entry: Enter on
+' a file that no entry names opens it in a new tab of the browser.
+' Take the apostrophe off the line below to see what an entry does.
+'
+'bat: type !.!

@@ -3,10 +3,11 @@
 // served as, from GitHub Pages or any host of files, a directory of
 //
 //   index.html       the page, vc.html;
-//   drives/c.json    C:, the page's one drive, as every load of the page
-//                    starts it: its directory vc and nothing in it, or the
-//                    tree of the directory that --drive-c names, for a
-//                    test;
+//   drives/c.json    C:, the drive of the page's files, as every load of
+//                    the page starts it: what --file names, each a path of
+//                    C: and the file that it is made of, C:\VC's files and
+//                    those of C:\ (CMakeLists.txt has them), or the tree of
+//                    the directory that --drive-c names, for a test;
 //   .nojekyll        so that GitHub Pages serves the files as they are.
 //
 // The page loads the tree into its memory and keeps every change there
@@ -14,6 +15,10 @@
 // alone; serve.mjs serves such a directory on this machine.
 //
 //   node static.mjs --page vc.html --out DIR [--drive-c DIR]
+//                   [--file PATH=SOURCE]...
+//
+// A: is the page's too, empty, and is no file of the site: the page makes
+// it (page.js).
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -51,14 +56,29 @@ export async function treeOf(root) {
   return { entries, mtime: Math.floor((await fs.stat(root)).mtimeMs) };
 }
 
+// C: as it is shipped: its directory vc, and each of `files`, [path,
+// source], a path of C: in lower case, as the program names what it makes
+// on the host, and the file of this machine that it is made of; every
+// directory and file of the time `mtime`.
+export async function shippedTree(files, mtime) {
+  const entries = [{ path: "vc", directory: true, mtime, readonly: false }];
+  for (const [named, source] of [...files].sort((a, b) =>
+    (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))) {
+    const data = await fs.readFile(source);
+    entries.push({ path: named, directory: false, mtime, readonly: false,
+                   data: data.toString("base64") });
+  }
+  return { entries, mtime };
+}
+
 // The site made in `out` of the page `page`, its C: the tree of `drive`
-// where that is said.
-export async function makeSite({ page, out, drive = null }) {
+// where that is said, else C: as shipped with `files` in it, of the time
+// of the page.
+export async function makeSite({ page, out, drive = null, files = [] }) {
   let c;
   if (drive === null) {
     const status = await fs.stat(page);
-    c = { entries: [{ path: "vc", directory: true,
-                      mtime: Math.floor(status.mtimeMs), readonly: false }] };
+    c = await shippedTree(files, Math.floor(status.mtimeMs));
   } else {
     c = await treeOf(drive);
   }
@@ -71,16 +91,22 @@ export async function makeSite({ page, out, drive = null }) {
 
 if (process.argv[1] && path.resolve(process.argv[1])
     === fileURLToPath(import.meta.url)) {
-  const told = {};
+  const told = { files: [] };
   const argv = process.argv.slice(2);
   for (let i = 0; i < argv.length; i += 2) {
     const name = { "--page": "page", "--out": "out",
-                   "--drive-c": "drive" }[argv[i]];
-    if (name === undefined || i + 1 >= argv.length) {
+                   "--drive-c": "drive", "--file": "file" }[argv[i]];
+    const at = name === "file" && i + 1 < argv.length
+      ? argv[i + 1].indexOf("=") : 0;
+    if (name === undefined || i + 1 >= argv.length || at < 0) {
       console.error(`static.mjs: what is ${argv[i]}? See the top of the file.`);
       process.exit(2);
     }
-    told[name] = path.resolve(argv[i + 1]);
+    if (name === "file")
+      told.files.push([argv[i + 1].slice(0, at),
+                       path.resolve(argv[i + 1].slice(at + 1))]);
+    else
+      told[name] = path.resolve(argv[i + 1]);
   }
   if (!told.page || !told.out) {
     console.error("static.mjs: --page and --out are wanted.");

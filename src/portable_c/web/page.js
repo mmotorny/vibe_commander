@@ -20,7 +20,7 @@
 import { COLUMNS, ROWS, BLINK_CLASS, BLINK_HALF, CURSOR_HALF, Screen, css, apply } from "./render.js";
 import { keyEvent, FOCUS_OUT } from "./keys.js";
 import { Mouse } from "./mouse.js";
-import { Drives, ROOTS } from "./drives.js";
+import { Drives, ROOTS, DISKETTE } from "./drives.js";
 
 // The type of a file that is opened in a new tab, by its extension.
 const TYPES = {
@@ -77,6 +77,14 @@ function made(type, code, key, held = {}) {
 // them, which then let go.
 function press(code, key, shift = false) {
   const held = { shift, ctrl: page.latched.ctrl, alt: page.latched.alt };
+  queue(keyEvent(made("keydown", code, key, held)).bytes);
+  queue(keyEvent(made("keyup", code, key, held)).bytes);
+  release();
+}
+
+// A key pressed and let go with Ctrl or Alt held as `held` says, the row's
+// own let go: for the strip of the keys that a browser keeps.
+function pressHeld(code, key, held) {
   queue(keyEvent(made("keydown", code, key, held)).bytes);
   queue(keyEvent(made("keyup", code, key, held)).bytes);
   release();
@@ -335,6 +343,34 @@ const BAR = [
   ["PgDn", "PageDown", "PageDown"],
 ];
 
+// The keys that a browser keeps for itself, which the keyboard does not
+// get to the program but in the full screen, where Chrome and Edge lock
+// the keyboard for the page (fullScreen): a strip of their own, on a
+// desktop as well as in the phone's row of keys.
+const KEPT = [
+  ["Ctrl-PgUp", "PageUp", "PageUp", { ctrl: true }],
+  ["Ctrl-PgDn", "PageDown", "PageDown", { ctrl: true }],
+  ["Ctrl-T", "KeyT", "t", { ctrl: true }],
+  ["Ctrl-W", "KeyW", "w", { ctrl: true }],
+  ["Ctrl-F4", "F4", "F4", { ctrl: true }],
+  ["Alt-F4", "F4", "F4", { alt: true }],
+];
+
+function makeStrip() {
+  const strip = $("kept-keys");
+  for (const [label, code, key, held] of KEPT) {
+    const button = document.createElement("button");
+    button.textContent = label;
+    button.addEventListener("click", () => pressHeld(code, key, held));
+    strip.append(button);
+  }
+  const hint = document.createElement("span");
+  hint.id = "kept-hint";
+  hint.textContent = "The browser keeps these keys: in Full screen, " +
+    "Chrome and Edge let the keyboard have them.";
+  strip.append(hint);
+}
+
 function makeBar() {
   const keys = $("keys");
   for (const [label, code, key] of BAR) {
@@ -368,8 +404,13 @@ function makeBar() {
     input.value = " ";
     input.focus();
   });
-  if (window.matchMedia("(pointer: coarse)").matches)
+  makeStrip();
+  // On a phone the strip is a part of the row of keys, in front of Enter,
+  // which stays last.
+  if (window.matchMedia("(pointer: coarse)").matches) {
     $("keys").hidden = false;
+    $("keys").insertBefore($("kept-keys"), enter);
+  }
   $("more").addEventListener("click", () => {
     $("keys").hidden = !$("keys").hidden;
     fit();
@@ -464,6 +505,12 @@ window.Module = {
   vcBegin: ({ FS, ENV, addRunDependency, removeRunDependency }) => {
     page.fs = FS;
     ENV.VC_DRIVE_C = ROOTS.c;
+    // A:, an empty diskette, so that changing disks can be tried; a test
+    // of the scenarios lays out the bench's drives alone.
+    if (!TEST) {
+      FS.mkdirTree(DISKETTE);
+      ENV.VC_DRIVE_A = DISKETTE;
+    }
     if (TEST)
       TEST.begin({ FS, ENV });
     addRunDependency("vc-drives");

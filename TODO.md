@@ -1708,9 +1708,8 @@ program asks for (1 to 61, the setup's 55 to 61 among them), and
 `tools/makehelp.py` makes of it `build/portable_c/VC.HLP` at every build
 (the target `portable_c-help`); the file is not kept in the repository.
 The test `portable_c-help-file` holds what F1 shows of it in the program
-for Linux. **Not yet on the page:** the piece that places C:\VC's files
-copies `build/portable_c/VC.HLP` into the page's C:\VC as `vc.hlp`, in
-the static site's `drives/c.json`, and the page's F1 then shows it.
+for Linux. The page ships it in C:\VC as `vc.hlp` ("C:\VC as it is
+shipped" below).
 
 ### W8, the page static alone, its drive ephemeral: done
 
@@ -1813,7 +1812,7 @@ deviation is (DEVIATIONS.md), documented in the README and
      entry of its own among the L entries of DEVIATIONS.md, "The program
      for Linux", and the scenarios that show the scroll have patches of
      the posix trees. DOS is unchanged.
-2. **Next, one piece of the page, after (a) has landed:**
+2. **One piece of the page: done**, as "C:\VC as it is shipped" below:
    - C:\VC holds the project's program for DOS, `VC.EXE`, with
      LICENSE.TXT (Volkov's) and LICENSE.DOS32A beside it; the VC.INI
      that the program saves; a VC.MNU, VC.EXT, VCVIEW.EXT and
@@ -1850,6 +1849,55 @@ deviation is (DEVIATIONS.md), documented in the README and
 
    The words "Try it live" stay in the README's caption alone, not in
    the SVG, as the user had it on 16 October 2026.
+
+### C:\VC as it is shipped: done, and what is left of it
+
+Item 2 of the queue above, on the user's word of 16 October 2026
+(CLAUDE.md, "The web page"; DEVIATIONS.md, W1, W4, W5 and W11):
+
+- **C:** is made by `static.mjs` of what CMake names, `web_shipped`
+  (`--file PATH=SOURCE`): in C:\VC `vc.exe`, the build's
+  `portable_c/VC.EXE` where VC_DOS is on (the Pages workflow builds with
+  it on now, Open Watcom being the pinned download that it is); Volkov's
+  `license.txt` and DOS/32A's licence as `dos32a.txt`, a name of 8.3 in
+  place of LICENSE.DOS32A, whose extension DOS does not take; `vc.hlp`,
+  the build's VC.HLP; `vc.ini` (below); and `vc.mnu`, `vc.ext`,
+  `vcview.ext` and `vcedit.ext` of the project's own; in C:\ a mock
+  `autoexec.bat` and `config.sys`. The written ones are in
+  `src/portable_c/web/drive/`, CRLF text kept as it is
+  (`.gitattributes`). The extension files have comments only, since an
+  entry would have Enter, F3 or F4 run a command that the page cannot
+  run in place of what it does without one. No README, on the user's
+  word: the help takes its place. Every file has the page's time.
+- **The clock**, checked in each place: the program's defaults, the
+  table of `start.c`, have it off (and the left panel off); the
+  shareware's VC.INI has it on (byte 1AAh, 1), which the bench switches
+  off; the page started with no setup file, so off, as the program for
+  Linux does at its first start. The page now ships the VC.INI that the
+  program saves, `tools/webini.py`, which takes the program for the web
+  under Node through `F9 o l`, Ctrl-F1, Ctrl-\, Tab and Shift-F9 from its
+  defaults: the clock on, C:\VC on the left and C:\ on the right. The
+  defaults are as they were, so the program for DOS is the same bytes
+  and no golden moved. **Open for the user:** the program for Linux still
+  starts with the clock off where it has no setup file; making it on
+  there is a change of its first start, which scenarios that start with
+  no setup file would show.
+- **A:** is a directory of the page's memory, `/drive/a`, made by the
+  page and not served, given as `VC_DRIVE_A` with no label
+  (`sys_web.c`, three drives now, `DOS_DRIVES` 3); a test of the
+  scenarios, by the hook, gets the bench's drives alone. A drive with no
+  label has none in a search for one (`Label` of `files_posix.c`), and
+  A: and B: answer 4408h as disks that can be taken out, so a search of
+  all drives passes them by.
+- **The strip** of the keys that a browser keeps, Ctrl-PgUp, Ctrl-PgDn,
+  Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4 (`KEPT` of `page.js`), small in the
+  bar on a desktop and in the phone's row of keys in front of Enter, with
+  its hint on the full screen. And the browser's pointer is hidden over
+  the grid, `cursor: none`.
+- **The tests:** `portable_c-web-site` holds the site that the build
+  made (`--site`, `--program`), `portable_c-web-page` the shipped site in
+  the page, and `portable_c-web-browser` the strip, its hint and the
+  pointer.
 
 ### Left open when the session of 15 October 2026 ended
 

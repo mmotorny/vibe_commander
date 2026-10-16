@@ -22,23 +22,37 @@ is declared in `src/portable_c/DEVIATIONS.md`, under "The web page"
 
 ### Drives
 
-The page has one drive, C:, labelled VC. It holds C:\VC, where the
-program lives: its own files, the setup file `VC.INI`, the menu and the
-extension file. Nothing else is shipped on it, no demo and no sample
-files, and the page starts in C:\VC. The user brings files in (see
-"Files in and out").
+The page has two drives. C:, labelled VC, holds C:\VC, where the
+program lives, and the page starts there, with C:\VC on the left and C:\
+on the right. A:, with no label, is empty: a diskette to change disks to
+and copy onto. The user brings files in (see "Files in and out").
 
-The drive is ephemeral. The page is a static site, and at every load it
-loads its drive from what is served with it, `drives/c.json`, C: with
-its directory `vc` and nothing in it, into its own memory, Emscripten's
-file system. Every change, the setup file's too, is made there and
-nowhere else: nothing is written back to where the page is served from,
-and nothing is kept in the browser, in IndexedDB or any other store.
-Changes last until the page is closed or reloaded, and the bar says so.
+C:\VC holds, as the page ships it, nothing of the shareware's:
 
-C: is an ordinary drive to the program. The shareware's help and menu
-files are not shipped: F1 shows nothing, as the original does without
-its help file, until the user brings `VC.HLP` into C:\VC.
+- `VC.EXE`, the project's program for DOS, with Volkov's licence,
+  `LICENSE.TXT`, and DOS/32A's, `DOS32A.TXT`, which goes with it;
+- `VC.HLP`, the project's own help, which F1 shows;
+- `VC.INI`, the setup file that the program saves (`tools/webini.py`),
+  with the clock on;
+- `VC.MNU`, `VC.EXT`, `VCVIEW.EXT` and `VCEDIT.EXT`, the project's own,
+  whose comments say their forms; the extension files have no entry,
+  since a web page runs no command.
+
+C:\ has a mock `AUTOEXEC.BAT` and `CONFIG.SYS`, for the look of a DOS
+disk and for something to view. The files are in
+`src/portable_c/web/drive/`, and the build puts the rest in beside them.
+
+The drives are ephemeral. The page is a static site, and at every load
+it loads C: from what is served with it, `drives/c.json`, into its own
+memory, Emscripten's file system, and makes A: there empty. Every
+change, the setup file's too, is made there and nowhere else: nothing is
+written back to where the page is served from, and nothing is kept in
+the browser, in IndexedDB or any other store. Changes last until the
+page is closed or reloaded, and the bar says so.
+
+A: and C: are ordinary drives to the program. A: is a disk that can be
+taken out, as DOS's diskettes are, so a search of all drives passes it
+by.
 
 The tests are another matter: they give the program the bench's two
 drives through the environment, C: labelled VIBE and D: labelled DEMO
@@ -92,6 +106,18 @@ screen locks the keyboard where the browser allows it, as Chromium
 does, and then most of those keys reach the program; holding Esc leaves
 full screen. A dead key or an input method's character is not typed.
 
+A strip of buttons gives the program six of them: Ctrl-PgUp, Ctrl-PgDn,
+Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4. On a desktop it is a small strip in
+the bar; on a phone it is in the row of keys, behind Enter. A hint beside
+it says that in full screen, by the Full screen button, Chrome and Edge
+let the keyboard have these keys (their keyboard lock).
+
+### The mouse pointer
+
+The browser's own pointer is hidden over the 80 by 25 grid, where the
+program draws its own as a cell, as on DOS; over the bar, the strip of
+keys and the dialogs it is the browser's as ever.
+
 ### Licences
 
 The bar names the program, "Vibe Commander 0.1, based on Volkov
@@ -128,12 +154,13 @@ cmake --build build
 
 A second build directory can reuse the first one's download with
 `-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=<first>/_deps/emscripten-src`.
-`-DVC_DOS=OFF` leaves out Open Watcom and everything for DOS.
+`-DVC_DOS=OFF` leaves out Open Watcom and everything for DOS, and the page
+then ships no `VC.EXE` in C:\VC; the Pages workflow builds with it on.
 
 | Target | What it makes |
 |---|---|
 | `portable_c-web` | `build/portable_c/web/vc.html`, the page, at `-O2` with no sanitizer |
-| `portable_c-web-static` | `build/portable_c/web/static/`, the static site: the page as `index.html`, the tree that its drive starts from at every load, C: with `vc` alone, and `.nojekyll` |
+| `portable_c-web-static` | `build/portable_c/web/static/`, the static site: the page as `index.html`, the tree that its drive starts from at every load, C: as shipped with C:\VC's files and AUTOEXEC.BAT and CONFIG.SYS (with VC_DOS, `VC.EXE` among them; `VC.INI` made by `tools/webini.py`), and `.nojekyll` |
 | `portable_c-web-node` | `build/portable_c/web-node/vc.js` with its `vc.wasm`: the program under Node with the host's files, sanitized. The scenarios run this one |
 
 ## Running it
@@ -238,11 +265,11 @@ the failures grouped by cause to `build/webpagerun/summary.txt`.
 |---|---|
 | `portable_c-web-probe` | Only with `-DVC_WEB=ON`. Every file that the web build compiles (the common code, the DOS emulation it shares with Linux, and its own) compiled by emcc for wasm32 with the Linux program's warnings and `-Werror`, each failure printed. `harness/webprobe.py`, which takes from the configuration the list of Linux files that the web leaves out |
 | `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`. `web-node/vc.js`, built with Asyncify and the address and undefined-behaviour sanitizers, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drives given through the environment as the bench has them: C: the bench's home directory, labelled VIBE, and D:, labelled DEMO, a directory of the run's with the program's own files in D:\VC. Screens and files are held to the original's goldens with what is declared for the portable C, for Linux (but the masks of the drive's letter) and for the web. Each scenario not run or cut on the web is named by an entry for Linux or for the web page in `DEVIATIONS.md` |
-| `portable_c-web-page` | Only with `-DVC_WEB=ON`. `vc.html` itself, its scripts run in Node with a stand-in document, as a static site served by `serve.mjs`, with files that the test lays on C:: the drive loaded and the start in C:\VC; the drive box with C: alone; the Licences link showing each carried file's text, closed by Esc and its button with no key reaching the program, and the bar's line "Changes last until the page is reloaded or closed."; a directory made and removed, a file opened in a tab, a file written in the editor, a file deleted and the setup saved, each in the page's memory; the page's end; no store of the browser's asked for and nothing of the site changed; the page loaded again without the changes; the shipped site's C: with `vc` alone; and a host with no drive, for which the page does not start. `harness/webpage.py` |
-| `portable_c-web-browser` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`. The page in the machine's own Chromium, headless, driven over the DevTools protocol from Node with nothing from npm, as the static site served by `serve.mjs`, which answers 404 for what it lacks. On a 1280 by 800 desktop: a start with no error, the bar's line "Changes last until the page is reloaded or closed.", the VGA font loaded, the grid 640 by 400, the VGA colours, Ctrl-F1, the start in C:\VC and C:\ with files that the test lays there, the cursor keys and Tab, F1, a file written in the editor, the mouse, a click on a file, a double click into a directory, a click on the menu bar and one on the key bar, each followed by a key that has to take effect, Enter on a text file opening a tab of a blob, the Licences opened and closed by Esc and its button with no key reaching the program, a reload that has the drive as served with the written file gone, and nothing of the page's in the browser's stores. As an iPhone, 390 by 844 at three pixels to one, with touch and Safari's user agent: the row of keys, its Ctrl and Alt held for F1 and F2, Alt-F2 and C:, a tap on a file moving the cursor there, a tap on the key bar with the row's Enter behind it, and the grid within the screen's width above the bar; turned to 844 by 390, the grid fitted again. And no console error. `harness/webbrowser.py`, `harness/webbrowser.mjs` |
+| `portable_c-web-page` | Only with `-DVC_WEB=ON`. `vc.html` itself, its scripts run in Node with a stand-in document, as a static site served by `serve.mjs`, with files that the test lays on C:: the drive loaded and the start in C:\VC; the drive box with A: and C:; the Licences link showing each carried file's text, closed by Esc and its button with no key reaching the program, and the bar's line "Changes last until the page is reloaded or closed."; a directory made and removed, a file opened in a tab, a file written in the editor, a file deleted and the setup saved, each in the page's memory; the page's end; no store of the browser's asked for and nothing of the site changed; the page loaded again without the changes; the site that the build made: C:\VC's files, AUTOEXEC.BAT and CONFIG.SYS, the clock on, C:\VC on the left and C:\ on the right, A: empty and changed to and back, and the strip of kept keys with its hint, its Ctrl-PgUp taking the panel up; and a host with no drive, for which the page does not start. `harness/webpage.py` |
+| `portable_c-web-browser` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`. The page in the machine's own Chromium, headless, driven over the DevTools protocol from Node with nothing from npm, as the static site served by `serve.mjs`, which answers 404 for what it lacks. On a 1280 by 800 desktop: a start with no error, the bar's line "Changes last until the page is reloaded or closed.", the VGA font loaded, the grid 640 by 400, the strip of the keys that the browser keeps with its hint, no pointer of the browser's over the grid and one over the bar, the VGA colours, Ctrl-F1, the start in C:\VC and C:\ with files that the test lays there, the cursor keys and Tab, F1, a file written in the editor, the mouse, a click on a file, a double click into a directory, a click on the menu bar and one on the key bar, each followed by a key that has to take effect, Enter on a text file opening a tab of a blob, the Licences opened and closed by Esc and its button with no key reaching the program, a reload that has the drive as served with the written file gone, and nothing of the page's in the browser's stores. As an iPhone, 390 by 844 at three pixels to one, with touch and Safari's user agent: the row of keys with the strip in it, its Ctrl and Alt held for F1 and F2, Alt-F2 and C:, a tap on a file moving the cursor there, a tap on the key bar with the row's Enter behind it, and the grid within the screen's width above the bar; turned to 844 by 390, the grid fitted again. And no console error. `harness/webbrowser.py`, `harness/webbrowser.mjs` |
 | `portable_c-web-page-scenarios` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`. Every scenario of the web played through `vc.html` as a static site whose C: is the bench's, the bench's D: laid out by the test hook, in the machine's own headless Chromium, one test of Chromium at a time. Keys and mouse steps are browser events, passed on by the page's `keys.js` and `mouse.js`. Every screen is read from the `<pre>` and from its pixels, and both are held to the goldens with the web's declarations and masks. A scenario that presses a key the browser keeps for itself is not played. `harness/webpagerun.py`, `harness/webpagerun.mjs` |
 | `portable_c-web-render` | The page's modules for drawing, keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node. Grids that the program for Linux writes through its test channel are drawn, and the HTML is read back and checked against the cells and the rows that changed. The keys and mouse reports that the modules make of browser events are typed into the program for Linux in a pseudo-terminal, and what it reads is checked against the BIOS's words. `harness/webrender.py`; skipped without Node or clang |
-| `portable_c-web-site` | The static site, its server and the page's drive in Node: the site made with C: as shipped and with C: of a directory, its tree with contents, times and the read-only bit and no host link; `serve.mjs` serving the page and the site's files and nothing outside them, 404 for `..`, a backslash, a NUL, a host link and any method but GET and HEAD; the drive loaded by `drives.js` into a file system of Emscripten's shape, a file brought in, and a site with no drive refused; and the page's script bundled, compiled and run up to the program. `harness/website.py`; skipped without Node |
+| `portable_c-web-site` | The static site, its server and the page's drive in Node: the site made with C: as shipped and with C: of a directory, and the site that the build made: every file of its C: against its source, VC.EXE the same bytes as the build's, VC.INI with its sum and the clock on, no file the shareware's or with a line of its help, and no README; its tree with contents, times and the read-only bit and no host link; `serve.mjs` serving the page and the site's files and nothing outside them, 404 for `..`, a backslash, a NUL, a host link and any method but GET and HEAD; the drive loaded by `drives.js` into a file system of Emscripten's shape, a file brought in, and a site with no drive refused; and the page's script bundled, compiled and run up to the program. `harness/website.py`; skipped without Node |
 
 The two tests in Chromium, `portable_c-web-browser` and
 `portable_c-web-page-scenarios`, have the label `browser` and not

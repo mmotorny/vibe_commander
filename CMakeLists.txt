@@ -880,17 +880,63 @@ if(VC_WEB)
     # Pages (.github/workflows/pages.yml); the page keeps every change in
     # its memory until it is closed. Made with every build, for the tests;
     # web/serve.mjs serves it on this machine.
+    #
+    # Its C: as shipped (TODO.md, "C:\VC as it is shipped"): in C:\VC the
+    # program for DOS, VC.EXE, where VC_DOS builds it, with the licences
+    # that it carries, Volkov's and DOS/32A's; the setup file that the
+    # program saves, with the clock on (tools/webini.py); the project's
+    # own menu and extension files and its help; and in C:\ a mock
+    # AUTOEXEC.BAT and CONFIG.SYS. A: is the page's, empty.
+    set(web_drive ${web_dir}/drive)
+    set(web_ini ${web_page_dir}/vc.ini)
+    add_custom_command(
+        OUTPUT ${web_ini}
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/tools/webini.py
+                --node ${node}
+                --program ${CMAKE_BINARY_DIR}/portable_c/web-node/vc.js
+                --out ${web_ini}
+        DEPENDS ${CMAKE_BINARY_DIR}/portable_c/web-node/vc.js
+                ${CMAKE_SOURCE_DIR}/tools/webini.py
+        COMMENT "Making the web page's VC.INI"
+        VERBATIM)
+    set(web_shipped
+        vc/vc.ini=${web_ini}
+        vc/vc.hlp=${CMAKE_BINARY_DIR}/portable_c/VC.HLP
+        vc/license.txt=${CMAKE_SOURCE_DIR}/src/asm/LICENSE.TXT
+        vc/dos32a.txt=${CMAKE_SOURCE_DIR}/LICENSE.DOS32A
+        vc/vc.mnu=${web_drive}/vc/vc.mnu
+        vc/vc.ext=${web_drive}/vc/vc.ext
+        vc/vcview.ext=${web_drive}/vc/vcview.ext
+        vc/vcedit.ext=${web_drive}/vc/vcedit.ext
+        autoexec.bat=${web_drive}/autoexec.bat
+        config.sys=${web_drive}/config.sys)
+    if(VC_DOS)
+        list(APPEND web_shipped vc/vc.exe=${CMAKE_BINARY_DIR}/portable_c/VC.EXE)
+    endif()
+    set(web_shipped_args "")
+    set(web_shipped_sources "")
+    foreach(one ${web_shipped})
+        list(APPEND web_shipped_args --file ${one})
+        string(REGEX REPLACE "^[^=]*=" "" source ${one})
+        list(APPEND web_shipped_sources ${source})
+    endforeach()
     add_custom_command(
         OUTPUT ${web_page_dir}/static/index.html
                ${web_page_dir}/static/drives/c.json
         COMMAND ${node} ${web_dir}/static.mjs
                 --page ${web_page_dir}/vc.html --out ${web_page_dir}/static
+                ${web_shipped_args}
         DEPENDS ${web_page_dir}/vc.html ${web_dir}/static.mjs
+                ${web_shipped_sources}
         COMMENT "Making the web page a static site"
         VERBATIM)
     add_custom_target(portable_c-web-static ALL
         DEPENDS ${web_page_dir}/static/index.html)
-    add_dependencies(portable_c-web-static portable_c-web)
+    add_dependencies(portable_c-web-static portable_c-web portable_c-web-node
+        portable_c-help)
+    if(VC_DOS)
+        add_dependencies(portable_c-web-static portable_c)
+    endif()
 endif()
 
 # --- Tests --------------------------------------------------------------------
@@ -1095,8 +1141,19 @@ set_tests_properties(portable_c-web-render PROPERTIES SKIP_RETURN_CODE 77)
 # drive loaded from it; and the page's script as the build makes it. See
 # harness/website.py. It needs Node and nothing downloaded, and runs no
 # machine.
+# With VC_WEB it holds the site that the build has made as well, its C:
+# as it is shipped, VC.EXE in it where VC_DOS builds that.
+set(web_site_args "")
+if(VC_WEB)
+    set(web_site_args --site ${CMAKE_BINARY_DIR}/portable_c/web/static)
+    if(VC_DOS)
+        list(APPEND web_site_args
+             --program ${CMAKE_BINARY_DIR}/portable_c/VC.EXE)
+    endif()
+endif()
 add_test(NAME portable_c-web-site
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/website.py)
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/website.py
+            ${web_site_args})
 set_tests_properties(portable_c-web-site PROPERTIES SKIP_RETURN_CODE 77)
 # The program for Linux through the scenarios, the piece L3b of step 6:
 # the sanitized build run on a bench of the host's laid out as the DOS

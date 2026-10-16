@@ -321,13 +321,22 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   file of the repository, and the page, which carries their code and the
   font to whoever opens it, has one small "Licences" link that shows all
   of those texts, no work credited apart from the others.
-- One drive, on the user's word of 15 October 2026, in place of the two
-  that the page had: C:, labelled VC, which holds C:\VC, the program's
-  own files, and nothing else as it is shipped. There is no drive of a
-  demo and no sample files. The page starts in C:\VC. The drive is
+- One drive of files, on the user's word of 15 October 2026, in place
+  of the two that the page had: C:, labelled VC, which holds C:\VC, the
+  program's own files. There is no drive of a demo and no sample files.
+  The page starts in C:\VC. What C: ships, on the user's word of 16
+  October 2026: in C:\VC the project's program for DOS, `VC.EXE`, with
+  Volkov's licence and DOS/32A's; the VC.INI that the program saves,
+  with the clock on (`tools/webini.py`), the tests' bench keeping its
+  own with the clock off; a VC.MNU, VC.EXT, VCVIEW.EXT and VCEDIT.EXT
+  of the project's own; and the project's help as `vc.hlp`, which takes
+  the place of a README, none being shipped; in C:\ a mock AUTOEXEC.BAT
+  and CONFIG.SYS (`src/portable_c/web/drive/`). Nothing of the
+  shareware's goes in. Beside it A:, empty and with no label, which the
+  page makes, so that changing disks can be tried. The drives are
   ephemeral, on the user's word of 16 October 2026: every load of the
-  page starts it from what is served with the page, C: with its `vc`
-  alone, in the page's own memory, and every change on it, the setup
+  page starts C: from what is served with the page, and A: empty, in
+  the page's own memory, and every change on it, the setup
   file too, lasts until the page is closed or loaded again. Nothing is
   written back to where the page is served from, and there is no store
   of the browser's, IndexedDB or any other. The tests keep the bench's
@@ -344,7 +353,13 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   page. Enter on a file that is no program opens it in a new tab of the
   browser, where the user may view it or save it.
 - The keys that a browser keeps for itself are declared, and a button for
-  the full screen locks the keyboard where the browser allows it.
+  the full screen locks the keyboard where the browser allows it. A strip
+  of buttons gives the program six of them, Ctrl-PgUp, Ctrl-PgDn,
+  Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4, small in the bar on a desktop and
+  in the row of keys on a phone, with a hint that full screen makes them
+  work from the keyboard in Chrome and Edge (the user, 16 October 2026).
+  The browser's own mouse pointer is hidden over the grid, where the
+  program draws its own.
 - It opens on an iPhone: the grid is scaled to fit the screen and fitted
   again when the screen turns or changes size, pinch-zoom allowed; a tap
   is a click on the cell under the finger; where there is no keyboard, a

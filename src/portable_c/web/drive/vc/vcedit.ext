@@ -1,0 +1,10 @@
+' The editors of Vibe Commander: the editor of your own that F4
+' runs for a file by its extension, in place of the built-in one.
+' A line such as
+'
+'   c: ne !.!
+'
+' names one. Alt-F4 always uses the built-in editor.
+'
+' A web page cannot run commands, so this file names no editor, and
+' F4 uses the built-in one for every file.

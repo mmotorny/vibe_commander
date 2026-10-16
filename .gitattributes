@@ -1,3 +1,7 @@
 # The original sources are CP866 text with CRLF line endings. Keep them
 # byte-exact: no line-ending conversion.
 src/asm/** -text
+
+# The files that the web page ships on its C:, DOS text with CRLF line
+# endings, as DOS has them: no line-ending conversion.
+src/portable_c/web/drive/** -text

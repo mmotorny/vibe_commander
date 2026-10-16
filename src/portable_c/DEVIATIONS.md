@@ -3016,28 +3016,35 @@ through them in Chromium, its C: the bench's, served as its static site
 serves it. What the harness goes by is `ON_WEB` of
 `harness/deviations.py`, which has what is declared of Linux but its
 masks of the drive's letter, and what is the web's alone. What the
-page itself adds, W4 to W8, the page's own tests hold:
+page itself adds, W4 to W8 and W11, the page's own tests hold:
 `portable_c-web-page` with the page's program in Node,
 `portable_c-web-site` with the static site and the page's drive, and
 `portable_c-web-browser` with the drawing, the keys, the mouse and the
 phone in Chromium.
 
-### W1. One drive, C:, where the program lives
+### W1. The drives: A:, empty, and C:, where the program lives
 
 **What the original does.** It has the drives that DOS has: on the
 bench of the tests the diskettes A: and B:, C: and D:; its own files
 are beside its program, in D:\VC on the bench.
 
 **What the web page does.** The program has the drives that the
-environment names, C: and D:, each a directory of the host,
-`VC_DRIVE_C` and `VC_DRIVE_D`, with the labels that `VC_LABEL_C` and
-`VC_LABEL_D` give (`sys_web.c`). The page names one: C:, labelled VC,
-which holds C:\VC, the program's own files, the setup file, the menu
-and the extension file, and nothing else as the page is shipped; the
-page starts the program there. It is a directory of Emscripten's file
-system in the page's memory, loaded at every load of the page from what
-is served with it, its directory `vc` alone as the page is shipped, and
-it lasts as long as the page (W6). It is an ordinary drive: the drive box, the Info
+environment names, A:, C: and D:, each a directory of the host,
+`VC_DRIVE_A`, `VC_DRIVE_C` and `VC_DRIVE_D`, with the labels that
+`VC_LABEL_A`, `VC_LABEL_C` and `VC_LABEL_D` give (`sys_web.c`). The page
+names two. C:, labelled VC, holds C:\VC, the program's own files as the
+page ships them (W11), and in C:\ a mock AUTOEXEC.BAT and CONFIG.SYS;
+the page starts the program in C:\VC. It is a directory of
+Emscripten's file system in the page's memory, loaded at every load of
+the page from what is served with it, and it lasts as long as the page
+(W6). A:, on the user's word of 16 October 2026, is an empty directory
+of the page's memory with no label, made by the page and not served, a
+diskette for changing disks and copying to; it lasts as long as the
+page too. A: and B: answer DOS's question whether a disk can be taken
+out (INT 21h 4408h) with yes, as the PC's diskettes do, so that a file
+search of all drives passes A: by, as it passes the diskettes on DOS;
+every other drive answers no, on Linux too. A drive with no label has
+none in the search for a label, as a diskette that was never labelled. It is an ordinary drive: the drive box, the Info
 panel and every question of a drive by its number have it. The
 program's own files are in the directory `vc` of the drive that
 `VC_PROGRAM_DRIVE` names, C: where it names none, made where it is not
@@ -3054,7 +3061,11 @@ the bench's working disk, labelled VIBE, and D:, labelled DEMO, holds
 the program's own files in D:\VC, so the letters are the original's
 and need no mask, and no golden or mask moved with the decision.
 
-**Which scenarios show it.** The drive's letter is as the original's,
+**Which scenarios show it.** `portable_c-web-page` has the drive box
+with A: and C:, the shipped site's A: empty and changed to and back, and
+`portable_c-web-site` the site's C: as it is shipped. A test of the
+scenarios lays out the bench's drives alone, C: and D:, so no golden
+shows A:. The drive's letter is as the original's,
 and is not masked; the drive box's letters and the labels of the
 tests, VIBE and DEMO, four letters as Linux's HOME, are masked as on
 Linux. The page's own label, VC, two letters, makes the box of Ctrl-F4
@@ -3116,7 +3127,12 @@ button for the full screen locks the keyboard where the browser allows
 it (`navigator.keyboard.lock()`, Chromium's), and then most of those
 keys reach the program; holding Esc leaves the full screen there. A key
 that a dead key or an input method makes comes by no key event, and is
-not typed.
+not typed. A strip of buttons for six of them, Ctrl-PgUp, Ctrl-PgDn,
+Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4, on the user's word of 16 October
+2026, stands in the bar on a desktop, small, and behind Enter in the
+row of keys on a phone; each gives the program its key with Ctrl or
+Alt held. A hint beside it says that in the full screen Chrome and Edge
+let the keyboard have them.
 
 **Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
 page"): what a browser keeps is declared.
@@ -3126,7 +3142,8 @@ under Node, which has no browser. The list is checked by hand. Played
 through the page in Chromium (`harness/webpagerun.py`), a scenario that
 presses one of these keys is not taken through the page: Ctrl-PgUp,
 Ctrl-PgDn, Ctrl-T and Ctrl-W never reach it there, and Ctrl-F4 and
-Alt-F4 close the tab.
+Alt-F4 close the tab. `portable_c-web-page` holds the strip's six buttons and its
+hint, and has Ctrl-PgUp of it take the panel up.
 
 ### W5. The screen is a page's, scaled, with a row of keys on a phone
 
@@ -3136,7 +3153,10 @@ cells, drawn by the VGA's font of 8 by 16 dots.
 **What the web page does.** The cells are lines of text, in VileR's
 Web437 IBM VGA 8x16, the VGA's font made a font of the web, with the
 VGA's colours, and bit 7 a blink as the VGA has it; the cursor is drawn
-over them. The grid is scaled to the window by whole multiples of the
+over them. The browser's own mouse pointer is hidden over the grid,
+where the program draws its own in a cell, on the user's word of 16
+October 2026; over the bar, the strip of keys and the dialogs it is the
+browser's. The grid is scaled to the window by whole multiples of the
 font, or, where the window has room for less than one, as a phone's
 has, as large as fits; it is fitted again when the window or the phone
 turns or changes size, and the fingers may zoom it. Below it is a bar
@@ -3259,3 +3279,42 @@ room under Node is far larger than any file of a scenario.
 refuses it, cell for cell, to the original's in `editor-big`, where the
 original refuses the same file; and without `VC_MEMORY`, that the
 editor opens it.
+
+### W11. C:\VC as the page ships it
+
+**What the original does.** Its distribution has in its directory
+VC.COM and VCSETUP.COM, the help VC.HLP, the setup file VC.INI, with
+the clock on and the Info panel on the right, the menus VC.MNU,
+ARCHIVES.MNU and FORMAT.MNU, VC.EXT and VCVIEW.EXT, and the author's
+texts. Started with no setup file, the program has its own defaults,
+the clock off and the left panel off.
+
+**What the web page does.** On the user's word of 16 October 2026,
+C:\VC holds none of the shareware's files or text (CLAUDE.md,
+"Third-party software"), and has: the project's program for DOS,
+VC.EXE, where the build makes it, with Volkov's licence, LICENSE.TXT,
+and DOS/32A's, DOS32A.TXT, which the licence of the extender asks to go
+with the program (its name of 8.3, where LICENSE.DOS32A of the
+repository has a longer extension than DOS takes); the project's own
+help, VC.HLP, which takes the place of a README; VC.MNU, VC.EXT,
+VCVIEW.EXT and VCEDIT.EXT of the project's own, whose comments say
+their forms and that a web page runs no command, VC.EXT and VCVIEW.EXT
+and VCEDIT.EXT having no entry so that Enter, F3 and F4 do what they do
+without one; and VC.INI, the setup file that the program saves from its
+own defaults with its own keys, the clock switched on, the left panel
+on C:\VC and the right one on C:\ (`tools/webini.py`). So a user of the
+page has the clock on, as the original's distribution has it; the
+program's defaults, and the program for DOS and for Linux started with
+no setup file, keep it off. The files have the time of the page's
+build.
+
+**Why.** The user's decision of 16 October 2026 (`TODO.md`, "Queued,
+decided by the user on 16 October 2026", 2): a disk that looks like a
+DOS machine's, with files to view and to try the program on.
+
+**Which scenarios show it.** None: the scenarios lay out the bench's
+drives. `portable_c-web-site` holds the site that the build makes, every
+file of its C: against its source, the setup file's clock and sum, no
+file the shareware's or with a line of its help, and no README;
+`portable_c-web-page` has the page start on C:\VC and C:\ with the
+clock on.

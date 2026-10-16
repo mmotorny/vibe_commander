@@ -18,7 +18,7 @@ types into it as the page's keys do:
     src/portable_c/web/bundle.mjs), and is closed by Esc and by its
     button with no key of it reaching the program; and its line that
     changes last until the page is reloaded or closed;
-  - Alt-F2, the drive box with C: alone, and C:\\ by ..;
+  - Alt-F2, the drive box with A: and C:, and C:\\ by ..;
   - F7, a directory made in the page's memory;
   - Enter of the row of keys on a file, opened in a tab with its bytes;
   - Shift-F4 and the editor, a file written;
@@ -29,7 +29,10 @@ types into it as the page's keys do:
     of the site changed.
 
 Then the page loaded again, its drive as it is served, with none of the
-changes; the site as it is shipped, its C: with vc alone; and a host that
+changes; the site that the build has made to be shipped, its C:\\VC
+with the program's files, C:\\ with AUTOEXEC.BAT and CONFIG.SYS, the
+clock on, A: empty and changed to and back, and the strip of the keys that
+the browser keeps with its hint, Ctrl-PgUp of it taken; and a host that
 serves the page and no drive, where the page says so and does not start.
 
 What the browser draws, and its keys, the mouse and the phone, are held

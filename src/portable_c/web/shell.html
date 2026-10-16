@@ -37,7 +37,7 @@ body {
   position: relative; margin: 0; padding: 0; overflow: hidden;
   font-family: "Web437 IBM VGA 8x16", monospace; font-size: 16px;
   line-height: 16px; width: 640px; height: 400px; white-space: pre;
-  background: #000; color: #aaa; cursor: default; user-select: none;
+  background: #000; color: #aaa; cursor: none; user-select: none;
   -webkit-user-select: none; -webkit-touch-callout: none;
   touch-action: manipulation; font-kerning: none;
   font-variant-ligatures: none; -webkit-text-size-adjust: none;
@@ -68,6 +68,15 @@ body {
 #bar button.held { background: #0a0; color: #000; }
 #keys { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
 #keys[hidden] { display: none; }
+#kept-keys {
+  display: flex; flex-wrap: wrap; gap: 3px; align-items: center;
+  justify-content: center;
+}
+#bar #kept-keys button {
+  font-size: 11px; padding: 3px 5px; min-width: 0; color: #bbb;
+}
+#keys #kept-keys button { font-size: inherit; padding: 6px 8px; }
+#kept-hint { font-size: 11px; color: #888; max-width: 22em; }
 #kept { font-size: 11px; color: #bbb; }
 #credit { font-size: 11px; color: #777; margin-left: 8px; }
 #bar button.link {
@@ -113,6 +122,7 @@ body {
 <div id="stage"><pre id="screen"><div id="cursor"></div></pre></div>
 <div id="bar">
   <div id="keys" hidden></div>
+  <div id="kept-keys" title="Keys that the browser keeps for itself"></div>
   <button id="type" title="The phone's keyboard">&#x2328;</button>
   <button id="more" title="The keys that a phone lacks">Keys</button>
   <button id="upload" title="Bring files into the current directory">Upload</button>

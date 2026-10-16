@@ -18,6 +18,10 @@
 // may hand Drives others.
 export const ROOTS = { c: "/drive/c" };
 
+// A:, which is not served: the page makes it, empty, a diskette that the
+// user may change disks to and copy onto (page.js).
+export const DISKETTE = "/drive/a";
+
 export function bytesOfBase64(text) {
   if (typeof Uint8Array.fromBase64 === "function")
     return Uint8Array.fromBase64(text);

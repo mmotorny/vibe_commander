@@ -7,16 +7,18 @@
  * behind it, over the file system that Emscripten gives, and this file
  * has what the page has of its own, as sys_posix.c has Linux's:
  *
- *   - There are at most two drives, C: and D:, each the directory of
- *     the host that a variable of the environment names, VC_DRIVE_C and
- *     VC_DRIVE_D, and labelled as VC_LABEL_C and VC_LABEL_D say, VC and
- *     DEMO where they say nothing (DosBeginGiven of files_posix.c). A
- *     drive whose variable is not set is not there. The page names C:
- *     alone, a directory of Emscripten's file system in the page's
- *     memory, loaded from what is served with the page, with the
- *     program's own files in C:\VC, and starts the program there
- *     (web/page.js, web/drives.js); what the program changes there lasts
- *     until the page is closed or loaded again. Under Node a
+ *   - There are at most three drives, A:, C: and D:, each the directory
+ *     of the host that a variable of the environment names, VC_DRIVE_A,
+ *     VC_DRIVE_C and VC_DRIVE_D, and labelled as VC_LABEL_A, VC_LABEL_C
+ *     and VC_LABEL_D say, none, VC and DEMO where they say nothing
+ *     (DosBeginGiven of files_posix.c). A drive whose variable is not set
+ *     is not there. The page names A: and C:, directories of
+ *     Emscripten's file system in the page's memory: A: empty and
+ *     without a label, a diskette to change disks with, and C: loaded
+ *     from what is served with the page, with the program's own files
+ *     in C:\VC, where it starts the program (web/page.js,
+ *     web/drives.js); what the program changes there lasts until the
+ *     page is closed or loaded again. Under Node a
  *     test gives both, with their labels, as the bench of DOS has them
  *     (harness/posixrun.py). The program's own files are in the
  *     directory vc of the drive that VC_PROGRAM_DRIVE names, C: where it
@@ -89,8 +91,9 @@ extern void web_test_screen(const char *kind, u32 number);
 #define MEMORY_CAP ((int64_t)256 << 20)
 static const struct {
     u8 letter;
-    const char *label;                  /* where its variable says none */
-} Drives[DOS_DRIVES] = {{'C', "VC"}, {'D', "DEMO"}};
+    const char *label;                  /* where its variable says none:
+                                           empty, none, for A: */
+} Drives[DOS_DRIVES] = {{'A', ""}, {'C', "VC"}, {'D', "DEMO"}};
 
 #define IDLE_WAIT 50                    /* milliseconds, under a tick */
 #define BUSY_YIELD 50.0                 /* milliseconds that KeyWaiting
