@@ -26,7 +26,11 @@
  *     protocol sends (web/keys.js), and the mouse as its reports, made
  *     the BIOS's words and the driver's motions by keyboard_posix.c,
  *     web_input. Or both come from the test channel, as on Linux, and
- *     the grid is written there.
+ *     the grid is written there. Or the test channel has its keys and
+ *     its mouse come through the page, as a user's do, where
+ *     VC_TEST_PAGE is set besides (harness/webpagerun.py): it says
+ *     which event is due, web_test_event, and is told each screen that
+ *     it records, web_test_screen, which the page has just drawn.
  *   - The program yields to the page by Emscripten's Asyncify, at the
  *     places that the plan names: KeyRead waits by emscripten_sleep and
  *     Idle yields; KeyWaiting yields once 50 ms have passed since the
@@ -68,6 +72,12 @@ extern void web_sync(void);
 extern i32 web_change(i32 what, const char *path, const char *other, i32 fd,
                       u32 mode);
 extern void web_where(const char *host);
+/* And of a test of the page: the event of the test channel's keys of
+   that number had the page give, waited for; and a screen that the
+   channel has recorded, of its kind and number, told, and waited for
+   while the test reads it from the page. */
+extern void web_test_event(i32 event);
+extern void web_test_screen(const char *kind, u32 number);
 
 /* The drives, by the variables of the environment that name each: its
    directory, its label and, of one of them, that the program's own files
@@ -75,6 +85,7 @@ extern void web_where(const char *host);
 #define DRIVE_VARIABLE "VC_DRIVE_"      /* and the letter */
 #define LABEL_VARIABLE "VC_LABEL_"      /* and the letter */
 #define PROGRAM_DRIVE_VARIABLE "VC_PROGRAM_DRIVE"
+#define PAGED_VARIABLE "VC_TEST_PAGE"
 #define LABEL_LONGEST 11                /* DOS's */
 /* The cap of the memory that the program's blocks hold together: the
    memory of wasm, once grown, is never given back while the page is
@@ -92,6 +103,7 @@ static const struct {
                                            goes without a yield */
 
 static bool Testing = false;            /* driven by the test channel */
+static bool Paged = false;              /* its keys through the page */
 static double YieldedAt = 0;            /* emscripten_get_now() */
 static i32 TicksRead = 0;               /* since the last yield */
 
@@ -101,7 +113,7 @@ static void Draw(void)
     struct ScreenShows shown;
     char where[HOST_PATH_ROOM];
 
-    if (Testing)
+    if (Testing && !Paged)
         return;
     TypedForget();
     shown = ScreenShown();
@@ -178,9 +190,52 @@ static void MouseFromPage(bool looked)
     MouseMoved(pointer.buttons, pointer.column, pointer.row);
 }
 
+/* What the page has queued taken, and what the decoder has held back
+   behind a change that the program has not yet seen made keys as far as
+   it may be now: through the page, the test channel's program reads its
+   keys, what is held and the mouse from the decoder, which it takes no
+   bytes for otherwise. */
+static void PageTake(void)
+{
+    char *room;
+    i32 space, got, wait;
+
+    if (!Paged)
+        return;
+    do {
+        wait = 0;
+        if (!KeyboardBefore(&wait))
+            break;
+        space = KeyboardRoom(&room);
+        got = web_input(room, space);
+        if (got > 0)
+            KeyboardAfter(got);
+    } while (got > 0);
+}
+
+/* An event of the test channel had the page give, and what the page has
+   then queued taken, as a user's keys and mouse are; or, for -1, only
+   what it has queued. */
+static void PageDeliver(i32 event)
+{
+    if (event >= 0)
+        web_test_event(event);
+    PageTake();
+    MouseFromPage(false);
+}
+
+/* A screen that the test channel has recorded: drawn, and the page told,
+   which reads it from what it shows. */
+static void PageRecorded(const char *kind, u32 number)
+{
+    Draw();
+    web_test_screen(kind, number);
+}
+
 void Idle(void)
 {
     if (Testing) {
+        PageTake();
         TestIdle();
         Yield(0);
         return;
@@ -198,8 +253,10 @@ struct Keys KeyWaiting(void)
 {
     if (emscripten_get_now() - YieldedAt >= BUSY_YIELD)
         Yield(0);
-    if (Testing)
+    if (Testing) {
+        PageTake();
         return TestKeyWaiting();
+    }
     PageInput(0);
     MouseFromPage(false);
     return KeyboardWaiting();
@@ -210,6 +267,7 @@ u16 KeyRead(void)
     u16 key;
 
     if (Testing) {
+        PageTake();
         key = TestKeyRead();
         Yield(0);
     } else {
@@ -226,7 +284,10 @@ u16 KeyRead(void)
 
 u16 KeysHeld(void)
 {
-    u16 held = Testing ? TestKeysHeld() : KeyboardHeld();
+    u16 held;
+
+    PageTake();
+    held = Testing ? TestKeysHeld() : KeyboardHeld();
 
     TraceHeld(held);
     return held;
@@ -239,14 +300,19 @@ u16 KeysHeld(void)
    page would never go on and the release would never come. */
 struct MouseAt MouseWhere(void)
 {
+    PageTake();
     if (emscripten_get_now() - YieldedAt >= BUSY_YIELD)
         Yield(0);
     if (Testing) {
         TestMouseAsked();
     } else {
         PageInput(0);
-        MouseFromPage(true);
     }
+    /* Through the page, the mouse is the page's as for a user: what it
+       has reported, as the program looks, after the channel has had the
+       page give the next event where it is due. */
+    if (!Testing || Paged)
+        MouseFromPage(true);
     return MouseAnswer();
 }
 
@@ -373,6 +439,11 @@ int main(int count, char **arguments)
         return 1;
     }
     Testing = TestBegin();
+    if (Testing && getenv(PAGED_VARIABLE) != 0) {
+        Paged = true;
+        TestByPage(PageDeliver, PageRecorded);
+        KeyboardUnpaced();
+    }
     MachineBegin(given, drives,
                  own != 0 && own[0] != 0 ? (u8)(own[0] & ~0x20) : 'C',
                  MEMORY_CAP);

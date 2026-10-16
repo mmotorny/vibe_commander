@@ -843,6 +843,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **W4, the documents: done**, below. DEVIATIONS "The web page" (W1 to W9, written by the pieces before it), the README's section "The web page", the licences of Emscripten, musl and the font, and the question of publishing, which is the user's, under "Open, for the user" below.
 - **W5, the licences on the page: done**, below. The bar's credit of the font gone, and one "Licences" that shows the texts of every work that the page carries, put in from the repository's files as the page is made (the user's decision of 15 October 2026, CLAUDE.md, "The web page").
 - **W6, the page in a real browser: done**, below. The machine's own Chromium, headless, driven over CDP from Node; both ways of serving, on a desktop and as an iPhone held both ways; the screenshots looked at; two faults of the drawing on a phone mended; the test `portable_c-web-browser`.
+- **W7, the scenarios through the page: done**, below. Every scenario of the web played through `vc.html` in Chromium, its keys and mouse the browser's events, its screens read from the `<pre>` and from the pixels; `harness/webpagerun.py`.
 
 ### W0, the toolchain: done, and what a later piece should know
 
@@ -1567,6 +1568,117 @@ DEVIATIONS.md). What it changed and met:
   `harness/session_files`, byte for byte, readme.txt's words on D:
   among them, so that `python3 harness/session.py` makes the same
   bytes of `docs/vibe-commander-session.svg`, which it does.
+
+### W7, the scenarios through the page
+
+The user asked on 15 October 2026 that the whole suite of scenarios be
+run at least once through the page itself, where `portable_c-web-scenarios`
+runs the program under Node and passes the page by.
+
+- **How.** `harness/webpagerun.py` with `harness/webpagerun.mjs`: the
+  page, `vc.html`, served by its own server (`makeServer` of
+  `server.mjs`, in the runner's process) with the bench's C: as its one
+  drive, as posixrun.py lays it out for the web, in the machine's Chromium,
+  headless, a Chromium and a profile in `build/webpagerun/` for each
+  scenario, three side by side. `setups.Program.load` takes `vc.html`
+  for the tree "web", and `posixrun.run` hands such a program to
+  `webpagerun.drive`, so that the run's screens, disks and declarations
+  are the web's, as under Node.
+- **The test channel through the page.** The program's channel keeps
+  the bench's clock and says when an event is due and when a step has
+  ended, as under Node; with `VC_TEST_PAGE` besides (`sys_web.c`), it
+  asks the page for each key, change of what is held and move of the
+  mouse by its number among the events of `keys` (`TestByPage` of
+  `machine_posix.c`, `web_test_event` of `library.js`), and waits; the
+  runner gives it as the browser's key events and pointer events over
+  CDP, which `keys.js` and `mouse.js` make the program's input as they
+  make a user's, and the decoder of `keyboard_posix.c` the BIOS's words;
+  the channel then holds the first key to the word that `keys` has, and
+  says on standard error where it differs. Each screen that the channel
+  records is told to the page, `web_test_screen`, and waited on while
+  the runner reads it. The page's one addition is its test hook,
+  `window.vcTestHook` (`page.js`), which a user's page does not have:
+  it puts the channel's variables into the environment and its keys
+  into the file system, and is the page's side of those two calls.
+- **What is read.** Each screen twice: the `<pre>`, its characters by
+  the page's own table of glyphs (`CodePageGlyph`) and its spans'
+  classes, a glyph that several bytes share, a blank among them, read
+  as the byte that the channel recorded; and its pixels, a screenshot
+  of the grid at one device pixel to the CSS pixel, every 8 by 16 cell
+  held to the glyph of the page's font, drawn by the page itself in its
+  `<pre>` white on black at the first screen, in the VGA's colours of
+  the cell (a blinking cell its background too, the cursor's cell with
+  its overlay or without); a cell that is not so is decoded into what
+  its pixels show. Both are held to the goldens with the web's
+  declarations and masks; the cursor that the page draws is held to the
+  one that the channel recorded. Chromium runs with `--disable-lcd-text`:
+  it draws text in the colours of the subpixels or in grey by what it
+  composites where, and the same glyph came out otherwise in the atlas
+  and on the screen. On a phone's viewport (`--viewport portrait` or
+  `landscape`), where a cell is no whole number of device pixels, the
+  pixels well inside each cell are held to the cell's two colours and
+  their blends, on the lattice of 80 by 25 cells: an exact atlas is not
+  workable at a scale that is no whole multiple of the font.
+- **D:.** The page has one drive, C:, since the user's word of 15
+  October 2026, and makes C:\VC; the bench has the program's own files
+  in D:\VC and no C:\VC. The hook takes the C:\VC that the page made
+  away again, with the root's time, gives the page's file system the
+  bench's D: from the job, and hands it back at the end, where the
+  runner writes it into the bench's `d` before the disks are read
+  (`tree_of` and `put_tree` of `webpagerun.py`). Its changes are no
+  server's: the page asks its server only of what is on C:.
+- **What the page's file system cannot hold**: the four files of
+  C:\STAMPS of a megabyte or more are laid out empty on the server's
+  drive and given their sizes in the page's file system once it has
+  loaded, read as zeros; the disks after a run have them as the bench
+  does where nothing changed them. And the program starts in C:\WORK
+  by the file system's current directory, which the hook sets before
+  it starts and puts back to the root at the first event: Emscripten's
+  file system refuses to rename or remove its current directory
+  (EBUSY), which a user's page, whose current directory is the root,
+  never meets.
+- **A scenario that presses a key that a browser keeps** (W4 of
+  DEVIATIONS.md: Ctrl-PgUp, Ctrl-PgDn, Ctrl-T, Ctrl-W, Ctrl-F4, Alt-F4)
+  is not taken through the page, `KEPT` of `webpagerun.py`: through
+  the page those keys never reach the program, or close the tab. 19
+  scenarios.
+- **Found and mended in the page**: a directory's time, and the root's.
+  `drives.js` (and `kept.js`) set each directory's time before what is
+  in it was made, which moved it, so that every directory showed the
+  time of the page's start; and the root's was never set, which `..`
+  shows. Each directory's time is set again once the tree is made, and
+  the server's tree has the root's time, `mtime` beside `entries`.
+- **The F2 of the user's screenshot** (the box "Could not find the menu
+  file" with Ok twice, a shadow to its right and below, and the key bar
+  with Help and Quit alone) is the original's, cell for cell: the
+  golden of `user-menu` has it, and the page passes that scenario both
+  ways.
+- **The mouse through the page.** The decoder of `keyboard_posix.c`
+  keeps a change of what is held or of the buttons from what comes
+  behind it until the program has looked, or for a while of the host's
+  clock (CHANGE_WAIT, BUTTON_HOLD), as a hand's pace has it. Through the
+  page the channel gives one event at a time when the program is to
+  have it, as the bench's driver does, and so takes the place of the
+  hand: `KeyboardUnpaced` has the decoder make whatever comes at once,
+  where the host's clock would make a run of the page another in every
+  run. And what the decoder holds back is taken where the program asks
+  for keys, what is held or the mouse (`PageTake` of `sys_web.c`). The
+  freeze of a click that the user met on the page (MouseWhere, which
+  neither yielded nor took input, ef09ff6) was met here too, by the
+  first run, as every scenario of the mouse stopping with the page
+  given no answer.
+- **The result** on 15 October 2026, at the desktop's viewport: of the
+  119 scenarios that the tree "web" is taken through, 100 are played
+  through the page and pass, by the `<pre>` and by the pixels alike, no
+  cell's pixels other than its glyph's, no cursor other than the
+  channel's; 19 press a key that the browser keeps and are not played.
+  Some five to nine minutes, three at a time. As an iPhone held upright
+  and turned, every scenario without the mouse passed by the lattice of
+  cells, and the 31 with the mouse once it was mended. The whole run was
+  before the page came to one drive; after it, eight scenarios, of the
+  mouse, of the setup file on D:, of the tree's copy and the start, were
+  run again and pass, and the machine was too loaded for another whole
+  run.
 
 ### Open, for the user
 

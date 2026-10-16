@@ -105,6 +105,15 @@ const TYPES = {
 
 const $ = (id) => document.getElementById(id);
 
+// The hook of a test of the page, harness/webpagerun.mjs, which puts it on
+// the window before the page's scripts run; a user's page has none. It
+// is told when the program is about to start, with Emscripten's FS and
+// ENV, and when the drives are loaded; and it is the page's side of the
+// test channel (library.js, web_test_event and web_test_screen): it gives
+// the keys and the mouse of an event as a user would, and reads each
+// screen that the channel records from what the page shows.
+const TEST = window.vcTestHook || null;
+
 const page = {
   drives: null,
   mode: null,                     // a name of MODES, once it is known
@@ -560,6 +569,8 @@ window.Module = {
   vcBegin: ({ FS, ENV, addRunDependency, removeRunDependency }) => {
     page.fs = FS;
     ENV.VC_DRIVE_C = ROOTS.c;
+    if (TEST)
+      TEST.begin({ FS, ENV });
     addRunDependency("vc-drives");
     askMode().then(async (mode) => {
       page.mode = mode;
@@ -567,12 +578,17 @@ window.Module = {
       await page.drives.load();
       FS.mkdirTree(`${ROOTS.c}/vc`);
       FS.chdir(`${ROOTS.c}/vc`);
+      if (TEST)
+        await TEST.loaded({ FS });
       kept(mode);
       removeRunDependency("vc-drives");
     }).catch((error) => {
       ended(`The drives could not be loaded: ${error.message}`);
     });
   },
+  vcTestEvent: TEST ? (event) => TEST.event(event) : undefined,
+  vcTestScreen: TEST ? (kind, number) => TEST.screen(kind, number)
+                     : undefined,
   onRuntimeInitialized: () => {
     const points = [];
     for (let byte = 0; byte < 256; byte++)

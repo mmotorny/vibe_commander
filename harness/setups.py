@@ -208,10 +208,12 @@ class Program:
             # the portable C. What the goldens call the program under
             # test is VC.EXE, which its bench has not.
             return cls("VC.EXE", contents, None, None, "posix", path)
-        if path.suffix == ".js":
+        if path.suffix in (".js", ".html"):
             # The program for the web under Node, the link web-node of
             # the piece W2 of step 7, which runs on the host as the
-            # program for Linux does: the tree "web".
+            # program for Linux does: the tree "web"; and the web page
+            # itself, vc.html, which harness/webpagerun.py takes through
+            # the scenarios in a browser, of the same tree.
             return cls("VC.EXE", contents, None, None, "web", path)
         if contents[:2] == b"MZ":
             # The translation has no assembly of its own to list: its main

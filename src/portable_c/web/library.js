@@ -22,7 +22,9 @@
 //                   emulate_posix.h), the answer 0 or the number of an
 //                   error of sys_web.c's table (drives.js, CHANGE_ERRORS);
 //   Module.vcWhere  (host): the directory of the file system that is DOS's
-//                   current one, told at every draw.
+//                   current one, told at every draw;
+//   Module.vcTestEvent, Module.vcTestScreen: a test's, which page.js puts
+//                   there where the page is tested (its test hook).
 addToLibrary({
   web_input: (to, room) => {
     const queue = Module.vcInput;
@@ -76,6 +78,27 @@ addToLibrary({
         what, path ? UTF8ToString(path) : null,
         other ? UTF8ToString(other) : null, fd, mode));
   },
+
+  // A test of the page (harness/webpagerun.mjs): the event of the test
+  // channel's keys of that number given by the page, as a user's keys
+  // and mouse come, waited for; and a screen that the channel has
+  // recorded, which the page has just drawn, told by its kind and number
+  // and waited for, while the test reads it from the page.
+  // Where the page has no test, nothing is asked or told.
+  web_test_event__async: true,
+  web_test_event: (event) => Asyncify.handleAsync(async () => {
+    if (Module.vcTestEvent) {
+      await Module.vcTestEvent(event);
+    }
+  }),
+
+  web_test_screen__deps: ['$UTF8ToString'],
+  web_test_screen__async: true,
+  web_test_screen: (kind, number) => Asyncify.handleAsync(async () => {
+    if (Module.vcTestScreen) {
+      await Module.vcTestScreen(UTF8ToString(kind), number >>> 0);
+    }
+  }),
 
   web_sync__async: true,
   web_sync: () => Asyncify.handleAsync(async () => {

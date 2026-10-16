@@ -1178,6 +1178,19 @@ if(VC_WEB)
                 ${CMAKE_BINARY_DIR}/portable_c/web/browser)
     set_tests_properties(portable_c-web-browser PROPERTIES
         LABELS portable_c SKIP_RETURN_CODE 77)
+    # The scenarios through the page itself, the piece W7 of step 7:
+    # vc.html as its server serves it over the bench's drives, in the
+    # machine's own headless Chromium, every key and step of the mouse the
+    # browser's events, every screen read from the <pre> and from its
+    # pixels and held to the goldens of the tree "web". Some ten minutes,
+    # three scenarios side by side. Skipped where there is no Chromium.
+    # See harness/webpagerun.py.
+    add_test(NAME portable_c-web-page-scenarios
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webpagerun.py
+                --page ${CMAKE_BINARY_DIR}/portable_c/web/vc.html
+                --out ${CMAKE_BINARY_DIR}/webpagerun)
+    set_tests_properties(portable_c-web-page-scenarios PROPERTIES
+        LABELS "portable_c;machine" SKIP_RETURN_CODE 77)
 endif()
 # The cap of the memory (TODO.md, "The cap of the memory: done"): the
 # program for Linux and, with VC_WEB, the program for the web under

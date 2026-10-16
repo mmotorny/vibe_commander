@@ -190,6 +190,7 @@ choice.
 - The page itself is opened in the machine's own Chromium, headless,
   both from its server and as the static site, on a desktop and as an
   iPhone held both ways.
+- Every scenario is also played through the page itself, see below.
 
 What no test can judge, how it looks and feels in Firefox and in Safari
 on the iPhone, is checked by hand, from a list in `TODO.md`. To save
@@ -205,12 +206,61 @@ For each way of serving, this saves the desktop at its start, with its
 two panels and with its Licences, and the iPhone upright and turned, as
 `build/browser/shots/{server,static}-*.png`.
 
+### The scenarios through the page
+
+`harness/webpagerun.py` plays every scenario of the web through
+`vc.html`. The page runs in the machine's own Chromium, served by its
+own server with the bench's C: as its drive. The bench's D:, which
+holds the program's own files, is given to the page's file system by
+the test hook and read back at the end. Each key is a browser key event
+and each mouse step is a set of pointer events. The page's own
+`keys.js` and `mouse.js` pass them to the program, as they pass a
+user's.
+
+The program's test channel still keeps the bench's clock. It says when a
+key is due and when a step has ended. With `VC_TEST_PAGE` set, it asks
+the page for each event and waits until the browser has given it; then
+it tells the page each screen it has recorded. The only thing added to
+the page for this is a test hook, `window.vcTestHook` in `page.js`,
+which a user's page does not have.
+
+Each screen is read twice:
+
+- from the `<pre>`: its characters and the classes of its spans;
+- from its pixels: a screenshot at one device pixel per CSS pixel,
+  with each 8 by 16 cell held to the glyph of the page's font in the
+  cell's VGA colours.
+
+Both readings are held to the goldens with the web's declarations and
+masks. On a phone's viewport, a cell is not a whole number of device
+pixels, so no glyph is exact there. Instead, the pixels inside each
+cell must be the cell's two colours or a blend of them.
+
+Some files and keys cannot be used through the page:
+
+- The STAMPS files of a gigabyte or more do not fit in the page's
+  memory. They are given their sizes in its file system and read as
+  zeros.
+- A scenario that presses a key the browser keeps for itself (Ctrl-PgUp,
+  Ctrl-PgDn, Ctrl-T, Ctrl-W, Ctrl-F4, Alt-F4) is not played.
+
+A full run takes about ten minutes, three scenarios at a time. It is
+the test `portable_c-web-page-scenarios`, or by hand:
+
+```sh
+python3 harness/webpagerun.py [--viewport portrait|landscape] [SCENARIO...]
+```
+
+It writes a line per scenario to `build/webpagerun/results.txt`, and
+the failures grouped by cause to `build/webpagerun/summary.txt`.
+
 | Test | What it checks |
 |---|---|
 | `portable_c-web-probe` | Only with `-DVC_WEB=ON`. Every file that the web build compiles (the common code, the DOS emulation it shares with Linux, and its own) compiled by emcc for wasm32 with the Linux program's warnings and `-Werror`, each failure printed. `harness/webprobe.py`, which takes from the configuration the list of Linux files that the web leaves out |
 | `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`. `web-node/vc.js`, built with Asyncify and the address and undefined-behaviour sanitizers, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drives given through the environment as the bench has them: C: the bench's home directory, labelled VIBE, and D:, labelled DEMO, a directory of the run's with the program's own files in D:\VC. Screens and files are held to the original's goldens with what is declared for the portable C, for Linux (but the masks of the drive's letter) and for the web. Each scenario not run or cut on the web is named by an entry for Linux or for the web page in `DEVIATIONS.md` |
 | `portable_c-web-page` | Only with `-DVC_WEB=ON`. `vc.html` itself, its scripts run in Node with a stand-in document. Against its server, with files that the test makes on C:: the drive loaded and the start in C:\VC; the drive box with C: alone; the Licences link showing each carried file's text, closed by Esc and its button with no key reaching the program; a directory made; a file opened in a tab; a file written in the editor reaching the server when closed; a directory removed; a server refusal shown as DOS's error; the setup saved on C:; and the page's end. As a static site, behind a host that answers 404 for what it lacks, on a stand-in IndexedDB: changes made and kept, the page reloaded with them, the reset, and a browser with no IndexedDB. Behind hosts that answer 200 with a page, or 500, for what they lack, still a static site; and a server that is away, answering 502, for which the page does not start. `harness/webpage.py` |
 | `portable_c-web-browser` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`. The page in the machine's own Chromium, headless, driven over the DevTools protocol from Node with nothing from npm, from its server on a free port and as the static site behind a host that answers 404. On a 1280 by 800 desktop: a start with no error, the bar's line about where changes are kept right for the way it is served, the VGA font loaded, the grid 640 by 400, the VGA colours, Ctrl-F1, the start in C:\VC and C:\ with files that the test lays there, the cursor keys and Tab, F1, a file written in the editor (on the server, or kept across a reload of the static page), the mouse, a click on a file, a double click into a directory, a click on the menu bar and one on the key bar, each followed by a key that has to take effect, Enter on a text file opening a tab of a blob, and the Licences opened and closed by Esc and its button with no key reaching the program. As an iPhone, 390 by 844 at three pixels to one, with touch and Safari's user agent: the row of keys, its Ctrl and Alt held for F1 and F2, Alt-F2 and C:, a tap on a file moving the cursor there, a tap on the key bar with the row's Enter behind it, and the grid within the screen's width above the bar; turned to 844 by 390, the grid fitted again. And no console error but the 404 by which a static page knows it has no server. `harness/webbrowser.py`, `harness/webbrowser.mjs` |
+| `portable_c-web-page-scenarios` | Only with `-DVC_WEB=ON`, and skipped where the path has no `chromium`. Every scenario of the web played through `vc.html` from its server over the bench's drives, in the machine's own headless Chromium. Keys and mouse steps are browser events, passed on by the page's `keys.js` and `mouse.js`. Every screen is read from the `<pre>` and from its pixels, and both are held to the goldens with the web's declarations and masks. A scenario that presses a key the browser keeps for itself is not played. `harness/webpagerun.py`, `harness/webpagerun.mjs` |
 | `portable_c-web-render` | The page's modules for drawing, keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node. Grids that the program for Linux writes through its test channel are drawn, and the HTML is read back and checked against the cells and the rows that changed. The keys and mouse reports that the modules make of browser events are typed into the program for Linux in a pseudo-terminal, and what it reads is checked against the BIOS's words. `harness/webrender.py`; skipped without Node or clang |
 | `portable_c-web-server` | The server and the page's file system in Node: the server's API and its refusal of every path outside its drive, D: and host links among them; the page's file system against it, with a file system of Emscripten's shape; what the static page keeps in the browser, `kept.js`, in memory and on a stand-in IndexedDB, with every change and refusal, the next visit, the reset and a full store; and the page's script bundled, compiled and run up to the program. `harness/webserver.py`; skipped without Node |
 

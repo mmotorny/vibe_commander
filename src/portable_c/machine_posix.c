@@ -1075,6 +1075,17 @@ i32 TypedText(bool first, char *text)
  * (Ticks), and a file that the program has written is stamped with
  * it when it is closed, as DOS stamps it. The time of day and the timer
  * are of it, and a user's run never has it.
+ *
+ * Driven through the web page (TestByPage, which sys_web.c calls where
+ * VC_TEST_PAGE is set besides), the channel goes as above, and only a
+ * key, a change of what is held and a move of the mouse come otherwise:
+ * when one is due, the page is asked for it by its number among the
+ * events of `keys`, counted from 0 over all the lines, and it comes as
+ * the page's keys and mouse come to a user, through the keyboard's
+ * decoder (keyboard_posix.c); what is held and the keys that wait are
+ * then the decoder's. A key that comes as another word than `keys` has
+ * is said on standard error. And each record is handed to the page as
+ * well, which reads the screen as it draws it.
  */
 
 #define TEST_VARIABLE "VC_TEST"
@@ -1122,6 +1133,8 @@ static u32 WaitTicks = 0;               /* by TestTicks */
 static u32 AutoTick = 0;                /* AutoSince, by TestTicks */
 static i32 Polled = 0;                  /* reads of Ticks since the program
                                            was last idle */
+static TestDeliverFn *Deliver = 0;      /* the page's, or none */
+static TestRecordedFn *Recorded = 0;
 
 /* The ticks for which AutoTim is believed, as DRIVER.ASM has them. */
 #define SOON 37
@@ -1259,6 +1272,8 @@ static void Record(const char *kind, u32 number)
     for (i = 0; i < 3; i++)
         *at++ = 0;
     Write(ScreensFd, record, sizeof record);
+    if (Recorded != 0)
+        Recorded(kind, number);
 }
 
 /* The C,R,B of mouse=, made an event: the column in the low byte of its
@@ -1453,6 +1468,43 @@ static bool AutoPending(void)
     return Elapsed() - AutoSince < 2000;
 }
 
+/* Whether a key waits: in the channel's buffer, or where the page
+   delivers the keys, in the decoder's, once what the page has queued
+   has been taken (the event -1). */
+static bool KeyWaits(void)
+{
+    if (Deliver != 0) {
+        Deliver(-1);
+        return !KeyboardWaiting().none;
+    }
+    return KeysCount > 0;
+}
+
+/* The page asked for the key of the event `due` and those of its chord
+   behind it, as the driver puts a chord's keys at once; the first is
+   held to the word that `keys` has, the decoder's buffer having been
+   empty. */
+static void DeliverKeys(const struct Due *due)
+{
+    struct Keys first;
+    u16 wanted = (u16)due->value;
+
+    for (;;) {
+        Deliver(Steps[StepNow].first + EventNow - 1);
+        if ((due->value & KEY_WITH_NEXT) == 0
+            || EventNow == Steps[StepNow].count
+            || Events[Steps[StepNow].first + EventNow].event != EVENT_KEY)
+            break;
+        due = &Events[Steps[StepNow].first + EventNow++];
+    }
+    first = KeyboardWaiting();
+    if (first.none || first.key != wanted)
+        fprintf(stderr, "vc: the page made %s%04X of the key %04X at step "
+                        "%d\n", first.none ? "no key, not " : "",
+                first.none ? 0 : (unsigned)first.key, (unsigned)wanted,
+                (int)StepNow);
+}
+
 /* The next event of the step, if one is due: a key is not while one
    waits, nor anything while the timer is waited for or the asks are
    counted, unless `reading`, where the program waits for a key, which
@@ -1463,7 +1515,7 @@ static bool TakeEvent(bool reading)
     struct Due *due;
 
     Polled = 0;
-    if (KeysCount > 0)
+    if (KeyWaits())
         return true;
     if (reading)
         Asks = 0;
@@ -1488,6 +1540,10 @@ static bool TakeEvent(bool reading)
     IdleRounds = 0;
     switch (due->event) {
     case EVENT_KEY:
+        if (Deliver != 0) {
+            DeliverKeys(due);
+            break;
+        }
         /* A key that has the next with it, a word with +, has it put
            into the buffer in the same round, as the driver puts the
            keys of one chord. */
@@ -1505,7 +1561,10 @@ static bool TakeEvent(bool reading)
     case EVENT_HELD:
         /* The program goes round once with each change of what is
            held, as the driver has it on the bench. */
-        Held = (u16)due->value;
+        if (Deliver != 0)
+            Deliver(Steps[StepNow].first + EventNow - 1);
+        else
+            Held = (u16)due->value;
         break;
     case EVENT_WAIT:
         Waiting = true;
@@ -1513,9 +1572,13 @@ static bool TakeEvent(bool reading)
         WaitTicks = TestTicks + due->value;
         break;
     case EVENT_MOUSE:
-        MouseButtons = (u16)(due->value >> 16);
-        MousePlace((i32)(due->value & 0xFF) * DOTS,
-                   (i32)(due->value >> 8 & 0xFF) * DOTS);
+        if (Deliver != 0) {
+            Deliver(Steps[StepNow].first + EventNow - 1);
+        } else {
+            MouseButtons = (u16)(due->value >> 16);
+            MousePlace((i32)(due->value & 0xFF) * DOTS,
+                       (i32)(due->value >> 8 & 0xFF) * DOTS);
+        }
         if (EventNow < Steps[StepNow].count
             && Events[Steps[StepNow].first + EventNow].event == EVENT_ASKS)
             Asks = (i32)Events[Steps[StepNow].first + EventNow++].value;
@@ -1563,6 +1626,8 @@ struct Keys TestKeyWaiting(void)
 {
     struct Keys keys;
 
+    if (Deliver != 0)
+        return KeyboardWaiting();
     keys.key = KeysCount > 0 ? KeysWaiting[0] : 0;
     keys.none = KeysCount == 0;
     return keys;
@@ -1572,6 +1637,11 @@ u16 TestKeyRead(void)
 {
     u16 key;
 
+    if (Deliver != 0) {
+        while (!KeyWaits())
+            Due(true);
+        return KeyboardTake();
+    }
     while (KeysCount == 0)
         Due(true);
     key = KeysWaiting[0];
@@ -1582,7 +1652,15 @@ u16 TestKeyRead(void)
 
 u16 TestKeysHeld(void)
 {
+    if (Deliver != 0)
+        return KeyboardHeld();
     return Held;
+}
+
+void TestByPage(TestDeliverFn *deliver, TestRecordedFn *recorded)
+{
+    Deliver = deliver;
+    Recorded = recorded;
 }
 
 void TestMouseAsked(void)

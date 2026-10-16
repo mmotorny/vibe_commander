@@ -132,8 +132,8 @@ class Connection {
 
 export class Browser {
   // Chromium, headless, with its profile in `profile`, and a connection
-  // to it.
-  static async start(chromium, profile) {
+  // to it; `more` are switches of its besides.
+  static async start(chromium, profile, more = []) {
     mkdirSync(profile, { recursive: true });
     const portFile = path.join(profile, "DevToolsActivePort");
     if (existsSync(portFile))
@@ -145,7 +145,7 @@ export class Browser {
       "--disable-background-networking", "--disable-sync",
       "--disable-component-update", "--disable-default-apps",
       "--hide-scrollbars", "--mute-audio", "--password-store=basic",
-      "--use-mock-keychain",
+      "--use-mock-keychain", ...more,
       "about:blank"], { stdio: ["ignore", "ignore", "pipe"] });
     let said = "";
     child.stderr.on("data", (chunk) => { said += chunk; });

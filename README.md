@@ -196,7 +196,7 @@ The tests need `python3`, `qemu-system-i386` and `mtools`. Some need
 more and are skipped without it: `gcc` for `portable_c-host`, `clang`
 for the source checks and the programs for Linux, `clang-tidy` version
 23 for `portable_c-tidy`, `node` for the web, and `chromium` on the path
-for `portable_c-web-browser`.
+for `portable_c-web-browser` and `portable_c-web-page-scenarios`.
 
 ```sh
 ctest --test-dir build --output-on-failure      # everything
@@ -244,6 +244,7 @@ in the machine, and how coverage is measured.
 | `portable_c-web-scenarios` | The web program under Node through the scenarios |
 | `portable_c-web-page` | The page's scripts in Node, against its server and as a static site |
 | `portable_c-web-browser` | The page in headless Chromium, on a desktop and as an iPhone |
+| `portable_c-web-page-scenarios` | Every scenario played through the page itself in headless Chromium, its screens read from the `<pre>` and from its pixels |
 | `portable_c-web-render` | The page's drawing, keys and mouse modules in Node |
 | `portable_c-web-server` | The web server's API and its refusal of every path outside its drives |
 | `harness-le` | The harness's reader of 32-bit DOS programs |

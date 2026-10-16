@@ -441,6 +441,8 @@ def run(scenario, program, setup=..., limit=60, environment=None):
     test of the cap (capcheck.py)."""
     import scenarios
     web = program.tree == "web"
+    # The web page itself, vc.html, in a browser (webpagerun.py).
+    page = program.path.suffix == ".html"
     if setup is ...:
         # The program for the web has its drive C: as the bench has it,
         # and starts from the bench's setup file as it is.
@@ -454,8 +456,9 @@ def run(scenario, program, setup=..., limit=60, environment=None):
         laid = lay_out(bench, setup, scenario.files, config)
         channel = bench / "channel"
         channel.mkdir()
-        (channel / "keys").write_text(
-            keys(scenario.steps if web else own(scenario.steps, bench)))
+        keys_text = keys(scenario.steps if web else
+                         own(scenario.steps, bench))
+        (channel / "keys").write_text(keys_text)
         # Enter on a file that is no program and that no extension file
         # has a command for hands it to xdg-open (L6b): a stub of it in
         # front of PATH, which does nothing, so that a scenario never
@@ -478,30 +481,51 @@ def run(scenario, program, setup=..., limit=60, environment=None):
                                VC_PROGRAM_DRIVE="D")
             command = [NODE, *command]
         environment.update(given)
-        try:
-            done = subprocess.run(
-                command, cwd=bench / "home" / "WORK",
-                env=environment, stdin=subprocess.DEVNULL,
-                capture_output=True, timeout=limit)
-        except subprocess.TimeoutExpired:
-            raise MachineError(f"the program did not end within {limit} "
-                               "s") from None
-        records = _screens((channel / "screens").read_bytes())
-        said = done.stderr.decode(errors="replace").strip()
-        if done.returncode not in (0, 2) or (
-                done.returncode == 2 and "keys have run out" not in said):
+        found = None
+        if page:
+            # The page's channel is a directory of its own file system,
+            # and the program starts in C:\WORK there.
+            import webpagerun
+            records, said, returncode, found = webpagerun.drive(
+                program.path, bench, keys_text, scenario.steps,
+                {"VC_TEST": "/test", "VC_TEST_PAGE": "1",
+                 "VC_TEST_CLOCK": CLOCK, "VC_PROGRAM_DRIVE": "D",
+                 "VC_DRIVE_D": "/drive/d", "VC_LABEL_C": "VIBE",
+                 "VC_LABEL_D": "DEMO", **given},
+                "/drive/c/WORK", max(limit, 300))
+        else:
+            try:
+                done = subprocess.run(
+                    command, cwd=bench / "home" / "WORK",
+                    env=environment, stdin=subprocess.DEVNULL,
+                    capture_output=True, timeout=limit)
+            except subprocess.TimeoutExpired:
+                raise MachineError(f"the program did not end within "
+                                   f"{limit} s") from None
+            records = _screens((channel / "screens").read_bytes())
+            said = done.stderr.decode(errors="replace").strip()
+            returncode = done.returncode
+        if returncode not in (0, 2) or (
+                returncode == 2 and "keys have run out" not in said):
             raise MachineError(
-                f"the program ended with {done.returncode}: {said}")
+                f"the program ended with {returncode}: {said}")
         shown = [screen for kind, _, screen in records if kind == "step"]
         ending = [screen for kind, number, screen in records
                   if kind == "end " and not (number == 2
-                                             and done.returncode == 2)]
+                                             and returncode == 2)]
         shown += ending
         if len(shown) != len(steps):
             raise MachineError(
                 f"after {scenarios._where(steps, len(shown))}: the program "
                 f"wrote {len(shown)} screens for {len(steps)} steps"
                 + (f"; it said: {said}" if said else ""))
+        if found is not None:
+            # As the screens, so the page's: the records that the page was
+            # read at, each step's and the end's.
+            found["dom"] = [screen for kind, number, screen in found["dom"]
+                            if kind == "step" or (
+                                kind == "end " and not (number == 2 and
+                                                        returncode == 2))]
         disks = {"C": read_tree(bench / "home", "", laid),
                  "D": {"VC": fat.Entry("VC", fat.DIRECTORY,
                                        *_dos_stamp(setups.EPOCH), 0, ""),
@@ -541,9 +565,22 @@ def run(scenario, program, setup=..., limit=60, environment=None):
         # say no more of.
         disks["D"]["VC\\" + program.filename] = fat.Entry(
             "VC\\" + program.filename, 0x20, 0, 0, 0, "")
+        if page:
+            # The files that the page held as stand-ins are on the server's
+            # drive empty, as webpagerun.drive() laid them; where nothing
+            # has changed them, they are as the bench has them.
+            for path, (when, size, _) in laid.items():
+                name = "\\".join(part.upper() for part in
+                                  path.relative_to(bench / "home").parts) \
+                    if path.is_relative_to(bench / "home") else None
+                entry = disks["C"].get(name)
+                if entry is not None and entry.size == 0 and size > 0 and \
+                        path.exists() and int(path.stat().st_mtime) == when:
+                    disks["C"][name] = dataclasses.replace(entry, size=size)
     finally:
         _remove(bench)
     ran = scenarios.Run(shown, disks)
+    ran.page = found
     # The directories that the run wrote into, by their paths on the
     # bench, the drive's root among them: the mask of a directory's time
     # (deviations.WrittenTimes) goes by it.

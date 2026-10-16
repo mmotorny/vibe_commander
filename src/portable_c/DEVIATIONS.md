@@ -3080,7 +3080,11 @@ not typed.
 page"): what a browser keeps is declared.
 
 **Which scenarios show it.** None: the scenarios type into the program
-under Node, which has no browser. The list is checked by hand.
+under Node, which has no browser. The list is checked by hand. Played
+through the page in Chromium (`harness/webpagerun.py`), a scenario that
+presses one of these keys is not taken through the page: Ctrl-PgUp,
+Ctrl-PgDn, Ctrl-T and Ctrl-W never reach it there, and Ctrl-F4 and
+Alt-F4 close the tab.
 
 ### W5. The screen is a page's, scaled, with a row of keys on a phone
 

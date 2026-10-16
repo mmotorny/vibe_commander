@@ -714,6 +714,15 @@ u16 TestKeysHeld(void);
 void TestMouseAsked(void);
 void TestProgramRun(void);
 
+/* The test channel driven through the web page (sys_web.c): `deliver`
+   has the page give the event of `keys` of that number, counted from 0
+   over all its lines, as a user's keys and mouse come, and waits until it
+   has, and for -1 takes what the page has given and gives nothing; `recorded` is told of each record of a screen as it is written,
+   by the kind and the number of the record. */
+typedef void TestDeliverFn(i32 event);
+typedef void TestRecordedFn(const char *kind, u32 number);
+void TestByPage(TestDeliverFn *deliver, TestRecordedFn *recorded);
+
 /* The trace, which VC_TRACE names: a key read, and what is held where
    it is otherwise than last time; and what is written of it handed to
    the host, as before a fork. */
@@ -783,6 +792,13 @@ void TermInput(i32 wait);
 /* Whether keys are dropped from now on, as they are while the screen
    cannot be shown: a terminal that is too small. */
 void KeyboardRefuse(bool refused);
+
+/* Whatever comes made keys and changes at once, with nothing held back
+   behind a change that the program has not seen, nor for a while: for
+   the test channel through the web page (sys_web.c), which gives one
+   event at a time when the program is to have it, as the driver of the
+   bench does, and so takes the place of the hand's pace. */
+void KeyboardUnpaced(void);
 
 /* Whether the terminal has answered the question for the kitty protocol
    since this was last asked: the flags are then to be pushed. */

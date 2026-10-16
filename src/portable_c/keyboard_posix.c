@@ -86,6 +86,7 @@ static struct ReportedMouse Pointer = { 0, 0, 0, 0 };
    held when it was pressed. Each waits CHANGE_WAIT at the most, for a
    program that does not look. */
 static bool HeldSeen = true, ButtonSeen = true;
+static bool Unpaced = false;            /* KeyboardUnpaced */
 static int64_t ChangedAt = 0, PushedAt = 0, ButtonAt = -BUTTON_HOLD;
 
 static int64_t Now(void)
@@ -101,6 +102,8 @@ static bool Settled(void)
 {
     int64_t now = Now();
 
+    if (Unpaced)
+        return true;
     return (HeldSeen && ButtonSeen && now - ButtonAt >= BUTTON_HOLD)
            || now - ChangedAt >= CHANGE_WAIT;
 }
@@ -108,7 +111,7 @@ static bool Settled(void)
 /* Whether a change may be made now. */
 static bool MayChange(void)
 {
-    return KeysCount == 0 || Now() - PushedAt >= CHANGE_WAIT;
+    return Unpaced || KeysCount == 0 || Now() - PushedAt >= CHANGE_WAIT;
 }
 
 /* A key into the buffer; dropped where it is full, as the BIOS beeps and
@@ -738,6 +741,11 @@ static i32 Soonest(void)
 void KeyboardRefuse(bool refused)
 {
     Refused = refused;
+}
+
+void KeyboardUnpaced(void)
+{
+    Unpaced = true;
 }
 
 bool KeyboardKittyAnswered(void)
