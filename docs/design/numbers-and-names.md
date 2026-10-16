@@ -1149,8 +1149,8 @@ places: the search of the viewer, the letters of the markup that
 `NgLine` and `LnStr` take in either case, the comparison of names, the
 command line's completion from the history, and each character of
 `Convert`. That is what makes the viewer's search find Russian text in
-either case on a Russian DOS ([chapter
-2](03-the-features.md#search-v81_00-and-v82_00)), with no Russian in
+either case on a Russian DOS ([the viewer and the
+editor](viewer-and-editor.md#comparing-v82_00)), with no Russian in
 the program.
 
 ### `LowCase` and `LowTab`: inverted once
