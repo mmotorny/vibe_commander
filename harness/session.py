@@ -38,8 +38,8 @@ page's build fetches and pins (CMakeLists.txt) and which is put into
 the SVG as it is, about 13 KB. A row that several frames have is drawn
 once and used by each, and the frames stand one under the other on a
 strip that CSS moves up frame by frame: no script, so that GitHub shows
-it as an image. Below the screen a button says that the program can be
-tried live, which the README's link around the image makes true.
+it as an image. The SVG is the screen and nothing else: the README's
+link around it and its caption say that the program can be tried live.
 
     python3 harness/session.py              # docs/vibe-commander-session.svg
     python3 harness/session.py --text       # the frames as text as well
@@ -310,27 +310,6 @@ def row_svg(cells):
     return "".join(parts)
 
 
-BADGE_H = 40                    # the strip below the screen, for the button
-
-
-def badge(width, top):
-    """The button below the screen that says the program can be tried
-    live: a rounded box with a triangle of play and the words, in the
-    VGA's font, the colours those of the program's panels."""
-    words = "Try it live in your browser"
-    text_w = len(words) * CELL_W
-    box_w = text_w + 3 * CELL_W + 28
-    left = (width - box_w) // 2
-    y = top + (BADGE_H - 28) // 2
-    return [f'<g id="live"><rect y="{top}" width="{width}" '
-            f'height="{BADGE_H}" fill="#000"/>',
-            f'<rect x="{left}" y="{y}" width="{box_w}" height="28" rx="6" '
-            'fill="#0000aa" stroke="#55ffff" stroke-width="2"/>',
-            f'<path d="M{left + 14} {y + 7}v14l12-7z" fill="#ffff55"/>',
-            f'<text x="{left + 14 + 3 * CELL_W}" y="{y + 19}" '
-            f'fill="#ffffff">{words}</text></g>']
-
-
 def svg(frames, title):
     """The animated SVG of the frames."""
     # Frames that are the same one behind the other are one.
@@ -346,11 +325,10 @@ def svg(frames, title):
         for line in lines:
             rows.setdefault(line, f"r{len(rows):x}")
     width, height = 80 * CELL_W, 25 * CELL_H
-    whole = height + BADGE_H
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" '
            f'xmlns:xlink="http://www.w3.org/1999/xlink" '
-           f'viewBox="0 0 {width} {whole}" width="{width}" '
-           f'height="{whole}">',
+           f'viewBox="0 0 {width} {height}" width="{width}" '
+           f'height="{height}">',
            f"<title>{title}</title>",
            "<desc>A session of Vibe Commander 0.1, made by "
            f"harness/session.py; the program runs live at {LIVE}. The font is VileR's Web437 IBM VGA 8x16 "
@@ -398,7 +376,6 @@ def svg(frames, title):
                        f'height="2" fill="{fore}"/>')
         out.append("</g>")
     out.append("</g></g>")
-    out.extend(badge(width, height))
     out.append("</svg>")
     return "\n".join(out) + "\n", len(merged), total, len(rows)
 

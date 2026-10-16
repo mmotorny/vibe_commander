@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://mmotorny.github.io/vibe_commander/">
     <img src="docs/vibe-commander-session.svg" width="720"
-         alt="An animated recording of Vibe Commander 0.1 in its web page, with a button to try it live: it starts in C:\VC with one panel beside its banner, Ctrl-F1 brings up the second, F7 makes the directory NOTES, Shift-F4 writes hello.txt in the editor, F3 views it, F9 opens the menu bar and walks the menus Right, Options, Commands and Files, the Configuration dialog opens from Options, and F10 asks whether to quit">
+         alt="An animated recording of Vibe Commander 0.1 in its web page: it starts in C:\VC with one panel beside its banner, Ctrl-F1 brings up the second, F7 makes the directory NOTES, Shift-F4 writes hello.txt in the editor, F3 views it, F9 opens the menu bar and walks the menus Right, Options, Commands and Files, the Configuration dialog opens from Options, and F10 asks whether to quit">
   </a>
 </p>
 <p align="center">

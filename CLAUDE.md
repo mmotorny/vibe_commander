@@ -366,8 +366,10 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   project's own script from the program's screens (`harness/session.py`):
   the web page as its server serves it, C: labelled VC and the page
   starting in C:\VC, played in the machine's Chromium and taken from the
-  page's own cells, with a button drawn below the screen, "Try it live in
-  your browser", which the README links to the published page.
+  page's own cells, the screen alone: the README links the image and
+  the caption under it, "Try it live in your browser", to the published
+  page (the user, on 16 October 2026, in place of a button drawn in the
+  SVG below the screen).
 
 ### Deviations
 

@@ -1580,9 +1580,11 @@ DEVIATIONS.md). What it changed and met:
   the cursor's element; the mouse's pointer is moved to the last cell of
   the key bar first, where the program had it in the middle of the
   screen. The page's clock is set to 16 June 2000, 12:00 UTC, so two
-  runs give the same bytes, which they did. The SVG has a button below
+  runs give the same bytes, which they did. The SVG had a button below
   the screen, "Try it live in your browser", and the README links the
-  image and a caption to the published page. `--linux` makes it of the
+  image and a caption to the published page; on 16 October 2026 the user
+  had the button and its band taken out, the caption being the one
+  place for those words, and the SVG is the 80 by 25 screen alone. `--linux` makes it of the
   program for Linux and `harness/session_files`, as before.
 
 ### W7, the scenarios through the page
