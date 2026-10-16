@@ -1858,9 +1858,11 @@ Item 2 of the queue above, on the user's word of 16 October 2026
 - **C:** is made by `static.mjs` of what CMake names, `web_shipped`
   (`--file PATH=SOURCE`): in C:\VC `vc.exe`, the build's
   `portable_c/VC.EXE` where VC_DOS is on (the Pages workflow builds with
-  it on now, Open Watcom being the pinned download that it is); Volkov's
-  `license.txt` and DOS/32A's licence as `dos32a.txt`, a name of 8.3 in
-  place of LICENSE.DOS32A, whose extension DOS does not take; `vc.hlp`,
+  it on now, Open Watcom being the pinned download that it is);
+  `license.txt`, every licence that the page carries in one file, which
+  `bundle.mjs --licences` makes of the repository's files in the order
+  of its LICENCES (the user, on 16 October 2026, in place of Volkov's
+  as `license.txt` and DOS/32A's as `dos32a.txt`); `vc.hlp`,
   the build's VC.HLP; `vc.ini` (below); and `vc.mnu`, `vc.ext`,
   `vcview.ext` and `vcedit.ext` of the project's own; in C:\ a mock
   `autoexec.bat` and `config.sys`. The written ones are in

@@ -3292,15 +3292,17 @@ the clock off and the left panel off.
 **What the web page does.** On the user's word of 16 October 2026,
 C:\VC holds none of the shareware's files or text (CLAUDE.md,
 "Third-party software"), and has: the project's program for DOS,
-VC.EXE, where the build makes it, with Volkov's licence, LICENSE.TXT,
-and DOS/32A's, DOS32A.TXT, which the licence of the extender asks to go
-with the program (its name of 8.3, where LICENSE.DOS32A of the
-repository has a longer extension than DOS takes); the project's own
-help, VC.HLP, which takes the place of a README; VC.MNU, VC.EXT,
-VCVIEW.EXT and VCEDIT.EXT of the project's own, whose comments say
-their forms and that a web page runs no command, VC.EXT and VCVIEW.EXT
-and VCEDIT.EXT having no entry so that Enter, F3 and F4 do what they do
-without one; and VC.INI, the setup file that the program saves from its
+VC.EXE, where the build makes it, with LICENSE.TXT, every licence that
+the page carries in one file, the project's first, then Volkov's and
+DOS/32A's, which the licence of the extender asks to go with the
+program, then Emscripten's, musl's and the font's, each under a
+heading line, made by the build of the repository's files so that it
+cannot drift from them, the page's Licences dialog showing the same
+texts; the project's own help, VC.HLP, which takes the place of a
+README; VC.MNU, VC.EXT, VCVIEW.EXT and VCEDIT.EXT of the project's own,
+whose comments say their forms and that a web page runs no command,
+VC.EXT and VCVIEW.EXT and VCEDIT.EXT having no entry so that Enter, F3
+and F4 do what they do without one; and VC.INI, the setup file that the program saves from its
 own defaults with its own keys, the clock switched on, the left panel
 on C:\VC and the right one on C:\ (`tools/webini.py`). So a user of the
 page has the clock on, as the original's distribution has it; the

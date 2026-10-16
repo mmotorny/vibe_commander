@@ -6,6 +6,10 @@
 // by SINGLE_FILE. Node's own modules alone.
 //
 //   node bundle.mjs FONT.woff OUT.html
+//   node bundle.mjs --licences LICENSE.TXT
+//
+// The second makes the file of all the licences that C:\\VC ships
+// (licenceFile).
 //
 // The licences are the repository's own files, read as the page is made,
 // so that what the page shows cannot drift from them: LICENCES below.
@@ -30,14 +34,18 @@ export const MODULES = ["render.js", "keys.js", "mouse.js", "drives.js",
 // else, each in the same form, the work, its copyright as the work has
 // it, where it is from, and the text (CLAUDE.md, "The web page"). The
 // project's own first, then Volkov Commander's, whose code it is made
-// of, and the three that the build puts in: Emscripten's runtime in the
-// script, musl's code in the wasm, the font. DOS/32A is in no page.
+// of, DOS/32A's, which the program for DOS that C:\VC ships has linked
+// into it, and the three that the build puts in: Emscripten's runtime in
+// the script, musl's code in the wasm, the font.
 export const LICENCES = [
   { work: "Vibe Commander 0.1", owner: "(c) 2026 Maksym Motorny",
     home: null, file: "LICENSE" },
   { work: "Volkov Commander 4.05, which Vibe Commander is based on",
     owner: "(c) 1991-2000 Vsevolod V. Volkov", home: null,
     file: "src/asm/LICENSE.TXT" },
+  { work: "DOS/32 Advanced DOS Extender, in C:\\VC\\VC.EXE. This product " +
+          "uses DOS/32 Advanced DOS Extender technology.",
+    owner: "(c) 1996-2006 Narech K.", home: null, file: "LICENSE.DOS32A" },
   { work: "Emscripten 6.0.12, its runtime in the page's script",
     owner: "(c) 2010-2014 Emscripten authors",
     home: "https://emscripten.org/", file: "LICENSE.EMSCRIPTEN" },
@@ -57,6 +65,35 @@ export function licences(top = path.resolve(here, "../../..")) {
     text: readFileSync(path.join(top, one.file), "utf8")
       .replace(/\r\n/g, "\n"),
   }));
+}
+
+// The licences as one file of DOS's, C:\\VC\\LICENSE.TXT on the page's C:,
+// which ships the program for DOS: each under its work as a heading
+// line, with its copyright and where it is from, in the order of
+// LICENCES, in code page 437 with CRLF. What 437 lacks of the texts is
+// written as ASCII has it, the copyright sign as (c) and curved quotes
+// straight; any other character that 437 lacks stops the build.
+const CP437 = { "\u00e9": 0x82, "\u00e4": 0x84 };
+const PLAIN = { "\u00a9": "(c)", "\u201c": "\"", "\u201d": "\"",
+                "\u2018": "'", "\u2019": "'" };
+export function licenceFile(top) {
+  const text = licences(top).map((one) =>
+    `${one.work}\n${one.owner}\n${one.home ? `${one.home}\n` : ""}\n` +
+    `${one.text.replace(/\n+$/, "")}\n`).join("\n\n");
+  const bytes = [];
+  for (const character of text.replace(/\n/g, "\r\n")) {
+    const plain = PLAIN[character] ?? character;
+    for (const one of plain) {
+      const code = one.codePointAt(0);
+      if (code < 0x80)
+        bytes.push(code);
+      else if (one in CP437)
+        bytes.push(CP437[one]);
+      else
+        throw new Error(`a licence has ${one}, which code page 437 lacks`);
+    }
+  }
+  return Buffer.from(bytes);
 }
 
 const NAME = "[A-Za-z_$][\\w$]*";
@@ -138,6 +175,11 @@ export function shell(font, directory = here) {
 
 if (process.argv[1] && path.resolve(process.argv[1])
     === fileURLToPath(import.meta.url)) {
-  const [font, out] = process.argv.slice(2);
-  writeFileSync(out, shell(readFileSync(font)));
+  const said = process.argv.slice(2);
+  if (said[0] === "--licences") {
+    writeFileSync(said[1], licenceFile());
+  } else {
+    const [font, out] = said;
+    writeFileSync(out, shell(readFileSync(font)));
+  }
 }

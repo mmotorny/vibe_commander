@@ -201,17 +201,16 @@ const inPage0 = (...names) => inPage(page0, ["/drive/c", ...names].join("/"));
 await see(" C:\\VC ");
 
 // The licences: one link in the bar, which shows the texts of the
-// repository's files that the page carries, the project's own and
-// Volkov Commander's among them, and not DOS/32A's, which is in no page;
-// Esc closes them, and neither Esc nor any key while they are up reaches
+// repository's files that the page carries, the project's own, Volkov
+// Commander's and DOS/32A's, which the program for DOS in C:\VC has
+// linked into it, among them; Esc closes them, and neither Esc nor any key while they are up reaches
 // the program.
 {
   const repository = path.resolve(web, "../../..");
-  const texts = ["LICENSE", "src/asm/LICENSE.TXT", "LICENSE.EMSCRIPTEN",
-                 "LICENSE.MUSL", "LICENSE.FONT"]
+  const texts = ["LICENSE", "src/asm/LICENSE.TXT", "LICENSE.DOS32A",
+                 "LICENSE.EMSCRIPTEN", "LICENSE.MUSL", "LICENSE.FONT"]
     .map((name) => readFileSync(path.join(repository, name), "utf8")
       .replace(/\r\n/g, "\n"));
-  const dos32a = readFileSync(path.join(repository, "LICENSE.DOS32A"), "utf8");
   const shell = readFileSync(html, "utf8");
   await step("the bar has one link to the licences, and no credit apart",
              () => /<button [^>]*\bid="?licences-open\b[^>]*>Licences<\/button>/.test(shell)
@@ -232,8 +231,12 @@ await see(" C:\\VC ");
     .filter((child) => child.id === "pre").map((child) => child.textContent);
   await step("the licences show every text that the page carries",
              () => elements.licences.open && shown.length === texts.length
-                   && texts.every((text, at) => shown[at] === text)
-                   && !shown.includes(dos32a));
+                   && texts.every((text, at) => shown[at] === text));
+  await step("the licences say what DOS/32A's asks them to say",
+             () => elements["licences-texts"].children.some((child) =>
+               child.textContent.includes(
+                 "This product uses DOS/32 Advanced DOS Extender technology.")
+               && child.id !== "pre"));
   page0.listeners.keydown(key("keydown", "KeyA", "a"));
   page0.listeners.keyup(key("keyup", "KeyA", "a"));
   page0.listeners.keydown(key("keydown", "Escape", "Escape"));
@@ -355,10 +358,16 @@ host.close();
   await page.step("the shipped site's C: has vc, AUTOEXEC.BAT and CONFIG.SYS",
                   () => names("/drive/c") === "autoexec.bat,config.sys,vc");
   await page.step("the shipped site's C:\\VC has the program's files",
-                  () => ["dos32a.txt", "license.txt", "vc.ext", "vc.hlp",
-                         "vc.ini", "vc.mnu", "vcedit.ext", "vcview.ext"]
+                  () => ["license.txt", "vc.ext", "vc.hlp", "vc.ini", "vc.mnu",
+                         "vcedit.ext", "vcview.ext"]
                     .every((name) => names("/drive/c/vc").split(",")
                       .includes(name)));
+  await page.step("the shipped site's C:\\VC has its licences in one file",
+                  () => !names("/drive/c/vc").includes("dos32a")
+                    && Buffer.from(page.fs.readFile("/drive/c/vc/license.txt"))
+                         .toString("latin1")
+                       .includes("This product uses DOS/32 Advanced DOS " +
+                                 "Extender technology."));
   await page.see("vc       ini");
   await page.see("vc       hlp");
   // The clock, in the corner of the top row, "12:00p" as the program

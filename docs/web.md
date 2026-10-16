@@ -29,8 +29,12 @@ and copy onto. The user brings files in (see "Files in and out").
 
 C:\VC holds, as the page ships it, nothing of the shareware's:
 
-- `VC.EXE`, the project's program for DOS, with Volkov's licence,
-  `LICENSE.TXT`, and DOS/32A's, `DOS32A.TXT`, which goes with it;
+- `VC.EXE`, the project's program for DOS;
+- `LICENSE.TXT`, every licence that the page carries in one file, the
+  project's first, then Volkov Commander's, DOS/32A's, which goes with
+  `VC.EXE`, Emscripten's, musl's and the font's, each under a heading
+  line of its work, made by the build of the repository's `LICENSE*`
+  files (`bundle.mjs --licences`), in code page 437 with CRLF;
 - `VC.HLP`, the project's own help, which F1 shows;
 - `VC.INI`, the setup file that the program saves (`tools/webini.py`),
   with the clock on;
@@ -130,9 +134,12 @@ The bar names the program, "Vibe Commander 0.1, based on Volkov
 Commander 4.05.", and has one small "Licences" link, on a phone too. It
 opens a dialog with the licence of every work that the page carries,
 each in the same form with its copyright and home: Vibe Commander's,
-Volkov Commander's, Emscripten's, musl's and the font's, the texts of
-`LICENSE`, `src/asm/LICENSE.TXT`, `LICENSE.EMSCRIPTEN`, `LICENSE.MUSL`
-and `LICENSE.FONT`, which the build puts into the page. Esc and the
+Volkov Commander's, DOS/32A's, for the program for DOS in C:\VC, whose
+heading says what its licence asks, "This product uses DOS/32 Advanced
+DOS Extender technology.", Emscripten's, musl's and the font's, the
+texts of `LICENSE`, `src/asm/LICENSE.TXT`, `LICENSE.DOS32A`,
+`LICENSE.EMSCRIPTEN`, `LICENSE.MUSL` and `LICENSE.FONT`, which the build
+puts into the page, and into C:\VC\LICENSE.TXT as one file. Esc and the
 dialog's button close it, and no key reaches the program while it is
 open.
 

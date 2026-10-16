@@ -175,7 +175,7 @@ and open `http://127.0.0.1:8437/`; any server of static files does as
 well, for example `python3 -m http.server -d
 build/portable_c/web/static 8437`. The page has two drives. C:,
 labelled VC, holds C:\VC, with the project's program for DOS, `VC.EXE`,
-its help, the setup file with the clock on, and menu and extension files
+`LICENSE.TXT` with every licence that the page carries, its help, the setup file with the clock on, and menu and extension files
 of the project's own; C:\ has a mock `AUTOEXEC.BAT` and `CONFIG.SYS`. A:
 is empty, for changing disks. The page starts in C:\VC. Bring files in
 with Upload, or by dragging them onto the page. The drives live in the
@@ -351,9 +351,10 @@ machines reliably.
 The extender's stub comes with the Open Watcom download and is linked
 into `build/portable_c/VC.EXE` and `debug/VC.EXE` at build time. It is
 not stored in the repository. Its licence text is kept here because a
-program built with it has to carry it. The web page's "Licences" dialog
-shows every licence above except DOS/32A's, since the page does not
-carry the extender. What the page may have of LLVM's runtime is under
+program built with it has to carry it. The web page carries it, in the program
+for DOS that its C:\VC ships: its "Licences" dialog shows every licence
+above, DOS/32A's among them, and C:\VC\LICENSE.TXT has the same texts in
+one file, which the build makes of the repository's. What the page may have of LLVM's runtime is under
 Apache-2.0 with the LLVM exception, which asks nothing of a compiled
 program.
 

@@ -852,8 +852,8 @@ if(VC_WEB)
     list(TRANSFORM web_page_script PREPEND ${web_dir}/)
     # The licences that the page shows, put into it from these files as it
     # is made (LICENCES of web/bundle.mjs).
-    set(web_licences LICENSE src/asm/LICENSE.TXT LICENSE.EMSCRIPTEN
-        LICENSE.MUSL LICENSE.FONT)
+    set(web_licences LICENSE src/asm/LICENSE.TXT LICENSE.DOS32A
+        LICENSE.EMSCRIPTEN LICENSE.MUSL LICENSE.FONT)
     list(TRANSFORM web_licences PREPEND ${CMAKE_SOURCE_DIR}/)
     file(MAKE_DIRECTORY ${web_page_dir})
     add_custom_command(
@@ -862,6 +862,15 @@ if(VC_WEB)
                 ${web_page_dir}/shell.html
         DEPENDS ${web_page_script} ${web_font} ${web_licences}
         COMMENT "Making the shell of the web page"
+        VERBATIM)
+    # The same licences as one file, C:\VC\LICENSE.TXT of the page's C:,
+    # which ships the program for DOS (licenceFile of web/bundle.mjs).
+    add_custom_command(
+        OUTPUT ${web_page_dir}/license.txt
+        COMMAND ${node} ${web_dir}/bundle.mjs --licences
+                ${web_page_dir}/license.txt
+        DEPENDS ${web_dir}/bundle.mjs ${web_licences}
+        COMMENT "Making the web page's LICENSE.TXT"
         VERBATIM)
     add_portable_c_host(portable_c-web ${web_page_dir} web
         COMPILER ${emcc} OUTPUT vc.html
@@ -902,8 +911,7 @@ if(VC_WEB)
     set(web_shipped
         vc/vc.ini=${web_ini}
         vc/vc.hlp=${CMAKE_BINARY_DIR}/portable_c/VC.HLP
-        vc/license.txt=${CMAKE_SOURCE_DIR}/src/asm/LICENSE.TXT
-        vc/dos32a.txt=${CMAKE_SOURCE_DIR}/LICENSE.DOS32A
+        vc/license.txt=${web_page_dir}/license.txt
         vc/vc.mnu=${web_drive}/vc/vc.mnu
         vc/vc.ext=${web_drive}/vc/vc.ext
         vc/vcview.ext=${web_drive}/vc/vcview.ext

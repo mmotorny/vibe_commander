@@ -319,14 +319,17 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   user judges the page by hand.
 - Every third-party work is credited alike: its licence in a `LICENSE.*`
   file of the repository, and the page, which carries their code and the
-  font to whoever opens it, has one small "Licences" link that shows all
-  of those texts, no work credited apart from the others.
+  font to whoever opens it, DOS/32A's in the program for DOS of its C:,
+  has one small "Licences" link that shows all of those texts, no work
+  credited apart from the others.
 - One drive of files, on the user's word of 15 October 2026, in place
   of the two that the page had: C:, labelled VC, which holds C:\VC, the
   program's own files. There is no drive of a demo and no sample files.
   The page starts in C:\VC. What C: ships, on the user's word of 16
   October 2026: in C:\VC the project's program for DOS, `VC.EXE`, with
-  Volkov's licence and DOS/32A's; the VC.INI that the program saves,
+  LICENSE.TXT, every licence that the page carries in one file, which
+  the build makes of the repository's (the user, later that day, in
+  place of Volkov's and DOS/32A's as two files); the VC.INI that the program saves,
   with the clock on (`tools/webini.py`), the tests' bench keeping its
   own with the clock off; a VC.MNU, VC.EXT, VCVIEW.EXT and VCEDIT.EXT
   of the project's own; and the project's help as `vc.hlp`, which takes

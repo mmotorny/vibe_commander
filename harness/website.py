@@ -29,7 +29,9 @@ in Node, harness/website.mjs, with no browser and nothing downloaded:
 
   5. The site that the build has made, --site, as it is published: its
      C: has in C:\VC the program for DOS, VC.EXE, the same bytes as
-     --program where the build has one; Volkov's licence and DOS/32A's;
+     --program where the build has one; LICENSE.TXT, every licence that
+     the page carries in one file, the project's first, then Volkov's,
+     DOS/32A's and the others, each text whole and in that order;
      the setup file that the program saves, 511 bytes with their sum,
      the clock on; the project's VC.MNU, VC.EXT, VCVIEW.EXT, VCEDIT.EXT
      and its help, VC.HLP; and in C:\ AUTOEXEC.BAT and CONFIG.SYS: those
@@ -63,8 +65,7 @@ ROOT = HERE.parent
 SHIPPED = {
     "autoexec.bat": WEB / "drive" / "autoexec.bat",
     "config.sys": WEB / "drive" / "config.sys",
-    "vc/dos32a.txt": ROOT / "LICENSE.DOS32A",
-    "vc/license.txt": ROOT / "src" / "asm" / "LICENSE.TXT",
+    "vc/license.txt": None,
     "vc/vc.ext": WEB / "drive" / "vc" / "vc.ext",
     "vc/vc.hlp": None,
     "vc/vc.ini": None,
@@ -72,6 +73,40 @@ SHIPPED = {
     "vc/vcedit.ext": WEB / "drive" / "vc" / "vcedit.ext",
     "vc/vcview.ext": WEB / "drive" / "vc" / "vcview.ext",
 }
+# The licences that C:\VC\LICENSE.TXT holds, in its order (LICENCES of
+# web/bundle.mjs), and what code page 437 lacks of them as the file has it.
+LICENCES = [ROOT / "LICENSE", ROOT / "src" / "asm" / "LICENSE.TXT",
+            ROOT / "LICENSE.DOS32A", ROOT / "LICENSE.EMSCRIPTEN",
+            ROOT / "LICENSE.MUSL", ROOT / "LICENSE.FONT"]
+PLAIN = {"\u00a9": "(c)", "\u201c": '"', "\u201d": '"', "\u2018": "'",
+         "\u2019": "'"}
+
+
+def licences_held(text):
+    """What is wrong with the shipped LICENSE.TXT: each licence's text has
+    to be in it whole, in the order of LICENCES, with CRLF and in code
+    page 437."""
+    failures = []
+    at = 0
+    for source in LICENCES:
+        wanted = source.read_text("utf-8").replace("\r\n", "\n").rstrip("\n")
+        for character, plain in PLAIN.items():
+            wanted = wanted.replace(character, plain)
+        wanted = wanted.replace("\n", "\r\n").encode("cp437")
+        found = text.find(wanted, at)
+        if found < 0:
+            failures.append(f"vc/license.txt lacks {source.relative_to(ROOT)}"
+                            " where it is wanted")
+        else:
+            at = found + len(wanted)
+    if b"This product uses DOS/32 Advanced DOS Extender technology." \
+            not in text:
+        failures.append("vc/license.txt lacks DOS/32A's acknowledgment")
+    if b"\n" in text.replace(b"\r\n", b""):
+        failures.append("vc/license.txt has a line that does not end in CRLF")
+    return failures
+
+
 # Where the setup file has the clock, and its sum (posixrun.SETUP_SUM).
 SETUP_CLOCK = 0x1AA
 SETUP_SUM = 0x1FD
@@ -96,6 +131,7 @@ def built_site(site, program):
             failures.append(f"{name} is not {source.relative_to(ROOT)}")
     if program and files.get("vc/vc.exe") != program.read_bytes():
         failures.append(f"vc/vc.exe is not {program}")
+    failures.extend(licences_held(files.get("vc/license.txt", b"")))
     helped = site.parent.parent / "VC.HLP"
     if files.get("vc/vc.hlp") != helped.read_bytes():
         failures.append(f"vc/vc.hlp is not {helped}")

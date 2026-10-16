@@ -356,7 +356,7 @@ async function desktop(browser, served) {
     await sleep(300);
     must(await tab.eval("document.getElementById('licences').open"), "the dialog is not open");
     const works = await tab.eval("document.querySelectorAll('#licences h2').length");
-    must(works === 5, `the dialog has ${works} works`);
+    must(works === 6, `the dialog has ${works} works`);
     await shot(tab, `desktop-licences`);
     await tab.press("Escape");
     await sleep(300);
