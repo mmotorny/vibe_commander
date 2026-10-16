@@ -1735,6 +1735,68 @@ being credited apart (W5); that the page starts on C:, as it does (W3b,
 "A start on C:"); and that the static page does not ask the browser to
 keep its data, `navigator.storage.persist()` (W3c).
 
+### Queued, decided by the user on 16 October 2026
+
+What the user decided on 16 October 2026 of the page's next pieces, in
+the order in which they are to be done. Each piece is declared where a
+deviation is (DEVIATIONS.md), documented in the README and
+`docs/web.md`, and, for the page, published again by `pages.yml` as
+"Open, for the user" above has it.
+
+1. **Running now**, two pieces side by side:
+   - **(a) The page made truly ephemeral.** The page keeps nothing: the
+     server's mode goes, so there is one way of serving, the static
+     one, and with it the probe of `api/server`; the browser's store goes, IndexedDB and
+     its stand-ins (W3b and W3c above have both), and the button Reset drives with it. The
+     bar's "Changes are kept in this browser." is replaced by a
+     statement that changes last until the page is reloaded or closed.
+     The tests that held the store and the server's mode go or change
+     with them, and the page is published again.
+   - **(b) A beep without a scroll, on Linux and on the web.** The
+     emulated BIOS takes the bell, 07h typed through it, for a beep
+     only, where the BIOS of the PC moves the screen up a row for it
+     (CLAUDE.md, the notes on rules, "move"). It is declared as an
+     entry of its own among the L entries of DEVIATIONS.md, "The program
+     for Linux", and the scenarios that show the scroll have patches of
+     the posix trees. DOS is unchanged.
+2. **Next, one piece of the page, after (a) has landed:**
+   - C:\VC holds the project's program for DOS, `VC.EXE`, with
+     LICENSE.TXT (Volkov's) and LICENSE.DOS32A beside it; the VC.INI
+     that the program saves; a VC.MNU, VC.EXT, VCVIEW.EXT and
+     VCEDIT.EXT of the project's own; a README of its own; and the
+     project's help, `build/portable_c/VC.HLP` as `vc.hlp` ("The
+     project's own help" above).
+   - C:\ has an AUTOEXEC.BAT and a CONFIG.SYS, mock ones, for the look
+     of a DOS disk and for something to view.
+   - An A: drive, empty, so that changing disks can be tried.
+   - The clock is on by default for users. What sets it is to be
+     checked in each place: the program's defaults, the VC.INI that is
+     distributed, and the first start of the page and of the program
+     for Linux. The tests' bench keeps it off (CLAUDE.md, "Scenarios").
+   - A strip of the keys that browsers keep for themselves, Ctrl-PgUp,
+     Ctrl-PgDn, Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4, on the desktop as
+     well as on a phone, beside the row of keys that the phone has, with
+     a hint that full screen makes them work from the keyboard, by the
+     keyboard lock of Chrome and Edge.
+   - Declared, documented and published again.
+3. **Then the README's animated session, shot again from the web page**
+   ("One drive, C:\VC alone" above, "The README's animation, from the
+   web page", has how it is made now). About 30 seconds, at a relaxed
+   pace:
+   1. It opens on both panels, C:\VC on the left and C:\ on the right,
+      as the README's screenshot under FreeDOS has them, with no banner
+      and no typing.
+   2. Insert on three files, F5 to copy them to A: with the box of its
+      progress, Alt-F1 to A: to see them, and back to C:.
+   3. F3 on AUTOEXEC.BAT, then Esc.
+   4. Ctrl-O to DOS's screen, and back.
+   5. Ctrl-L for the Info panel, the tree box, the red box of F8
+      cancelled, and a sweep of the menu bar of F9.
+   6. The starfield of the screen saver as the finale, looping.
+
+   The words "Try it live" stay in the README's caption alone, not in
+   the SVG, as the user had it on 16 October 2026.
+
 ### Left open when the session of 15 October 2026 ended
 
 - **The page in a real browser**: done as W6, above, in Chromium. Firefox and Safari on an iPhone are still the pass by hand of W4.
