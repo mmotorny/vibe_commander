@@ -4,9 +4,9 @@ Two setups share one clock and one source of files:
 
   fresh install   a single hard disk with the shareware distribution unpacked
                   in C:\\VC, and VC started there. This is what a user saw
-                  on first run, and what the picture at the top of the
-                  README showed until the portable C's, which is made
-                  on the test bench (see screenshot.py), took its place.
+                  on first run, and what the README's picture showed
+                  until the portable C's, which is made on the test
+                  bench (see screenshot.py), took its place.
 
   test bench      the program under test on its own disk in D:\\VC, next to
                   the distribution's help and configuration files, and a

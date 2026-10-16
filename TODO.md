@@ -41,8 +41,9 @@ The portable C stays in the memory whole while a command runs
 (`src/portable_c/DEVIATIONS.md`, the first entry), and is one program:
 the linker writes its file, DOS loads and relocates it, its main data is
 a variable, and it has no part that stays, no copy of anything and no
-tool that lays it out (the README, "Staying in the memory whole", has
-what went and what is left of what rests on Open Watcom). What that has
+tool that lays it out (`docs/portable-c.md`, "Staying in the memory
+whole", has what is left of what rests on Open Watcom, and `DIARY.md`
+what went). What that has
 left open:
 
 - No scenario has the program without memory for the viewer's 8,000
@@ -167,8 +168,8 @@ scenario that is no longer run was alone in testing.
 **The room.** Since the piece F9 of step 2 the program for DOS takes the
 memory for its panels and its text from the extender, as much as the
 machine has, and its editor has all of it but its own objects and its
-two panels: on the bench of the tests, a machine of 16 MB, the README's
-figures have how much, many times the original's room there (345,840
+two panels: on the bench of the tests, a machine of 16 MB, the figures
+of `docs/portable-c.md` have how much, many times the original's room there (345,840
 bytes) and more than any file of a scenario. On a machine of 2 MB, which
 a scenario may ask for (`memory` of `harness/scenarios.py`; `view-window`
 does), it is some 550 KB. The program for Linux and the web page have
@@ -1472,8 +1473,8 @@ held for the next key, and the phone's keyboard by its button.
   is empty when the tab is made.
 - **The checks**, `harness/webbrowser.mjs`, and the test
   `portable_c-web-browser` (`harness/webbrowser.py`), which runs them
-  without screenshots in some forty seconds: the README's table has
-  them. With `--shots DIR` the same run saves its screenshots. The
+  without screenshots in some forty seconds: the table of tests in
+  `docs/web.md` has them. With `--shots DIR` the same run saves its screenshots. The
   server is `server.mjs` as a process of its own on a free port; the
   static site is behind a host of Node's that answers 404, whose
   sockets are closed with it, or Chromium's kept-alive ones hold its

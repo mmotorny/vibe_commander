@@ -117,7 +117,7 @@ below the megabyte stays the extender.
   starts and kept for as long as it runs, and made longer for a
   directory of more entries than that holds (27); and the room, the
   largest block that there is then, which is all that the extender has
-  behind the panels: the README's figures have how much that is on the
+  behind the panels: the figures of `docs/portable-c.md` have how much that is on the
   bench of the tests, some 15 MB, and 13 says what follows for the
   editor. The original has each panel as long as its list and the room
   behind them, and moves the second panel and the room when a list
@@ -224,7 +224,7 @@ word of 13 October 2026:
 - What it wants of the machine, where it cannot start. It is compiled
   for the 386 and started by an extender that needs one, and it wants
   memory above the megabyte for all of itself, for its two panels and
-  for the least of its room: the README's figures have how much, some
+  for the least of its room: the figures of `docs/portable-c.md` have how much, some
   360 KB. The original runs on any PC that DOS runs on, and wants no
   memory there. With too little for its objects the extender does not
   start it and says so in its own words, not in the program's:
@@ -1456,7 +1456,7 @@ it was, and the panel is as tall as it was. The program does not work
 the two figures out: it does not read where the memory ends, and the
 word of the main data that held it, `Memorys`, keeps its place and is
 neither set nor read. How much memory a command has is no longer to be
-seen from the program; the README has it for the bench of the tests,
+seen from the program; `docs/portable-c.md` has it for the bench of the tests,
 under "The figures".
 
 **Why.** The user's decision, on 13 October 2026: the two lines "mean
@@ -1675,8 +1675,8 @@ its text in the extender's memory, above the megabyte, of which it asks
 for as much as there is, as the original asks DOS (`DIARY.md`, "Revise
 the plan for a flat memory by the user's two answers"): its editor has
 all of that but its own objects and its two panels, 64K each unless a
-directory has needed more (27), whatever DOS has free. The README's
-figures have how much that is on the bench of the tests, some 15 MB:
+directory has needed more (27), whatever DOS has free. The figures of
+`docs/portable-c.md` have how much that is on the bench of the tests, some 15 MB:
 more than forty times the original's room there, 345,840 bytes. From
 when it was switched to 32 bits until the memory was the extender's, on
 14 October 2026, the program handed out 640 KB of its own instead, and
@@ -2569,7 +2569,7 @@ out:
 ## The program for Linux
 
 The portable C is also a program for Linux, `vc` (`CLAUDE.md`, the
-road, step 6; the README, "The program for Linux"). It is of the same
+road, step 6; `docs/linux.md`). It is of the same
 source, so every entry above holds for it as well. What follows is what
 it does otherwise than the original besides, because it runs on Linux
 and emulates DOS there behind `sys.h`, and what a user sees of that.

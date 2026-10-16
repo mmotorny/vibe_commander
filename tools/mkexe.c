@@ -45,7 +45,7 @@
  *
  * What the linker's map has to show for that, which the build arranges by
  * the compiler's options and the linker's command and nothing in the C
- * language promises (see the README, "What rests on Open Watcom"): the
+ * language promises (see docs/translation.md, "What rests on Open Watcom"): the
  * code and the data of the part that stays are one group, R_GROUP, which
  * begins at the PSP; the room of the PSP is the first thing of it; the
  * stack is alone in the last segment of it; and no code of the part that

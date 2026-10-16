@@ -107,8 +107,9 @@ in front.
   data is laid out as the original's, held by `c-data`.
 - Where C could be written in more than one way, portable C came before C
   that is tied to this compiler or this machine, that before the
-  compiler's intrinsics, and those before inline assembly. The README
-  lists what rests on Open Watcom and every piece of inline assembly.
+  compiler's intrinsics, and those before inline assembly.
+  `docs/translation.md` lists what rests on Open Watcom and every piece
+  of inline assembly.
 - The mouse is tested like the keys. An instruction of the original that
   no scenario can reach is listed as out of reach in `harness/ported.py`
   with its reason; a new scenario that reaches one fails `c-scenarios`
@@ -185,8 +186,8 @@ laid out. Steps 0 to 6 are done; step 7 is under way.
   there before it lands.
 - The order of the translation holds, and is now the point of the work:
   portable C first, then C tied to a compiler or a machine, then
-  intrinsics, then assembly inline in a C file. What the README lists as
-  resting on Open Watcom is to shrink, not grow.
+  intrinsics, then assembly inline in a C file. What `docs/portable-c.md`
+  lists as resting on Open Watcom is to shrink, not grow.
 - The program is Vibe Commander 0.1. Its title and the first line of its
   banner are "Vibe Commander 0.1", and where the original names itself
   without a version it is "Vibe Commander". It says "based on Volkov
@@ -734,10 +735,10 @@ rebase write it anew rather than merge it.
 
 The figures of the portable C that change with the work, the length of
 its file, what it has of the memory, the counts of what only Open Watcom
-takes, are in one place: the table of the README under "The figures",
+takes, are in one place: the table of `docs/portable-c.md` under "The figures",
 which `python3 tools/figures.py --write` writes of the build and the
 source. Run it when a piece of work lands, after the build and the
-rebase, and commit the README with the work; `--check` says whether the
+rebase, and commit `docs/portable-c.md` with the work; `--check` says whether the
 table is the build's. Write no such figure anywhere else: say the thing
 without the number, or point to the table. A new figure is a row of the
 table, added in the script. A figure that is history stays where it tells
@@ -993,8 +994,8 @@ from the C translation:
   it; and written in every implementation, `sys_dos.c` and `sys_posix.c`
   and the web page's, where the comment at the head of its group says the
   service. If it takes a name, it goes into `NAMED` of `harness/reads.py`.
-  The README counts the functions by group under "The system in one
-  place"; a table of `sys_dos.c` alone is in `OWN_OF` of
+  `docs/portable-c.md` counts the functions by group under "The system
+  in one place"; a table of `sys_dos.c` alone is in `OWN_OF` of
   `harness/datacheck.py` and in `REVIEWED` of `harness/reads.py`; the toy
   `harness/trial32/sys.c` asks every function; and the host check's
   record moves.

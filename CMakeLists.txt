@@ -261,7 +261,7 @@ function(add_c_tree tree description model)
     # That part is one segment to the program, the PSP's, as the whole
     # program was when it was a .COM file: CS, DS and SS are on the PSP
     # there, and every offset counts from it. Two options of Open Watcom
-    # make it so, and nothing of the C language does (see the README,
+    # make it so, and nothing of the C language does (see docs/translation.md,
     # "What rests on Open Watcom"):
     #   -nd=R        the data of a file is in a group of its own, R_GROUP,
     #                which the code reads through DS, in four segments of
@@ -303,7 +303,7 @@ function(add_c_tree tree description model)
     # rest. No code of the rest may stand within a page of the stack:
     # tools/mkexe.c says why, and stops the build if it does. The
     # directive is Open Watcom's, and its help does not list it for DOS
-    # (see the README, "What rests on Open Watcom").
+    # (see docs/translation.md, "What rests on Open Watcom").
     #
     # Warning 1014 says that there is no stack segment: the stack is of
     # the part that stays in the memory, and tools/mkexe.c names it in the
