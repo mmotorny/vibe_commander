@@ -1856,9 +1856,9 @@ deviation is (DEVIATIONS.md), documented in the README and
      illusion; the shipped menu and extension files have the same
      review. Landed in 27843e2.
    - **Then the page is published again**, by `pages.yml`.
-4. **Then, strictly after item 3 is on `main`, the README's animated
-   session, shot again from the web page**, so that it shows the final
-   C:\ and AUTOEXEC.BAT ("One drive, C:\VC alone" above, "The README's
+4. **Strictly after item 3 is on `main`, the README's animated
+   session, shot again from the web page: done**, so that it shows
+   the final C:\ and AUTOEXEC.BAT ("One drive, C:\VC alone" above, "The README's
    animation, from the web page", has how it is made now). About 30
    seconds, at a relaxed pace, by the user's storyboard:
    1. It opens on both panels, C:\VC on the left and C:\ on the right,
@@ -1874,6 +1874,21 @@ deviation is (DEVIATIONS.md), documented in the README and
 
    The words "Try it live" stay in the README's caption alone, not in
    the SVG, as the user had it on 16 October 2026.
+
+   Made so: `harness/websession.mjs` plays the session on the site that
+   the build made, as it is published, and from the program's first look
+   at the clock gives the page a clock of the session's own, as the
+   bench's machine counts its time in what it executes: it goes on by
+   0.05 ms at every look and to a timer's time when the session lets the
+   timers run, never by itself, and a timer waits 4 ms at the least, as
+   a browser has it. So the program goes round as often between two keys
+   at every run, and two runs give the same bytes, the clock's colon and
+   the stars included; Asyncify goes on in a promise, so each timer is
+   called once the one before has run. The copy of three files is made
+   in an instant on the page, and its box is caught by letting the clock
+   go 5 ms at each look for that one frame, so that the program yields
+   while VC.EXE is half copied. The stars come by moving the pointer into
+   the top right corner, which brings the screen saver up at once.
 5. **The README's figures: done**, beside its paragraph "The project is
    also an experiment in how far an AI coding agent can take such a
    recreation on its own. …", which is rephrased as what has been

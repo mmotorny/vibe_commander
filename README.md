@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://mmotorny.github.io/vibe_commander/">
     <img src="docs/vibe-commander-session.svg" width="720"
-         alt="An animated recording of Vibe Commander 0.1 in its web page: it starts in C:\VC with one panel beside its banner, Ctrl-F1 brings up the second, F7 makes the directory NOTES, Shift-F4 writes hello.txt in the editor, F3 views it, F9 opens the menu bar and walks the menus Right, Options, Commands and Files, the Configuration dialog opens from Options, and F10 asks whether to quit">
+         alt="An animated recording of Vibe Commander 0.1 in its web page: it starts with C:\VC on the left and C:\ on the right and the clock on, selects three files with Insert and copies them to A: with F5, its box of progress showing, goes to A: with Alt-F1 to see them and back to C:, views AUTOEXEC.BAT with F3, shows DOS's screen with Ctrl-O, brings up the Info panel with Ctrl-L, the tree with Alt-F10 and the red box of F8, walks the menus of F9, and ends in the stars of the screen saver">
   </a>
 </p>
 <p align="center">
@@ -280,14 +280,15 @@ The web tests other than `portable_c-web-render` and
 The animation at the top is made by `python3 harness/session.py`, with
 the project built with `-DVC_WEB=ON` for the page, and
 Node and Chromium on the path. It plays a fixed list of keys on the web
-page, `build/portable_c/web/vc.html`, as it is served, with its one drive
-C: labelled VC and the page starting in C:\VC, in a headless Chromium
+page as it is published, `build/portable_c/web/static`, with C:\VC and
+C:\ as they are shipped and A: empty, in a headless Chromium
 (`harness/websession.mjs`), takes the page's own cells behind each step,
-and draws each screen as a frame of an SVG that animates by CSS alone,
-with a button below the screen that the README links to the page on
-GitHub Pages. The page's clock is set to a fixed time, so two runs give
-the same file. `--linux` takes the screens from the program for Linux in
-a terminal instead, as the animation was first made.
+and draws each screen as a frame of an SVG that animates by CSS alone;
+the README links it to the page on GitHub Pages. The page's clock is set
+to a fixed time and goes on only as the session lets it, so two runs
+give the same file, the screen saver's stars included. `--linux` takes
+the screens from the program for Linux in a terminal instead, as the
+animation was first made.
 
 The DOS screenshot is made by
 
@@ -386,5 +387,6 @@ the C trees are linked without Open Watcom's libraries.
 The shareware distribution of Volkov Commander is proprietary and is not
 part of this repository. The DOS screenshot shows the portable C in its
 directory, with the shareware's files beside it. The animation has none
-of them: only what its session makes on the web page's drive, and, made
-with `--linux`, a few files written for it, `harness/session_files`.
+of them: only the web page's own files and what its session makes
+there, and, made with `--linux`, a few files written for it,
+`harness/session_files`.

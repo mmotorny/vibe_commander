@@ -11,14 +11,15 @@ time that its step gives it.
 The screens are taken one of two ways:
 
 - From the web page, the default, as it is published: SESSION is played
-  by harness/websession.mjs on build/portable_c/web/vc.html, made a
-  static site with its one drive, C:, labelled VC, which holds C:\\VC
-  alone, where the page starts, in the Chromium that the machine has
-  (`chromium` or `chromium-browser` on the path), headless, with the
-  keys as a keyboard sends them to the page. A frame is the page's own
-  cells once the screen has stayed the same for a while. The page's
-  clock starts at STAMP, in UTC, so that what the session makes on C:
-  has the same time at every run.
+  by harness/websession.mjs on the site that the build made,
+  build/portable_c/web/static, with C:\\VC and C:\\ as they are shipped
+  and A: empty, in the Chromium that the machine has (`chromium` or
+  `chromium-browser` on the path), headless, with the keys and the mouse
+  as a keyboard and a mouse send them to the page. A frame is the page's
+  own cells behind a step. The page's clock starts at STAMP, in UTC, and
+  goes on only as the session lets it, so that the clock, the files
+  that the session makes and the screen saver's stars are the same at
+  every run.
 - From the program for Linux, with --linux, as the README's animation
   was first made: SESSION_LINUX is played on build/portable_c/posix/vc
   in a pseudo-terminal of 80 by 25 as harness/terminal.py does, its keys
@@ -65,7 +66,7 @@ import terminal
 
 ROOT = deps.ROOT
 PROGRAM = ROOT / "build" / "portable_c" / "posix" / "vc"
-PAGE = ROOT / "build" / "portable_c" / "web" / "vc.html"
+SITE = ROOT / "build" / "portable_c" / "web" / "static"
 WORK = ROOT / "build" / "session"   # Chromium of a snap reads no hidden
                                     # directory and not the real /tmp
 CHROMIUMS = ("chromium", "chromium-browser")
@@ -80,11 +81,16 @@ ESC = "\x1b"
 
 # The steps of the session on the web page, and how long the frame behind
 # each is shown, in seconds: a key by the name that harness/browser.mjs
-# gives it, with what it is pressed with, or text typed into the editor a
-# character at a time, a frame behind each. The first is the page as it
-# starts, in C:\VC.
-def key(name, seconds, **held):
-    return dict(press=name, seconds=seconds, **held)
+# gives it, with what it is pressed with, text typed a character at a
+# time, a frame behind each, or the mouse's pointer moved onto a cell;
+# and, where it is not a second, how long the page's clock runs before the
+# frame is taken, in milliseconds (websession.mjs). The first is the page
+# as it starts, C:\VC on the left and C:\ on the right.
+def key(name, seconds, run=None, **held):
+    step = dict(press=name, seconds=seconds, **held)
+    if run is not None:
+        step["run"] = run
+    return step
 
 
 def typed(text, seconds=0.07):
@@ -92,37 +98,46 @@ def typed(text, seconds=0.07):
 
 
 SESSION = [
-    dict(seconds=2.0),                      # the page as it starts
-    key("F1", 1.6, ctrl=True),              # Ctrl-F1: the left panel too
-    key("F7", 1.0),                         # F7: a directory made
-    *typed("NOTES", 0.12),
-    key("Enter", 1.4),                      # NOTES in the panel
-    key("F4", 1.0, shift=True),             # Shift-F4: a file to edit
-    *typed("hello.txt", 0.1),
-    key("Enter", 1.2),                      # the question of a new file
-    key("Enter", 1.0),                      # the editor
-    *typed("Hello from Vibe Commander,"),
-    key("Enter", 0.3),
-    *typed("in a web page of 80 by 25."),
-    key("Enter", 0.3),
-    *typed("Its screen is DOS's, cell for cell."),
-    key("F2", 1.2),                         # F2: saved
-    key("Escape", 1.2),                     # Esc: hello.txt in the panel
-    key("Down", 0.8),                       # Down, to hello.txt
-    key("F3", 2.5),                         # F3: the viewer
-    key("Escape", 1.0),                     # Esc
-    key("F9", 1.0),                         # F9: the menu bar, at Right
-    key("Enter", 1.2),                      # Enter: its menu
-    key("Left", 1.2),                       # Left: the menu of Options
-    key("Left", 1.2),                       # Left: of Commands
-    key("Left", 1.2),                       # Left: of Files
-    key("Right", 0.8),                      # Right
-    key("Right", 1.0),                      # Right: of Options again
-    key("Down", 0.5),                       # Down
-    key("Up", 0.8),                         # Up, to Configuration
-    key("Enter", 3.5),                      # Enter: its dialog
-    key("Escape", 1.2),                     # Esc
-    key("F10", 2.5),                        # F10: the question whether to quit
+    dict(mouse=(79, 24), seconds=2.0),      # the page as it starts, the
+                                            # pointer on the key bar
+    key("Down", 0.6),                       # Down, to LICENSE.TXT
+    key("Insert", 0.5),                     # Insert: it and the next two
+    key("Insert", 0.5),                     # selected
+    key("Insert", 0.8),
+    key("F5", 1.2),                         # F5: the dialog of the copy
+    *typed("A:\\", 0.2),                     # to A:
+    key("Enter", 0.3, run=150),             # Enter: the box of its progress
+    dict(seconds=1.8, run=320, quantum=5),  # VC.EXE half copied
+    key("F1", 1.0, alt=True),               # Alt-F1: the drives
+    key("Home", 0.6),                       # Home, to A:
+    key("Enter", 1.6),                      # Enter: A:, with the copies
+    key("F1", 0.6, alt=True),               # Alt-F1
+    key("End", 0.6),                        # End, to C:
+    key("Enter", 1.0),                      # Enter: C:\VC again
+    key("Tab", 0.5),                        # Tab: the right panel, C:\
+    key("Down", 0.6),                       # Down, to AUTOEXEC.BAT
+    key("F3", 1.6),                         # F3: the viewer
+    key("Escape", 0.6),                     # Esc
+    key("o", 1.4, ctrl=True),               # Ctrl-O: DOS's screen
+    key("o", 0.8, ctrl=True),               # Ctrl-O: the panels
+    key("Tab", 0.5),                        # Tab: the left panel
+    key("l", 1.6, ctrl=True),               # Ctrl-L: the Info panel
+    key("F10", 1.6, alt=True),              # Alt-F10: the tree
+    key("Escape", 0.6),                     # Esc
+    key("Down", 0.5),                       # Down, to LICENSE.TXT
+    key("F8", 1.4),                         # F8: the red box of the delete
+    key("Escape", 0.6),                     # Esc
+    key("F9", 0.7),                         # F9: the menu bar
+    key("Enter", 0.8),                      # Enter: the menu of Left
+    key("Right", 0.8),                      # Right: of Files
+    key("Right", 0.8),                      # Right: of Commands
+    key("Right", 0.8),                      # Right: of Options
+    key("Right", 0.8),                      # Right: of Right
+    key("Escape", 0.6),                     # Esc
+    dict(mouse=(79, 0), seconds=1.5, run=4500),  # the pointer in the top
+    dict(seconds=1.5, run=1500),            # right corner: the screen
+    dict(seconds=1.5, run=1500),            # saver's stars
+    dict(seconds=1.5, run=1500),
 ]
 
 # The keys of the session for Linux, as xterm sends them, and how long
@@ -202,8 +217,8 @@ VGA = ["000000", "0000aa", "00aa00", "00aaaa", "aa0000", "aa00aa", "aa5500",
 def record_web():
     """The frames of SESSION played on the web page, each with its time,
     in the form of a frame of the terminal (snapshot)."""
-    if not PAGE.exists():
-        sys.exit(f"{PAGE} is not built: configure with -DVC_WEB=ON")
+    if not (SITE / "index.html").exists():
+        sys.exit(f"{SITE} is not built: configure with -DVC_WEB=ON")
     node = shutil.which("node")
     chromium = next((found for found in map(shutil.which, CHROMIUMS)
                      if found), None)
@@ -214,7 +229,7 @@ def record_web():
     steps.write_text(json.dumps(SESSION))
     frames.unlink(missing_ok=True)
     subprocess.run([node, str(ROOT / "harness" / "websession.mjs"),
-                    "--chromium", chromium, "--page", str(PAGE),
+                    "--chromium", chromium, "--site", str(SITE),
                     "--work", str(WORK), "--steps", str(steps),
                     "--stamp", str(STAMP * 1000), "--out", str(frames)],
                    check=True, timeout=600)
