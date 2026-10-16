@@ -25,7 +25,7 @@ What the program was, the limits it was written to, the question of the book, a 
 
 ### [1. The program: one segment, one loop, one screen buffer](01-the-program.md)
 
-The skeleton: the source and the file, the start, the main data and the panels, the main loop and its key tables, input, the screen in outline, the help, the clock and the blanker.
+The skeleton: the source and the file, the start in outline, the main data and the panels, the main loop and its key tables, input, the screen in outline, the help, the clock and the blanker.
 
 - [The source: one file and twelve includes](01-the-program.md#the-source-one-file-and-twelve-includes)
 - [The parts of `VC.COM`](01-the-program.md#the-parts-of-vccom)
@@ -46,9 +46,13 @@ The skeleton: the source and the file, the start, the main data and the panels, 
   - [The mouse at the panels](01-the-program.md#the-mouse-at-the-panels)
 - [Input](01-the-program.md#input)
   - [`Input` and `Input0`](01-the-program.md#input-and-input0)
+  - [The key bar: one byte from the caller, three tables](01-the-program.md#the-key-bar-one-byte-from-the-caller-three-tables)
   - [The mouse driver](01-the-program.md#the-mouse-driver)
 - [The screen and its boxes](01-the-program.md#the-screen-and-its-boxes)
 - [The help: `VC.HLP`, one entry at a time](01-the-program.md#the-help-vchlp-one-entry-at-a-time)
+  - [The file: a Norton Guides database](01-the-program.md#the-file-a-norton-guides-database)
+  - [One F1: twelve calls of DOS](01-the-program.md#one-f1-twelve-calls-of-dos)
+  - [The index and the pages](01-the-program.md#the-index-and-the-pages)
 - [The clock and the blanker](01-the-program.md#the-clock-and-the-blanker)
   - [The clock](01-the-program.md#the-clock)
   - [The blanker](01-the-program.md#the-blanker)
@@ -150,7 +154,7 @@ What the program does with files: reading and sorting a directory, the cursor an
 - [Every file the program reads and writes](03-the-features.md#every-file-the-program-reads-and-writes)
 - [Where to read next](03-the-features.md#where-to-read-next)
 
-### [The viewer and the editor](04-the-viewer-and-editor.md)
+### [4. The viewer and the editor](04-the-viewer-and-editor.md)
 
 F3 and F4: the viewer's window of 64K that slides by halves over a file of any size, its line table and its two views, the search shared with find file, and the editor's whole text with one line apart, its lines, columns, words, undo and screen.
 
@@ -188,7 +192,43 @@ F3 and F4: the viewer's window of 64K that slides by halves over a file of any s
 - [What it adds up to](04-the-viewer-and-editor.md#what-it-adds-up-to)
 - [Where to read next](04-the-viewer-and-editor.md#where-to-read-next)
 
-### [4. Talking to DOS and the PC: the system](06-the-system.md)
+### [5. Numbers without DIV, names without strings: the program's arithmetic and text](05-numbers-and-names.md)
+
+The arithmetic and the text that every screen leans on: decimal numbers by subtraction, sizes, dates and times in the country's order, hex, percentages without `DIV`, names in DOS's eleven-byte form, upper and lower case from DOS's table, paths cut to fit, the separators of words, and one binary for two code pages.
+
+- [The trouble with `DIV`](05-numbers-and-names.md#the-trouble-with-div)
+- [`Number`: ten subtractions in a row](05-numbers-and-names.md#number-ten-subtractions-in-a-row)
+  - [`TxtNum`: and back](05-numbers-and-names.md#txtnum-and-back)
+- [`PutSize`: nine columns](05-numbers-and-names.md#putsize-nine-columns)
+- [The selected files: a "K" by cutting text](05-numbers-and-names.md#the-selected-files-a-k-by-cutting-text)
+- [Dates and times: two packed words](05-numbers-and-names.md#dates-and-times-two-packed-words)
+  - [`PutDate`: three fields in the country's order](05-numbers-and-names.md#putdate-three-fields-in-the-countrys-order)
+  - [`PutTime`: twelve hours by one `DIV`](05-numbers-and-names.md#puttime-twelve-hours-by-one-div)
+  - [The way back: the attributes dialog](05-numbers-and-names.md#the-way-back-the-attributes-dialog)
+- [Comparing directories: a date is an integer](05-numbers-and-names.md#comparing-directories-a-date-is-an-integer)
+- [Hex: `HexByt` and `HexCod`](05-numbers-and-names.md#hex-hexbyt-and-hexcod)
+- [Percentages: a 32-bit divisor](05-numbers-and-names.md#percentages-a-32-bit-divisor)
+  - [The copy's bar: `PerCent`](05-numbers-and-names.md#the-copys-bar-percent)
+  - [The viewer: `V25_00`](05-numbers-and-names.md#the-viewer-v25_00)
+- [Sums that do not overflow, and the cluster multiply](05-numbers-and-names.md#sums-that-do-not-overflow-and-the-cluster-multiply)
+  - [`DiSi10`: a sum that sticks at the top](05-numbers-and-names.md#disi10-a-sum-that-sticks-at-the-top)
+  - [`RdInfo` and the Info panel: bytes per cluster](05-numbers-and-names.md#rdinfo-and-the-info-panel-bytes-per-cluster)
+- [Names: the eleven-character form](05-numbers-and-names.md#names-the-eleven-character-form)
+  - [`Convert` and `Conv10`](05-numbers-and-names.md#convert-and-conv10)
+  - [`UnConv` and `UnCnv1`: the dot that is not there](05-numbers-and-names.md#unconv-and-uncnv1-the-dot-that-is-not-there)
+  - [`TstMas`: eleven comparisons](05-numbers-and-names.md#tstmas-eleven-comparisons)
+  - [Copying `*.txt` to `*.bak`](05-numbers-and-names.md#copying-txt-to-bak)
+- [Upper and lower case](05-numbers-and-names.md#upper-and-lower-case)
+  - [`UpCase`: DOS's routine, for every byte](05-numbers-and-names.md#upcase-doss-routine-for-every-byte)
+  - [`LowCase` and `LowTab`: inverted once](05-numbers-and-names.md#lowcase-and-lowtab-inverted-once)
+  - [Where the case is used](05-numbers-and-names.md#where-the-case-is-used)
+- [Paths on the screen](05-numbers-and-names.md#paths-on-the-screen)
+- [Word separators](05-numbers-and-names.md#word-separators)
+- [One binary for CP437 and CP866](05-numbers-and-names.md#one-binary-for-cp437-and-cp866)
+- [What it adds up to](05-numbers-and-names.md#what-it-adds-up-to)
+- [Where to read next](05-numbers-and-names.md#where-to-read-next)
+
+### [6. Talking to DOS and the PC: the system](06-the-system.md)
 
 The conversation with DOS and the PC: the error wrapper, the critical error, Ctrl-Break, the display, the keyboard, the mouse, the resident part that runs a command and loads the commander again, the memory map, and the 256-byte stack.
 
@@ -235,14 +275,15 @@ The conversation with DOS and the PC: the error wrapper, the critical error, Ctr
 - [What it adds up to](06-the-system.md#what-it-adds-up-to)
 - [Where to read next](06-the-system.md#where-to-read-next)
 
-### [5. The setup program: `VCSETUP.COM`](07-the-setup.md)
+### [7. The setup program: `VCSETUP.COM`](07-the-setup.md)
 
-`VCSETUP.COM`: its segment and menus, `VC.INI` as a dump of the main data, the private call by which it hands a running commander its settings, what it copies of the commander, and its help.
+`VCSETUP.COM`: its segment, menus and palette editor, `VC.INI` as a dump of the main data, the private call by which it hands a running commander its settings, what it copies of the commander, and its help.
 
 - [What the program is](07-the-setup.md#what-the-program-is)
   - [The segment](07-the-setup.md#the-segment)
   - [Its conversation with DOS and the PC](07-the-setup.md#its-conversation-with-dos-and-the-pc)
   - [The menus](07-the-setup.md#the-menus)
+  - [The palette editor: a list, a grid and four pictures](07-the-setup.md#the-palette-editor-a-list-a-grid-and-four-pictures)
 - [`VC.INI`: a dump of the main data](07-the-setup.md#vcini-a-dump-of-the-main-data)
   - [Why a dump](07-the-setup.md#why-a-dump)
   - [The format, byte by byte](07-the-setup.md#the-format-byte-by-byte)
