@@ -1,7 +1,8 @@
-# 2. Working with files: the commander's features
+# 3. Working with files: the commander's features
 
-[Chapter 1](01-the-program.md) has the skeleton of `VC.COM`: the main
-data, the main loop, the screen and the dialogs. This chapter is about
+[Chapter 1](01-the-program.md) has the skeleton of `VC.COM`, the main
+data and the main loop, and [chapter 2](02-the-screen.md) the screen
+and the dialogs. This chapter is about
 the flesh: what the program does with files, and how each feature is
 built out of a few routines that the others use too. Everything here is in Volkov's
 assembly in `src/asm/`, mostly in these include files:
@@ -1376,7 +1377,7 @@ history, the extension file and `DosBuf` into it, keeps each panel in
 which runs each command of `DosBuf` and then brings the commander back
 at `Init11`, the panels read again and the cursor and the selection
 found in what was kept.
-[Chapter 3](03-the-system.md#the-resident-part-12690-bytes-that-stay)
+[Chapter 4](04-the-system.md#the-resident-part-12690-bytes-that-stay)
 has all of it.
 
 ## How the features share the main data
@@ -1436,8 +1437,9 @@ room, which is whatever DOS has left.
 - `src/asm/VCFIND.INC`: `FndData`, `F67_00`, `FindFil`, `FndAdr`.
 - `src/asm/VCFUNC.INC`: `F21_00` to `F21_40`, `F32_00`, `Run_00`,
   `FileLst`.
-- [Chapter 1](01-the-program.md) for the main data, the loop, the
-  screen and the dialogs; [chapter 3](03-the-system.md) for `Intr21`,
+- [Chapter 1](01-the-program.md) for the main data and the loop;
+  [chapter 2](02-the-screen.md) for the screen, the panels as drawn and
+  the dialogs; [chapter 4](04-the-system.md) for `Intr21`,
   the critical error, the calls of DOS and the resident part that runs
-  a command; [chapter 4](04-the-setup.md) for `VC.INI`, which keeps each
+  a command; [chapter 5](05-the-setup.md) for `VC.INI`, which keeps each
   panel's mode, sort order, filter and path.

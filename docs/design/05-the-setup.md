@@ -1,4 +1,4 @@
-# 4. The setup program: `VCSETUP.COM`
+# 5. The setup program: `VCSETUP.COM`
 
 ![VCSETUP.COM: the menu](img/setup-menu.png)
 
@@ -111,7 +111,7 @@ each other), the number
 of rows from the font (1130h), the display's segment, TopView's buffer
 (AH 0FEh), DESQview (`INT 21h` 2B01h with `'DE'` and `'SQ'`), and
 whether there is snow (`SetSnow`, the commander's test of port 3DAh).
-[Chapter 3](03-the-system.md) has each of those.
+[Chapter 4](04-the-system.md) has each of those.
 
 ### The menus
 
@@ -556,7 +556,7 @@ and left as it is is not offered for saving.
 The setup program is run from the commander's command line like any
 program. The commander that ran it has its settings in its resident
 part, in `ComnIni`, and will copy them into its new main data when the
-command is done ([chapter 3](03-the-system.md#the-resident-part-12690-bytes-that-stay)).
+command is done ([chapter 4](04-the-system.md#the-resident-part-12690-bytes-that-stay)).
 If the setup program only wrote
 `VC.INI`, a commander that has already read it would go on with the
 old settings until it is started again.
@@ -575,7 +575,7 @@ date", and changes nothing. That makes it a classic install check of
 the time, a call that every DOS survives and that a resident program
 can recognise by its registers: DESQview's is AX 2B01h with `'DE'` in
 CX and `'SQ'` in DX, and the commander tests for DESQview with exactly
-that ([chapter 3](03-the-system.md#giving-time-away)). Its own is `'VC'` in CX and `'OM'` in DX, the year
+that ([chapter 4](04-the-system.md#giving-time-away)). Its own is `'VC'` in CX and `'OM'` in DX, the year
 22,083 and a month of 79:
 
 ```asm
@@ -913,6 +913,7 @@ fit in what is left of the segment.*
 - `src/asm/VC.ASM`: `MainDat` and `WCBdef` for the layout of
   `VC.INI`, `Init00` for its reading, `New21` for the private call;
   `VCSUB3.INC`: `SaveSet`, `MakeIni` and `MkIni1` for its writing.
-- [Chapter 1](01-the-program.md) for the main data and the dialogs
-  that the setup program borrows, and [chapter 3](03-the-system.md) for
-  the resident part, `New21` and the way back from a command.
+- [Chapter 1](01-the-program.md) for the main data; [chapter 4](04-the-system.md) for the
+  resident part, `New21` and the way back from a command; and
+  [chapter 2](02-the-screen.md) for the boxes, dialogs and shadows that
+  both programs draw with the same routines.

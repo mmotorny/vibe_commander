@@ -1,4 +1,4 @@
-# 3. Talking to DOS and the PC: the system
+# 4. Talking to DOS and the PC: the system
 
 A file manager is mostly a conversation with the operating system:
 open, read, find the next file, ask where the cursor is, wait for a
@@ -442,7 +442,7 @@ The program composes every screen in `ScrBuf` of its main data and
 copies rectangles of it to the display by `Window`, whole rows where
 there is more than one, and boxes save and restore what they cover in
 three buffers of their own;
-[chapter 1](01-the-program.md#the-screen) has the routines. What the
+[chapter 2](02-the-screen.md#the-shadow-screen-scrbuf) has the routines. What the
 system has to say to that is where the display is. `Screen` is a far
 pointer filled at start: the segment is B000h in mode 7, a monochrome
 card, and B800h otherwise; the offset is the BIOS's word at
@@ -656,7 +656,7 @@ another multitasker that understands it; if nothing answers, AL stays
 80h and the program never asks again. DESQview is found at start by
 its own install check, a call of DOS's "set date" with impossible
 values that only DESQview answers, `INT 21h` AX 2B01h with `'DE'` in CX
-and `'SQ'` in DX. [Chapter 4](04-the-setup.md#the-private-call-int-21h-ah-2bh-vc-om) shows the
+and `'SQ'` in DX. [Chapter 5](05-the-setup.md#the-private-call-int-21h-ah-2bh-vc-om) shows the
 commander using the same trick for an API of its own.
 
 ## The mouse: eight calls of `INT 33h`
@@ -962,7 +962,7 @@ SS, which still holds the PSP.
 
 `Init00` runs once, on the first start. It reads `VC.INI` straight
 into the resident copy of the main data
-([chapter 4](04-the-setup.md#vcini-a-dump-of-the-main-data) has the
+([chapter 5](05-the-setup.md#vcini-a-dump-of-the-main-data) has the
 format),
 prints the banner through DOS, reads the main extension file, and
 takes three addresses:
@@ -1374,7 +1374,7 @@ VCapi:  CMP     CX,'VC'
         JNE     Old21
         CMP     DX,'OM'
         JNE     Old21
-        ...                             ;; chapter 4
+        ...                             ;; chapter 5
 New21   ENDP
 ```
 
@@ -1514,8 +1514,8 @@ already does, DOS is made to do.
 - `src/asm/VCSUB1.INC`: `Timer`, `TstBrk`, `IniMous` to `GetMous`,
   `BasAdr`, `SavWin`, `Window`, `MovScr`, and `Intr21` at the end;
   `VCSUB2.INC`: `Input0` and `LeaveTm`; `VCSUB3.INC`: `Fantom`.
-- [Chapter 1](01-the-program.md) for the main data, the main loop and
-  the boxes that use these routines, [chapter 2](02-the-features.md)
+- [Chapter 1](01-the-program.md) for the main data and the main loop,
+  [chapter 2](02-the-screen.md) for the boxes that use these routines, [chapter 3](03-the-features.md)
   for the panels' memory and the features that make most of the calls
-  of DOS, and [chapter 4](04-the-setup.md) for the setup program and
+  of DOS, and [chapter 5](05-the-setup.md) for the setup program and
   the API of `New21`.

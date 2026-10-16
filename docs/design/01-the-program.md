@@ -11,14 +11,14 @@ gives its data back to DOS, and in the small mode of Memory allocation,
 which is how it is distributed, its code too, keeping 12,690 bytes of
 itself, stack and all.
 
-This chapter is the skeleton that the features of
-[chapter 2](02-the-features.md) hang on, read from the source in
+This chapter is the skeleton that the toolkit of the screen in
+[chapter 2](02-the-screen.md) and the features of
+[chapter 3](03-the-features.md) hang on, read from the source in
 `src/asm/`: how the source is put together, what is in the file, how
 the program cuts up its memory when it starts, the structures of its
 data and its panels, the main loop and its commands, the input, the
-screen, the tables that describe every box and menu, the help, and the
-clock and the blanker. The calls of DOS and the BIOS underneath are
-[chapter 3](03-the-system.md), and so is the resident part that runs a
+screen in outline, the help, and the clock and the blanker. The calls of DOS and the BIOS underneath are
+[chapter 4](04-the-system.md), and so is the resident part that runs a
 command; this chapter has it in outline. The last section lists the
 economies in one place, with their sizes. A reader who wants a reminder
 of segments, the PSP and memory control blocks will find one in the
@@ -215,7 +215,7 @@ flowchart TD
 ```
 
 `Alloc0`, 256 bytes that run once, does four things before anything
-else, and [chapter 3](03-the-system.md#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb)
+else, and [chapter 4](04-the-system.md#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb)
 has each of them instruction by instruction. It adds up the 65,090
 bytes of its own file into a 16-bit sum, `ChkFile`, by which it will
 know the file again when it loads itself after a command. It refuses a
@@ -237,7 +237,7 @@ reads it with one call of DOS straight into the resident part, at a
 place chosen so that the 330 bytes land on `ComnIni`, the copy of the
 main data that `Init11` will copy down, and asks for one byte more than
 the file has: only a file of the right length reads one byte less than
-was asked. [Chapter 4](04-the-setup.md#reading-it-the-commander) has the
+was asked. [Chapter 5](05-the-setup.md#reading-it-the-commander) has the
 code. Only each panel's 88 bytes then go on, to `WCB1sav` and `WCB2sav`.
 
 Without a good file the defaults come from `_DATA`, which begins with
@@ -362,7 +362,7 @@ up the commander, and the resident part does the rest. In outline:
    `VC.COM` as its own loader; either way it comes back to `Init11`,
    which takes the data anew.
 
-[Chapter 3](03-the-system.md#the-resident-part-12690-bytes-that-stay)
+[Chapter 4](04-the-system.md#the-resident-part-12690-bytes-that-stay)
 has the four steps byte by byte: what stays, how a command line is made
 in place, and how the second copy of `VC.COM` hands the first its code
 and its check sum through one word.
@@ -514,7 +514,7 @@ entry:
  offset  bytes  field                         offset  bytes  field
  0000      1    WinTyp   0 files, 1 tree,     00      13     NameF   name, ASCIIZ
                          2 info               0D       1     AttrF   DOS attributes;
- 0001      1    BrfFul   brief or full                               bit 7 selected
+ 0001      1    BrfFul   brief or full                               bit 6 selected
  0002      1    Visible                       0E       2     TimeF
  0003      1    Hidden   hidden files shown   10       2     DateF
  0004      1    MasTyp   which filter         12       4     SizeF
@@ -546,7 +546,7 @@ list keeps the entry in SI or DI with DS on the panel, and steps by
 `SIZE FilEnt`. The list may grow past the 256 entries of the 423
 paragraphs: `ReDir` moves the other panel and the room up to make
 space, and a panel stops at 64K, 2,703 entries.
-[Chapter 2](02-the-features.md) has the reading, the sorting and the
+[Chapter 3](03-the-features.md) has the reading, the sorting and the
 selection.
 
 ### A panel is its segment
@@ -890,7 +890,7 @@ What the loop does each time round:
    for Alt, Ctrl, Shift or none; `PutKey0` draws only when the bar it
    picks differs from `BarPrev`, so holding a key costs nothing.
 2. `LeaveTm` gives the time away to DOS's background programs, to
-   Windows and to DESQview ([chapter 3](03-the-system.md#giving-time-away)).
+   Windows and to DESQview ([chapter 4](04-the-system.md#giving-time-away)).
 3. With a blank delay set, it compares the time with `BlTime`, now
    plus `BlDelay` minutes, set again whenever something happens.
 4. With the clock on, it draws the clock.
@@ -914,364 +914,28 @@ key, 3Bh plus the column divided by 8 for F1 to F10, 54h on for Shift,
 ### The mouse driver
 
 The mouse is INT 33h, eight calls in a few lines of `VCSUB1.INC`, and
-[chapter 3](03-the-system.md#the-mouse-eight-calls-of-int-33h) has them
+[chapter 4](04-the-system.md#the-mouse-eight-calls-of-int-33h) has them
 all: the position in cells, the buttons exchanged for a left-handed
 mouse, and a pointer that is a character, `√`, `■` or `x`, to tell the
 user what letting go will do.
 
-## The screen
+## The screen and its boxes
 
-### `ScrBuf`, and places in one register
-
-The program never draws on the screen. It draws into `ScrBuf`, 4,000
-words of the main data, 80 x 50 cells in exactly the layout of the
-adapter's memory, and copies rectangles of it out. A place on the
-screen is one word, the row in the high byte and the column in the low
-byte, so that it fits a register and its row and column are BH and BL,
-DH and DL, with no shift to take it apart; a size is packed the same
-way. `BasAdr` makes an address of a place:
-
-```asm
-BasAdr	PROC	NEAR			;; BH,BL: row, column
-	PUSH	BX
-	PUSH	AX
-	MOV	AL,80
-	MUL	BH			;; the row times 80
-	MOV	BH,0
-	ADD	AX,BX			;; and the column
-	ADD	AX,AX			;; two bytes a cell
-	ADD	AX,OFFSET ScrBuf
-	MOV	DI,AX			;; DI: the cell, in ES
-	POP	AX
-	POP	BX
-	RET
-BasAdr	ENDP
-```
-
-20 bytes, called from almost everything that draws.
-
-### `Window` and `MovScr`
-
-`Window`, 121 bytes, copies the rectangle of `ScrBuf` at BX, of size
-DX, to the screen, whose segment and offset the start has put in
-`Screen`: `B800h`, or `B000h` on a monochrome adapter, or the buffer
-that TopView or DESQview answers to INT 10h AH FEh; and the offset of
-the page shown, from the BIOS's data at 44Eh. A single row it copies
-cell by cell; a taller rectangle it widens to whole rows, from column 0
-to 79, so that the copy is one block:
-
-```asm
-Window	PROC	NEAR			;; BX the place, DX the size
-	...
-	MOV	AL,0
-	CALL	CurMous			;; the pointer off: the driver draws it
-	PUSH	ES			;;  into the same memory
-	POP	DS
-	MOV	ES,DS:Screen.Segm
-	CALL	BasAdr
-	MOV	SI,DI
-	SUB	DI,OFFSET ScrBuf
-	ADD	DI,DS:Screen.Offs	;; the same cell on the screen
-	MOV	AL,DS:Snow
-	CMP	DH,1
-	JE	Wind1			;; one row: cell by cell
-	MOV	BH,0
-	ADD	BX,BX
-	SUB	SI,BX			;; several: from column 0, whole rows
-	SUB	DI,BX
-	PUSH	DI
-	PUSH	DX
-	CALL	MovScr
-	...
-Wind7:	MOV	AL,1
-	CALL	CurMous			;; the pointer on again
-```
-
-`MovScr` (52 bytes) is the copy, `REP MOVSW`, in pieces of at most
-seven rows; on a CGA that would show "snow" it waits for the vertical
-retrace before each piece
-([chapter 3](03-the-system.md#cga-snow-and-volkovs-own-question-marks)).
-`SavScr` is the copy the other way,
-the screen into `ScrBuf`, which `Init40` makes after every command, and
-then keeps in `UserScr`, the 49 rows of what DOS showed: switching the
-panels off with Ctrl-O shows it again, `ResUser`, as does Esc with
-`EscBar`.
-
-```mermaid
-graph LR
-    R["Panel, PutFls, NgLine, DialBox ..."] -- "STOSW cells" --> SB["ScrBuf, 80 x 50"]
-    SB -- "Window: REP MOVSW" --> V["B800:0000 or B000:0000"]
-    V -- "SavScr, at Init40" --> SB
-    SB -- "Init40" --> US["UserScr: DOS's screen"]
-    US -- "ResUser" --> SB
-    SB -- "SavWin" --> WB["WinBuf, ErrBuf, ErrBuf1, MenuBuf"]
-    WB -- "ResWin" --> SB
-```
-
-### What a box covers
-
-There is no window system and no redrawing of what lies under a box. A
-box saves the cells it is about to cover with `SavWin`, 39 bytes, and
-puts them back with `ResWin`, 42, both `REP MOVSW` row by row from and
-to a buffer of the main data. Which buffer is a word of the box's
-table. There are three of 77 x 48 cells, 7,392 bytes each, so boxes nest
-three deep: `WinBuf` for a box or a menu over the panels, `ErrBuf` for
-a box over that (and the menu bar's row while the bar is up), `ErrBuf1`
-for the help and the critical error, which can come up over anything.
-A small box may use `MenuBuf` or `TmpBuf` instead. 22,176 bytes of
-buffers are the whole of the program's windowing.
-
-### Colours
-
-Every colour the program draws is a number from 0 to 39, an `EQU`
-of `VC.ASM`, from `Back_C` = 0 for the panels to `Sky2_C` = 37 for the
-blanker's bright stars. `Color` (9 bytes) makes an attribute of it, by
-`ColTab`, 40 entries of six bytes, one for each palette (black and
-white, colour, laptop) on each kind of adapter: which byte is read is
-`ColTyp` and whether the adapter is a monochrome one. Entry 38,
-`ShadFl`, is no colour but says how a box's shadow is drawn. The setup
-program edits the table, and the file keeps it in its first 240 bytes.
-
-## Boxes, dialogs and menus as tables
-
-### A line and its markup: `NgLine`
-
-Every text that the program shows in a box, a menu, a status line or
-the help goes through one routine, `NgLine`, 204 bytes, in a markup
-like that of Norton Guides:
-
-| In the text | It does |
-|---|---|
-| `^N` `^R` `^B` `^U` | normal, reversed, bold, underlined: the 1st to 4th colour of the line's table; the same twice is back to normal |
-| `^V`, `^W` | put in the text at `TmpErr+1`, `TmpErr+101` |
-| `^I` | put in the "include line" that the caller passes in DX |
-| `^Cxx` | colour xx, in hex |
-| `^Axx` | character xx, in hex |
-| `^^` | a caret |
-| `FFh, n` | n spaces |
-| `FFh, 80h+n, c` | n copies of the character c |
-
-`LnStr`, 112 bytes, counts the cells a line will take with the same
-markup, so that a box can be as wide as its longest line. The runs are
-the commonest mark: "Yes" and "No" three spaces apart are
-
-```asm
-YesNo_S	DB	'Yes',0FFh,3,'No',0
-```
-
-and a menu's line with its hot key on the right is `'Copy',0FFh,14,'F5',0`,
-nine bytes for a line of 20 cells. `LnStr` counts a run with a carry
-trick: it reads the two bytes behind the FFh as one word, adds n - 1
-and the inverted bit 7 shifted out into the carry, and leaves a run's
-character to the next round of its loop, which counts it as an
-ordinary one.
-
-`NgLine` and `LnStr` disagree in one place, code against code: `LnStr`
-counts `^Cxx` as a cell and `^Axx` as none, where `NgLine` changes the
-colour for `^C` and writes a character for `^A`. A line that used
-either would be measured one cell wrong; none of the program's own
-texts uses either, so it never shows.
-
-### `DialBox`: a box is 8 bytes and its lines
-
-A box is a table in `_DATA`. The F10 box:
-
-```asm
-	.CONST
-Name_S	DB	PrgName,0		;; 'Volkov Commander'
-Quit1_S	DB	' The ^I ',0
-Quit2_S	DB	'Do you want to quit the ^I?',0
-YesNo_S	DB	'Yes',0FFh,3,'No',0
-
-	.DATA
-Quit_P	DB	Box_C, BoxCu_C, BoxCu_C, 0	;; four colours for ^N ^R ^B ^U
-	DB	3, 0			;; three lines, no variable texts
-	DW	OFFSET WinBuf		;; where what it covers goes
-	DW	OFFSET Quit1_S		;; the title, on the frame
-	DW	OFFSET Quit2_S
-	DW	OFFSET YesNo_S
-```
-
-```
- a box (_P)                          for each of 0 to 2 variable texts
- +0  DB  4 colours                   +0  DW  where the text is (DS:)
- +4  DB  number of lines             +2  DB  how: 4 trim, 2 a path,
- +5  DB  number of variable texts            1 the drive letter too
- +6  DW  save buffer, in ES                   (NormStr, PathLin, LetLin)
- +8  ... the variable texts          +3  DB  the most cells, cut in
- ... DW  a line each: the first is           front (ShrtLin)
-         the title, 0 is a rule
-```
-
-`DialBox`, 210 bytes, does all of it: copies the variable texts into
-`TmpErr` at +1 and +101, 81 bytes each, and shortens a path that is
-too long; finds the widest line with `LnStr`; adds 040Ch to the size,
-four rows and twelve columns for the margins, the frame and the
-shadow; centres the box on the place it is given; saves what it covers;
-draws the frame and the shadow, growing it from the middle first when
-`ZoomWin` is set (`MinBox`); and writes each line centred, or a rule
-`╟──╢` across for a line of 0. On a screen of more than 25 rows,
-`SftEGA` moves the box down by half the extra rows.
-
-### `Dialog`: a header of 10 bytes, a field of 11
-
-A dialog is a box with fields that take keys. Its table is a `BOXHD`
-and a `BOXMN` for each field, ended by a zero:
-
-```asm
-BOXHD	STRUC				;; 10 bytes
-  pDiBox  DW	?			; Pointer to DialBox structure
-  BoxBase DW	?			; The dialog box begin-center
-  SubFunc DW	?			; Subfunction
-  bKeyBar DB	?			; KeyBar
-  bMenu   DB	0FFh			; PutMnu
-  bHelp   DB	0			; HlpPage
-  bFlags  DB	0			; Flags
-BOXHD	ENDS
-
-BOXMN	STRUC				;; 11 bytes
-  mType	  DB	?			; Menu type
-  mUp	  DB	0			; Up link
-  mDown	  DB	0			; Down link
-  mLeft	  DB	0			; Left link
-  mRight  DB	0			; Right link
-  mBase	  DW	?			; Menu base
-  mPoint  DW	?
-  mCtrl	  DW	?
-BOXMN	ENDS
-```
-
-The quit dialog is 22 bytes, its buttons 5:
-
-```asm
-YesNo_D	DB	5, 0			;; a button 5 cells wide at column 0
-	DB	4, 6			;;  and one of 4 at column 6
-	DB	0
-Quit_B	BOXHD	< Quit_P, 528h, 0, 1, 2, 26, 0 >
-	;; the box above; its top centred at row 5, column 40; no routine;
-	;; key bar 1; the Files menu lit; help page 26; no flags
-	BOXMN	< 4, 0,0,0,0, 323h, TmpBuf, YesNo_D>
-	;; buttons, no links, row 3 column 23 of the box; the answer into
-	;; TmpBuf; the buttons YesNo_D
-	DB	0
-
-	.CODE
-F30_00:	CMP	ES:QuitAck,0		; F10 - quit
-	JZ	F30_01
-	MOV	DX,OFFSET Name_S	;; what ^I stands for
-	MOV	BP,OFFSET Quit_B
-	CALL	Dialog
-	JE	F30_01			;; Yes
-	JMP	Func04
-F30_01:	JMP	Exit
-```
-
-The command is 25 bytes, and the whole of F10 with its texts and
-tables about a hundred.
-
-![F10 at the panels](img/quit.png)
-
-*F10: `Quit_B`. The box of `Quit_P` saved what it covers in `WinBuf`;
-its shadow is two cells wide and one row deep; the `^I` of both lines
-is `Name_S`.*
-
-A field's `mType` says which routine takes the keys while the cursor is
-on it: 1 an input line, `InpStr`, typed into `DosBuf` behind the command
-line at +134, or +234 for a second one; 2 a group of choices, `Select`,
-whose answer is a byte; 3 a tick, `FlipFl`; 4 a row of buttons,
-`MinMnu`. `mPoint` is where the field's value is in ES, the main data,
-and `mBase` its place in the box. The four links name the field that
-Up, Down, Left and Right go to, by number, so that a dialog of several
-groups is a graph of fields in a few bytes. `bFlags` asks for the
-keyboard to be emptied first (bit 0), a beep (bit 1), the box moved
-down by `SftErr` (bit 2), F10 and Alt-F10 for the tree (bit 3), and no
-box at all where the box is on the screen already (bit 4). `SubFunc` is
-the address of a routine that `Dialog` calls on Enter, which may refuse
-the answer: in the dialog of attributes it is `M30_60` of `VCF1.INC`,
-"Test date & time", which reads the date and the time typed in.
-
-Here Volkov's comments and his code disagree, and the code is what
-runs. The comment above `Dialog` lists the flags as "b0 - Beep" and
-"b1 - ClrKbd", where `Dial21` tests bit 0 to empty the keyboard and
-bit 1 to beep, as above; and it names the header's third word
-`SecondBox`, where the `STRUC` calls it `SubFunc` and the code calls
-the routine that it names.
-
-`Dialog`, 1,006 bytes, then draws the bars (`bMenu`, `bKeyBar`), the
-box, every field from its value, sets the help page, and loops on
-`Input` and its table `Dial_T`: Tab and Shift-Tab, the arrows by the
-links, Home, End, PgUp and PgDn, Enter, Esc, and F10 and Alt-F10, which
-answer for the tree where `bFlags` bit 3 asks for it, F10 being Esc
-otherwise. It answers with the button
-chosen, and Esc with FFh. Every dialog of the program, the error boxes
-included, is a table run by this one routine.
-
-![F9, O, Enter: the Configuration dialog](img/config.png)
-
-*F9, O, Enter: the Configuration dialog, `Conf_B` and its fields,
-groups of choices, ticks and buttons, linked by their `mUp` to
-`mRight`. The box is still growing from the middle, `ZoomWin`.*
-
-### The menu bar: `MnuTab` and a table of commands
-
-The bar is drawn by `PutMnu`, from one text with runs of spaces between
-the names:
-
-```asm
-PtMnu_S	DB	0FFh,4,'Left',0FFh,4,'Files',0FFh,4,'Commands'
-	DB	0FFh,4,'Options',0FFh,4,'Right',0FFh,31,0
-```
-
-F9 runs it, `F39_00`, and each of the five menus is a row of `MnuTab`,
-eight bytes: the place of its box, its size, its lines and the help
-pages of its lines. The Right menu is the Left one again at another
-place:
-
-```asm
-MnuTab	DW	102h, 121Bh, MenuLn1, MnuHlp1	;; Left: row 1 column 2, 18 x 27
-	DW	10Ah, 141Eh, MenuLn2, MnuHlp2	;; Files
-	DW	113h, 1023h, MenuLn3, MnuHlp3	;; Commands
-	DW	11Fh, 1322h, MenuLn4, MnuHlp4	;; Options
-	DW	12Ah, 121Bh, MenuLn1, MnuHlp1	;; Right
-```
-
-A menu's lines are one block of texts behind one another, each ended
-by its zero, and an empty one, a single 0, for a rule:
-
-```asm
-MenuLn2	DB	'Help'		   ,0FFh,14,'F1',0
-	DB	'User menu'	   ,0FFh, 9,'F2',0
-	DB	'View'		   ,0FFh,14,'F3',0
-	...
-	DB	'Delete'	   ,0FFh,12,'F8',0
-	DB					 0
-	DB	'file Attributes'  ,0FFh, 3,'^A',0
-```
-
-The letter that chooses a line is its first capital: `file Attributes`
-is A. `MnuKey`, five bytes `'LFCOR'`, are the letters of the bar. What
-an item does is an address in a table of the same shape, a word for
-each line and 0 for a rule: `Menu2_T` has `F33_00` for View, the
-command of F3. The menu jumps to the same command as the key, and
-`KeyTab` lets an open menu take a command's own key: 34 pairs of the
-key and the item, so that F5 with the Files menu open chooses Copy.
-
-![F9, then O](img/options-menu.png)
-
-*F9, O: the Options menu, a row of `MnuTab` and the texts of
-`MenuLn4`; the ticks are bytes of the main data, `FulScr` and its
-neighbours.*
-
-### The key bar
-
-The bottom row is drawn by `PutKey0`, 132 bytes, from three tables:
-`KeyB_T`, four bytes for each of the 15 bars, which picks a row by the
-bar's number and the shift keys held; `KeyC_T`, ten numbers for each of
-its 19 rows, one for each key; and `Key_S`, 34 names of six characters,
-204 bytes in which "Help  ", "View  " and "Quit  " each occur once
-however many bars show them. A key is its number, its six letters and
-a space, eight cells, so ten keys fill the 80 columns, the tenth with
-"10" in place of a digit and a space.
+The program never draws on the display directly. Every routine draws
+into `ScrBuf`, 8,000 bytes of the main data laid out as the adapter's
+memory, 80 x 50 cells, with a place on the screen kept as one word,
+the row in the high byte and the column in the low; `Window` copies a
+rectangle of it out. A box saves the cells it will cover into one of
+three buffers of 7,392 bytes, `WinBuf`, `ErrBuf` and `ErrBuf1`, and
+puts them back when it closes, so nothing is ever redrawn for being
+uncovered. Every box, dialog and menu is a table of bytes read by a
+handful of routines: `DialBox` draws a box from 8 bytes and its lines,
+`NgLine` writes every text in one markup, `Dialog` runs a header of 10
+bytes and fields of 11, and every colour is a number looked up in
+`ColTab`. [Chapter 2](02-the-screen.md) is all of it: the frames and
+their junctions, the shadow, the growing box, focus and hot letters,
+the input lines, how deep boxes nest, the menus, the key bar and the
+panels as drawn.
 
 ## The help: `VC.HLP`, one entry at a time
 
@@ -1469,34 +1133,29 @@ calls `LeaveTm`, so even the blanker gives its time to DOS and Windows.
 | Key tables of 4 bytes an entry, walked by one routine that jumps by dropping its own return | `Case`, `FncTab` and 17 more | 37 bytes for every `switch` on a key; 72 keys of the panels in 290 bytes |
 | An injected key: auto menus are F2 in AX, auto change dir the pseudo-key FE00h | `Func07`, `Input0` | no code path of their own in the loop |
 | F1 caught in `Input` for every routine that waits | `Input` | help everywhere in 18 bytes |
-| Places on the screen as row and column in one word | `BasAdr` and everything | a place in a register, its row and column in BH and BL |
-| A shadow screen, copied out in whole rows | `ScrBuf`, `Window`, `MovScr` | one `REP MOVSW` per redraw, and snow handled in one place |
-| Three save buffers for what boxes cover | `WinBuf`, `ErrBuf`, `ErrBuf1` | no window system, no redraw of what is under a box |
-| One line routine and one markup for every text, with runs of characters | `NgLine`, `LnStr` | `'Yes',0FFh,3,'No'` is 9 bytes; a rule of 40 is 3 |
-| Boxes and dialogs as tables, run by `DialBox` and `Dialog` | `_P`, `_B`, `_D` | a header of 10 bytes, a field of 11; F10 in about 100 bytes all told |
-| Menus as blocks of texts and tables of addresses of the same shape | `MnuTab`, `MenuLn1`..`4`, `Menu1_T`.. | a menu item is its text and one word |
-| Key bar names shared by number | `KeyB_T`, `KeyC_T`, `Key_S` | 15 bars in 4 shift states from 34 names |
 | The help kept in its file, one entry read at a time, XORed with 1Ah | `Help`, `HelpBuf`, `DeCode` | the help's text costs no byte of the program; 3,000 bytes of data |
 | The clock's covered cells kept in the wait's own stack frame, the clock drawn only when its separator changes | `Input0`, `ClkBuf` | no buffer in the main data; two copies a second |
 | The blanker drawing through the BIOS, so the shadow screen keeps the real one | `Blank` | nothing to save to blank, one `Window` to come back |
 | A pointer that is a character, by the driver's own masks | `TypMous` | the `√`, `■` and `x` feedback in one call |
 | Code shared by falling through and jumping into other code | 2,486 labels against 305 procedures | 44 percent of the code is entered by jumps, a 2- or 3-byte jump where a call and a copy of a tail would be more |
 
-The economies of the resident part, of the hand-made MCB, `RunPar` and
+The economies of the screen, its boxes, dialogs and menus are listed
+in [chapter 2](02-the-screen.md#the-economies-in-one-table). The
+economies of the resident part, of the hand-made MCB, `RunPar` and
 the program that loads itself, are listed with the rest of the system in
-[chapter 3](03-the-system.md#what-it-adds-up-to).
+[chapter 4](04-the-system.md#what-it-adds-up-to).
 
 ## Where to read next
 
 - `src/asm/VC.ASM`: the structures near the top, `MainDat`, `WCBdef`,
   `BOXHD` and `BOXMN`; `Init00` to `Init33` for the start; `Init40` to
   `Func62` for the main loop, with `FncTab`.
-- `src/asm/VCSUB1.INC`: `Case`, `BasAdr`, `SavWin`, `ResWin`, `Window`,
-  `MovScr`, `DialBox`, `Dialog`, `LnStr` and `NgLine`; `VCSUB2.INC`:
-  `Input`, `Input0`, `PutKey0`, `Blank` and `Rnd`; `VCMENU.INC`: `MnuTab`
-  and the menus; `VCHELP.INC`: `Help`.
-- [Chapter 2](02-the-features.md) for what the panels, the viewer, the
-  editor, copy and find file do on this skeleton;
-  [chapter 3](03-the-system.md) for the calls of DOS and the BIOS and
-  for the resident part; [chapter 4](04-the-setup.md) for `VC.INI` and
+- `src/asm/VCSUB1.INC`: `Case`; `VCSUB2.INC`: `Input`, `Input0`,
+  `Blank` and `Rnd`; `VCHELP.INC`: `Help`.
+- [Chapter 2](02-the-screen.md) for the screen, the boxes, the
+  dialogs and the menus; [chapter 3](03-the-features.md) for what the
+  panels, the viewer, the editor, copy and find file do on this
+  skeleton;
+  [chapter 4](04-the-system.md) for the calls of DOS and the BIOS and
+  for the resident part; [chapter 5](05-the-setup.md) for `VC.INI` and
   the setup program.

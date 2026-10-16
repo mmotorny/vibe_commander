@@ -139,25 +139,32 @@ The book is about the original program, Volkov's assembly in
 ```mermaid
 graph TD
     P["Preface: the program, its limits, a DOS refresher"]
-    C1["1. The program: the file, the start, the main data, the loop, the screen, the tables"]
-    C2["2. The features: panels, the tree, walking files, copy, viewer, editor, find file"]
-    C3["3. The system: DOS and the BIOS, the critical error, the resident part"]
-    C4["4. The setup: VCSETUP.COM, VC.INI and the private call"]
+    C1["1. The program: the file, the start, the main data, the loop, the input"]
+    C2["2. The screen: frames, boxes, dialogs, focus, menus, shadows"]
+    C3["3. The features: panels, the tree, walking files, copy, viewer, editor, find file"]
+    C4["4. The system: DOS and the BIOS, the critical error, the resident part"]
+    C5["5. The setup: VCSETUP.COM, VC.INI and the private call"]
     P --> C1
     C1 --> C2
     C1 --> C3
     C2 --> C3
+    C1 --> C4
     C3 --> C4
+    C4 --> C5
+    C2 --> C5
 ```
 
 [Chapter 1](01-the-program.md) is the skeleton: how the source is put
 together, what is in the file, how the program cuts up memory, the main
-data and the panels, the main loop, input, the screen, and the tables
-from which every box and menu is drawn. [Chapter 2](02-the-features.md)
+data and the panels, the main loop and the input.
+[Chapter 2](02-the-screen.md) is the text-mode toolkit on top of it: the
+frames, the boxes and dialogs described as tables, focus, menus, the
+key bar, shadows and what a box saves of what it covers.
+[Chapter 3](03-the-features.md)
 is what the program does with files on that skeleton.
-[Chapter 3](03-the-system.md) is the conversation with DOS and the PC,
+[Chapter 4](04-the-system.md) is the conversation with DOS and the PC,
 and the part of the program that stays in memory while a command runs.
-[Chapter 4](04-the-setup.md) is the second program, and the file and
+[Chapter 5](05-the-setup.md) is the second program, and the file and
 the private call that join the two.
 
 Each topic is explained in one place, and the other chapters link to
@@ -165,9 +172,9 @@ it; each chapter ends with what to read next, in the source and in the
 book. The [contents](README.md) list every section.
 
 **The excerpts.** Code is quoted from `src/asm/` with Volkov's labels,
-instructions and comments. In chapters 1, 3 and 4 a comment that
+instructions and comments. In chapters 1, 2, 4 and 5 a comment that
 starts with `;;` is the book's and one with a single `;` is Volkov's;
-in chapter 2 the comments of the excerpts are the book's. Volkov's
+in chapter 3 the comments of the excerpts are the book's. Volkov's
 names are a numbering, not words, and chapter 1 explains them. Where
 his comments disagree with his code, the book says so, and the code is
 what runs. The source files are CP866 text, the code page of Russian
