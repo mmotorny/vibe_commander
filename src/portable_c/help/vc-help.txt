@@ -1,0 +1,529 @@
+;; The help of Vibe Commander: the source of VC.HLP, which
+;; tools/makehelp.py makes of it when the program is built. The text is
+;; the project's own; nothing of the help that the shareware
+;; distribution of Volkov Commander ships is in it.
+;;
+;; `@page N Title` begins a page. The number is the one the program asks
+;; for: F1 at the panels shows the index, which lists every page by its
+;; title; a menu item, a dialog, the viewer and the editor each ask for
+;; their own (help.c, menu.c MnuHlp, the bHelp of each dialog), and the
+;; setup asks for 55 to 61, which have to stay together and short
+;; (sthelp.c). A line is at most 62 columns. ^B, ^U and ^R switch bold,
+;; underlined and reversed on and off.
+;;
+@page 1 Vibe Commander
+ ^BVibe Commander 0.1^B, based on Volkov Commander 4.05.
+
+ A two-panel file manager in the style of the classic DOS
+ commanders: a faithful recreation of Volkov Commander 4.05,
+ the DOS file manager by Vsevolod V. Volkov, carried from his
+ published assembly source to C, and from DOS to today's
+ systems. It runs on ^BDOS^B, on ^BLinux^B in a terminal, and
+ as a ^Bweb page^B.
+
+ The engineering is done by Claude, an AI coding agent; a
+ human sets the direction and reviews the results.
+
+ ^BGetting about^B
+   Tab        the other panel
+   Enter      into a directory, or run a program
+   F1         this help; F10 leaves it
+   F3 / F4    view or edit the file under the cursor
+   F5 / F6    copy, or rename and move
+   F7 / F8    make a directory, delete
+   F9         the menu bar
+   F10        quit
+
+ Every page of the help is listed in its index: press Index
+ below, or Next and Previous to read them in order.
+
+ ^BMore^B: the panels, the keys, the command line and the
+ mouse each have a page of their own, and so do the
+ platforms, the licences and the credits.
+@page 2 The panels
+ The screen has two ^Bpanels^B, side by side. Each shows one
+ of four things:
+
+   ^BFiles^B   the files of a directory, Brief or Full
+   ^BInfo^B    the drive and the directory of the other panel
+   ^BTree^B    the directories of a drive
+   off     nothing, and what commands printed shows through
+
+ One panel is the ^Bactive^B one: its title is highlighted
+ and its cursor shows. Tab moves to the other.
+
+ In a file panel the cursor bar is the file that a command
+ works on, unless files are ^Bselected^B: then commands work
+ on all of them. Ins selects the file under the cursor.
+
+ The top line of a panel is its directory; the bottom line,
+ the ^Bmini status^B, has the name, size, date and time of
+ the file under the cursor, or the total of what is selected.
+
+ The Left and Right menus of the menu bar, F9, set what each
+ panel shows and in which order.
+@page 3 The viewer
+ ^BThe viewer^B shows a file without changing it.
+
+   Up, Down     a line
+   PgUp, PgDn   a screen
+   Home, End    the beginning or the end of the file
+   Left, Right  sideways, when lines are not wrapped
+   F2           wrap long lines, or not
+   F4           text or hex
+   F7           search for a text; Shift-F7 the next one
+   Esc, F3, F10 back to the panels
+
+ The key bar at the bottom of the screen says what each
+ function key does at the moment.
+
+ The viewer reads any file: a text, a program, a picture.
+ Bytes that are no characters show as what the code page 437
+ draws for them.
+@page 4 Keys at the panels
+ ^BMoving^B
+   Up, Down, PgUp, PgDn, Home, End    the cursor
+   Left, Right   a column, in a Brief panel
+   Tab           the other panel
+   Ctrl-PgUp     the parent directory
+   Ctrl-PgDn     into the directory under the cursor
+   Ctrl-\       the root of the drive
+
+ ^BSelecting^B
+   Ins           select the file, and go down
+   Gray +, -     select, unselect by a mask
+   Gray *        invert the selection
+   Ctrl-M        restore the last selection
+
+ ^BPanels^B
+   Ctrl-O        both panels off or on
+   Ctrl-P        the other panel off or on
+   Ctrl-F1/F2    the left or the right panel off or on
+   Ctrl-U        swap the panels
+   Ctrl-L        Info panel; Ctrl-Z tree panel
+   Ctrl-R        read the directory again
+   Ctrl-F        the filter; Ctrl-H hidden files
+   Ctrl-B        the key bar off or on
+   Alt-F1/F2     the drive of the left or the right panel
+
+ ^BCommands^B
+   F1 help        F2 user menu   F3 view      F4 edit
+   F5 copy        F6 rename      F7 mkdir     F8 delete
+   F9 menu bar    F10 quit       Shift-F9 save setup
+   Shift-F3..F8   the same, asking for the file's name
+   Alt-F3, Alt-F4 the other viewer or editor
+   Alt-F6 sizes   Alt-F7 find    Alt-F8 history
+   Alt-F10 tree   Ctrl-A attributes
+   Ctrl-C compare directories    Ctrl-F4 volume label
+@page 5 The editor
+ ^BThe editor^B changes a text file.
+
+   Arrows, PgUp, PgDn    move
+   Home, End             the beginning or the end of a line
+   Ctrl-PgUp, Ctrl-PgDn  the beginning or the end of the text
+   Del, Backspace        delete a character
+   Ctrl-Y                delete the line
+   Ctrl-K                delete to the end of the line
+   F2                    save
+   Shift-F2              save under another name
+   F7                    search; Shift-F7 the next one
+   F4                    text or hex
+   Esc, F10              leave, asking to save a changed file
+
+ Shift-F4 at the panels asks for a name and opens a new file
+ in the editor.
+
+ The status line at the top has the file's name, the line
+ and the column of the cursor.
+@page 6 The command line
+ Below the panels is the ^Bcommand line^B. Type a command and
+ press Enter: it runs, with what it prints on the screen
+ behind the panels. Ctrl-O shows that screen.
+
+   Ctrl-Enter    put the name under the cursor into the line
+   Ctrl-I        put the selected names into the line
+   Ctrl-[        put the left panel's path into the line
+   Ctrl-]        put the right panel's path into the line
+   Ctrl-E        the previous command; Ctrl-X the next
+   Alt-F8        the list of earlier commands
+   Esc           clear the line
+
+ On Linux a command runs through $SHELL -c in the terminal's
+ own screen, and a name in DOS's form, such as LONGNA~1, is
+ handed to the shell as the file's real name. The web page
+ has no shell and runs no command.
+@page 7 The Left and Right menus
+ The ^BLeft^B and ^BRight^B menus of the menu bar set what each
+ panel shows:
+
+   Brief, Full     files, in columns or with their details
+   Info            facts about the drive
+   Tree            the directories of the drive
+   On/Off          the panel itself
+   Name, eXtension, tiMe, Size
+                   the order of the files
+   Re-read         read the directory again
+   fiLter          which files to show
+   Drive           another drive
+
+ A menu opens with F9 and the arrows, or with Alt and the
+ letter of its name. An item is chosen with Enter or with
+ its highlighted letter.
+@page 8 Brief and Full
+ ^BBrief^B shows only names, in three columns, so that many
+ files fit in the panel.
+
+ ^BFull^B shows one file a line with its size, its date and
+ its time. A directory has its kind in place of a size.
+
+ Either way the files are sorted by the order that the menu
+ sets: by name, unless another is chosen.
+@page 9 The Info panel
+ The ^BInfo^B panel says what Vibe Commander knows about the
+ drive and the directory of the other panel: its name and
+ version, the drive's label, how large the disk is and how
+ much of it is free, and how many files the directory has.
+
+ Ctrl-L switches it on and off.
+@page 10 The Tree panel
+ The ^BTree^B panel shows the directories of a drive as a
+ tree. Moving the cursor in it moves the other panel to that
+ directory, at once or after a short wait, by the setup.
+
+ Ctrl-Z switches it on and off. Alt-F10 shows the tree in a
+ box instead, to go to a directory and come back.
+@page 11 A panel on and off
+ ^BOn/Off^B in the Left or the Right menu, or Ctrl-F1 and
+ Ctrl-F2, takes a panel off the screen or puts it back.
+
+ With a panel off, the screen behind it shows what commands
+ have printed.
+@page 12 The order of files
+ A file panel sorts its files by ^Bname^B, ^Bextension^B,
+ ^Btime^B or ^Bsize^B, as the Left or the Right menu says.
+
+ Directories always come first. A panel sorts by name until
+ another order is chosen.
+@page 13 Re-read
+ ^BRe-read^B, Ctrl-R, reads the panel's directory from the disk
+ again, for when something else has changed it.
+@page 14 The filter
+ The ^Bfilter^B, Ctrl-F, chooses which files a panel shows:
+
+   All files        every file
+   Executable files the programs that Enter would run
+   Custom           files that match the masks typed in,
+                    such as *.TXT *.DOC
+
+ Hidden files can be shown or left out as well.
+
+ On Linux, Executable files are those that the user may run,
+ whatever their names.
+@page 15 Choosing a drive
+ Alt-F1 and Alt-F2 open a box of the ^Bdrives^B for the left
+ and the right panel. Choose one with the arrows and Enter, or
+ with its letter.
+
+ On ^BLinux^B there are two drives: R:, the root of the file
+ system, and H:, the user's home directory. On the ^Bweb
+ page^B, C: is the page's own drive.
+@page 16 The Files menu
+ The ^BFiles^B menu has the commands that work on files: view,
+ edit, copy, rename, make a directory, delete, the file
+ attributes, the selection of groups of files, and quit.
+
+ Each has a key of its own at the panels, shown beside it.
+@page 17 The user menu
+ F2 opens the ^Buser menu^B, a menu of commands of your own
+ kept in the file VC.MNU. Each item has a key and a text,
+ and runs its commands when it is chosen.
+
+ Menu file edit, in the Commands menu, opens VC.MNU in the
+ editor: the main one, beside the program, or a local one in
+ the current directory, which is used there instead.
+@page 18 View
+ F3 opens the file under the cursor in the ^Bviewer^B, or the
+ viewer that the file VCVIEW.EXT names for its extension.
+ Alt-F3 always uses the built-in viewer.
+
+ Shift-F3 asks for the name of the file to view.
+@page 19 Edit
+ F4 opens the file under the cursor in the ^Beditor^B, or the
+ editor that the file VCEDIT.EXT names for its extension.
+ Alt-F4 always uses the built-in editor.
+
+ Shift-F4 asks for a name, and opens a new file if there is
+ none of that name.
+@page 20 Copy
+ F5 ^Bcopies^B the file under the cursor, or the selected
+ files, to the directory of the other panel. The box lets you
+ change where the copy goes, and asks before a file is
+ overwritten.
+
+ Shift-F5 asks for the name to copy to, in the same
+ directory.
+@page 21 Rename or move
+ F6 ^Brenames^B a file or ^Bmoves^B it, or the selected files,
+ to the directory of the other panel. Type a new name to
+ rename it where it is.
+
+ Shift-F6 asks for the new name of the file under the cursor.
+@page 22 Make directory
+ F7 makes a new ^Bdirectory^B in the panel's directory. Type
+ its name and press Enter.
+@page 23 Delete
+ F8 ^Bdeletes^B the file under the cursor, or the selected
+ files. A directory is deleted with all that is in it, after
+ a second question. A read-only file is asked about first.
+
+ There is no undo: read the box before you say yes.
+@page 24 File attributes
+ Ctrl-A sets or clears the ^Battributes^B of the file under the
+ cursor, or of the selected files: read only, archive, hidden
+ and system, and can change their date and time.
+
+ On Linux, read only is the file's write permission; the
+ other three are taken but not kept.
+@page 25 Selecting files
+ Gray + ^Bselects^B the files that match a mask, Gray -
+ unselects them, and Gray * inverts the selection. Ins
+ selects or unselects the file under the cursor.
+
+ Ctrl-M restores the selection that the last command used.
+ Commands such as copy and delete work on all the selected
+ files.
+@page 26 Quit
+ F10 ^Bleaves^B Vibe Commander, asking first if the setup says
+ so. On Linux the terminal is given back as it was.
+@page 27 The Commands menu
+ The ^BCommands^B menu has the commands that are not about one
+ file: the tree, the volume label, the sizes of directories,
+ find file, the history of commands, swapping the panels,
+ the panels on and off, comparing two directories, and the
+ menu file.
+@page 28 The directory tree
+ Alt-F10 shows the ^Btree^B of the drive's directories in a box.
+ Move to a directory and press Enter to go there.
+
+ Typing letters moves to a directory of that name. F2 reads
+ the tree from the disk again. Esc leaves.
+@page 29 Volume label
+ Ctrl-F4 shows the ^Bvolume label^B of the drive, and on DOS lets
+ you change it. The drives of Linux are always labelled ROOT
+ and HOME.
+@page 30 The mouse
+ Vibe Commander works with a ^Bmouse^B as well as with keys.
+
+   Click a file          the cursor goes there
+   Double-click          as Enter
+   Right button          selects files
+   Click the menu bar    opens a menu
+   Click the key bar     as that function key
+   Click a button        presses it
+
+ In the help, the viewer and the editor, holding a button
+ near the top or the bottom of the text scrolls it.
+
+ On Linux the terminal reports the mouse; on the web page,
+ the browser does, by touch as well.
+@page 31 Directory sizes
+ Alt-F6 counts the ^Bsizes^B of the directories under the
+ cursor or selected, with everything that is in them, and
+ shows them in the panel.
+@page 32 Find file
+ Alt-F7 ^Bfinds files^B by a mask, on the drive or in the
+ current directory and below, and can look for a text in
+ them too. The list that is found can be viewed, or a file in
+ it gone to.
+@page 33 History
+ Alt-F8 shows the ^Bhistory^B of the commands typed on the
+ command line. Choose one with the arrows; Enter runs it
+ again, and the right arrow puts it into the line to change.
+
+ Ctrl-E and Ctrl-X go through the history in the line itself.
+@page 34 Platforms
+ Vibe Commander runs on three platforms.
+
+ ^BDOS^B: VC.EXE, a 32-bit program started by the DOS/32A
+ extender, with all of the machine's memory for its panels
+ and its editor.
+
+ ^BLinux^B: vc, a 64-bit program that runs in any terminal of
+ 80 by 25 or more, with no library. Drives R: (the root) and
+ H: (the home directory); long names get DOS aliases such as
+ LONGNA~1; commands run through $SHELL. The setup is kept in
+ ~/.config/vc/vc.ini, and this help can be copied there as
+ vc.hlp.
+
+ ^BThe web^B: one HTML page, built to WebAssembly. Its screen
+ is text, it keeps your files in the browser, and it works
+ on a phone.
+
+ The program asks the system what it asked DOS, and each
+ platform answers as DOS would.
+@page 35 Swap panels
+ Ctrl-U ^Bswaps^B the two panels: the left one goes to the right
+ and the right one to the left, each with what it shows.
+@page 36 Panels on and off
+ Ctrl-O takes ^Bboth panels^B off the screen, to see what the
+ commands have printed, and brings them back. Ctrl-P does the
+ same for the panel that is not active.
+@page 37 Compare directories
+ Ctrl-C ^Bcompares^B the directories of the two panels and
+ selects, in each, the files that the other one lacks or has
+ older. If they hold the same, the box says so.
+@page 38 Menu file edit
+ ^BMenu file edit^B opens the user menu's file, VC.MNU, in the
+ editor: the main one or a local one.
+
+ A line that begins with a key and a colon, such as
+ F1: Archives, is an item; the lines indented below it are
+ its commands.
+@page 39 The Options menu
+ The ^BOptions^B menu sets how Vibe Commander looks and works:
+ the configuration, the advanced options, the files of
+ extensions, viewers and editors, and switches for the auto
+ menus, the path prompt, the key bar, a full screen panel,
+ directory sizes, the mini status and the clock.
+
+ Save setup keeps them all for the next time, and More setup
+ opens the setup, with the colours and the country.
+@page 40 Configuration
+ The ^BConfiguration^B box has the screen's colours, the panel
+ options, other options such as confirmation on quit and
+ auto save of the setup, the screen blank delay, and the
+ mouse options.
+
+ Space changes an option; the arrows move between them.
+@page 41 Advanced options
+ The ^BAdvanced options^B are about the keys: whether Alt by
+ itself opens the menu bar, whether Esc takes the panels off,
+ whether F3 and F4 use the other viewer and editor, and
+ whether the keyboard buffer is cleared.
+@page 42 The extension file
+ ^BeXtension file edit^B opens VC.EXT, which says what Enter
+ does with a file by its extension. A line such as
+
+   txt: edit !.!
+
+ has Enter on a .TXT file open it. ! stands for the file's
+ name and !.! for its name and extension.
+@page 43 Viewers
+ ^BViewers^B opens VCVIEW.EXT, which names a viewer of your own
+ for files of an extension. F3 uses it; Alt-F3 the built-in
+ viewer.
+@page 44 Editors
+ ^BEditors^B opens VCEDIT.EXT, which names an editor of your
+ own for files of an extension. F4 uses it; Alt-F4 the
+ built-in editor.
+@page 45 Auto menus
+ With ^BAuto menus^B on, the user menu comes up by itself when
+ the program starts and after every command it runs.
+@page 46 Path prompt
+ With ^BPath prompt^B on, the command line begins with the
+ current directory, as DOS's prompt $p$g does.
+@page 47 Key bar
+ The ^Bkey bar^B is the bottom line of the screen, which says
+ what F1 to F10 do. Ctrl-B switches it off and on. Holding
+ Shift, Ctrl or Alt shows what they do with each key.
+@page 48 Full screen
+ With ^BFull screen^B on, a panel takes the whole height of
+ the screen; off, it leaves room above the command line.
+@page 49 Auto directory sizes
+ With ^Bauto Directory sizes^B on, moving between directories
+ counts the sizes of the directories in the panel at once.
+@page 50 Mini status
+ The ^Bmini status^B is the line at the bottom of a file panel
+ that describes the file under the cursor. This switches it
+ on and off.
+@page 51 Clock
+ The ^Bclock^B shows the time in the top right corner of the
+ screen.
+@page 52 Licences
+ Vibe Commander is released under the ^B3-clause BSD licence^B,
+ which covers everything written for it.
+
+ It is based on ^BVolkov Commander 4.05^B, (C) 1991-2000
+ Vsevolod V. Volkov, which its author released under the
+ 2-clause BSD licence.
+
+ The DOS program uses the DOS/32A extender, (C) 1996-2006
+ Narech K., under its own licence. This product uses DOS/32
+ Advanced DOS Extender technology.
+
+ The web page has the runtime of Emscripten (MIT and NCSA),
+ musl (MIT), and the font Web437 IBM VGA 8x16 by VileR
+ (CC BY-SA 4.0).
+
+ The texts of the licences are in the project's repository.
+ The shareware distribution of Volkov Commander is not part
+ of it.
+@page 53 Save setup
+ ^BSave setup^B, Shift-F9, writes the current setup to the
+ setup file, VC.INI, so that the next start has it: the
+ panels, their directories and orders, and the options.
+
+ With Auto save setup on, that is done whenever the program
+ is left.
+@page 54 Credits
+ ^BVsevolod V. Volkov^B wrote Volkov Commander, and published
+ its source.
+
+ ^BMaksym Motorny^B started Vibe Commander, sets its direction
+ and reviews the work.
+
+ ^BClaude^B, by Anthropic, does the engineering: the C
+ translation, the portable C, the Linux program, the web page
+ and the tests that hold each to the original.
+
+ Thanks to the authors of FreeDOS, QEMU, Open Watcom, JWasm,
+ DOS/32A, clang, Emscripten and pyte, on which the work rests.
+@page 55 Setup: Configuration
+ ^BConfiguration^B has the general options: auto menus, path
+ prompt, key bar, menu bar always visible, full screen,
+ clock, confirmation on quit, error sound, auto save setup,
+ and showing the drive B:.
+
+ The keyboard options: Alt by itself opens the menu bar, Esc
+ takes the panels off, the other viewer and editor for F3
+ and F4, and clearing the keyboard buffer.
+
+ Space changes an option, the arrows move between them, and
+ Enter keeps the changes.
+@page 56 Setup: Screen and mouse
+ ^BScreen and Mouse^B chooses the palette, black and white,
+ colour or laptop, and how long the keyboard and the mouse
+ may rest before the screen is blanked.
+
+ Zooming boxes grow out of the middle of the screen when
+ they open. The screen saver's characters are those the
+ blanked screen draws.
+
+ Left-handed mouse swaps the mouse's buttons.
+@page 57 Setup: Panel options
+ ^BPanel options^B are for the file panels: the mini status
+ line, directory sizes counted at once, Ins moving down, and
+ unselecting each file as a group command reaches it.
+
+ For the tree panel: whether the other panel follows the
+ tree's cursor, after how long, whether hidden directories
+ show, and whether the tree is read again by itself.
+@page 58 Setup: Colours
+ The three ^Bpalettes^B, black and white, colour and laptop,
+ each have a colour for every part of the screen.
+
+ Choose a part from the list, and its colour with the arrows
+ among the sixteen. The picture beside shows the result.
+
+ F8 sets the palette's colours back to their defaults.
+@page 59 Setup: Default configuration
+ ^BSet default configuration^B puts every option back as it
+ was when Vibe Commander was first started, after a question.
+ The colours are not changed.
+@page 60 Setup: Country info
+ ^BCountry info^B shows how the time, the date and the numbers
+ are written, and the table of characters with their capitals
+ and the order they sort in, as the system tells them.
+@page 61 Setup: Exit
+ ^BExit^B, or Esc, leaves the setup. If anything has changed,
+ it asks whether to save the setup to VC.INI first.

@@ -1066,6 +1066,26 @@ add_test(NAME portable_c-terminal
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/terminal.py
             ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
 set_tests_properties(portable_c-terminal PROPERTIES SKIP_RETURN_CODE 77)
+# The help file, VC.HLP, in the format that the program reads, with text
+# of the project's own: made of src/portable_c/help/vc-help.txt by
+# tools/makehelp.py into build/portable_c/VC.HLP, which is not kept in
+# the repository. The shareware's help is never used. The test holds what
+# F1 shows of it in the program for Linux, at the panels, in a dialog, in
+# the editor and in the setup, and that the next page and the index are
+# reached from a page. See harness/helpfile.py. It runs no machine, and
+# is skipped where there is no clang.
+set(help_file ${CMAKE_BINARY_DIR}/portable_c/VC.HLP)
+add_custom_command(OUTPUT ${help_file}
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/tools/makehelp.py
+            ${CMAKE_SOURCE_DIR}/src/portable_c/help/vc-help.txt ${help_file}
+    DEPENDS ${CMAKE_SOURCE_DIR}/tools/makehelp.py
+            ${CMAKE_SOURCE_DIR}/src/portable_c/help/vc-help.txt
+    COMMENT "Making the help file VC.HLP")
+add_custom_target(portable_c-help ALL DEPENDS ${help_file})
+add_test(NAME portable_c-help-file
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/helpfile.py
+            ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc ${help_file})
+set_tests_properties(portable_c-help-file PROPERTIES SKIP_RETURN_CODE 77)
 # The modules of the web page, the piece W3a of step 7: render.js, which
 # draws the program's grid as text, and keys.js and mouse.js, which make
 # the browser's events the escape codes of a terminal with the kitty
@@ -1217,7 +1237,7 @@ set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-tidy
     portable_c-posix-unit portable_c-terminal portable_c-web-render
-    portable_c-web-server
+    portable_c-web-server portable_c-help-file
     PROPERTIES LABELS portable_c)
 if(VC_DOS)
     set_tests_properties(c-data c-arith PROPERTIES LABELS frozen)

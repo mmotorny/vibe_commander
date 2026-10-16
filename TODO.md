@@ -1698,6 +1698,21 @@ runs the program under Node and passes the page by.
   run again and pass, and the machine was too loaded for another whole
   run.
 
+### The project's own help: made, for C:\VC to ship
+
+The project writes its own help file in the format of the original's
+VC.HLP, with text of its own; the shareware's help is never used
+(CLAUDE.md, "The web page"). Its source is
+`src/portable_c/help/vc-help.txt`, one page for every number that the
+program asks for (1 to 61, the setup's 55 to 61 among them), and
+`tools/makehelp.py` makes of it `build/portable_c/VC.HLP` at every build
+(the target `portable_c-help`); the file is not kept in the repository.
+The test `portable_c-help-file` holds what F1 shows of it in the program
+for Linux. **Not yet on the page:** the piece that places C:\VC's files
+copies `build/portable_c/VC.HLP` into the page's C:\VC as `vc.hlp`, for
+the server's drive and the static site's `drives/c.json` alike, and the
+page's F1 then shows it.
+
 ### Open, for the user
 
 - Publishing to GitHub Pages: done, on the user's word of 16 October

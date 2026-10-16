@@ -151,10 +151,13 @@ cd ~ && /path/to/checkout/build/portable_c/posix/vc
 
 The program uses the terminal's alternate screen and gives it back when
 F10 leaves. It keeps its setup in `~/.config/vc/vc.ini`
-(`$XDG_CONFIG_HOME/vc` where that is set). The help and the menu files
-are the original's and are not shipped: to have F1 and F2, copy
-`VC.HLP`, `VC.MNU`, `VC.EXT` and the other files of the shareware
-distribution into `~/.config/vc`. `python3 harness/deps.py` downloads
+(`$XDG_CONFIG_HOME/vc` where that is set). The project has a help of
+its own, with text of its own in the original's format: the build makes
+it of `src/portable_c/help/vc-help.txt` as
+`build/portable_c/VC.HLP`, and copied to `~/.config/vc/vc.hlp` it is
+what F1 shows. The menu files are the original's and are not shipped:
+to have F2, copy `VC.MNU`, `VC.EXT` and the other files of the
+shareware distribution into `~/.config/vc`. `python3 harness/deps.py` downloads
 the distribution to `downloads/vc405sw.zip`. Ctrl-O shows the output of
 the last command. [docs/linux.md](docs/linux.md) has the details.
 

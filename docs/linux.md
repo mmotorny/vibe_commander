@@ -65,10 +65,15 @@ and creates it if needed. The setup is saved there as `vc.ini`.
 
 The help file and the files of the menus and extensions are read from
 there too, with names in capitals or not: `VC.HLP`, `VC.MNU`, `VC.EXT`,
-`VCVIEW.EXT`, `VCEDIT.EXT`, `ARCHIVES.MNU` and `FORMAT.MNU`. They are the
-original's and are not shipped, so F1 shows no help and F2 no user menu
-until they are copied there from the shareware distribution.
-`python3 harness/deps.py` downloads it to `downloads/vc405sw.zip`.
+`VCVIEW.EXT`, `VCEDIT.EXT`, `ARCHIVES.MNU` and `FORMAT.MNU`.
+
+The help is the project's own, with text of its own in the original's
+format: the build makes it of `src/portable_c/help/vc-help.txt` as
+`build/portable_c/VC.HLP`, and F1 shows it once it is copied there as
+`vc.hlp`. The files of the menus and extensions are the original's and
+are not shipped, so F2 shows no user menu until they are copied there
+from the shareware distribution. `python3 harness/deps.py` downloads it
+to `downloads/vc405sw.zip`.
 
 ## How it is judged
 

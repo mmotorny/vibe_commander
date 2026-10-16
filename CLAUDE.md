@@ -328,6 +328,9 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   that they work on in their drive, and nothing of them is shipped. The
   user's own files come in by a button and by dragging them onto the
   page, into the current directory.
+- The project writes its own help in VC.HLP's format, with text of its
+  own (`src/portable_c/help/vc-help.txt`, made by `tools/makehelp.py`);
+  the shareware's help is never used.
 - A command says on DOS's screen that commands cannot be run in a web
   page. Enter on a file that is no program opens it in a new tab of the
   browser, where the user may view it or save it.
