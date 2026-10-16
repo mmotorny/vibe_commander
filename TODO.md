@@ -839,6 +839,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **W3b, the page and its server: done**, below. The server, the page's file system against it, the glue, the shell HTML, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, the phone, and the targets `portable_c-web` and `portable_c-web-serve`. The user tries it in a browser.
 - **W3c, the static page: done**, below. The same page with no server, its drives starting from what is served with it and the user's changes kept in the browser (CLAUDE.md, "The web page"), the static site, and the workflow of GitHub Pages, which runs only by hand and with a variable set.
 - **W4, the documents: done**, below. DEVIATIONS "The web page" (W1 to W9, written by the pieces before it), the README's section "The web page", the licences of Emscripten, musl and the font, and the question of publishing, which is the user's, under "Open, for the user" below.
+- **W5, the licences on the page: done**, below. The bar's credit of the font gone, and one "Licences" that shows the texts of every work that the page carries, put in from the repository's files as the page is made (the user's decision of 15 October 2026, CLAUDE.md, "The web page").
 
 ### W0, the toolchain: done, and what a later piece should know
 
@@ -1202,8 +1203,8 @@ held for the next key, and the phone's keyboard by its button.
   web, `oldschool_pc_font_pack_v2.2_web.zip` from int10h.org, 5 MB,
   pinned in `CMakeLists.txt` by its SHA-256 `f0e0a15e...a8d74855`, with
   VC_WEB alone; the page takes `Web437_IBM_VGA_8x16.woff`, 9.8 KB, as
-  base64. Its credit is in the page's bar. W4 keeps the licence's text if
-  it is to be kept beside the README's mention.
+  base64. It was credited in the page's bar until W5, which has its
+  licence shown with the others' by the bar's "Licences".
 - **The demo**, `src/portable_c/web/demo`: a readme, notes, three small
   programs' sources that cannot be run, made-up data, and a text with
   DOS's line ends, written for the project.
@@ -1225,7 +1226,8 @@ held for the next key, and the phone's keyboard by its button.
   DEVIATIONS.md says (the root of the first drive): the demo is a drive
   away, by Alt-F1 or Alt-F2. Starting on D: is one line of `vcBegin`
   (`FS.chdir(ROOTS.d)` behind the load); it was tried and taken out, as
-  a choice that is the user's: **for the user**.
+  a choice that is the user's, and the user decided on 15 October 2026
+  that the page starts on C:, as it does.
 - **Left for W4**: the README, the licences, the list of keys checked in
   the browsers, and publishing.
 
@@ -1300,7 +1302,9 @@ held for the next key, and the phone's keyboard by its button.
   end; Safari's may refuse it, and then the page says it keeps the
   changes in memory). `navigator.storage.persist()`, which asks the
   browser not to clear the site's data when room is short, is not asked
-  for: some browsers ask the visitor, and it is the user's to decide.
+  for: some browsers ask the visitor, and the user decided on 15 October
+  2026 that the static page does not ask it (CLAUDE.md, "The web
+  page").
   The drives that a visitor has kept are not changed by a new deploy of
   the demo until Reset drives.
 
@@ -1333,7 +1337,9 @@ held for the next key, and the phone's keyboard by its button.
   warranty, are on the pack's page that the credit links to, which the
   licence allows (3(a)(2)). A line with "(c) 2016-2020 VileR" in the
   bar would say it on the page itself: not made, since W4 changed no
-  code; **for the user**, if it is wanted.
+  code. The user decided on 15 October 2026 that no work is credited
+  apart from the others: W5 took the credit out of the bar, and the
+  font's copyright line is in its licence's heading on the page, below.
 - **The pass by hand**, the user's, which nothing else can make, in
   Chrome, in Firefox and in Safari on the iPhone. In a checkout
   configured with `cmake -B build -DVC_WEB=ON` (and
@@ -1386,16 +1392,67 @@ held for the next key, and the phone's keyboard by its button.
     Safari may refuse IndexedDB, the bar then saying that they are kept
     in the page's memory.
 
+### W5, the licences on the page: done
+
+- **What the page shows.** The bar has "Vibe Commander 0.1, based on
+  Volkov Commander 4.05." and one small "Licences", a button that looks
+  like a link, beside it in the bar that wraps, so the phone's layout
+  has it too. It opens a modal `<dialog>` of the page's with a heading
+  and a text for each work that the page carries, all in one form: the
+  work and what of it the page has, its copyright, its home where it
+  has one, and the licence's text as the repository has it. Five:
+  Vibe Commander's own, `LICENSE`; Volkov Commander's, whose code the
+  program is, `src/asm/LICENSE.TXT` (its second condition asks that a
+  binary carry the notice); Emscripten's, `LICENSE.EMSCRIPTEN`; musl's,
+  `LICENSE.MUSL`; the font's, `LICENSE.FONT`, with "(c) 2016-2020
+  VileR" in its heading, since the licence's text has no copyright of
+  the font in it. DOS/32A's is in no page. A browser that has no
+  `showModal` gets the five as text in a new tab, from a blob.
+- **Closing it.** Esc, which the browser takes for the dialog, its
+  Close button, and a click on the backdrop. No key reaches the program
+  while it is up, nor the letting go of a key that went down then, Esc
+  above all (`unseen` of `page.js`); the focus is taken off "Licences"
+  when it closes, so that the next Enter is the program's. The modal
+  dialog keeps the mouse from the screen.
+- **Where the texts come from.** `LICENCES` of `web/bundle.mjs` names
+  the files and the headings; the bundle reads the files as it makes
+  the shell, line ends made LF, and puts them in as JSON in a `<script
+  type="application/json">` with every `<` escaped, so no text can end
+  the element. `CMakeLists.txt` has the five files among what the shell
+  depends on, so the page is made again when one changes. Each was held
+  against its source before: the font's against the `LICENSE.TXT` of
+  the pinned archive, Emscripten's and musl's against the `LICENSE` and
+  the `COPYRIGHT` of the pinned Emscripten 6.0.12, the same bytes.
+- **Emscripten minifies the shell**: attributes lose their quotes,
+  `id=licences-data`. A test that reads `vc.html` looks for a name with
+  or without them.
+- **The test**, `portable_c-web-page`: one button "Licences" in the
+  page and no credit of the font apart; a click shows the five texts,
+  each the file's, in order, and not DOS/32A's; keys while it is up, Esc
+  with its letting go, reach nothing of the program; the button closes
+  it, and keys are the program's again. It fails, tried, where the
+  dialog does not hold the keys back. `VC.EXE` and `debug/VC.EXE` are
+  the same bytes as before.
+- **What is the user's to see by hand**: the dialog in Chrome, Firefox
+  and Safari on the iPhone, scrolled, and closed by Esc and by its
+  button.
+
 ### Open, for the user
 
 - Whether to publish to GitHub Pages: set `VC_PAGES` to `publish` (a
   variable of the repository's Actions) and switch Pages on, with
   GitHub Actions as its source; then run the workflow `pages.yml` by
-  hand. Nothing is published before that.
-- Whether the page starts on D:, the demo, where it starts at the root
-  of C: now (W3b, "A start on C:").
-- Whether the static page asks the browser to keep its data,
-  `navigator.storage.persist()` (W3c).
+  hand. Nothing is published before that. The repository is private,
+  and a site of GitHub Pages is public to anyone who has its address
+  unless the account is of GitHub Enterprise Cloud; Pages for a private
+  repository also needs a paid plan. The user holds publishing until
+  the project is public.
+
+Decided on 15 October 2026, by the user: the font's copyright line,
+which is in its heading among the licences that the page shows, no work
+being credited apart (W5); that the page starts on C:, as it does (W3b,
+"A start on C:"); and that the static page does not ask the browser to
+keep its data, `navigator.storage.persist()` (W3c).
 - Whether the bar says the font's copyright line as well (W4).
 
 ## Step 8, the app for iOS

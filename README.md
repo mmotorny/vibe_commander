@@ -1442,6 +1442,15 @@ whole multiples of the font.
   do, and then most of those keys reach the program; holding Esc
   leaves the full screen. A dead key or an input method's character is
   not typed.
+- **Licences.** The bar names the program, "Vibe Commander 0.1, based
+  on Volkov Commander 4.05.", and has one small "Licences", on a phone
+  too, which shows in a dialog of the page the licence of every work
+  that the page carries, each in the same form, with its copyright and
+  its home: Vibe Commander's own, Volkov Commander's, Emscripten's,
+  musl's and the font's, the texts of `LICENSE`, `src/asm/LICENSE.TXT`,
+  `LICENSE.EMSCRIPTEN`, `LICENSE.MUSL` and `LICENSE.FONT`, which the
+  build puts into the page as it makes it. Esc and its button close it,
+  and no key reaches the program while it is up.
 - **What cannot work.** A command: a page has no shell, so a command of
   the command line, the user menu or the extension file, and the
   external viewer and editor, write "Commands cannot be run in a web
@@ -1502,7 +1511,7 @@ list is in `TODO.md`, "W4".
 |---|---|
 | `portable_c-web-probe` | Only with `-DVC_WEB=ON`: every file that the build for the web is to compile, the common code, the files of the emulation of DOS that the web shares with Linux and the web's own, compiled by Emscripten's emcc for wasm32 with the warnings of the program for Linux and `-Werror`, each failure printed. `harness/webprobe.py`, which takes the list of what the web leaves of Linux's files from the configuration |
 | `portable_c-web-scenarios` | Only with `-DVC_WEB=ON`: the program for the web under Node, `web-node/vc.js`, built by Emscripten with Asyncify and the sanitizers of addresses and of undefined behaviour, through the scenarios as `portable_c-posix-scenarios` takes the program for Linux, on the same bench, its drive C: the bench's home directory and D: a directory of the run's with the program's own files in D:\VC. Its screens and its files are held to the original's goldens with what is declared for the portable C, for Linux but the masks of the drive's letter, and for the web, each scenario that is not run on the web or is cut there named by an entry of Linux or of the web page of `DEVIATIONS.md` |
-| `portable_c-web-page` | Only with `-DVC_WEB=ON`: `vc.html` itself, its scripts run in Node with a document of what the page asks of one. Against its server: the drives loaded, a directory made, a file opened in a tab, a file written in the editor reaching the server at its close, a directory removed, a refusal of the server shown as DOS's error, the setup saved on C:, and the page's end. As a static site, served by a host that answers 404 for what it has not, on a stand-in of IndexedDB: changes made and kept, the page loaded again with them, the reset, and a browser with no IndexedDB. `harness/webpage.py` |
+| `portable_c-web-page` | Only with `-DVC_WEB=ON`: `vc.html` itself, its scripts run in Node with a document of what the page asks of one. Against its server: the drives loaded, the bar's one link to the licences showing the text of each file that the page carries and closed by Esc and its button with no key reaching the program, a directory made, a file opened in a tab, a file written in the editor reaching the server at its close, a directory removed, a refusal of the server shown as DOS's error, the setup saved on C:, and the page's end. As a static site, served by a host that answers 404 for what it has not, on a stand-in of IndexedDB: changes made and kept, the page loaded again with them, the reset, and a browser with no IndexedDB. `harness/webpage.py` |
 | `portable_c-web-render` | The page's modules that draw and take the keys and the mouse, `render.js`, `keys.js` and `mouse.js`, in Node: the grids that the program for Linux writes through its test channel drawn, the HTML read back and held to the cells and to the rows that changed; the keys and the mouse's reports that the modules make of the browser's events typed into the program for Linux in a pseudo-terminal, and what it reads held to the BIOS's words. `harness/webrender.py`; skipped where there is no Node or no clang |
 | `portable_c-web-server` | The server and the page's file system in Node: the server's API and its refusals of every path outside the two drives, links of the host's among them; the page's file system against it, with a file system of Emscripten's shape; what the static page keeps in the browser, `kept.js`, in memory and on a stand-in of IndexedDB, every change and refusal, the next visit, the reset, a full store; and the page's script bundled, compiled and run up to the program. `harness/webserver.py`; skipped where there is no Node |
 
@@ -1518,9 +1527,9 @@ musl, under MIT: the page has Emscripten's runtime in its script and
 musl's code in its wasm, and their notices are `LICENSE.EMSCRIPTEN` and
 `LICENSE.MUSL` (see [Licence](#licence)). The font, from the Ultimate
 Oldschool PC Font Pack 2.2 by VileR, is under CC BY-SA 4.0, put into the
-page as it comes and credited in the page's bar, with a link to the
-pack's site and to the licence, as the pack asks; its licence is
-`LICENSE.FONT`. Both are fetched by the build, pinned by SHA-256, only
+page as it comes; its licence is `LICENSE.FONT`. The page's "Licences"
+shows these three with the project's own and Volkov Commander's, all
+alike. Both are fetched by the build, pinned by SHA-256, only
 with `-DVC_WEB=ON`: [What the build downloads](#what-the-build-downloads).
 
 ## Testing
@@ -2186,9 +2195,16 @@ Web437 IBM VGA 8x16 of the Ultimate Oldschool PC Font Pack, (c)
 2016-2020 VileR, under the Creative Commons Attribution-ShareAlike 4.0
 International licence, whose text is `LICENSE.FONT`: the `LICENSE.TXT`
 of the pack's archive that the build fetches, copied as it is. The page
-puts the font in as it comes, unchanged, and credits it in its bar as
-the pack asks, by the handle VileR with a link to the pack's site, and
-by a link to the licence.
+puts the font in as it comes, unchanged.
+
+The page credits every work that it carries alike: its bar has one
+link, "Licences", which shows the texts of `LICENSE`,
+`src/asm/LICENSE.TXT`, `LICENSE.EMSCRIPTEN`, `LICENSE.MUSL` and
+`LICENSE.FONT`, put into the page from these files when it is built,
+each under the name of its work, its copyright and its home: the
+font's as the pack asks, "(c) 2016-2020 VileR" with a link to the
+pack's site. `LICENSE.DOS32A` is not among them, since no page carries
+the extender.
 
 The shareware distribution of Volkov Commander is proprietary and is not
 part of this repository. The picture at the top shows the portable C

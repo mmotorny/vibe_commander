@@ -1031,9 +1031,9 @@ TREES = {
             "editor-big": "it has the editor refuse a file of 381,338 "
                           "bytes, which the original's editor has no room "
                           "for and the editor of the portable C has, in "
-                          "the 640 KB of its own that its text lies in: "
-                          "the portable C opens the file where the "
-                          "original shows its box",
+                          "the memory that it asks the system for, as "
+                          "much as the machine has: the portable C opens "
+                          "the file where the original shows its box",
             # The scenarios of the setup program, until the tree has the
             # code that each shows: an entry goes with the commit that
             # makes its scenario pass (DIARY.md, "Write down the plan for

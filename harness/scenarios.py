@@ -556,11 +556,13 @@ out again (show.py --changes is how):
     a:\\freedos\\bin\\country.sys behind them are 381,338. The files
     of C:\\STAMPS have no bytes behind their sizes: the editor opens
     night.dat as an empty text, and has no room for noon.dat.
-    The portable C, a program of 32 bits, has its text in 640 KB of its
-    own, room for 641,824 bytes: the 381,338 fit it, and editor-big is
-    not run for it (deviations.TREES); noon.dat it refuses. A scenario
-    that is to fill the editor's memory, or to have a file too large
-    for it, needs more than that for that program.
+    The portable C has its text in memory that it asks the system for,
+    since step 2 as much as the machine has (the extender's on DOS, the
+    host's on Linux and in the web page): the 381,338 fit it, and
+    editor-big is not run for it (deviations.TREES); noon.dat it
+    refuses. A scenario that is to fill the editor's memory, or to have
+    a file too large for it, cannot be made for that program by the
+    size of a file on the bench.
   - The floppy of the bench has no SETUP.BAT.
   - The key bar is drawn when the program waits for a key and finds
     none, and only if it is another than the last one drawn: the bar of
