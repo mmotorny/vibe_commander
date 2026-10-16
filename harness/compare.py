@@ -306,7 +306,8 @@ def main():
         if program.tree in posixrun.HOSTED and \
                 not ported.check_linux_declared():
             sys.exit(1)
-        if program.tree == "web" and not ported.check_web_declared():
+        if program.tree in posixrun.AS_THE_WEB and \
+                not ported.check_web_declared():
             sys.exit(1)
     failed, _ = compare(names, program, together=args.together,
                         limits=dict.fromkeys(names, args.limit),

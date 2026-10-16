@@ -1490,7 +1490,7 @@ The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
 
 ### Pieces
 - **I1, the cap**, in `machine_posix.c`, plus `VC_MEMORY` and the web page's 256 MB. Done here, on Linux. The plan is copied into TODO.md. Start now.
-- **I2, `sys_ios.c`** and a tree "ios-host": `sys_ios.c` built on Linux against a stand-in for the shell, as the rule on test builds allows, and run through every scenario by VC_TEST, sanitized, as the web's Node build is. Here. Start now.
+- **I2, `sys_ios.c`** and a tree "ios-host": `sys_ios.c` built on Linux against a stand-in for the shell, as the rule on test builds allows, and run through every scenario by VC_TEST, sanitized, as the web's Node build is: **done**, below, but for the cap, which waits for I1's `MachineBegin` (see there).
 - **I3, the table from HID codes and modifiers to kitty bytes**, in C, held to `keyboard_posix.c`'s decoder as `portable_c-web-render` holds keys.js. Here. Done: see "I3, the keys of a hardware keyboard" below.
 - **I4, the build on the Mac.**
   - `VC_IOS` in CMake (`-G Xcode -DCMAKE_SYSTEM_NAME=iOS`), and the SwiftUI app with its grid view and font.
@@ -1561,6 +1561,83 @@ The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
   typed the key of the US layout goes, as `keys.js` sends it); and that
   UIKit repeats no key, so the shell repeats a held key by a timer as
   `IOS_REPEAT`, at the rate it chooses.
+
+### I2, `sys_ios.c` and the tree "ios-host": done, and what I4 to I7 should know
+
+- **The files.** `src/portable_c/sys_ios.c`, the binding of `sys.h`,
+  plain C with POSIX's threads, and `src/portable_c/ios_shell.h`, what
+  the program and the shell ask of each other, plain C with no type of
+  the program's so that Swift imports it as it is (a bridging header).
+  A build of the implementation `ios` (I3's in CMake) takes `*_posix.c`
+  and `*_ios.c`, `keys_ios.c` of I3 among them, but `sys_posix.c` and
+  `term_posix.c` (`portable_c_takes_ios`, `portable_c_leaves_ios`);
+  `webprobe.py` knows it, `hostcheck.py` reads `*_ios.c` with
+  `-D_XOPEN_SOURCE=700`, as `*_posix.c`, and `tidycheck.py` reads
+  `sys_ios.c` with the program's command, beside `sys_posix.c`. The program for DOS is the same bytes.
+- **The interface** (`ios_shell.h`). The shell calls `ios_start(drive_c,
+  drive_d)`, which starts the program on a thread of its own with a
+  stack of 8 MB (a thread of the device's has 512 KB otherwise), and
+  again after the end to start it anew; `ios_input(bytes, count)` with
+  the bytes that a terminal with the kitty protocol sends, and the
+  mouse's SGR reports, queued (4 KB) and a condition variable signalled;
+  `ios_screen(cells, &row, &column, &shape)` on its own thread, which
+  copies the last grid handed and answers how many have been. The shell
+  has `ios_shell_draw()` (a grid is there: on the device a
+  `DispatchQueue.main.async` that calls `ios_screen`),
+  `ios_shell_open_file(path)` (QuickLook; the path is the program's only
+  for the call), `ios_shell_ended(code)` (F10: keep the last screen, a
+  tap calls `ios_start` again) and `ios_shell_memory()` (on the device
+  `os_proc_available_memory()`, from `<os/proc.h>`, which a small C or
+  Swift function of the app's gives).
+- **The thread.** The program copies the grid for the shell where the
+  web page yields: KeyRead and Idle before they wait, KeyWaiting every
+  50 ms, Ticks at its second read with no copy between (every 15 ms at
+  the most, with a sleep of 1 ms between reads otherwise, so that a
+  wait for the next tick does not spin the battery away). KeyRead
+  blocks on the condition variable for as long as it takes. A command
+  says "Commands cannot be run on iOS.", as the web page's does; no
+  file is a program; Enter on one hands its host path to the shell.
+- **The end and a start anew.** `ProgramEnd` copies the last screen,
+  stops the machine (`MachineStop` of `machine_posix.c`, which is
+  `MachineEnd` without the process's `exit` and frees the environment,
+  which a second start would otherwise leak), tells the shell and ends
+  the thread by `pthread_exit`. A second start begins the machine again
+  and calls `Main` again. That the common code starts over cleanly in
+  one process was tried by hand only: the stand-in with
+  `VC_IOS_KEYS=$'\e[21~\r' VC_IOS_STARTS=3` quits three times, each run
+  the same number of screens, and ASan says nothing. A static of the
+  common code that keeps what a run left would show only in such a run:
+  I6 should try a second start with a setup changed in the first, and
+  the editor and the viewer.
+- **Under the test channel** the program ends in the same way, and the
+  stand-in, on the main thread, ends the process with the code. That is
+  not only tidier: a process ended by `exit` on the program's thread
+  took 15 s in LeakSanitizer's check at the end, every scenario, where
+  ended from the main thread it takes nothing. The test channel's "keys
+  have run out" still ends the process on the program's thread; no
+  scenario ends so.
+- **The stand-in**, `harness/ios_stand_in.c`, linked into
+  `build/portable_c/ios-host/vc` with the sanitizers of `posix-asan`.
+  Its drives are the web's tests' (`VC_DRIVE_C`, `VC_DRIVE_D`,
+  `VC_PROGRAM_DRIVE` of `sys_ios.c`), its memory a fixed 1 GB, so the
+  cap is 256 MB, the web page's. The tree "ios-host" of the harness is
+  `setups.Program.load` of an ELF file in a directory `ios-host`; it is
+  hosted (`posixrun.HOSTED`), with the web's drives
+  (`posixrun.AS_THE_WEB`), declared as the web is
+  (`deviations.TREES["ios-host"]`, `BASE` "web"), so it is held to the
+  web's patches where it has none of its own, and it has none. The
+  test `portable_c-ios-host-scenarios` takes it through every scenario
+  that the web is taken through: 119 pass, as on Linux, in under half a
+  minute.
+- **The cap**: `sys_ios.c` works out min(256 MB, half of
+  `ios_shell_memory()`) at each start, `Cap`, and hands it to nothing
+  yet: I1 adds the argument `cap` to `MachineBegin`, and `Program` of
+  `sys_ios.c` then passes `Cap` there in place of its `(void)Cap`.
+- **For the documents (I9).** The entries of the web page that hold for
+  the app are W1 (the drives, with the app's Documents), W2 (a command,
+  with its text), W3 (QuickLook in place of a tab) and W7 (F10, with a
+  tap to start anew), and I1's of the cap; W4, W5 and W8 are the
+  shell's and are written with I5 and I6.
 
 ## A patch with a line for a cell that blinks: untried
 

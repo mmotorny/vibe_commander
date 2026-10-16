@@ -1166,6 +1166,20 @@ else()
 endif()
 set_tests_properties(portable_c-posix-scenarios PROPERTIES
     SKIP_RETURN_CODE 77 LABELS "portable_c;machine")
+# The program of the app for iOS on this computer through the scenarios,
+# the piece I2 of step 8: build/portable_c/ios-host/vc, sys_ios.c with a
+# stand-in for the app's shell, sanitized, on the bench of the program
+# for Linux with its drives as the web's tests have them, held to the
+# goldens of the original with what is declared for the web (the tree
+# "ios-host" of harness/deviations.py). Where there is no clang there is
+# no such program, and the scenarios of the program for Linux say so.
+if(clang)
+    add_test(NAME portable_c-ios-host-scenarios
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
+                ${CMAKE_BINARY_DIR}/portable_c/ios-host/vc)
+    set_tests_properties(portable_c-ios-host-scenarios PROPERTIES
+        LABELS "portable_c;machine")
+endif()
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see

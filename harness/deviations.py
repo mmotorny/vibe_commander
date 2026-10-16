@@ -1637,6 +1637,17 @@ ON_WEB = Declared(not_run={**LINUX_NOT_RUN, **WEB_NOT_RUN},
 BASE["web"] = "posix"
 TREES["web"] = _on_top(TREES["portable_c"], ON_WEB)
 
+# The program of the app for iOS on this computer, the piece I2 of step
+# 8 (TODO.md, "Step 8, the app for iOS"): sys_ios.c over the machine of
+# the program for Linux, with a stand-in for the app's shell that has
+# its drives as the web's tests have them (harness/ios_stand_in.c). What
+# it does otherwise than the web page under Node is nothing that a
+# scenario sees: a command's line on DOS's screen, which is masked, and
+# where a file to show is handed. So it is declared as the web is, and
+# has the web's patches where it has none of its own.
+BASE["ios-host"] = "web"
+TREES["ios-host"] = _on_top(TREES["portable_c"], ON_WEB)
+
 
 def ruled(screen, rule):
     """Whether `rule`, a rule of a tree, expects anything of `screen` of
