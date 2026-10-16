@@ -24,10 +24,12 @@ modern systems. It runs on DOS, on Linux in a terminal, and as a web
 page.
 
 Vibe Commander was built by an AI coding agent. Claude did the
-engineering, the translation, the ports, the tests and the documents,
-while a human set the direction and reviewed the results.
+engineering: it wrote, tested and landed the translation, the ports,
+the tests and the documents. A human set the direction and made the
+decisions, and read the results afterwards, rarely the code: the code
+was reviewed only minimally, and always after it had landed.
 
-| | |
+| What | How much |
 |---|---|
 | Dates | 10 to 16 October 2026, first commit to last |
 | Wall time | about 127 hours |
