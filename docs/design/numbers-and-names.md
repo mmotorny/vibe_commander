@@ -29,7 +29,7 @@ from Intel's tables, for instructions already in the queue; an 8088 at
 proportions. The structures named here, `MainDat`, the panel's
 `WCBdef` and the 24-byte `FILENT` of each file, are in
 [chapter 1](01-the-program.md#the-main-data) and
-[chapter 2](02-the-features.md#a-panel-wcbdef).
+[chapter 3](03-the-features.md#a-panel-wcbdef).
 
 ## The trouble with `DIV`
 
@@ -718,7 +718,7 @@ and divide by subtracting.
 The copy box fills a bar in proportion to what has been read and
 written against twice the size of the file. `PerCent` (125 bytes) is
 shown in [chapter
-2](02-the-features.md#the-bar-48-bit-arithmetic-without-mul): it adds
+2](03-the-features.md#the-bar-48-bit-arithmetic-without-mul): it adds
 the 33-bit sum of read and written into 48 bits as many times as the
 bar has cells, then subtracts twice the size until it borrows,
 counting the cells to fill.
@@ -1070,7 +1070,7 @@ TstMs3:	LOOP	TstMs1
 
 A `?` matches a space too, so `A?.TXT` matches `A.TXT` and `AB.TXT`,
 as in DOS. The filter of a panel, `SetMask` in
-[chapter 2](02-the-features.md#the-filter-setmask), and Grey + and
+[chapter 3](03-the-features.md#the-filter-setmask), and Grey + and
 Grey -, which select by a mask, convert the mask once and call
 `TstMas` for every file. Each call converts the name again, with an
 `UpCase` for each of its characters, which is a far call into DOS (see
@@ -1150,7 +1150,7 @@ places: the search of the viewer, the letters of the markup that
 command line's completion from the history, and each character of
 `Convert`. That is what makes the viewer's search find Russian text in
 either case on a Russian DOS ([chapter
-2](02-the-features.md#search-v81_00-and-v82_00)), with no Russian in
+2](03-the-features.md#search-v81_00-and-v82_00)), with no Russian in
 the program.
 
 ### `LowCase` and `LowTab`: inverted once
@@ -1360,7 +1360,7 @@ that are left, takes the 0 along:
 
 These routines meet in `DiBx30`, which puts a variable into a box for
 `DialBox` ([chapter
-1](01-the-program.md#dialbox-a-box-is-8-bytes-and-its-lines)). The
+1](02-the-screen.md#a-box-is-a-table-dialbox-and-ngline)). The
 box's table has, for each of its two variables, a byte of mode and a
 byte of limit, `DB 7, 64` in the copy box, and the mode's bits choose
 the routines:
@@ -1478,7 +1478,7 @@ EdSub2	ENDP
 with its own end of line. The setup program has its own copy of
 `CmpSym` and its table, as it has of `UpCase`, `LowCase`, the path
 routines and `HexDec`
-([chapter 4](04-the-setup.md#what-it-shares-with-vccom-by-copy)).
+([chapter 5](05-the-setup.md#what-it-shares-with-vccom-by-copy)).
 
 ## One binary for CP437 and CP866
 
@@ -1576,8 +1576,8 @@ because in that form the hard part has already been done.
   `M49_00`; `src/asm/VCF1.INC`: `M30_50` and `M30_60`;
   `src/asm/VCCOPY.INC`: `C00_13` to `C00_19`, `C20_50` and `PerCent`.
 - [Chapter 1](01-the-program.md) for the main data, `ScrBuf` and
-  `DialBox`; [chapter 2](02-the-features.md) for the panels, the
+  `DialBox`; [chapter 3](03-the-features.md) for the panels, the
   filter, the copy and the viewer that use these routines;
-  [chapter 3](03-the-system.md) for `Intr21` and the rest of what is
-  asked of DOS; and [chapter 4](04-the-setup.md) for the setup
+  [chapter 4](04-the-system.md) for `Intr21` and the rest of what is
+  asked of DOS; and [chapter 5](05-the-setup.md) for the setup
   program's copies of them.
