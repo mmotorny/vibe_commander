@@ -267,7 +267,10 @@ web's own would be in `harness/goldens/web/`, which has none.
   its licence is `LICENSE.FONT`.
 
 The page's "Licences" shows these three alongside the project's own
-licence and Volkov Commander's. Emscripten and the font are fetched by
-the build, pinned by SHA-256, only with `-DVC_WEB=ON`: see
+licence and Volkov Commander's. Emscripten is fetched by the build,
+pinned by SHA-256, only with `-DVC_WEB=ON`; the font is the one file
+of the pack that the page takes, kept in the repository unchanged,
+`src/portable_c/web/font/Web437_IBM_VGA_8x16.woff`, since its site does
+not serve the build machines reliably: see
 [Downloads](../README.md#downloads) and [the
 licences](../README.md#licences-and-credits).

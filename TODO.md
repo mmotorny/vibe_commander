@@ -790,7 +790,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 
 ### The font
 - VileR's Web437 IBM VGA 8x16, from the Ultimate Oldschool PC Font Pack (int10h.org), CC BY-SA 4.0, about 20 KB.
-- Fetched pinned by SHA-256 and inlined as a base64 @font-face, with `font-display: block`, and credited on the page.
+- Fetched pinned by SHA-256 and inlined as a base64 @font-face, with `font-display: block`, and credited on the page. Kept in the repository since 16 October 2026, `src/portable_c/web/font/`, its site not serving the build machines reliably.
 - 16px × n with line-height 1 gives a cell of exactly 8×16·n.
 
 ### Testing

@@ -33,8 +33,8 @@ The screens are taken one of two ways:
 
 The frames are drawn as the program draws them: 80 by 25 cells of 8 by
 16 pixels, the colours of the VGA's mode 3, and the characters in
-VileR's Web437 IBM VGA 8x16 (CC BY-SA 4.0, LICENSE.FONT), which the web
-page's build fetches and pins (CMakeLists.txt) and which is put into
+VileR's Web437 IBM VGA 8x16 (CC BY-SA 4.0, LICENSE.FONT), which the
+repository keeps, src/portable_c/web/font/, and which is put into
 the SVG as it is, about 13 KB. A row that several frames have is drawn
 once and used by each, and the frames stand one under the other on a
 strip that CSS moves up frame by frame: no script, so that GitHub shows
@@ -70,8 +70,7 @@ WORK = ROOT / "build" / "session"   # Chromium of a snap reads no hidden
                                     # directory and not the real /tmp
 CHROMIUMS = ("chromium", "chromium-browser")
 LIVE = "https://mmotorny.github.io/vibe_commander/"
-FONT = (ROOT / "build" / "_deps" / "vga_font-src" / "woff - Web (webfonts)"
-        / "Web437_IBM_VGA_8x16.woff")
+FONT = ROOT / "src" / "portable_c" / "web" / "font" / "Web437_IBM_VGA_8x16.woff"
 FILES = ROOT / "harness" / "session_files"
 OUT = ROOT / "docs" / "vibe-commander-session.svg"
 STAMP = 961156800               # the time of the files: 16 June 2000,
@@ -389,7 +388,7 @@ def main():
                         help="take the screens from the program for Linux")
     args = parser.parse_args()
     if not FONT.exists():
-        sys.exit(f"{FONT} is not there: configure with -DVC_WEB=ON")
+        sys.exit(f"{FONT} is not there")
     if args.linux:
         frames = record()
         title = "Vibe Commander 0.1 in a terminal"

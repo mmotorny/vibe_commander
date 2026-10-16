@@ -44,7 +44,12 @@ here; what was done and how is in git's history.
   official source and pinned, by SHA-256 (see `harness/deps.py`) or by git
   commit (see `CMakeLists.txt`), and fetched only for a build that needs
   it: Open Watcom for a build for DOS, Emscripten for the web page,
-  where that makes sense. Anything new to download is asked first.
+  where that makes sense. Anything new to download is asked first. The
+  exception, on the user's word of 16 October 2026: the web page's font,
+  `src/portable_c/web/font/Web437_IBM_VGA_8x16.woff`, one small file
+  under CC BY-SA 4.0, is kept in the repository unchanged with its
+  licence, `LICENSE.FONT`, because its site, int10h.org, does not serve
+  the build machines reliably.
 - No GitHub Actions workflow runs by itself, on the user's word of 16
   October 2026: every workflow's only trigger is `workflow_dispatch`, run
   by hand, never `push`, `pull_request`, `schedule` or any other event,
@@ -299,7 +304,8 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   of its own.
 - The screen is drawn as text: the 80 by 25 cells as lines of a `<pre>`
   with the colours of DOS in spans, not on a canvas. The font is VileR's
-  Web437 IBM VGA 8x16 (CC BY-SA 4.0), pinned and put into the page.
+  Web437 IBM VGA 8x16 (CC BY-SA 4.0), kept in the repository and put
+  into the page.
 - The page is judged in a real browser as well: the Chromium that the
   machine has installed, found on the path and not fetched or pinned,
   simplicity counting for more there than a pin (the user), its test

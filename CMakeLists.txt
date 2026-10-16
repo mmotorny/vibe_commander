@@ -836,19 +836,17 @@ endif()
 # names, made one script by web/bundle.mjs into the shell, web/shell.html)
 # and the font in it, and the licences of what it carries, which its
 # "Licences" shows. The font is VileR's Web437 IBM VGA 8x16 of the
-# Ultimate Oldschool PC Font Pack, version 2.2, its archive for the web
-# from int10h.org, pinned by its SHA-256, which CLAUDE.md allows by name;
-# its licence is CC BY-SA 4.0, LICENSE.FONT. It is served as the static
+# Ultimate Oldschool PC Font Pack, version 2.2, the one file of its
+# archive for the web from int10h.org that the page takes, kept in the
+# repository unchanged as web/font/Web437_IBM_VGA_8x16.woff, since that
+# site does not serve the build machines reliably (CLAUDE.md, "Third-party
+# software"); its licence is CC BY-SA 4.0, LICENSE.FONT. It is served as the static
 # site below, and nothing else. Its memory grows to the cap of sys_web.c, 256 MB, and 64 MB besides for the
 # runtime, and no further, since wasm never gives back what it has grown
 # by (TODO.md, "The cap of the memory: done").
 if(VC_WEB)
-    FetchContent_Declare(vga_font
-        URL https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip
-        URL_HASH SHA256=f0e0a15e46ab85901165188034e90ad933133e8a205640f624f38dc8a8d74855)
-    FetchContent_MakeAvailable(vga_font)
     set(web_page_dir ${CMAKE_BINARY_DIR}/portable_c/web)
-    set(web_font "${vga_font_SOURCE_DIR}/woff - Web (webfonts)/Web437_IBM_VGA_8x16.woff")
+    set(web_font ${web_dir}/font/Web437_IBM_VGA_8x16.woff)
     set(web_page_script render.js keys.js mouse.js drives.js
         page.js shell.html bundle.mjs)
     list(TRANSFORM web_page_script PREPEND ${web_dir}/)

@@ -255,7 +255,7 @@ The web tests other than `portable_c-web-render` and
 ## The pictures
 
 The animation at the top is made by `python3 harness/session.py`, with
-the project built with `-DVC_WEB=ON` for the page and its font, and
+the project built with `-DVC_WEB=ON` for the page, and
 Node and Chromium on the path. It plays a fixed list of keys on the web
 page, `build/portable_c/web/vc.html`, as it is served, with its one drive
 C: labelled VC and the page starting in C:\VC, in a headless Chromium
@@ -311,7 +311,6 @@ CMake fetches these into the build directory, pinned in
 | JWasm 2.20, as source at a pinned commit | <https://github.com/Baron-von-Riedesel/JWasm> |
 | Open Watcom 2.0, the snapshot of 1 October 2026, pinned by SHA-256 (150 MB) | <https://github.com/open-watcom/open-watcom-v2/releases/tag/2026-10-01-Build> |
 | Emscripten 6.0.12 with its LLVM and Binaryen, pinned by SHA-256, only with `-DVC_WEB=ON` | <https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/6e9f6885cb17a3d6c8fd488a5cff730f50aba61d/wasm-binaries.tar.xz> |
-| The Ultimate Oldschool PC Font Pack 2.2 by VileR, pinned by SHA-256, only with `-DVC_WEB=ON` | <https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip> |
 
 The original source in `src/asm/` is the author's 4.05 source archive,
 <https://vc.vvv.kyiv.ua/download/src/vc405.zip> (SHA-256
@@ -333,6 +332,13 @@ the changes to the files in `src/asm/`.
 | Emscripten 6.0.12, whose runtime is in the web page | 2010-2014 the Emscripten authors | MIT and University of Illinois/NCSA | [`LICENSE.EMSCRIPTEN`](LICENSE.EMSCRIPTEN) |
 | musl, the C library in the web page's WebAssembly | 2005-2020 Rich Felker, et al. | MIT | [`LICENSE.MUSL`](LICENSE.MUSL) |
 | Web437 IBM VGA 8x16 from the Ultimate Oldschool PC Font Pack, used unchanged in the web page and the animation | 2016-2020 VileR | CC BY-SA 4.0 | [`LICENSE.FONT`](LICENSE.FONT) |
+
+The font is the one file of the pack that the page takes,
+[`src/portable_c/web/font/Web437_IBM_VGA_8x16.woff`](src/portable_c/web/font/Web437_IBM_VGA_8x16.woff),
+kept in the repository as it is in the pack's archive for the web,
+version 2.2, from <https://int10h.org/oldschool-pc-fonts/>, and not
+downloaded by the build, since that site does not serve the build
+machines reliably.
 
 **This product uses DOS/32 Advanced DOS Extender technology.**
 
