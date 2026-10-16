@@ -182,6 +182,12 @@ export class KeptDrives extends Drives {
       }
       this.fs.utime(at, record.mtime, record.mtime);
     }
+    // A directory's time once what is in it has been made, which moved it.
+    for (const record of records) {
+      const root = this.roots[record.drive];
+      if (root !== undefined && record.directory)
+        this.fs.utime(`${root}/${record.path}`, record.mtime, record.mtime);
+    }
   }
 
   // Everything that the store has, made what is served again at the next

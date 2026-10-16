@@ -31,7 +31,8 @@
 //   GET  /api/tree?drive=c
 //                        the drive's files and directories, parents first:
 //                        { entries: [{ path, directory, mtime, readonly,
-//                        data }] }, `data` the contents in base64;
+//                        data }], mtime }, `data` the contents in base64,
+//                        and `mtime` that of the drive's root;
 //   PUT  /api/file?drive=c&path=P&mtime=MS&readonly=0
 //                        the file P written whole with the request's body,
 //                        made where it is not there, its time and its
@@ -141,7 +142,7 @@ export async function treeOf(root) {
     }
   }
   await walk(root, "");
-  return { entries };
+  return { entries, mtime: Math.floor((await fs.stat(root)).mtimeMs) };
 }
 
 // The server, not yet listening: `roots` the drive's directory as

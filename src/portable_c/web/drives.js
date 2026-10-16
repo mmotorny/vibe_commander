@@ -67,7 +67,7 @@ export class Drives {
       if (!answer.ok)
         throw new Error(`the server did not give drive ${drive}: ` +
                         `${answer.status}`);
-      const { entries } = await answer.json();
+      const { entries, mtime } = await answer.json();
       this.fs.mkdirTree(root);
       for (const entry of entries) {
         const at = `${root}/${entry.path}`;
@@ -80,6 +80,13 @@ export class Drives {
         }
         this.fs.utime(at, entry.mtime, entry.mtime);
       }
+      // A directory's time once what is in it has been made, which moved
+      // it; and the root's, which the tree has apart.
+      for (const entry of entries)
+        if (entry.directory)
+          this.fs.utime(`${root}/${entry.path}`, entry.mtime, entry.mtime);
+      if (typeof mtime === "number")
+        this.fs.utime(root, mtime, mtime);
     }
   }
 
