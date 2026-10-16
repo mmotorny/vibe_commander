@@ -86,23 +86,27 @@ async function startSite(work, built, stamp) {
 }
 
 // The page's clock, put in before any script of the page runs: the time
-// of the stamp, and from the program's first look at the clock on a clock
-// of the session's own, as the bench's machine counts its time in what it
-// executes. That clock goes on by QUANTUM at every look, and to the time of
-// a timer of the page when the timer is due; a timer is due only when the
-// session lets the clock run (__session.run), never by itself. So the
-// program goes round the same number of times between two keys at every
-// run, its random numbers, the stars, are the same, and so is the colon
-// of the clock, which shows in the second half of a second.
+// of the stamp, standing still until the program's first look at
+// performance.now, and from then on a clock of the session's own, as the
+// bench's machine counts its time in what it executes. That clock goes on
+// by QUANTUM at every look, and to the time of a timer of the page when
+// the timer is due; a timer is due only when the session lets the clock
+// run (__session.run), never by itself. So the program goes round the
+// same number of times between two keys at every run, its random
+// numbers, the stars, are the same, and so is the colon of the clock,
+// which shows in the second half of a second. Before that first look
+// Date is the stamp itself, not the stamp and the real time that has
+// gone by since the page began to load: with those real milliseconds in
+// what asked Date first, about one run in two had its clock's colon, its
+// stars and its copy's box otherwise.
 const QUANTUM = 0.05;                   // milliseconds
 const CLAMP = 4;                        // the least wait of a timer, as
                                         // a browser has it for timers
                                         // that set timers
 function clockAt(stamp) {
   return `(() => {
-    const Real = Date, realNow = performance.now.bind(performance);
+    const Real = Date;
     const realSet = setTimeout, realClear = clearTimeout;
-    const shift = ${stamp} - Real.now();
     let own = false, now = 0, made = 0, serial = 1e9, quantum = ${QUANTUM};
     const due = [], channel = new MessageChannel();
     const look = () => { now += quantum; return now; };
@@ -110,7 +114,7 @@ function clockAt(stamp) {
       constructor(...given) {
         if (given.length === 0) super(Moved.now()); else super(...given);
       }
-      static now() { return own ? ${stamp} + Math.floor(look()) : Real.now() + shift; }
+      static now() { return own ? ${stamp} + Math.floor(look()) : ${stamp}; }
     }
     globalThis.Date = Moved;
     performance.now = () => {

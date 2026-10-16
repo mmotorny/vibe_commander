@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://mmotorny.github.io/vibe_commander/">
     <img src="docs/vibe-commander-session.svg" width="720"
-         alt="An animated recording of Vibe Commander 0.1 in its web page: it starts with C:\VC on the left and C:\ on the right and the clock on, selects three files with Insert and copies them to A: with F5, its box of progress showing, goes to A: with Alt-F1 to see them and back to C:, views AUTOEXEC.BAT with F3, shows DOS's screen with Ctrl-O, brings up the Info panel with Ctrl-L, the tree with Alt-F10 and the question of F8, cancelled, walks the menus of F9, and ends in the stars of the screen saver">
+         alt="An animated recording of Vibe Commander 0.1 in its web page: it starts with C:\VC on the left and C:\ on the right and the clock on, turns the right panel to the empty A: with Alt-F2, selects three files with Insert and copies them there with F5, its box of progress showing and A: then listing them, turns the right panel back to C:\, views AUTOEXEC.BAT with F3, shows DOS's screen with Ctrl-O, brings up the Info panel with Ctrl-L, the tree with Alt-F10 and the question of F8, cancelled, walks the menus of F9, and ends in the stars of the screen saver">
   </a>
 </p>
 <p align="center">
@@ -37,7 +37,7 @@ was reviewed only minimally, and always after it had landed.
 | Agents | 295, in 7 main sessions |
 | The human's messages | 304 |
 | Commits | about 790 |
-| Model | Claude Opus 5.5 (`claude-opus-5-5`) |
+| Model | Claude Opus 5.5 (`claude-opus-5-5`), effort between medium and high |
 | Harness | Claude Code, 2.1.296 to 2.1.301 |
 
 The agentic time is the sum, over every session record and every

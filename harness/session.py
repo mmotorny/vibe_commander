@@ -100,21 +100,25 @@ def typed(text, seconds=0.07):
 SESSION = [
     dict(mouse=(79, 24), seconds=2.0),      # the page as it starts, the
                                             # pointer on the key bar
+    key("F2", 0.8, alt=True),               # Alt-F2: the drives of the
+                                            # right panel
+    key("Home", 0.6),                       # Home, to A:
+    key("Enter", 1.2),                      # Enter: A:, empty
     key("Down", 0.6),                       # Down, to LICENSE.TXT
     key("Insert", 0.5),                     # Insert: it and the next two
     key("Insert", 0.5),                     # selected
     key("Insert", 0.8),
-    key("F5", 1.2),                         # F5: the dialog of the copy
-    *typed("A:\\", 0.2),                     # to A:
+    key("F5", 1.2),                         # F5: the dialog of the copy,
+                                            # to A:\
     key("Enter", 0.3, run=150),             # Enter: the box of its progress
     dict(seconds=1.8, run=320, quantum=5),  # VC.EXE half copied
-    key("F1", 1.0, alt=True),               # Alt-F1: the drives
-    key("Home", 0.6),                       # Home, to A:
-    key("Enter", 1.6),                      # Enter: A:, with the copies
-    key("F1", 0.6, alt=True),               # Alt-F1
+    dict(seconds=1.6),                      # A: with the copies
+    key("Tab", 0.5),                        # Tab: the right panel, A:
+    key("F2", 0.6, alt=True),               # Alt-F2
     key("End", 0.6),                        # End, to C:
-    key("Enter", 1.0),                      # Enter: C:\VC again
-    key("Tab", 0.5),                        # Tab: the right panel, C:\
+    key("Enter", 0.6),                      # Enter: C:\VC, DOS's current
+                                            # directory of C:
+    key("Enter", 1.0),                      # Enter on ..: C:\
     key("Down", 0.6),                       # Down, to AUTOEXEC.BAT
     key("F3", 1.6),                         # F3: the viewer
     key("Escape", 0.6),                     # Esc
