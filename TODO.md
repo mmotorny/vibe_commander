@@ -152,28 +152,37 @@ above all, would differ there.
 
 ## The editor's room: untested in the program of 32 bits
 
-The editor of the program of 32 bits has room for a file that the
-original's has none for (`src/portable_c/DEVIATIONS.md`, 13), and the
-scenario that has the editor refuse such a file, `editor-big`, is not
-run for that program, on the user's word of 13 October 2026
-(`CLAUDE.md`, "Deviations"): `TREES["portable_c"]` of
-`harness/deviations.py`. The C translation is taken through it as it
-was, and so was the portable C of 16 bits until that build went. This is
-what the scenario alone tested, and so what no test holds of the program
-of 32 bits; what that program was seen to do with the scenario all the
-same; what two scenarios that it passes no longer get it to; and what
-would test all of it again. Made at `87291dc`, by reading the scenario
-and what ran of the original, and by three trials on the bench that were
-not kept. It stands behind the tall screen's section, which is of the
-same kind: what a scenario that is no longer run was alone in testing.
+The editor of the portable C has room for a file that the original's has
+none for (`src/portable_c/DEVIATIONS.md`, 13), and the scenario that has
+the editor refuse such a file, `editor-big`, is not run for it, on the
+user's word of 13 October 2026 (`CLAUDE.md`, "Deviations"):
+`TREES["portable_c"]` of `harness/deviations.py`, and so on Linux and on
+the web, whose trees are built on that one. The C translation is taken
+through it as it was. This is what the scenario alone tested, and so
+what no test holds of the portable C; what two scenarios that it passes
+no longer get it to; and what would test all of it again. It stands
+behind the tall screen's section, which is of the same kind: what a
+scenario that is no longer run was alone in testing.
 
-**So this is untested in the program of 32 bits**, each of it compiled
-by `wcc386` from statements that the scenario does hold of the program
-of 16 bits:
+**The room.** Since the piece F9 of step 2 the program for DOS takes the
+memory for its panels and its text from the extender, as much as the
+machine has, and its editor has all of it but its own objects and its
+two panels: on the bench of the tests, a machine of 16 MB, the README's
+figures have how much, many times the original's room there (345,840
+bytes) and more than any file of a scenario. On a machine of 2 MB, which
+a scenario may ask for (`memory` of `harness/scenarios.py`; `view-window`
+does), it is some 550 KB. The program for Linux and the web page have
+what the host gives them, at most 2 GB on the page. Until F9 the program
+of 32 bits handed out 640 KB of its own, and what was written here was
+reckoned from that; `DIARY.md` has the figures as they were measured
+then.
+
+**So this is untested in the portable C**, each of it compiled from
+statements that the scenario holds of the C translation:
 
 | | What | What still holds a part of it |
 |---|---|---|
-| 1 | That the editor refuses a file a little larger than its room, and one that is far larger, where the window is the whole screen: the box over the panels | `view-window`: the box for a megabyte, in the window of the Info panel |
+| 1 | That the editor refuses a file a little larger than its room, and one that is far larger, where the window is the whole screen: the box over the panels | `view-window`: the box for a megabyte, in the window of the Info panel, on a machine of 2 MB |
 | 2 | View from that box: the viewer with its status line on the file that was refused | `view-window`: View, in a window without a status line |
 | 3 | The box left by Esc and by Cancel: `closed:` of `T00_00`, which nothing else runs | Nothing |
 | 4 | A file that gives fewer bytes than its directory entry says, opened as long as it gave: `T00_11` | Nothing |
@@ -182,43 +191,35 @@ of 16 bits:
 
 **Two scenarios that pass and do not get there.** The same memory is
 what the editor fills and what a copy reads into, and two scenarios
-that are run for the program of 32 bits were made to reach its end.
-They pass, since a count of free memory is left out of the comparison
-(`IGNORED` of `harness/deviations.py`) and their steps were written to
-end on the same screen however much room a build has, for the C
-translation, which is full a few keys before the original. Nothing
-says that they no longer test what their titles say.
+that are run for the portable C were made to reach its end. They pass,
+since a count of free memory is left out of the comparison (`IGNORED`
+of `harness/deviations.py`) and their steps were written to end on the
+same screen however much room a build has, for the C translation, which
+is full a few keys before the original. Nothing says that they no
+longer test what their titles say.
 
-- `editor-full`, "with all of its memory full". Seen, by
-  `harness/show.py --changes` with the scenario's steps up to the two
-  behind `"ab"`, the count of free bytes in the status line:
-
-  | | The original | The portable C, 16 bits | The portable C, 32 bits |
-  |---|---|---|---|
-  | With the long line made | 267,852 | 213,372 | 563,836 |
-  | After the six steps that put a line back as often as they have keys for | 1 | 1 | 247,855 |
-  | After `"ab"` | 0 | 0 | 247,853 |
-
-  So the editor of the program of 32 bits is never full there. What
-  that leaves untested: `T51_00` where a line has grown and there is no
-  room for it, with its beep and the line cut ("Known and not dealt
-  with" has what the original does then), and a byte typed in hex
-  behind the last one with no room.
-- `copy-big`, "one that the memory does not hold". By the numbers, not
-  seen: the file is 526,632 bytes, six times `command.com`, and a copy
-  reads into what the editor has for a text, cut to whole pieces of 512
-  bytes (`copy.c`, `left`). That is some 291,000 bytes in the program
-  of 16 bits, two parts, and 641,000 in that of 32, one. Untested then:
-  a file read and written in more than one part, and the question
-  whether to overwrite asked with only a part of the file read, which
-  the scenario answers with Skip, by the comments at its steps. Since
-  F1 of step 2 the room is 524,240 bytes, the panels having 64K each,
-  and the file is read in two parts again, the first of 523,776 bytes:
-  both were tested again, until the memory was the extender's ("F1,
-  three blocks where there was one"). Since F9 the room is some 15 MB,
-  and the file is one part again; on a machine of 2 MB, as
-  `view-window` has, the room is some 550 KB, more than the file, so
-  that machine does not get it there either.
+- `editor-full`, "with all of its memory full". The original has some
+  268K free with the long line made, and none after the steps that put
+  a line back as often as they have keys for and `"ab"`; the C
+  translation the same, a little less to begin with. The portable C is
+  never near full there, with the bench's room as with the 640 KB that
+  it had when this was first seen (it had some 248K left after
+  `"ab"`). What that leaves untested: `T51_00` where a line has grown
+  and there is no room for it, with its beep and the line cut ("Known
+  and not dealt with" has what the original does then), and a byte
+  typed in hex behind the last one with no room.
+- `copy-big`, "one that the memory does not hold". The file is 526,632
+  bytes, six times `command.com`, and a copy reads into what the editor
+  has for a text, cut to whole pieces of 512 bytes (`copy.c`, `left`).
+  The original and the C translation read it in two parts; the
+  portable C, with the bench's room, in one, and on a machine of 2 MB it
+  would still have room for all of it. Untested then: a file read and
+  written in more than one part, and the question whether to overwrite
+  asked with only a part of the file read, which the scenario answers
+  with Skip, by the comments at its steps. (For a day, from the piece
+  F1 to F9, the panels in blocks of their own left the 640 KB a room
+  short enough that the file went in two parts again, and both were
+  tested.)
 - The list of the file search is in the same memory. No scenario fills
   it in any build.
 
@@ -227,16 +228,16 @@ harness, which has no word for a scenario that is run and does not
 reach its point.
 
 **What would test it again.** None of it is for the piece that wrote
-this. What the program of 32 bits does with a text that the original
-has no room for, which `editor-big` does not run, `editor-huge` holds
-since the piece H, to an expectation of the portable C's own: the
-editor opens such a text and has all of it.
+this. What the portable C does with a text that the original has no room
+for, which `editor-big` does not run, `editor-huge` holds since the
+piece H, to an expectation of the portable C's own: the editor opens
+such a text and has all of it.
 
 | Way | What it tests again | Against |
 |---|---|---|
-| For the program of 32 bits the five steps 28 to 32 are left out of `editor-big`, `left_out_of`, where the scenario is not run for it now | 3 to 6 of the table, and the far larger file of 1: all but the box in a whole screen for the file that fits, and View from it. Tried, as above: it passes as the program is | The user's word is that the scenario is not run for that program: this is another thing than was decided, and is asked first. And it holds only while a megabyte is above the room: with the memory the extender's, step 2 of the road, `noon.dat` may fit, and steps 39 and 40 then go the way of 28 |
-| A scenario of its own with a file that no build has room for, as C1's table has it: eight times `command.com`, 702,176 bytes | 1 and 2 for every build, with nothing declared | A new golden of the original; drive C: of the bench has to hold the file; and it is in the same 64K as no build's room. Seven times `command.com` and `country.sys`, 644,654 bytes, would be in the same 64K as the room of the program of 32 bits and 2,830 bytes above it, by C1's figure: by arithmetic alone, a number that is gone with step 2 |
-| `editor-full` with as many steps more as fill 640 KB, and `copy-big` with a file of more than that | What those two no longer reach | Both scenarios change, so both goldens are derived anew, and every tree is taken through the longer steps |
+| For the portable C the five steps 28 to 32 are left out of `editor-big`, `left_out_of`, where the scenario is not run for it now | 3 to 6 of the table: View and Esc and Cancel from the box, and the file shorter than its entry, but for what the room now changes | The user's word is that the scenario is not run for the portable C: this is another thing than was decided, and is asked first. And with the room what the machine has, `noon.dat`, which says a megabyte, is no longer too large on the bench: steps 39 and 40 would open it where the original refuses, and have to go the way of 28 or be declared. Tried while the room was 640 KB, when it passed; not tried since |
+| A scenario of its own on a machine of 2 MB, `memory`, with a file larger than the portable C's room there and so than the original's: eight times `command.com`, 702,176 bytes | 1 and 2 for the program for DOS, with nothing declared | A new golden of the original, which has to come out on that machine as on the bench's; drive C: of the bench has to hold the file. The program for Linux and the web page have the host's room, larger than any such file: there it is cut before the box, or not run, declared |
+| `editor-full` and `copy-big` on a machine of 2 MB, `memory`, with as many steps more as fill some 550 KB, and a file of more than that for `copy-big` | What those two no longer reach, for the program for DOS | Both scenarios change, so both goldens are derived anew, on that machine, and every tree is taken through the longer steps; on Linux and the web they again do not get there |
 
 ## The portable C: without Quick execute commands
 
@@ -837,7 +838,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **W2, the program under Node: done**, below. `sys_web.c`, the web-node link, the harness's tree "web", ON_WEB, and `portable_c-web-scenarios`.
 - **W3b, the page and its server: done**, below. The server, the page's file system against it, the glue, the shell HTML, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, the phone, and the targets `portable_c-web` and `portable_c-web-serve`. The user tries it in a browser.
 - **W3c, the static page: done**, below. The same page with no server, its drives starting from what is served with it and the user's changes kept in the browser (CLAUDE.md, "The web page"), the static site, and the workflow of GitHub Pages, which runs only by hand and with a variable set.
-- **W4.** DEVIATIONS "The web page", the README, TODO and CLAUDE notes, the licences, and the question of publishing to the user.
+- **W4, the documents: done**, below. DEVIATIONS "The web page" (W1 to W9, written by the pieces before it), the README's section "The web page", the licences of Emscripten, musl and the font, and the question of publishing, which is the user's, under "Open, for the user" below.
 
 ### W0, the toolchain: done, and what a later piece should know
 
@@ -1302,6 +1303,100 @@ held for the next key, and the phone's keyboard by its button.
   for: some browsers ask the visitor, and it is the user's to decide.
   The drives that a visitor has kept are not changed by a new deploy of
   the demo until Reset drives.
+
+### W4, the documents: done, and the user's pass by hand
+
+- **The README** has a section of its own, "The web page", beside "The
+  program for Linux": the two drives, the two ways of serving, building
+  it, the server and Tailscale Serve, the phone, the keys that a browser
+  keeps, what cannot work, the tests of the web and the downloads with
+  their licences. The rows of the web's five tests are in its table of
+  tests, and the count of the tests in "Testing" has them.
+- **The licences.** `LICENSE.EMSCRIPTEN` is the `LICENSE` of Emscripten
+  6.0.12, MIT and NCSA, and `LICENSE.MUSL` the `COPYRIGHT` of the musl
+  that Emscripten builds its C library from, MIT, both as Emscripten's
+  repository has them at the tag `6.0.12`: the page has Emscripten's
+  runtime in its script and musl's code in its wasm. `LICENSE.FONT` is
+  the `LICENSE.TXT` of the font pack's archive that the build fetches,
+  CC BY-SA 4.0, copied as it is; the pack's `README.TXT` says "(c)
+  2016-2020 VileR". Each is kept as `LICENSE.DOS32A` is, beside
+  `LICENSE`, and the README's "Licence" names them. Clang's runtime
+  that may be in the wasm is Apache-2.0 with the LLVM exception, which
+  asks nothing of a program compiled with it.
+- **The page's credit of the font**, the bar's: the font's name, linked
+  to the pack's home page, "by VileR", and "CC BY-SA 4.0" linked to the
+  licence. The pack asks for credit in that form, the handle VileR and a
+  link to the site ("Legal Stuff" of its documentation); the font is put
+  into the page as it comes, the WOFF unchanged, so the page is no
+  adaptation of it and ShareAlike asks nothing of the page. The
+  licence's other items, the copyright notice and the notice of no
+  warranty, are on the pack's page that the credit links to, which the
+  licence allows (3(a)(2)). A line with "(c) 2016-2020 VileR" in the
+  bar would say it on the page itself: not made, since W4 changed no
+  code; **for the user**, if it is wanted.
+- **The pass by hand**, the user's, which nothing else can make, in
+  Chrome, in Firefox and in Safari on the iPhone. In a checkout
+  configured with `cmake -B build -DVC_WEB=ON` (and
+  `-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=<build>/_deps/emscripten-src`
+  to take the download of another build):
+
+      cmake --build build --target portable_c-web-serve
+
+  serves the page with its server on `http://127.0.0.1:8437/`, and for
+  the phone, beside it,
+
+      tailscale serve --bg 8437
+
+  hands it to the tailnet as `https://<machine>.<tailnet>.ts.net/`
+  (`tailscale serve status` shows it, `tailscale serve --https=443 off`
+  takes it away). The static page:
+
+      cmake --build build --target portable_c-web-static
+      python3 -m http.server -d build/portable_c/web/static 8438
+
+  and `http://127.0.0.1:8438/`; for the phone, `tailscale serve --bg
+  8438` in place of the other. What to look at:
+  - [ ] The panels in the VGA's font and colours, the blink, the cursor
+    in the editor and on the command line.
+  - [ ] The keys: F1 to F10 with Shift, Ctrl and Alt and the key bar
+    that follows them, Alt alone for the menu, Ctrl-O, the arrows,
+    Ins and Del, typing with Shift and AltGr; and that the keys of W4
+    of `DEVIATIONS.md` are the browser's and every other key the
+    program's. The full screen with its keyboard lock in Chrome, and
+    holding Esc to leave it.
+  - [ ] The mouse: a click, a double click, the right button, with no
+    menu of the browser's.
+  - [ ] Enter on a file: it opens in a new tab, or the notice with its
+    link where the browser held the tab back.
+  - [ ] Upload and a file dragged onto the page: written into the
+    current directory, the question before one is written over, the
+    panel read anew.
+  - [ ] On the iPhone: the fit, again when it turns; pinch-zoom; a tap
+    as a click; the row of keys, with Ctrl and Alt held for the next
+    key; the phone's keyboard by its button, typing and Backspace and
+    Enter.
+  - [ ] F10: the last screen stays, and the page says to reload.
+  - [ ] The page of the server: a change made on the page is in
+    `build/portable_c/web/drives/` at once; a refusal is DOS's error
+    (a directory of the drive made read-only on the host).
+  - [ ] The static page: the bar says that changes are kept in this
+    browser; a change, then a reload, and the change is there; Reset
+    drives asks, forgets and loads the served drives again; a private
+    window, where Firefox keeps the changes until the window closes and
+    Safari may refuse IndexedDB, the bar then saying that they are kept
+    in the page's memory.
+
+### Open, for the user
+
+- Whether to publish to GitHub Pages: set `VC_PAGES` to `publish` (a
+  variable of the repository's Actions) and switch Pages on, with
+  GitHub Actions as its source; then run the workflow `pages.yml` by
+  hand. Nothing is published before that.
+- Whether the page starts on D:, the demo, where it starts at the root
+  of C: now (W3b, "A start on C:").
+- Whether the static page asks the browser to keep its data,
+  `navigator.storage.persist()` (W3c).
+- Whether the bar says the font's copyright line as well (W4).
 
 ## A patch with a line for a cell that blinks: untried
 
