@@ -12,8 +12,10 @@ import vm from "node:vm";
 
 const web = process.argv[2];
 const work = process.argv[3] || tmpdir();
-const { makeServer, prepare } = await import(path.join(web, "server.mjs"));
+const { makeServer, prepare, treeOf } = await import(path.join(web, "server.mjs"));
 const drives = await import(path.join(web, "drives.js"));
+const kept = await import(path.join(web, "kept.js"));
+const { FakeIndexedDB } = await import(new URL("./fakeidb.mjs", import.meta.url));
 const bundle = await import(path.join(web, "bundle.mjs"));
 const { Drives, HOST_CONTENTS, HOST_DELETE, HOST_RENAME, HOST_DIR_MAKE,
         HOST_DIR_REMOVE, HOST_MODE, CHANGE_ERRORS } = drives;
@@ -72,6 +74,11 @@ await check("the drives made", () => {
   assert.ok(statSync(path.join(roots.c, "vc")).isDirectory());
   for (const name of readdirSync(options.demo))
     assert.ok(existsSync(path.join(roots.d, name)), name);
+});
+await check("the server says that it is one", async () => {
+  const answer = await fetch(`${base}/api/server`);
+  assert.equal(answer.status, 200);
+  assert.equal((await answer.json()).server, "vibe-commander");
 });
 await check("the page", async () => {
   const answer = await fetch(`${base}/`);
@@ -212,6 +219,24 @@ class Files {
     return { mode: node.mode, mtime: new Date(node.mtime) };
   }
   utime(at, atime, mtime) { this.nodes.get(at).mtime = mtime; }
+  isDir(mode) { return (mode & 0o170000) === 0o040000; }
+  readdir(at) {
+    const names = [".", ".."];
+    for (const key of this.nodes.keys()) {
+      if (key.startsWith(`${at}/`) && !key.slice(at.length + 1).includes("/"))
+        names.push(key.slice(at.length + 1));
+    }
+    return names;
+  }
+  rmdir(at) { this.nodes.delete(at); }
+  rename(from, to) {
+    for (const key of Array.from(this.nodes.keys())) {
+      if (key === from || key.startsWith(`${from}/`)) {
+        this.nodes.set(to + key.slice(from.length), this.nodes.get(key));
+        this.nodes.delete(key);
+      }
+    }
+  }
   chmod(at, mode) {
     const node = this.nodes.get(at);
     node.mode = (node.mode & ~0o7777) | mode;
@@ -303,7 +328,135 @@ await check("a server that is not there is DOS's failure", async () => {
   assert.ok(existsSync(path.join(roots.d, "readme.txt")));
 });
 
-// 3. The page's script as the build makes it: one script, which compiles.
+// 3. The page with no server, kept.js: the drives as they are served
+// beside a static page, the store of the browser's in their place.
+const served = { c: { entries: [{ path: "vc", directory: true,
+                                  mtime: 0, readonly: false }] },
+                 d: await treeOf(options.demo) };
+let fetched = 0;
+const staticFetch = async (url) => {
+  fetched++;
+  const match = /^drives\/([cd])\.json$/.exec(url);
+  if (match === null)
+    return new Response("", { status: 404 });
+  return new Response(JSON.stringify(served[match[1]]), { status: 200 });
+};
+const text = (fs, at) => new TextDecoder().decode(fs.readFile(at));
+const demoText = (...names) => readFileSync(path.join(options.demo, ...names),
+                                            "utf8");
+for (const [kind, makeStore] of [
+  ["memory", async () => new kept.MemoryStore()],
+  ["IndexedDB", async () => kept.openStore(new FakeIndexedDB())]]) {
+  const store = await makeStore();
+  let first = new Files();
+  const local = new kept.KeptDrives({ fs: first, fetch: staticFetch, store });
+  await check(`${kind}: the store is what it is`, () => {
+    assert.equal(store.kept, kind === "IndexedDB");
+    assert.equal(local.kept, store.kept);
+  });
+  await check(`${kind}: the drives loaded as they are served`, async () => {
+    fetched = 0;
+    await local.load();
+    assert.equal(fetched, 2);
+    assert.equal(text(first, "/drive/d/notes/todo.txt"),
+                 demoText("notes", "todo.txt"));
+    assert.ok(first.isDir(first.stat("/drive/c/vc").mode));
+    assert.ok((await store.get("d:notes/todo.txt")).data.length > 0);
+  });
+  await check(`${kind}: each change kept, a refusal keeping nothing`,
+              async () => {
+    const change = (...a) => local.change(...a);
+    assert.equal(await change(HOST_DIR_MAKE, "/drive/d/work", null, -1, 0), 0);
+    first.mkdirTree("/drive/d/work");
+    assert.equal(await change(HOST_DIR_MAKE, "/drive/d/work", null, -1, 0),
+                 number("EEXIST"));
+    const at = "/drive/d/work/new.txt";
+    first.writeFile(at, new TextEncoder().encode("kept"));
+    first.utime(at, 1000, 1000);
+    assert.equal(await change(HOST_CONTENTS, null, null, first.open(at), 0), 0);
+    assert.equal(await change(HOST_DIR_REMOVE, "/drive/d/work", null, -1, 0),
+                 number("ENOTEMPTY"));
+    assert.equal(await change(HOST_RENAME, "/drive/d/work", "/drive/d/notes",
+                              -1, 0), number("EEXIST"));
+    assert.equal(await change(HOST_RENAME, "/drive/d/work",
+                              "/drive/d/work/in", -1, 0), number("EACCES"));
+    assert.equal(await change(HOST_RENAME, "/drive/d/work", "/drive/c/work",
+                              -1, 0), number("EACCES"));
+    assert.equal(await change(HOST_RENAME, "/drive/d/work", "/drive/d/play",
+                              -1, 0), 0);
+    first.rename("/drive/d/work", "/drive/d/play");
+    assert.equal(await store.get("d:work/new.txt"), undefined);
+    assert.equal((await store.get("d:play/new.txt")).mtime, 1000);
+    assert.equal(await change(HOST_DELETE, "/drive/d/play", null, -1, 0),
+                 number("EACCES"));
+    assert.equal(await change(HOST_DELETE, "/drive/d/data/dos.txt", null,
+                              -1, 0), 0);
+    first.nodes.delete("/drive/d/data/dos.txt");
+    assert.equal(await change(HOST_DELETE, "/drive/d/data/dos.txt", null,
+                              -1, 0), number("ENOENT"));
+    assert.equal(await change(HOST_MODE, "/drive/d/readme.txt", null, -1,
+                              0o444), 0);
+    assert.equal((await store.get("d:readme.txt")).readonly, true);
+    assert.equal(await local.upload("/drive/d/notes", "brought.txt",
+                                    new TextEncoder().encode("in")), 0);
+    assert.equal(text(first, "/drive/d/notes/brought.txt"), "in");
+    assert.equal(await local.upload("/drive/d/notes", "../x", new Uint8Array(1)),
+                 number("EACCES"));
+    assert.equal(await change(HOST_CONTENTS, null, null,
+                              first.open("/tmp/x"), 0), 0);
+  });
+  await check(`${kind}: the next visit has what was kept`, async () => {
+    const again = new Files();
+    fetched = 0;
+    await new kept.KeptDrives({ fs: again, fetch: staticFetch, store }).load();
+    assert.equal(fetched, 0);
+    assert.equal(text(again, "/drive/d/play/new.txt"), "kept");
+    assert.equal(again.stat("/drive/d/play/new.txt").mtime.getTime(), 1000);
+    assert.equal(text(again, "/drive/d/notes/brought.txt"), "in");
+    assert.throws(() => again.stat("/drive/d/data/dos.txt"));
+    assert.throws(() => again.stat("/drive/d/work"));
+    assert.equal(again.stat("/drive/d/readme.txt").mode & 0o222, 0);
+  });
+  await check(`${kind}: a reset is the drives as they are served`, async () => {
+    await local.reset();
+    const fresh = new Files();
+    fetched = 0;
+    await new kept.KeptDrives({ fs: fresh, fetch: staticFetch, store }).load();
+    assert.equal(fetched, 2);
+    assert.equal(text(fresh, "/drive/d/data/dos.txt"),
+                 demoText("data", "dos.txt"));
+    assert.throws(() => fresh.stat("/drive/d/play"));
+    first = fresh;
+  });
+}
+await check("a store that is full is DOS's ENOSPC", async () => {
+  const idb = new FakeIndexedDB();
+  const store = await kept.openStore(idb);
+  const files = new Files();
+  const local = new kept.KeptDrives({ fs: files, fetch: staticFetch, store });
+  await local.load();
+  idb.full = true;
+  assert.equal(await local.change(HOST_DIR_MAKE, "/drive/d/full", null, -1, 0),
+               number("ENOSPC"));
+  idb.full = false;
+  assert.equal(await store.get("d:full"), undefined);
+});
+await check("no IndexedDB, or one that refuses: the page's memory",
+            async () => {
+  assert.equal((await kept.openStore(undefined)).kept, false);
+  const idb = new FakeIndexedDB();
+  idb.refuse = true;
+  assert.equal((await kept.openStore(idb)).kept, false);
+  assert.equal(idb.opened, 1);
+});
+await check("served trees that are not there", async () => {
+  const local = new kept.KeptDrives({
+    fs: new Files(), fetch: async () => new Response("", { status: 404 }),
+    store: new kept.MemoryStore() });
+  await assert.rejects(local.load());
+});
+
+// 4. The page's script as the build makes it: one script, which compiles.
 await check("the page's script", () => {
   const script = bundle.script(web);
   new vm.Script(script, { filename: "page" });

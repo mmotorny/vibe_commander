@@ -4,12 +4,15 @@
 // exits with 1, or says how many passed.
 
 import { readFileSync, mkdtempSync, readdirSync, existsSync, chmodSync,
-         rmSync } from "node:fs";
+         rmSync, statSync } from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
+import { createServer } from "node:http";
+import { execFileSync } from "node:child_process";
 
 const [web, html, work] = process.argv.slice(2);
 const { makeServer, prepare } = await import(path.join(web, "server.mjs"));
+const { FakeIndexedDB } = await import(new URL("./fakeidb.mjs", import.meta.url));
 const top = mkdtempSync(path.join(work, "webpage-"));
 const roots = await prepare({ c: path.join(top, "c"), d: path.join(top, "d"),
                               demo: path.join(web, "demo") });
@@ -17,94 +20,110 @@ const server = makeServer(roots, html);
 await new Promise((done) => server.listen(0, "127.0.0.1", done));
 const base = `http://127.0.0.1:${server.address().port}`;
 
-// A document of nothing but what the page asks of one.
-class Element {
-  constructor(id) {
-    this.id = id;
-    this.style = {};
-    this.dataset = {};
-    this.hidden = false;
-    this.textContent = "";
-    this.innerHTML = "";
-    this.classList = { toggle() {}, add() {}, remove() {} };
-  }
-  append() {}
-  addEventListener() {}
-  getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 400 }; }
-  focus() {}
-  click() {}
-}
-const elements = {};
-const opened = [];
-const window = {
-  document: {
-    readyState: "complete", head: new Element("head"),
-    documentElement: new Element("html"),
-    getElementById: (id) => (elements[id] ||= new Element(id)),
-    createElement: (tag) => new Element(tag),
-    querySelectorAll: () => [], addEventListener() {},
-  },
-  matchMedia: () => ({ matches: false }), addEventListener() {},
-  location: { href: `${base}/` },
-  open: (url) => { opened.push(url); return {}; },
-  fetch: (url, init) => fetch(new URL(url, base), init),
-  console, setTimeout, clearTimeout, setInterval, clearInterval, URL, Blob,
-  URLSearchParams, atob, btoa, TextDecoder, TextEncoder, WebAssembly, performance, crypto,
-  navigator: { userAgent: "node" }, confirm: () => true,
-};
-window.window = window.self = window;
-// The tab that is opened has the file as a blob: the name of DOS's that
-// the page was handed, and the bytes, are what is held.
-const createObjectURL = URL.createObjectURL;
-window.URL = class extends URL {
-  static createObjectURL(blob) {
-    opened.blob = blob;
-    return createObjectURL(blob);
-  }
-};
-const context = vm.createContext(window);
-for (const [, script] of readFileSync(html, "utf8")
-       .matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))
-  vm.runInContext(script, context);
-const Module = window.Module;
-let screen = null;
-Module.vcDraw = (cells) => { screen = Array.from(cells); };
-
-function text() {
-  if (screen === null)
-    return "(nothing drawn)";
-  let out = "";
-  for (let row = 0; row < 25; row++)
-    out += String.fromCharCode(...screen.slice(row * 80, row * 80 + 80)
-      .map((cell) => ((cell & 0xFF) >= 32 && (cell & 0xFF) < 127
-                      ? cell & 0xFF : 46))) + "\n";
-  return out;
-}
+let passed = 0, failed = 0;
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
-const keys = (...all) => { for (const one of all) Module.vcInput.push(one); };
 const KEY = { F2: "\x1b[Q", F7: "\x1b[18~", F8: "\x1b[19~", F10: "\x1b[21~",
               shiftF4: "\x1b[1;2S", shiftF9: "\x1b[20;2~", home: "\x1b[H",
               end: "\x1b[F", altF2: "\x1b[1;3Q", down: "\x1b[B", esc: "\x1b[27u", enter: "\r" };
 
-let passed = 0, failed = 0;
-async function step(name, condition, seconds = 20) {
-  const until = Date.now() + seconds * 1000;
-  while (Date.now() < until) {
-    if (condition()) {
-      passed++;
-      return true;
+// The page loaded from `base`, its scripts run as the browser would, with a
+// document of nothing but what the page asks of one, and `indexedDB` as
+// the window has it (harness/fakeidb.mjs, or none).
+function load(base, indexedDB) {
+  class Element {
+    constructor(id) {
+      this.id = id;
+      this.style = {};
+      this.dataset = {};
+      // Hidden as the shell has them at the start.
+      this.hidden = ["keys", "kept", "reset", "notice", "ended"].includes(id);
+      this.textContent = "";
+      this.innerHTML = "";
+      this.listeners = {};
+      this.classList = { toggle() {}, add() {}, remove() {} };
     }
-    await sleep(50);
+    append() {}
+    addEventListener(type, listener) { this.listeners[type] = listener; }
+    getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 400 }; }
+    focus() {}
+    click() {}
   }
-  failed++;
-  console.log(`FAIL ${name}\n${text()}`);
-  return false;
+  const elements = {};
+  const opened = [];
+  const page = { elements, opened, reloads: 0, fs: null, screen: null };
+  const window = {
+    document: {
+      readyState: "complete", head: new Element("head"),
+      documentElement: new Element("html"),
+      getElementById: (id) => (elements[id] ||= new Element(id)),
+      createElement: (tag) => new Element(tag),
+      querySelectorAll: () => [], addEventListener() {},
+    },
+    matchMedia: () => ({ matches: false }), addEventListener() {},
+    location: { href: `${base}/`, reload: () => { page.reloads++; } },
+    open: (url) => { opened.push(url); return {}; },
+    fetch: (url, init) => fetch(new URL(url, `${base}/`), init),
+    console, setTimeout, clearTimeout, setInterval, clearInterval, URL, Blob,
+    URLSearchParams, atob, btoa, TextDecoder, TextEncoder, WebAssembly, performance, crypto,
+    navigator: { userAgent: "node" }, confirm: () => true, indexedDB,
+  };
+  window.window = window.self = window;
+  // The tab that is opened has the file as a blob: the name of DOS's that
+  // the page was handed, and the bytes, are what is held.
+  const createObjectURL = URL.createObjectURL;
+  window.URL = class extends URL {
+    static createObjectURL(blob) {
+      opened.blob = blob;
+      return createObjectURL(blob);
+    }
+  };
+  const context = vm.createContext(window);
+  for (const [, script] of readFileSync(html, "utf8")
+         .matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))
+    vm.runInContext(script, context);
+  const Module = window.Module;
+  page.Module = Module;
+  Module.vcDraw = (cells) => { page.screen = Array.from(cells); };
+  // The page's file system, for the test to look into.
+  const begin = Module.vcBegin;
+  Module.vcBegin = (given) => { page.fs = given.FS; begin(given); };
+
+  page.text = () => {
+    if (page.screen === null)
+      return "(nothing drawn)";
+    let out = "";
+    for (let row = 0; row < 25; row++)
+      out += String.fromCharCode(...page.screen.slice(row * 80, row * 80 + 80)
+        .map((cell) => ((cell & 0xFF) >= 32 && (cell & 0xFF) < 127
+                        ? cell & 0xFF : 46))) + "\n";
+    return out;
+  };
+  page.keys = (...all) => { for (const one of all) Module.vcInput.push(one); };
+  page.step = async (name, condition, seconds = 20) => {
+    const until = Date.now() + seconds * 1000;
+    while (Date.now() < until) {
+      if (condition()) {
+        passed++;
+        return true;
+      }
+      await sleep(50);
+    }
+    failed++;
+    console.log(`FAIL ${name}\n${page.text()}`);
+    return false;
+  };
+  // What the screen is to show before the next keys are given: the
+  // program clears what was typed ahead where a box opens.
+  page.see = (what, seconds) => page.step(`the screen shows ${what}`,
+                                          () => page.text().includes(what),
+                                          seconds);
+  return page;
 }
+
+// 1. The page against its server, which every change is made on.
+const served = new FakeIndexedDB();
+const { elements, opened, keys, step, see, text } = load(base, served);
 const onServer = (...names) => path.join(roots.d, ...names);
-// What the screen is to show before the next keys are given: the
-// program clears what was typed ahead where a box opens.
-const see = (what, seconds) => step(`the screen shows ${what}`,
-                                    () => text().includes(what), seconds);
 
 // The program starts at the root of the first drive, C:, where its own
 // directory is; then D:, by the drive box of the panel.
@@ -173,7 +192,140 @@ await step("the program ends, and the page says so",
            () => elements.ended && !elements.ended.hidden
                  && elements.ended.textContent.includes("Reload"));
 
+await step("the page of the server keeps nothing in the browser",
+           () => served.opened === 0
+                 && (!elements.kept || elements.kept.textContent === ""));
 server.close();
+
+// 2. The page served statically, as static.mjs makes it, by a host that
+// answers 404 for what it has not, as GitHub Pages: the drives start from
+// what is served, and the changes are kept in IndexedDB (the stand-in,
+// one for the browser across the page's visits).
+const site = path.join(top, "static");
+execFileSync(process.execPath, [path.join(web, "static.mjs"), "--page", html,
+                                "--demo", path.join(web, "demo"),
+                                "--out", site]);
+const host = createServer((request, response) => {
+  const name = new URL(request.url, "http://localhost").pathname;
+  const file = path.join(site, name.endsWith("/") ? `${name}index.html` : name);
+  if (!file.startsWith(site) || !existsSync(file)
+      || !statSync(file).isFile()) {
+    response.writeHead(404, { "Content-Type": "text/html" });
+    response.end("<h1>404</h1>");
+    return;
+  }
+  response.writeHead(200);
+  response.end(readFileSync(file));
+});
+await new Promise((done) => host.listen(0, "127.0.0.1", done));
+const at = `http://127.0.0.1:${host.address().port}`;
+const browser = new FakeIndexedDB();
+const kept = () => browser.records("vibe-commander", "records");
+const keptText = (key) => {
+  const record = kept().get(key);
+  return record ? Buffer.from(record.data).toString("latin1") : null;
+};
+const isDirectory = (page, at) => {
+  try {
+    return page.fs.isDir(page.fs.stat(at).mode);
+  } catch {
+    return false;
+  }
+};
+const inPage = (page, at) => {
+  try {
+    return Buffer.from(page.fs.readFile(at)).toString("latin1");
+  } catch {
+    return null;
+  }
+};
+{
+  const page = load(at, browser);
+  await page.see(" C:\\ ");
+  await page.step("the page with no server keeps its changes in the browser",
+                  () => page.elements.kept.textContent.includes("this browser")
+                        && page.elements.reset.hidden === false);
+  page.keys(KEY.altF2);
+  await page.see("Drive");
+  page.keys("d");
+  await page.see("readme");
+  page.keys(KEY.F7);
+  await page.see("Create the directory");
+  page.keys("newdir", KEY.enter);
+  await page.step("a directory made is kept", () => kept().has("d:newdir"));
+  await page.see("NEWDIR");
+  page.keys(KEY.shiftF4);
+  await page.see("Edit the file");
+  page.keys("note.txt", KEY.enter);
+  await page.see("New-file");
+  page.keys(KEY.enter);
+  await page.see("2Save");
+  for (const [place, character] of [..."kept here"].entries()) {
+    page.keys(character);
+    await page.see(`Col ${place + 2} `);
+  }
+  page.keys(KEY.F2);
+  await page.step("a file written in the editor is kept at its close",
+                  () => (keptText("d:note.txt") || "").startsWith("kept here"));
+  page.keys(KEY.esc);
+  await page.see("8Delete");
+  // The last of the panel, readme.txt: deleted.
+  page.keys(KEY.end, KEY.F8);
+  await page.see("Do you wish to delete");
+  page.keys(KEY.enter);
+  await page.step("a file deleted is gone from what is kept",
+                  () => kept().has("d:notes") && !kept().has("d:readme.txt"));
+  await page.see("8Delete");
+  page.keys(KEY.shiftF9);
+  await page.see("Save");
+  page.keys(KEY.enter);
+  await page.step("the setup saved on C: is kept",
+                  () => kept().has("c:vc/vc.ini"));
+  await page.see("8Delete");
+  page.keys(KEY.F10);
+  await page.see("Do you want to quit");
+  page.keys(KEY.enter);
+  await page.step("the program ends", () => page.elements.ended
+                  && !page.elements.ended.hidden
+                  && page.elements.ended.textContent.includes("Reload"));
+}
+{
+  // The page loaded again: the drives as they were left.
+  const page = load(at, browser);
+  await page.see(" C:\\ ");
+  await page.step("the next visit has the changes",
+                  () => (inPage(page, "/drive/d/note.txt") || "")
+                          .startsWith("kept here")
+                        && inPage(page, "/drive/d/readme.txt") === null
+                        && isDirectory(page, "/drive/d/newdir")
+                        && inPage(page, "/drive/c/vc/vc.ini") !== null);
+  page.elements.reset.listeners.click();
+  await page.step("Reset forgets them, and loads the page anew",
+                  () => page.reloads === 1 && kept().size === 0);
+}
+{
+  const page = load(at, browser);
+  await page.see(" C:\\ ");
+  await page.step("after a reset, the drives as they are served",
+                  () => inPage(page, "/drive/d/readme.txt") !== null
+                        && inPage(page, "/drive/d/note.txt") === null
+                        && kept().has("d:readme.txt"));
+}
+{
+  // A browser that gives the page no IndexedDB: the page's memory, and
+  // the page says so.
+  const page = load(at, undefined);
+  await page.see(" C:\\ ");
+  await page.step("no IndexedDB: the changes last as long as the page",
+                  () => page.elements.kept.textContent.includes("no storage")
+                        && page.elements.reset.hidden === true);
+  page.keys(KEY.F7);
+  await page.see("Create the directory");
+  page.keys("mem", KEY.enter);
+  await page.step("a directory made in the page's memory",
+                  () => isDirectory(page, "/drive/c/mem"));
+}
+host.close();
 rmSync(top, { recursive: true, force: true });
 if (failed > 0) {
   console.log(`${failed} of ${passed + failed} steps failed`);

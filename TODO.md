@@ -836,7 +836,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **W3a, the pure JS.** render.js, keys.js, mouse.js and the test `portable_c-web-render`. Medium.
 - **W2, the program under Node: done**, below. `sys_web.c`, the web-node link, the harness's tree "web", ON_WEB, and `portable_c-web-scenarios`.
 - **W3b, the page and its server: done**, below. The server, the page's file system against it, the glue, the shell HTML, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, the phone, and the targets `portable_c-web` and `portable_c-web-serve`. The user tries it in a browser.
-- **W3c, the static page.** The same page with no server, its drives starting from what is served with it and the user's changes kept in the browser (CLAUDE.md, "The web page"). After W3b.
+- **W3c, the static page: done**, below. The same page with no server, its drives starting from what is served with it and the user's changes kept in the browser (CLAUDE.md, "The web page"), the static site, and the workflow of GitHub Pages, which runs only by hand and with a variable set.
 - **W4.** DEVIATIONS "The web page", the README, TODO and CLAUDE notes, the licences, and the question of publishing to the user.
 
 ### W0, the toolchain: done, and what a later piece should know
@@ -1227,6 +1227,81 @@ held for the next key, and the phone's keyboard by its button.
   a choice that is the user's: **for the user**.
 - **Left for W4**: the README, the licences, the list of keys checked in
   the browsers, and publishing.
+
+### W3c, the static page: done, and what W4 should know
+
+- **One page, two ways.** `vc.html` is the same file served both ways,
+  and knows which by asking where it is served, `askMode` of
+  `web/page.js` beside `MODES`, the one place: `GET api/server`, a new
+  answer of `server.mjs`, `{ server: "vibe-commander", drives }`, is the
+  server ("server", every change made on it, as in W3b); an answer of
+  4xx, a static host's 404, is no server ("browser"); an answer of 5xx
+  or none is a server that is away, and the page says so and does not
+  start, so that a page of the server never keeps its changes in the
+  browser because the server was down for a moment (a proxy in front of
+  it answers 502). A build of its own for the static site was set aside:
+  a second page to build and test, for a question that the host answers.
+- **The static site**, `web/static.mjs`, the target
+  `portable_c-web-static` (in ALL with VC_WEB):
+  `build/portable_c/web/static/`, `index.html` (the page), `drives/c.json`
+  (C:, its `vc` and nothing in it), `drives/d.json` (the demo, by
+  `treeOf` of `server.mjs`, lifted out of `makeServer` for it, the
+  server's tree as it was) and `.nojekyll`. The trees are of the shape of
+  `/api/tree`. To try it by hand: `python3 -m http.server -d
+  build/portable_c/web/static 8438` and `http://127.0.0.1:8438/`, which
+  answers 404 for `api/server` as GitHub Pages does (a browser that
+  opens it as `file://` cannot fetch the trees).
+- **The store**, `web/kept.js`: `KeptDrives` is `Drives` with its `put`
+  and `order` made in a store of records by key (`d:notes/todo.txt`, one
+  per file or directory, the bytes with the time and the read-only bit)
+  and a record `begun` that says the drives are the store's; `load` takes
+  the store where `begun` is there, and else what is served, which it
+  then keeps. A change that the copy is to refuse (there already, not
+  empty, not there, into itself) is refused first, so that the store
+  never has what the copy has not. `IdbStore` is IndexedDB, the database
+  `vibe-commander` with its one object store `records`, a transaction a
+  call; `MemoryStore` where `openStore` finds no IndexedDB, or it does
+  not open in 5 seconds (blocked, refused). The bar says which (`#kept`),
+  and in IndexedDB has the button Reset drives (`#reset`), which empties
+  the store after a `confirm` and reloads the page. Whole files at close,
+  as with the server.
+- **The tests**, nothing downloaded: `portable_c-web-server` holds
+  `kept.js` with `MemoryStore` and with `IdbStore` on
+  `harness/fakeidb.mjs`, a stand-in of IndexedDB of what the store uses,
+  in Node: every change and refusal, the next visit, the reset, a full
+  store (ENOSPC), no IndexedDB and one that refuses; and that the server
+  answers `api/server`. `portable_c-web-page` runs the server's part as
+  before, and holds that it opens no IndexedDB; then makes the static
+  site by `static.mjs`, serves it by a host of a few lines that answers
+  404 for what it has not, and runs the page four times on one stand-in
+  of IndexedDB: changes made and kept, the page loaded again with them,
+  the reset, and a browser with no IndexedDB. Some ten seconds.
+- **The workflow**, `.github/workflows/pages.yml`: `workflow_dispatch`
+  alone, and both jobs `if: vars.VC_PAGES == 'publish'`, so it cannot run
+  by itself and does nothing until the user sets the variable; Pages has
+  to be switched on as well, with GitHub Actions as its source. It
+  configures with `-DVC_DOS=OFF -DVC_WEB=ON`, builds the target
+  `portable_c-web-static` and deploys its directory. Emscripten is kept
+  between runs by actions/cache, keyed by the two lines of
+  `CMakeLists.txt` that pin it, unpacked in `~/emscripten-src` and handed
+  to the configure by `FETCHCONTENT_SOURCE_DIR_EMSCRIPTEN`, with emcc's
+  cache of libraries beside it. Its actions are GitHub's own, checkout,
+  cache, upload-pages-artifact and deploy-pages, each pinned by the
+  commit of its tag (looked up by `git ls-remote`). The commands of its
+  steps were run here in a build directory of their own, with the
+  Emscripten of another checkout, and made the same `drives/d.json`;
+  the workflow itself has never run. **For the user**: whether to
+  publish, by setting `VC_PAGES` to `publish` and switching Pages on.
+- **What W4 should know.** The browser has not seen the static page:
+  the user's pass by hand, in a browser, of the page from a static host,
+  a reload keeping the changes, Reset drives, and a private window
+  (Firefox's IndexedDB works in a private window and is cleared at its
+  end; Safari's may refuse it, and then the page says it keeps the
+  changes in memory). `navigator.storage.persist()`, which asks the
+  browser not to clear the site's data when room is short, is not asked
+  for: some browsers ask the visitor, and it is the user's to decide.
+  The drives that a visitor has kept are not changed by a new deploy of
+  the demo until Reset drives.
 
 ## A patch with a line for a cell that blinks: untried
 

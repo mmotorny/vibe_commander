@@ -2,7 +2,8 @@
 // page"; TODO.md, "Step 7, the web page"): what ties the program, built by
 // Emscripten with the page's library (library.js), to the browser. It
 // draws the grid (render.js), hands over the keys and the mouse (keys.js,
-// mouse.js), keeps the drives on the server (drives.js), opens a file in
+// mouse.js), keeps the drives on the server (drives.js) or, served with no
+// server, in the browser (kept.js), opens a file in
 // a new tab, brings the user's files in by a button and by dragging them
 // onto the page, has a button for the full screen, and on a phone fits the
 // grid to the screen and has a row of the keys that a phone lacks.
@@ -17,15 +18,53 @@ import { COLUMNS, ROWS, BLINK_CLASS, BLINK_HALF, CURSOR_HALF, Screen, css, apply
 import { keyEvent, FOCUS_OUT } from "./keys.js";
 import { Mouse } from "./mouse.js";
 import { Drives, ROOTS, CHANGE_ERRORS } from "./drives.js";
+import { KeptDrives, openStore } from "./kept.js";
 
-// How the page keeps its drives, chosen here and nowhere else: "server",
-// the page's server (server.mjs), which every change is made on. The
-// piece W3c adds a page with no server, which keeps them in the browser.
-const MODE = "server";
-
+// How the page keeps its drives, chosen here and nowhere else. "server":
+// the page's server (server.mjs), which every change is made on. "browser":
+// a page served statically, with no server, as from GitHub Pages, whose
+// drives start from what is served with it (static.mjs) and whose changes
+// are kept in the browser, in IndexedDB, or in the page's memory where the
+// browser gives it no IndexedDB (kept.js).
+//
+// Which it is, the page asks where it is served, askMode below: the project's server
+// answers `api/server` with its name, and a static host has no such file,
+// 404 or another refusal of 4xx. One page is built and served both ways;
+// a build of its own for each would be a second page to build and test.
+// An answer of 5xx, or none, is a server that should be there and is not
+// (a proxy in front of a server that has stopped): the page says so and
+// does not start, so that a page of the server never keeps its changes in
+// the browser where the server is merely away.
 const MODES = {
-  server: (fs) => new Drives({ fs, fetch: (...a) => fetch(...a), base: "" }),
+  server: async (fs) => new Drives({ fs, fetch: (...a) => fetch(...a),
+                                     base: "" }),
+  browser: async (fs) => new KeptDrives({
+    fs, fetch: (...a) => fetch(...a), base: "drives/",
+    store: await openStore(window.indexedDB) }),
 };
+
+async function askMode() {
+  let answer;
+  try {
+    answer = await fetch("api/server", { cache: "no-store" });
+  } catch (caught) {
+    throw new Error(`the page's server did not answer (${caught.message})`);
+  }
+  if (answer.ok) {
+    let said = null;
+    try {
+      said = await answer.json();
+    } catch {
+      // a file of that name on a static host, which is no server
+    }
+    if (said && said.server === "vibe-commander")
+      return "server";
+    return "browser";
+  }
+  if (answer.status >= 400 && answer.status < 500)
+    return "browser";
+  throw new Error(`the page's server answered ${answer.status}`);
+}
 
 // The type of a file that is opened in a new tab, by its extension.
 const TYPES = {
@@ -44,6 +83,7 @@ const $ = (id) => document.getElementById(id);
 
 const page = {
   drives: null,
+  mode: null,                     // a name of MODES, once it is known
   fs: null,
   where: "",                      // DOS's current directory, of the FS
   screen: null,
@@ -335,12 +375,47 @@ function wire() {
   else
     $("full").hidden = true;
 
+  $("reset").addEventListener("click", reset);
+
   makeBar();
   fit();
   window.addEventListener("resize", fit);
   window.addEventListener("orientationchange", () => setTimeout(fit, 200));
   if (window.visualViewport)
     window.visualViewport.addEventListener("resize", fit);
+}
+
+// Where the page keeps the user's changes, said in its bar where they are
+// kept in the browser, with the button that forgets them.
+function kept(mode) {
+  if (mode !== "browser")
+    return;
+  if (page.drives.kept) {
+    $("kept").textContent = "Changes are kept in this browser.";
+    $("reset").hidden = false;
+  } else {
+    $("kept").textContent = "This browser gives the page no storage: " +
+      "changes last until the page is closed.";
+  }
+  $("kept").hidden = false;
+}
+
+// The drives as they are served, again: what the browser keeps forgotten,
+// and the page loaded anew.
+async function reset() {
+  if (page.mode !== "browser" || !page.drives
+      || !confirm("Forget every change kept in this browser, and start " +
+                  "again from the drives as they are served?"))
+    return;
+  page.ended = true;
+  try {
+    await page.drives.reset();
+  } catch {
+    page.ended = false;
+    notice("The browser did not forget the changes.");
+    return;
+  }
+  window.location.reload();
 }
 
 function ended(text) {
@@ -361,13 +436,16 @@ window.Module = {
   // loaded into the FS, which the program waits for.
   vcBegin: ({ FS, ENV, addRunDependency, removeRunDependency }) => {
     page.fs = FS;
-    page.drives = MODES[MODE](FS);
     ENV.VC_DRIVE_C = ROOTS.c;
     ENV.VC_DRIVE_D = ROOTS.d;
     addRunDependency("vc-drives");
-    page.drives.load().then(() => {
+    askMode().then(async (mode) => {
+      page.mode = mode;
+      page.drives = await MODES[mode](FS);
+      await page.drives.load();
+      kept(mode);
       removeRunDependency("vc-drives");
-    }, (error) => {
+    }).catch((error) => {
       ended(`The drives could not be loaded: ${error.message}`);
     });
   },

@@ -20,7 +20,25 @@ a directory of build/tmp, and types into it as the page's keys do:
   - the server refusing (D:'s root made read-only on the host): DOS's
     error on the screen, and nothing made;
   - Shift-F9, the setup saved on C: of the server, C:\\VC\\VC.INI;
-  - F10, the program ended, and the page saying that it has.
+  - F10, the program ended, and the page saying that it has;
+  - and nothing kept in the browser: the page did not open IndexedDB.
+
+Then the same page as a static site, made by src/portable_c/web/
+static.mjs and served by a host that answers 404 for what it has not, as
+GitHub Pages does, with a stand-in of the browser's IndexedDB
+(harness/fakeidb.mjs) that is one browser across the page's visits (the
+piece W3c, TODO.md):
+
+  - the page finding no server and saying that its changes are kept in
+    the browser, with the button of the reset;
+  - F7, Shift-F4 and the editor, F8 and Shift-F9: a directory made, a
+    file written, a file of the demo deleted and the setup saved on C:,
+    each kept in IndexedDB;
+  - the page loaded again: its drives as they were left;
+  - the reset: the store emptied and the page loaded anew, and then the
+    drives as they are served;
+  - a browser with no IndexedDB: the page saying that changes last as
+    long as it does, and a directory made in its memory.
 
 What the browser draws, and its keys, the mouse and the phone, are
 checked by hand (TODO.md, "W3b"). The test exits with 77, which the build

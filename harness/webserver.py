@@ -9,7 +9,8 @@ runs them in Node, harness/webserver.mjs, with no browser and nothing
 downloaded:
 
   1. The server, listening on a port of its own, with two drives in a
-     directory of build/tmp, D: made of the demo: the page served; a
+     directory of build/tmp, D: made of the demo: the page served; its
+     answer to `api/server`, by which the page knows a server; a
      drive's tree, parents first, with the contents, and no link of the
      host's in it; a file written whole, with its time and its read-only
      bit, also over a file that is read-only; a directory made, renamed,
@@ -29,7 +30,21 @@ downloaded:
      server's refusals made the numbers that sys_web.c makes DOS's
      errors; a file brought in by the user; and a server that is not
      there answering the general failure.
-  3. The page's script as bundle.mjs makes it for the shell: one classic
+  3. The page with no server, the piece W3c (TODO.md, "W3c"):
+     src/portable_c/web/kept.js, its drives loaded from the trees that a
+     static page is served with, of the server's shape (treeOf of
+     server.mjs), and each change kept in the browser's store before it
+     is made, once in the page's memory (MemoryStore) and once in
+     IndexedDB (IdbStore on harness/fakeidb.mjs, a stand-in of IndexedDB
+     in Node): a directory made, a file's contents at its close, a
+     directory renamed with what is in it, a file deleted, the read-only
+     bit, an upload, and refused, with nothing kept, where the file
+     system would refuse it (there already, not empty, not there, a
+     directory into itself or onto another drive); the next visit loading
+     what was kept and nothing served, and a reset the drives as they are
+     served again; a store that is full answering DOS's ENOSPC; no
+     IndexedDB, or one that refuses to open, the page's memory.
+  4. The page's script as bundle.mjs makes it for the shell: one classic
      script, which compiles, takes from each module only what that module
      exports, and puts Module up.
 

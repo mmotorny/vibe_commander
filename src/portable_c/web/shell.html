@@ -58,6 +58,8 @@ body {
 #bar button.held { background: #0a0; color: #000; }
 #keys { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
 #keys[hidden] { display: none; }
+#kept { font-size: 11px; color: #bbb; }
+#kept[hidden], #reset[hidden] { display: none; }
 #credit { font-size: 11px; color: #777; margin-left: 8px; }
 #credit a { color: #999; }
 #notice, #ended {
@@ -80,6 +82,8 @@ body {
   <button id="more" title="The keys that a phone lacks">Keys</button>
   <button id="upload" title="Bring files into the current directory">Upload</button>
   <button id="full" title="The full screen">Full screen</button>
+  <span id="kept" hidden></span>
+  <button id="reset" title="Forget the changes kept in this browser" hidden>Reset drives</button>
   <span id="credit">Vibe Commander 0.1, based on Volkov Commander 4.05.
   Font: <a href="https://int10h.org/oldschool-pc-fonts/" target="_blank"
   rel="noopener">Web437 IBM VGA 8x16</a> by VileR,

@@ -25,6 +25,9 @@
 //
 // What it answers:
 //   GET  /               the page;
+//   GET  /api/server     { server: "vibe-commander", drives }: by this the
+//                        page knows that it has a server to write to, where
+//                        a static host answers 404 (page.js, askMode);
 //   GET  /api/tree?drive=c
 //                        the drive's files and directories, parents first:
 //                        { entries: [{ path, directory, mtime, readonly,
@@ -136,6 +139,37 @@ export async function prepare(options) {
   return roots;
 }
 
+// A directory's files and directories, parents first, as GET /api/tree
+// answers them: links of the host's, and names with a backslash or a NUL,
+// left out. static.mjs makes the trees of a page with no server by it.
+export async function treeOf(root) {
+  const entries = [];
+  async function walk(directory, prefix) {
+    const listed = await fs.readdir(directory, { withFileTypes: true });
+    listed.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const entry of listed) {
+      const at = path.join(directory, entry.name);
+      const named = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
+      if (entry.isSymbolicLink() || /[\\\0]/.test(entry.name))
+        continue;                       // never followed, never shown
+      const status = await fs.lstat(at);
+      const readonly = (status.mode & 0o200) === 0;
+      if (entry.isDirectory()) {
+        entries.push({ path: named, directory: true,
+                       mtime: Math.floor(status.mtimeMs), readonly: false });
+        await walk(at, named);
+      } else if (entry.isFile()) {
+        const data = await fs.readFile(at);
+        entries.push({ path: named, directory: false,
+                       mtime: Math.floor(status.mtimeMs), readonly,
+                       data: data.toString("base64") });
+      }
+    }
+  }
+  await walk(root, "");
+  return { entries };
+}
+
 // The server, not yet listening: `roots` the drives' directories as
 // prepare answers them, `page` the file of the page.
 export function makeServer(roots, page) {
@@ -171,31 +205,7 @@ export function makeServer(roots, page) {
   async function tree(drive) {
     if (!DRIVES.includes(drive))
       throw new Refused("EACCES");
-    const entries = [];
-    async function walk(directory, prefix) {
-      const listed = await fs.readdir(directory, { withFileTypes: true });
-      listed.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-      for (const entry of listed) {
-        const at = path.join(directory, entry.name);
-        const named = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
-        if (entry.isSymbolicLink() || /[\\\0]/.test(entry.name))
-          continue;                     // never followed, never shown
-        const status = await fs.lstat(at);
-        const readonly = (status.mode & 0o200) === 0;
-        if (entry.isDirectory()) {
-          entries.push({ path: named, directory: true,
-                         mtime: Math.floor(status.mtimeMs), readonly: false });
-          await walk(at, named);
-        } else if (entry.isFile()) {
-          const data = await fs.readFile(at);
-          entries.push({ path: named, directory: false,
-                         mtime: Math.floor(status.mtimeMs), readonly,
-                         data: data.toString("base64") });
-        }
-      }
-    }
-    await walk(roots[drive], "");
-    return { entries };
+    return treeOf(roots[drive]);
   }
 
   async function write(drive, text, body, mtime, readonly) {
@@ -300,6 +310,10 @@ export function makeServer(roots, page) {
     if (request.method === "GET"
         && (url.pathname === "/" || url.pathname === "/vc.html")) {
       send(response, 200, await fs.readFile(page), "text/html; charset=utf-8");
+      return;
+    }
+    if (request.method === "GET" && url.pathname === "/api/server") {
+      send(response, 200, { server: "vibe-commander", drives: DRIVES });
       return;
     }
     if (request.method === "GET" && url.pathname === "/api/tree") {

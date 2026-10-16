@@ -2974,7 +2974,7 @@ directories of its server: so what the page does to have a change made
 on the server is not what the scenarios show. What the harness goes by is `ON_WEB` of
 `harness/deviations.py`, which has what is declared of Linux but its
 masks of the drive's letter, and what is the web's alone. What the
-page itself adds, W4 to W8, the page's own test holds where Node can run
+page itself adds, W4 to W9, the page's own test holds where Node can run
 it, `portable_c-web-page` with the page's program and its server, and
 `portable_c-web-server` with the server and the page's file system; the
 browser's side of it, the drawing, the keys, the mouse and the phone,
@@ -2992,7 +2992,8 @@ the labels that `VC_LABEL_C` and `VC_LABEL_D` give (`sys_web.c`). On the
 page, C:, labelled VIBE, is where the program lives, its own files, the
 setup file, the menu and the extension file, in C:\VC; and D:, labelled
 DEMO, starts as the demo's sample files. Both are directories of the
-page's server, which every change is made on as it happens. Both are
+page's server, which every change is made on as it happens; a page
+served with no server keeps them in the browser (W9). Both are
 ordinary drives: the drive box, the Info panel and every question of a
 drive by its number have both. The program's own files are in the
 directory `vc` of the drive that `VC_PROGRAM_DRIVE` names, C: where it
@@ -3153,3 +3154,56 @@ page").
 
 **Which scenarios show it.** None; `portable_c-web-server` holds the
 writing of such a file.
+
+### W9. Served with no server, the page keeps its changes in the browser
+
+**What the original does.** Its drives are DOS's disks, and what it
+changes there stays there.
+
+**What the web page does.** The same page has a second way to be
+served: as a static site, from GitHub Pages or any host with no server
+(`web/static.mjs` makes it: the page, and the trees that its two drives
+start from, C: with its directory `vc` and nothing in it, D: the demo).
+The page asks where it is served whether it has a server (`api/server`,
+which the page's server answers with its name); a host that answers
+404, or another refusal of 4xx, has none, and the page keeps the
+drives in the browser (`web/kept.js`). An answer of 5xx, or none, is a
+server that is away: the page says so and does not start, so that a
+page of the server never keeps its changes in the browser. With no
+server:
+
+- The drives start from what is served with the page, at the first
+  visit and after a reset; from then on, from what the browser keeps.
+- Every change is kept in the browser's IndexedDB before it is made in
+  the page's copy, as W6 has it made on the server: a file's contents
+  at its close, with its time and whether it is read-only, a file
+  deleted, a file or directory renamed, a directory made or removed,
+  the read-only bit, a file brought in (W8), the setup file too. What
+  the copy is to refuse is refused first, with DOS's error, so that
+  the browser keeps nothing that the copy has not; a store that is full
+  is DOS's full disk, and one that fails otherwise its general failure.
+- The bar says that the changes are kept in this browser, and has a
+  button, Reset drives, that forgets them, after asking, and loads the
+  page anew from the drives as they are served.
+- Where the browser gives the page no IndexedDB, or it does not open,
+  as in a sandbox or some private windows, the changes are kept in the
+  page's memory, and the bar says that they last until the page is
+  closed.
+- What the browser keeps is the visitor's own, in that browser alone,
+  and the browser may clear it as it clears a site's data.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page"): a static page, from GitHub Pages, with its changes kept in the
+browser of the user's own, beside the page of the server and not in
+place of it. One page is built and served both ways, and knows which by
+the answer of where it is served, so that there is one page to build and
+to test.
+
+**Which scenarios show it.** None of the original's: under Node the
+program has the host's files. `portable_c-web-page` takes the static
+site, served by a host that answers 404 as GitHub Pages does, with a
+stand-in of IndexedDB: a directory made, a file written, a file of the
+demo deleted and the setup saved, each kept; the page loaded again
+with them; the reset; and a browser with no IndexedDB. And it holds
+that the page of the server opens no IndexedDB. `portable_c-web-server`
+holds the store's every change and refusal, in memory and in IndexedDB.

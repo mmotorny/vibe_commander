@@ -847,8 +847,8 @@ if(VC_WEB)
     FetchContent_MakeAvailable(vga_font)
     set(web_page_dir ${CMAKE_BINARY_DIR}/portable_c/web)
     set(web_font "${vga_font_SOURCE_DIR}/woff - Web (webfonts)/Web437_IBM_VGA_8x16.woff")
-    set(web_page_script render.js keys.js mouse.js drives.js page.js
-        shell.html bundle.mjs)
+    set(web_page_script render.js keys.js mouse.js drives.js kept.js
+        page.js shell.html bundle.mjs)
     list(TRANSFORM web_page_script PREPEND ${web_dir}/)
     file(MAKE_DIRECTORY ${web_page_dir})
     add_custom_command(
@@ -869,6 +869,26 @@ if(VC_WEB)
              --js-library ${web_dir}/library.js --pre-js ${web_dir}/pre.js
         LINK_DEPENDS ${web_dir}/library.js ${web_dir}/pre.js
                      ${web_page_dir}/shell.html)
+    # The page as a static site, the piece W3c of step 7 (TODO.md, "W3c"):
+    # build/portable_c/web/static/, index.html and the two drives' trees
+    # as they start, for a host with no server, as GitHub Pages
+    # (.github/workflows/pages.yml), where the page keeps the user's
+    # changes in the browser. Made with every build, for the test.
+    file(GLOB_RECURSE web_demo CONFIGURE_DEPENDS ${web_dir}/demo/*)
+    add_custom_command(
+        OUTPUT ${web_page_dir}/static/index.html
+               ${web_page_dir}/static/drives/c.json
+               ${web_page_dir}/static/drives/d.json
+        COMMAND ${node} ${web_dir}/static.mjs
+                --page ${web_page_dir}/vc.html --demo ${web_dir}/demo
+                --out ${web_page_dir}/static
+        DEPENDS ${web_page_dir}/vc.html ${web_dir}/static.mjs
+                ${web_dir}/server.mjs ${web_demo}
+        COMMENT "Making the web page a static site"
+        VERBATIM)
+    add_custom_target(portable_c-web-static ALL
+        DEPENDS ${web_page_dir}/static/index.html)
+    add_dependencies(portable_c-web-static portable_c-web)
     add_custom_target(portable_c-web-serve
         COMMAND ${node} ${web_dir}/server.mjs --port 8437
                 --page ${web_page_dir}/vc.html
