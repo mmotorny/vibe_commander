@@ -1398,6 +1398,49 @@ held for the next key, and the phone's keyboard by its button.
   `navigator.storage.persist()` (W3c).
 - Whether the bar says the font's copyright line as well (W4).
 
+## Step 8, the app for iOS
+
+The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
+"The app for iOS").
+
+### Decided
+- A native app (option A).
+  - The C is the common code plus `machine_posix.c`, `files_/paths_/names_/codepage_/time_posix.c` and `keyboard_posix.c`, built by clang for arm64 iOS.
+  - `sys_ios.c` is plain C with pthreads. The program runs on a thread of its own: KeyRead blocks on a condition variable, so no Asyncify is needed, and Draw copies the 2,000 cells for the main thread.
+- The shell is in SwiftUI.
+  - It draws the grid as text (CoreText or SwiftUI Text, with the same Web437 font as a TTF made from the pinned WOFF by a small script, nothing new downloaded).
+  - It takes keys from a hardware keyboard (`pressesBegan`/`pressesEnded`, `UIKey` HID codes and modifiers made into kitty bytes as `keys.js` does) and from the phone's keyboard, with the same row of keys as the web page. A tap is a click.
+  - The Swift toolchain of Xcode is taken on for this app alone.
+- Building, and the Simulator's scenarios, are on the USER'S MAC, which agents reach by ssh over the tailnet. Installation is from Xcode on the Mac with the user's paid team (no TestFlight). Apple's SDK is used on the Mac only; nothing of it is fetched on Linux.
+- Drives:
+  - C: VIBE is the app's Documents, visible in the Files app (`UIFileSharingEnabled`, `LSSupportsOpeningDocumentsInPlace`), with C:\VC.
+  - D: DEMO is the demo, copied into Documents on the first start. The demo may live beside C: as a second folder.
+- Enter on a file that is no program shows a QuickLook preview. A command says "Commands cannot be run on iOS." F10 shows the last screen, and a tap starts the program again. Files come in through the document picker and the Files app.
+- The memory cap.
+  - `MemoryAll = min(physical, cap)`, the cap set by each implementation, and the variable `VC_MEMORY` for tests.
+  - The web page: 256 MB (wasm memory once grown is never given back).
+  - Native iOS: min(256 MB, half of `os_proc_available_memory()` at start).
+  - Linux: none.
+  - A file larger than the room gets the original's refusal. `editor-big` may come back as a scenario on iOS or the web with a small `VC_MEMORY`; asked as a deviation.
+
+### Pieces
+- **I1, the cap**, in `machine_posix.c`, plus `VC_MEMORY` and the web page's 256 MB. Done here, on Linux. The plan is copied into TODO.md. Start now.
+- **I2, `sys_ios.c`** and a tree "ios-host": `sys_ios.c` built on Linux against a stand-in for the shell, as the rule on test builds allows, and run through every scenario by VC_TEST, sanitized, as the web's Node build is. Here. Start now.
+- **I3, the table from HID codes and modifiers to kitty bytes**, in C, held to `keyboard_posix.c`'s decoder as `portable_c-web-render` holds keys.js. Here. Start now.
+- **I4, the build on the Mac.**
+  - `VC_IOS` in CMake (`-G Xcode -DCMAKE_SYSTEM_NAME=iOS`), and the SwiftUI app with its grid view and font.
+  - It needs the Mac on the tailnet with SSH (Remote Login) on, its hostname, and Xcode installed. The user gives these.
+  - Also a Darwin build of the program for Linux through posixrun on the Mac, to catch Darwin's C library.
+- **I5, the shell's input:** keys, the key row and touch. On the Mac and the phone.
+- **I6, the files and the life of the app:** the drives, the Files app, the picker, QuickLook and the lifecycle. On the Mac.
+- **I7, the Simulator's scenarios.**
+  - `xcrun simctl launch` with `SIMCTL_CHILD_VC_TEST` naming a host directory, as a harness tree "ios".
+  - The bench's setup file is made on the workstation by QEMU and copied to the Mac over the tailnet.
+  - Note: the Mac's APFS is usually case-insensitive and the iPhone's is case-sensitive.
+- **I8, installing** on the iPhone from Xcode with the paid team. The user does it by hand, with instructions.
+- **I9, the documents:** DEVIATIONS "iOS" (I entries), the README, and CLAUDE.md's notes.
+- **Order:** I1, I2 and I3 now. Then I4 once the Mac is reachable, I5 and I6 after I4, I7 after I2 and I4, I8 after I7, and I9 last.
+
 ## A patch with a line for a cell that blinks: untried
 
 What no scenario has yet, and was tried by hand only: a patch with a
