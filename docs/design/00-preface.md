@@ -1,180 +1,205 @@
-# Preface: a commander in 64 kilobytes
+# Preface
 
-![Volkov Commander 4.05 at the panels](img/panels.png)
+## What Volkov Commander was
 
-*Volkov Commander 4.05, as it starts on a PC with DOS: two panels of
-files, the command line, the key bar.*
+Volkov Commander is a file manager for DOS by Vsevolod V. Volkov, in
+the manner of the Norton Commander: two panels of files side by side,
+a command line under them, a row of function keys at the bottom, and a
+menu bar that drops down from the top. Its banner says "Copyright (C)
+1991-2000"; this book is about version 4.05, from 2000. Volkov distributed it
+as shareware, and published its source, in assembly, as the freeware
+edition of 4.05.
 
-## The program
+What it does is a long list for any program of its day. Two panels,
+each a list of files in brief or full form, a tree of the disk, or an
+information panel, filtered by a mask and sorted five ways. Copy, move
+and rename, of files and of whole directories, a file split across
+diskettes when one fills up. Delete, attributes, dates and times. A
+viewer for files of any size, in text or hex, with a search; an editor
+that undoes the changes to a line; a search for files across every
+drive, inside them too. A user menu and extension files with macros, a
+history of commands, the mouse everywhere, a clock, a screen saver, a
+help of 62 pages, a manager for the resident programs that the user
+starts, and a map of the memory. And a separate setup program, with an
+editor for three palettes of forty colours.
 
-Volkov Commander is a file manager for DOS. Vsevolod V. Volkov had the
-idea on 15 May 1991, began it the next day, and dated his last version,
-4.05, 16 June 2000; the head of `src/asm/VC.ASM` still says so. It is a
-clone of the Norton Commander, the program that taught a generation of
-PC users to manage files in two blue panels: Tab moves between them, F5
-copies from one to the other, F3 views, F4 edits, F8 deletes, F9 opens a
-menu bar, and the bottom row of the screen says which function key does
-what. Under the panels a DOS command line is always there, so the
-commander is also a shell.
+All of it is in one file of **65,090 bytes**, `VC.COM`. The setup
+program, `VCSETUP.COM`, is 24,278 bytes more; the help, `VC.HLP`,
+68,836 bytes, is read from the disk a page at a time; the settings,
+`VC.INI`, are 511 bytes. And while the user's own command runs, the
+commander keeps **12,690 bytes** of itself in memory.
 
-What made Volkov's program famous was its size, and its speed on the
-slow machines of the day. Volkov Commander 4.05 is one file of **65,090 bytes**, `VC.COM`, and holds two
-panels of files with five orders and a filter, a tree of the disk, a
-viewer with hex and search, an editor, copy, move and delete through
-whole trees of directories, a file search on all drives that also looks
-inside files, a user menu and extension files with macros, a history of
-commands, a clock, a screen blanker with a starry sky, mouse support,
-and a menu bar with dialogs for all of it. Its setup is a second file of
-24,278 bytes, `VCSETUP.COM`. It was written entirely in 8086 assembly,
-33,836 lines of it in sixteen files, 27,190 of them for `VC.COM`, which
-Volkov published.
+## The constraints
 
-This book is about how that fits.
+The program is written for the 8086 in real mode, and for DOS 3.20 or
+later. Five limits shape everything in it.
 
-## The machine it was written for
+- **A `.COM` file is one segment.** DOS loads it at offset 100h of a
+  single 64K segment, behind 256 bytes of its own, so the code, the
+  tables and the texts together can have at most 65,280 bytes. `VC.COM`
+  ends 190 bytes short of that.
+- **Its data cannot be in the file.** The program's state, the *main
+  data*, is a structure of **62,603 bytes**, and each of the two panels
+  is at least 6,754 more. None of it is in `VC.COM`: it is laid over
+  memory that DOS hands out when the program starts, and the program
+  will not start with less than 84,144 bytes for it.
+- **The machine has 640 KB, and the user wants them.** A file manager
+  that runs other programs must get out of their way. With Memory
+  allocation in its small mode, as distributed, the commander gives back
+  its data and its code and keeps the 12,690 bytes; with it off, the
+  code stays too, 76,050 bytes in all.
+- **The stack is 256 bytes.** The program sets up its own stack before
+  anything else, and every routine lives within it.
+- **An offset is 16 bits.** A panel's list of files ends inside its
+  64K segment, so a panel holds at most 2,703 files; the tree holds 767
+  directories; the viewer looks at a file through a window of 64K.
 
-A reader who knows a modern toolchain needs five facts about the PC and
-DOS to read the rest.
+## The question
 
-**Memory is addressed by segment and offset.** The 8086 has 16-bit
-registers and a 20-bit address bus. An address is a segment, which the
-processor multiplies by 16, plus an offset: `B800:0000` is byte
-`B8000h`. One segment register reaches 64 KB, and a program that wants
-more has to load another segment into DS or ES and keep track of which
-is which. DOS gives a program at most the 640 KB below `A0000h`, less
-what DOS itself and the resident programs loaded before it take: on a
-typical machine of 1995, some 550 to 600 KB.
+How did Volkov fit so much into so little? Not by one trick but by a
+habit, applied everywhere: a buffer that is idle is borrowed rather
+than a new one added; a table is read by one routine instead of code
+written for each case; whatever DOS already does, DOS is made to do;
+and code is shared by falling into it and jumping into it, not only by
+calling it. This book follows that habit through the source, a routine
+at a time, with the bytes that each choice costs or saves.
 
-**A .COM file is one segment.** DOS loads it at offset 100h of a segment
-and points CS, DS, ES and SS all at that segment. The 256 bytes in
-front, offsets 0 to FFh, are the PSP, the Program Segment Prefix: DOS
-puts there the command line the program was started with (at 80h), the
-segment of its environment strings (at 2Ch), and the addresses DOS goes
-back to when the program ends (at 0Ah). Code, constants, variables and
-the stack all share the one 64K segment, so a .COM file can be no more
-than 64K less the PSP, 65,280 bytes. `VC.COM` is 190 bytes short of
-that.
+## A DOS refresher
 
-**DOS is called through INT 21h.** The program puts a function number in
-AH and its arguments in other registers, executes `INT 21h`, and finds
-the answer in AX with the carry flag set on an error: 3Dh opens a file,
-3Fh reads, 4Eh finds the first file of a pattern, 4Bh runs another
-program. The BIOS has its own interrupts, INT 10h for the screen and
-INT 16h for the keyboard, and the mouse driver has INT 33h.
+The chapters take a few facts about real-mode DOS for granted. They are
+all here.
 
-**The screen is memory.** In text mode the display shows a page of
-memory at `B800:0000`: 80 by 25 cells of two bytes, a character of code
-page 437 and an attribute byte, four bits of foreground colour and three
-of background with a blink bit on top. A `MOV` into that memory is on the
-screen at once. Everything a commander draws, boxes, shadows, menus, is
-bytes written there.
+**Segments and paragraphs.** The 8086 makes a 20-bit address of two
+16-bit registers, `segment * 16 + offset`. A *paragraph* is 16 bytes,
+so two segments one paragraph apart overlap in all but 16 bytes. Four
+segment registers say where the code is (CS), the data (DS and ES) and
+the stack (SS), and an instruction reaches only what those point at,
+64K each, without loading one of them first. A program that keeps
+every pointer as an offset within one segment never loads a segment
+register to follow one.
 
-**A program can stay behind.** A TSR, "terminate and stay resident",
-ends with a DOS call that keeps part of its memory, and can hook
-interrupts so that it runs again later. DOS itself offers the reverse:
-a program can give back memory it does not need while it runs another
-program.
+**A `.COM` file.** DOS loads it at offset 100h of a segment, with CS,
+DS, ES and SS all on that segment, SP at its top, FFFEh, and a word of
+0 pushed there, so that a near `RET` from the first level goes to
+offset 0, where the PSP begins with `INT 20h`, "end the program". There
+is no header and no relocation: the file is the bytes. The program gets
+the largest free block of memory, which in practice is all of it.
 
-## The constraints that shaped it
+**The PSP.** The Program Segment Prefix is DOS's 256 bytes in front of
+the program. Volkov Commander uses these fields:
 
-Each of those facts is a constraint on the commander, and the code is
-an answer to each.
-
-- **64 KB of code and constants.** Every routine of the program and
-  every text, box, dialog, menu and key table has to fit one segment
-  with the PSP and the stack. So texts are written in a markup that a
-  single routine draws, dialogs are tables of 10- and 11-byte records
-  that one routine runs, commands share tails of code by jumping into
-  each other, and a routine is called with its arguments in whatever
-  registers the caller already has them in.
-- **64 KB of data.** All of the program's state, its buffers and its
-  copy of the screen, is one block of **62,603 bytes** that it asks DOS
-  for, `struct MainDat`, addressed by DS. Buffers that two features never
-  need at the same time are one buffer, and structures are laid over
-  buffers.
-- **256 bytes of stack** (`LenStk EQU 100h`). Nothing large can be a
-  local variable, recursion is out, and the program is shaped so that a
-  DOS call that needs stack, as the capitals of a mask do, is made when
-  little else is on it.
-- **Directories of any size.** A directory can have thousands of
-  files, 24 bytes each in a panel. Each panel is a segment of its own,
-  6,754 bytes for its first 256 files and at most 64K, 2,703 files,
-  carved out of what DOS has left and moved, with the other panel, when
-  a directory grows.
-- **A command needs the memory.** When the user runs a program from the
-  command line, that program wants the 640K too. So the commander gives
-  back almost all of itself, keeps 12,690 bytes that run the command,
-  and afterwards loads itself again by running its own file as a child
-  program.
-
-The chapters show each of these in the code, with the size of each
-thing.
-
-## The three versions of the source
-
-The source of this program exists in three forms, and the book uses two
-of them.
-
-```mermaid
-graph LR
-    ASM["src/asm: Volkov's assembly, 8086, MASM syntax"]
-    C["src/c: the same program in 16-bit C"]
-    PC["src/portable_c: the same program in portable C"]
-    ASM -- "translated routine by routine" --> C
-    C -- "made portable: 32 bits, flat memory" --> PC
+```
+PSP:0000  CD 20       INT 20h, the old way to end
+    0002  word        the segment where the program's memory ends
+    000A  dword       where DOS goes on when the program ends (INT 22h)
+    000E  dword       DOS's Ctrl-C handler for this program (INT 23h)
+    0012  dword       DOS's critical error handler (INT 24h)
+    002C  word        segment of the environment
+    005C  16 bytes    FCB 1, parsed from the command tail
+    006C  16 bytes    FCB 2
+    0080  byte        length of the command tail
+    0081  127 bytes   the command tail, ended by a CR
 ```
 
-- `src/asm/` is Volkov's assembly as he published it. It is the
-  original, and where a trick only shows in the instructions, the book
-  quotes it.
-- `src/c/` is a translation of it into 16-bit C, routine for routine,
-  data for data, with the same memory layout, the resident part
-  included.
-- `src/portable_c/` is the same program in portable C: 32-bit, with one
-  flat memory and pointers where the original had segments, and with
-  the system's services behind one header, `sys.h`.
+When a program ends, DOS puts INT 22h, 23h and 24h back from the PSP's
+copies.
 
-The code shown in this book is the **portable C**, because modern C is
-easier to read than forty-year-old assembly. It is a faithful rendering:
-the routines keep Volkov's labels as their names (`F11_00` is Ctrl-O,
-`DialBox` draws a box, `Init50` draws the panels), the main data keeps
-his layout byte for byte, and a comment such as `/* Func41 */` marks
-where a label of the assembly stood. Where the flat memory of the
-portable C hides the original's design, segments of 64K, places kept as
-16-bit offsets, the part that stays resident, the book describes the
-original and shows the assembly or the 16-bit C.
+**Memory.** DOS hands out memory in paragraphs and names each block by
+its segment: INT 21h function 48h asks for a block of BX paragraphs,
+49h gives one back, 4Ah makes one longer or shorter. Asked for FFFFh
+paragraphs, which no machine has, 48h fails and says in BX how much
+the largest block holds: that is how a program learns what there is.
+Each block has a 16-byte header in the paragraph in front of it, the
+*memory control block* or MCB: `'M'`, or `'Z'` for the last block, at
+byte 0, the owner's PSP at byte 1, the length in paragraphs at byte 3.
+Nothing stops a program from writing one.
+
+**Interrupts as an API.** The first kilobyte of memory is 256 far
+pointers, the interrupt vectors. `INT 21h` is DOS, with the function
+number in AH; `INT 10h` is the video BIOS, `INT 16h` the keyboard,
+`INT 33h` the mouse driver. DOS reports failure with the carry flag
+and an error number in AX. A program may read who has a vector (AH
+35h) and point it at its own code (AH 25h).
+
+**The screen and the keyboard.** A colour adapter shows the 80 x 25
+characters of its text screen from `B800:0000`, a monochrome one from
+`B000:0000`: two bytes a cell, the character and then its colour, 80
+cells a row, so that writing a word there puts a character on the
+screen with no call at all. The BIOS keeps its own data at segment
+40h: the offset of the page shown at `0040:004Eh`, the count of timer
+ticks, 18.2 a second, at `0040:006Ch`. A key comes from the BIOS as
+one word, the scan code in the high byte and the character in the low
+byte: 4800h is Up, 1C0Dh is Enter.
 
 ## How to read this book
 
+The book is about the original program, Volkov's assembly in
+`src/asm/`, and only its last chapter is about the C into which it was
+carried. Each chapter can be read alone, but they build on one another:
+
 ```mermaid
 graph TD
-    P["0. Preface: the machine and the constraints"]
-    A["1. The program: the main data, the loop, input, the screen, boxes and menus"]
-    B["2. The features: panels, tree, group commands, copy, viewer, editor, search, menus"]
-    S["3. The system: DOS, the BIOS, the resident part, sys.h"]
-    P --> A
-    A --> B
-    A --> S
-    B --> S
+    P["Preface: the program, its limits, a DOS refresher"]
+    C1["1. The program: the file, the start, the main data, the loop, the screen, the tables"]
+    C2["2. The features: panels, the tree, walking files, copy, viewer, editor, find file"]
+    C3["3. The system: DOS and the BIOS, the critical error, the resident part"]
+    C4["4. The setup: VCSETUP.COM, VC.INI and the private call"]
+    C5["5. Into C: the C translation and the portable C"]
+    P --> C1
+    C1 --> C2
+    C1 --> C3
+    C2 --> C3
+    C3 --> C4
+    C3 --> C5
+    C4 --> C5
 ```
 
-- [Chapter 1, the program](01-the-program.md), is the skeleton: the
-  one block of data, how the program starts and gives itself back for a
-  command, the main loop that is not a routine, keys as BIOS words, the
-  screen buffer, and the tables of boxes, dialogs and menus. Read it
-  first.
-- [Chapter 2, the features](02-the-features.md), is what the skeleton
-  carries: panels and their lists, sorting and the filter, the tree as a
-  flat list, one routine for every command that goes through files, the
-  copy that splits a file over diskettes, the viewer's 64K window, the
-  editor's one line apart, the file search, the user menu and Enter.
-- [Chapter 3, the system](03-the-system.md), is the layer under both:
-  how the original talks to DOS, the BIOS and the mouse driver, the
-  critical error, the resident part that runs a command and loads the
-  rest again, and how the portable C asks the same of DOS through one
-  header from 32-bit protected mode.
+[Chapter 1](01-the-program.md) is the skeleton: how the source is put
+together, what is in the file, how the program cuts up memory, the main
+data and the panels, the main loop, input, the screen, and the tables
+from which every box and menu is drawn. [Chapter 2](02-the-features.md)
+is what the program does with files on that skeleton.
+[Chapter 3](03-the-system.md) is the conversation with DOS and the PC,
+and the part of the program that stays in memory while a command runs.
+[Chapter 4](04-the-setup.md) is the second program, and the file and
+the private call that join the two. [Chapter 5](05-into-c.md) tells
+how the assembly became C.
 
-Each chapter ends with the files to read next. Names in `code` are the
-program's own: a routine, a field of the main data, a constant, a file.
-Numbers in hex are written as the assembly writes them, `F48Bh`, or as C
-does, `0xF48B`; sizes are in bytes unless they say otherwise.
+Each topic is explained in one place, and the other chapters link to
+it; each chapter ends with what to read next, in the source and in the
+book. The [contents](README.md) list every section.
+
+**The excerpts.** Code is quoted from `src/asm/` with Volkov's labels,
+instructions and comments. In chapters 1, 3 and 4 a comment that
+starts with `;;` is the book's and one with a single `;` is Volkov's;
+in chapter 2 the comments of the excerpts are the book's. Volkov's
+names are a numbering, not words, and chapter 1 explains them. Where
+his comments disagree with his code, the book says so, and the code is
+what runs. The source files are CP866 text, the code page of Russian
+DOS: `iconv -f cp866` makes them readable on a modern system.
+
+**The figures.** Sizes and offsets come from the assembler's listing of
+the source, built to the layout of the binary that Volkov shipped: the
+published source reserves room for what only the shareware edition had,
+so that every byte lands where it is in the shipped `VC.COM`, and the
+figures are the shipped file's (chapter 1 explains how). Numbers in hex
+end in `h`, as in the source. Offsets in the program count from the
+start of the PSP, so the first byte of the file is at 100h.
+
+**The screens** are the shipped program's own, recorded as it ran,
+drawn in the VGA font at twice their size.
+
+The figures that recur:
+
+| What | Bytes |
+|---|---:|
+| `VC.COM`, the commander | 65,090 |
+| `VCSETUP.COM`, the setup program | 24,278 |
+| `VC.HLP`, the help | 68,836 |
+| `VC.INI`, the settings | 511 |
+| what stays in memory while a command runs, in the small mode of Memory allocation, the default | 12,690 |
+| what stays with Memory allocation off | 76,050 |
+| the main data, `MainDat` | 62,603 |
+| a panel, `WCBdef`, at the least | 6,754 |
+| the transient part: code, tables and texts | 63,323 |
+| the stack | 256 |
