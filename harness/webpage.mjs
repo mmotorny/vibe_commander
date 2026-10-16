@@ -265,6 +265,11 @@ await step("the program ends, and the page says so",
 await step("the page of the server keeps nothing in the browser",
            () => served.opened === 0
                  && (!elements.kept || elements.kept.textContent === ""));
+// What the page takes for a static site where api/server is not answered
+// as it should be: the server never serves it.
+const drivesOfSite = (await fetch(`${base}/drives/c.json`)).status;
+await step("the server serves no drives of a static site",
+           () => drivesOfSite === 404);
 server.close();
 
 // 2. The page served statically, as static.mjs makes it, by a host that
@@ -275,19 +280,35 @@ const site = path.join(top, "static");
 execFileSync(process.execPath, [path.join(web, "static.mjs"), "--page", html,
                                 "--demo", path.join(web, "demo"),
                                 "--out", site]);
-const host = createServer((request, response) => {
-  const name = new URL(request.url, "http://localhost").pathname;
-  const file = path.join(site, name.endsWith("/") ? `${name}index.html` : name);
-  if (!file.startsWith(site) || !existsSync(file)
-      || !statSync(file).isFile()) {
-    response.writeHead(404, { "Content-Type": "text/html" });
-    response.end("<h1>404</h1>");
-    return;
-  }
-  response.writeHead(200);
-  response.end(readFileSync(file));
-});
-await new Promise((done) => host.listen(0, "127.0.0.1", done));
+// A host of the static site, which answers a name that it has not by
+// `missing`, and anything but the page by `away` where that is set.
+async function hostOf({ missing, away = null }) {
+  const host = createServer((request, response) => {
+    const name = new URL(request.url, "http://localhost").pathname;
+    const file = path.join(site, name.endsWith("/") ? `${name}index.html` : name);
+    if (away !== null && !name.endsWith("/")) {
+      response.writeHead(away, { "Content-Type": "text/html" });
+      response.end("<h1>away</h1>");
+      return;
+    }
+    if (!file.startsWith(site) || !existsSync(file)
+        || !statSync(file).isFile()) {
+      if (missing === 200) {
+        response.writeHead(200, { "Content-Type": "text/html" });
+        response.end(readFileSync(path.join(site, "index.html")));
+        return;
+      }
+      response.writeHead(missing, { "Content-Type": "text/html" });
+      response.end(`<h1>${missing}</h1>`);
+      return;
+    }
+    response.writeHead(200);
+    response.end(readFileSync(file));
+  });
+  await new Promise((done) => host.listen(0, "127.0.0.1", done));
+  return host;
+}
+const host = await hostOf({ missing: 404 });
 const at = `http://127.0.0.1:${host.address().port}`;
 const browser = new FakeIndexedDB();
 const kept = () => browser.records("vibe-commander", "records");
@@ -396,6 +417,28 @@ const inPage = (page, at) => {
                   () => isDirectory(page, "/drive/c/mem"));
 }
 host.close();
+// Hosts that answer api/server otherwise than by 4xx: with a page of
+// their own, 200, as a host of pages in a sandbox may, or by 500; the
+// drives beside the page say that it is a static site. And a host that
+// answers 502 for anything but the page, a proxy in front of a server
+// that has stopped: the page does not start.
+for (const missing of [200, 500]) {
+  const other = await hostOf({ missing });
+  const page = load(`http://127.0.0.1:${other.address().port}`, undefined);
+  await page.see(" C:\\ ");
+  await page.step(`a host that answers ${missing} for a name it has not is static`,
+                  () => page.elements.kept.textContent.includes("no storage"));
+  other.close();
+}
+{
+  const other = await hostOf({ missing: 404, away: 502 });
+  const page = load(`http://127.0.0.1:${other.address().port}`, undefined);
+  await page.step("a server that is away: the page says so and does not start",
+                  () => page.elements.ended && !page.elements.ended.hidden
+                        && page.elements.ended.textContent.includes("502")
+                        && page.screen === null);
+  other.close();
+}
 rmSync(top, { recursive: true, force: true });
 if (failed > 0) {
   console.log(`${failed} of ${passed + failed} steps failed`);

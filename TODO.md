@@ -1244,6 +1244,14 @@ held for the next key, and the phone's keyboard by its button.
   browser because the server was down for a moment (a proxy in front of
   it answers 502). A build of its own for the static site was set aside:
   a second page to build and test, for a question that the host answers.
+  Since a page was published on a host of pages in a sandbox, whose
+  answer to a name that it has not is not known: an answer of 5xx or
+  none is a static site all the same where `drives/c.json` is served
+  beside the page as `static.mjs` writes it, `staticSite` of
+  `web/page.js`, since `server.mjs` never serves that name and a proxy
+  in front of a stopped server does not either; `portable_c-web-page`
+  holds hosts that answer 200 with a page and 500, and one that is
+  away, 502.
 - **The static site**, `web/static.mjs`, the target
   `portable_c-web-static` (in ALL with VC_WEB):
   `build/portable_c/web/static/`, `index.html` (the page), `drives/c.json`

@@ -36,7 +36,11 @@ import { KeptDrives, openStore } from "./kept.js";
 // An answer of 5xx, or none, is a server that should be there and is not
 // (a proxy in front of a server that has stopped): the page says so and
 // does not start, so that a page of the server never keeps its changes in
-// the browser where the server is merely away.
+// the browser where the server is merely away. Unless the drives of a
+// static site are served beside the page, `drives/c.json`, which the
+// server never serves: then it is a static host that answers a name it
+// has not otherwise than by 4xx, or that does not let the page ask for
+// it at all, as a host of pages in a sandbox may (staticSite below).
 const MODES = {
   server: async (fs) => new Drives({ fs, fetch: (...a) => fetch(...a),
                                      base: "" }),
@@ -45,11 +49,27 @@ const MODES = {
     store: await openStore(window.indexedDB) }),
 };
 
+// Whether the drives of a static site are served beside the page: the
+// tree of C: as static.mjs writes it.
+async function staticSite() {
+  try {
+    const answer = await fetch("drives/c.json", { cache: "no-cache" });
+    if (!answer.ok)
+      return false;
+    const tree = await answer.json();
+    return Array.isArray(tree && tree.entries);
+  } catch {
+    return false;
+  }
+}
+
 async function askMode() {
   let answer;
   try {
     answer = await fetch("api/server", { cache: "no-store" });
   } catch (caught) {
+    if (await staticSite())
+      return "browser";
     throw new Error(`the page's server did not answer (${caught.message})`);
   }
   if (answer.ok) {
@@ -64,6 +84,8 @@ async function askMode() {
     return "browser";
   }
   if (answer.status >= 400 && answer.status < 500)
+    return "browser";
+  if (await staticSite())
     return "browser";
   throw new Error(`the page's server answered ${answer.status}`);
 }
