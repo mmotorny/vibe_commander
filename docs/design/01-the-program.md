@@ -1135,7 +1135,8 @@ DeCode	ENDP
 ```
 
 The 62 pages hold 65,377 bytes of text; the largest is page 55,
-"Configuration", which is the setup program's, at 2,939 bytes.
+"Configuration", which is the setup program's, at 2,939 bytes of
+text behind its header of 26.
 `RdEntry` refuses a page of 2,968 bytes or more, `LenHelp` less the 32
 bytes of the state, by `CMP CX,LenHelp-20h` and a `CMC` that turns
 "below" into "no error". How the setup program reads its seven pages

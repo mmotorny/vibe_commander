@@ -442,6 +442,8 @@ reads one less than was asked. The 179 bytes in front of `ComnIni`
 are the end of `WCB2sav`, which is still empty at that moment; the
 two panels' 88 bytes each are then copied from there to the heads of
 `WCB1sav` and `WCB2sav`.
+[Chapter 1](01-the-program.md#init00-the-setup-file-read-in-place)
+draws where each part of the read lands.
 
 The directory is that of the environment variable `VC=`, if it is set,
 or else the commander's own, from the path that DOS puts behind the
@@ -862,7 +864,7 @@ commander uses pages 1 to 54; the last of those, "VCSETUP program",
 says what the setup program is for. Pages 55 to 61 are the setup
 program's:
 
-| Page | Title | Bytes | Help of |
+| Page | Title | Bytes, with its header of 26 | Help of |
 |---:|---|---:|---|
 | 55 | Configuration | 2,965 | F2, and its dialog |
 | 56 | Screen and Mouse | 1,603 | F3 |

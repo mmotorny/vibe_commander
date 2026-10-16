@@ -1574,6 +1574,7 @@ half blocks, `▌WORK▐`, and a `◄` marks the current directory.
 - [Chapter 1](01-the-program.md) for the main data in which every
   buffer here lives and for `Input`; [chapter 3](03-the-features.md)
   for what the panels list and how they are read;
-  [chapter 6](06-the-system.md#the-screen) for the display's address,
+  [chapter 5](05-numbers-and-names.md) for the sizes, dates and names
+  that they print; [chapter 6](06-the-system.md#the-screen) for the display's address,
   CGA snow and the mouse driver; [chapter 7](07-the-setup.md) for the
   setup program, which draws with copies of these routines.

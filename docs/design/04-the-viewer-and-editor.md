@@ -66,7 +66,7 @@ ViewDat	ENDS
 
 With `OPTION OLDSTRUCTS` at the head of `VC.ASM` the field names are
 global, so `MOV ES:ViFirst,AX` writes `TmpBuf+218` of the main data,
-0D7Bh. The 43 bytes run from `TmpBuf+200` to `TmpBuf+242`. No
+0D83h. The 43 bytes run from `TmpBuf+200` to `TmpBuf+242`. No
 instance of `ViewDat` is ever declared: the structure is only a list
 of names. (`ViSpace` holds bytes, not paragraphs as its comment says:
 the comment is older than the code.)
@@ -533,36 +533,15 @@ bytes) writes the two figures that change, and `V40_00` (76 bytes) the
 The percentage is how far into the file the first line on the screen
 is: (`ViOffset` + `ViFirst`) times 100, divided by `ViLen`. Both numbers
 are 32 bits, and the 8086's `DIV` divides 32 bits by 16 only, with a
-fault, INT 0, where the quotient does not fit 16 bits. So `V25_00`
-neither multiplies nor divides:
-
-```asm
-	MOV	AX,DS:ViOffset.Lo
-	MOV	BX,DS:ViOffset.Hi
-	ADD	AX,DS:ViFirst		;; BX:AX, the place of the first line
-	ADC	BX,SI
-	MOV	CX,100
-V25_02:	ADD	DX,AX			;; DI:SI:DX += BX:AX,
-	ADC	SI,BX			;; a hundred times:
-	ADC	DI,0			;; the place times 100, in 48 bits
-	LOOP	V25_02
-	MOV	AX,DS:ViLen.Lo
-	MOV	BX,DS:ViLen.Hi
-	...
-	MOV	CX,0FFFFh
-V25_03:	INC	CX			;; count the subtractions
-	SUB	DX,AX			;; of the length
-	SBB	SI,BX
-	SBB	DI,0
-	JNB	V25_03			;; CX: the percentage, 0 to 100
-```
-
-At most 101 subtractions, since the place is below the length: about
-5,500 cycles in all, a little more than a millisecond on a PC/XT, for
-a figure that changes with every key. `V40_00` says when it is 100:
-when the window reaches the end of the file and the last line is on
-the screen, it writes "100" straight into `ScrBuf` and sets `Vi100pc`,
-by which Down, PgDn and End then do nothing.
+fault where the quotient does not fit, so `V25_00` neither multiplies
+nor divides: it adds the place into 48 bits a hundred times and counts
+how often the length can be taken away, at most 101 times, some 5,500
+cycles in all. `V40_00` says when it is 100: when the window reaches
+the end of the file and the last line is on the screen, it writes
+"100" straight into `ScrBuf` and sets `Vi100pc`, by which Down, PgDn
+and End then do nothing.
+[Chapter 5](05-numbers-and-names.md#the-viewer-v25_00) has both
+routines instruction by instruction.
 
 ### The mouse
 
@@ -686,11 +665,10 @@ spends about 340 cycles on an 8088 by Intel's tables, a third of them
 in the far call to DOS's routine and back, counting that routine at
 its shortest, a test and a return for a byte below 80h. That is
 about 14,000 bytes a second on a PC/XT: a 64K window in under five
-seconds, a megabyte in a minute and a quarter. Its opposite,
-`LowCase`, which the panels use to show names, cannot be asked of DOS,
-so `Init21` of `VC.ASM` builds a table of 128 bytes, `LowTab`, at the
-start, by asking `CaseMap` for every byte from 80h up and inverting the
-answers.
+seconds, a megabyte in a minute and a quarter.
+[Chapter 5](05-numbers-and-names.md#upper-and-lower-case) has `UpCase`
+and its opposite, `LowCase`, which cannot be asked of DOS and is a
+table that the program inverts from DOS's capitals once, at the start.
 
 ### The viewer's search: `V15_00`
 
@@ -1026,13 +1004,10 @@ end in it.
 ### Words: `T55_00`
 
 Ctrl-Left and Ctrl-Right go by words, and Ctrl-T and Ctrl-BackSpace
-delete one. A word ends at one of ten characters, `CtEn_T`:
-
-```asm
-CtEn_T	DB	' +:.,><|\',9
-```
-
-and `CmpSym` (17 bytes) is `REPNE SCASB` over them. `T55_00` (37 bytes)
+delete one. A word ends at one of the ten characters of `CtEn_T`,
+which `CmpSym` looks for with one `REPNE SCASB`
+([chapter 5](05-numbers-and-names.md#word-separators)).
+`T55_00` (37 bytes)
 skips the separators to the right of the cursor and then the
 characters that are not; `EdSub1`, the same thing to the left, is not
 the editor's at all: it is the routine of `EdLin`, the input line of
@@ -1265,4 +1240,6 @@ effect at the next Enter without starting the program again.
   [chapter 2](02-the-screen.md) for `ScrBuf`, `Window` and the buffers
   that boxes save into; [chapter 3](03-the-features.md) for the room
   and for find file, the third user of the search;
+  [chapter 5](05-numbers-and-names.md) for `Number`, the percentage,
+  `HexByt`, `UpCase` and the separators of words;
   [chapter 6](06-the-system.md) for `Intr21` and the critical error.

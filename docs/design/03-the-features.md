@@ -390,12 +390,13 @@ The entries from `EndBuf` to `EndFul` are read, kept, and invisible.
 Changing the filter calls `SetMask` and `Sort` again over all of them,
 without the disk.
 
-`TstMas` works on the *fixed form* of a name that DOS itself uses in a
-directory: eleven characters, eight of name and three of extension,
-padded with spaces. `Convert` (36 bytes) makes that form, in capitals,
-with `*` turned into as many `?` as fill its part; the mask is converted
-once into `TmpBuf`, each name into `TmpBuf+20`, and the test is a loop
-of eleven comparisons where `?` matches anything. `TstExe` is three
+`TstMas` holds a name against the mask in the form in which DOS keeps
+a name in a directory, eleven characters padded with spaces, where `?`
+matches anything and a `*` has become the `?`s it stands for; the mask
+is converted once, each name at every test.
+[Chapter 5](05-numbers-and-names.md#names-the-eleven-character-form)
+has `Convert`, which makes the form, and the loop of eleven
+comparisons. `TstExe` is three
 three-byte comparisons of what follows the first full stop with
 `'com','exe','bat'`, a nine-byte table.
 
@@ -1386,8 +1387,8 @@ or from a network path is always a copy.
 
 A target with wildcards is made in the eleven-byte form of the
 directory, where the `?` of the mask are the only places that take the
-source's characters; [the chapter on numbers and
-names](05-numbers-and-names.md#copying-txt-to-bak) has it worked through,
+source's characters; [chapter
+5](05-numbers-and-names.md#copying-txt-to-bak) has it worked through,
 `notes.txt` and `*.bak` making `NOTES.BAK`. Doing it by fixed places
 has one curiosity: with the mask `??x*.*`, the file `a.txt` becomes
 `A_X_____TXT` (`_` a space), since the mask's `x` lands at place 2 of
@@ -1557,7 +1558,7 @@ just seen one.
 
 ## The viewer and the editor
 
-F3 and F4 have [a chapter of their own](04-the-viewer-and-editor.md): the
+F3 and F4 have [chapter 4](04-the-viewer-and-editor.md): the
 viewer's window of 64K over a file of any size and its line table, the
 search `V81_00` and `V82_00` that find file shares, and the editor's
 whole text with one line apart.
@@ -2030,7 +2031,7 @@ the program uses the other letter.
 
 ![Alt-F1: the drive letters](img/drive-letter.png)
 
-*Alt-F1 on a bench with A:, C: and D:: the box over the left panel,
+*Alt-F1 on a machine with A:, C: and D:: the box over the left panel,
 three letters three cells apart, the cursor on the panel's drive.*
 
 The row is spaced by how many letters there are: three spaces between
@@ -2097,8 +2098,8 @@ clusters times `ClstSiz`, one `MUL` to 32 bits each, and then what the
 take. That is not the sum of their sizes, but of their sizes rounded up
 to whole clusters, a 32-bit size divided by a 16-bit cluster in two
 `DIV`s, the high word first and its remainder carried into the low:
-[the chapter on numbers and
-names](05-numbers-and-names.md#rdinfo-and-the-info-panel-bytes-per-cluster)
+[chapter
+5](05-numbers-and-names.md#rdinfo-and-the-info-panel-bytes-per-cluster)
 has the instructions, and why neither quotient can overflow.
 
 Below a rule comes the text of `DIRINFO`, as much as fits, 36 cells a
@@ -2297,10 +2298,6 @@ through a buffer of its own and then copied onward.
   `F54_00`, `DirFunc`, `FncSel`, `FncMas`, `DelTree`.
 - `src/asm/VCCOPY.INC`: the `EQU`s at the top, `C00_00` to `C30_00`,
   `PerCent`, and the boxes of errors at the top.
-- `src/asm/VCVIEW.INC`: `ViewDat`, `V00_10`, `V50_00`, `V51_00`,
-  `V60_00`, `V81_00`, `V82_00`.
-- `src/asm/VCEDIT.INC`: `EdData`, `Edit_T`, `T00_00`, `T50_00`,
-  `T51_00`, `T61_00`, `T80_00`.
 - `src/asm/VCFIND.INC`: `FndData`, `F67_00`, `FindFil`, `FndAdr`.
 - `src/asm/VCFUNC.INC`: `AdrNum`, `NumAdr`, `F00_50` and the cursor
   keys at the top; `F21_00` to `F21_40`, `F25_00` to `F27_11`,
@@ -2308,7 +2305,10 @@ through a buffer of its own and then copied onward.
   `Run_00`, `FileLst`.
 - [Chapter 1](01-the-program.md) for the main data and the loop;
   [chapter 2](02-the-screen.md) for the screen, the panels as drawn,
-  `EdLin` and the dialogs; [chapter 6](06-the-system.md) for `Intr21`,
+  `EdLin` and the dialogs; [chapter 4](04-the-viewer-and-editor.md)
+  for F3 and F4; [chapter 5](05-numbers-and-names.md) for the sizes,
+  dates, masks and names that every feature here prints or compares;
+  [chapter 6](06-the-system.md) for `Intr21`,
   the critical error, `Fantom`, the calls of DOS and the resident part
   that runs a command; [chapter 7](07-the-setup.md) for `VC.INI`, which
   keeps each panel's mode, sort order, filter and path.

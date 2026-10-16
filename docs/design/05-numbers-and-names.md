@@ -718,7 +718,7 @@ and divide by subtracting.
 The copy box fills a bar in proportion to what has been read and
 written against twice the size of the file. `PerCent` (125 bytes) is
 shown in [chapter
-2](03-the-features.md#the-bar-48-bit-arithmetic-without-mul): it adds
+3](03-the-features.md#the-bar-48-bit-arithmetic-without-mul): it adds
 the 33-bit sum of read and written into 48 bits as many times as the
 bar has cells, then subtracts twice the size until it borrows,
 counting the cells to fill.
@@ -1149,8 +1149,8 @@ places: the search of the viewer, the letters of the markup that
 `NgLine` and `LnStr` take in either case, the comparison of names, the
 command line's completion from the history, and each character of
 `Convert`. That is what makes the viewer's search find Russian text in
-either case on a Russian DOS ([the viewer and the
-editor](04-the-viewer-and-editor.md#comparing-v82_00)), with no Russian in
+either case on a Russian DOS ([chapter
+4](04-the-viewer-and-editor.md#comparing-v82_00)), with no Russian in
 the program.
 
 ### `LowCase` and `LowTab`: inverted once
@@ -1360,7 +1360,7 @@ that are left, takes the 0 along:
 
 These routines meet in `DiBx30`, which puts a variable into a box for
 `DialBox` ([chapter
-1](02-the-screen.md#a-box-is-a-table-dialbox-and-ngline)). The
+2](02-the-screen.md#a-box-is-a-table-dialbox-and-ngline)). The
 box's table has, for each of its two variables, a byte of mode and a
 byte of limit, `DB 7, 64` in the copy box, and the mode's bits choose
 the routines:
@@ -1571,9 +1571,11 @@ because in that form the hard part has already been done.
 - `src/asm/VCVIEW.INC`: `V25_00`, `V40_00`; `src/asm/VCMENU.INC`:
   `M49_00`; `src/asm/VCF1.INC`: `M30_50` and `M30_60`;
   `src/asm/VCCOPY.INC`: `C00_13` to `C00_19`, `C20_50` and `PerCent`.
-- [Chapter 1](01-the-program.md) for the main data, `ScrBuf` and
-  `DialBox`; [chapter 3](03-the-features.md) for the panels, the
-  filter, the copy and the viewer that use these routines;
+- [Chapter 1](01-the-program.md) for the main data;
+  [chapter 2](02-the-screen.md) for `ScrBuf` and `DialBox`;
+  [chapter 3](03-the-features.md) for the panels, the filter and the
+  copy, and [chapter 4](04-the-viewer-and-editor.md) for the viewer
+  and the editor, that use these routines;
   [chapter 6](06-the-system.md) for `Intr21` and the rest of what is
   asked of DOS; and [chapter 7](07-the-setup.md) for the setup
   program's copies of them.

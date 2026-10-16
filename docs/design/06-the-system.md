@@ -1667,10 +1667,9 @@ while the box is up.
 
 *The box as the shipped program draws it on DOS 7.10, after two tiny
 resident programs, `T.COM` and `U.COM`, were started from its command
-line; the recording leaves out the figures that follow the length of
-the program under test, shown here as dots. `DRIVER.COM` is the
-recording bench's own resident program, and the bench starts the
-commander under the name `VC.EXE`. The `•` marks the two programs that
+line. The figures that depend on the machine it was recorded on are
+shown as dots; `DRIVER.COM` is a resident program of that machine,
+which started the commander under the name `VC.EXE`. The `•` marks the two programs that
 the TSR manager noted and can release.*
 
 ### Walking the chain: `F65_00` to `F65_05`
