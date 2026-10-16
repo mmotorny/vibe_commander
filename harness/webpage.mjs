@@ -33,7 +33,7 @@ function load(base, indexedDB) {
   class Element {
     constructor(id) {
       this.id = id;
-      this.style = {};
+      this.style = { setProperty(name, value) { this[name] = value; } };
       this.dataset = {};
       // Hidden as the shell has them at the start.
       this.hidden = ["keys", "kept", "reset", "notice", "ended"].includes(id);

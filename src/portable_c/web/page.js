@@ -219,10 +219,15 @@ function fit() {
   if (scale >= 1)
     scale = Math.floor(scale);
   scale = Math.max(scale, 0.25);
-  const size = 16 * scale;
+  // A row of a whole number of the page's pixels: Chromium puts a line of
+  // text on a whole pixel of the page's, not of the device's, and rows
+  // whose edges fall between two left notches in every upright line of a
+  // frame on a phone, at every third row (a headless Chromium showed it).
+  const size = Math.max(Math.floor(16 * scale), 4);
   const screen = $("screen");
   screen.style.fontSize = `${size}px`;
   screen.style.lineHeight = `${size}px`;
+  screen.style.setProperty("--cell", `${size}px`);
   screen.style.width = `${COLUMNS * size / 2}px`;
   screen.style.height = `${ROWS * size}px`;
   page.cell = { width: size / 2, height: size };

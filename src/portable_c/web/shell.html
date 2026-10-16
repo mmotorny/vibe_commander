@@ -8,6 +8,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:,">
 <title>Vibe Commander</title>
 <style>
 @font-face {
@@ -40,6 +42,13 @@ body {
   touch-action: manipulation; font-kerning: none;
   font-variant-ligatures: none; -webkit-text-size-adjust: none;
   text-size-adjust: none;
+}
+/* Each run of one colour is a box as tall as the cell, so that its
+   background fills the row whatever the scale: an inline run fills only
+   the font's own height, which at a scale that is no whole multiple left
+   seams of black between the rows on a phone. */
+#screen > span > span {
+  display: inline-block; vertical-align: top; height: var(--cell, 16px);
 }
 #cursor {
   position: absolute; display: none; background: #aaa;
