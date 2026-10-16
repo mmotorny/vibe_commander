@@ -1462,7 +1462,20 @@ which is in its heading among the licences that the page shows, no work
 being credited apart (W5); that the page starts on C:, as it does (W3b,
 "A start on C:"); and that the static page does not ask the browser to
 keep its data, `navigator.storage.persist()` (W3c).
-- Whether the bar says the font's copyright line as well (W4).
+
+### Left open when the session on the workstation ended, 15 October 2026
+
+- **The page in a real browser: not seen yet.** The headless Chromium of CLAUDE.md ("The web page") has no test so far.
+  - The snapshot is chosen: revision 1720314, `https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/1720314/chrome-linux.zip`, 251,789,489 bytes, SHA-256 `abdf43304eb2ff97b78ad7b44acda0dc4bf3c5486f8f9f49c004692f08cbb381`.
+  - On the workstation it does not start: `chrome` wants `libnspr4.so`, `libnss3.so`, `libnssutil3.so` and `libsmime3.so` (Ubuntu's `libnss3` and `libnspr4`), which are not installed. The user is asked to install them.
+  - The piece still to do: pin it in CMake, write a Node driver over CDP with nothing from npm, and run both ways of serving on a desktop and as an iPhone held both ways. Look at the screenshots, and make it the test `portable_c-web-browser`.
+  - On a Mac, Claude in Chrome against the user's own Chrome is another way to look.
+- **The private artifact** of the static page (https://claude.ai/artifact/LGs8hcnLh9vm24bL3Hw3yY) has not been opened either. In the Claude app:
+  - `confirm()` answers no at once, so Reset drives and an upload over a file do nothing;
+  - Enter on a file may give only the fallback link;
+  - the bar's bottom may sit under the edge, because the host pads the safe-area insets and `shell.html`'s `body` adds them again with `height:100dvh`. If so, `height:100%` may be the mend; it touches the layout of Safari, so look at both.
+- **A small fault in `web/drives.js`:** `upload` refuses names that match `/[/\\\0]/`. The minifier writes the `\0` as a raw NUL, which a browser reads as U+FFFD, so the check refuses U+FFFD instead of NUL. It is harmless, since no name has a NUL, but it should say what it means, for example `\u0000` written so that it survives the minifier.
+- **`editor-big`** is run by no tree of the portable C. Running it on the web or iOS with a small `VC_MEMORY`, where the cap makes the original's refusal reachable, is a deviation to ask the user (I1).
 
 ## Step 8, the app for iOS
 
