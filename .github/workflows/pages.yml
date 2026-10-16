@@ -51,12 +51,25 @@ jobs:
             build/emscripten/cache
           key: emscripten-${{ steps.pin.outputs.emscripten }}
 
+      # The font fetched by curl, from the URL of CMakeLists.txt and held
+      # to its SHA-256 there: CMake's own download of it came back cut
+      # short on GitHub's runners, another file at each of its tries,
+      # where curl gets the pinned bytes.
+      - name: The font
+        run: |
+          url=$(grep -A2 'FetchContent_Declare(vga_font' CMakeLists.txt | sed -n 's/^ *URL \(.*\)$/\1/p')
+          sum=$(grep -A2 'FetchContent_Declare(vga_font' CMakeLists.txt | sed -n 's/^ *URL_HASH SHA256=\(.*\))$/\1/p')
+          curl -fsSL --retry 3 -o ~/vga_font.zip "$url"
+          echo "$sum  $HOME/vga_font.zip" | sha256sum -c
+          mkdir ~/vga_font-src && unzip -q ~/vga_font.zip -d ~/vga_font-src
+
       - name: Configure
         run: |
           if [ -d ~/emscripten-src/emscripten ]; then
             from="-DFETCHCONTENT_SOURCE_DIR_EMSCRIPTEN=$HOME/emscripten-src"
           fi
-          cmake -S . -B build -DVC_DOS=OFF -DVC_WEB=ON $from
+          cmake -S . -B build -DVC_DOS=OFF -DVC_WEB=ON $from \
+            -DFETCHCONTENT_SOURCE_DIR_VGA_FONT=$HOME/vga_font-src
       - name: Keep Emscripten for the next run
         if: steps.cache.outputs.cache-hit != 'true'
         run: cp -a build/_deps/emscripten-src ~/emscripten-src
