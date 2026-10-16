@@ -29,9 +29,15 @@ body {
            env(safe-area-inset-bottom) env(safe-area-inset-left);
   box-sizing: border-box;
 }
+/* The browser's own pointer is hidden over the stage, the grid and the
+   black around it alike, where the program draws its own: the grid is
+   fitted at a whole scale where it can be, and in full screen above all
+   the black around it is a wide band that looks like the screen, where
+   a rule on the grid alone left the browser's arrow. The bar, the
+   dialogs and the notices are outside the stage and keep theirs. */
 #stage {
   flex: 1; display: flex; align-items: center; justify-content: center;
-  min-height: 0; overflow: hidden;
+  min-height: 0; overflow: hidden; cursor: none;
 }
 #screen {
   position: relative; margin: 0; padding: 0; overflow: hidden;

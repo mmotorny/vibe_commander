@@ -115,8 +115,14 @@ let the keyboard have these keys (their keyboard lock).
 ### The mouse pointer
 
 The browser's own pointer is hidden over the 80 by 25 grid, where the
-program draws its own as a cell, as on DOS; over the bar, the strip of
-keys and the dialogs it is the browser's as ever.
+program draws its own as a cell, as on DOS, and over the black around
+the grid, `#stage`; over the bar, the strip of keys and the dialogs it
+is the browser's as ever. The rule was on the grid alone at first, and
+the black around it, which the grid's whole scale leaves wide in full
+screen and which looks like the screen, showed the browser's arrow.
+`portable_c-web-browser` asks the element at cells of the grid, at its
+corners and in the black around it what pointer it has, in a window and
+in full screen.
 
 ### Licences
 

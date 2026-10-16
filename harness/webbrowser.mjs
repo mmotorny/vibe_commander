@@ -186,11 +186,48 @@ async function desktop(browser, served) {
     const r = await tab.rect("#kept-keys");
     must(r.height <= 40, `the strip is ${r.height} high`);
   });
+  // The browser's pointer, as the element that a place of the page hits
+  // has it: none at cells of the grid, its corners among them, and in the
+  // black around it, which in full screen is a wide band; its own over
+  // the bar's buttons and the link to the licences.
+  const pointers = `(() => {
+    const at = (x, y) => { const e = document.elementFromPoint(x, y);
+      return e ? \`\${e.id || e.tagName}:\${getComputedStyle(e).cursor}\` : "nothing"; };
+    const s = document.getElementById("screen").getBoundingClientRect();
+    const t = document.getElementById("stage").getBoundingClientRect();
+    const hidden = [];
+    for (const [fx, fy] of [[0.001, 0.001], [0.5, 0.5], [0.999, 0.999],
+                            [0.05, 0.95], [0.95, 0.05], [0.5, 0.01]])
+      hidden.push(at(s.left + fx * s.width, s.top + fy * s.height));
+    hidden.push(at(t.left + 2, t.top + 2), at(t.right - 2, t.bottom - 2),
+                at((t.left + s.left) / 2, (s.top + s.bottom) / 2));
+    const shown = ["#full", "#upload", "#kept-keys button", "#licences-open"]
+      .map((selector) => { const r = document.querySelector(selector)
+        .getBoundingClientRect(); return at(r.left + r.width / 2, r.top + r.height / 2); });
+    return JSON.stringify({ hidden, shown, full: !!document.fullscreenElement });
+  })()`;
+  const noPointer = async (full) => {
+    const said = JSON.parse(await tab.eval(pointers));
+    must(said.full === full, `the full screen is ${said.full}`);
+    must(said.hidden.every((one) => one.endsWith(":none")),
+         `over the grid and the black around it: ${said.hidden.join(", ")}`);
+    must(said.shown.every((one) => !one.endsWith(":none")),
+         `over the bar: ${said.shown.join(", ")}`);
+  };
   await step("no pointer of the browser's over the grid, one over the bar",
-             async () => {
-    const grid = await tab.eval("getComputedStyle(document.getElementById('screen')).cursor");
-    const bar = await tab.eval("getComputedStyle(document.querySelector('#kept-keys button')).cursor");
-    must(grid === "none" && bar !== "none", `the grid's is ${grid}, the strip's ${bar}`);
+             () => noPointer(false));
+  await step("none over the grid in full screen either", async () => {
+    const full = async (wanted) => {
+      await tab.hit("#full");
+      for (let tries = 0; tries < 50; tries++) {
+        if (await tab.eval("!!document.fullscreenElement") === wanted)
+          return;
+        await sleep(100);
+      }
+    };
+    await full(true);
+    await noPointer(true);
+    await full(false);
   });
   await shot(tab, `desktop-start`);
   await step("Ctrl-F1: the left panel too", async () => {

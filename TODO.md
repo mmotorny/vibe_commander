@@ -1893,7 +1893,9 @@ Item 2 of the queue above, on the user's word of 16 October 2026
   Ctrl-T, Ctrl-W, Ctrl-F4 and Alt-F4 (`KEPT` of `page.js`), small in the
   bar on a desktop and in the phone's row of keys in front of Enter, with
   its hint on the full screen. And the browser's pointer is hidden over
-  the grid, `cursor: none`.
+  the grid and the black around it, `cursor: none` on `#stage`: on the
+  grid alone it left the browser's arrow in that black, a wide band in
+  full screen, where the user saw it.
 - **The tests:** `portable_c-web-site` holds the site that the build
   made (`--site`, `--program`), `portable_c-web-page` the shipped site in
   the page, and `portable_c-web-browser` the strip, its hint and the
