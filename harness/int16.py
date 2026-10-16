@@ -177,12 +177,11 @@ SKIPPED = 77
 # by the ending of their names, as add_portable_c of CMakeLists.txt
 # knows them: the *_posix.c of the program for Linux (sys_stub.c was one
 # until it went, DIARY.md, "Take the stub out, and hold the program for
-# Linux to clang-tidy in its place (L7)"), the *_web.c of the web
-# page's, and the *_ios.c of the app for iOS's. They were never compiled
-# by Open Watcom nor for an int of 16 bits, and include the C library of
-# this computer, or Emscripten's, which clang for the 386 has no headers
-# of.
-OTHER_SYSTEMS = ("_posix.c", "_web.c", "_ios.c")
+# Linux to clang-tidy in its place (L7)"), and the *_web.c of the web
+# page's. They were never compiled by Open Watcom nor for an int of 16
+# bits, and include the C library of this computer, or Emscripten's,
+# which clang for the 386 has no headers of.
+OTHER_SYSTEMS = ("_posix.c", "_web.c")
 
 
 def dos_files(source):

@@ -25,9 +25,7 @@ differ in what they make and not in what clang is to say. The files of
 the emulation, the other `*_posix.c`, are read with their test,
 `harness/posixcheck.c`, by the command of the build of that test,
 `compiled.txt` of `build/portable_c/posix-unit` (CMakeLists.txt, the
-piece L1 of step 6), which `--posix-compiled` names; and with them the
-table of the keys of iOS, `keys_ios.c`, which is built with that command
-(the piece I3 of step 8).
+piece L1 of step 6), which `--posix-compiled` names.
 
 The test was `portable_c-stub`, `harness/stubcheck.py`, which read the
 common code with the stub of step 5, `sys_stub.c`, until the stub went
@@ -99,10 +97,6 @@ PLACE = re.compile(r"^(?P<path>[^:\n]+):(?P<line>\d+):(?P<column>\d+): "
 # The files of Linux that are the program's and not the emulation's: they
 # read what the common code has, and are read with it.
 PROGRAM_POSIX = ("sys_posix.c", "machine_posix.c")
-# And the app for iOS's binding of sys.h, sys_ios.c (the piece I2 of
-# step 8), which reads what the common code has as sys_posix.c does and
-# asks nothing of the host that Linux has not: read with them.
-PROGRAM_IOS = ("sys_ios.c",)
 
 
 def files():
@@ -111,20 +105,17 @@ def files():
     sys_posix.c and machine_posix.c, as add_portable_c_host of
     CMakeLists.txt takes them for posix/vc."""
     return sorted(path for path in SOURCE.glob("*.c")
-                  if not re.search(r"_(dos|posix|web|ios)\.c$", path.name)
-                  or path.name in PROGRAM_POSIX + PROGRAM_IOS)
+                  if not re.search(r"_(dos|posix|web)\.c$", path.name)
+                  or path.name in PROGRAM_POSIX)
 
 
 def posix_files():
     """The files of the emulation and their test: those that the build of
     portable_c-posix-unit in CMakeLists.txt takes, which leaves out
-    sys_posix.c for its main and machine_posix.c for the main data; and
-    keys_ios.c, which the build of portable_c-ios-keys compiles with the
-    same command."""
+    sys_posix.c for its main and machine_posix.c for the main data."""
     return sorted(path for path in SOURCE.glob("*_posix.c")
-                  if path.name not in PROGRAM_POSIX) + [
-                      SOURCE / "keys_ios.c",
-                      ROOT / "harness" / "posixcheck.c"]
+                  if path.name not in PROGRAM_POSIX) + [ROOT / "harness" /
+                                                    "posixcheck.c"]
 
 
 def compiled(path):

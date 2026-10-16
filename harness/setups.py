@@ -206,13 +206,8 @@ class Program:
             # The program for Linux, which runs on the host and not in a
             # machine (see posixrun.py): the tree "posix", of the source of
             # the portable C. What the goldens call the program under
-            # test is VC.EXE, which its bench has not. Or the program of
-            # the app for iOS on this computer, the piece I2 of step 8,
-            # with a stand-in for its shell, in a directory of that name:
-            # the tree "ios-host".
-            tree = "ios-host" if path.resolve().parent.name == "ios-host" \
-                else "posix"
-            return cls("VC.EXE", contents, None, None, tree, path)
+            # test is VC.EXE, which its bench has not.
+            return cls("VC.EXE", contents, None, None, "posix", path)
         if path.suffix == ".js":
             # The program for the web under Node, the link web-node of
             # the piece W2 of step 7, which runs on the host as the

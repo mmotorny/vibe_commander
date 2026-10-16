@@ -37,11 +37,8 @@ help.c            clean
 help_t.c          clean
 info.c            clean
 input.c           clean
-ios_shell.h       clean
 keyboard_posix.c  clean
 keys.c            clean
-keys_ios.c        clean
-keys_ios.h        clean
 keys_t.c          clean
 line.c            clean
 machine_posix.c   clean
@@ -71,7 +68,6 @@ stopts_t.c        clean
 string.c          clean
 sys.h             clean
 sys_dos.c         to-number 13, to-pointer 25, naked 2, asm 2, asm-pragma 11, registers 1, intrinsic 1
-sys_ios.c         clean
 sys_posix.c       clean
 system.c          clean
 system_t.c        clean

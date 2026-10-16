@@ -16,7 +16,7 @@ Vibe Commander is a faithful recreation of
 the DOS file manager written by Vsevolod V. Volkov. It starts from the
 author's published assembly source, carries it to C, and from DOS to
 modern systems. It runs on DOS, on Linux in a terminal, and as a web
-page. An app for iOS is under way.
+page.
 
 The project is also an experiment in how far an AI coding agent can take
 such a recreation on its own. The engineering work is done by Claude. A
@@ -54,7 +54,6 @@ otherwise, the difference is declared in
 | DOS | `VC.EXE`, a 32-bit program started by the DOS/32A extender, with all of the machine's memory for its panels and editor |
 | Linux | `vc`, a 64-bit program built with clang that runs in any terminal, with no library. Drives R: (the root) and H: (the home directory); long names get DOS aliases such as `LONGNA~1`; commands run through `$SHELL` |
 | Web | One HTML page, built to WebAssembly by Emscripten. The screen is text in a `<pre>`. It is served by its own small Node server, or by any static host, and works on a phone |
-| iOS | Under way: the same code behind a native shell |
 
 ## Repository layout
 
@@ -62,7 +61,7 @@ otherwise, the difference is declared in
 |---|---|
 | `src/asm/` | The original assembly source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: one C file per part of the program, with its tables in the matching `_t.c` file |
-| `src/portable_c/` | The portable C. `sys.h` is what it asks of the system. Files ending in `_dos.c` answer it for DOS, `_posix.c` for Linux, `sys_web.c` and `web/` for the web page, `_ios.c` for iOS. Every other file is common. Files starting with `st` are the original's setup program |
+| `src/portable_c/` | The portable C. `sys.h` is what it asks of the system. Files ending in `_dos.c` answer it for DOS, `_posix.c` for Linux, `sys_web.c` and `web/` for the web page. Every other file is common. Files starting with `st` are the original's setup program |
 | `harness/` | The test harness: scenarios, recorded goldens, the test bench in QEMU, and the checks |
 | `tools/` | Build helpers: `mkexe.c` lays out the C translation's `VC.EXE`, `stub.c` silences the extender's banner, `figures.py` and `calls.py` measure the portable C |
 | `docs/` | Reference documentation and the pictures |
@@ -240,8 +239,6 @@ in the machine, and how coverage is measured.
 | `portable_c-terminal` | What the Linux program draws in a pseudo-terminal, replayed through pyte |
 | `portable_c-posix-scenarios` | The Linux program through the scenarios, with masks for what is the host's |
 | `portable_c-cap` | The cap on the memory of the program's blocks on each platform |
-| `portable_c-ios-keys` | The table of iOS hardware-keyboard keys, held to the BIOS's key words |
-| `portable_c-ios-host-scenarios` | The iOS program, built on Linux against a stand-in shell, through the scenarios |
 | `portable_c-web-probe` | Every file of the web build compiles for WebAssembly |
 | `portable_c-web-scenarios` | The web program under Node through the scenarios |
 | `portable_c-web-page` | The page's scripts in Node, against its server and as a static site |

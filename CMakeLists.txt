@@ -341,17 +341,14 @@ endfunction()
 # but those that portable_c_leaves_<it> names: the web page's (step 7,
 # TODO.md, "Step 7, the web page") takes the emulation of DOS of the
 # program for Linux, *_posix.c, but the two files that have a terminal
-# and a shell, sys_posix.c and term_posix.c, and has its own, *_web.c;
-# the app for iOS's (step 8, TODO.md, "Step 8, the app for iOS") the same
-# of Linux's, with its own, *_ios.c. A file of a new implementation is
-# named here when it is added, or it is taken for common code.
-set(portable_c_implementations dos posix web ios)
+# and a shell, sys_posix.c and term_posix.c, and has its own, *_web.c. A
+# file of a new implementation is named here when it is added, or it is
+# taken for common code.
+set(portable_c_implementations dos posix web)
 set(portable_c_takes_dos dos)
 set(portable_c_takes_posix posix)
 set(portable_c_takes_web posix web)
 set(portable_c_leaves_web sys_posix.c term_posix.c)
-set(portable_c_takes_ios posix ios)
-set(portable_c_leaves_ios sys_posix.c term_posix.c)
 
 # portable_c_sources(<variable> <implementation>) sets <variable> to the
 # files that a build of <implementation> takes, by the lists above, by
@@ -608,7 +605,6 @@ function(add_portable_c_host target directory implementation)
             DEPENDS ${source_dir}/${source} ${source_dir}/vc.h
                     ${source_dir}/tables.h ${source_dir}/sys.h
                     ${source_dir}/compiler.h ${source_dir}/emulate_posix.h
-                    ${source_dir}/ios_shell.h
                     ${directory}/compiled.txt
             COMMENT "Compiling portable_c/${source} (${target})"
             VERBATIM)
@@ -696,21 +692,6 @@ if(clang)
         COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer
                 -fsanitize=memory -fsanitize-memory-track-origins
                 -fno-sanitize-recover=all)
-    # The program of the app for iOS on this computer, the piece I2 of
-    # step 8 (TODO.md, "Step 8, the app for iOS"): sys_ios.c with the
-    # emulation of Linux's, as the app has it, and in place of the app's
-    # shell in SwiftUI a stand-in in C, harness/ios_stand_in.c, as the
-    # rule on test builds allows; with the sanitizers of posix-asan.
-    # build/portable_c/ios-host/vc, which the test
-    # portable_c-ios-host-scenarios takes through the scenarios.
-    set(ios_stand_in ${CMAKE_SOURCE_DIR}/harness/ios_stand_in.c)
-    add_portable_c_host(portable_c-ios-host
-        ${CMAKE_BINARY_DIR}/portable_c/ios-host ios
-        COMPILE -D_XOPEN_SOURCE=700 -O1 -g -fno-omit-frame-pointer -pthread
-                -fsanitize=address,undefined,integer,implicit-conversion,float-divide-by-zero
-                -fno-sanitize-recover=all
-        LINK ${ios_stand_in}
-        LINK_DEPENDS ${ios_stand_in} ${CMAKE_SOURCE_DIR}/src/portable_c/ios_shell.h)
 endif()
 
 # What the program for Linux emulates of DOS without input or output of
@@ -763,32 +744,6 @@ if(clang)
         VERBATIM)
     add_custom_target(portable_c-posix-unit-check ALL
         DEPENDS ${unit_dir}/check)
-endif()
-
-# The table of the keys of iOS, src/portable_c/keys_ios.c, the piece I3
-# of step 8 (TODO.md, "Step 8, the app for iOS"), built on Linux with the
-# command of the test of the emulation above, warnings and sanitizers,
-# beside codepage_posix.c, whose UTF-8 it reads, and harness/ioskeys.c,
-# which runs it: build/portable_c/ios-keys/ioskeys, for the test
-# portable_c-ios-keys.
-if(clang)
-    set(ios_keys_dir ${CMAKE_BINARY_DIR}/portable_c/ios-keys)
-    file(MAKE_DIRECTORY ${ios_keys_dir})
-    add_custom_command(
-        OUTPUT ${ios_keys_dir}/ioskeys
-        COMMAND ${unit_compile} -o ${ios_keys_dir}/ioskeys
-                ${unit_source}/keys_ios.c ${unit_source}/codepage_posix.c
-                ${CMAKE_SOURCE_DIR}/harness/ioskeys.c
-        DEPENDS ${unit_source}/keys_ios.c ${unit_source}/keys_ios.h
-                ${unit_source}/codepage_posix.c
-                ${CMAKE_SOURCE_DIR}/harness/ioskeys.c
-                ${unit_source}/emulate_posix.h ${unit_source}/vc.h
-                ${unit_source}/sys.h ${unit_source}/compiler.h
-                ${unit_dir}/compiled.txt
-        COMMENT "Building the table of the keys of iOS for Linux"
-        VERBATIM)
-    add_custom_target(portable_c-ios-keys-table ALL
-        DEPENDS ${ios_keys_dir}/ioskeys)
 endif()
 
 # --- Emscripten ---------------------------------------------------------------
@@ -888,7 +843,7 @@ endif()
 # portable_c-web-serve runs it on 127.0.0.1:8437 (TODO.md, "W3b"). Its
 # memory grows to the cap of sys_web.c, 256 MB, and 64 MB besides for the
 # runtime, and no further, since wasm never gives back what it has grown
-# by (I1 of step 8, TODO.md, "Step 8, the app for iOS").
+# by (TODO.md, "The cap of the memory: done").
 if(VC_WEB)
     FetchContent_Declare(vga_font
         URL https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip
@@ -1129,17 +1084,6 @@ add_test(NAME portable_c-web-render
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webrender.py
             ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
 set_tests_properties(portable_c-web-render PROPERTIES SKIP_RETURN_CODE 77)
-# The table of the keys of a hardware keyboard on iOS, the piece I3 of
-# step 8: keys_ios.c, run on Linux with UIKit's key events of US, German
-# and Russian layouts and of the keypad, its bytes typed into the program
-# for Linux in a pseudo-terminal and held to the BIOS's words that it
-# reads. See harness/ioskeys.py. It runs no machine, and is skipped where
-# there is no clang.
-add_test(NAME portable_c-ios-keys
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ioskeys.py
-            ${CMAKE_BINARY_DIR}/portable_c/ios-keys/ioskeys
-            ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
-set_tests_properties(portable_c-ios-keys PROPERTIES SKIP_RETURN_CODE 77)
 # The web page's server and its file system, the piece W3b of step 7:
 # src/portable_c/web/server.mjs and drives.js run in Node, the server's
 # API held, its refusals of every path outside the two drives, and the
@@ -1169,20 +1113,6 @@ else()
 endif()
 set_tests_properties(portable_c-posix-scenarios PROPERTIES
     SKIP_RETURN_CODE 77 LABELS "portable_c;machine")
-# The program of the app for iOS on this computer through the scenarios,
-# the piece I2 of step 8: build/portable_c/ios-host/vc, sys_ios.c with a
-# stand-in for the app's shell, sanitized, on the bench of the program
-# for Linux with its drives as the web's tests have them, held to the
-# goldens of the original with what is declared for the web (the tree
-# "ios-host" of harness/deviations.py). Where there is no clang there is
-# no such program, and the scenarios of the program for Linux say so.
-if(clang)
-    add_test(NAME portable_c-ios-host-scenarios
-        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
-                ${CMAKE_BINARY_DIR}/portable_c/ios-host/vc)
-    set_tests_properties(portable_c-ios-host-scenarios PROPERTIES
-        LABELS "portable_c;machine")
-endif()
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see
@@ -1254,16 +1184,14 @@ if(VC_WEB)
     set_tests_properties(portable_c-web-browser PROPERTIES
         LABELS portable_c SKIP_RETURN_CODE 77)
 endif()
-# The cap of the memory, the piece I1 of step 8 (TODO.md, "Step 8, the
-# app for iOS"): the program for Linux, the app's on a host (ios-host)
-# and, with VC_WEB, the program for the web under Node, each with
-# VC_MEMORY at 512K, where the editor has to
+# The cap of the memory (TODO.md, "The cap of the memory: done"): the
+# program for Linux and, with VC_WEB, the program for the web under
+# Node, each with VC_MEMORY at 512K, where the editor has to
 # refuse a file of 1 MB in the original's box, and without it, where it
 # opens the file. See harness/capcheck.py. It starts a machine of DOS only
 # for the bench's setup file, the first time, as the scenarios of Linux.
 if(clang)
-    set(cap_programs ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc
-        ${CMAKE_BINARY_DIR}/portable_c/ios-host/vc)
+    set(cap_programs ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
     if(VC_WEB)
         list(APPEND cap_programs ${CMAKE_BINARY_DIR}/portable_c/web-node/vc.js)
     endif()
@@ -1281,7 +1209,7 @@ set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-tidy
     portable_c-posix-unit portable_c-terminal portable_c-web-render
-    portable_c-web-server portable_c-ios-keys
+    portable_c-web-server
     PROPERTIES LABELS portable_c)
 if(VC_DOS)
     set_tests_properties(c-data c-arith PROPERTIES LABELS frozen)

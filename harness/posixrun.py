@@ -81,13 +81,8 @@ PROGRAM = ROOT / "build" / "portable_c" / "posix-asan" / "vc"
 # which has the same machine and test channel behind sys.h, its drives
 # C: the bench's home directory (VC_DRIVE_C) and D: the run's `d`
 # (VC_DRIVE_D), with its own files on D:\VC, `d/vc`, as on the bench
-# (sys_web.c). And the program of the app for iOS on this computer,
-# build/portable_c/ios-host/vc (the piece I2 of step 8), sys_ios.c with
-# a stand-in for the app's shell, whose drives the stand-in has as the
-# web's tests have them (harness/ios_stand_in.c): the tree "ios-host".
-HOSTED = ("posix", "web", "ios-host")
-# The trees whose drives are the web page's in a test, C: and D:.
-AS_THE_WEB = ("web", "ios-host")
+# (sys_web.c).
+HOSTED = ("posix", "web")
 # Node, which runs the program for the web.
 NODE = shutil.which("node") or "node"
 
@@ -442,7 +437,7 @@ def run(scenario, program, setup=..., limit=60, environment=None):
     variables for the program besides the run's own, VC_MEMORY of a
     test of the cap (capcheck.py)."""
     import scenarios
-    web = program.tree in AS_THE_WEB
+    web = program.tree == "web"
     if setup is ...:
         # The program for the web has its drive C: as the bench has it,
         # and starts from the bench's setup file as it is.
@@ -477,8 +472,7 @@ def run(scenario, program, setup=..., limit=60, environment=None):
             environment.update(VC_DRIVE_C=str(bench / "home"),
                                VC_DRIVE_D=str(bench / "d"),
                                VC_PROGRAM_DRIVE="D")
-            if program.tree == "web":
-                command = [NODE, *command]
+            command = [NODE, *command]
         environment.update(given)
         try:
             done = subprocess.run(

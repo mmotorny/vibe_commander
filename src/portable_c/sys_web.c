@@ -78,7 +78,7 @@ extern void web_where(const char *host);
    memory of wasm, once grown, is never given back while the page is
    open, and the program asks for all that there is (machine_posix.c).
    The page's ceiling, MAXIMUM_MEMORY of CMakeLists.txt, is this and what
-   the runtime needs besides (I1 of step 8, TODO.md). */
+   the runtime needs besides (TODO.md, "The cap of the memory: done"). */
 #define MEMORY_CAP ((int64_t)256 << 20)
 static const struct {
     u8 letter;

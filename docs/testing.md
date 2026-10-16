@@ -83,13 +83,6 @@ load time, including those that cross a page boundary and those that
 point outside their object. The toy is not run; the top of
 `harness/lecheck.py` says how it was checked on the bench by hand.
 
-Two more tests are of the app for iOS, which is under way:
-`portable_c-ios-keys` holds the table of a hardware keyboard's keys on
-iOS, run on Linux, to the BIOS key words that the program reads
-(`harness/ioskeys.py`), and `portable_c-ios-host-scenarios` takes the
-app's program, built on Linux against a stand-in for its shell,
-`ios-host/vc`, through the scenarios.
-
 ### How portable_c-data reads the tables
 
 A text or a table of bytes is held to the original's bytes. A table that

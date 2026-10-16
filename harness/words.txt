@@ -37,11 +37,8 @@ help.c            none
 help_t.c          MD_AT 2
 info.c            ENTRY 1, DSKBUF 1
 input.c           none
-ios_shell.h       none
 keyboard_posix.c  none
 keys.c            MD_PLACE 2, TREE_OFFSET 2, ENTRY 6, DSKBUF 3, MAIN_AS_PANEL 1
-keys_ios.c        none
-keys_ios.h        none
 keys_t.c          MD_AT 10, NUMBER 1
 line.c            none
 machine_posix.c   none
@@ -71,7 +68,6 @@ stopts_t.c        MD_AT 62, NUMBER 28
 string.c          none
 sys.h             none
 sys_dos.c         none
-sys_ios.c         none
 sys_posix.c       none
 sys_web.c         none
 system.c          none

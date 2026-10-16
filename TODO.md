@@ -173,8 +173,8 @@ of `docs/portable-c.md` have how much, many times the original's room there (345
 bytes) and more than any file of a scenario. On a machine of 2 MB, which
 a scenario may ask for (`memory` of `harness/scenarios.py`; `view-window`
 does), it is some 550 KB. The program for Linux and the web page have
-what the host gives them, at most 256 MB on the page since I1 of step
-8 (W10 of `DEVIATIONS.md`). Until F9 the program
+what the host gives them, at most 256 MB on the page since the cap
+("The cap of the memory: done"; W10 of `DEVIATIONS.md`). Until F9 the program
 of 32 bits handed out 640 KB of its own, and what was written here was
 reckoned from that; `DIARY.md` has the figures as they were measured
 then.
@@ -786,7 +786,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **Enter on a file.** It opens a new tab.
 - **The keys.** The browser's reserved keys, as above.
 - **F10, leaving.** It shows the last screen and "Reload to start again", after the sync.
-- **Memory.** Capped at 2 GB (`MAXIMUM_MEMORY`); since I1 of step 8, at 256 MB for the program's blocks and 320 MB for the page (W10).
+- **Memory.** Capped at 2 GB (`MAXIMUM_MEMORY`); since the cap ("The cap of the memory: done"), at 256 MB for the program's blocks and 320 MB for the page (W10).
 - **The screen.** It is scaled by whole multiples of the font.
 - **Help and menus.** The shareware's files are not shipped: F1 shows the original's message for help that is missing. A user may upload their own.
 
@@ -1556,61 +1556,23 @@ keep its data, `navigator.storage.persist()` (W3c).
   - Enter on a file may give only the fallback link;
   - the bar's bottom may sit under the edge, because the host pads the safe-area insets and `shell.html`'s `body` adds them again with `height:100dvh`. If so, `height:100%` may be the mend; it touches the layout of Safari, so look at both.
 - **A small fault in `web/drives.js`:** `upload` refuses names that match `/[/\\\0]/`. The minifier writes the `\0` as a raw NUL, which a browser reads as U+FFFD, so the check refuses U+FFFD instead of NUL. It is harmless, since no name has a NUL, but it should say what it means, for example `\u0000` written so that it survives the minifier.
-- **`editor-big`** is run by no tree of the portable C. Running it on the web or iOS with a small `VC_MEMORY`, where the cap makes the original's refusal reachable, is a deviation to ask the user (I1).
+- **`editor-big`** is run by no tree of the portable C. Running it on the web with a small `VC_MEMORY`, where the cap makes the original's refusal reachable, is a deviation to ask the user ("The cap of the memory: done").
 
-## Step 8, the app for iOS
+## The cap of the memory: done
 
-The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
-"The app for iOS").
+The web page's memory has a cap, as the user decided on 15 October 2026
+(`CLAUDE.md`, "The web page"): the memory of WebAssembly, once grown, is
+never given back while the page is open. The piece was called I1.
 
-### Decided
-- A native app (option A).
-  - The C is the common code plus `machine_posix.c`, `files_/paths_/names_/codepage_/time_posix.c` and `keyboard_posix.c`, built by clang for arm64 iOS.
-  - `sys_ios.c` is plain C with pthreads. The program runs on a thread of its own: KeyRead blocks on a condition variable, so no Asyncify is needed, and Draw copies the 2,000 cells for the main thread.
-- The shell is in SwiftUI.
-  - It draws the grid as text (CoreText or SwiftUI Text, with the same Web437 font as a TTF made from the pinned WOFF by a small script, nothing new downloaded).
-  - It takes keys from a hardware keyboard (`pressesBegan`/`pressesEnded`, `UIKey` HID codes and modifiers made into kitty bytes as `keys.js` does) and from the phone's keyboard, with the same row of keys as the web page. A tap is a click.
-  - The Swift toolchain of Xcode is taken on for this app alone.
-- Building, and the Simulator's scenarios, are on the USER'S MAC, which agents reach by ssh over the tailnet. Installation is from Xcode on the Mac with the user's paid team (no TestFlight). Apple's SDK is used on the Mac only; nothing of it is fetched on Linux.
-- Drives:
-  - C: VIBE is the app's Documents, visible in the Files app (`UIFileSharingEnabled`, `LSSupportsOpeningDocumentsInPlace`), with C:\VC.
-  - D: DEMO is the demo, copied into Documents on the first start. The demo may live beside C: as a second folder.
-- Enter on a file that is no program shows a QuickLook preview. A command says "Commands cannot be run on iOS." F10 shows the last screen, and a tap starts the program again. Files come in through the document picker and the Files app.
-- The memory cap.
-  - `MemoryAll = min(physical, cap)`, the cap set by each implementation, and the variable `VC_MEMORY` for tests.
-  - The web page: 256 MB (wasm memory once grown is never given back).
-  - Native iOS: min(256 MB, half of `os_proc_available_memory()` at start).
-  - Linux: none.
-  - A file larger than the room gets the original's refusal. `editor-big` may come back as a scenario on iOS or the web with a small `VC_MEMORY`; asked as a deviation.
-
-### Pieces
-- **I1, the cap**, in `machine_posix.c`, plus `VC_MEMORY` and the web page's 256 MB. Done here, on Linux. The plan is copied into TODO.md. Start now.
-- **I2, `sys_ios.c`** and a tree "ios-host": `sys_ios.c` built on Linux against a stand-in for the shell, as the rule on test builds allows, and run through every scenario by VC_TEST, sanitized, as the web's Node build is: **done**, below, but for the cap, which waits for I1's `MachineBegin` (see there).
-- **I3, the table from HID codes and modifiers to kitty bytes**, in C, held to `keyboard_posix.c`'s decoder as `portable_c-web-render` holds keys.js. Here. Done: see "I3, the keys of a hardware keyboard" below.
-- **I4, the build on the Mac.**
-  - `VC_IOS` in CMake (`-G Xcode -DCMAKE_SYSTEM_NAME=iOS`), and the SwiftUI app with its grid view and font.
-  - It needs the Mac on the tailnet with SSH (Remote Login) on, its hostname, and Xcode installed. The user gives these.
-  - Also a Darwin build of the program for Linux through posixrun on the Mac, to catch Darwin's C library.
-- **I5, the shell's input:** keys, the key row and touch. On the Mac and the phone.
-- **I6, the files and the life of the app:** the drives, the Files app, the picker, QuickLook and the lifecycle. On the Mac.
-- **I7, the Simulator's scenarios.**
-  - `xcrun simctl launch` with `SIMCTL_CHILD_VC_TEST` naming a host directory, as a harness tree "ios".
-  - The bench's setup file is made on the workstation by QEMU and copied to the Mac over the tailnet.
-  - Note: the Mac's APFS is usually case-insensitive and the iPhone's is case-sensitive.
-- **I8, installing** on the iPhone from Xcode with the paid team. The user does it by hand, with instructions.
-- **I9, the documents:** DEVIATIONS "iOS" (I entries), the README, and CLAUDE.md's notes.
-- **Order:** I1, I2 and I3 now. Then I4 once the Mac is reachable, I5 and I6 after I4, I7 after I2 and I4, I8 after I7, and I9 last.
-
-### I1, the cap: done, and what I2 should know
-
+- `MemoryAll = min(physical, cap)`, the cap set by each implementation,
+  and the variable `VC_MEMORY` for tests. The web page: 256 MB. Linux:
+  none.
 - `MachineBegin` of `machine_posix.c` takes the cap as its last
-  argument, `int64_t cap`, 0 for none: `sys_posix.c` passes 0,
-  `sys_web.c` its `MEMORY_CAP`, 256 MB, and `sys_ios.c`, which I2
-  landed first, its `Cap`, min(256 MB, half of what the shell says is
-  available at the start, `os_proc_available_memory()` on iOS). The
-  memory is then the machine's (`_SC_PHYS_PAGES`) or the cap, whichever
-  is less, and the blocks that the program holds, the panels and the
-  room, hold that much at most together (`Largest`).
+  argument, `int64_t cap`, 0 for none: `sys_posix.c` passes 0 and
+  `sys_web.c` its `MEMORY_CAP`, 256 MB. The memory is then the
+  machine's (`_SC_PHYS_PAGES`) or the cap, whichever is less, and the
+  blocks that the program holds, the panels and the room, hold that
+  much at most together (`Largest`).
 - `VC_MEMORY` takes the place of the cap on every implementation that
   has the machine: a number of bytes, with K, M or G behind it for
   1,024, 1,024 squared or cubed, from 1 to 7FFFFFF0h; anything else ends
@@ -1631,145 +1593,11 @@ The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
   `H:\STAMPS\noon.dat`, 1 MB, cell for cell against the original's in
   the golden of `editor-big`, step 39; without it, that the editor opens
   the file; and that a `VC_MEMORY` of `512Q` does not start. It runs in
-  a second or two, and for the app's program on a host, `ios-host/vc`,
-  as well. `posixrun.run` takes `environment` for it. The Simulator's
-  tree of I7 can be given to it in the same way.
+  a second or two. `posixrun.run` takes `environment` for it.
 - Declared as W10 of `DEVIATIONS.md`, with L7 saying that Linux has no
   cap. `editor-big` stays not run in every tree of the portable C;
-  bringing it back on the web or iOS with a small `VC_MEMORY` is a
-  deviation to ask, as the plan says.
-
-### I3, the keys of a hardware keyboard: done, and what I5 should know
-
-- `src/portable_c/keys_ios.c` and `keys_ios.h`: the shell fills a
-  `struct IosKey` of a `UIKey` (`keyCode`, `modifierFlags.rawValue`,
-  `characters` and `charactersIgnoringModifiers` in UTF-8, and
-  `IOS_PRESS`, `IOS_REPEAT` or `IOS_RELEASE`), keeps one `struct
-  IosKeys` (zeros at the start), and hands both to `IosKeyBytes`, which
-  writes the bytes of kitty's that `keyboard_posix.c` decodes, at most
-  `IOS_KEY_ROOM`, or answers 0: then the press is not the program's and
-  the shell calls `super`. `IosKeysLost` is the terminal's focus lost,
-  `CSI O`, for when the view stops being the first responder or the app
-  leaves the foreground: what the program takes to be held is let go.
-  The file is the table and nothing else; it needs `codepage_posix.c`
-  (`Utf8Decode`, `UnicodeSmall`) and includes `emulate_posix.h`.
-- The test `portable_c-ios-keys`, `harness/ioskeys.py`: the table built
-  on Linux by itself, `build/portable_c/ios-keys/ioskeys` (driven by
-  `harness/ioskeys.c`, a line per event), 85 cases of US, German and
-  Russian layouts of the Mac and of the keypad typed into
-  `posix-asan/vc` in a pseudo-terminal with the kitty protocol and held
-  to the bench's BIOS's words by `VC_TRACE`, as `webrender.py` holds
-  `keys.js`; five events held to give no bytes. About 45 seconds.
-- For the build: `ios` is in `portable_c_implementations` of
-  `CMakeLists.txt`, with no `portable_c_takes_ios` yet (I2's), so that
-  no `*_ios.c` is taken for common code; `tidycheck.py` leaves `*_ios.c`
-  out of the common code and reads `keys_ios.c` with the emulation's
-  command; `int16.py` has `_ios.c` among `OTHER_SYSTEMS`. The records of
-  `hostcheck` and `words` have the two files, clean.
-- Decided in the piece, for the user to look at (no deviation of the
-  original: the original has no Mac keyboard):
-  - The left Option is Alt: its key bar while held, a tap of it the menu
-    bar, Alt with a letter by the US key in its place. The right Option
-    is AltGraph (kitty's `ISO_LEVEL3_SHIFT`): no Alt held, and a key
-    under it types what `characters` has, as a German layout of the Mac
-    types @ [ ] { } | \ ~ (right Option with L is `2640`, with Shift and
-    7 `085C`). Both held is Alt. One Option for both could not be: Alt
-    alone, whose tap opens the menu bar, could not be told from the
-    shift of a character to come. Terminals of the Mac let either
-    Option be Meta the same way.
-  - A key with Command, and Command itself, is left to UIKit, where
-    `keys.js` hands Meta on as kitty's Super, which the decoder types as
-    if nothing were held.
-  - The keypad types its figures, which is Num Lock on; Shift turns it
-    round as the bench's BIOS does (Shift with the keypad's 7 is Home).
-    Clear, where a PC has Num Lock, holds nothing.
-- What only the device can say, for I5: whether
-  `charactersIgnoringModifiers` keeps Shift (the table takes either:
-  the test has Shift-1 both ways); what `characters` is under Control
-  and Option (the table takes the key by `charactersIgnoringModifiers`
-  then, `characters` being what Option or Control makes of it); whether
-  the press of an Option has `.alternate` in its own flags (the table
-  goes by the key's usage for those, and clears what it keeps when a
-  key comes without `.alternate`); what a dead key gives (with nothing
-  typed the key of the US layout goes, as `keys.js` sends it); and that
-  UIKit repeats no key, so the shell repeats a held key by a timer as
-  `IOS_REPEAT`, at the rate it chooses.
-
-### I2, `sys_ios.c` and the tree "ios-host": done, and what I4 to I7 should know
-
-- **The files.** `src/portable_c/sys_ios.c`, the binding of `sys.h`,
-  plain C with POSIX's threads, and `src/portable_c/ios_shell.h`, what
-  the program and the shell ask of each other, plain C with no type of
-  the program's so that Swift imports it as it is (a bridging header).
-  A build of the implementation `ios` (I3's in CMake) takes `*_posix.c`
-  and `*_ios.c`, `keys_ios.c` of I3 among them, but `sys_posix.c` and
-  `term_posix.c` (`portable_c_takes_ios`, `portable_c_leaves_ios`);
-  `webprobe.py` knows it, `hostcheck.py` reads `*_ios.c` with
-  `-D_XOPEN_SOURCE=700`, as `*_posix.c`, and `tidycheck.py` reads
-  `sys_ios.c` with the program's command, beside `sys_posix.c`. The program for DOS is the same bytes.
-- **The interface** (`ios_shell.h`). The shell calls `ios_start(drive_c,
-  drive_d)`, which starts the program on a thread of its own with a
-  stack of 8 MB (a thread of the device's has 512 KB otherwise), and
-  again after the end to start it anew; `ios_input(bytes, count)` with
-  the bytes that a terminal with the kitty protocol sends, and the
-  mouse's SGR reports, queued (4 KB) and a condition variable signalled;
-  `ios_screen(cells, &row, &column, &shape)` on its own thread, which
-  copies the last grid handed and answers how many have been. The shell
-  has `ios_shell_draw()` (a grid is there: on the device a
-  `DispatchQueue.main.async` that calls `ios_screen`),
-  `ios_shell_open_file(path)` (QuickLook; the path is the program's only
-  for the call), `ios_shell_ended(code)` (F10: keep the last screen, a
-  tap calls `ios_start` again) and `ios_shell_memory()` (on the device
-  `os_proc_available_memory()`, from `<os/proc.h>`, which a small C or
-  Swift function of the app's gives).
-- **The thread.** The program copies the grid for the shell where the
-  web page yields: KeyRead and Idle before they wait, KeyWaiting every
-  50 ms, Ticks at its second read with no copy between (every 15 ms at
-  the most, with a sleep of 1 ms between reads otherwise, so that a
-  wait for the next tick does not spin the battery away). KeyRead
-  blocks on the condition variable for as long as it takes. A command
-  says "Commands cannot be run on iOS.", as the web page's does; no
-  file is a program; Enter on one hands its host path to the shell.
-- **The end and a start anew.** `ProgramEnd` copies the last screen,
-  stops the machine (`MachineStop` of `machine_posix.c`, which is
-  `MachineEnd` without the process's `exit` and frees the environment,
-  which a second start would otherwise leak), tells the shell and ends
-  the thread by `pthread_exit`. A second start begins the machine again
-  and calls `Main` again. That the common code starts over cleanly in
-  one process was tried by hand only: the stand-in with
-  `VC_IOS_KEYS=$'\e[21~\r' VC_IOS_STARTS=3` quits three times, each run
-  the same number of screens, and ASan says nothing. A static of the
-  common code that keeps what a run left would show only in such a run:
-  I6 should try a second start with a setup changed in the first, and
-  the editor and the viewer.
-- **Under the test channel** the program ends in the same way, and the
-  stand-in, on the main thread, ends the process with the code. That is
-  not only tidier: a process ended by `exit` on the program's thread
-  took 15 s in LeakSanitizer's check at the end, every scenario, where
-  ended from the main thread it takes nothing. The test channel's "keys
-  have run out" still ends the process on the program's thread; no
-  scenario ends so.
-- **The stand-in**, `harness/ios_stand_in.c`, linked into
-  `build/portable_c/ios-host/vc` with the sanitizers of `posix-asan`.
-  Its drives are the web's tests' (`VC_DRIVE_C`, `VC_DRIVE_D`,
-  `VC_PROGRAM_DRIVE` of `sys_ios.c`), its memory a fixed 1 GB, so the
-  cap is 256 MB, the web page's. The tree "ios-host" of the harness is
-  `setups.Program.load` of an ELF file in a directory `ios-host`; it is
-  hosted (`posixrun.HOSTED`), with the web's drives
-  (`posixrun.AS_THE_WEB`), declared as the web is
-  (`deviations.TREES["ios-host"]`, `BASE` "web"), so it is held to the
-  web's patches where it has none of its own, and it has none. The
-  test `portable_c-ios-host-scenarios` takes it through every scenario
-  that the web is taken through: 119 pass, as on Linux, in under half a
-  minute.
-- **The cap**: `sys_ios.c` works out min(256 MB, half of
-  `ios_shell_memory()`) at each start, `Cap`, and `Program` hands it to
-  `MachineBegin`, whose argument `cap` I1 added.
-- **For the documents (I9).** The entries of the web page that hold for
-  the app are W1 (the drives, with the app's Documents), W2 (a command,
-  with its text), W3 (QuickLook in place of a tab) and W7 (F10, with a
-  tap to start anew), and I1's of the cap; W4, W5 and W8 are the
-  shell's and are written with I5 and I6.
+  bringing it back on the web with a small `VC_MEMORY` is a deviation to
+  ask.
 
 ## A patch with a line for a cell that blinks: untried
 
@@ -2478,9 +2306,6 @@ here when it was cut down to the rules as they stand (15 October 2026).
   counts them): `V00_10` of `view.c`, `C20_00` of `copy.c`, `F32_00` and
   `Run_00` of `usermenu.c` and `F39_00` of `menu.c` among them. Each goes
   when its function is rewritten.
-- iOS, step 8: the room of the editor and the viewer is as much as the
-  machine has on Linux; the web page has a cap of 256 MB since I1 (W10),
-  and iOS is to get one in I2 ("Step 8, the app for iOS").
 - No test builds the toy that asks every function of `sys.h`,
   `harness/trial32/sys.c`, so a change to what a function takes leaves it
   broken without a word (the piece F9 did, and S found it so). After such

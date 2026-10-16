@@ -2,26 +2,24 @@
 """Hold the cap of the memory to what it is for: a file larger than the
 room that is left under it gets the original's refusal.
 
-The piece I1 of step 8 (TODO.md, "Step 8, the app for iOS"). The program
-of the machine of `*_posix.c` asks for all the memory that there is for
-its panels and its texts, as it asks DOS, and the machine gives it the
-host's, or at most a cap where the implementation has one: the web page
-256 MB, iOS what the system lets a program have, Linux none; and
-VC_MEMORY, which a test sets, in place of that (machine_posix.c). With a
+TODO.md, "The cap of the memory: done". The program of the machine of
+`*_posix.c` asks for all the memory that there is for its panels and its
+texts, as it asks DOS, and the machine gives it the host's, or at most a
+cap where the implementation has one: the web page 256 MB, Linux none;
+and VC_MEMORY, which a test sets, in place of that (machine_posix.c). With a
 cap the editor has room for less, and a file larger than that room is
 refused as the original refuses a file that its room is short of, in the
 box of the scenario `editor-big`.
 
-For each program that it is given, the program for Linux, the app's on a
-host (the tree "ios-host") or the program for the web under Node, on the
-bench of posixrun.py, the editor is asked
+For each program that it is given, the program for Linux or the program
+for the web under Node, on the bench of posixrun.py, the editor is asked
 for H:\\STAMPS\\noon.dat, 1 MB long:
 
   - with VC_MEMORY at 512K: the box is held cell for cell, characters and
     colours, to the box of the original's golden of `editor-big` where
     its editor refuses the same file;
   - with no VC_MEMORY: the editor opens it, no box. That is Linux as it
-    was, and the caps of the web page and of iOS, with room for it;
+    was, and the cap of the web page, with room for it;
   - with a VC_MEMORY that is no number of bytes: the program does not
     start, and says so.
 
@@ -88,7 +86,7 @@ def check(path, golden):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("programs", nargs="+", type=pathlib.Path,
-                        help="vc of a build for Linux or of ios-host, "
+                        help="vc of a build for Linux, "
                              "vc.js of one for the web under Node")
     arguments = parser.parse_args()
     golden = goldens.read("editor-big").screens[GOLDEN_STEP]

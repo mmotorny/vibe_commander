@@ -2749,7 +2749,7 @@ no cap, where the web page has one (W10). An error of the host's that DOS has no
 failure.
 
 **Why.** The user's decisions of 14 October 2026; the room of the
-editor, of 15 October 2026: a cap is for the web page and iOS alone.
+editor, of 15 October 2026: a cap is for the web page alone.
 
 **Which scenarios show it.** None can: the original has no such file.
 The room of the drive and what the files of a directory use, of the
@@ -3229,8 +3229,8 @@ with K, M or G behind it, takes the place of the cap for a test, on the
 web under Node and on Linux alike; a value that is no such number ends
 the program before it starts.
 
-**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The app
-for iOS"; `TODO.md`, "Step 8, the app for iOS", I1): the memory of
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page"; `TODO.md`, "The cap of the memory: done"): the memory of
 WebAssembly, once grown, is never given back while the page is open,
 and before the cap the program's ask for all that there is grew the
 page's memory to as much as the browser would give, 2 GB at most. The

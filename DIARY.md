@@ -30536,3 +30536,8 @@ program of DOS inside its own, a megabyte counted from 64K below the
 main data, in which a segment and an offset were made a pointer, and
 the test `portable_c-layout` held the linked file to where that put
 the tables and what followed the main data.
+
+### Drop the native app for iOS, step 8
+
+15 October 2026: the native iOS app (step 8) was dropped on the user's
+word, its pieces I1–I3 removed except the cap, which the web page keeps.

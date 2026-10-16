@@ -235,13 +235,12 @@ TOGETHER = min(4, os.cpu_count() or 1)
 # The trees that may have patches, and what each is called in the first
 # line of one.
 TREES = {"portable_c": "The portable C", "posix": "The program for Linux",
-         "web": "The web page", "ios-host": "The app for iOS on a host"}
+         "web": "The web page"}
 
 # The build of a tree that `patch` and `record` take through a scenario,
 # under build/: TREE/VC.EXE where it is not here.
 PROGRAMS = {"posix": "portable_c/posix-asan/vc",
-            "web": "portable_c/web-node/vc.js",
-            "ios-host": "portable_c/ios-host/vc"}
+            "web": "portable_c/web-node/vc.js"}
 
 # Where a tree's patches are declared, where that is not an entry of
 # src/TREE/DEVIATIONS.md: the program for Linux is of the portable C's
@@ -249,8 +248,7 @@ PROGRAMS = {"posix": "portable_c/posix-asan/vc",
 # user decided of Linux (CLAUDE.md, step 6). Its patch has a line
 # "Decided: CLAUDE.md, step 6" in place of "Deviation: N of ...", and
 # "Why: " says which decision.
-DECIDED = {"posix": "CLAUDE.md, step 6", "web": "CLAUDE.md, step 7",
-           "ios-host": "CLAUDE.md, step 8"}
+DECIDED = {"posix": "CLAUDE.md, step 6", "web": "CLAUDE.md, step 7"}
 
 
 def program_path(tree):

@@ -298,7 +298,7 @@ static int64_t MemoryAll = 0;           /* the machine's, at the start, or
 /*
  * The cap: the most that the program's blocks hold together, where a
  * system ends a program that takes too much or never gives back what it
- * has once taken (the web page, iOS); the implementation says it to
+ * has once taken (the web page); the implementation says it to
  * MachineBegin, 0 for none, as on Linux. VC_MEMORY, a number of bytes
  * with K, M or G behind it for so many times 1,024, 1,024 squared or
  * 1,024 cubed, takes its place, for a test on any implementation that
@@ -344,7 +344,7 @@ static int64_t Capped(int64_t cap)
    the cap, its ceiling being the cap and what the runtime needs besides
    (CMakeLists.txt); else found by halving, to a page, for a heap that
    gives less (the piece W2 of step 7, TODO.md, "Step 7, the web page";
-   I1 of step 8, "Step 8, the app for iOS"). A block taken and given back
+   "The cap of the memory: done"). A block taken and given back
    on the web leaves the heap as long as it was, so the cap is what keeps
    the page's memory from growing toward the machine's. */
 #define OBTAINED_TO 4096
@@ -2132,17 +2132,10 @@ void MachineEnvironment(const u8 *shell, int count, char **arguments)
     ScreenSetMode(3);
 }
 
-void MachineStop(u16 code)
+void MachineEnd(u16 code)
 {
     Record("end ", code & 0xFF);
     GiveAll();
     DosEnd(&MachineDos);
-    free(Environment);
-    Environment = 0;
-}
-
-void MachineEnd(u16 code)
-{
-    MachineStop(code);
     exit(code & 0xFF);
 }

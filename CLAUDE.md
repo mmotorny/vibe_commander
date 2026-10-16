@@ -163,8 +163,8 @@ laid out. Steps 0 to 6 are done; step 7 is under way.
    test `portable_c-tidy`.
 6. Done. The program for Linux: see "The program for Linux".
 7. Under way. A static web page: see "The web page".
-8. iOS, under way after the web page: a native app ("The app for iOS").
-   Windows and macOS are not targets.
+
+Windows and macOS are not targets.
 
 ### One program, one place for the system
 
@@ -342,43 +342,11 @@ Step 7, as the user decided it (`TODO.md` has the plan and its pieces).
   server writes to the server, and only a page with no server keeps its
   changes in the browser. Switching GitHub Pages on, or publishing the
   page anywhere, is asked first.
-- It comes before iOS as a rehearsal of what iOS has too: no shell, a file
-  system of the program's own, an event loop. On iOS the room of the
-  editor and the viewer gets a cap, since the system ends a program that
-  takes too much.
+- The room of the editor and the viewer has a cap on the web page, since
+  the memory of WebAssembly once taken is never given back while the page
+  is open; Linux has none. `VC_MEMORY` sets it for a test.
 - The README shows a recorded session as an animated SVG made by the
   project's own script from the program's screens (`harness/session.py`).
-
-### The app for iOS
-
-Step 8, as the user decided it (`TODO.md` has the plan and its pieces).
-
-- A native app: the common code and the emulation of `*_posix.c` built
-  by clang for iOS, behind `sys.h` a file of its own, `sys_ios.c`, plain
-  C, the program on a thread of its own; a shell in SwiftUI that draws
-  the 80 by 25 cells as text in the same font, takes the keys of a
-  keyboard and of the phone's own, with the row of keys that a phone
-  lacks as the web page has it, and a tap as a click. Xcode's toolchain,
-  Swift with it, is taken on for this app alone, on the user's Mac.
-- It is built, and its scenarios run in the Simulator, on the user's
-  Mac, which agents reach over the tailnet; it goes onto the user's
-  iPhone from Xcode there, under the user's paid team. Apple's SDK is
-  used on the Mac alone, as its licence asks: nothing of it is fetched
-  on Linux.
-- C:, labelled VIBE, is the app's Documents, seen in the Files app, with
-  the program's own files in C:\VC; D:, labelled DEMO, is the demo tree,
-  copied there when the app first starts. Enter on a file that is no
-  program shows it by QuickLook; a command says that commands cannot be
-  run on iOS; F10 shows the last screen, and a tap starts the program
-  again.
-- A hardware keyboard on iOS: the left Option is Alt, the right Option
-  types what the layout has there, as AltGr does; Command and what goes
-  with it are the system's, never the program's; the keypad always types
-  figures, as with Num Lock on, Shift making its cursor keys.
-- The room of the editor and the viewer has a cap where the system ends
-  a program that takes too much: on iOS, and for the web page, where the
-  memory once taken is never given back; Linux has none. `VC_MEMORY`
-  sets it for a test.
 
 ### Deviations
 
