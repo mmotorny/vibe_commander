@@ -1,1077 +1,1607 @@
 # 2. Working with files: the commander's features
 
-A file manager is a few lists and a few loops over them. Volkov
-Commander has two lists of files, one per panel, a list of directories
-for the tree, a list of found files for the file search, and one buffer,
-the *room*, that the viewer, the editor, the copy and the search take
-turns to fill. Almost every feature in this chapter is one of three
-loops: read a directory into a list, go through the files of a list or
-of a directory, or move a file through the room a piece at a time. That
-is how the features fit: the copy, the delete, the attributes, the
-directory sizes and the file search are one walker over the disk with
-five different routines plugged into it, and the viewer, the editor and
-the copy never hold their own buffers.
+Chapter 1 has the skeleton of `VC.COM`: the main data, the main loop,
+the screen and the dialogs. This chapter is about the flesh: what the
+program does with files, and how each feature is built out of a few
+routines that the others use too. Everything here is in Volkov's
+assembly in `src/asm/`, mostly in these include files:
 
-The code shown is the portable C, `src/portable_c/`, which keeps the
-original's routines under their labels (`ReDr00`, `C20_00`, `V00_10`,
-`T00_00`) and the main data, `struct MainDat`, at its 62,603 bytes,
-field for field, with the scratch fields of a command in `TmpBuf` at the
-original's offsets. Where the C has moved something big, a panel or the
-room, out of the original's segments, the original's way comes first.
+| File | Lines | What it holds |
+|---|---:|---|
+| `VCSUB2.INC`, `VCSUB3.INC` | 2,514 + 2,589 | reading a directory (`ReDir`), the filter, the sort, the tree, the extension files |
+| `VCF1.INC` | 1,806 | delete, attributes, the walkers `DirFunc`, `FncSel` and `FncMas` |
+| `VCCOPY.INC` | 1,914 | copy, move and rename |
+| `VCVIEW.INC` | 2,167 | the viewer, and the search that three features share |
+| `VCEDIT.INC` | 2,689 | the editor |
+| `VCFIND.INC` | 1,159 | find file |
+| `VCFUNC.INC` | 2,832 | Enter, the user menu, the macros of the commands |
 
-```mermaid
-graph TD
-    MD["main data: struct MainDat, 62,603 bytes, fixed"]
-    LP["left panel: struct WCBdef and its list"]
-    RP["right panel: struct WCBdef and its list"]
-    ROOM["the room: what is left of memory"]
-    MD -- "TreeBuf: the tree" --> TREE["tree.c, treebox.c"]
-    MD -- "TmpBuf, MenuBuf, HelpBuf: per-command scratch" --> CMDS["copy.c, dirfunc.c, find.c, usermenu.c"]
-    LP --> READ["read.c, files.c"]
-    RP --> READ
-    ROOM --> VIEW["view.c: a 64K window over the file"]
-    ROOM --> EDIT["edit.c: the whole text"]
-    ROOM --> COPY["copy.c: the copy buffer"]
-    ROOM --> FIND["find.c: the found lines, and a part of a file"]
-    ROOM --> OLD["read.c: the old list while a directory is read"]
+Read from far enough away, the whole chapter is three loops and one
+rule. The loops: read a directory into a list; walk the files of a list
+or of a disk and call a routine on each; move a file through memory a
+piece at a time. The rule: nothing owns a buffer. The memory that DOS
+gives the program is cut into four pieces when it starts, and the last
+of them, which this chapter calls the *room*, is filled by whichever
+feature is running, from its first byte, every time. The 256 bytes of
+`TmpBuf` in the main data are the same: each command lays its own
+variables over them with `EQU`s. That is how a viewer for files of any
+size, an editor, a copier that splits files across floppies, a file
+search that reads inside files, and a tree of the disk fit into a
+65,090-byte `.COM` and one 64K data segment.
+
+A note on registers, which every excerpt below takes for granted: in
+the commands, **ES is the main data** and **DS is the current panel's
+segment**. `MOV DS:CurAdr,SI` writes the panel; `MOV ES:FncAddr,AX`
+writes the main data. Many routines swap the two with `PUSH ES / POP
+DS` when they want to work in the main data alone.
+
+## The memory: one block, cut in four
+
+`Init11` in `VC.ASM` asks DOS for the largest free block in the classic
+way: ask for `0FFFFh` paragraphs, which always fails and leaves the size
+of the largest block in BX, then ask again for exactly that.
+
+```asm
+	MOV	BX,0FFFFh
+	MOV	AH,48h			; allocate 1 MB: fails,
+	INT	21h			; BX = paragraphs of the largest block
+	MOV	AH,48h			; allocate that
+	INT	21h
+	MOV	ES,AX			; ES = the new main data
+	MOV	DX,((SIZE MainDat-1) SHR 4)+1	; 3,913 paragraphs
+	MOV	DI,((SIZE WCBdef -1) SHR 4)+1	;   423 paragraphs a panel
+	MOV	AX,((   MinView  -1) SHR 4)+1	;   500 paragraphs, 8,000 bytes
+	ADD	AX,DX
+	ADD	AX,DI
+	ADD	AX,DI
+	CMP	AX,BX			; less than 5,259 paragraphs?
+	JBE	Init13
+	...				; "Program too big to fit in memory"
+Init13:	MOV	ES:FreMem2,BX		; the block's length
+	...
+	MOV	AX,ES
+	ADD	AX,DX
+	MOV	ES:WCB1seg,AX		; left panel behind the main data
+	ADD	AX,DI
+	MOV	ES:WCB2seg,AX		; right panel behind that
+	ADD	AX,DI
+	MOV	ES:ViewSeg,AX		; the room: all the rest
 ```
 
-## The memory: one block cut in four
-
-The original takes all the memory DOS has left in one block and cuts it
-by paragraph arithmetic ([chapter 1](01-the-program.md#how-the-program-starts)):
-
-```
- one block from DOS, all that is free                    paragraphs
- +------------------------------------------+ SecDat
- | main data, struct MainDat, 62,603 bytes  |  3,913
- +------------------------------------------+ WCB1seg
- | left panel: header 610 + 256 x 24        |    423, or up to 4,096
- +------------------------------------------+ WCB2seg
- | right panel: the same                    |    423, or up to 4,096
- +------------------------------------------+ ViewSeg
- | the room: viewer, editor, copy, search,  |  at least 500, 8,000 bytes
- |   the old list while a panel is read     |
- +------------------------------------------+ FreMem2: the block's end
-```
-
-A panel starts with room for 256 files and grows when a directory has
-more: the panel being read may reach to 500 paragraphs short of the
-block's end, but no further than its own 64K. A panel that grows pushes
-the one above it up, and both push the room. Every user of the room
-sizes it as `FreMem2 - ViewSeg` when it starts, so the viewer, the
-editor (`VCEDIT.INC`), the search (`VCFIND.INC`) and the copy
-(`VCCOPY.INC`) each have whatever is left at the time, and nothing is
-reserved for any of them. On a 640K machine with DOS and a mouse driver
-loaded that is some 345K.
-
-The C gives the same four things blocks of their own, from three
-functions of `sys.h` that are DOS's 48h, 49h and 4Ah in DOS's terms:
-
-```c
-struct Block MemTake(i32 bytes);
-struct Answer MemGive(u8 *block);
-struct Block MemResize(u8 *block, i32 bytes);
-```
-
-and asks as the original asked: for more than there is, which is
-refused with the largest size, then for that. `TakeRoom` of `start.c`:
-
-```c
-largest = MemTake(BYTES_MOST).largest;
-block = MemTake(largest);
-answer.value = Paragraphs(largest);
-answer.failed = LEAST_ROOM > largest;
-```
-
-`Init11` takes the two panels first, `PANEL_LEAST` bytes each, the
-original's 64K and the 32 bytes of `struct Places`, so that the room,
-taken last, is as large as it can be; with fewer than `LEAST_ROOM`
-bytes, 8,000, the program does not start. The four pointers of `main.c`,
-`LeftPanel`, `RightPanel`, `Room` and `RoomEnd`, take the place of
-`WCB1seg`, `WCB2seg`, `ViewSeg` and `FreMem2`.
-
-The room has no owner. Whoever is working fills it from `Room` on and
-expects nothing to be left in it from before. Nothing keeps a pointer
-into it across a command, or across `ReDir`, which may move it. In the
-original nothing at all survives a command but the setup and 256 names
-of each panel ([chapter 1](01-the-program.md#a-command-runs-in-the-commanders-memory)).
-
-## A panel: the block, the list, the places
-
-A panel's block is three things in a row:
+Everything is a segment number. A panel is not a pointer to a
+structure; it *is* a segment, and its fields are at fixed offsets in it.
+The room is not a buffer with a length; it is `ViewSeg`, and its end is
+the main data's segment plus `FreMem2`.
 
 ```
- PLACES(wcb) = (struct Places *)wcb - 1          wcb = LeftPanel, ...
- |                                               |
- v                                               v
- +------------------------------+----------------------------------+------------------------------+
- | struct Places, 32 bytes      | struct WCBdef header, 610 bytes  | list: struct FILENT[n]       |
- |  +0  Bytes   block length    |  +0   WinTyp  0 files 1 tree     |  DSKBUF = 610, 24 B each     |
- |  +4  Unused[3]               |             2 info               |                              |
- | +16  CurAdr  cursor          |  +1   BrfFul  +2 Visible         |  .. EndBuf: shown            |
- | +20  First   first shown     |  +3   Hidden  +4 MasTyp          |  .. EndFul: left out by the  |
- | +24  EndBuf  end of shown    |  +5   SortTyp +6 Ctrl_L          |             filter           |
- | +28  EndFul  end of all read |  +7   DskMas[13]  filter mask    |  then PANEL_TAIL = 64 bytes  |
- |                              | +20   WinPath[68] the directory  |  (a paragraph, 2 entries)    |
- |                              |       (+0..+87 saved in VC.INI)  |                              |
- |                              | +88   three 16-bit words of the  |                              |
- |                              |       original, unset            |                              |
- |                              | +94   ExtBuf[512] its VC.EXT     |                              |
- |                              | +606  EndFul16 (unset)           |                              |
- |                              | +608  ChgFlg  +609 SizDir        |                              |
- +------------------------------+----------------------------------+------------------------------+
-   all four places are i32 offsets from wcb, so ENTRY(wcb, CurAdr) is the entry under the cursor
+ the block from DOS                                         paragraphs
+ SecDat = ES ->  +-------------------------------------+
+                 | MainDat           62,603 bytes      |    3,913
+ WCB1seg     ->  +-------------------------------------+
+                 | left panel: WCBdef                  |    423 at the least,
+                 |   610-byte header + DskBuf          |    up to 0FFFh
+ WCB2seg     ->  +-------------------------------------+
+                 | right panel: the same               |    423 .. 0FFFh
+ ViewSeg     ->  +-------------------------------------+
+                 | the room                            |    500 at the least
+                 |   viewer, editor, copy, find file,  |
+                 |   the old list while a panel is read|
+ ES+FreMem2  ->  +-------------------------------------+
 ```
 
-`struct WCBdef` is declared with 256 entries of `DskBuf`, the original's
-minimum `MinFls`, which is why `DSKBUF` is written as
-`sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT)`: the list starts
-where those 256 would. The list may run far beyond the structure's end.
-An entry is the original's 24 bytes:
+The least the program will start in is 5,259 paragraphs, 84,144 bytes,
+on top of `VC.COM`'s own. Whatever DOS has beyond that goes to the
+room. No feature reserves any of it: each one works out `FreMem2 -
+ViewSeg` again when it starts, and has what is there.
+
+While a command runs, all of this block is given back to DOS, and
+with Memory allocation in its small mode the code goes too, all but a
+resident part of 12,690 bytes ([chapter 1](01-the-program.md)). Kept
+there, of each panel, are the header and **13 bytes for each of the
+first 256 files**, so that the cursor and the selection survive the
+command: see [Enter, and running a program](#enter-and-running-a-program).
+
+## A panel: `WCBdef`
+
+The panel's segment starts with a header of 610 bytes, `WCBsize`, and
+the list of files follows it. `VC.ASM` declares the structure with three
+`=` marks inside it, each the length of a prefix that some other code
+copies:
 
 ```
- struct FILENT, 24 bytes
- +0  NameF[13]  name, ASCIIZ; files in small letters, directories in capitals
- +13 AttrF      DOS attributes, low 6 bits; 0x40 selected; 0x80 selected before
- +14 TimeF      DOS packed time
- +16 DateF      DOS packed date
- +18 SizeF      u32; for a directory, its size when Auto calculate is on
- +22 NumbF      u16 order in which DOS gave it (written, read by nothing)
+ WCBdef, at offset 0 of the panel's segment                VC.ASM
+ +0    WinTyp   0 files, 1 tree, 2 info         \
+ +1    BrfFul   brief / full                     |
+ +2    Visible                                   |
+ +3    Hidden   show hidden and system files     |  WCBini = 88:
+ +4    MasTyp   0 the mask, 1 programs only      |  saved in VC.INI
+ +5    SortTyp  0 name 1 ext 2 time 3 size 4 none|
+ +6    Ctrl_L                                    |
+ +7    DskMas   [13]  the filter mask            |
+ +20   WinPath  [68]  the directory             /
+ +88   CurAdr   offset of the entry under the cursor   \  WCBsave = 94:
+ +90   First    offset of the first entry shown         | kept while a
+ +92   EndBuf   end of the entries shown               /  command runs
+ +94   ExtBuf   [512] the directory's VC.EXT
+ +606  EndFul   end of all entries read
+ +608  ChgFlg   1: read the panel again
+ +609  SizDir   1: directory sizes were counted
+ +610  DskBuf   FILENT[256] declared, more in fact
 ```
 
-Why are the places of the list in front of the panel and not in it? The
-original kept `CurAdr`, `First`, `EndBuf` and `EndFul` inside the panel,
-as 16-bit offsets in the panel's segment. A segment was as far as a panel
-reached, so 16 bits were enough. Here a panel can be any size, so the
-places are `i32`. They cannot go into `struct WCBdef`, because its
-first 88 bytes are what `VC.INI` saves of a panel, laid out byte for byte
-(`/* End of WCB part saved in VC.INI */`), and the original's three words
-that follow are still there, unset, as is the rest of its layout. So the four `i32` go into the paragraph in
-front of the panel, and the length of the block goes in the paragraph
-before that. The panel still starts on a paragraph, as its block does.
-`PLACES(wcb)` is a cast and a minus one.
+`CurAdr`, `First`, `EndBuf` and `EndFul` are offsets in the panel's own
+segment, so moving a panel means changing its segment number and nothing
+inside it. `DskBuf` is declared with `MinFls` = 256 entries, which gives
+`SIZE WCBdef` = 6,754 bytes, the panel's least size. A larger directory
+simply runs on behind the declared end; the segment reaches as far as
+64K.
 
-Four pointers of `main.c` name the panels: `CurrentPanel`, `OtherPanel`,
-`LeftPanel`, `RightPanel`. They take the place of the four segment words
-of the original's main data (`WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg`),
-which are still in `struct MainDat`, unset. A pointer is wider than the
-word. Since a block may move when it grows, the rule is the one at the
-top of `vc.h`: nothing keeps a pointer to a panel, or into its list,
-across `ReDir`. Places are offsets for that reason too.
+An entry is 24 bytes:
 
-## Reading a directory into a panel
+```
+ FILENT                          DTAs (what DOS writes on a search)
+ +0   NameF [13]                 +0    [21] DOS's own, the search's place
+ +13  AttrF       --.            +15h  FilAttr
+ +14  TimeF         | 9 bytes    +16h  FilTime
+ +16  DateF         | in DOS's   +18h  FilDate
+ +18  SizeF  (DD)   | order      +1Ah  FilSize (DD)
+ +22  NumbF       --'            +1Eh  FilName [13]
+```
 
-`ReDir(struct WCBdef **at, bool keep)` of `read.c` is the one entry. It
-chooses by `WinTyp`: `RdInfo` for the Info panel, `ReadTre` of
-`treebox.c` for the tree, and for files three functions one after the
-other, `ReDr00`, `ReDr45` and `ReDr50`. The split into three is a fossil
-of a 256-byte stack. Filtering calls DOS for the capitals of a mask, and
-DOS makes them on the caller's stack, so the original made sure nothing
-of the read was still on the stack then. The C keeps the split, and the
-function names say where the assembly's labels were.
+The four fields from `AttrF` to `SizeF` are in the order in which DOS
+puts them into the disk transfer area after a `FindFirst` or a
+`FindNext`, so an entry is filled by copying the name and then one
+`REP MOVSB` of nine bytes from `DTA.FilAttr`. `NumbF` is the place in
+which DOS gave the file, which the fifth sort order uses. Bits 6 and 7
+of `AttrF` are free in DOS's attributes, and the program uses them for
+its own: **40h is "selected"**, **80h is "selected before"**.
+
+## Reading a directory: `ReDir`
+
+`ReDir` of `VCSUB3.INC` (957 bytes) is the one way to fill a panel. It is
+called with DS on the panel and AL saying whether to keep the selection.
+It looks at `WinTyp` first: a tree panel goes to `ReadTre`, an Info
+panel to `RdInfo`, and a panel of files goes on in four steps, which are
+labels inside the one procedure.
 
 ```mermaid
 flowchart TD
-    A["ReDir(at, keep)"] --> B{"WinTyp"}
-    B -- "2: Info" --> INFO["RdInfo: DriveSpace, DIRINFO, GetVol"]
-    B -- "1: tree" --> TR["ReadTre of treebox.c"]
-    B -- "0: files" --> C["ReDr00: copy old list into the room"]
-    C --> D["FindFirst of WinPath and the mask, attributes 37h"]
-    D -- "path not found" --> E["ReDr24: current dir of the drive, then root of DOS's drive"]
-    E --> D
-    D -- "found" --> F["store FILENT, name in small letters unless a directory"]
-    F --> G{"file >= limit?"}
-    G -- "no" --> H["FindNext"]
-    G -- "yes" --> I["PanelGrow: shrink room to the old list, double the block"]
-    I -- "no memory" --> J["Beep, stop: show what was read"]
-    I -- "grown, maybe moved" --> H
-    H -- "more" --> F
-    H -- "12h no more" --> K["EndFul = EndBuf = end; cursor at DSKBUF"]
-    J --> K
-    K --> L["PanelFit: shrink to the list, not under 65,568"]
-    L --> M["read VC.EXT of the directory into ExtBuf, else copy ExtMain"]
-    M --> N["ReDr45: DirSize if AutoSiz, SetMask, Sort"]
-    N --> O["ReDr50: old selection and cursor looked up by name"]
-    O --> P{"block resized?"}
-    P -- "yes" --> Q["RoomAgain: give the room back, take the largest block again"]
-    P -- "no" --> R["done: ChgFlg 0 if read"]
-    Q --> R
+    A["ReDir: DS = the panel, ChgFlg = 1"] --> B{"WinTyp"}
+    B -- "1" --> T["ReadTre: the tree"]
+    B -- "2" --> I["RdInfo: the Info panel"]
+    B -- "0" --> C["ReDr00: grow the panel to its most,<br/>moving the panel above it up"]
+    C --> D["copy the old list into the room,<br/>as much as fits"]
+    D --> E["ReDr20: FindFirst of WinPath and *.*, attributes 37h"]
+    E -- "error 3, path not found" --> E2["ReDr24: ask DOS for the drive's<br/>current directory, then the root<br/>of DOS's current drive"]
+    E2 --> E
+    E -- "a file" --> F["ReDr27: store a FILENT"]
+    F --> G["FindNext"]
+    G -- "found, and DI below the limit" --> F
+    G -- "found, at the limit" --> BEEP["Beep: the rest is not read"]
+    G -- "error 12h, no more" --> H["EndFul = EndBuf = DI"]
+    BEEP --> H
+    H --> X["read the directory's VC.EXT into ExtBuf,<br/>or copy ExtMain"]
+    X --> S["ReDr45: DirSize if Auto size, SetMask, Sort"]
+    S --> O["ReDr50: marks and cursor back from the old list"]
+    O --> K["ReDr55: shrink the panel to its list,<br/>move the panel above it down"]
 ```
+
+### Growing the panel, and the 2,703
+
+A panel lives between other blocks. The left panel has the right one
+above it; the right one has the room. So before reading, `ReDr00` makes
+the panel being read as large as it can be: up to 64K (`DS+1000h`), but
+never so large that the room would be shorter than `MinView`, 500
+paragraphs. If another panel is above it, that panel is moved up out
+of the way with a backwards `REP MOVSB` (`STD`), and whichever of the
+four segment words named it, `WCB1seg`, `WCB2seg`, `WCBcrn` and
+`WCBsec`, is changed. When the read is over, `ReDr55` does the opposite:
+the panel is cut to `EndFul` plus one entry, rounded up to a paragraph,
+but never under 423 paragraphs, and the panel above is moved down again
+behind it.
+
+Then the limit for the read:
+
+```asm
+ReDr08:	MOV	AX,DS			; Save old files
+	SUB	BP,AX			; BP = paragraphs the panel may have
+	CMP	BP,0FFFh
+	JBE	ReDr09
+	MOV	BP,0FFFh		; at most 0FFFh: 65,520 bytes
+ReDr09:	MOV	CL,4
+	SHL	BP,CL			; in bytes
+	SUB	BP,SIZE FilEnt + SIZE FilEnt	; less two entries: 65,472
+```
+
+The loop stores an entry, asks for the next, and stores that one only
+while DI is below BP:
+
+```asm
+ReDr32:	MOV	AH,4Fh			; Find next
+	CALL	Intr21
+	JC	ReDr33			; no more
+	CMP	DI,BP
+	JB	ReDr27			; room: store it
+	CALL	Beep			; full: the rest of the directory is lost
+```
+
+So the most a panel holds is the number of 24-byte entries that start
+below 65,472 when the first starts at 610: **2,703**, `..` included.
+Every number in that sum is a consequence of 16-bit offsets. A panel is
+one segment, so the list must end inside 64K; the panel's length is
+held in paragraphs and capped at `0FFFh` so that `SHL BP,4` cannot wrap
+to 0; and two entries are kept back behind the list, of which the sort
+needs one: it exchanges two entries through the space behind
+`EndFul`.
+
+### One entry, from the DTA
+
+```asm
+ReDr28:	MOV	ES:[DI].NumbF,BX	; DOS's order
+	INC	BX
+	LEA	CX,[DI+SIZE FilEnt]
+	PUSH	CX
+	MOV	CX,13
+ReDr29:	LODSB				; the name from DTA.FilName
+	TEST	AH,10h			; a directory keeps its capitals,
+	JNZ	ReDr30
+	...
+	CALL	LowCase			; a file is shown in small letters
+	...
+ReDr30:	STOSB
+	LOOP	ReDr29
+ReDr31:	MOV	SI,OFFSET DTA.FilAttr
+	AND	BYTE PTR DS:[SI],3Fh	; DOS's attributes, no marks
+	MOV	CX,9
+	REP	MOVSB			; attribute, time, date, size: one move
+	POP	DI
+```
+
+(The registers are swapped here, DS on the main data and ES on the
+panel, so that `LODSB` reads the DTA and `STOSB` writes the list.)
+
+The entry `..` is not taken from DOS. Before the first `FindFirst`,
+`ReDr20` writes one at the head of the list in any directory that is not
+a root, with the attribute 10h and the date `182Fh`, 15 January 1992;
+when DOS then hands over `.` and `..`, their attributes, time, date and
+size are copied over that entry, with hidden and system cleared so that
+no filter ever takes it away. If a DOS does not report `..`, the panel
+still has one.
 
 ### The old list, kept in the room
 
-Before a single entry is read, `ReDr00` copies the panel's list, as far
-as `EndBuf`, into the room, in whole entries, and notes where the cursor
-and the first line were as offsets into that copy (`struct OldList`).
-After the new list is sorted, `ReDr50` walks the copy. Every entry with
-a mark in its top two bits is looked up by name with `FnFile`, and its
-marks go to the new entry. Then `NearFl` puts the cursor on the same
-file, or on the nearest one that survived, looking forward first and
-then back. With `keep` false, which is the case when the directory was
-gone and another was read, only bit 7 is carried over: the "was
-selected" mark that Ctrl-M selects again. A file of that name in another
-directory gets it.
+Before reading, `ReDr00` copies the panel's visible entries, from
+`DskBuf` to `EndBuf`, to the start of the room, as many as fit there, and
+keeps the cursor and the first line as offsets into that copy, clamped to
+it. After the new list is sorted, `ReDr50` walks the copy:
 
-The original kept no more of the old list than a paragraph short of 64K.
-Here the room bounds it, and what does not fit is lost from the end. The
-cursor is clamped to what was kept.
-
-### How a list grows past 64K
-
-The loop reads until `file >= limit`. `limit` is the block length minus
-the places and `PANEL_TAIL`, 16 + 2 x 24 = 64 bytes. The original
-stopped the same distance short of its 64K. That is how it ended at
-2,703 entries: (65,536 - 64 - 610) / 24, rounded up for the entry that
-crosses the line. Instead of beeping there, `PanelGrow` of `start.c`
-does two things:
-
-1. The room, which holds the old list in its first `count` bytes, is made
-   as short as that list, but not under `LEAST_ROOM`. This gives back
-   the memory that the panel is about to grow into.
-2. The panel's block is resized to twice its length. If the system
-   refuses, it is resized to the largest block there is, if that is
-   longer than what it has. `MemResize` may move the block, contents and
-   all. `Moved` then updates whichever of the four panel pointers
-   pointed at the old place.
-
-```c
-want = BYTES_MOST & ~15;
-if (bytes < want / 2)
-    want = bytes * 2;
-made = MemResize(block, want);
-if (made.failed) {
-    want = MemTake(BYTES_MOST).largest & ~15;
-    if (want <= bytes)
-        return 0;
-    made = MemResize(block, want);
-    ...
-}
-return Moved(panel, made, want);
+```asm
+ReDr50:	MOV	AH,ES:[DI].AttrF	; ES = the room: the old entry
+	AND	AH,0C0h			; its two marks
+	JZ	ReDr52
+	CMP	AL,0			; a different directory was read?
+	JNZ	ReDr51
+	AND	AH,80h			; then only "selected before" goes on
+	JZ	ReDr52
+ReDr51:	CALL	FnFile			; the same name in the new list
+	JNC	ReDr52
+	OR	DS:[SI].AttrF,AH	; gets the old marks
+ReDr52:	ADD	DI,SIZE FilEnt
+ReDr53:	CMP	DI,BX
+	JB	ReDr50
 ```
 
-Only when no larger block is possible does the program beep and show
-what it has, which is the original's behaviour at its own limit. After
-the read, `PanelFit` cuts the block back to the list and its tail,
-rounded to a paragraph, never under `PANEL_LEAST`. Since the room was
-cut or the free memory moved, `ReDir` ends with `RoomAgain`, which gives
-the room back and takes the largest block again. Its contents are not
-kept. They were the old list, which `ReDr50` has finished with by then.
+`FnFile` is a linear search by name, so this is quadratic in the
+directory's size; with at most 2,703 names that was acceptable. Then
+`NearFl` puts the cursor back on the file it was on, or, if that file
+is gone, on the next old file that still exists, looking forward first
+and then back. The first line shown is found the same way. Nothing of
+this needs memory of its own: the room is free between commands, and
+the copy lives there only for the length of `ReDir`.
 
-`ReDr00` re-reads `PLACES(panel)->Bytes` and `limit` after every grow,
-and returns the panel's new address. `ReDir` writes it to `*at`. That is
-the whole protocol for a moving panel.
+### The extension file comes with the directory
 
-### 65,536
-
-`NumbF`, the order in which DOS gave an entry, is a 16-bit word: an
-entry is 24 bytes and not one more. A DOS directory holds at most 65,536
-entries, so the number always fits, and it is the most that a panel of
-the C can hold. The 16-bit side shows elsewhere too: `Func40` of
-`main.c` leaves the number of the last line in DX for Rename, as the
-original does, and a panel of more than 65,536 entries would be cut
-there ("wraps").
+A directory may have its own `VC.EXT`, the table of what Enter does with
+a file by its extension. `ReDir` reads it, at most 511 bytes and a 1Ah
+behind them, into `ExtBuf`, 512 bytes inside the panel's header. Where
+there is none, it copies `ExtMain`, the program's own `VC.EXT`, read
+once when the program started. So Enter on a file never reads the disk
+to find out what to do: the table is in the panel already.
 
 ### The filter: `SetMask`
 
-The filter does not delete anything. It *partitions*. `SetMask` of
-`files.c` runs a cursor from the front and a cursor from the back. An
-entry that passes stays; one that fails is swapped with the entry at the
-back, loses its selection (`AttrF &= 0x3F`), and the back cursor steps
-in. When they meet, `EndBuf` is set. Everything from there to `EndFul` is
-read, kept and invisible. That is why a filter can be changed without
-reading the disk again.
+The filter removes nothing. `SetMask` (122 bytes) partitions the list in
+place, with a cursor from the front, SI, and one from the back, BX. An
+entry that passes stays where it is; one that fails is exchanged with
+the entry at the back, byte by byte, and loses its marks:
 
-An entry passes if:
-
-- it is not hidden or system, unless the panel shows those (`Hidden`); and
-- it is a directory, or else it passes both of these:
-  - when `MasTyp` asks for programs only, `TstExe`, which asks
-    `ProgramOfFile` of `sys.h` with the panel's directory and the name;
-  - `TstMas` against the mask `DskMas`, which `Convert` has put into its
-    fixed form: eleven characters, 8 + 3, with `?` for wildcards.
-
-On DOS `ProgramOfFile` compares the three characters behind the first
-full stop with `com`, `exe` and `bat` and asks DOS nothing: in the
-original that is three `CMP`s of a word and a byte in `TstExe`. It is a
-function of the system layer because another system has another idea of
-a program ([chapter 3](03-the-system.md)).
-
-### Sorting: `Sort` and `CmpPar`
-
-Before it sorts, `Sort` lays every name out in columns: the name padded
-with spaces to eight characters and the extension moved to bytes 9-11.
-Then a byte comparison of 12 characters (skipping byte 8) orders by name
-and extension, and the extension alone sits at a fixed place for sorting
-by type. After the sort the names are put back together. The sort itself
-is a diminishing-gap exchange sort. It is the original's, and it is not
-quite Shell sort:
-
-```c
-gap = PLACES(panel)->EndBuf - DSKBUF;
-for (;;) {
-    gap = gap / SIZE_FILENT >> 1;
-    gap = (gap << 4) + (gap << 3);  /* times the size of an entry */
-    if (gap == 0)
-        break;
-    end = PLACES(panel)->EndBuf;
-    do {
-        swapped = 0;
-        for (file = DSKBUF; file + gap < end; file += SIZE_FILENT) {
-            if (!CmpPar(ENTRY(panel, file), ENTRY(panel, file + gap),
-                        panel->SortTyp))
-                continue;
-            swapped = file + gap;
-            ... exchange the two through the spare entry at EndFul ...
-        }
-        end = swapped;
-    } while (swapped != 0);
-}
+```asm
+SetMs3:	CMP	BYTE PTR DS:Hidden,0
+	JNZ	SetMs4
+	TEST	BYTE PTR DS:[SI+13],6	; hidden or system: out
+	JNZ	SetMs6
+SetMs4:	TEST	BYTE PTR DS:[SI+13],10h	; a directory always passes
+	JNZ	SetMs8
+	CMP	BYTE PTR DS:MasTyp,0
+	JZ	SetMs5
+	CALL	TstExe			; "programs only"
+	JNC	SetMs6
+SetMs5:	CALL	TstMas			; the mask
+	JC	SetMs8
+SetMs6:	...				; out: exchange [SI] and [BX], 24 bytes
+	AND	BYTE PTR DS:[BX+13],3Fh	; an entry not shown is not selected
+	JMP	SetMs2			; BX one entry back, test [SI] again
+SetMs8:	ADD	SI,SIZE FilEnt		; in: go on
+	CMP	SI,BX
+	JBE	SetMs3
+SetMs9:	MOV	DS:EndBuf,SI		; the shown ones end here
 ```
 
-Each gap is a bubble sort whose pass ends at the last exchange of the one
-before. `(gap << 4) + (gap << 3)` is times 24 without a multiply, which a
-16-bit 8086 paid dearly for. The exchange goes through the entry behind
-`EndFul`, one of the two that `PANEL_TAIL` reserves.
+The entries from `EndBuf` to `EndFul` are read, kept, and invisible.
+Changing the filter calls `SetMask` and `Sort` again over all of them,
+without the disk.
 
-`CmpPar` puts directories before files, `.` and `..` first, and system
-files before other files. Then it orders by `SortTyp`: 1 by extension,
-2 by date and time (newest first), 3 by size (largest first), and by
-name for 0 and as the tie-break for the others. The original has a
-fifth order, unsorted, which is simply the order in which DOS gave the
-entries: `NumbF` exists so that it can be restored without reading the
-disk again. The C has dropped that order, and `NumbF` is written and
-never read.
+`TstMas` works on the *fixed form* of a name that DOS itself uses in a
+directory: eleven characters, eight of name and three of extension,
+padded with spaces. `Convert` (36 bytes) makes that form, in capitals,
+with `*` turned into as many `?` as fill its part; the mask is converted
+once into `TmpBuf`, each name into `TmpBuf+20`, and the test is a loop
+of eleven comparisons where `?` matches anything. `TstExe` is three
+three-byte comparisons of what follows the first full stop with
+`'com','exe','bat'`, a nine-byte table.
+
+### Five orders, one sort
+
+`Sort` (236 bytes) first turns every name *in place* into the fixed
+form, in the 13 bytes it has: the name padded to eight characters with
+spaces, the extension moved to bytes 9 to 11. Now two names compare by
+name with one `REPE CMPSB` of eight bytes, and by extension with one of
+three bytes at a fixed place, `CmpExt`. At the end the names are put
+back together.
+
+The sort itself is Volkov's "Shell sort", whose comment it bears. It is
+a diminishing-gap exchange sort: the gap starts at half the list and
+halves, and for each gap the list is passed over, exchanging pairs that
+are out of order, until a pass exchanges nothing; each pass ends where
+the last exchange of the one before was.
+
+```asm
+	MOV	BX,DS:EndBuf		; Shell sort
+	SUB	BX,OFFSET DskBuf	; BX = the list in bytes
+Sort10:	MOV	CX,SIZE FilEnt
+	MOV	AX,BX
+	XOR	DX,DX
+	DIV	CX			; in entries,
+	SHR	AX,1			; halved,
+	MUL	CX			; in bytes again: the gap
+	MOV	BX,AX
+	OR	BX,BX
+	JE	Sort15			; gap 0: sorted
+	MOV	CX,DS:EndBuf		; this pass ends at the end
+Sort11:	XOR	DX,DX			; DX = where the last exchange was
+	MOV	SI,OFFSET DskBuf
+Sort12:	LEA	DI,[SI+BX]
+	CMP	DI,CX
+	JAE	Sort14
+	PUSH	CX
+	CALL	CmpPar			; CF = 1: exchange
+	JNC	Sort13
+	MOV	DX,DI
+	MOV	DI,DS:EndFul		; three moves of 24 bytes,
+	...				; through the spare entry at EndFul
+```
+
+`CmpPar` (136 bytes) decides the order. Its first lines are the fifth
+order, "unsorted":
+
+```asm
+CmpPar	PROC	NEAR
+	MOV	AL,DS:SortTyp
+	CMP	AL,4			; 4: unsorted
+	JB	CmpPr0
+	MOV	AX,DS:[DI+22]		; NumbF: the order DOS gave
+	CMP	AX,DS:[SI+22]
+	RET
+```
+
+"Unsorted" is not a missing sort: it is the same sort by `NumbF`, which
+is why the field is there. It puts the list back into DOS's order
+without reading the disk again. For the other four orders, directories
+come before files, `.` and `..` before other directories, system files
+before other files, and then name (0), extension and name (1), date and
+time with the newest first (2), or size with the largest first (3).
 
 ![Gray+ with `*.txt`](img/select.png)
 
-*Gray+ with `*.txt`: two files selected, bit 6 of their attributes set, and the status line counting them in 32 bits.*
+*Gray+ with `*.txt`: two files selected, bit 6 of their `AttrF` set,
+and the status line counting them.*
 
 ### Selection
 
-Selecting a file sets bit 6 of `AttrF`, `ATTR_SELECTED`. Ins toggles it
-(`keys.c`). Gray+ and Gray- ask for a mask and walk the list. The right
-mouse button drags it over a run of files and remembers, in `WinMous`,
-whether the first file passed was selected, so that the drag either
-selects or unselects all of them. `TotSel` counts selected files and
-directories in 32 bits.
+Ins toggles bit 6 of the entry under the cursor. Gray+ and Gray- ask
+for a mask, kept in `SelMas`, and walk the list with `TstMas`. `TotSel`
+(36 bytes) counts selected entries in one pass, files in DX and
+directories in BX. Bit 7 is the program's memory of the last group
+operation: every walker clears it on all entries first, and sets it on
+each entry that it has done, in place of bit 6. Ctrl-M then selects
+again whatever has bit 7. Since `ReDr50` carries bit 7 to the new list
+when another directory is read, a file of the same name elsewhere is
+reselected too.
 
-Bit 7 is the program's memory of the *last* group operation. When
-`FncSel` has done its work on a file, it clears bit 6 and sets bit 7.
-Ctrl-M then reselects whatever has bit 7, and `ReDr50` carries bit 7 even
-across a change of directory.
+## The tree and `TREEINFO.NCD`
 
-## The tree and its file
-
-The tree is not in a panel's block. It lives in the main data, in
-`TreeBuf`, 12,299 bytes: a `struct DIRTREE` header and room for 768
-entries of 16 bytes (`MinTree`). The layout of the buffer *is* the
-layout of the file, `\TREEINFO.NCD` in the root of the disk, a format
-inherited from the Norton Commander:
+The tree is not a panel's list. It lives in the main data, `TreeBuf`,
+12,299 bytes: `MinTree` entries of 16 bytes and an 11-byte header. That
+buffer is laid out byte for byte as the file `\TREEINFO.NCD` in the
+root of the disk, the format of the Norton Commander's tree, so reading
+the tree from the file is one `INT 21h` 3Fh into the buffer, and saving
+it one 40h out of it.
 
 ```
- TreeBuf / TREEINFO.NCD
- +0   TreHead[5]  "PNCI",0         (while reading: [0] how it ended, [1] the level)
- +5   TreeLen     u16, number of directories
- +7   TreSum1     u16, ChkSum of the 7 bytes before it
- +9   TRELIST ->  struct DIRENT[TreeLen], the root first   (the list begins
-                                                            where TreSum2 is
-                                                            declared)
- +9+16n           u16, ChkSum of the list
-                  file length = 16 x TreeLen + 11
+ DIRTREE, TreeBuf, \TREEINFO.NCD                             VC.ASM
+ +0    TreHead [5]  'PNCI',0       while scanning: [0] TreeErr, [1] TreeLev
+ +5    TreeLen      number of directories, the root counted
+ +7    TreSum1      the sum of the 7 bytes before it
+ +9    TreList      DIRENT[TreeLen], the root first, in pre-order
+ +9+16n             the sum of the list
+                    a file is 16 x TreeLen + 11 bytes
 
- struct DIRENT, 16 bytes
- +0   DirName[13]  name; byte 12 doubles as DirRecu, "not read yet", while scanning
- +13  DirLevel     depth, root = 0
- +14  DirShift     1 if this entry starts a new branch
- +15  DirCont      1 if a sibling follows below at the same level
+ DIRENT, 16 bytes
+ +0    DirName [13]  byte 12 is DirRecu while scanning: FFh "not read yet"
+ +13   DirLevel      0 for the root
+ +14   DirShift      1: a new branch begins here
+ +15   DirCont       1: a sibling follows lower down ('├'), 0: '└'
 ```
 
-No path is stored. A path is rebuilt by walking the list: `DESCEND` in
-`tree.c` puts each name behind the backslash of its level in a path
-carried along in `MenuBuf`. `DirShift` and `DirCont` are all that
-`PutTree` needs to draw the lines, `├`, `└` and `│`, without looking
-ahead.
+No path is stored: a path is the names of the entries above, one per
+level, and the levels and the two bits are all that `PutTree` needs to
+draw `├`, `└` and `│` without looking ahead. `ChkSum` is 21 bytes:
+add bytes into BX, then compare with the word that follows.
 
-`ReadTre` of `treebox.c` tries the file first. `TreeFileRight` checks
-the signature, both sums, and that the length is exactly `16n + 11`. A
-file that claims no entries, or 4,096 or more, counts as broken: the
-original counted the list's bytes in 16 bits, so a list of 4,096
-entries of 16 bytes is 0 to it. Otherwise the disk is scanned by
-`RdTr10`:
+`ReadTre` (776 bytes) believes the file only if the signature is
+there, both sums agree, and the file is exactly `16 x TreeLen + 11`
+bytes long; a file that fills the whole buffer is taken for one too
+large. (`TreeLen` is shifted left by four in 16 bits, so a file that
+claims 4,096 entries passes with a list of none: a bug that a damaged
+file can reach.) Otherwise the disk is scanned, and the scan is a
+small marvel.
 
 ```mermaid
 flowchart TD
-    S["TreeBuf cleared; LIST[0] = root, entry = LIST+1"] --> N["TreeLen++; from the 5th, the box 'Scanning the directory...' counts"]
-    N --> F["FindFirst or FindNext of SCANNED, the path and the mask"]
-    F -- "a directory, not hidden unless HidDirs, not dot" --> INS["insert a DIRENT at entry, shifting the rest of TreeBuf down; DirRecu = FFh; level = TreeLev + 1"]
-    INS --> N
-    F -- "not a directory" --> F
-    F -- "no more here" --> NX["go back to the first entry still marked DirRecu, clear the mark, build its path into SCANNED"]
-    NX -- "found one" --> F
-    NX -- "none left" --> DONE["done"]
-    F -- "error 53h" --> NR["READ_NO_DISK"]
-    N -- "Esc, F10, Ctrl-C" --> ST["READ_STOPPED: no file written"]
-    INS -- "TreeBuf full: 767" --> FULL["Beep; READ_FULL with what fits"]
+    A["RdTr10: clear TreeBuf. Entry 0 = the root.<br/>MenuBuf+40 = the path being read, '\*.*'"] --> B["RdTr11: TreeLen + 1. From the 5th,<br/>the box 'Scanning the directory structure'"]
+    B --> C["FindFirst, then FindNext, of the path"]
+    C -- "a directory, not '.', not hidden<br/>unless HidDirs" --> D["RdTr20: make room at DI, shifting<br/>the rest of TreeBuf down 16 bytes,<br/>write name, FFh, TreeLev+1"]
+    D --> B
+    C -- "a file" --> C
+    C -- "no more here" --> E["RdTr22: the first entry still marked FFh<br/>before or at DI: clear the mark,<br/>build its path in MenuBuf+40"]
+    E -- "one is left" --> C
+    E -- "none" --> F["done: save the file if 5 or more<br/>directories, else delete it"]
+    D -- "767 directories" --> G["Beep: the tree is what fits"]
+    C -- "Esc, F10 or Ctrl-C" --> H["stopped: no file written"]
 ```
 
-Each subdirectory found is inserted right behind its parent, and the
-scan goes on with the first entry still marked unread. So the list comes
-out in pre-order, each directory followed by its subtree, without any
-recursion or path stack. The only state is the mark in byte 12 of each
-name. The cost is a `memmove` of the tail of `TreeBuf` for each
-directory found. With at most 767 entries, that was cheap even on an
-8088.
+Each subdirectory that is found is inserted right behind its parent's
+earlier children, marked unread in byte 12 of its name. When a
+directory has no more entries, the scan steps back from DI to the first
+entry of the run that is still marked, and reads that one next. So the
+list comes out in pre-order, each directory followed by its whole
+subtree, with no recursion and no stack of paths: the only state is one
+byte in each name, and the insertion point. The insertion itself is
+one backwards `REP MOVSB` of the rest of the buffer:
 
-A scan that ran to the end writes the file, if it found five or more
-directories. With fewer, it deletes the file. Whoever changes the
-directory structure marks the file out of date: `DelTr0` of `dirfunc.c`
-writes 0 over its first byte. The first directory that a delete
-(`F38_54`), a copy or a move (`C30_00`) makes or removes does that, and
-only if `ChgTree` (auto rescan) is on. `ChDir` in a tree box is
-`ChTree`, which opens the same list in a dialog with a speed search kept
-at `MenuBuf+230`.
-
-## Going through files: FncAddr, FncSel, FncMas, DirFunc
-
-Delete, attributes, copy, move and the file search all do the same
-thing: for each file, call a routine, and for each directory, the same
-routine again on each of its files. In the assembly the routine was a
-code address stored in `FncAddr` of the main data. In C, `FncAddr` is
-still a 16-bit word of the main data at the original's place, and holds
-an index into a table of functions:
-
-```c
-typedef u16 FncFn(u16 attributes);
-static FncFn * const Fnc_T[] = {
-    C00_00, DiSi10, FindFil, F38_40, M30_50
-};
-
-u16 FncCall(u16 attributes)
-{
-    return Fnc_T[md.FncAddr](attributes);
-}
+```asm
+RdTr20:	LEA	CX,[BP]-SIZE DIRENT	; BP = the end of TreeBuf
+	SUB	CX,DI			; what lies behind the insertion point
+	JBE	RdTr80
+	...
+	LEA	DI,[BP]-1
+	LEA	SI,[DI]-SIZE DIRENT
+	STD
+	REP	MOVSB			; all of it 16 bytes down
+	CLD
+	...
+RdTr80:	MOV	CX,12
+	...
+	REP	MOVSB			; the name from the DTA
+	...
+	CALL	FilZero
+	MOV	AL,0FFh			; DirRecu: not read yet
+	STOSB
+	MOV	AL,DS:TreeBuf.TreeLev
+	INC	AX
+	STOSB				; DirLevel = the parent's + 1
 ```
 
-A routine is handed the file's attributes, finds the file's path at the
-start of `TmpBuf`, and answers 1 for done, 0 for not done, and something
-in the high byte (100h) to stop the whole command. Three drivers call it:
+The path in `MenuBuf+40` is rebuilt for each directory that is read
+next by skipping as many backslashes as its level and copying its name
+there: the path of the parent is always what is left in front. A path
+that would pass 68 bytes is skipped. The limit is the buffer:
+`(12,299 - 11 - 16) / 16` = **767** directories, root included. The
+line `MOV BP,OFFSET TreeBuf+MinTree*SIZE DIRENT+SIZE DIRTREE ; ???
+Expand` at the head of `ReadTre`, and `; ??? Compress` at its end, are
+Volkov's own notes: he meant the tree to grow as the panels do, and it
+never did.
 
-- `FncSel` goes through the selected entries of the current panel, or the
-  one under the cursor when nothing is selected or the command is for one
-  file (`OneFile`, the Ctrl variants). After each file it turns bit 6
-  into bit 7, and with `UnSlct` set it redraws that file's row of the
-  panel at once.
-- `FncMas` (`FncMs1`) goes through what a mask at `TmpBuf` matches on
-  the disk, skipping directories, hidden and system files. Shift-F8 and
-  Shift-F5 use it.
-- `DirFunc` goes through every entry of the directory at `TmpBuf` and
-  calls the routine with the name appended to the path. A routine that
-  meets a directory calls `DirFunc` again, so the commands reach as deep
-  as the disk does.
+A scan that ran to the end writes the file, if it found five
+directories or more, and deletes it otherwise: on a disk that small,
+scanning is cheaper than a file. Writing goes with `BlocEr` set, so that
+a write-protected floppy does not raise the critical-error box: the
+program beeps.
+
+Whoever makes or removes a directory makes the file out of date, and
+`DelTree` of `VCF1.INC` does that by writing **one zero byte** over the
+`P` of `PNCI`:
+
+```asm
+DelTr3:	MOV	BX,AX			; the file, opened for writing
+	MOV	SI,DX
+	MOV	BYTE PTR DS:[SI],0	; one byte: 0
+	MOV	CX,1
+	MOV	AH,40h
+	CALL	Intr21			; over the 'P' of 'PNCI'
+```
+
+The next time the tree is read, the signature fails and the disk is
+scanned. `DelTree` does nothing unless Auto rescan, `ChgTree`, is on;
+delete and copy call it once per command, keeping a flag in `TmpBuf` so
+that the file is written only for the first directory that changes.
+
+<!-- SCREENSHOT: golden tree-box step 14 -->
+
+## Walking the files: `FncAddr`, `FncSel`, `FncMas`, `DirFunc`
+
+Delete, attributes, copy, move, the directory sizes and find file all
+do the same thing: for each file, a routine; for each directory, the
+same routine for each of its files. Volkov wrote the walking once and
+made the routine a variable: `FncAddr`, a word of the main data, holds
+the address of the routine, and the walkers call through it.
+
+```asm
+	MOV	AL,DS:DTA.FilAttr	; the file's attributes in AL,
+	CALL	DS:FncAddr		; its path in TmpBuf: one indirect call
+```
+
+Five routines are ever put there:
+
+| `FncAddr` | Set by | Does to one file |
+|---|---|---|
+| `F38_40` | F8, `F38_00` | delete |
+| `M30_50` | Ctrl-A, `M30_00` | set attributes, date and time |
+| `C00_00` | F5 and F6, `F35_01`, `F45_01` | copy, move or rename |
+| `DiSi10` | `DirSize` | add a file's size to a sum in `TmpBuf+90` |
+| `FindFil` | Alt-F7, `F67_00` | find files in a directory |
+
+A routine takes the attributes in AL and the path at `TmpBuf`, and
+answers in AX: AL 1 for done and 0 for not done, AH not 0 to stop the
+whole command (100h). It may call the walkers itself. There are three:
+
+- **`FncSel`** walks the current panel: the selected entries, or the
+  one under the cursor when none is selected or the command is for one
+  file (`OneFile`). It copies the entry's 13-byte name to `TmpBuf`,
+  which with the current directory being DOS's is a path, calls the
+  routine, and on success turns bit 6 into bit 7. With Unselect on,
+  `UnSlct`, it redraws that row of the panel at once, working out the
+  row and column from the entry's offset with two `DIV`s.
+- **`FncMas`** walks what a mask at `TmpBuf` matches on the disk, files
+  only (`TEST DS:DTA.FilAttr,16h` leaves out directories, hidden and
+  system), for Shift-F8 and Shift-F5. It says "Can't find file" when
+  nothing matched, and puts an `s` behind the word when the mask had a
+  wildcard.
+- **`DirFunc`** (281 bytes) walks a directory: every entry of the path
+  at `TmpBuf`, with `\*.*` behind it, calls the routine with the name
+  put behind the path, and returns AL 1 if every call answered 1. A
+  routine that meets a directory calls `DirFunc` again, so the commands
+  go as deep as the disk does.
+
+All three end at `FncExt`, which marks both panels to be read again,
+`ChgFlg = 1`, if `TmpBuf+91` says that any routine changed the disk, and
+goes back to the main loop.
 
 ```mermaid
 sequenceDiagram
-    participant Cmd as F38_00, F8
-    participant ML as main loop, F1Next
+    participant F8 as F38_00, the F8 key
     participant Sel as FncSel
-    participant R as F38_40 via FncCall
+    participant Del as F38_40, by FncAddr
     participant DF as DirFunc
-    participant DOS as sys.h FindFirst and FindNext
-    Cmd->>Cmd: FncAddr = FNC_F38_40, ask Delete
-    Cmd-->>ML: TO_FNCSEL
-    ML->>Sel: FncSel()
-    Sel->>R: FncCall(attributes) for DIR1
-    R->>R: RemoveDir finds it not empty, All, WALK
-    R->>DF: DirFunc() with TmpBuf = DIR1
-    DF->>DOS: FindFirst of DIR1 with the mask
-    DOS-->>DF: FILE.TXT
-    DF->>R: FncCall(attributes) for DIR1 and FILE.TXT
-    R-->>DF: 1, done
-    DF->>DOS: FindNext gives 12h, no more
-    DF->>DOS: search the parent again until DIR1 is found
-    DF-->>R: 1, all done
-    R->>R: F38_60 removes DIR1
-    R-->>Sel: 1
+    participant DOS as INT 21h
+    F8->>F8: FncAddr = F38_40, ask "Delete"
+    F8->>Sel: JMP FncSel
+    Sel->>Del: CALL ES:FncAddr for DIR1, AL = 10h
+    Del->>DOS: 3Ah, remove DIR1
+    DOS-->>Del: error 5, not empty
+    Del->>DOS: 13h, delete DIR1\*.* by an FCB
+    Del->>DF: CALL DirFunc, TmpBuf = DIR1
+    DF->>DOS: 4Eh, DIR1\*.*
+    DOS-->>DF: SUB, a directory
+    DF->>Del: CALL DS:FncAddr for DIR1\SUB
+    Del-->>DF: AX = 1
+    DF->>DOS: 4Fh until 12h, no more
+    DF->>DOS: 4Eh and 4Fh of the parent, until DIR1 again
+    DF-->>Del: AX = 1
+    Del->>DOS: 3Ah, remove DIR1
+    Del-->>Sel: AX = 1
     Sel->>Sel: AttrF bit 6 off, bit 7 on
-    Sel-->>ML: FncExt, panels read again if TmpBuf[91]
+    Sel->>Sel: JMP FncExt, panels read again
 ```
 
-### One DTA
+### One DTA, and the search found again
 
-The interesting part of `DirFunc` is at its end. DOS searches with one
-record, the DTA (`md.DTA`, a `struct DTAs` of 44 bytes), and the search
-remembers where it is only in that record's 21 reserved bytes. When the
-routine called for a subdirectory runs its own `DirFunc`, it overwrites
-the parent's search. The parent cannot simply call `FindNext` afterwards.
-So when the inner search ends, `DirFunc` cuts its name off the path and
-searches the *parent* directory again from the start, `\*.*`, until it
-finds a directory with the name it just finished (kept in `MenuBuf`).
-That leaves DOS's record exactly where the outer `FindNext` expects it.
-It is quadratic in the size of the parent directory, and it needs no
-memory at all.
+DOS keeps the state of a search in 21 bytes at the head of the DTA, and
+the program has one DTA, `DTA` in the main data, 44 bytes. A recursive
+walk with one DTA should not work: the inner `DirFunc` overwrites the
+outer search, and the outer `FindNext` would go on from the inner one's
+place.
 
-A path of 68 characters or more is not entered (`PthEr_B`): DOS's
-limit is 67, a drive, a colon, a backslash and 64 characters, and every
-path buffer of the program is `LenPath`, 68 bytes with its zero.
+`DirFunc` repairs that at its end, and this is the cleverest thing in
+the chapter. When the search of a directory ends, it cuts the last name
+off the path, keeps that name in `MenuBuf`, searches the *parent*
+directory again from the start, and goes through it until it meets a
+directory of that name:
 
-### Delete and attributes
+```asm
+DiFu08:	...
+	MOV	SI,DX
+	CALL	CutPath			; SI = the name that has just ended
+	PUSH	SI
+	MOV	DI,OFFSET MenuBuf
+	MOV	CX,13
+	REP	MOVSB			; keep it
+	POP	DI
+	...
+	MOV	SI,OFFSET Mask_S+1	; and put '*.*' in its place
+	MOV	CX,4
+	REP	MOVSB
+	...
+	MOV	CX,37h
+	MOV	AH,4Eh			; search the parent from the start
+	JMP	DiFu11
+DiFu09:	TEST	DS:DTA.FilAttr,10h
+	JZ	DiFu10
+	MOV	DI,OFFSET MenuBuf
+	...
+	MOV	SI,OFFSET DTA.FilName
+	REPE	CMPSB			; is it the one?
+	JE	DiFu12			; the DTA is where the caller left it
+DiFu10:	MOV	AH,4Fh
+DiFu11:	CALL	Intr21
+	JNC	DiFu09
+```
 
-`F38_00`, F8, sets `FncAddr = FNC_F38_40`, clears the three flags it
-keeps in `TmpBuf` (`DEL_ALL` at 90, `FNC_CHANGE` at 91, `DEL_TREE` at
-92), asks once, and returns `TO_FNCSEL`. `F38_40` deletes a file through
-`FileDelete`. A read-only file gets the dialog `RdOnl_B`, and on
-"Delete" its attributes are set to 20h and the delete is tried again. A
-directory is tried with `DirRemove` first. If it is not empty, the user
-is asked once (or never again after "All"), and then:
+Then the path in `TmpBuf` is put back as the caller had it, and the
+DTA is exactly where the caller's `FindNext` expects it. The cost is
+time, a scan of the parent for every subdirectory, which is quadratic in
+the size of a directory full of directories. The gain is that a
+recursion of any depth needs no memory at all beyond the path: no saved
+DTAs, no stack of searches on a 256-byte stack. A path of 68 bytes or
+more is not entered, the box `PthEr_B`, since every path buffer is
+`LenPath`, 68 bytes.
 
-1. `F38_70` deletes the directory's files with one FCB call, DOS's 13h,
-   `FcbDelete` of `sys.h`: a single call that removes every file that
-   `*.*` matches, hidden and system files included. An FCB has no path,
-   so the directory is made the current one for the call and the old one
-   put back;
-2. `DirFunc` deals with what is left, read-only files and the
-   subdirectories, by calling `F38_40` for each;
-3. `F38_60` removes the directory. If it is the current one, it first
-   changes to the directory above.
+One curiosity of the source: `DirFunc`, `FncSel` and `FncExt` follow a
+`.DATA` block in `VCF1.INC` (the box `PthEr_B`) with no `.CODE` in
+between, so the assembler put them into the data segment, `_DATA`,
+where the listing has `DirFunc` at 0C57h. In a `.COM` file all segments
+are one, `DGROUP`, so the code runs there as well as anywhere.
 
-`M30_00`, Ctrl-A, is the same machine with `M30_50`. Its dialog leaves a
-mask of bits to keep at `TmpBuf+94`, bits to set at `+95`, and a date
-and a time at `+96` and `+98` (0FFFFh for "unchanged"). `M30_51` clears
-read-only, opens the file to set the stamp, then writes
-`(old & ATTR_KEEP) | ATTR_SET`. For a directory it goes into the
-directory through `DirFunc` and does not touch the directory itself.
+### Directory sizes
 
-Every one of these ends at `FncExt`, which marks both panels for
-re-reading if `TmpBuf[91]` says that anything on the disk changed.
+With Auto size on, `ReDir` calls `DirSize` for each directory of the
+list, and `DirSize` is the walk in its smallest form: `FncAddr =
+DiSi10`, a sum of 32 bits cleared in `TmpBuf+90`, `CALL ES:FncAddr` with
+AL 10h, and the sum written into the entry's `SizeF`. `DiSi10` (60 bytes)
+adds the file's size from the DTA, stopping at `0FFFFFFFFh` rather than
+wrapping, and calls `DirFunc` for a directory. `DirFunc` knows the one
+caller that may not show a box: for `DiSi10` a path that is too long is
+skipped in silence.
+
+## Delete and attributes
+
+`F38_00`, F8, clears three bytes of `TmpBuf` that it keeps for the
+command, 90 for "All" answered, 91 for "the disk changed" and 92 for
+"the tree is marked out of date", sets `FncAddr = OFFSET F38_40`, asks
+once, and jumps to `FncSel`.
+
+`F38_40` (356 bytes) deletes a file with 41h. If DOS refuses with error
+5 and the file is read-only, it asks `RdOnl_B`, sets the attributes to
+20h, and tries again. For a directory it tries 3Ah, remove, through
+`F38_60`, which knows one more trick: if DOS says error 10h, "the
+current directory", it asks DOS for the true name (60h), changes to `..`
+and removes it then. The two bytes for `..` cost three instructions:
+
+```asm
+	MOV	AX,'.'			; AL = '.', AH = 0
+	STOSB				; '.'
+	STOSW				; '.', 0: "..", ended
+	MOV	AH,3Bh			; change to it
+```
+
+A directory that is not empty is emptied in two passes. First `F38_70`
+deletes every plain file in it with **one call of DOS**: 13h, delete by
+an FCB. It builds an extended FCB at `TmpBuf+200`, the byte FFh, five
+reserved bytes, the attribute 26h, archive, hidden and system, the
+drive, and the name `*.*` put into FCB form by 29h. An FCB has no path,
+so the directory is made the current one around the call and the old
+one put back. Then `DirFunc` calls `F38_40` for what is left:
+read-only files, which the FCB call does not touch, and
+subdirectories, each emptied the same way. Last, `F38_60` removes the
+directory. One call of DOS does what would otherwise be a search and a
+41h for every file.
+
+`M30_00`, Ctrl-A, is the same machine with `M30_50`. Its dialog leaves,
+in `TmpBuf`, a mask of attribute bits to keep at +94, bits to set at
++95, and a date and a time at +96 and +98, `AttrDat` and `AttrTim`,
+0FFFFh meaning "unchanged". Whether the stamp is to be set at all is
+tested in three instructions, since only `0FFFFh AND 0FFFFh` gives a
+word that `INC` turns into 0:
+
+```asm
+	MOV	DI,CX			; the old attributes
+	MOV	AX,DS:AttrDat
+	AND	AX,DS:AttrTim
+	INC	AX			; both 0FFFFh?
+	JE	M30_54			; then leave the stamp alone
+	AND	CL,0FEh			; else clear read-only,
+	MOV	AX,4301h
+	CALL	Intr21
+	...				; open, 5700h, 5701h, close
+M30_54:	MOV	CX,DI
+	AND	CL,DS:[TmpBuf+94]	; keep these
+	OR	CL,DS:[TmpBuf+95]	; set these
+	MOV	AX,4301h
+```
+
+For a directory, `M30_50` calls `DirFunc` and changes what is inside,
+not the directory itself.
+
+<!-- SCREENSHOT: golden attributes step 2 -->
 
 ## Copy, move and rename
 
-`copy.c` holds the longest single routine in the program. `C20_00` runs
-to some 460 lines of C, with 22 labels left from the assembly, whose
-paths cross too much for `if` and loops: the C keeps the jumps.
-The parts are:
-
-- `F35_01`, F5 and F6, and `F45_01`, the Shift variants, ask for the
-  target in the dialog `Copy1_B`, copy the answer into `ToFile`, set
-  `CopyMov` (`TmpBuf[100]`: 0 copy, 1 move, 2 move that has to copy, 3
-  rename of a directory in the tree), set `FncAddr = FNC_C00_00` and
-  return `GO_SELECTED`.
-- `C00_00` is the routine of `FncAddr`. `C00_01` builds the target's
-  name in `CpDest` (`TmpBuf+130`) from `ToFile` and the source (`CpSrc`
-  at `TmpBuf+0`): a directory, a name with wildcards, or a device. Then
-  it decides: a move on the same drive is a rename (`C10_00`, which is
-  `FileRename`, DOS's 56h); a move across drives, or to a device, is a
-  copy followed by a delete. A directory goes to `C30_00`, which makes
-  the target directory, runs `DirFunc` over the source, and for a move
-  removes the source afterwards.
-- `C20_00` copies one file.
-
-Everything the copy keeps between DOS calls is in `TmpBuf`, by the
-equates at the top of `VCCOPY.INC`:
+`VCCOPY.INC` is the longest single routine in the program: `C00_00 PROC`
+runs from `C00_00` through `C10_00`, `C20_00` and `C30_00` to its
+`ENDP`, 2,684 bytes of code with 128 labels. Its state lives in
+`TmpBuf`, named by 27 `EQU`s at the top of the file, and some of
+them share bytes: `CpVar1`, a variable of the dialog, is `TmpBuf+120`,
+which is also `CpAttr` once the copy runs.
 
 ```
- TmpBuf during a copy (copy.c, #define Cp...)
- +0    CpSrc[..]   source path             +100 CopyMov   0/1/2/3
- +86   CpDev1      source is a device      +104 CpDev2    target is a device
- +87   CpCase                              +106 CpRead    u32 bytes read
- +88   CpTree1     +89 CpTree2             +110 CpWrite   u32 bytes written
- +90   CpAll       "All" was answered      +116 CpHndl1   +118 CpHndl2
- +91   FncChg      something was written   +120 CpAttr  +122 CpDate  +124 CpTime
- +94   SplitFl     the file was split      +126 CpCntBg   where the bar is
- +95   CpCntSz     cells of the bar        +130 CpDest[..] target path
- +96   CpSize      u32 source size
+ TmpBuf during a copy, by the EQUs of VCCOPY.INC
+ +0    CpSrc    the source path          +100  CopyMov  0 copy, 1 move,
+                (and CpInpt, the input)                 2 move by copying,
+ +86   CpDev1   the source is a device                  3 rename
+ +87   CpCase   the target: 0 not known, +102  CpBgNam  where the name
+                1 a name, 2 a directory,               begins in CpSrc
+                3 a device               +104  CpDev2   the target is a device
+ +88   CpTree1  +89 CpTree2: the trees   +106  CpRead   DD bytes read
+                were marked out of date  +110  CpWrite  DD bytes written
+ +90   CpAll    "All" was answered       +116  CpHndl1  +118 CpHndl2
+ +91   FncChg   the disk changed         +120  CpAttr   +122 CpDate  +124 CpTime
+ +94   SplitFl  the file was split       +126  CpCntBg  where the bar is
+ +95   CpCntSz  the bar's width          +128  CpCont   segment to go on from
+ +96   CpSize   DD the source's size     +130  CpDest   the target path
 ```
 
-Two words of the original's layout held addresses: `CpBgNam` at 102 and
-`CpCont` at 128. A pointer is wider than a word, so they moved out into
-C variables (`CpBgNam` static in the file, `CpCont` as `rest` in
-`C20_00`), and their bytes in `TmpBuf` stay unset.
+`F35_01`, F5 and F6, asks for the target in `Copy1_B`, puts it into
+`ToFile`, sets `CopyMov`, and sets `FncAddr = C00_00` for `FncSel`.
+Then for each file:
 
-### The loop
+- **`C00_00`** builds the target's name in `CpDest`. If `ToFile` names
+  a directory, the source name goes behind it; if it has wildcards,
+  `Convert` puts both the source name and the mask into the 11-byte
+  form, every `?` of the mask takes the source's character at the same
+  place, and `UnConv` turns the result back into a name: copying
+  `*.txt` to `*.bak` is eleven byte comparisons. For a file inside a
+  directory being copied, `CpBgNam` says where the part of the source
+  path below the top directory begins, and that part goes behind
+  `ToFile`: that is how the recursion maps source paths to target paths
+  without a stack of its own. Then it decides: a move on one drive is a
+  rename, `C10_00`; anything else is a copy, `C20_00`; a directory goes
+  to `C30_00`.
+- **`C10_00`** is DOS's 56h. If DOS refuses it with anything but
+  "access denied", as it does for a move across drives, `CopyMov`
+  becomes 2 and the file is copied and then deleted.
+- **`C30_00`** makes the target directory with the source's
+  attributes, runs `DirFunc` over the source with `C00_00` still in
+  `FncAddr`, and for a move removes the source directory afterwards.
+  A directory moved on one drive is simply renamed.
 
-```mermaid
-flowchart TD
-    O["open source: OpenFil mode 40h"] --> DV{"FileDevice"}
-    DV -- "console input (81h)" --> NS["refuse: Can't open"]
-    DV -- "file" --> SZ["CpSize = FileStep(end); CpAttr, date, time"]
-    DV -- "device" --> R
-    SZ --> R["read: left = RoomBytes() rounded down to 512"]
-    R --> RL["FileRead pieces of 32K into the room, PerCent after each"]
-    RL -- "a read gives 0" --> EOF["close source; a device's size = what was read"]
-    RL -- "room full" --> T
-    EOF --> T["target: first time open it"]
-    T --> EX{"target exists?"}
-    EX -- "no" --> CR["FileCreate 20h"]
-    EX -- "yes, not All" --> ASK["OvrCo_B: Overwrite / All / Append / Skip"]
-    ASK -- "overwrite" --> RO{"read-only?"}
-    RO -- "no" --> DEL
-    RO -- "yes: ask Prot_B, clear it" --> DEL["FileDelete, then FileCreate"]
-    ASK -- "append" --> AP["OpenFil 12h, seek to end, back over a 1Ah"]
-    CR --> W
-    DEL --> W
-    AP --> W
-    W["write the room in pieces of 32K"] -- "a write gives 0" --> FULL["disk full: write what fits, ask Cont_B"]
-    FULL -- "another disk" --> SPL["SplitFl; make the target's directories there; open again"]
-    SPL --> W
-    W -- "source still open" --> R
-    W -- "all written" --> FIN["SetDate, close, FileSetAttributes(CpAttr)"]
-    FIN -- "move" --> DS["FileDelete source, ask RdOnl_B if read-only"]
+### The copy loop: all of the room
+
+`C20_00` does not copy a file through a buffer of its own. It reads as
+much of the source as the room holds, then writes all of it, then reads
+again. A file smaller than the room is one read and one write.
+
+```asm
+C20_10:	MOV	AX,ES			; Reading
+	ADD	AX,ES:FreMem2
+	SUB	AX,ES:ViewSeg		; the room, in paragraphs
+	AND	AL,0E0h			; down to 32 paragraphs, 512 bytes
+	MOV	SI,AX			; DI:SI = the room in bytes
+	MOV	AL,AH
+	MOV	AH,0
+	MOV	CL,4
+	SHL	SI,CL
+	SHR	AX,CL
+	MOV	DI,AX
+	MOV	DS,ES:ViewSeg
+	...
+C20_11:	...
+	XOR	DX,DX			; each piece at offset 0
+	MOV	CX,8000h		; of 32K, or what is left
+	...
+C20_12:	MOV	AH,3Fh
+	CALL	Intr21
+	...
+	ADD	ES:CpRead.Lo,AX
+	ADC	ES:CpRead.Hi,0
+	CALL	PerCent
+	OR	AX,AX
+	JE	C20_15			; read 0: the end of the source
+	ADD	DX,AX
+	SUB	CX,AX
+	JNE	C20_12			; a short read: read the rest
+	MOV	DX,DS
+	ADD	DX,800h			; the next 32K: the next segment
+	MOV	DS,DX
+	SUB	SI,AX
+	SBB	DI,0
 ```
 
-The room is the copy buffer, and all of it is used: the program reads
-as much of the source as the room holds, then writes all of it, then
-reads again. A 4 MB file on a machine with 300 MB free is one read and
-one write, in pieces of 32K (`count = 0x8000`). DOS takes a 16-bit count
-per call, and the original stepped a segment per piece. A device can
-answer a piece in several short reads. The original counted the room
-down by the last of them only, so a slow device could have it read past
-the room's end; the C counts every read. The writes
-step the buffer by whole paragraphs only (`buffer += got >> 4 << 4`),
-because the original stepped a segment by the paragraphs written. A
-short write is followed by the disk-full path and never by the next
-piece, so the rounding never misplaces data.
+DOS takes a 16-bit count, and an 8086 offset reaches 64K, so the room,
+which may be hundreds of kilobytes, is walked as a row of segments
+`800h` paragraphs apart, each piece read to offset 0 of its own. The
+same in the writing loop, which steps DS by the paragraphs written,
+`SHR AX,4`. A piece that a device answers in several short reads is
+read on at `ADD DX,AX`, but the room is counted down only by the last
+of them, `SUB SI,AX`, so a slow device can have the loop read past the
+room's end: a bug of the original.
 
-The progress bar is `PerCent`. It counts what has been read plus what has
-been written against twice the size, so the bar is half full when the
-file has been read, and full when it has been written. It does that in
-48-bit arithmetic made of 32-bit `Plus32` and `Minus32` with explicit
-carries, a direct transcription of the original's register pairs: a
-286 had no instruction for a 32-bit sum, so the original chains `ADD`
-and `ADC` over DX:AX, and over a third word for the doubled size.
+<!-- SCREENSHOT: golden copy step 2 -->
 
-A full disk is a feature, not just an error. `C20_00` asks `DriveSpace`
-how much is free, writes exactly that much of the piece, closes the
-file, and asks with `Cont_B` whether to continue on another disk. If so,
-it makes the target's directory chain on the new disk with `DirMake` and
-goes back to `open` with `SplitFl` set. `rest` remembers where in the
-room the unwritten part begins. That is how files larger than a floppy
-were copied in 1991.
+### The bar: 48-bit arithmetic without `MUL`
 
+The bar in the copy box fills in proportion to (read + written) against
+twice the size, so it is half full when the file has been read and full
+when it is written. The sizes are 32 bits, the product with the bar's
+width up to 48, and the 8086 multiplies 16 by 16. `PerCent` (125 bytes)
+does without multiplying or dividing at all:
 
-### Errors
+```asm
+	MOV	AX,DS:CpRead.Lo		; BX:AX = read + written,
+	MOV	BX,DS:CpRead.Hi
+	XOR	DX,DX
+	ADD	AX,DS:CpWrite.Lo
+	ADC	BX,DS:CpWrite.Hi
+	ADC	DX,0			; with its carry in DX: 48 bits
+	XOR	SI,SI
+	XOR	DI,DI
+	XOR	BP,BP
+	MOV	CL,DS:CpCntSz		; times the width of the bar,
+PerCn1:	ADD	SI,AX			; by adding it that many times
+	ADC	DI,BX
+	ADC	BP,DX
+	LOOP	PerCn1
+	...				; DX:BX:AX = 2 x the size
+	MOV	CX,0FFFFh
+PerCn2:	INC	CX			; divided, by subtracting
+	SUB	SI,AX			; until it goes below 0
+	SBB	DI,BX
+	SBB	BP,DX
+	JAE	PerCn2			; CX = the cells to fill
+```
 
-Every failure leads to one of five labels near the bottom of `C20_00`:
-`skip` (this file is not done, go on), `terminate` (stop, and delete a
-target that was half written), `close_source`, `stop`, and `close`, which
-puts the screen back. Error 53h, the critical-error box answered with
-Cancel, never gets a second box: the user has just seen one. A target
-that was appended to is deleted like any other when the copy stops. The
-code keeps that bug of the original, as it does the source that stays
-open when DOS will not give its attributes. The comment at `C20_00` lists
-what it keeps and what it fixed.
+The bar is a few dozen cells wide, so each loop runs at most that many
+times: a multiplication and a division of 48 bits in a few dozen bytes
+of code, in a time that a 4.77 MHz 8088 does not notice.
+
+### A disk that fills up
+
+A write that writes nothing is not just an error. `C20_50` asks DOS for
+the free room of the target drive, 36h, multiplies sectors per cluster,
+bytes per sector and free clusters, writes exactly that much of the
+piece if it fits in 16 bits, closes the file, and asks `Cont_B`, "There
+isn't enough room to copy: Abort / Continue". On Continue it sets
+`SplitFl`, makes the target's chain of directories on the new disk, and
+goes back to open the target with `CpCont` holding the segment in the
+room where the unwritten part begins. That is how a file larger than a
+floppy was carried on several. On Abort the half-written target is
+deleted.
+
+Every way out of `C20_00` goes through `C20_45`, which closes the target
+and deletes it, and closes the source; error 53h, the critical-error
+box answered with Cancel, ends without a second box, since the user has
+just seen one.
 
 ## The viewer: a 64K window over any file
 
-The viewer reads its file into the room, but never more than 65,504
-bytes, `0xFFE0`, whatever the room holds:
+F3 is `V00_00` in `VCVIEW.INC`. The viewer's state is a structure laid
+over `TmpBuf`, and the way it is declared is a trick of its own: the
+first member of the `STRUC` is padding as long as the offset of
+`TmpBuf+200` in the main data, so that every field's name *is* its
+address in the main data and needs no base register:
 
-```c
-ViSpace = RoomBytes() & ~0xF;
-if (ViSpace > 0xFFE0)
-    ViSpace = 0xFFE0;
+```asm
+ViewDat	STRUC
+	 DB	TmpBuf+200 DUP(?)	; nothing: the fields start at TmpBuf+200
+ViSpace	 DW	?			; Edit buffer size in paragraphs
+ViewEdit DB	?			; View / Edit
+ViStatus DB	?			; Output status line
+ViLoaded DW	?			; Bytes loaded in buffer
+ViLen	 DD	?			; Size of file
+ViOffset DD	?			; Offset of first loaded byte in buffer
+...
+ViFirst	 DW	?			; Offset of first line of screen
+ViHandle DW	?			; File handle
+...
+ViPoint	 DW	?			; Point to address of first line
+ViEndTab DW	?			; Point to end of line table
+ViBase	 DW	?			; View window base
+ViSize	 DW	?			; View window size
+...
+ViewDat	ENDS
 ```
 
-The reason is the table of lines. The viewer keeps, at the *top* of the
-same bytes, a table of 16-bit words, one per screen line, each the offset
-in the text where that line begins. The table grows down from `ViSpace`
-toward the text. Where they meet, the part of the file that is in the
-memory ends. Offsets of 16 bits reach 64K, and `WORD_AT` cuts every
-offset to 16 bits on purpose, so that a place two bytes before 0 reads
-the word at the segment's end as on DOS. Widening that table would buy
-nothing a user sees, since the window moves anyway.
+With `OPTION OLDSTRUCTS` at the head of `VC.ASM` the field names are
+global, so `MOV ES:ViFirst,AX` writes `TmpBuf+218` of the main data.
+The 43 bytes run from `TmpBuf+200` to `TmpBuf+242`. (`ViSpace` holds
+bytes, not paragraphs as its comment says: the comment is older than the
+code.)
+
+The file is opened, its length taken by seeking to the end, 4202h, and
+then the viewer takes as much of the room as it can address with one
+segment, never more:
+
+```asm
+V00_10:	MOV	AX,ES
+	ADD	AX,DS:FreMem2
+	SUB	AX,DS:ViewSeg		; the room in paragraphs
+	CMP	AX,0FFEh
+	JBE	V00_11
+	MOV	AX,0FFEh		; at most 65,504 bytes
+V00_11:	MOV	CL,4
+	SHL	AX,CL
+	MOV	DS:ViSpace,AX
+	MOV	CX,AX
+	MOV	DS,DS:ViewSeg
+	XOR	DX,DX
+	CALL	V55_00			; read that much from offset 0
+```
+
+`V55_00` (20 bytes) clears the buffer before it reads, so a short read
+leaves zeros. The segment holds the text from its bottom and a table of
+the lines from its top, growing down:
 
 ```
- the room while the viewer shows a file                     ViSpace (<= 0xFFE0)
- 0                                                                    |
- +--------------------------------------+-------------+---------------+
- | text: ViLoaded bytes of the file,    |    free     | line table    |
- | from file offset ViOffset            |             | u16 per line, |
- |                                      |             | grows down    |
- +--------------------------------------+-------------+---------------+
- ^ ViFirst: first screen line           ^ ViLoaded     ^ ViEndTab     ^ ViSpace-2: line 0
-                                                                        (ViPoint: its entry)
- V50_00 (forward): second half becomes first, ViOffset += ViSpace/2, read on
- V51_00 (back):    move up by half, read the half before, rebuild the table
+ ViewSeg while the viewer runs                                ViSpace
+ 0                                                       (<= 65,504)
+ +----------------------------------+-----------+------------------+
+ | the text: ViLoaded bytes of the  |   free    | the line table:  |
+ | file, from file offset ViOffset  |           | one word a line, |
+ |                                  |           | its offset in the|
+ |                                  |           | text, growing    |
+ |                                  |           | down             |
+ +----------------------------------+-----------+------------------+
+ ^ ViFirst: first line on screen    ^ ViLoaded  ^ ViEndTab  ViSpace-2:
+                                                           line 0 (ViPoint)
 ```
 
-`V60_00` builds the table from a place on. A line ends behind CR LF or
-LF CR, or at 80 columns. A tab advances the column to the next multiple
-of eight (`column |= 7; column++`). A line of exactly 80 columns that a
-line end follows does not make an empty line. In unwrapped mode a screen
-line is everything between two line ends, however many table entries
-that spans, and `NextLin` skips entries to the next one that follows a
-CR LF. Hex mode has no table: a line is 16 bytes, `at = (at & 0xFFF0) +
-0x10`.
+`V60_00` (93 bytes) builds the table from a place on. Where the table
+grows down into the text, the text ends there: `ViLoaded` is cut to the
+table, so a file of short lines keeps less text in memory than one of
+long lines, and the two always share the segment exactly.
 
-When the screen runs off the end of what is loaded and the first line is
-in the second half, `V50_00` slides: the second half moves to the
-start, the line offsets that survive are rebased by `half`, and the file
-is read on behind them. Going back, `V51_00` does the mirror image and
-then rebuilds the table from the start up to the line where the second
-line was, so the lines below it come out the same as before. A file is
-never more than 65,504 bytes in memory, and any file can be paged
-through, a gigabyte as easily as a kilobyte.
+```asm
+V60_01:	XOR	BX,BX			; a new line: column 0
+	CMP	SI,DI
+	JAE	V60_02
+	DEC	DI
+	DEC	DI
+	MOV	DS:[DI],SI		; the table: where it begins
+	CMP	DI,DX
+	JAE	V60_03
+V60_02:	MOV	DX,DI			; the table has reached the text
+V60_03:	CMP	SI,DX
+	JAE	V60_06
+	LODSW				; two bytes at once,
+	CMP	SI,DX
+	JA	V60_04
+	CALL	IsCrLf			; CR LF or LF CR?
+	JE	V60_01
+V60_04:	DEC	SI			; else one character
+	CMP	AL,9
+	JNE	V60_05
+	OR	BL,7			; a tab: to the next column of 8
+V60_05:	INC	BX
+	CMP	BX,80
+	JB	V60_03
+	JA	V60_01			; past 80: a new line
+	...				; at 80, unless a line end follows
+```
 
-`struct ViewDat`, 43 bytes, is the viewer's state, at `TmpBuf+200`. The
-editor's `EdData` lies over it from `TmpBuf+100`, and the two share six
-fields at the same places: `ViLen` is `EdLen`, `ViBase` and `ViSize` are
-`EdBase`, `EdSizeX` and `EdSizeY`, and `ViTxHex` is `EdTxHex`. That is
-how F4 inside the viewer hands the open file to the editor without
-copying anything. The structure ends 13 bytes before `TmpBuf` does and
-cannot grow, so every field that counts is also a 32-bit static of
-`view.c` under the same name (`ViSpace`, `ViLoaded`, `ViFirst`, ...).
-The 16-bit fields keep their bytes but are no longer written.
+`IsCrLf` is two instructions, `CMP AX,0D0Ah` and `CMP AX,0A0Dh`: having
+read a word, the test for a line end in either order is a comparison of
+a register. The tab is `OR BL,7` and the `INC` behind it.
+
+When the screen runs past what is loaded and the first line shown is in
+the second half, `V50_00` (194 bytes) slides the window: `ViOffset` goes
+on by half of `ViSpace`, the second half of the text is moved to the
+bottom, the table's entries that survive are rebased by the same amount
+in one pass, and the file is read on behind. Going back, `V51_00` (189
+bytes) moves the text up by half, reads the half before into the bottom,
+builds the table from the start and then again from the line that was
+the first, so that the lines below it come out as before. So any file
+can be paged through, a gigabyte as easily as a kilobyte, in a window
+of 64K, by line offsets of 16 bits.
+
+In hex mode no table is needed: a line is 16 bytes.
 
 ![F3, then F4](img/viewer-hex.png)
 
-*F3, then F4: the viewer in hex, 16 bytes a line, no table of lines needed.*
+*F3, then F4: the viewer in hex, 16 bytes a line.*
 
-### Search
+The mouse in the viewer has no buttons drawn: the window is cut into
+thirds from top to bottom and quarters from left to right, and a click
+in the top or bottom third scrolls up or down, in the left or right
+quarter left or right (`V00_31` to `V00_35`, with `DIV BL` by 3 and two
+`SHR`s for the quarter).
 
-F7 asks for a text (`Srch_B`), and `V81_00` prepares it in `HelpBuf`:
-the text in capitals at offset 0 with its length at +90, and, if the
-viewer shows hex, the bytes that the text spells as hex digits (one or
-two digits to a byte, spaces or commas between) at +100, with their count
-at +190. `V82_00(text, at, count)` then scans: at each place it tries the
-text, comparing `UpCase` of each byte, then the bytes. The answer says
-which matched: 1 for the text, 0 for the bytes, 100h for neither.
+### Search: `V81_00` and `V82_00`
 
-`UpCase` is the country's capital, which DOS knows: DOS hands the
-program a far routine for the capitals of bytes 80h to FFh (INT 21h AX
-3800h gives its address in the country record), and the original calls
-it for every byte that it compares. Below 80h it is a subtraction.
+F7 asks for a text, `Srch_B`, into `SrchStr`. `V81_00` (105 bytes)
+prepares it in `HelpBuf`, the buffer of the help pages, which is free
+while a dialog is not asking for help: the text in capitals from
+offset 0, its length at +90, and, in hex mode, the bytes that the text
+spells as hex digits at +100, `HexLen` of them at +190. Since F1 may
+fill `HelpBuf` with a help page at any time, `V81_00` is run again
+before every search, never trusted to have survived.
 
-The file search and the editor's search use the same `V82_00`.
+`V82_00` (90 bytes) is the search itself. At each place of the text it
+compares the pattern with `UpCase` of each byte, then the hex bytes
+exactly, and says which matched: AL 1 for the text, 0 for the bytes.
+
+```asm
+V82_02:	PUSH	CX
+	MOV	BX,SI			; this place
+	MOV	DI,OFFSET HelpBuf
+	MOV	CX,ES:[DI+90]		; the text's length
+V82_03:	LODSB
+	CALL	UpCase			; the file's byte in capitals
+	SCASB
+	LOOPE	V82_03
+	MOV	AL,1
+	JE	V82_05			; the text matched
+	MOV	SI,BX
+V82_04:	MOV	DI,OFFSET HelpBuf[100]
+	MOV	CX,ES:[DI+90]		; HexLen
+	JCXZ	V82_05
+	REPE	CMPSB			; the bytes?
+	MOV	AL,0
+V82_05:	POP	CX
+	JE	V82_07
+	LEA	SI,[BX+1]		; the next place
+	LOOP	V82_02
+```
+
+`UpCase` is what makes a search of Russian text work: for a byte of
+`a` to `z` it subtracts 20h, and every byte then goes through
+`Country.CaseMap`, the far routine for capitals above 80h whose address
+DOS gives in its country record (3800h). It is called for every byte
+compared. Its opposite, `LowCase`, which the panels use to show names,
+cannot be asked of DOS, so `Init21` of `VC.ASM` builds a table of 128
+bytes, `LowTab`, at the start by asking `CaseMap` for every byte from
+80h up and inverting the answers.
+
+Past what is loaded, `V15_04` searches the file itself: it reads it
+4,000 bytes at a time into `MenuBuf`, overlapping each read by the
+length of the text so that a match across the seam is found, and when
+one is found it moves the window to 2,000 bytes before it. The same
+`V82_00` serves the editor's F7 and find file's "Containing".
 
 ## The editor: the whole text, and one line apart
 
-The editor shares the viewer's entry. `V00_02` opens the file with the
-"Reading the file" box, and when the command is F4, `V00_03` of
-`main.c` goes on to `T00_00` of `edit.c`. The editor wants the whole
-file in the room:
-
-```c
-EdSpace = RoomBytes() & ~0x0F;
-if ((u32)ed.EdLen >= (u32)EdSpace) {
-    if ((u8)Dialog(&BigFi_B, 0, 0, 0, &md) != 0)   /* "too large for Edit" */
-        return T00_10(begin, size);
-    ...
-    return Ends(EDIT_VIEW, 0);                      /* View it instead */
-}
-```
-
-In the original the room is what DOS has left once the main data and
-the panels are taken, some 345K on a 640K machine with DOS and a mouse
-driver loaded, so "too large for Edit" was a box that users met. In the
-C it is all the memory there is.
-
-The file is read in pieces of `0xFF00` bytes. That is the largest piece
-that fits in one 16-bit count and stays a whole number of paragraphs, and
-it is the piece size the original used. A file that gives fewer bytes
-than its size claims is as long as what it gave.
+F4 opens the file exactly as F3 does, `V00_02` with `ViewEdit` set, and
+then jumps to `T00_00` of `VCEDIT.INC`. The editor's state is another
+structure over `TmpBuf`, `EdData`, from `TmpBuf+100` to `TmpBuf+237`,
+and it is laid out with holes so that the viewer's fields under it
+survive:
 
 ```
- the room while the editor runs                       EdSpace
- 0             EdOffst      EdEndBf                   EdLen          |
- +-------------+------------+-------------------------+--------------+
- | text before | the cursor | text after              |    free      |
- |             | line       |                         |              |
- +-------------+------------+-------------------------+--------------+
-                     |  T50_00 copies it out (at most 3,900 bytes)
-                     v  T51_00 puts it back: moves "text after" up or down
- MenuBuf = EditBuf [4000]: the line being edited, EdSizLn bytes, cursor EdCursr
- ErrBuf  = UndoBuf: the line as it was (Ctrl-U), EdUndo bytes
+ TmpBuf+   ViewDat (viewer)         EdData (editor)
+ 100..199                           EdOffst, EdEndBf, EdSizLn, EdCursr, ...
+                                    EdUndo, then 77 bytes of nothing
+ 200       ViSpace       =          EdSpace
+ 202       ViewEdit                 (a byte of nothing)
+ 203       ViStatus      =          EdStat
+ 206       ViLen         =          EdLen     the file's size, from V00_06
+ 214       ViKeyBar                 (a word of nothing: kept)
+ 216       ViTxHex       =          EdTxHex
+ 218       ViFirst, ViHandle        (a double word of nothing: kept)
+ 228       ViBase        =          EdBase
+ 230       ViSize        =          EdSize
 ```
 
-Editing in the middle of a big text by moving the whole tail for every
-key would be slow, so the editor does not. The line under the cursor is
-copied out into a buffer of its own, `EditBuf`, which is `MenuBuf` (no
-menu is open while the editor runs), as much of it as 3,900 bytes. Keys
-change only that buffer, and `EdUpdat` notes that it changed. When the
-cursor leaves the line, `T51_00` puts the buffer back in one move: if the
-line got longer, the rest of the text moves down by the difference
-(`T51_30` copies downward from the end), if shorter, up. If the text
-would pass `EdSpace`, the editor beeps and the end of the *text* is cut,
-not the line. The comment marks that as ported as it is. In hex mode
-there is no buffer: a line is 16 bytes, and keys edit the text in place.
+The editor takes the file's size, the handle and the window that the
+viewer's entry has just set, without copying anything; the 77 bytes of
+padding are there to make the shared fields land.
 
-Places in the text are `i32` offsets from `Room`, with 32-bit statics
-(`EdOffst`, `EdEndBf`, `EdFirst`, `EdLine`, ...) beside the 16-bit fields
-of `struct EdData` (138 bytes at `TmpBuf+100`), as in the viewer. The
-line count is 32 bits as well, so a text of more than 65,535 lines can be
-reached, where the original's count of lines wrapped at 65,535, and
-`Col` moves right only when the line number needs a sixth digit.
+Unlike the viewer, the editor wants all of the file in the room:
 
-### Keys
+```asm
+T00_00:	...
+	MOV	AX,ES
+	ADD	AX,DS:FreMem2
+	SUB	AX,DS:ViewSeg
+	MOV	DS:EdSpace,AX		; the room in paragraphs
+	...				; DI:AX = the room in bytes
+	CMP	DI,DS:EdLen.Hi
+	JB	T00_01
+	JA	T00_03
+	CMP	AX,DS:EdLen.Lo
+	JA	T00_03
+T00_01:	PUSH	BP			; File too large
+	MOV	BP,OFFSET BigFi_B	; "... is too large for Edit. View / Cancel"
+```
 
-`T00_19` is the loop: draw (`T00_20`), wait for a key with the right key
-bar (6 hex, 7 text, 10 with no status line), then hand the key to
-`T00_83`. That function is the original's `Case` table written as two
-`switch` statements: one on the character for keys that have one (Tab,
-the WordStar controls ^S ^D ^E ^X ^R ^C ^G ^Y ^K ^U ^T ^W, BackSpace,
-Esc), and one on the scan code for the rest (arrows, PgUp, PgDn, Home,
-End, Ctrl-PgUp, Del, F2, Shift-F2, F4 for hex, F7 and Shift-F7 for
-search, F10, Shift-F10). Any other key with a character is typed:
-`T01_03` in text, `T01_10` in hex. ^Q makes the next key a character
-whatever it is.
+The room is whatever DOS left after the main data and the panels, so
+"too large for Edit" was a box that users met with files of a few
+hundred kilobytes; View then opens the viewer on it in place.
 
-Opening `VC.MNU`, `VC.EXT`, `VCVIEW.EXT` or `VCEDIT.EXT` takes ten rows
-off the window for a help pane on the format of those files (`EdtH1_S`
-or `EdtH2_S`).
+The file is read in pieces of `0FF00h` bytes, the largest piece that
+fits a 16-bit count and is a whole number of paragraphs, so that each
+next piece starts at offset 0 of the segment `0FF0h` paragraphs on. The
+text is one run of bytes across several segments, and a place in it is
+a 32-bit offset, `EdOffst`, `EdEndBf`, `EdFirst`. Two routines of a few
+bytes turn one into the other: `T61_00` makes a segment and an offset
+below 16 of a 32-bit place, and `T60_00` the reverse.
+
+```asm
+T61_00:	PUSH	DX			; DX BX -> DS:SI
+	PUSH	CX
+	PUSH	AX
+	MOV	SI,BX
+	AND	SI,0Fh			; the offset: the low four bits
+	MOV	AX,BX
+	MOV	CL,4
+	SHR	AX,CL			; the paragraph: bits 4 to 19,
+	SHL	DL,CL
+	OR	AH,DL			; with four bits of the high word
+	ADD	AX,ES:ViewSeg
+	MOV	DS,AX			; DS:SI = the place, SI < 16
+```
+
+With SI always below 16, the next 65,520 bytes can be read through
+DS:SI without crossing the segment's end, which is all that a line of
+text needs.
+
+```
+ the room while the editor runs                         ViewSeg+EdSpace
+ 0                EdOffst     EdEndBf                   EdLen     |
+ +----------------+-----------+-------------------------+---------+
+ | text before    | the line  | text after              |  free   |
+ +----------------+-----------+-------------------------+---------+
+                       |   T50_00: copied out, at most 3,900 bytes
+                       v   T51_00: put back, moving "text after"
+ EditBuf = MenuBuf (4,000 bytes): the line being edited, EdSizLn, EdCursr
+ UndoBuf = ErrBuf  (7,392 bytes): the line as it was, for Ctrl-U
+```
+
+Moving the whole rest of a large text for every key would be slow, so
+the editor does not. The line under the cursor is copied out into a
+buffer of its own, `EditBuf`, which is `MenuBuf`, by `EQU`: no menu is
+open while the editor runs. Keys change only that buffer and set
+`EdUpdat`. When the cursor leaves the line, `T51_00` (374 bytes) puts the
+buffer back in one move: if the line got shorter, the rest of the text
+moves up (`CLD`), if longer, down (`STD`), in pieces of `0FF00h` with
+the segment stepped by `0FF0h` either way. If the text would pass the
+room, the editor beeps and cuts the end of the *text*, not the line.
+In hex mode there is no line buffer: keys edit the text in place.
+The comment beside the `EQU`s states the one rule that this rests on:
+`; The length of undo buffer must be greate then edit buffer`.
+
+The keys are a `Case` table, `Edit_T`: 41 entries of a key word and an
+address, four bytes each, and a zero. A key word is the BIOS's, the
+scan code in the high byte for a key without a character, `4B00h` for
+Left, and the character in the low byte for one with, `0013h` for ^S,
+so the arrows and the WordStar keys are two entries to one routine:
+
+```asm
+Edit_T	DW	0009h, T03_00		; Tab
+	DW	0011h, T04_00		; ^Q
+	DW	4B00h, T05_00		; Left
+	DW	0013h, T05_00		; ^S
+	DW	4D00h, T06_00		; Right
+	DW	0004h, T06_00		; ^D
+	...
+	DW	001Bh, T35_00		; Esc
+	DW	4400h, T35_00		; F10
+	DW	5D00h, T35_01		; Shift F10
+	DW	0
+```
+
+Opening `VC.MNU`, `VC.EXT`, `VCVIEW.EXT` or `VCEDIT.EXT` takes ten
+rows off the window for a pane of help on the file's macros: `T00_03`
+compares the name with the four by `T64_00`, and `AX = 0A01h` gives both
+the kind of help and the ten rows in one load.
+
+<!-- SCREENSHOT: golden editor step 2 -->
 
 ### Save
 
-`T80_00` puts the line buffer back, shows "Saving the file", has
-`ChgDisk` ask for the disk if the drive is a shared floppy, and calls
-`T80_02`. That function clears read-only if the user agrees,
-`FileCreate`s the file, writes the room in pieces of `0xFF00`, and gives
-the attributes back. A device keeps its own attributes, and the console
-is written nothing. A short write is a full disk, error 27h. The file is
-then deleted rather than left truncated, and the error box shows only if
-the delete worked. `T80_14` runs after every save, successful or not: if
-the file was the main `VC.EXT` in the program's directory (`NcPath`), its
-first 511 bytes are copied into `md.ExtMain`, so the change takes effect
-without a restart.
+`T80_00` (432 bytes) puts the line back, asks for the attributes, asks
+`Prot_B` if the file is read-only, creates the file with 3Ch and the
+old attributes and archive, writes the text in pieces of `0FF00h`, and
+gives the attributes back. A short write is a full disk: the file is
+deleted rather than left cut short. Then it does something that no
+user sees and every user relies on: if the file saved is the program's
+own `VC.EXT`, in the directory of `NcPath`, its first 511 bytes are
+copied into `ExtMain` with a 1Ah behind them, so the change takes
+effect at the next Enter without starting the program again.
 
 ## Find file
 
-Alt-F7, `F67_00` of `find.c`, is `DirFunc` again, with `FindFil` as the
-routine, plus a list in the room:
+Alt-F7, `F67_00` of `VCFIND.INC`, is `DirFunc` once more, with
+`FindFil` in `FncAddr`, and a list in the room. Its state, `FndData`,
+is the third structure over `TmpBuf`, 18 bytes from `TmpBuf+100`: the
+cursor, the first line shown, the number of lines, the most there may
+be, the window, the number of files found, and four bytes of flags.
+
+A found file is a line of 65 bytes, `LenFnf`, already in the form the
+box shows: three spaces, the name in small letters or a directory's in
+capitals, the size or `SUB-DIR`, the letters `ASHR` or dots, the date
+and the time. Before the first file of a directory comes a line with
+the directory's path, and before that an empty line. So the box draws a
+line by copying it, and Go to finds the directory of a file by walking
+up the list to the line before.
 
 ```
- the room during a file search
- Room
- +-------+-------+-------+------ ... ------+-------------------------------+
- | line0 | line1 | line2 |  65 bytes each  | part of a file being searched |
- | dir   | file  | file  |  FndNumb lines  | for a text: <= 32,848 bytes   |
- +-------+-------+-------+------ ... ------+-------------------------------+
-                                           ^ Line(FndNumb+1), back to its paragraph
- FndSize = RoomBytes() / 65 - 1 lines at most
+ the room during a search                                 FreMem2
+ ViewSeg
+ +-------+-------+-------+----- ... -----+---------------------------+
+ | line0 | line1 | line2 | 65 bytes each | a part of the file being  |
+ | path  | file  | file  | FndNumb lines | searched for a text,      |
+ |       |       |       |               | at most 32,848 bytes      |
+ +-------+-------+-------+----- ... -----+---------------------------+
+ FndSize = room in bytes / 65 - 1          ^ FndAdr(FndNumb + 1)
 ```
 
-A found file is a line of 65 bytes (`LenFnf`), formatted the way the box
-shows it: name, size or `SUB-DIR`, the attribute letters `ASHR`, date and
-time. Before the first file found in a directory comes a line with the
-directory's path, and before that an empty line. `FndStuf` appends a
-line and redraws, and the counts in `struct FndData` (28 bytes at
-`TmpBuf+100`) are 32 bits. The original's list was bounded by its 16-bit
-counts and its segment; here it holds as many lines as the room does.
+Line N is at `ViewSeg` plus 65 x N bytes, which can pass 64K, so
+`FndAdr` (30 bytes) makes a segment and offset of the 32-bit product of
+one `MUL`, the same arithmetic as the editor's `T61_00`.
 
-`FindFil` is called for each directory. It expands the mask
-(`FindStr`, with `*.*` behind a name that has no full stop), runs
-FindFirst and FindNext over the directory, lists the matches, and when the
-directory has no more entries it cuts the name off and calls `DirFunc`,
-which calls `FindFil` back for each subdirectory. The single-DTA trick of
-`DirFunc` is what makes it resumable. With `*:` as the drive, `F67_08`
-does this for every drive from A: to Z: that is fixed or on a network,
-leaving CD-ROMs out (`DriveCd`, `DriveRemote`, `DriveFixed`).
+`FindFil` (585 bytes) is called with AL, the attributes of what
+`DirFunc` found, and returns at once for anything that is not a
+directory. For a directory, it runs its own `FindFirst` and `FindNext`
+of the mask over it, lists the matches, and at its end cuts its own
+name off and calls `DirFunc`, which calls `FindFil` for each
+subdirectory. The DTA trick of `DirFunc` is what makes this nest. With
+`*:` as the drive, `F67_10` does this for each drive from A: to Z: that
+is not a CD-ROM (INT 2Fh 150Bh, which `MSCDEX` answers with `0ADADh` in
+BX) and is a network drive (4409h, bit 12 of DX) or a fixed one (4408h).
 
 ### Searching inside files
 
-With a text in "Containing", each candidate file is opened and read into
-the memory *behind* the list, in parts. Each part is searched with
-`V82_00`, and the next part starts 80 bytes before the end of the last,
-`FileStep(handle, 1, -80)`, so that a match across the seam is found:
+With a text in "Containing", each file that matches is opened and read
+into the room *behind* the list, in parts of up to 32,848 bytes,
+`8000h + 80`. Each part is searched with `V82_00`, and the next part
+begins 80 bytes before the end of the last, `4201h` with `CX:DX =
+-1:-80`, so that a match across the seam is not lost:
 
-```c
-left = (i32)(RoomEnd - part);
-chunk = 0x8000 + 80;
-if (left < chunk)
-    chunk = left;
-if (chunk < 4000)
-    return FnFl48(handle);          /* the list has eaten the room: stop */
+```asm
+	MOV	AX,ES
+	ADD	AX,DS:FreMem2
+	SUB	AX,DS:ViewSeg		; the whole room, in paragraphs
+	MOV	BP,8000h+80
+	...				; BP = the room or 32,848, the smaller
+FnFl45:	CMP	BP,4000
+	JB	FnFl48			; Out of memory ???
+	MOV	AX,DS:FndNumb
+	INC	AX
+	CALL	FndAdr			; DS = behind the list
+FnFl46:	...
+	MOV	CX,BP
+	XOR	DX,DX
+	MOV	AH,3Fh
+	CALL	Intr21			; read a part there
+	...
+	CALL	V82_00
+	...
+	MOV	AX,4201h		; back 80 bytes
+	MOV	CX,-1
+	MOV	DX,-80
+	CALL	Intr21
 ```
 
-The original took the part's length from the whole room rather than
-from what was left behind the list, and with a long list it read past
-its own buffer's end: a bug of the original, which the C mends. `part` is
-rounded back to the paragraph its line starts in, up to 15 bytes into the
-free end of the last line, because the original addressed it by segment.
+The length of the part is taken from the whole room, not from what the
+list has left of it, so with a long list and little memory the read
+goes past the room's end: a bug of the original. `Out of memory ???` is
+Volkov's comment, three times in `FindFil`.
 
-The search stays interactive. `FndBack` runs before every DOS call that
-can take long. It looks at the keyboard and the mouse, lets the cursor
-move in the list while the search runs (`MODE_CURSOR`), and opens the box
-menu `[ Stop ] [ Go to ] [ Quit ]`. Go to changes directory to the
-chosen line's directory and puts the cursor on the file (`TO_F24_02`).
-The original asks DOS for the disk of the wrong drive there, reading
-the drive's letter at the wrong place; the C reads the right one.
+The search stays responsive because `FndBack` (144 bytes) runs before
+every call of DOS that can take long: it looks at the keyboard and the
+mouse, moves the cursor in the list while the search goes on, and opens
+the menu `[ Stop ] [ Go to ] [ Quit ]`.
 
 ![Alt-F7](img/find-file.png)
 
-*Alt-F7: the file search's list, a line of 65 bytes for each name and one for each directory, kept in the room.*
+*Alt-F7: the list in the room, 65 bytes for each line.*
 
 ## The user menu and the extension files
 
-Both are text files in one format, read by `FndItem` of `extfile.c`. A
-line that starts at the margin begins an entry. Lines below it that start
-with a space or a tab are its commands. A line that starts with `'` is a
-comment. The program puts 1Ah behind what it read, and the file ends
-there.
+`VC.MNU` and `VC.EXT` are text files of one format, which `FndItem` (37
+bytes) walks: a line that begins at the margin begins an entry; lines
+below it that begin with a space or a tab are its commands; a line that
+begins with `'` is a comment; the program has put a 1Ah behind what it
+read, and that is the end.
 
 ```
- VC.MNU                                VC.EXT
- F1: Compile this file                 c:   tcc !.!
-     tcc !.!                           txt: edit !.!
-     pause                             d??: debug !.!
- 'a comment                            *:   type !.!
+ VC.MNU                                 VC.EXT
+ F1: Compile this file                  c:   tcc !.!
+     tcc !.!                            txt: edit !.!
+     pause                              d??: debug !.!
+ 'a comment                             *:   type !.!
  G: Go to the root
      cd \
- X: Another menu
-     extra.mnu
 ```
 
-**Extension files.** Every `ReDir` of a panel of files reads the
-directory's `VC.EXT` into the panel's own `ExtBuf[512]`, or copies the
-main one, `md.ExtMain`, read once at start from the program's directory.
-So each panel has its extension table at hand without reading the disk
-on Enter. `FindExt` copies the 512 bytes to `MenuBuf` with a 1Ah, puts
-the file's extension at `TmpErr` padded with spaces, and walks the
-entries. Up to three characters are compared, `?` matching any one and
-`*` the rest, and the comparison is by `LowCase`. The answer is a pointer
-behind the colon, where the commands begin.
+**The extension files.** Enter on a file that is not a program copies
+the panel's `ExtBuf` into `MenuBuf` with a 1Ah and calls `FindExt` (104
+bytes). That puts the file's extension at `TmpErr`, three characters
+padded with spaces, and walks the entries, comparing up to three
+characters by `LowCase`, `?` matching any one and `*` the rest. It
+answers with SI behind the colon, where the commands begin.
 
-**The user menu.** F2, `F32_00`, reads `VC.MNU` of the current directory,
-or else the program's (Shift-F2 goes there directly), into `MenuBuf`,
-4,000 bytes, and keeps one word per entry at `TmpBuf+100`: the letter in
-capitals, or a function key's scan code in the high byte. A command that
-is only the name of a `*.mnu` file opens that menu instead (`F34_40`).
+**The user menu.** F2, `F32_00`, reads `VC.MNU` of the current
+directory, or the program's own (Shift-F2 goes there at once), into
+`MenuBuf`, at most 3,999 bytes, and builds the menu from it: one word
+per entry at `TmpBuf+100`, the entry's letter in capitals in the low
+byte, or for `F1` to `F12` the BIOS's scan code in the high byte, `3Bh`
+to `44h` and `85h`, `86h`, worked out from the digits. The box is as
+wide as the longest line and as tall as the entries, at most the
+screen's rows less six.
 
-**Run_00** turns the commands of an entry into something to execute. It
-copies each command into `DosBuf` (1,000 bytes), each ending in a zero,
-the list ending in two, and expands the macros on the way:
+### `Run_00`: the macros
 
-| macro | becomes |
+`Run_00` turns the commands of an entry into the command line to run,
+in `DosBuf`, 1,000 bytes: each command ended by a zero, the list by two.
+A first command that begins with `@` sets bit 7 of `LoadFl`, which runs
+the commands without the prompt and the echo. On the way it expands the
+macros:
+
+| Macro | Becomes |
 |---|---|
-| `!` | name of the file under the cursor, without extension |
+| `!` | the name of the file under the cursor, without its extension |
 | `!.!` | the name with its extension |
-| `!:` | the current drive's letter |
+| `!:` | the current drive, `C:` |
 | `!\` | the current directory, ending in a backslash |
-| `!@` | the name of `vc.lst`, which `FileLst` writes then with the selected files |
+| `!@` | the name of `vc.lst` in `TEMP`, which `FileLst` fills with the selected files |
 | `!!` | `!` |
 
-A first command that starts with `@` runs without the prompt and its echo
-(`LoadFl |= 0x80`). A command is cut at 123 characters (`LenCmd - 1`).
-`Run_00` is a nest of 12 labels in the C too, as in the assembly: its
-paths cross.
+The expansion is economical in a way only assembly invites. `!` and
+`!.!` are one piece of code, which copies the name up to a terminator
+in DL: `.` for `!`, 0 for `!.!`. And `!:` writes the drive's letter and
+*does not step past the colon*, so the colon of the macro is copied as
+the next character and the drive comes out as `C:` for free:
+
+```asm
+Run_11:	CMP	AL,':'
+	JNE	Run_12
+	MOV	AL,DS:DosPth[0]		; the letter; SI stays on the ':',
+	JMP	Run_06			; which is copied next
+	...
+Run_18:	MOV	DX,'.'			; '!': up to the full stop
+	CMP	AX,'!.'			; '!.!'?
+	JNE	Run_19
+	INC	SI
+	INC	SI
+	MOV	DL,0			; then up to the end of the name
+```
+
+With BP not 0, the name is taken from `ViewFil`, the file of the viewer
+or the editor, which is how `VCVIEW.EXT` and `VCEDIT.EXT` name an
+outside viewer or editor for Alt-F3 and Alt-F4.
+
+![F2](img/user-menu.png)
+
+*F2: the user menu, read from `VC.MNU` into `MenuBuf`.*
 
 ## Enter, and running a program
 
 ```mermaid
 flowchart TD
-    E["Enter: F21_00"] --> CL{"command line empty and panel visible?"}
-    CL -- "no" --> H["F21_25: note in HstBuf, 512 bytes, last first"]
+    E["F21_00: Enter"] --> CL{"DosBuf empty and the panel visible?"}
+    CL -- "no" --> H["F21_25: the command line into HstBuf"]
     CL -- "yes" --> F["F21_10: what is under the cursor"]
-    F -- "tree" --> TDIR["DirChange(CrnPath), F24_02, NEXT_INIT50"]
-    F -- "directory" --> GD["F23_02: DirChange; '..' keeps the left name for the cursor"]
-    F -- "file" --> PF{"ProgramOfFile(name)"}
-    PF -- "a program" --> TY["type prefix + name into the command line by EdLin"]
+    F -- "a tree panel" --> TD1["3Bh to CrnPath, F24_02"]
+    F -- "a directory" --> GD["F23_02: change directory"]
+    F -- "a file" --> PX{"TstExe: com, exe, bat?"}
+    PX -- "yes" --> TY["F21_22: type the name into<br/>the command line, by EdLin"]
     TY --> H
-    PF -- "not a program" --> EXT{"FindExt in panel ExtBuf"}
-    EXT -- "entry" --> RUN["Run_00: commands into DosBuf"]
+    PX -- "no" --> EXT{"FindExt in ExtBuf"}
+    EXT -- "found" --> RUN["Run_00: the commands into DosBuf"]
+    EXT -- "none" --> NO["nothing"]
     RUN --> X
-    EXT -- "none" --> OPEN["nothing: the file is not run"]
-    H --> X["F21_30 / F21_31: give vectors back, Quit restores the screen, NEXT_EXEC"]
-    X --> L["main loop returns END_EXEC to Round"]
-    L --> G["GiveMem; Exec; TakeMem"]
-    G --> R["Exec02: each command via the shell, /C"]
-    R --> I["IniData: the program starts over, panels kept"]
+    H --> X["F21_30, F21_31: the setup and 256 names<br/>of each panel into the resident part"]
+    X --> FR["49h: the main data's block back to DOS"]
+    FR --> EX["RETF to Exec, in the resident part"]
+    EX --> SH["Exec02: each command by 4B00h,<br/>COMMAND.COM /C, or by INT 2Eh"]
+    SH --> RL["the transient part loaded again: Init11"]
 ```
 
-Enter on a program does not run it directly. It *types* it into the
-command line, through the same `EdLin` that a key goes through, and then runs the command line. So running a program by Enter and by typing its name
-are one path, and the program lands in the history.
+Enter on a program does not run it. It *types* it: `F21_22` puts the
+name into the command line one character at a time through `EdLin`, the
+routine that a key goes through, and then runs the command line. So a
+program run by Enter and one run by typing its name take one path, and
+both land in the history. The history, `HstBuf`, is 512 bytes of
+commands ended by zeros, the last one first; `F21_25` moves it down by
+the command's length with one backwards `REP MOVSB`, puts the command at
+its head unless it is already the newest, and cuts the oldest off at a
+zero.
 
-To run, the program leaves its loop. `F21_31` gives the interrupts back
-(`RestVct`), puts back the screen DOS had (`Quit`), writes the prompt and
-returns `NEXT_EXEC`. The main loop returns `END_EXEC` to `Round` of
-`main.c`, which gives the room back, calls `Exec` of `exec.c`, takes the
-room again, and starts the loop over from `IniData`. The stack is as deep
-after a command as before it.
+### Keeping the panels while a command runs
 
-`Exec02` runs each command of `DosBuf` with the shell that `COMSPEC`
-names, `ProgramRunBare(name, tail)`. It writes the tail into the four
-bytes in front of the command, a count, `/C` and a space; the four in
-front of the first command are the end of `DosChg`, there for that
-purpose. Between commands it prints a prompt the way COMMAND.COM would,
-drive and path and `>`. A command that begins with `@` skips that.
+To run a command the program leaves memory, all but the resident part,
+and the panels go with the main data. `F21_31` copies what is to
+survive into the resident part first: `ComnIni`, the first 2,733 bytes
+of the main data (`CmnSave`: the setup, the history, `ExtMain`, the
+paths, `DosBuf`), and for each panel `F21_40`:
 
-`ProgramRun` of `sys.h` is DOS's 4B00h, EXEC: DOS loads `COMMAND.COM`
-into the largest free block, hands it the tail `/C command` and the
-parameter block in `md.EPB` (14 bytes: the environment's segment and far
-pointers to the tail and to two FCBs), and returns when it ends. The
-command needs memory to run in, and on a 640K machine that memory is the
-commander's own. How the original makes room, by giving back everything
-but a few kilobytes and loading itself again afterwards, is in
-[chapter 1](01-the-program.md#a-command-runs-in-the-commanders-memory);
-how the C makes the call, through DOS/32A, in
-[chapter 3](03-the-system.md).
+```asm
+F21_40	PROC	NEAR
+	MOV	AX,DS:EndBuf
+	MOV	CX,OFFSET DskBuf+MinFls*SIZE FilEnt
+	CMP	AX,CX			; more than 256 entries?
+	JBE	F21_42
+	MOV	AX,CX			; keep 256
+	...				; the cursor's entry (and the first
+	...				; line's) copied into the last places
+F21_42:	XOR	SI,SI
+	MOV	CX,WCBsave
+	REP	MOVSB			; the header's first 94 bytes
+	...
+F21_43:	PUSH	SI
+	PUSH	CX
+	MOV	CX,12
+	REP	MOVSB			; 12 bytes of the name,
+	INC	SI			; not the 13th, which is always 0,
+	MOVSB				; and AttrF, with the marks
+	POP	CX
+	POP	SI
+	ADD	SI,SIZE FilEnt
+	LOOP	F21_43
+```
 
-The original has a second way, "Quick execute": it hands each command to
-the copy of `COMMAND.COM` that it was started from, through INT 2Eh, an
-undocumented entry of `COMMAND.COM` that runs a command line in the
-shell's own memory, which saves loading a second shell. The C does not
-have it.
+A name of DOS is at most 12 characters, so the thirteenth byte of
+`NameF` is always the zero, and an entry is kept in 13 bytes, name and
+attributes, where it has 24: the time, the date and the size are read
+again with the directory anyway. `WCB1sav` and `WCB2sav` are each 94 +
+13 x 256 = 3,422 bytes of the resident part, and `Expand` of `VC.ASM`
+(46 bytes) turns them back into entries when the program comes back, so
+that `ReDir`'s `ReDr50` finds the cursor and the marks in the old list.
+A panel of more than 256 files is cut to 256 for that: if the cursor was
+beyond, its entry is copied into the 256th place so that it comes back
+where it was.
 
-![F2](img/user-menu.png)
+The resident part is therefore, by the listing:
 
-*F2: the user menu, read from `VC.MNU` into `MenuBuf`; each entry's hot key is one word at `TmpBuf+100`.*
+| Part | Bytes |
+|---|---:|
+| the PSP and the resident code, up to `WCB1sav` | 2,857 |
+| `WCB1sav`, the left panel | 3,422 |
+| `WCB2sav`, the right panel | 3,422 |
+| `ComnIni`, the first part of the main data | 2,733 |
+| `DataSav`, the stack, `LenStk` | 256 |
+| **all** | **12,690** |
 
-## How the pieces share the main data
+`F21_31` then gives back the main data's block with 49h and goes to
+`Exec` in the resident part with a far return, `PUSH DS`, `PUSH AX`,
+`RETF`.
 
-The scratch areas are worth one table, because who may use what at the
-same time is not checked by any type:
+### `Exec`
 
-| Buffer | Size | Used by |
-|---|---|---|
-| `TmpBuf+0` | path, up to 81 | the file that `FncCall` is handed; `CpSrc` |
-| `TmpBuf+90..+100` | flags | each command's own (`DEL_ALL`, `CpAll`, `ATTR_KEEP`, ...) |
-| `TmpBuf+100` | 28 / 138 | `FndData` of the search, or `EdData` of the editor, or menu keys |
-| `TmpBuf+130` | path | `CpDest` |
-| `TmpBuf+200` | 43 | `ViewDat` |
-| `TmpErr` | 256 | names being compared or reported, the extension for `FindExt` |
-| `MenuBuf` | 4,000 | menus; the editor's line; the tree's path; the extension file on Enter |
-| `HelpBuf` | 3,000 | help pages; the prepared search text |
-| `ErrBuf` | 2 x 77 x 48 | what a box covers; the editor's undo line |
-| `TreeBuf` | 12,299 | the tree and its file |
-| `DosBuf` | 1,000 | the commands to run next |
+`Exec02` of `VC.ASM` runs the commands of `ComnIni.DosBuf` one after
+the other. For each it needs a DOS command tail, a count byte, `/C `,
+the command and a carriage return, and it makes it in place, in the
+four bytes in front of the command. The four in front of the first
+command are the end of `DosChg`, the five bytes in front of `DosBuf`
+that are there for that, "Reserved for change drive or /C_":
 
-The editor's `EditBuf` is the menu buffer because no menu is open while
-the editor runs. `DirFunc` keeps the name of the directory it is leaving
-in `MenuBuf` because nothing that calls it has a menu open. The program
-is full of such contracts. The original made them to fit 64K: every
-buffer that two features never need at the same time is one buffer, and
-the table above is the whole list of who may use what. The C keeps them
-because `struct MainDat` keeps the original's layout.
+```asm
+Exec04:	SUB	CX,SI			; the length,
+	MOV	CH,'/'			; and '/' behind it: one word
+	MOV	DS:[SI],CX		; count, '/'
+	MOV	WORD PTR DS:[SI+2],' C'	; 'C', ' '
+	MOV	BX,OFFSET ComnIni.EPB
+	MOV	DS:[BX].CmdLine.Offs,SI
+	MOV	DS:[BX].CmdLine.Segm,DS
+Exec05:	MOV	DI,OFFSET Command	; 'COMMAND.COM'
+	MOV	DX,DS:ComnIni.ComSpec	; or the COMSPEC= of the environment
+	...
+	MOV	AX,4B00h		; EXEC
+	INT	21h
+```
+
+Between two commands it prints a prompt as COMMAND.COM would, the
+drive, the path if Path prompt is on, and `>`, into `IntTab` of the
+resident part, which is free then. A command that begins with `@` goes
+without it. With Quick execute on, `ExecTyp`, each command goes instead
+to the COMMAND.COM that started the program through INT 2Eh, its
+undocumented entry for running a command line in its own memory, which
+saves loading a second shell; `DosChg` then holds `2, letter, ':',
+0Dh`, a command of its own, `X:`, that `F21_34` writes when DOS's
+current drive is not the one the shell had, and that goes to the shell
+before the first real command. INT 2Eh loses SS and SP, so behind each call
+the stack is set again from CS, `MOV SP,OFFSET VcStack`.
+
+When the commands are done, `Exec10` loads `VC.COM` again with 4B00h,
+if the small mode had given the code back, and the program starts at
+`Init11`, with the main data copied back from `ComnIni` and the panels
+expanded and read again: the stack is as empty after a command as
+before the first one.
+
+![After a command](img/exec-output.png)
+
+*The screen of DOS after a command, with the prompt that `Exec08`
+writes between commands.*
+[Chapter 1](01-the-program.md) has the loading and the resident part
+in full; [chapter 3](03-the-system.md) has the calls of DOS.
+
+## How the features share the main data
+
+No type checks who may use which buffer at the same time. The rule is
+that every buffer which two features never need at once is one buffer,
+and this table, from the listing, is the whole contract:
+
+| Buffer | At | Bytes | Used by |
+|---|---:|---:|---|
+| `HstBuf` | 015Ch | 512 | the history |
+| `ExtMain` | 035Ch | 512 | the program's own `VC.EXT` |
+| `DosBuf` | 06C5h | 1,000 | the commands to run next, from Enter, `Run_00` and the command line |
+| `DTA` | 0BFDh | 44 | every search of DOS: `ReDir`, `ReadTre`, `DirFunc`, `FncMas`, `FindFil` |
+| `LowTab` | 0C29h | 128 | small letters above 80h |
+| `TmpBuf` | 0CA9h | 256 | the path handed to `FncAddr`, `CpSrc`; a command's flags at +90; `FndData` at +100, or `EdData` at +100, or the user menu's keys at +100; `CpDest` at +130; `ViewDat` at +200; the extended FCB of a delete at +200 |
+| `TmpErr` | 0DA9h | 256 | names in a box, the extension for `FindExt`, a found file's line, converted masks |
+| `MenuBuf` | 0F29h | 4,000 | the menus; the user menu's file; `VC.EXT` on Enter; the editor's line, `EditBuf`; the path that the tree scan builds at +40; the name `DirFunc` is leaving; the viewer's search beyond the window |
+| `ScrBuf` | 2448h | 8,000 | the program's copy of the screen |
+| `UserScr` | 4388h | 7,840 | the screen of DOS, behind the panels |
+| `WinBuf` | 6228h | 7,392 | what a box of the first level covers |
+| `ErrBuf` | 7F08h | 7,392 | what an error box covers; the editor's undo line, `UndoBuf` |
+| `ErrBuf1` | 9BE8h | 7,392 | what the help and the critical error cover |
+| `HelpBuf` | B8C8h | 3,000 | a help page; the prepared search text and its hex bytes |
+| `TreeBuf` | C480h | 12,299 | the tree, laid out as `TREEINFO.NCD` |
+| the room | `ViewSeg` | the rest | the old list in `ReDir`; the viewer's window; the editor's text; the copy's pieces; find file's list and the part of a file behind it |
+
+Three things make the sharing work. The **`EQU`**, which gives one
+buffer a second name for a second use, `EditBuf EQU MenuBuf`, so the
+code says what it means and costs nothing. The **`STRUC` padded to an
+address**, `DB TmpBuf+200 DUP(?)`, which overlays a feature's variables
+on scratch memory with every field addressable without a base register.
+And **work in place**, which needs no buffer at all: the sort converts
+names inside the entries; the filter partitions the list instead of
+copying it; the tree scan inserts into its own buffer; `DirFunc` finds
+its search again instead of saving it; `F21_40` keeps 13 bytes of an
+entry by skipping the one byte that is always 0. Of the 62,603 bytes of
+the main data, 38,016 are the screen and the four save areas behind
+boxes, and the features in this chapter work in the rest and in the
+room, which is whatever DOS has left.
 
 ## Where to read next
 
-- `src/portable_c/vc.h`: `struct MainDat`, `struct WCBdef`,
-  `struct Places`, `struct FILENT`, `struct DIRTREE`, and `DSKBUF`,
-  `ENTRY` and `PLACES` near the end.
-- `src/portable_c/start.c`: `Init11`, `TakeRoom`, `PanelGrow`,
-  `PanelFit`, `RoomAgain`, `GiveMem`, `TakeMem`.
-- `src/portable_c/read.c`: `ReDir`, `ReDr00`, `ReDr50`; then
-  `files.c`: `SetMask`, `Sort`, `CmpPar`, `NearFl`.
-- `src/portable_c/treebox.c`: `ReadTre`, `RdTr10`, `TreeFileRight`;
-  `tree.c` for drawing.
-- `src/portable_c/dirfunc.c`: `Fnc_T`, `FncSel`, `FncMs1`, `DirFunc`,
-  `F38_40`, `M30_51`.
-- `src/portable_c/copy.c`: `C00_00`, then `C20_00` from the label
-  `read:` to `write:`.
-- `src/portable_c/view.c`: `V00_10`, `V60_00`, `V50_00`, `V51_00`,
-  `V82_00`.
-- `src/portable_c/edit.c`: `T00_00`, `T50_00`, `T51_00`, `T00_83`,
-  `T80_02`.
-- `src/portable_c/find.c`: `FindFil`; `usermenu.c`: `Run_00`;
-  `extfile.c`: `FindExt`.
-- `src/portable_c/enter.c`: `F21_10`, `F21_31`; `exec.c`: `Exec02`;
-  `sys.h` with `sys_dos.c` and `sys_posix.c` for `MemTake`,
-  `ProgramOfFile` and `ProgramRun`.
-- The assembly, `src/asm/`: `VCF1.INC` for the group commands,
-  `VCCOPY.INC` for the copy, `VCVIEW.INC` and `VCEDIT.INC` for the
-  viewer and the editor, `VCFIND.INC` for the search.
-- [Chapter 1](01-the-program.md) for the main data, the loop and the
-  screen that these features draw on, and
-  [chapter 3](03-the-system.md) for the calls of DOS behind
-  `FindFirst`, `FileRead` and `ProgramRun`.
+- `src/asm/VC.ASM`: `MainDat`, `WCBdef`, `FILENT`, `DIRENT`, `DIRTREE`
+  near the top; `Init11` for the memory; `Exec` and `Expand`.
+- `src/asm/VCSUB3.INC`: `ReDir`, `ReadTre`, `DirSize`, `NearFl`; and
+  `VCSUB2.INC` for `SetMask`, `TstExe`, `Sort`, `CmpPar`, `FnFile`,
+  `TotSel`, `FndItem`, `FindExt`.
+- `src/asm/VCF1.INC`: `F38_00` to `F38_70`, `M30_00`, `M30_50`,
+  `DirFunc`, `FncSel`, `FncMas`, `DelTree`.
+- `src/asm/VCCOPY.INC`: the `EQU`s at the top, `C00_00` to `C30_00`,
+  `PerCent`.
+- `src/asm/VCVIEW.INC`: `ViewDat`, `V00_10`, `V50_00`, `V51_00`,
+  `V60_00`, `V81_00`, `V82_00`.
+- `src/asm/VCEDIT.INC`: `EdData`, `Edit_T`, `T00_00`, `T50_00`,
+  `T51_00`, `T61_00`, `T80_00`.
+- `src/asm/VCFIND.INC`: `FndData`, `F67_00`, `FindFil`, `FndAdr`.
+- `src/asm/VCFUNC.INC`: `F21_00` to `F21_40`, `F32_00`, `Run_00`,
+  `FileLst`.
+- [Chapter 1](01-the-program.md) for the main data, the loop, the
+  screen and the resident part; [chapter 3](03-the-system.md) for
+  `Intr21`, the critical error and the calls of DOS; chapter 5 for how
+  these routines were carried into C.
