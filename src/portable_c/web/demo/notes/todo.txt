@@ -1,0 +1,8 @@
+Things to do
+------------
+
+[x] Draw the panels as text, 80 by 25
+[x] Keys and the mouse from the browser
+[ ] Water the plants
+[ ] Read the notes in IDEAS.MD again
+[ ] Copy DATA\CITIES.CSV somewhere and sort it by hand

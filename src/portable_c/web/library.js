@@ -14,7 +14,15 @@
 //   Module.vcOpen   (host, name): a file of the host to open in a new tab,
 //                   with DOS's name of it;
 //   Module.vcSync   () => a promise: the store written, which the program
-//                   waits for before it ends.
+//                   waits for before it ends;
+//   Module.vcChange (what, path, other, fd, mode) => a promise of a number:
+//                   a change of the files made on the page's server before
+//                   the program makes it in the page's file system, as
+//                   files_posix.c tells it (enum HostChange of
+//                   emulate_posix.h), the answer 0 or the number of an
+//                   error of sys_web.c's table (drives.js, CHANGE_ERRORS);
+//   Module.vcWhere  (host): the directory of the file system that is DOS's
+//                   current one, told at every draw.
 addToLibrary({
   web_input: (to, room) => {
     const queue = Module.vcInput;
@@ -47,6 +55,26 @@ addToLibrary({
     if (Module.vcOpen) {
       Module.vcOpen(UTF8ToString(host), UTF8ToString(name));
     }
+  },
+
+  web_where__deps: ['$UTF8ToString'],
+  web_where: (host) => {
+    if (Module.vcWhere) {
+      Module.vcWhere(UTF8ToString(host));
+    }
+  },
+
+  // Where the page has no server, as under Node, nothing is waited for:
+  // the program does not unwind for a change that nobody keeps.
+  web_change__deps: ['$UTF8ToString'],
+  web_change__async: true,
+  web_change: (what, path, other, fd, mode) => {
+    if (!Module.vcChange) {
+      return 0;
+    }
+    return Asyncify.handleAsync(() => Module.vcChange(
+        what, path ? UTF8ToString(path) : null,
+        other ? UTF8ToString(other) : null, fd, mode));
   },
 
   web_sync__async: true,

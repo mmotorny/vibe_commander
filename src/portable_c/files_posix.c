@@ -251,6 +251,21 @@ static void Begin(struct Dos *dos)
     }
     dos->record = &dos->own;
     dos->clock = NULL;
+    dos->change = NULL;
+}
+
+/* A change of the host's files told to what keeps them besides, where
+   something does (the web page's server): 0, or DOS's error for which
+   the change is not to be made, of a path where `path` says so. */
+static u16 Told(struct Dos *dos, enum HostChange what, const char *path,
+                const char *other, int fd, u32 mode, bool of_path)
+{
+    int error;
+
+    if (dos->change == NULL)
+        return 0;
+    error = dos->change(what, path, other, fd, mode);
+    return error == 0 ? 0 : DosErrorOf(error, of_path);
 }
 
 void DosBegin(struct Dos *dos, const char *home)
@@ -498,6 +513,7 @@ static struct Answer Opened(struct Dos *dos, i32 slot, int fd,
     handle->open = true;
     handle->written = false;
     handle->stamped = false;
+    handle->made = false;
     return Done((u16)slot);
 }
 
@@ -532,7 +548,10 @@ struct Answer DosFileCreate(struct Dos *dos, const u8 *name,
                   (attributes & DOS_READ_ONLY) != 0 ? 0444 : 0666);
     if (fd < 0)
         return Failed(dos, OpenError(errno));
-    return Opened(dos, slot, fd, host, 2, false, full[0]);
+    led = Opened(dos, slot, fd, host, 2, false, full[0]);
+    if (!led.failed)
+        dos->handles[slot].made = true;
+    return led;
 }
 
 struct Answer DosFileOpen(struct Dos *dos, const u8 *name, u16 mode)
@@ -580,6 +599,7 @@ static bool Stamp(int fd, struct DosStamp stamp)
 struct Answer DosFileClose(struct Dos *dos, u16 handle)
 {
     struct DosHandle *open = Handle(dos, handle);
+    u16 error = 0;
 
     if (open == NULL)
         return Failed(dos, INVALID_HANDLE);
@@ -592,10 +612,18 @@ struct Answer DosFileClose(struct Dos *dos, u16 handle)
             Stamp(open->fd, open->stamp);
         else if (open->written && dos->clock != NULL)
             Stamp(open->fd, dos->clock());
+        /* What keeps the files besides has the file whole, before the
+           close answers; where it refuses, the close fails with its
+           error, the handle closed all the same. */
+        if (open->made || open->written || open->stamped)
+            error = Told(dos, HOST_CONTENTS, NULL, NULL, open->fd, 0,
+                         false);
         close(open->fd);
     }
     open->fd = -1;
     open->open = false;
+    if (error != 0)
+        return Failed(dos, error);
     return Done(AX_CLOSE);
 }
 
@@ -790,6 +818,7 @@ struct Answer DosFileDelete(struct Dos *dos, const u8 *name)
     char host[HOST_ROOM];
     struct Answer led = Lead(dos, name, full, host);
     struct stat status;
+    u16 error;
 
     if (led.failed)
         return led;
@@ -801,6 +830,9 @@ struct Answer DosFileDelete(struct Dos *dos, const u8 *name)
         && (S_ISDIR(status.st_mode)
             || (Attributes(&status, host) & DOS_READ_ONLY) != 0))
         return Failed(dos, ACCESS_DENIED);
+    error = Told(dos, HOST_DELETE, host, NULL, -1, 0, false);
+    if (error != 0)
+        return Failed(dos, error);
     if (unlink(host) != 0)
         return Failed(dos, DosErrorOf(errno, false));
     Reread(dos, host);
@@ -815,6 +847,7 @@ struct Answer DosFileRename(struct Dos *dos, const u8 *from, const u8 *to)
     char goes[HOST_ROOM];
     struct Answer led = Lead(dos, from, full, host);
     struct stat status;
+    u16 error;
 
     if (led.failed)
         return led;
@@ -835,6 +868,9 @@ struct Answer DosFileRename(struct Dos *dos, const u8 *from, const u8 *to)
        replaced: DOS refuses, where the host would replace it. */
     if (led.value == 1 || lstat(goes, &status) == 0)
         return Failed(dos, ACCESS_DENIED);
+    error = Told(dos, HOST_RENAME, host, goes, -1, 0, false);
+    if (error != 0)
+        return Failed(dos, error);
     if (rename(host, goes) != 0)
         /* A directory into itself is the host's EINVAL. */
         return Failed(dos, errno == EINVAL ? ACCESS_DENIED
@@ -891,6 +927,7 @@ struct Answer DosFileSetAttributes(struct Dos *dos, const u8 *name,
     struct stat status;
     bool now, wanted;
     mode_t mode;
+    u16 error;
 
     if (led.failed)
         return led;
@@ -904,10 +941,14 @@ struct Answer DosFileSetAttributes(struct Dos *dos, const u8 *name,
         now = (Attributes(&status, host) & DOS_READ_ONLY) != 0;
         wanted = (attributes & DOS_READ_ONLY) != 0;
         mode = status.st_mode & 07777;
-        if (now != wanted
-            && chmod(host, wanted ? mode & ~(mode_t)0222
-                                  : mode | S_IWUSR) != 0)
-            return Failed(dos, DosErrorOf(errno, false));
+        if (now != wanted) {
+            mode = wanted ? mode & ~(mode_t)0222 : mode | S_IWUSR;
+            error = Told(dos, HOST_MODE, host, NULL, -1, (u32)mode, false);
+            if (error != 0)
+                return Failed(dos, error);
+            if (chmod(host, mode) != 0)
+                return Failed(dos, DosErrorOf(errno, false));
+        }
     }
     return Done(attributes);
 }
@@ -1141,7 +1182,8 @@ struct Answer DosFcbDelete(struct Dos *dos, const u8 *fcb, bool flagged)
                     & (DOS_READ_ONLY | (~allowed & (DOS_HIDDEN | DOS_SYSTEM))))
                        != 0)
                 continue;
-            if (unlink(path) == 0)
+            if (Told(dos, HOST_DELETE, path, NULL, -1, 0, false) == 0
+                && unlink(path) == 0)
                 deleted = true;
         }
         if (deleted)
@@ -1350,6 +1392,7 @@ struct Answer DosDirMake(struct Dos *dos, const u8 *name)
     u8 full[DOS_PATH_ROOM];
     char host[HOST_ROOM];
     struct Answer led = Lead(dos, name, full, host);
+    u16 error;
 
     if (led.failed)
         return led;
@@ -1357,6 +1400,9 @@ struct Answer DosDirMake(struct Dos *dos, const u8 *name)
         return Failed(dos, PATH_NOT_FOUND);
     if (led.value == 1)
         return Failed(dos, ACCESS_DENIED);
+    error = Told(dos, HOST_DIR_MAKE, host, NULL, -1, 0, true);
+    if (error != 0)
+        return Failed(dos, error);
     if (mkdir(host, 0777) != 0)
         return Failed(dos, DosErrorOf(errno, true));
     /* DOS gives a new directory the time of day, which a test has of its
@@ -1377,6 +1423,7 @@ struct Answer DosDirRemove(struct Dos *dos, const u8 *name)
     u8 full[DOS_PATH_ROOM];
     char host[HOST_ROOM];
     struct Answer led = Lead(dos, name, full, host);
+    u16 error;
 
     if (led.failed)
         return led;
@@ -1387,6 +1434,9 @@ struct Answer DosDirRemove(struct Dos *dos, const u8 *name)
                    .current)
         == 0)
         return Failed(dos, full[3] == '\0' ? ACCESS_DENIED : REMOVE_CURRENT);
+    error = Told(dos, HOST_DIR_REMOVE, host, NULL, -1, 0, true);
+    if (error != 0)
+        return Failed(dos, error);
     if (rmdir(host) != 0)
         return Failed(dos, DosErrorOf(errno, true));
     Reread(dos, host);

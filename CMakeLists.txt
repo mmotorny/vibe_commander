@@ -830,6 +830,55 @@ if(VC_WEB)
         LINK_DEPENDS ${web_dir}/library.js ${web_dir}/node.js)
 endif()
 
+# The web page itself, the piece W3b of step 7 (TODO.md, "Step 7, the web
+# page"): build/portable_c/web/vc.html, one file by SINGLE_FILE, with the
+# program, its JS, the page's script (web/page.js and the modules that it
+# names, made one script by web/bundle.mjs into the shell, web/shell.html)
+# and the font in it. The font is VileR's Web437 IBM VGA 8x16 of the
+# Ultimate Oldschool PC Font Pack, version 2.2, its archive for the web
+# from int10h.org, pinned by its SHA-256, which CLAUDE.md allows by name;
+# its licence is CC BY-SA 4.0, and the page credits it. The page's server,
+# web/server.mjs, serves it with the two drives: the target
+# portable_c-web-serve runs it on 127.0.0.1:8437 (TODO.md, "W3b").
+if(VC_WEB)
+    FetchContent_Declare(vga_font
+        URL https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip
+        URL_HASH SHA256=f0e0a15e46ab85901165188034e90ad933133e8a205640f624f38dc8a8d74855)
+    FetchContent_MakeAvailable(vga_font)
+    set(web_page_dir ${CMAKE_BINARY_DIR}/portable_c/web)
+    set(web_font "${vga_font_SOURCE_DIR}/woff - Web (webfonts)/Web437_IBM_VGA_8x16.woff")
+    set(web_page_script render.js keys.js mouse.js drives.js page.js
+        shell.html bundle.mjs)
+    list(TRANSFORM web_page_script PREPEND ${web_dir}/)
+    file(MAKE_DIRECTORY ${web_page_dir})
+    add_custom_command(
+        OUTPUT ${web_page_dir}/shell.html
+        COMMAND ${node} ${web_dir}/bundle.mjs ${web_font}
+                ${web_page_dir}/shell.html
+        DEPENDS ${web_page_script} ${web_font}
+        COMMENT "Making the shell of the web page"
+        VERBATIM)
+    add_portable_c_host(portable_c-web ${web_page_dir} web
+        COMPILER ${emcc} OUTPUT vc.html
+        COMPILE -D_XOPEN_SOURCE=700 -O2
+        LINK -sASYNCIFY -sASYNCIFY_STACK_SIZE=65536 -sENVIRONMENT=web
+             -sEXIT_RUNTIME -sALLOW_MEMORY_GROWTH -sMAXIMUM_MEMORY=2GB
+             -sINITIAL_MEMORY=64MB -sSINGLE_FILE
+             -sEXPORTED_FUNCTIONS=_main,_CodePageGlyph
+             --shell-file ${web_page_dir}/shell.html
+             --js-library ${web_dir}/library.js --pre-js ${web_dir}/pre.js
+        LINK_DEPENDS ${web_dir}/library.js ${web_dir}/pre.js
+                     ${web_page_dir}/shell.html)
+    add_custom_target(portable_c-web-serve
+        COMMAND ${node} ${web_dir}/server.mjs --port 8437
+                --page ${web_page_dir}/vc.html
+                --drive-c ${web_page_dir}/drives/c
+                --drive-d ${web_page_dir}/drives/d
+        DEPENDS portable_c-web
+        USES_TERMINAL
+        VERBATIM)
+endif()
+
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS
 # in QEMU (see harness/) and also need qemu-system-i386 and mtools. The
@@ -1006,6 +1055,15 @@ add_test(NAME portable_c-web-render
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webrender.py
             ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc)
 set_tests_properties(portable_c-web-render PROPERTIES SKIP_RETURN_CODE 77)
+# The web page's server and its file system, the piece W3b of step 7:
+# src/portable_c/web/server.mjs and drives.js run in Node, the server's
+# API held, its refusals of every path outside the two drives, and the
+# page's file system against it; and the page's script as the build makes
+# it. See harness/webserver.py. It needs Node and nothing downloaded, and
+# runs no machine.
+add_test(NAME portable_c-web-server
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webserver.py)
+set_tests_properties(portable_c-web-server PROPERTIES SKIP_RETURN_CODE 77)
 # The program for Linux through the scenarios, the piece L3b of step 6:
 # the sanitized build run on a bench of the host's laid out as the DOS
 # bench's, its screens and its disks held to the goldens of the original
@@ -1071,6 +1129,15 @@ if(VC_WEB)
     add_test(NAME portable_c-web-scenarios
         COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
                 ${CMAKE_BINARY_DIR}/portable_c/web-node/vc.js)
+    # The web page's program against its server, the piece W3b of step
+    # 7: build/portable_c/web/vc.html run in Node with a document of what
+    # it asks of one, its drives on server.mjs, each change of the
+    # program's made on the server first. See harness/webpage.py.
+    add_test(NAME portable_c-web-page
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/webpage.py
+                ${CMAKE_BINARY_DIR}/portable_c/web/vc.html)
+    set_tests_properties(portable_c-web-page PROPERTIES
+        LABELS portable_c SKIP_RETURN_CODE 77)
     set_tests_properties(portable_c-web-scenarios PROPERTIES
         LABELS "portable_c;machine")
 endif()
@@ -1082,6 +1149,7 @@ set_tests_properties(asm-bytes PROPERTIES LABELS frozen)
 set_tests_properties(portable_c-host portable_c-int16
     portable_c-words portable_c-width portable_c-tidy
     portable_c-posix-unit portable_c-terminal portable_c-web-render
+    portable_c-web-server
     PROPERTIES LABELS portable_c)
 if(VC_DOS)
     set_tests_properties(c-data c-arith PROPERTIES LABELS frozen)

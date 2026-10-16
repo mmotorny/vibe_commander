@@ -39,6 +39,7 @@
  *     new tab of the browser, web_open_file; nothing is a program.
  */
 #include <emscripten.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +55,15 @@ extern i32 web_input(char *to, i32 room);
 extern void web_draw(const u16 *cells, u16 place, u16 shape);
 extern void web_open_file(const char *host, const u8 *name);
 extern void web_sync(void);
+/* And of the page's file system: a change of the host's files made on
+   the server that the page mirrors, before the program makes it in the
+   mirror, waited for, as files_posix.c tells it (enum HostChange); the
+   answer 0, or a number of Errors below for what the server refused or
+   what failed on the way to it. And the directory of the host that is
+   DOS's current one, where the page puts what the user brings in. */
+extern i32 web_change(i32 what, const char *path, const char *other, i32 fd,
+                      u32 mode);
+extern void web_where(const char *host);
 
 /* The drives, by the variables of the environment that name each: its
    directory, its label and, of one of them, that the program's own files
@@ -75,16 +85,37 @@ static bool Testing = false;            /* driven by the test channel */
 static double YieldedAt = 0;            /* emscripten_get_now() */
 static i32 TicksRead = 0;               /* since the last yield */
 
-/* The grid handed to the page. */
+/* The grid handed to the page, with where DOS is. */
 static void Draw(void)
 {
     struct ScreenShows shown;
+    char where[HOST_PATH_ROOM];
 
     if (Testing)
         return;
     TypedForget();
     shown = ScreenShown();
     web_draw(shown.cells, shown.place, shown.shape);
+    if (DosCurrentHost(&MachineDos, where, (i32)sizeof where).failed)
+        where[0] = 0;
+    web_where(where);
+}
+
+/* A change of the files told to the page, which makes it on its server
+   first (web_change): the host's error for what the page answers. The
+   test channel's page under Node has no server, and answers 0. */
+static const int Errors[] = {
+    0, EACCES, ENOENT, EEXIST, ENOTEMPTY, ENOSPC, EIO
+};
+
+static int Change(enum HostChange what, const char *path, const char *other,
+                  int fd, u32 mode)
+{
+    i32 answer = web_change((i32)what, path, other, (i32)fd, mode);
+
+    if (answer < 0 || answer >= (i32)(sizeof Errors / sizeof Errors[0]))
+        return EIO;
+    return Errors[answer];
 }
 
 /* The page let go on for `wait` milliseconds, the grid drawn first. */
@@ -325,6 +356,7 @@ int main(int count, char **arguments)
     Testing = TestBegin();
     MachineBegin(given, drives,
                  own != 0 && own[0] != 0 ? (u8)(own[0] & ~0x20) : 'C');
+    MachineDos.change = Change;
     MachineEnvironment((const u8 *)"COMMAND.COM", count, arguments);
     YieldedAt = emscripten_get_now();
     Main();

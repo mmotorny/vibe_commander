@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- The shell of the web page, the piece W3b of step 7 (TODO.md, "Step 7,
+     the web page"). bundle.mjs puts the font and the page's script in
+     where the two marks of @@ stand, and Emscripten its program where
+     SCRIPT stands, all into one file, vc.html. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Vibe Commander</title>
+<style>
+@font-face {
+  font-family: "Web437 IBM VGA 8x16";
+  src: url(data:font/woff;base64,@@FONT@@) format("woff");
+  font-display: block;
+}
+:root { color-scheme: dark; }
+html, body {
+  margin: 0; padding: 0; background: #000; color: #aaa;
+  height: 100%; overflow: hidden;
+  font-family: system-ui, sans-serif; font-size: 14px;
+}
+body {
+  display: flex; flex-direction: column; height: 100vh; height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+}
+#stage {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  min-height: 0; overflow: hidden;
+}
+#screen {
+  position: relative; margin: 0; padding: 0; overflow: hidden;
+  font-family: "Web437 IBM VGA 8x16", monospace; font-size: 16px;
+  line-height: 16px; width: 640px; height: 400px; white-space: pre;
+  background: #000; color: #aaa; cursor: default; user-select: none;
+  -webkit-user-select: none; -webkit-touch-callout: none;
+  touch-action: manipulation; font-kerning: none;
+  font-variant-ligatures: none; -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+#cursor {
+  position: absolute; display: none; background: #aaa;
+  pointer-events: none; mix-blend-mode: difference;
+}
+#cursor.off { visibility: hidden; }
+#bar {
+  flex: none; display: flex; flex-wrap: wrap; gap: 4px; padding: 4px;
+  align-items: center; justify-content: center; background: #111;
+}
+#bar button {
+  font: inherit; color: #ddd; background: #333; border: 1px solid #555;
+  border-radius: 4px; padding: 6px 8px; min-width: 2.5em;
+  touch-action: manipulation;
+}
+#bar button.held { background: #0a0; color: #000; }
+#keys { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+#keys[hidden] { display: none; }
+#credit { font-size: 11px; color: #777; margin-left: 8px; }
+#credit a { color: #999; }
+#notice, #ended {
+  position: fixed; left: 50%; top: 12px; transform: translateX(-50%);
+  background: #fff; color: #000; padding: 8px 12px; border-radius: 4px;
+  max-width: 90vw; z-index: 2;
+}
+#notice[hidden], #ended[hidden] { display: none; }
+#input {
+  position: fixed; left: 0; bottom: 0; width: 1px; height: 1px;
+  opacity: 0; font-size: 16px; border: 0; padding: 0;
+}
+</style>
+</head>
+<body>
+<div id="stage"><pre id="screen"><div id="cursor"></div></pre></div>
+<div id="bar">
+  <div id="keys" hidden></div>
+  <button id="type" title="The phone's keyboard">&#x2328;</button>
+  <button id="more" title="The keys that a phone lacks">Keys</button>
+  <button id="upload" title="Bring files into the current directory">Upload</button>
+  <button id="full" title="The full screen">Full screen</button>
+  <span id="credit">Vibe Commander 0.1, based on Volkov Commander 4.05.
+  Font: <a href="https://int10h.org/oldschool-pc-fonts/" target="_blank"
+  rel="noopener">Web437 IBM VGA 8x16</a> by VileR,
+  <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank"
+  rel="noopener">CC BY-SA 4.0</a>.</span>
+</div>
+<input id="files" type="file" multiple hidden>
+<input id="input" type="text" autocapitalize="off" autocomplete="off"
+       autocorrect="off" spellcheck="false" aria-label="Keyboard">
+<div id="notice" hidden></div>
+<div id="ended" hidden></div>
+<script>
+@@PAGE@@
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>

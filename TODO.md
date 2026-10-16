@@ -835,7 +835,8 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
     - VC.EXE and debug/VC.EXE are the same bytes before and after (SHA-256 f6538da4... and cf1abd33...). The program for Linux is the same code moved: posix-scenarios, terminal, posix-unit and tidy pass. The records of `portable_c-host` and `portable_c-words` have the two new files, clean and with no word.
 - **W3a, the pure JS.** render.js, keys.js, mouse.js and the test `portable_c-web-render`. Medium.
 - **W2, the program under Node: done**, below. `sys_web.c`, the web-node link, the harness's tree "web", ON_WEB, and `portable_c-web-scenarios`.
-- **W3b, the page.** The glue, the shell HTML, the IDBFS sync, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, and the target `portable_c-web`. After W2 and W3a. The user tries it in a browser.
+- **W3b, the page and its server: done**, below. The server, the page's file system against it, the glue, the shell HTML, upload and new-tab open, the demo tree, the font pinned, the cursor, the full screen, the phone, and the targets `portable_c-web` and `portable_c-web-serve`. The user tries it in a browser.
+- **W3c, the static page.** The same page with no server, its drives starting from what is served with it and the user's changes kept in the browser (CLAUDE.md, "The web page"). After W3b.
 - **W4.** DEVIATIONS "The web page", the README, TODO and CLAUDE notes, the licences, and the question of publishing to the user.
 
 ### W0, the toolchain: done, and what a later piece should know
@@ -1104,6 +1105,128 @@ The piece W3a of the plan above: done.
   the plan) never reach `keyEvent`; `prevent` is true for every key
   that the program takes, Alt alone included, which keeps Firefox's
   menu bar away.
+
+### W3b, the page and its server: done, and what W3c should know
+
+**To try it in a browser** (the user, by hand): in a checkout configured
+with `-DVC_WEB=ON`,
+
+    cmake --build build --target portable_c-web-serve
+
+builds the page and runs its server in the foreground, on
+`http://127.0.0.1:8437/`, with C: in `build/portable_c/web/drives/c` and
+D: in `build/portable_c/web/drives/d` (D: made as a copy of the demo,
+`src/portable_c/web/demo`, the first time; delete the directory to start
+the demo afresh). Ctrl-C stops it. By hand, with other directories or
+another port:
+
+    node src/portable_c/web/server.mjs --port 8437 \
+        --page build/portable_c/web/vc.html \
+        --drive-c DIR --drive-d DIR [--demo DIR]
+
+For the iPhone over the tailnet, beside it: `tailscale serve --bg 8437`
+(Tailscale Serve hands `https://<machine>.<tailnet>.ts.net/` to the port;
+`tailscale serve status` shows it, `tailscale serve --https=443 off` takes
+it away). What to look at by hand: the panels drawn in the VGA font and
+colours, the blink, the cursor in the editor and the command line; the
+keys of W4 of DEVIATIONS.md, in Chrome and Firefox, and the full screen
+with its keyboard lock in Chrome; the mouse, clicks and the right button;
+Enter on a file, a new tab; Upload and dragging a file, with the
+question before one is written over; on the phone, the fit when it
+turns, pinch-zoom, a tap as a click, the row of keys with Ctrl and Alt
+held for the next key, and the phone's keyboard by its button.
+
+- **The server**, `src/portable_c/web/server.mjs`, Node's own modules: it
+  serves the page and the drives' trees, `GET /api/tree?drive=c|d` (every
+  file with its contents in base64, parents first), and makes the
+  changes, `PUT /api/file` (a file written whole, with its time and
+  read-only bit) and `POST /api/change` (`delete`, `rename`, `mkdir`,
+  `rmdir`, `mode`); its top has the API. It refuses, with EACCES, any
+  path with `.`, `..`, an empty name, a backslash or a NUL, an absolute
+  path, a drive that there is not, and any name on the way that is a
+  link of the host's, the last included; a tree lists no link. It
+  listens on 127.0.0.1 alone. It makes C:'s `vc` where it is not there,
+  since the program's `OwnDirectory` makes it in the page's copy alone.
+  Its answers are no-store: nothing is cached.
+- **The hooks.** `files_posix.c` tells `dos->change` of `struct Dos`
+  (`emulate_posix.h`, `enum HostChange`) of every change before it makes
+  it: delete (and the FCB's delete), rename, make and remove a
+  directory, and the read-only bit, before the host is asked; a file's
+  contents, time and mode at its close, of the handle that is still
+  open, where it was made (`made`, new in `struct DosHandle`), written or
+  stamped. An error answered is the call's, by `DosErrorOf`; Linux has
+  no hook, `DosBegin` making it none, and does what it did. `sys_web.c`
+  sets it to `Change`, which calls `web_change` of `library.js`, awaited
+  by `Asyncify.handleAsync` where the page has put `Module.vcChange` and
+  answered at once where not (Node): its numbers are `Errors` there,
+  `CHANGE_ERRORS` of `drives.js`. `Draw` also tells the page DOS's
+  current directory on the host at each yield, `web_where`, which the
+  uploads go into. The program's mkdir of its own directory at the start
+  (`OwnDirectory`) and the test channel's files are not told: the first
+  is the server's to make, the second the tests'.
+- **The page's file system**, `web/drives.js`, a plain module handed the
+  FS and `fetch`: `load` (each drive's tree into MEMFS at `/drive/c` and
+  `/drive/d`, `ROOTS`), `change` (the server first; a path in neither
+  drive is no concern of the server's), `upload`. Whole-file writes at
+  close, as the brief allowed. `VC_DRIVE_C` and `VC_DRIVE_D` are set in
+  the pre-js's `preRun` (`web/pre.js` hands the page FS and ENV), and the
+  program waits for the load by a run dependency.
+- **The mode is chosen in one place**, `MODE` and `MODES` at the top of
+  `web/page.js`: "server" makes the `Drives` of the server. W3c adds a
+  mode with no server, whose object has the same three methods, `load`,
+  `change` (answering 0 and keeping the copy, in IndexedDB or as it
+  likes) and `upload`, and chooses it where the page has no server (a
+  failed `/api/tree`, or the page's URL).
+- **The page**, `web/page.js` with `web/shell.html`, made one file by
+  `web/bundle.mjs` (each module a function of its own answering its
+  exports, its one-line imports taken from those before it) and emcc's
+  `SINGLE_FILE`, `build/portable_c/web/vc.html`, about 570 KB, no
+  sanitizers, `-O2`, 2 GB at most. emcc minifies the shell's script.
+  `ProgramOpenFile` opens a blob URL with a type by the extension in a new
+  tab; a browser that keeps a tab from opening, as one may since the
+  open does not come from the click itself, gets a notice with a link to
+  click. Ctrl-R is typed after an upload. The cursor blinks at
+  `CURSOR_HALF`, the characters at `BLINK_HALF`, as W3a's notes say. The
+  phone: the grid fitted by `visualViewport` where the page is not zoomed
+  (a zoom of the fingers is left alone), by whole multiples of the font
+  where it has room for one, smaller where not; a tap is pointerdown and
+  pointerup, `touch-action: manipulation`; the row of keys is shown on a
+  coarse pointer and by its button; the phone's keyboard comes up for a
+  hidden input (`font-size: 16px`, so that Safari does not zoom in on its
+  focus) focused in the tap, its `input` events made keys, Backspace and
+  Enter by their input types; `100dvh` with `100vh` before it; nothing
+  rests on hover. None of the browser's side has been seen in a
+  browser: it is the user's pass by hand.
+- **The font**: the Ultimate Oldschool PC Font Pack 2.2's archive for the
+  web, `oldschool_pc_font_pack_v2.2_web.zip` from int10h.org, 5 MB,
+  pinned in `CMakeLists.txt` by its SHA-256 `f0e0a15e...a8d74855`, with
+  VC_WEB alone; the page takes `Web437_IBM_VGA_8x16.woff`, 9.8 KB, as
+  base64. Its credit is in the page's bar. W4 keeps the licence's text if
+  it is to be kept beside the README's mention.
+- **The demo**, `src/portable_c/web/demo`: a readme, notes, three small
+  programs' sources that cannot be run, made-up data, and a text with
+  DOS's line ends, written for the project.
+- **The tests.** `portable_c-web-server` (`harness/webserver.py` and
+  `.mjs`, Node alone, no VC_WEB): the server's API and its refusals,
+  links of the host's among them, the page's file system against it with
+  a file system of Emscripten's shape, and the page's script bundled,
+  compiled and run up to `Module`. `portable_c-web-page`
+  (`harness/webpage.py` and `.mjs`, VC_WEB): `vc.html` itself, its
+  scripts run in Node with a document of what the page asks of one,
+  against the server: the drives loaded, a directory made, a file opened
+  in a tab, a file written in the editor reaching the server at its
+  close, a directory removed, a refusal of the server (the drive's
+  directory made read-only on the host) shown as DOS's error, the setup
+  saved on C:, and the page's end. Some five seconds. The editor clears
+  what is typed ahead of it, so the test types one key at a time, and
+  waits for each box before its keys.
+- **A start on C:.** The page starts at the root of C:, as W1 of
+  DEVIATIONS.md says (the root of the first drive): the demo is a drive
+  away, by Alt-F1 or Alt-F2. Starting on D: is one line of `vcBegin`
+  (`FS.chdir(ROOTS.d)` behind the load); it was tried and taken out, as
+  a choice that is the user's: **for the user**.
+- **Left for W4**: the README, the licences, the list of keys checked in
+  the browsers, and publishing.
 
 ## A patch with a line for a cell that blinks: untried
 

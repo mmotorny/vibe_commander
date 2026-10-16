@@ -1,0 +1,64 @@
+"""Hold the web page's server and the page's file system to what they do.
+
+The piece W3b of step 7 (TODO.md, "Step 7, the web page"): the page keeps
+its two drives on a server of the project's own, src/portable_c/web/
+server.mjs, and mirrors them in Emscripten's file system, which every
+change of the program's is asked of the server for first, by
+src/portable_c/web/drives.js. Both are of Node's own modules, and this test
+runs them in Node, harness/webserver.mjs, with no browser and nothing
+downloaded:
+
+  1. The server, listening on a port of its own, with two drives in a
+     directory of build/tmp, D: made of the demo: the page served; a
+     drive's tree, parents first, with the contents, and no link of the
+     host's in it; a file written whole, with its time and its read-only
+     bit, also over a file that is read-only; a directory made, renamed,
+     removed, and refused where it is there, not empty, or is renamed
+     into itself; a file deleted, and refused where it is a directory or
+     is not there; the read-only bit set and cleared. And refused, with
+     nothing changed outside the drives: `..` and `.` anywhere, an
+     absolute path, a backslash, a NUL, an empty name, a drive that there
+     is not, an operation that there is not, a body that is no JSON, and
+     a link of the host's inside a drive, to a file or to a directory
+     outside it, wherever it stands in the path.
+  2. The page's file system, drives.js, with a file system of the shape
+     of Emscripten's, against the same server: the drives loaded, with
+     their times; where a path of the file system is; a file's contents,
+     time and read-only bit sent at its close; each change of
+     files_posix.c's (enum HostChange) made on the server, with the
+     server's refusals made the numbers that sys_web.c makes DOS's
+     errors; a file brought in by the user; and a server that is not
+     there answering the general failure.
+  3. The page's script as bundle.mjs makes it for the shell: one classic
+     script, which compiles, takes from each module only what that module
+     exports, and puts Module up.
+
+What the browser does with the page is checked by hand (TODO.md, "W3b").
+The test exits with 77, which the build takes for a test that is skipped,
+where there is no Node.
+"""
+
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+import dos
+
+SKIPPED = 77
+HERE = Path(__file__).resolve().parent
+WEB = HERE.parent / "src" / "portable_c" / "web"
+
+
+def main():
+    node = shutil.which("node")
+    if node is None:
+        print("no Node: skipped")
+        return SKIPPED
+    with dos.workdir() as work:
+        return subprocess.run([node, str(HERE / "webserver.mjs"), str(WEB),
+                               work]).returncode
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -2973,7 +2973,12 @@ taken, with the host's files (`NODERAWFS`) where the page has the
 directories of its server: so what the page does to have a change made
 on the server is not what the scenarios show. What the harness goes by is `ON_WEB` of
 `harness/deviations.py`, which has what is declared of Linux but its
-masks of the drive's letter, and what is the web's alone.
+masks of the drive's letter, and what is the web's alone. What the
+page itself adds, W4 to W8, the page's own test holds where Node can run
+it, `portable_c-web-page` with the page's program and its server, and
+`portable_c-web-server` with the server and the page's file system; the
+browser's side of it, the drawing, the keys, the mouse and the phone,
+is checked by hand.
 
 ### W1. Two drives, C: where the program lives and D: of the demo
 
@@ -3043,3 +3048,108 @@ page").
 **Which scenarios show it.** Under Node nothing is opened; the trace,
 `VC_TRACE`, has a line for each file that would be. `filter` is cut as
 on Linux (L8).
+
+### W4. The keys that a browser keeps for itself
+
+**What the original does.** Every key of the PC's keyboard reaches it
+through the BIOS.
+
+**What the web page does.** A key reaches the program as the browser
+reports it (`web/keys.js`), and a browser keeps some for itself and
+never reports them in an ordinary tab: Ctrl-W, Ctrl-T and Ctrl-N with
+their Shift forms, Ctrl-Tab and Ctrl-Shift-Tab, Ctrl-PgUp and Ctrl-PgDn,
+Ctrl-F4 and Alt-F4, and the keys of the system around the browser
+(Cmd on a Mac, the Windows key); F11 and F12 are the browser's own in
+most, and reach the program or not by the browser. Every key that the
+program takes is kept from the browser, Alt alone too. The page's
+button for the full screen locks the keyboard where the browser allows
+it (`navigator.keyboard.lock()`, Chromium's), and then most of those
+keys reach the program; holding Esc leaves the full screen there. A key
+that a dead key or an input method makes comes by no key event, and is
+not typed.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page"): what a browser keeps is declared.
+
+**Which scenarios show it.** None: the scenarios type into the program
+under Node, which has no browser. The list is checked by hand.
+
+### W5. The screen is a page's, scaled, with a row of keys on a phone
+
+**What the original does.** It has the PC's text screen of 80 by 25
+cells, drawn by the VGA's font of 8 by 16 dots.
+
+**What the web page does.** The cells are lines of text, in VileR's
+Web437 IBM VGA 8x16, the VGA's font made a font of the web, with the
+VGA's colours, and bit 7 a blink as the VGA has it; the cursor is drawn
+over them. The grid is scaled to the window by whole multiples of the
+font, or, where the window has room for less than one, as a phone's
+has, as large as fits; it is fitted again when the window or the phone
+turns or changes size, and the fingers may zoom it. Below it is a bar
+of the page's own: buttons to bring files in (W8), for the full screen
+(W4), for a row of the keys that a phone lacks, F1 to F10, Esc, Tab,
+the arrows, PgUp and PgDn, with Ctrl and Alt that stay held for the
+next key, and for the phone's keyboard, whose text is typed as keys;
+and the credit of the font. A tap is a click on the cell under the
+finger. The mouse's wheel does nothing, as on Linux.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page").
+
+**Which scenarios show it.** None; the grid that is drawn is held to
+the program's cells by `portable_c-web-render`.
+
+### W6. A change that the server cannot make is DOS's error
+
+**What the original does.** A file, a directory or an attribute is
+changed on the disk, and what DOS cannot do there is its error.
+
+**What the web page does.** The drives are directories of the page's
+server (W1), and the page has a copy of each. Every change is asked of
+the server first, and made in the copy only where the server has made
+it: what the server refuses or cannot do, or a server that does not
+answer, is DOS's error for that call, access denied for a refusal,
+file or path not found, a full disk, or a general failure for what has
+no better number. A file's contents go to the server whole when the
+program closes the file, with its time and whether it is read-only,
+before the close answers: where the server refuses them, the close
+fails with that error, and the copy keeps what the program wrote. The
+server never reaches outside its two directories, and follows no link
+of the host's in them. The page waits for the server at each change,
+so a copy of many files is slower than on a disk.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page"): the drives are the server's, written through as they change.
+
+**Which scenarios show it.** None of the original's: under Node the
+program has the host's files. `portable_c-web-page` has the page's
+program make a directory, write a file, remove a directory and save its
+setup on the server, and be refused.
+
+### W7. F10 ends the page
+
+**What the original does.** It leaves to DOS, and DOS's prompt is on
+the screen.
+
+**What the web page does.** The last screen stays, and the page says
+that the program has ended and that a reload starts it again.
+
+**Why.** A page has nothing to leave to.
+
+**Which scenarios show it.** `portable_c-web-page`; the scenarios under
+Node end as on Linux.
+
+### W8. The user's files come in by a button and by dragging them
+
+**What the original does.** Nothing of the kind: files come by DOS.
+
+**What the web page does.** The page's Upload button, and files dragged
+onto the page, write the files into DOS's current directory, on the
+server first (W6), asking before one is written over; then the page
+types Ctrl-R, which has the panel read the directory anew.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The web
+page").
+
+**Which scenarios show it.** None; `portable_c-web-server` holds the
+writing of such a file.
