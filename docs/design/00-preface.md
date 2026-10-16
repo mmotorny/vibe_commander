@@ -177,9 +177,8 @@ it; each chapter ends with what to read next, in the source and in the
 book. The [contents](README.md) list every section.
 
 **The excerpts.** Code is quoted from `src/asm/` with Volkov's labels,
-instructions and comments. In chapters 1, 2, 4 and 5, and in the one
-on the viewer and the editor, a comment that starts with `;;` is the book's and one with a single `;` is Volkov's;
-in chapter 3 the comments of the excerpts are the book's. Volkov's
+instructions and comments. A comment that starts with `;;` is the
+book's and one with a single `;` is Volkov's. Volkov's
 names are a numbering, not words, and chapter 1 explains them. Where
 his comments disagree with his code, the book says so, and the code is
 what runs. The source files are CP866 text, the code page of Russian

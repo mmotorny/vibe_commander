@@ -102,7 +102,7 @@ The user interface: frames drawn from the code page, the shadow screen and the c
 
 ### [3. Working with files: the commander's features](03-the-features.md)
 
-What the program does with files: reading and sorting a directory, the tree, the walkers that every group command shares, delete, copy, find file, the user menu and Enter.
+What the program does with files: reading and sorting a directory, the cursor and the speed search, the tree, the walkers that every group command shares, delete, copy, find file, the user menu, the command line and its history, Enter, the drives and the Info panel, the errors, and every file the program reads and writes.
 
 - [The room](03-the-features.md#the-room)
 - [A panel: `WCBdef`](03-the-features.md#a-panel-wcbdef)
@@ -114,7 +114,13 @@ What the program does with files: reading and sorting a directory, the tree, the
   - [The filter: `SetMask`](03-the-features.md#the-filter-setmask)
   - [Five orders, one sort](03-the-features.md#five-orders-one-sort)
   - [Selection](03-the-features.md#selection)
+- [The cursor: offsets kept, numbers worked with](03-the-features.md#the-cursor-offsets-kept-numbers-worked-with)
+  - [The mouse in a list](03-the-features.md#the-mouse-in-a-list)
+- [Speed search](03-the-features.md#speed-search)
 - [The tree and `TREEINFO.NCD`](03-the-features.md#the-tree-and-treeinfoncd)
+  - [Drawing it: `PutTree`](03-the-features.md#drawing-it-puttree)
+  - [Finding a directory in it: `TreeCur`](03-the-features.md#finding-a-directory-in-it-treecur)
+  - [The tree in a box: `ChTree`](03-the-features.md#the-tree-in-a-box-chtree)
 - [Walking the files: `FncAddr`, `FncSel`, `FncMas`, `DirFunc`](03-the-features.md#walking-the-files-fncaddr-fncsel-fncmas-dirfunc)
   - [One DTA, and the search found again](03-the-features.md#one-dta-and-the-search-found-again)
   - [Directory sizes](03-the-features.md#directory-sizes)
@@ -128,9 +134,20 @@ What the program does with files: reading and sorting a directory, the tree, the
   - [Searching inside files](03-the-features.md#searching-inside-files)
 - [The user menu and the extension files](03-the-features.md#the-user-menu-and-the-extension-files)
   - [`Run_00`: the macros](03-the-features.md#run_00-the-macros)
+- [The command line and the history](03-the-features.md#the-command-line-and-the-history)
+  - [`PutPrm` and `DosCom`: a window over 123 characters](03-the-features.md#putprm-and-doscom-a-window-over-123-characters)
+  - [Text that is typed for the user](03-the-features.md#text-that-is-typed-for-the-user)
+  - [The history: 512 bytes and a zero in front](03-the-features.md#the-history-512-bytes-and-a-zero-in-front)
+  - [Alt-F8: the history as a box](03-the-features.md#alt-f8-the-history-as-a-box)
 - [Enter, and running a program](03-the-features.md#enter-and-running-a-program)
   - [Running it](03-the-features.md#running-it)
+- [Drives, labels and the Info panel](03-the-features.md#drives-labels-and-the-info-panel)
+  - [Which drives there are: Alt-F1 and Alt-F2](03-the-features.md#which-drives-there-are-alt-f1-and-alt-f2)
+  - [The label: `GetVol` and Ctrl-F4](03-the-features.md#the-label-getvol-and-ctrl-f4)
+  - [The Info panel: `RdInfo` and `PutInf`](03-the-features.md#the-info-panel-rdinfo-and-putinf)
+- [Errors as the user sees them](03-the-features.md#errors-as-the-user-sees-them)
 - [How the features share the main data](03-the-features.md#how-the-features-share-the-main-data)
+- [Every file the program reads and writes](03-the-features.md#every-file-the-program-reads-and-writes)
 - [Where to read next](03-the-features.md#where-to-read-next)
 
 ### [The viewer and the editor](viewer-and-editor.md)
