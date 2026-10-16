@@ -72,6 +72,12 @@ extern void web_where(const char *host);
 #define LABEL_VARIABLE "VC_LABEL_"      /* and the letter */
 #define PROGRAM_DRIVE_VARIABLE "VC_PROGRAM_DRIVE"
 #define LABEL_LONGEST 11                /* DOS's */
+/* The cap of the memory that the program's blocks hold together: the
+   memory of wasm, once grown, is never given back while the page is
+   open, and the program asks for all that there is (machine_posix.c).
+   The page's ceiling, MAXIMUM_MEMORY of CMakeLists.txt, is this and what
+   the runtime needs besides (I1 of step 8, TODO.md). */
+#define MEMORY_CAP ((int64_t)256 << 20)
 static const struct {
     u8 letter;
     const char *label;                  /* where its variable says none */
@@ -311,8 +317,8 @@ void ProgramEnd(u16 code)
    And a block given back is given back, not kept from use for a while to
    catch a use of it after it is free, which the sanitizer would do: the
    machine finds how long a block the heap can give by taking it and
-   giving it back (Obtainable of machine_posix.c), and a heap of 2 GB at
-   the most has no room for a second such block beside the first. */
+   giving it back (Obtainable of machine_posix.c), and a heap with a
+   ceiling may have no room for a second such block beside the first. */
 #if defined(__has_feature)
 #if __has_feature(address_sanitizer)
 const char *__asan_default_options(void);
@@ -355,7 +361,8 @@ int main(int count, char **arguments)
     }
     Testing = TestBegin();
     MachineBegin(given, drives,
-                 own != 0 && own[0] != 0 ? (u8)(own[0] & ~0x20) : 'C');
+                 own != 0 && own[0] != 0 ? (u8)(own[0] & ~0x20) : 'C',
+                 MEMORY_CAP);
     MachineDos.change = Change;
     MachineEnvironment((const u8 *)"COMMAND.COM", count, arguments);
     YieldedAt = emscripten_get_now();

@@ -403,8 +403,7 @@ static char *Arguments[] = {ProgramName, 0};
 static void *Program(void *unused)
 {
     (void)unused;
-    (void)Cap;                          /* I1: MachineBegin's cap */
-    MachineBegin(Given, GivenCount, Own);
+    MachineBegin(Given, GivenCount, Own, Cap);
     MachineEnvironment((const u8 *)"COMMAND.COM", 1, Arguments);
     DrawnAt = NowMs();
     TicksRead = 0;

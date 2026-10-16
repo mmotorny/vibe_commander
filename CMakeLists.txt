@@ -885,7 +885,10 @@ endif()
 # from int10h.org, pinned by its SHA-256, which CLAUDE.md allows by name;
 # its licence is CC BY-SA 4.0, LICENSE.FONT. The page's server,
 # web/server.mjs, serves it with the two drives: the target
-# portable_c-web-serve runs it on 127.0.0.1:8437 (TODO.md, "W3b").
+# portable_c-web-serve runs it on 127.0.0.1:8437 (TODO.md, "W3b"). Its
+# memory grows to the cap of sys_web.c, 256 MB, and 64 MB besides for the
+# runtime, and no further, since wasm never gives back what it has grown
+# by (I1 of step 8, TODO.md, "Step 8, the app for iOS").
 if(VC_WEB)
     FetchContent_Declare(vga_font
         URL https://int10h.org/oldschool-pc-fonts/download/oldschool_pc_font_pack_v2.2_web.zip
@@ -913,7 +916,7 @@ if(VC_WEB)
         COMPILER ${emcc} OUTPUT vc.html
         COMPILE -D_XOPEN_SOURCE=700 -O2
         LINK -sASYNCIFY -sASYNCIFY_STACK_SIZE=65536 -sENVIRONMENT=web
-             -sEXIT_RUNTIME -sALLOW_MEMORY_GROWTH -sMAXIMUM_MEMORY=2GB
+             -sEXIT_RUNTIME -sALLOW_MEMORY_GROWTH -sMAXIMUM_MEMORY=320MB
              -sINITIAL_MEMORY=64MB -sSINGLE_FILE
              -sEXPORTED_FUNCTIONS=_main,_CodePageGlyph
              --shell-file ${web_page_dir}/shell.html
@@ -1235,6 +1238,25 @@ if(VC_WEB)
     set_tests_properties(portable_c-web-page PROPERTIES
         LABELS portable_c SKIP_RETURN_CODE 77)
     set_tests_properties(portable_c-web-scenarios PROPERTIES
+        LABELS "portable_c;machine")
+endif()
+# The cap of the memory, the piece I1 of step 8 (TODO.md, "Step 8, the
+# app for iOS"): the program for Linux, the app's on a host (ios-host)
+# and, with VC_WEB, the program for the web under Node, each with
+# VC_MEMORY at 512K, where the editor has to
+# refuse a file of 1 MB in the original's box, and without it, where it
+# opens the file. See harness/capcheck.py. It starts a machine of DOS only
+# for the bench's setup file, the first time, as the scenarios of Linux.
+if(clang)
+    set(cap_programs ${CMAKE_BINARY_DIR}/portable_c/posix-asan/vc
+        ${CMAKE_BINARY_DIR}/portable_c/ios-host/vc)
+    if(VC_WEB)
+        list(APPEND cap_programs ${CMAKE_BINARY_DIR}/portable_c/web-node/vc.js)
+    endif()
+    add_test(NAME portable_c-cap
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/capcheck.py
+                ${cap_programs})
+    set_tests_properties(portable_c-cap PROPERTIES
         LABELS "portable_c;machine")
 endif()
 # What each test judges, as a label, so that a run can pick by it: `ctest

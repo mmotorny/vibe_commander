@@ -462,7 +462,7 @@ int main(int count, char **arguments)
         }
         OnTerminal = true;
     }
-    MachineBegin(0, 0, 0);
+    MachineBegin(0, 0, 0, 0);       /* Linux has no cap */
     ShellOf();
     MachineEnvironment(ShellDos, count, arguments);
     Main();

@@ -292,13 +292,61 @@ struct Held {
 
 static struct Held Blocks[BLOCKS_MOST];
 static i32 BlocksHeld = 0;
-static int64_t MemoryAll = 0;               /* the machine's, at the start */
+static int64_t MemoryAll = 0;           /* the machine's, at the start, or
+                                           the cap where that is less */
+
+/*
+ * The cap: the most that the program's blocks hold together, where a
+ * system ends a program that takes too much or never gives back what it
+ * has once taken (the web page, iOS); the implementation says it to
+ * MachineBegin, 0 for none, as on Linux. VC_MEMORY, a number of bytes
+ * with K, M or G behind it for so many times 1,024, 1,024 squared or
+ * 1,024 cubed, takes its place, for a test on any implementation that
+ * has the machine. The room of the editor and the viewer is the largest
+ * block that there is (start.c), so a file larger than what is left of
+ * the cap is one that the editor has no room for, as the original's.
+ */
+#define MEMORY_VARIABLE "VC_MEMORY"
+
+static int64_t Capped(int64_t cap)
+{
+    const char *given = getenv(MEMORY_VARIABLE);
+    const char *at = given;
+    int64_t bytes = 0;
+    i32 shift = 0;
+
+    if (given == 0)
+        return cap;
+    while (*at >= '0' && *at <= '9' && bytes <= BYTES_MOST) {
+        bytes = bytes * 10 + (*at - '0');
+        at++;
+    }
+    if (*at == 'K' || *at == 'k')
+        shift = 10;
+    else if (*at == 'M' || *at == 'm')
+        shift = 20;
+    else if (*at == 'G' || *at == 'g')
+        shift = 30;
+    if (shift != 0)
+        at++;
+    if (at == given || *at != 0 || bytes == 0 || bytes > BYTES_MOST
+        || bytes > (int64_t)BYTES_MOST >> shift) {
+        fprintf(stderr, "vc: %s: no number of bytes, from 1 to %ld: %s\n",
+                MEMORY_VARIABLE, (long)BYTES_MOST, given);
+        exit(1);
+    }
+    return bytes << shift;
+}
 
 /* The longest block of at most `most` bytes that the C library gives
    now: `most` where it gives that, as Linux does, which lets a program
-   have more than it touches; else found by halving, to a page, as the
-   web page's heap gives less, whose ceiling is the page's (the piece W2
-   of step 7, TODO.md, "Step 7, the web page"). */
+   have more than it touches, and as the web page's heap does within
+   the cap, its ceiling being the cap and what the runtime needs besides
+   (CMakeLists.txt); else found by halving, to a page, for a heap that
+   gives less (the piece W2 of step 7, TODO.md, "Step 7, the web page";
+   I1 of step 8, "Step 8, the app for iOS"). A block taken and given back
+   on the web leaves the heap as long as it was, so the cap is what keeps
+   the page's memory from growing toward the machine's. */
 #define OBTAINED_TO 4096
 
 /* What is tried, kept where the compiler cannot see that nothing reads
@@ -2045,12 +2093,16 @@ static void StartIn(char *here)
 
 static u8 Program[DOS_PATH_ROOM + 4];   /* the path of its file */
 
-void MachineBegin(const struct DriveGiven *given, i32 count, u8 own)
+void MachineBegin(const struct DriveGiven *given, i32 count, u8 own,
+                  int64_t cap)
 {
     char here[4096], directory[PATH_MAX];
     long pages = sysconf(_SC_PHYS_PAGES), page = sysconf(_SC_PAGESIZE);
 
     MemoryAll = pages > 0 && page > 0 ? (int64_t)pages * page : BYTES_MOST;
+    cap = Capped(cap);
+    if (cap > 0 && cap < MemoryAll)
+        MemoryAll = cap;
     StartMs = TodayMs();
     clock_gettime(CLOCK_MONOTONIC, &StartedAt);
     if (given == 0) {

@@ -2744,12 +2744,12 @@ and says the room of a disk in 16 bits of clusters.
 shows the most that DOS can say, and is never copied or moved cut
 short: the program refuses it with an error. The free room of a disk
 shows at most four gigabytes less 64K, in clusters of up to 64K. The
-room of the editor and the viewer is as much as the machine has. An
-error of the host's that DOS has no number for is DOS's general
+room of the editor and the viewer is as much as the machine has, with
+no cap, where the web page has one (W10). An error of the host's that DOS has no number for is DOS's general
 failure.
 
 **Why.** The user's decisions of 14 October 2026; the room of the
-editor, of 15 October 2026, until iOS asks for a cap.
+editor, of 15 October 2026: a cap is for the web page and iOS alone.
 
 **Which scenarios show it.** None can: the original has no such file.
 The room of the drive and what the files of a directory use, of the
@@ -3207,3 +3207,39 @@ demo deleted and the setup saved, each kept; the page loaded again
 with them; the reset; and a browser with no IndexedDB. And it holds
 that the page of the server opens no IndexedDB. `portable_c-web-server`
 holds the store's every change and refusal, in memory and in IndexedDB.
+
+### W10. The memory has a cap of 256 MB
+
+**What the original does.** Its panels and the room of its editor and
+its viewer are in the memory that DOS leaves it, some 345K on the bench,
+and a file larger than the room is refused: "The file ... is too large
+for Edit.", with View and Cancel.
+
+**What the web page does.** The program asks for all the memory that
+there is, as the program for Linux does (entry 13 for the program for
+DOS, L7 for Linux), but the blocks that it holds, its panels and its
+room, hold 256 MB at the most together: the cap of `sys_web.c`, which
+`MachineBegin` of `machine_posix.c` takes, the memory being the
+machine's or the cap, whichever is less. The page's memory grows to the
+cap and what the runtime needs besides, `MAXIMUM_MEMORY` of
+`CMakeLists.txt`, 320 MB, and no further. A file larger than what is
+left of the cap is refused in the original's box, as the original
+refuses one that its room is short of. `VC_MEMORY`, a number of bytes
+with K, M or G behind it, takes the place of the cap for a test, on the
+web under Node and on Linux alike; a value that is no such number ends
+the program before it starts.
+
+**Why.** The user's decision of 15 October 2026 (`CLAUDE.md`, "The app
+for iOS"; `TODO.md`, "Step 8, the app for iOS", I1): the memory of
+WebAssembly, once grown, is never given back while the page is open,
+and before the cap the program's ask for all that there is grew the
+page's memory to as much as the browser would give, 2 GB at most. The
+program for Linux has no cap.
+
+**Which scenarios show it.** None of the original's: with the cap, the
+room under Node is far larger than any file of a scenario.
+`portable_c-cap` has the editor asked for a file of 1 MB with
+`VC_MEMORY` at 512K, under Node and on Linux, and holds the box that
+refuses it, cell for cell, to the original's in `editor-big`, where the
+original refuses the same file; and without `VC_MEMORY`, that the
+editor opens it.

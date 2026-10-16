@@ -1345,6 +1345,7 @@ is no clang:
 | `portable_c-posix-unit` | What the program emulates of DOS without input or output of its own, the files `*_posix.c` but `sys_posix.c` and `machine_posix.c`: names and aliases, the code page and UTF-8, drives and paths, dates, DOS's errors, and the services on files and directories of the host's, by `harness/posixcheck.c`, built with the sanitizers |
 | `portable_c-terminal` | What `posix-asan/vc` draws in a pseudo-terminal, replayed through pyte, a terminal emulator in Python that the harness fetches pinned, held cell by cell to the grid that the program writes for the same keys through its test channel, in 24 bits and in 16 colours; a terminal too small, SIGTSTP and SIGCONT, the kitty protocol and the keys that the program reads held to the BIOS's words, the mouse, and commands with Ctrl-O. `harness/terminal.py` |
 | `portable_c-posix-scenarios` | `posix-asan/vc` through the scenarios, by `harness/posixrun.py`: on a bench of the host's in `/tmp`, its home directory laid out as the machine's C:, driven through the test channel, `VC_TEST`, which takes the scenarios' keys as the BIOS's words and writes the grid whenever the program waits for a key, on the clock of the machine of the tests, `VC_TEST_CLOCK`. Its screens and its files are held to the original's goldens with what is declared for the portable C and, on top of that, for Linux, each scenario that is not run on Linux or is cut there named by an entry of Linux of `DEVIATIONS.md`. It starts a machine of DOS once, for the bench's setup file, and keeps that in `build/posix-bench` |
+| `portable_c-cap` | The cap of the memory that the program's blocks hold together, which the machine of `*_posix.c` takes from the implementation, none on Linux, 256 MB on the web page and at most that on iOS, and from `VC_MEMORY` in its place for a test: `posix-asan/vc`, the app for iOS on a host, `ios-host/vc`, and with `-DVC_WEB=ON` `web-node/vc.js`, on the bench of `harness/posixrun.py`, the editor asked for a file of 1 MB. With `VC_MEMORY` at 512K the box that refuses it is the original's, cell for cell, as the golden of `editor-big` has it where the original refuses the same file; without it the editor opens the file; and with a `VC_MEMORY` that is no number of bytes the program does not start. `harness/capcheck.py` |
 | `portable_c-tidy` | The common code, the files of Linux and their test held to clang's warnings, with the commands that the build compiles them with, and to clang-tidy by `.clang-tidy`. `harness/tidycheck.py` |
 
 What is declared for Linux is `ON_LINUX` of `harness/deviations.py`,
@@ -1558,9 +1559,10 @@ C translation's checks made of it, `portable_c-host`, `portable_c-int16`,
 `portable_c-words`, `portable_c-width` and `portable_c-cut` are of its
 source, `portable_c-layout` and `portable_c-debug-layout` of its two
 programs for DOS as the linker wrote them, and `portable_c-tidy`,
-`portable_c-posix-unit`, `portable_c-terminal` and
-`portable_c-posix-scenarios` of [the program for
-Linux](#the-program-for-linux), which that section has, and
+`portable_c-posix-unit`, `portable_c-terminal`,
+`portable_c-posix-scenarios` and `portable_c-cap` of [the program for
+Linux](#the-program-for-linux), which that section has, the last of the
+web page's program too, and
 `portable_c-web-render` and `portable_c-web-server`, with
 `portable_c-web-probe`, `portable_c-web-scenarios` and
 `portable_c-web-page` where the web is built, of [the web
@@ -1573,8 +1575,9 @@ machine that does nothing else. Every test has a label for what it
 judges: `portable_c` for those of the portable C, `frozen` for those of
 the assembly and the C translation, and `harness` for `harness-le`. The
 three that start a machine, `c-scenarios`, `portable_c-scenarios` and
-`portable_c-posix-scenarios`, and `portable_c-web-scenarios` where the
-web is built, which runs every scenario under Node, have the label
+`portable_c-posix-scenarios`, with `portable_c-cap`, which starts one
+for the bench of Linux as that does, and `portable_c-web-scenarios` where
+the web is built, which runs every scenario under Node, have the label
 `machine` too: `ctest --test-dir build -LE machine` runs the other
 seventeen, nineteen with the web, and `-L portable_c -LE machine` those
 of the portable C among them.

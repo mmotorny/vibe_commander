@@ -660,9 +660,12 @@ extern struct Dos MachineDos;
    which is made where the host has it not; then, once the implementation
    knows the DOS's name of its shell, which COMSPEC is, the environment,
    the tail of `arguments`, which are main()'s, and the screen in mode
-   3. */
+   3. The memory that the program's blocks hold together is at most the
+   machine's, and at most `cap` bytes where that is not 0, the cap of the
+   implementation, which VC_MEMORY takes the place of for a test. */
 bool TestBegin(void);
-void MachineBegin(const struct DriveGiven *given, i32 count, u8 own);
+void MachineBegin(const struct DriveGiven *given, i32 count, u8 own,
+                  int64_t cap);
 void MachineEnvironment(const u8 *shell, int count, char **arguments);
 
 /* The end: the last screen recorded for the test channel, the memory

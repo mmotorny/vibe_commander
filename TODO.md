@@ -172,7 +172,8 @@ figures have how much, many times the original's room there (345,840
 bytes) and more than any file of a scenario. On a machine of 2 MB, which
 a scenario may ask for (`memory` of `harness/scenarios.py`; `view-window`
 does), it is some 550 KB. The program for Linux and the web page have
-what the host gives them, at most 2 GB on the page. Until F9 the program
+what the host gives them, at most 256 MB on the page since I1 of step
+8 (W10 of `DEVIATIONS.md`). Until F9 the program
 of 32 bits handed out 640 KB of its own, and what was written here was
 reckoned from that; `DIARY.md` has the figures as they were measured
 then.
@@ -783,7 +784,7 @@ CLAUDE.md, the road, step 7, has the user's decisions; this is the plan behind t
 - **Enter on a file.** It opens a new tab.
 - **The keys.** The browser's reserved keys, as above.
 - **F10, leaving.** It shows the last screen and "Reload to start again", after the sync.
-- **Memory.** Capped at 2 GB (`MAXIMUM_MEMORY`).
+- **Memory.** Capped at 2 GB (`MAXIMUM_MEMORY`); since I1 of step 8, at 256 MB for the program's blocks and 320 MB for the page (W10).
 - **The screen.** It is scaled by whole multiples of the font.
 - **Help and menus.** The shareware's files are not shipped: F1 shows the original's message for help that is missing. A user may upload their own.
 
@@ -1506,6 +1507,44 @@ The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
 - **I9, the documents:** DEVIATIONS "iOS" (I entries), the README, and CLAUDE.md's notes.
 - **Order:** I1, I2 and I3 now. Then I4 once the Mac is reachable, I5 and I6 after I4, I7 after I2 and I4, I8 after I7, and I9 last.
 
+### I1, the cap: done, and what I2 should know
+
+- `MachineBegin` of `machine_posix.c` takes the cap as its last
+  argument, `int64_t cap`, 0 for none: `sys_posix.c` passes 0,
+  `sys_web.c` its `MEMORY_CAP`, 256 MB, and `sys_ios.c`, which I2
+  landed first, its `Cap`, min(256 MB, half of what the shell says is
+  available at the start, `os_proc_available_memory()` on iOS). The
+  memory is then the machine's (`_SC_PHYS_PAGES`) or the cap, whichever
+  is less, and the blocks that the program holds, the panels and the
+  room, hold that much at most together (`Largest`).
+- `VC_MEMORY` takes the place of the cap on every implementation that
+  has the machine: a number of bytes, with K, M or G behind it for
+  1,024, 1,024 squared or cubed, from 1 to 7FFFFFF0h; anything else ends
+  the program before it starts, with a line on standard error that names
+  the variable. Under Node it is copied into the program's environment
+  by `web/node.js`; the page has no environment, and so no `VC_MEMORY`.
+- The page's ceiling, `MAXIMUM_MEMORY`, is 320 MB, the cap and 64 MB
+  for the runtime, where it was 2 GB; the program under Node keeps its
+  512 MB, which the sanitizer wants room in. `Obtainable` stays: with
+  the cap the heap gives the block at the first try, and the halving is
+  there for a heap that gives less, which none of the builds now is.
+- What the original does when its room is short is what the program
+  does under a cap: the editor's box, "The file ... is too large for
+  Edit.", with View and Cancel. No code of the program changed for it;
+  the room is the largest block that there is (`start.c`).
+- The test `portable_c-cap`, `harness/capcheck.py`, holds it on Linux and
+  under Node: with `VC_MEMORY` at 512K the editor's box for
+  `H:\STAMPS\noon.dat`, 1 MB, cell for cell against the original's in
+  the golden of `editor-big`, step 39; without it, that the editor opens
+  the file; and that a `VC_MEMORY` of `512Q` does not start. It runs in
+  a second or two, and for the app's program on a host, `ios-host/vc`,
+  as well. `posixrun.run` takes `environment` for it. The Simulator's
+  tree of I7 can be given to it in the same way.
+- Declared as W10 of `DEVIATIONS.md`, with L7 saying that Linux has no
+  cap. `editor-big` stays not run in every tree of the portable C;
+  bringing it back on the web or iOS with a small `VC_MEMORY` is a
+  deviation to ask, as the plan says.
+
 ### I3, the keys of a hardware keyboard: done, and what I5 should know
 
 - `src/portable_c/keys_ios.c` and `keys_ios.h`: the shell fills a
@@ -1630,9 +1669,8 @@ The plan, as the user decided it on 15 October 2026 (`CLAUDE.md`,
   that the web is taken through: 119 pass, as on Linux, in under half a
   minute.
 - **The cap**: `sys_ios.c` works out min(256 MB, half of
-  `ios_shell_memory()`) at each start, `Cap`, and hands it to nothing
-  yet: I1 adds the argument `cap` to `MachineBegin`, and `Program` of
-  `sys_ios.c` then passes `Cap` there in place of its `(void)Cap`.
+  `ios_shell_memory()`) at each start, `Cap`, and `Program` hands it to
+  `MachineBegin`, whose argument `cap` I1 added.
 - **For the documents (I9).** The entries of the web page that hold for
   the app are W1 (the drives, with the app's Documents), W2 (a command,
   with its text), W3 (QuickLook in place of a tab) and W7 (F10, with a
@@ -2347,8 +2385,8 @@ here when it was cut down to the rules as they stand (15 October 2026).
   `Run_00` of `usermenu.c` and `F39_00` of `menu.c` among them. Each goes
   when its function is rewritten.
 - iOS, step 8: the room of the editor and the viewer is as much as the
-  machine has on Linux and on the web page; on iOS it gets a cap, since
-  the system ends a program that takes too much.
+  machine has on Linux; the web page has a cap of 256 MB since I1 (W10),
+  and iOS is to get one in I2 ("Step 8, the app for iOS").
 - No test builds the toy that asks every function of `sys.h`,
   `harness/trial32/sys.c`, so a change to what a function takes leaves it
   broken without a word (the piece F9 did, and S found it so). After such

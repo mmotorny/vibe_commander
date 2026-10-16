@@ -430,7 +430,7 @@ def _screens(data):
     return out
 
 
-def run(scenario, program, setup=..., limit=60):
+def run(scenario, program, setup=..., limit=60, environment=None):
     """Take the program for Linux, `program` (a setups.Program of the
     tree "posix"), through `scenario` (its
     steps as the tree "posix" is taken through them) with `setup` as the
@@ -438,7 +438,9 @@ def run(scenario, program, setup=..., limit=60):
     given, and return the scenarios.Run, with what is then in the setup
     file's place as `saved`, None if nothing. Raises
     MachineError where the program ends otherwise than the scenario has
-    it, or does not end within `limit` seconds."""
+    it, or does not end within `limit` seconds. `environment` has
+    variables for the program besides the run's own, VC_MEMORY of a
+    test of the cap (capcheck.py)."""
     import scenarios
     web = program.tree in AS_THE_WEB
     if setup is ...:
@@ -464,7 +466,7 @@ def run(scenario, program, setup=..., limit=60):
         stubs.mkdir()
         (stubs / "xdg-open").write_text("#!/bin/sh\nexit 0\n")
         (stubs / "xdg-open").chmod(0o755)
-        environment = {
+        given, environment = environment or {}, {
             "PATH": f"{stubs}:" + os.environ.get("PATH", "/usr/bin:/bin"),
             "TZ": "UTC", "HOME": str(bench / "home"),
             "XDG_CONFIG_HOME": str(bench),
@@ -477,6 +479,7 @@ def run(scenario, program, setup=..., limit=60):
                                VC_PROGRAM_DRIVE="D")
             if program.tree == "web":
                 command = [NODE, *command]
+        environment.update(given)
         try:
             done = subprocess.run(
                 command, cwd=bench / "home" / "WORK",
