@@ -37,10 +37,11 @@ shipped `VC.COM`.
 A text-mode frame is made of characters, and the characters are those
 of the code page that the display adapter's font holds. Volkov wrote
 for Russian DOS, whose code page is 866, and the program runs the same
-on the American 437. It can, because the two agree where it matters:
-CP866 puts its Cyrillic letters at 80h to AFh and E0h to EFh, and
-leaves B0h to DFh, the box-drawing block, exactly as the IBM PC had it.
-Every frame in the program is drawn with bytes from that block:
+on the American 437, because the box-drawing block, B0h to DFh, is the
+same in both: [chapter 5](05-numbers-and-names.md#one-binary-for-cp437-and-cp866)
+has the map of the two code pages and what the program asks DOS for
+where they differ. Every frame in the program is drawn with bytes from
+that block:
 
 | Bytes | Characters | Used for |
 |---|---|---|
@@ -55,8 +56,9 @@ Every frame in the program is drawn with bytes from that block:
 A few more come from below 20h, where the PC's font has pictures for
 the control codes: 07h `•` for the chosen line of a group, 10h and 11h
 `►◄` around `UP--DIR` and at the tree's current directory, 18h and 19h
-`↑↓` in a dialog's hint, and FBh `√`, a tick, which is also the mouse
-pointer over something clickable.
+`↑↓` in a dialog's hint. And FBh `√`, a tick, which is also the mouse
+pointer over something clickable, is one of the few bytes above DFh
+that the two code pages share.
 
 Since the source is CP866 text, the assembly holds these characters
 as themselves. A frame's corners are an immediate operand:
@@ -152,13 +154,13 @@ junctions are not worked out: the frame is drawn whole and the
 crossings are overwritten, a cell each.
 
 ```
- BoxDubl            Panel8 with ╤, │ ... │, ┴        the result
- ╔══════════════╗   ....╤.........╤.......           ╔═══╤═════════╤══════╗
- ║              ║   ....│.........│.......           ║   │         │      ║
- ║              ║   ....│.........│.......           ║   │         │      ║
- ╟──────────────╢   ....┴.........┴.......           ╟───┴─────────┴──────╢
- ║              ║                                    ║ mini status        ║
- ╚══════════════╝                                    ╚════════════════════╝
+ BoxDubl                  Panel8 with ╤, │ ... │, ┴     the result
+ ╔════════════════════╗   ....╤.........╤.......        ╔═══╤═════════╤══════╗
+ ║                    ║   ....│.........│.......        ║   │         │      ║
+ ║                    ║   ....│.........│.......        ║   │         │      ║
+ ╟────────────────────╢   ....┴.........┴.......        ╟───┴─────────┴──────╢
+ ║                    ║                                 ║ mini status        ║
+ ╚════════════════════╝                                 ╚════════════════════╝
 ```
 
 The Info panel does it with rules alone, two `╟──╢` lines under its

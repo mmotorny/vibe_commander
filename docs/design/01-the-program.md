@@ -141,48 +141,14 @@ program's own stack.
 
 **The resident part is first, and its buffers cost nothing.** Behind
 the resident code, at `LastRes`, the source declares 10,923 bytes of
-buffers for the time while a command runs:
-
-```asm
-LastRes:
-
-;--------------------- Release data --------------------
-IntTab	DD	256	DUP(?)		;; the interrupt table, for the TSR list
-SavePtr	DD	?
-Vect21	DD	?
-Vect22	DD	?
-Vect27	DD	?
-Counter	DW	?
-PrgList	DW	MaxProg	DUP(?)
-NameBuf	DB	12	DUP(?)
-
-;------------------ Data save segment ------------------
-WCB1sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB1
-WCB2sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB2
-ComnIni	DB	CmnSave			DUP(?)	; Common data
-DataSav	DB	LenStk			DUP(?)	; Local stack
-VcStack:
-LastDat:
-```
-
-and then, further down, goes back:
-
-```asm
-;--------------------- Main module ---------------------
-	.CODE
-	ORG	LastRes			;; back to 06E7h
-
-Alloc0:	CLD
-```
-
-`ORG LastRes` sets the place of assembly back to the start of the
-buffers, so the loader and the transient code are assembled over them.
-In the file those bytes are code. Once the program runs, the code has
-been copied elsewhere and the same addresses of the first segment are
-the buffers: the save areas of the two panels, the copy of the main
-data, the 256-byte stack ending at `VcStack`, 3192h. The resident part
-is 3192h = 12,690 bytes from the start of the PSP, of which 1,511 are in
-the file.
+buffers for the time while a command runs, and then goes back with
+`ORG LastRes` and assembles the loader and the transient part over
+them: in the file those bytes are code, once the program runs they are
+the save areas of the panels, the copy of the main data and the stack.
+The resident part is 3192h = 12,690 bytes from the start of the PSP, of
+which 1,511 are in the file;
+[chapter 6](06-the-system.md#org-lastres-the-start-up-runs-where-the-vectors-will-go)
+has the listing.
 
 **The rest is one transient part.** From `Init00` to the end, 63,323
 bytes of code, tables and texts are needed only while the commander is
@@ -198,36 +164,17 @@ segment register on the PSP. `Alloc0` makes of it two blocks of DOS's,
 a resident one and a transient one, and `Init11` then asks DOS for
 the data.
 
-```mermaid
-flowchart TD
-    A["DOS jumps to 100h: JMP Alloc0"] --> B["Alloc1: sum all 65,090 bytes into ChkFile"]
-    B --> C{"command tail 'VVV' and a segment?"}
-    C -- "yes: run as its own loader" --> L["copy Init00..Last into the parent's block, exit 0"]
-    C -- "no" --> D["Alloc3: DOS 3.20 or later?"]
-    D --> E["Alloc5: resize own block to resident + transient"]
-    E --> F["Alloc6: copy Init00..Last upward, STD REP MOVSB"]
-    F --> G["write an MCB by hand: two blocks"]
-    G --> H["Alloc7: RunPar = block - 7Eh, RETF to Init00"]
-    H --> I["Init00: VC.INI or defaults, banner, VC.EXT, hooks"]
-    I --> J["Init11: data block, panels, viewer room"]
-    J --> K["screen, country, environment, DOS's colour"]
-    K --> M["Init40: the main loop"]
-```
-
-`Alloc0`, 256 bytes that run once, does four things before anything
-else, and [chapter 6](06-the-system.md#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb)
-has each of them instruction by instruction. It adds up the 65,090
-bytes of its own file into a 16-bit sum, `ChkFile`, by which it will
-know the file again when it loads itself after a command. It refuses a
-DOS older than 3.20. It copies the transient part, `Init00` to the
-end, upward behind the 794 paragraphs that are to stay, and splits its
-one block of DOS's in two by writing a memory control block by hand.
-And it jumps into the copy by a far return to `RunPar:Init00`, where
-`RunPar` is the new block's segment less 7Eh: from that segment
-`Init00` is at offset 07E7h again, the offset that the assembler gave
-it, so not one address of the transient part is relocated. The
-transient part's 63,323 bytes take a block of 3,959 paragraphs, 63,344
-bytes.
+`Alloc0`, 256 bytes that run once, adds up its own file into a check
+sum, `ChkFile`, by which it will know the file again when it loads
+itself after a command; refuses a DOS older than 3.20; copies the
+transient part, `Init00` to the end, upward behind the 794 paragraphs
+that are to stay, splitting its one block in two with a memory control
+block written by hand; and jumps into the copy by a far return to
+`RunPar:Init00`. `RunPar` is the new block's segment less 7Eh, so that
+`Init00` is at offset 07E7h again and not one address of the
+transient part is relocated.
+[Chapter 6](06-the-system.md#alloc0-a-sum-a-version-a-move-and-a-hand-made-mcb)
+has each step instruction by instruction.
 
 ### `Init00`: the setup file, read in place
 
@@ -380,30 +327,14 @@ source rarely says so: the convention is the documentation.
 
 ## A command runs in 12,690 bytes
 
-Enter on a command line ends at `F21_31` of `VCFUNC.INC`, which packs
-up the commander, and the resident part does the rest. In outline:
-
-1. `F21_31` copies the first `CmnSave` = 2,733 bytes of the main data,
-   the setup, the history, the extension file and the command line
-   `DosBuf`, to `ComnIni` in the resident part, keeps each panel in its
-   save area, 13 bytes a file for at most 256 files, and puts the
-   critical-error and Ctrl-Break vectors back (`RestVct`).
-2. It gives the data block back to DOS and jumps, by `PUSH`/`RETF`, to
-   `Exec` in the resident part.
-3. `Exec` gives the transient block back too when `LoadFl`, the small
-   mode of Memory allocation, is set, as it is by default: then 12,690
-   bytes of the commander are left in memory. Otherwise the code stays
-   with them, 76,050 bytes in all. Then it runs each command of
-   `DosBuf` in turn, through `COMMAND.COM /C`, or with Quick execute
-   through COMMAND.COM's own INT 2Eh.
-4. In the small mode it then loads the transient part again, by running
-   `VC.COM` as its own loader; either way it comes back to `Init11`,
-   which takes the data anew.
-
+Enter on a command line ends at `F21_31` of `VCFUNC.INC`, which saves
+the setup, the history and each panel into the resident part, gives
+the data block back to DOS and jumps to `Exec` there. In the small mode
+of Memory allocation `Exec` gives the code back too, runs the commands,
+and loads the transient part again by running `VC.COM` as its own
+loader; either way the program comes back to `Init11`.
 [Chapter 6](06-the-system.md#the-resident-part-12690-bytes-that-stay)
-has the four steps byte by byte: what stays, how a command line is made
-in place, and how the second copy of `VC.COM` hands the first its code
-and its check sum through one word.
+has it byte by byte.
 
 ## The main data
 
@@ -1508,8 +1439,10 @@ the program that loads itself, are listed with the rest of the system in
   `Blank` and `Rnd`; `VCHELP.INC`: `Help`.
 - [Chapter 2](02-the-screen.md) for the screen, the boxes, the
   dialogs and the menus; [chapter 3](03-the-features.md) for what the
-  panels, the viewer, the editor, copy and find file do on this
-  skeleton;
+  panels, copy and find file do on this skeleton, and
+  [chapter 4](04-the-viewer-and-editor.md) for the viewer and the
+  editor; [chapter 5](05-numbers-and-names.md) for the numbers, the
+  names and the case that every chapter prints;
   [chapter 6](06-the-system.md) for the calls of DOS and the BIOS and
   for the resident part; [chapter 7](07-the-setup.md) for `VC.INI` and
   the setup program.

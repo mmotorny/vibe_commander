@@ -940,18 +940,21 @@ move the transient part out of the way: 63,323 bytes, from `Init00` to
 the end of the file.
 
 ```
-In the file, as DOS loads it:           After Alloc0:
+In the file, as DOS loads it:            After Alloc0:
 
-PSP:0000 PSP                            PSP:0000 PSP
-    0100 resident code                      0100 resident code
-    06E7 Alloc0 ........ (IntTab)           06E7 IntTab, the saved panels,
-    07E7 Init00 .......  (WCB1sav,               ComnIni, the stack
-         the transient    WCB2sav,          3192 VcStack
-         part             ComnIni,          31A0 MCB written by hand
-                          DataSav)          31B0 the transient part:
-    3192 ..............  (VcStack)               Init00 is at offset 7E7h
-         ... the rest of the                     of RunPar, the PSP+29Dh
-         transient part ...
+PSP:0000 PSP                             PSP:0000 PSP
+    0100 resident code                       0100 resident code
+    06E7 Alloc0 ...... (IntTab, its          06E7 IntTab
+                        first 256 bytes)     0AE7 SavePtr .. NameBuf
+    07E7 Init00 ...... (the rest of IntTab)  0B29 WCB1sav
+         the transient  0AE7 SavePtr ..      1887 WCB2sav
+         part           0B29 WCB1sav         25E5 ComnIni
+                        1887 WCB2sav         3092 DataSav, the stack
+                        25E5 ComnIni         3192 VcStack
+                        3092 DataSav         31A0 MCB written by hand
+    3192 .............. (VcStack)            31B0 the transient part:
+         ... the rest of the                      Init00 is at offset 7E7h
+         transient part ...                       of RunPar, the PSP+29Dh
     FF42 end of the file
 ```
 

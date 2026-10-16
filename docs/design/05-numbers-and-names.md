@@ -1505,20 +1505,16 @@ AFh and E0h to F1h and kept code page 437's frames, shades and blocks
 at B0h to DFh in their places, so that programs written for American
 DOS would draw their boxes. Volkov's program takes every character
 that it draws from those places. Read out of the texts and tables of
-the source, the bytes above 7Fh that it puts on the screen are:
-
-| Bytes | Characters | Where |
-|---|---|---|
-| B0h, DBh to DFh | `░ █ ▄ ▌ ▐ ▀` | the copy's bar, marks in the panels, the tree and the editor |
-| B3h, BAh, C4h, CDh and the corners and joins | `│ ║ ─ ═ ┌ ┐ └ ┘ ╔ ╗ ╚ ╝ ├ ╟ ╢ ┴ ╤ ╧` | boxes, menus, panels, the tree |
-| F9h, FAh | `∙` `·` | the blanker's stars |
-| FBh | `√` | the tick of a menu's item |
-| FEh | `■` | the mouse's pointer on the corner that switches the panels |
-
-All are in B0h to DFh or among F8h to FBh and FEh, where the two code
-pages are the same. Below 20h, `►` and `◄` around `UP--DIR` are the
-font's own, alike in both. Every text of the program is in English,
-in ASCII.
+the source, the bytes above 7Fh that it puts on the screen are the
+frames, shades and blocks of B0h to DFh, which
+[chapter 2](02-the-screen.md#the-characters) lists with what each is
+used for, and four more: F9h `∙` and FAh `·`, the blanker's stars, FBh
+`√`, the tick of a menu's item and the mouse's pointer, and FEh `■`,
+the pointer on the corner that switches the panels. Those four are
+among F8h to FBh and FEh, where the two code pages are the same too.
+Below 20h, the pictures that the PC's font has for the control codes,
+`►` and `◄` around `UP--DIR` among them, are alike in both. Every text
+of the program is in English, in ASCII.
 
 What differs, DOS answers: the capitals of 80h to FFh through the case
 map, the small letters from it through `LowTab`, and the separators,
